@@ -79,8 +79,9 @@ describe("atomic server create authority", () => {
   const repository = new ServerRepository();
 
   it("keeps direct organization ownership locked through both inserts", async () => {
-    await expect(repository.createWithAudit(server(), audit("usr_owner")))
-      .resolves.toMatchObject({ id: "srv_1" });
+    await expect(repository.createWithAudit(server(), audit("usr_owner"))).resolves.toMatchObject({
+      id: "srv_1",
+    });
     expect(state.locks).toEqual(["share"]);
     expect(state.inserted).toHaveLength(2);
   });
@@ -90,8 +91,9 @@ describe("atomic server create authority", () => {
     { role: "member", permissions: ["manage_servers"] },
   ])("accepts delegated rights under locked membership: %j", async (membership) => {
     state.membership = membership;
-    await expect(repository.createWithAudit(server(), audit("usr_manager")))
-      .resolves.toMatchObject({ id: "srv_1" });
+    await expect(repository.createWithAudit(server(), audit("usr_manager"))).resolves.toMatchObject(
+      { id: "srv_1" },
+    );
     expect(state.locks).toEqual(["share", "share"]);
     expect(state.inserted).toHaveLength(2);
   });
@@ -103,29 +105,35 @@ describe("atomic server create authority", () => {
     { role: "developer", permissions: ["view_servers"] },
   ])("rejects absent or revoked membership before any inserts: %j", async (membership) => {
     state.membership = membership;
-    await expect(repository.createWithAudit(server(), audit("usr_manager")))
-      .rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+    await expect(repository.createWithAudit(server(), audit("usr_manager"))).rejects.toMatchObject({
+      statusCode: 403,
+      code: "FORBIDDEN",
+    });
     expect(state.locks).toEqual(["share", "share"]);
     expect(state.inserted).toHaveLength(0);
   });
 
   it("allows a platform administrator to create a server in an existing organization", async () => {
-    await expect(repository.createWithAudit(server(), audit("usr_admin"), "admin"))
-      .resolves.toMatchObject({ id: "srv_1" });
+    await expect(
+      repository.createWithAudit(server(), audit("usr_admin"), "admin"),
+    ).resolves.toMatchObject({ id: "srv_1" });
     expect(state.locks).toEqual(["share"]);
     expect(state.inserted).toHaveLength(2);
   });
 
   it("rejects nonexistent organizations and does not persist an audit", async () => {
     state.organization = null;
-    await expect(repository.createWithAudit(server(), audit("usr_manager")))
-      .rejects.toMatchObject({ statusCode: 404, code: "NOT_FOUND" });
+    await expect(repository.createWithAudit(server(), audit("usr_manager"))).rejects.toMatchObject({
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
     expect(state.inserted).toHaveLength(0);
   });
 
   it("keeps personal registrations independent from organization lookups", async () => {
-    await expect(repository.createWithAudit({ ...server(), organizationId: undefined }, audit("usr_owner")))
-      .resolves.toMatchObject({ id: "srv_1" });
+    await expect(
+      repository.createWithAudit({ ...server(), organizationId: undefined }, audit("usr_owner")),
+    ).resolves.toMatchObject({ id: "srv_1" });
     expect(state.locks).toEqual([]);
     expect(state.inserted).toHaveLength(2);
   });

@@ -10,7 +10,8 @@ export const organizationContentCopy = (locale: Locale) =>
         back: "К организации",
         author: "Автор",
         new: "Создать публикацию организации",
-        notice: "Автор и владелец организации получают уведомления о создании, правках, архивировании и решениях модерации, если включены уведомления о контенте.",
+        notice:
+          "Автор и владелец организации получают уведомления о создании, правках, архивировании и решениях модерации, если включены уведомления о контенте.",
         uncertain:
           "Не удалось подтвердить сохранение. Проверьте публикацию в редакции перед повторной отправкой.",
       }
@@ -22,7 +23,8 @@ export const organizationContentCopy = (locale: Locale) =>
         back: "Back to organization",
         author: "Author",
         new: "Create organization publication",
-        notice: "The author and organization owner receive creation, edit, archive and moderation notices when content notifications are enabled.",
+        notice:
+          "The author and organization owner receive creation, edit, archive and moderation notices when content notifications are enabled.",
         uncertain:
           "Could not confirm the save. Check the publication in the editorial workspace before submitting again.",
       };

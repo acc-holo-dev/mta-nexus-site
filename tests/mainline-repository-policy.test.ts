@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("mainline repository policy", () => {
   it("keeps maintained automation on main", () => {
@@ -21,9 +20,9 @@ describe("mainline repository policy", () => {
       .split(/^\s{4}- name: /m)
       .filter((step) => step.includes("actions/upload-artifact@"));
     expect(coordinatorArtifactUploads.length).toBeGreaterThan(0);
-    expect(coordinatorArtifactUploads.every((step) =>
-      step.includes(bestEffortArtifact)
-    )).toBe(true);
+    expect(coordinatorArtifactUploads.every((step) => step.includes(bestEffortArtifact))).toBe(
+      true,
+    );
 
     for (const path of [
       ".github/workflows/auth-browser.yml",
@@ -50,22 +49,19 @@ describe("mainline repository policy", () => {
       .sort();
 
     // PROBLEMS.md is the single maintained problem registry (owner-requested).
-    expect(documents).toEqual([
-      "ARCHITECTURE.md",
-      "OPERATIONS.md",
-      "PROBLEMS.md",
-    ]);
+    expect(documents).toEqual(["ARCHITECTURE.md", "OPERATIONS.md", "PROBLEMS.md"]);
 
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
     expect(handbook.length).toBeGreaterThanOrEqual(4);
     expect(handbook.every((name) => name.endsWith(".md"))).toBe(true);
-    expect(handbook).toEqual(expect.arrayContaining([
-      "00-README.md",
-      "11-AI-AGENT-HANDOFF.md",
-      "13-DECISION-REGISTER.md",
-      "58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md",
-      "MANIFEST-SHA256.md",
-    ]));
+    expect(handbook).toEqual(
+      expect.arrayContaining([
+        "00-README.md",
+        "10-ROADMAP.md",
+        "13-DECISION-REGISTER.md",
+        "15-AI-CONTEXT-INDEX.md",
+      ]),
+    );
 
     const readme = read("README.md");
     expect(readme).toContain("docs/handbook/00-README.md");
@@ -84,5 +80,12 @@ describe("mainline repository policy", () => {
     const readme = read("README.md");
     expect(readme).toMatch(/\*\*Active development branch:\*\* `main` only\./);
     expect(readme).not.toContain("--branch dev");
+  });
+
+  it("assigns a unique identifier to each recorded product decision", () => {
+    const register = read("docs/handbook/13-DECISION-REGISTER.md");
+    const ids = [...register.matchAll(/^\|\s*([A-Z]+-\d+)\s*\|/gm)].map((match) => match[1]);
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });

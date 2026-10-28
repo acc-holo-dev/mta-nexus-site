@@ -14,10 +14,13 @@ const profiles = new Map([
 export function installBrowserTools(profile, directory, run = spawnSync) {
   const packages = profiles.get(profile);
   if (!packages) throw new Error("Browser tool profile must be basic, a11y or agent");
-  if (typeof directory !== "string" || !isAbsolute(directory)) throw new Error("Browser tool directory must be absolute");
-  const result = run("npm", [
-    "install", "--prefix", directory, "--no-audit", "--no-fund", "--save-exact", ...packages,
-  ], { stdio: "inherit" });
+  if (typeof directory !== "string" || !isAbsolute(directory))
+    throw new Error("Browser tool directory must be absolute");
+  const result = run(
+    "npm",
+    ["install", "--prefix", directory, "--no-audit", "--no-fund", "--save-exact", ...packages],
+    { stdio: "inherit" },
+  );
   if (result.error) throw result.error;
   return result.status ?? 1;
 }

@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { getTableName, type SQL } from "drizzle-orm";
 import { PgDialect, type PgTable } from "drizzle-orm/pg-core";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -82,8 +83,16 @@ beforeEach(() => {
 });
 
 it("inserts the baseline once and does not audit a no-op rerun", async () => {
-  expect(await seedBaseline(fixtures())).toEqual({ inserted: 13, repairedBuilds: 0, repairedMedia: 0 });
-  expect(await seedBaseline(fixtures())).toEqual({ inserted: 0, repairedBuilds: 0, repairedMedia: 0 });
+  expect(await seedBaseline(fixtures())).toEqual({
+    inserted: 13,
+    repairedBuilds: 0,
+    repairedMedia: 0,
+  });
+  expect(await seedBaseline(fixtures())).toEqual({
+    inserted: 0,
+    repairedBuilds: 0,
+    repairedMedia: 0,
+  });
   expect(state.rows.audit_events).toHaveLength(1);
   expect(state.locks).toBe(2);
 });
@@ -93,20 +102,10 @@ it("ships a baseline with no auto-fetched remote media", () => {
   const remote = /^https?:\/\//iu;
   const values = [
     ...data.users.map((row) => Reflect.get(row, "avatarUrl")),
-    ...data.organizations.flatMap((row) => [
-      Reflect.get(row, "logoUrl"),
-    ]),
-    ...data.servers.flatMap((row) => [
-      Reflect.get(row, "bannerUrl"),
-      Reflect.get(row, "logoUrl"),
-    ]),
-    ...data.products.flatMap((row) => [
-      Reflect.get(row, "thumbnailUrl"),
-      ...row.screenshots,
-    ]),
-    ...data.content.map((row) =>
-      Reflect.get(row, "coverImageUrl"),
-    ),
+    ...data.organizations.flatMap((row) => [Reflect.get(row, "logoUrl")]),
+    ...data.servers.flatMap((row) => [Reflect.get(row, "bannerUrl"), Reflect.get(row, "logoUrl")]),
+    ...data.products.flatMap((row) => [Reflect.get(row, "thumbnailUrl"), ...row.screenshots]),
+    ...data.content.map((row) => Reflect.get(row, "coverImageUrl")),
   ].filter((value): value is string => typeof value === "string");
 
   expect(values.filter((value) => remote.test(value))).toEqual([]);
@@ -115,34 +114,20 @@ it("ships a baseline with no auto-fetched remote media", () => {
 it("repairs only exact legacy demo media and preserves custom replacements", async () => {
   await seedBaseline(fixtures());
 
-  const user = state.rows.users.find(
-    (row) => row.id === "usr_admin_001",
-  )!;
-  const customUser = state.rows.users.find(
-    (row) => row.id === "usr_dev_001",
-  )!;
-  const organization = state.rows.organizations.find(
-    (row) => row.id === "org_horizon",
-  )!;
-  const server = state.rows.servers.find(
-    (row) => row.id === "srv_drift_01",
-  )!;
-  const product = state.rows.products.find(
-    (row) => row.id === "prd_inv_pro",
-  )!;
-  const article = state.rows.content.find(
-    (row) => row.id === "cnt_art_001",
-  )!;
+  const user = state.rows.users.find((row) => row.id === "usr_admin_001");
+  const customUser = state.rows.users.find((row) => row.id === "usr_dev_001");
+  const organization = state.rows.organizations.find((row) => row.id === "org_horizon");
+  const server = state.rows.servers.find((row) => row.id === "srv_drift_01");
+  const product = state.rows.products.find((row) => row.id === "prd_inv_pro");
+  const article = state.rows.content.find((row) => row.id === "cnt_art_001");
+  assert.ok(user && customUser && organization && server && product && article);
 
-  user.avatarUrl =
-    "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin";
+  user.avatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin";
   customUser.avatarUrl = "https://media.example/custom.svg";
-  organization.logoUrl =
-    "https://api.dicebear.com/7.x/shapes/svg?seed=horizon-interactive";
+  organization.logoUrl = "https://api.dicebear.com/7.x/shapes/svg?seed=horizon-interactive";
   server.bannerUrl =
     "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80";
-  server.logoUrl =
-    "https://api.dicebear.com/7.x/identicon/svg?seed=sa-drift-paradise";
+  server.logoUrl = "https://api.dicebear.com/7.x/identicon/svg?seed=sa-drift-paradise";
   product.thumbnailUrl =
     "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80";
   product.screenshots = [
@@ -161,42 +146,20 @@ it("repairs only exact legacy demo media and preserves custom replacements", asy
     repairedMedia: 5,
   });
 
-  expect(
-    state.rows.users.find(
-      (row) => row.id === "usr_admin_001",
-    )?.avatarUrl,
-  ).toBeNull();
-  expect(
-    state.rows.users.find(
-      (row) => row.id === "usr_dev_001",
-    )?.avatarUrl,
-  ).toBe("https://media.example/custom.svg");
-  expect(
-    state.rows.organizations.find(
-      (row) => row.id === "org_horizon",
-    )?.logoUrl,
-  ).toBeNull();
-  expect(
-    state.rows.servers.find(
-      (row) => row.id === "srv_drift_01",
-    ),
-  ).toMatchObject({
+  expect(state.rows.users.find((row) => row.id === "usr_admin_001")?.avatarUrl).toBeNull();
+  expect(state.rows.users.find((row) => row.id === "usr_dev_001")?.avatarUrl).toBe(
+    "https://media.example/custom.svg",
+  );
+  expect(state.rows.organizations.find((row) => row.id === "org_horizon")?.logoUrl).toBeNull();
+  expect(state.rows.servers.find((row) => row.id === "srv_drift_01")).toMatchObject({
     bannerUrl: null,
     logoUrl: null,
   });
-  expect(
-    state.rows.products.find(
-      (row) => row.id === "prd_inv_pro",
-    ),
-  ).toMatchObject({
+  expect(state.rows.products.find((row) => row.id === "prd_inv_pro")).toMatchObject({
     thumbnailUrl: null,
     screenshots: [],
   });
-  expect(
-    state.rows.content.find(
-      (row) => row.id === "cnt_art_001",
-    )?.coverImageUrl,
-  ).toBeNull();
+  expect(state.rows.content.find((row) => row.id === "cnt_art_001")?.coverImageUrl).toBeNull();
   expect(state.rows.audit_events).toHaveLength(2);
 });
 

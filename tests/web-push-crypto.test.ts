@@ -1,15 +1,8 @@
 import { Buffer } from "node:buffer";
-import {
-  createECDH,
-  createPublicKey,
-  verify as verifySignature,
-} from "node:crypto";
+import { createECDH, createPublicKey, verify as verifySignature } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import type { WebPushVapidConfig } from "@nexus/config";
-import {
-  WebPushPermanentPayloadError,
-  WebPushPermanentSubscriptionError,
-} from "@nexus/db";
+import { WebPushPermanentPayloadError, WebPushPermanentSubscriptionError } from "@nexus/db";
 import {
   createVapidAuthorization,
   encryptWebPushMessage,
@@ -24,18 +17,14 @@ describe("RFC 8291 Web Push encryption", () => {
     const receiverPublic =
       "BCVxsr7N_eNgVRqvHtD0zTZsEc6-VV-JvLexhqUzORcxaOzi6-AYWXvTBHm4bjyPjs7Vd8pZGH6SRpkNtoIAiw4";
     const auth = "BTBZMqHH6r4Tts7J_aSIgg";
-    const senderPrivate =
-      "yfWPiYE-n46HLnH0KqZOF1fJJU3MYrct3AELtAQ-oRw";
+    const senderPrivate = "yfWPiYE-n46HLnH0KqZOF1fJJU3MYrct3AELtAQ-oRw";
     const salt = "DGv6ra1nlYgDCS1FRnbzlw";
     const expected =
       "DGv6ra1nlYgDCS1FRnbzlwAAEABBBP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A_yl95bQpu6cVPTpK4Mqgkf1CXztLVBSt2Ks3oZwbuwXPXLWyouBWLVWGNWQexSgSxsj_Qulcy4a-fN";
 
     const encrypted = encryptWebPushMessage(
       { p256dh: receiverPublic, auth },
-      Buffer.from(
-        "When I grow up, I want to be a watermelon",
-        "utf8",
-      ),
+      Buffer.from("When I grow up, I want to be a watermelon", "utf8"),
       {
         recordSize: 4096,
         salt: decode(salt),
@@ -50,24 +39,14 @@ describe("RFC 8291 Web Push encryption", () => {
     const receiver = createECDH("prime256v1");
     receiver.generateKeys();
     const subscription = {
-      p256dh: receiver
-        .getPublicKey(undefined, "uncompressed")
-        .toString("base64url"),
+      p256dh: receiver.getPublicKey(undefined, "uncompressed").toString("base64url"),
       auth: Buffer.alloc(16, 7).toString("base64url"),
     };
 
-    expect(
-      encryptWebPushMessage(
-        subscription,
-        Buffer.alloc(3993),
-      ),
-    ).toHaveLength(4096);
-    expect(() =>
-      encryptWebPushMessage(
-        subscription,
-        Buffer.alloc(3994),
-      ),
-    ).toThrow(WebPushPermanentPayloadError);
+    expect(encryptWebPushMessage(subscription, Buffer.alloc(3993))).toHaveLength(4096);
+    expect(() => encryptWebPushMessage(subscription, Buffer.alloc(3994))).toThrow(
+      WebPushPermanentPayloadError,
+    );
   });
 
   it("rejects a message that cannot fit the mandatory single record", () => {
@@ -77,9 +56,7 @@ describe("RFC 8291 Web Push encryption", () => {
     expect(() =>
       encryptWebPushMessage(
         {
-          p256dh: receiver
-            .getPublicKey(undefined, "uncompressed")
-            .toString("base64url"),
+          p256dh: receiver.getPublicKey(undefined, "uncompressed").toString("base64url"),
           auth: Buffer.alloc(16, 7).toString("base64url"),
         },
         Buffer.alloc(100),
@@ -111,9 +88,7 @@ describe("RFC 8292 VAPID authorization", () => {
     const privateKey = Buffer.alloc(32);
     scalar.copy(privateKey, privateKey.length - scalar.length);
     return {
-      publicKey: ecdh
-        .getPublicKey(undefined, "uncompressed")
-        .toString("base64url"),
+      publicKey: ecdh.getPublicKey(undefined, "uncompressed").toString("base64url"),
       privateKey: privateKey.toString("base64url"),
       subject: "mailto:ops@nexus.example.com",
     };
@@ -130,12 +105,9 @@ describe("RFC 8292 VAPID authorization", () => {
 
     expect(authorization.audience).toBe("https://push.example.net");
     expect(authorization.expiresAt).toBe(now + 12 * 60 * 60);
-    expect(authorization.header).toBe(
-      `vapid t=${authorization.token}, k=${config.publicKey}`,
-    );
+    expect(authorization.header).toBe(`vapid t=${authorization.token}, k=${config.publicKey}`);
 
-    const [encodedHeader, encodedClaims, encodedSignature] =
-      authorization.token.split(".");
+    const [encodedHeader, encodedClaims, encodedSignature] = authorization.token.split(".");
     expect(JSON.parse(decode(encodedHeader).toString("utf8"))).toEqual({
       typ: "JWT",
       alg: "ES256",
@@ -159,10 +131,7 @@ describe("RFC 8292 VAPID authorization", () => {
     expect(
       verifySignature(
         "sha256",
-        Buffer.from(
-          `${encodedHeader}.${encodedClaims}`,
-          "ascii",
-        ),
+        Buffer.from(`${encodedHeader}.${encodedClaims}`, "ascii"),
         {
           key: verificationKey,
           dsaEncoding: "ieee-p1363",
@@ -174,10 +143,7 @@ describe("RFC 8292 VAPID authorization", () => {
 
   it("rejects an insecure push endpoint before creating credentials", () => {
     expect(() =>
-      createVapidAuthorization(
-        "http://push.example.net/subscription",
-        vapidConfig(),
-      ),
+      createVapidAuthorization("http://push.example.net/subscription", vapidConfig()),
     ).toThrow("must use HTTPS");
   });
 });

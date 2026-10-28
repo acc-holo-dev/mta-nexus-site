@@ -46,9 +46,12 @@ export function selectMtaDirectoryPage(
     const server = servers[index];
     if ((server.players ?? 0) < minPlayers) continue;
     if (term && searchStrings) {
-      const searchable = searchStrings[index] ?? [
-        server.name, server.address, server.gameMode, server.mapName, server.version,
-      ].filter(Boolean).join(" ").toLocaleLowerCase();
+      const searchable =
+        searchStrings[index] ??
+        [server.name, server.address, server.gameMode, server.mapName, server.version]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase();
       searchStrings[index] = searchable;
       if (!searchable.includes(term)) continue;
     }

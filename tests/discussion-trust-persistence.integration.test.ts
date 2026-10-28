@@ -178,15 +178,13 @@ it("rolls back deletion, counter and notice when mandatory audit insertion fails
     item = await publication(author.id),
     message = await comment(item.id, author.id);
   const input = { ...command(message, moderator.id), slug: item.slug, reason: "Spam" };
-  await db
-    .insert(auditEvents)
-    .values({
-      id: input.auditId,
-      actorId: moderator.id,
-      action: "fixture",
-      targetType: "comment",
-      targetId: message.id,
-    });
+  await db.insert(auditEvents).values({
+    id: input.auditId,
+    actorId: moderator.id,
+    action: "fixture",
+    targetType: "comment",
+    targetId: message.id,
+  });
   await expect(management.mutate(input)).rejects.toThrow();
   expect(await db.select().from(comments).where(eq(comments.id, message.id))).toHaveLength(1);
   const [stored] = await db.select().from(content).where(eq(content.id, item.id));
@@ -233,18 +231,16 @@ it("traverses exact microsecond own-comment and public-approval keys without dup
     proofUrl: "https://private.test/evidence",
     reviewNotes: "private evidence notes",
   }));
-  await db
-    .insert(verificationRequests)
-    .values([
-      ...requests,
-      ...["pending", "rejected"].map((status) => ({
-        ...requests[0],
-        id: `vrf_${randomUUID()}`,
-        status,
-      })),
-      { ...requests[0], id: `vrf_${randomUUID()}`, resolvedAt: null },
-      { ...requests[0], id: `vrf_${randomUUID()}`, targetType: "organization" },
-    ]);
+  await db.insert(verificationRequests).values([
+    ...requests,
+    ...["pending", "rejected"].map((status) => ({
+      ...requests[0],
+      id: `vrf_${randomUUID()}`,
+      status,
+    })),
+    { ...requests[0], id: `vrf_${randomUUID()}`, resolvedAt: null },
+    { ...requests[0], id: `vrf_${randomUUID()}`, targetType: "organization" },
+  ]);
   const keys: string[] = [];
   let approvalCursor: { createdAt: string; id: string; context: string } | undefined;
   for (let i = 0; i < 4; i++) {

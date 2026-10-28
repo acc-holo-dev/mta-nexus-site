@@ -19,43 +19,30 @@ export interface SeedOptions {
 }
 
 const LEGACY_USER_AVATARS: Record<string, string> = {
-  usr_admin_001:
-    "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
-  usr_dev_001:
-    "https://api.dicebear.com/7.x/bottts/svg?seed=horizon_dev",
-  usr_server_001:
-    "https://api.dicebear.com/7.x/bottts/svg?seed=drift_king",
-  usr_player_001:
-    "https://api.dicebear.com/7.x/bottts/svg?seed=speedy_cj",
+  usr_admin_001: "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
+  usr_dev_001: "https://api.dicebear.com/7.x/bottts/svg?seed=horizon_dev",
+  usr_server_001: "https://api.dicebear.com/7.x/bottts/svg?seed=drift_king",
+  usr_player_001: "https://api.dicebear.com/7.x/bottts/svg?seed=speedy_cj",
 };
 
 const LEGACY_ORGANIZATION_LOGOS: Record<string, string> = {
-  org_horizon:
-    "https://api.dicebear.com/7.x/shapes/svg?seed=horizon-interactive",
+  org_horizon: "https://api.dicebear.com/7.x/shapes/svg?seed=horizon-interactive",
 };
 
-const LEGACY_SERVER_MEDIA: Record<
-  string,
-  { bannerUrl: string; logoUrl: string }
-> = {
+const LEGACY_SERVER_MEDIA: Record<string, { bannerUrl: string; logoUrl: string }> = {
   srv_drift_01: {
     bannerUrl:
       "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80",
-    logoUrl:
-      "https://api.dicebear.com/7.x/identicon/svg?seed=sa-drift-paradise",
+    logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=sa-drift-paradise",
   },
   srv_horizon_rp: {
     bannerUrl:
       "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80",
-    logoUrl:
-      "https://api.dicebear.com/7.x/identicon/svg?seed=horizon-roleplay",
+    logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=horizon-roleplay",
   },
 };
 
-const LEGACY_PRODUCT_MEDIA: Record<
-  string,
-  { thumbnailUrl: string; screenshot: string }
-> = {
+const LEGACY_PRODUCT_MEDIA: Record<string, { thumbnailUrl: string; screenshot: string }> = {
   prd_inv_pro: {
     thumbnailUrl:
       "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
@@ -75,15 +62,8 @@ const LEGACY_CONTENT_COVERS: Record<string, string> = {
     "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
 };
 
-function isLegacySingleScreenshot(
-  value: unknown,
-  expected: string,
-): boolean {
-  return (
-    Array.isArray(value) &&
-    value.length === 1 &&
-    value[0] === expected
-  );
+function isLegacySingleScreenshot(value: unknown, expected: string): boolean {
+  return Array.isArray(value) && value.length === 1 && value[0] === expected;
 }
 
 function assertIdentity(existing: { id: string }[], expected: { id: string }[], keys: string[]) {
@@ -126,10 +106,7 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       for (const row of existingUsers) {
         const legacy = LEGACY_USER_AVATARS[row.id];
         if (legacy && row.avatarUrl === legacy) {
-          await tx
-            .update(users)
-            .set({ avatarUrl: null })
-            .where(eq(users.id, row.id));
+          await tx.update(users).set({ avatarUrl: null }).where(eq(users.id, row.id));
           repairedMedia++;
         }
       }
@@ -157,10 +134,7 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       for (const row of existingOrganizations) {
         const legacy = LEGACY_ORGANIZATION_LOGOS[row.id];
         if (legacy && row.logoUrl === legacy) {
-          await tx
-            .update(organizations)
-            .set({ logoUrl: null })
-            .where(eq(organizations.id, row.id));
+          await tx.update(organizations).set({ logoUrl: null }).where(eq(organizations.id, row.id));
           repairedMedia++;
         }
       }
@@ -199,10 +173,7 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
           values.logoUrl = null;
         }
         if (Object.keys(values).length > 0) {
-          await tx
-            .update(servers)
-            .set(values)
-            .where(eq(servers.id, row.id));
+          await tx.update(servers).set(values).where(eq(servers.id, row.id));
           repairedMedia++;
         }
       }
@@ -237,19 +208,11 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
         if (row.thumbnailUrl === legacy.thumbnailUrl) {
           values.thumbnailUrl = null;
         }
-        if (
-          isLegacySingleScreenshot(
-            row.screenshots,
-            legacy.screenshot,
-          )
-        ) {
+        if (isLegacySingleScreenshot(row.screenshots, legacy.screenshot)) {
           values.screenshots = [];
         }
         if (Object.keys(values).length > 0) {
-          await tx
-            .update(products)
-            .set(values)
-            .where(eq(products.id, row.id));
+          await tx.update(products).set(values).where(eq(products.id, row.id));
           repairedMedia++;
         }
       }
@@ -341,10 +304,7 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       for (const row of existingContent) {
         const legacy = LEGACY_CONTENT_COVERS[row.id];
         if (legacy && row.coverImageUrl === legacy) {
-          await tx
-            .update(content)
-            .set({ coverImageUrl: null })
-            .where(eq(content.id, row.id));
+          await tx.update(content).set({ coverImageUrl: null }).where(eq(content.id, row.id));
           repairedMedia++;
         }
       }

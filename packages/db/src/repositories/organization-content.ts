@@ -91,7 +91,15 @@ class OrganizationContentRepository {
       const now = new Date();
       const [created] = await tx
         .insert(content)
-        .values({ ...data, organizationId, authorId: actorId, serverId: null, productId: null, createdAt: now, updatedAt: now })
+        .values({
+          ...data,
+          organizationId,
+          authorId: actorId,
+          serverId: null,
+          productId: null,
+          createdAt: now,
+          updatedAt: now,
+        })
         .returning();
       if (!created) throw new Error("Content insert did not return a row");
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });

@@ -20,11 +20,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -32,7 +28,6 @@ function json(
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -47,8 +42,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error:
-            "Too many login attempts. Please try again in a few minutes.",
+          error: "Too many login attempts. Please try again in a few minutes.",
         },
         429,
       );
@@ -79,11 +73,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(
-        context,
-        { error: error.message, code: error.code },
-        error.statusCode,
-      );
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
     }
 
     logRequestEvent({
@@ -96,4 +86,3 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(context, { error: "Failed to log in" }, 500);
   }
 });
-

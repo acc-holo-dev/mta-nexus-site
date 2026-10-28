@@ -36,7 +36,7 @@ module.exports = {
   ],
   options: {
     tsConfig: { fileName: "tsconfig.json" },
-    // SWC supports the project's TypeScript 7 syntax without loading an older tsc.
+    // SWC parses source; a separate TypeScript 6 supplies pre-compilation dependencies.
     parser: "swc",
     tsPreCompilationDeps: true,
     doNotFollow: { path: "node_modules" },

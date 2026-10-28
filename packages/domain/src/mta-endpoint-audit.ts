@@ -9,9 +9,10 @@ export type ServerEndpointAuditRow = Readonly<{
   isVerified?: boolean;
 }>;
 
-export type ServerEndpointAuditDetail = ServerEndpointAuditRow & Readonly<{
-  canonicalAddress: string;
-}>;
+export type ServerEndpointAuditDetail = ServerEndpointAuditRow &
+  Readonly<{
+    canonicalAddress: string;
+  }>;
 
 type EndpointGroup = {
   canonicalAddress: string;
@@ -21,14 +22,19 @@ type EndpointGroup = {
   hasDifferentOwners: boolean;
   hasMixedOwnership: boolean;
   hasVerified: boolean;
-  serverIds?: string[];
-  ownerScopes?: Set<string>;
-  verifiedServerIds?: string[];
+  details: {
+    serverIds: string[];
+    ownerScopes: Set<string>;
+    verifiedServerIds: string[];
+  } | null;
 };
 
 function ownerScope(row: ServerEndpointAuditRow): string {
-  return row.organizationId ? `organization:${row.organizationId}`
-    : row.ownerId ? `user:${row.ownerId}` : "unclaimed";
+  return row.organizationId
+    ? `organization:${row.organizationId}`
+    : row.ownerId
+      ? `user:${row.ownerId}`
+      : "unclaimed";
 }
 
 /**
@@ -55,8 +61,11 @@ export class ServerEndpointAuditCollector {
     const mixedOwnership = Boolean(row.ownerId && row.organizationId);
     if (mixedOwnership) this.mixedOwnershipRows += 1;
     if (!row.ownerId && !row.organizationId) this.unclaimedRows += 1;
-    const valid = isValidMtaAddress(canonicalAddress) &&
-      Number.isInteger(row.port) && row.port >= 1 && row.port <= 65535;
+    const valid =
+      isValidMtaAddress(canonicalAddress) &&
+      Number.isInteger(row.port) &&
+      row.port >= 1 &&
+      row.port <= 65535;
     if (!valid) {
       this.invalidCount += 1;
       if (this.includeDetails) this.invalidRows.push({ ...row, canonicalAddress });
@@ -79,11 +88,13 @@ export class ServerEndpointAuditCollector {
         hasDifferentOwners: false,
         hasMixedOwnership: mixedOwnership,
         hasVerified: Boolean(row.isVerified),
-        ...(this.includeDetails ? {
-          serverIds: [row.id],
-          ownerScopes: new Set([scope]),
-          verifiedServerIds: row.isVerified ? [row.id] : [],
-        } : {}),
+        details: this.includeDetails
+          ? {
+              serverIds: [row.id],
+              ownerScopes: new Set([scope]),
+              verifiedServerIds: row.isVerified ? [row.id] : [],
+            }
+          : null,
       });
       return;
     }
@@ -91,19 +102,17 @@ export class ServerEndpointAuditCollector {
     if (scope !== group.firstOwnerScope) group.hasDifferentOwners = true;
     if (mixedOwnership) group.hasMixedOwnership = true;
     if (row.isVerified) group.hasVerified = true;
-    if (this.includeDetails) {
-      group.serverIds!.push(row.id);
-      group.ownerScopes!.add(scope);
-      if (row.isVerified) group.verifiedServerIds!.push(row.id);
+    if (group.details) {
+      group.details.serverIds.push(row.id);
+      group.details.ownerScopes.add(scope);
+      if (row.isVerified) group.details.verifiedServerIds.push(row.id);
     }
   }
 
   result() {
     const collisions = [...this.groups.values()]
       .filter((group) => group.count > 1)
-      .sort((a, b) =>
-        a.canonicalAddress.localeCompare(b.canonicalAddress) || a.port - b.port,
-      );
+      .sort((a, b) => a.canonicalAddress.localeCompare(b.canonicalAddress) || a.port - b.port);
     return {
       summary: {
         scanned: this.scanned,
@@ -116,21 +125,24 @@ export class ServerEndpointAuditCollector {
         collisionGroupsWithOwnershipConflict: collisions.filter(
           (group) => group.hasDifferentOwners || group.hasMixedOwnership,
         ).length,
-        collisionGroupsWithVerifiedServers: collisions.filter(
-          (group) => group.hasVerified,
-        ).length,
+        collisionGroupsWithVerifiedServers: collisions.filter((group) => group.hasVerified).length,
       },
       details: {
         invalidRows: [...this.invalidRows],
         nonCanonicalRows: [...this.nonCanonicalRows],
-        collisions: this.includeDetails ? collisions.map((group) => ({
-          canonicalAddress: group.canonicalAddress,
-          port: group.port,
-          serverIds: [...group.serverIds!].sort(),
-          ownerScopes: [...group.ownerScopes!].sort(),
-          verifiedServerIds: [...group.verifiedServerIds!].sort(),
-          ownershipConflict: group.hasDifferentOwners || group.hasMixedOwnership,
-        })) : [],
+        collisions: this.includeDetails
+          ? collisions.map((group) => {
+              if (!group.details) throw new Error("Endpoint audit details are unavailable");
+              return {
+                canonicalAddress: group.canonicalAddress,
+                port: group.port,
+                serverIds: [...group.details.serverIds].sort(),
+                ownerScopes: [...group.details.ownerScopes].sort(),
+                verifiedServerIds: [...group.details.verifiedServerIds].sort(),
+                ownershipConflict: group.hasDifferentOwners || group.hasMixedOwnership,
+              };
+            })
+          : [],
       },
     };
   }

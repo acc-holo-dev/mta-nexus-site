@@ -10,14 +10,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg";
 }
 
-export function Avatar({
-  src,
-  alt,
-  fallback,
-  size = "md",
-  className,
-  ...props
-}: AvatarProps) {
+export function Avatar({ src, alt, fallback, size = "md", className, ...props }: AvatarProps) {
   const [imageFailed, setImageFailed] = React.useState(false);
 
   const sizes = {
@@ -46,9 +39,7 @@ export function Avatar({
           className="h-full w-full object-cover"
         />
       ) : (
-        <span aria-hidden="true">
-          {fallback.slice(0, 2).toUpperCase()}
-        </span>
+        <span aria-hidden="true">{fallback.slice(0, 2).toUpperCase()}</span>
       )}
     </div>
   );

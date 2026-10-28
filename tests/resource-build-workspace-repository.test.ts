@@ -201,7 +201,13 @@ it("staff history rechecks the live role", async () => {
 
 it("moderation also compares the reviewer-observed build revision under the product lock", async () => {
   const { buildRepository } = await import("../packages/db/src/repositories/builds");
-  state.rows = [[["prd_a"]], [["prd_a", "published", "usr_a", null]], [["moderator"]], [["ses_staff", "2099-01-01T00:00:00.000Z"]], []];
+  state.rows = [
+    [["prd_a"]],
+    [["prd_a", "published", "usr_a", null]],
+    [["moderator"]],
+    [["ses_staff", "2099-01-01T00:00:00.000Z"]],
+    [],
+  ];
   const audit = {
     id: "aud_review",
     actorId: "usr_staff",
@@ -210,7 +216,9 @@ it("moderation also compares the reviewer-observed build revision under the prod
     targetId: "bld_a",
     targetType: "build",
   };
-  expect(await buildRepository.moderatePending("bld_a", "approve", audit, 3, "staff-session")).toBeNull();
+  expect(
+    await buildRepository.moderatePending("bld_a", "approve", audit, 3, "staff-session"),
+  ).toBeNull();
   expect(state.queries[1].sql).toContain("for no key update");
   expect(state.queries[2].sql).toContain("for share");
   expect(state.queries[3].sql).toContain('"sessions"');

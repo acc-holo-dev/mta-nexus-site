@@ -9,14 +9,7 @@ describe("admin mutation confirmation", () => {
   };
 
   it("accepts only a matching successful command response", () => {
-    expect(
-      confirmsAdminAction(
-        200,
-        body,
-        "target_1",
-        "approve",
-      ),
-    ).toBe(true);
+    expect(confirmsAdminAction(200, body, "target_1", "approve")).toBe(true);
   });
 
   it.each([
@@ -28,13 +21,6 @@ describe("admin mutation confirmation", () => {
     [200, { ...body, targetId: "target_2" }],
     [200, { ...body, action: "reject" }],
   ])("rejects ambiguous or unrelated result %#", (status, value) => {
-    expect(
-      confirmsAdminAction(
-        status as number,
-        value,
-        "target_1",
-        "approve",
-      ),
-    ).toBe(false);
+    expect(confirmsAdminAction(status as number, value, "target_1", "approve")).toBe(false);
   });
 });

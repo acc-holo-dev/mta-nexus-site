@@ -98,8 +98,8 @@ describe("safe resource acquisition", () => {
       await entitlementRepository.hasEntitlement(
         { type: "user", id: player.id },
         freeResource.id,
-        "product.download"
-      )
+        "product.download",
+      ),
     ).toBe(true);
   });
 
@@ -118,7 +118,7 @@ describe("safe resource acquisition", () => {
 
   it("rejects a paid resource through the free claim path", async () => {
     await expect(
-      commerceService.claimFreeResource({ user: player, productId: paidResource.id })
+      commerceService.claimFreeResource({ user: player, productId: paidResource.id }),
     ).rejects.toMatchObject({ statusCode: 422 });
   });
 });

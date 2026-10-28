@@ -22,7 +22,8 @@ type StructuredLogInput = Readonly<{
   fields?: Readonly<Record<string, LogValue>>;
 }>;
 
-const blockedFieldNames = /(?:authorization|cookie|token|secret|password|email|ip|headers|body|query|url)/iu;
+const blockedFieldNames =
+  /(?:authorization|cookie|token|secret|password|email|ip|headers|body|query|url)/iu;
 const reservedFieldNames = new Set([
   "timestamp",
   "level",
@@ -61,11 +62,7 @@ export function errorLogMetadata(error: unknown): Readonly<{
     name: cleanText(error.name || "Error", 80),
   };
 
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error
-  ) {
+  if (typeof error === "object" && error !== null && "code" in error) {
     const code = (error as { code?: unknown }).code;
     if (typeof code === "string") metadata.code = cleanText(code, 80);
     if (typeof code === "number" && Number.isFinite(code)) metadata.code = code;

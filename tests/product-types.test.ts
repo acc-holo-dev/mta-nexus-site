@@ -34,9 +34,7 @@ it("keeps the forward migration and schema constraint aligned with the registry"
   const migration = readFileSync("packages/db/migrations/0024_product_type_invariant.sql", "utf8");
   const typeList = migration.match(/type IN \(([^)]+)\)/)?.[1];
   if (!typeList) throw new Error("Migration lacks type constraint");
-  const values = [...typeList.matchAll(/'([^']+)'/g)].map(
-    (match) => match[1],
-  );
+  const values = [...typeList.matchAll(/'([^']+)'/g)].map((match) => match[1]);
   expect(values).toEqual([...PRODUCT_TYPES]);
   expect(migration).toContain("WHERE type = 'tool'");
   const check = getTableConfig(products).checks.find((item) => item.name === "products_type_check");

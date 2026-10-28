@@ -15,9 +15,7 @@ const privateHeaders = {
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
   try {
-    const user = await authService.getSession(
-      request.cookies.get("nexus_session")?.value,
-    );
+    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
     if (!user) {
       return jsonWithRequestId(
         context,
@@ -26,14 +24,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const organizations = await organizationRepository.listServerManageableByUser(
-      user.id,
-    );
-    return jsonWithRequestId(
-      context,
-      { organizations },
-      { headers: privateHeaders },
-    );
+    const organizations = await organizationRepository.listServerManageableByUser(user.id);
+    return jsonWithRequestId(context, { organizations }, { headers: privateHeaders });
   } catch (error) {
     logRequestEvent({
       level: "error",

@@ -15,7 +15,10 @@ export class OrganizationRepository {
   async findServerMembershipForUser(
     organizationId: string,
     userId: string,
-  ): Promise<Pick<typeof organizationMembers.$inferSelect, "organizationId" | "role" | "permissions"> | null> {
+  ): Promise<Pick<
+    typeof organizationMembers.$inferSelect,
+    "organizationId" | "role" | "permissions"
+  > | null> {
     if (!organizationId || !userId) return null;
     const [membership] = await db
       .select({
@@ -24,10 +27,12 @@ export class OrganizationRepository {
         permissions: organizationMembers.permissions,
       })
       .from(organizationMembers)
-      .where(and(
-        eq(organizationMembers.organizationId, organizationId),
-        eq(organizationMembers.userId, userId),
-      ))
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.userId, userId),
+        ),
+      )
       .limit(1);
     return membership ?? null;
   }
@@ -48,31 +53,48 @@ export class OrganizationRepository {
         slug: organizations.slug,
       })
       .from(organizations)
-      .where(or(
-        eq(organizations.ownerId, userId),
-        exists(db.select({ id: organizationMembers.id }).from(organizationMembers).where(and(
-          eq(organizationMembers.organizationId, organizations.id),
-          eq(organizationMembers.userId, userId),
-          or(
-            eq(organizationMembers.role, "admin"),
-            and(inArray(organizationMembers.role, ["member", "developer"]), sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`),
+      .where(
+        or(
+          eq(organizations.ownerId, userId),
+          exists(
+            db
+              .select({ id: organizationMembers.id })
+              .from(organizationMembers)
+              .where(
+                and(
+                  eq(organizationMembers.organizationId, organizations.id),
+                  eq(organizationMembers.userId, userId),
+                  or(
+                    eq(organizationMembers.role, "admin"),
+                    and(
+                      inArray(organizationMembers.role, ["member", "developer"]),
+                      sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`,
+                    ),
+                  ),
+                ),
+              ),
           ),
-        ))),
-      ))
+        ),
+      )
       .orderBy(asc(organizations.name), asc(organizations.id))
       .limit(limit);
   }
 
   async searchPublic(term: string, limit = 50): Promise<Organization[]> {
     const pattern = containsPattern(term);
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
-    const rows = await db.select().from(organizations).where(or(
-      ilike(organizations.name, pattern),
-      ilike(organizations.slug, pattern),
-      ilike(organizations.description, pattern),
-    )).orderBy(desc(organizations.updatedAt), desc(organizations.id)).limit(boundedLimit);
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
+    const rows = await db
+      .select()
+      .from(organizations)
+      .where(
+        or(
+          ilike(organizations.name, pattern),
+          ilike(organizations.slug, pattern),
+          ilike(organizations.description, pattern),
+        ),
+      )
+      .orderBy(desc(organizations.updatedAt), desc(organizations.id))
+      .limit(boundedLimit);
     return rows as unknown as Organization[];
   }
 
@@ -88,10 +110,7 @@ export class OrganizationRepository {
     return rows as unknown as Organization[];
   }
 
-  async listOwnedByUser(
-    userId: string,
-    limit = 50,
-  ): Promise<Organization[]> {
+  async listOwnedByUser(userId: string, limit = 50): Promise<Organization[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 50;
@@ -104,11 +123,13 @@ export class OrganizationRepository {
   }
 
   async findById(id: string): Promise<Organization | null> {
-        const rows = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
+    const rows = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
     return (rows[0] as unknown as Organization) || null;
   }
 
-  async findSummariesByIds(ids: readonly string[]): Promise<Pick<Organization, "id" | "name" | "slug">[]> {
+  async findSummariesByIds(
+    ids: readonly string[],
+  ): Promise<Pick<Organization, "id" | "name" | "slug">[]> {
     const uniqueIds = [...new Set(ids)];
     if (!uniqueIds.length) return [];
     return db
@@ -118,7 +139,7 @@ export class OrganizationRepository {
   }
 
   async findBySlug(slug: string): Promise<Organization | null> {
-        const rows = await db.select().from(organizations).where(eq(organizations.slug, slug)).limit(1);
+    const rows = await db.select().from(organizations).where(eq(organizations.slug, slug)).limit(1);
     return (rows[0] as unknown as Organization) || null;
   }
 
@@ -138,12 +159,12 @@ export class OrganizationRepository {
       updatedAt: new Date(),
     };
 
-        const rows = await db.insert(organizations).values(values).returning();
+    const rows = await db.insert(organizations).values(values).returning();
     return rows[0] as unknown as Organization;
   }
 
   async listUserMemberships(userId: string): Promise<OrganizationMember[]> {
-        const rows = await db
+    const rows = await db
       .select()
       .from(organizationMembers)
       .where(eq(organizationMembers.userId, userId));

@@ -6,13 +6,12 @@ import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { licenseControlService } from "../../../../../lib/services/license-control-service";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
-export const POST = withBrowserMutation((
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) => {
-  return resourceCommerceRequest(request, true, async (user) => {
-    const parsed = licenseOwnerCommandSchema.safeParse(await readBoundedJson(request, 4096));
-    if (!parsed.success) throw new ValidationError("Invalid license command");
-    return licenseControlService.ownerCommand(user, (await context.params).id, parsed.data);
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (user) => {
+      const parsed = licenseOwnerCommandSchema.safeParse(await readBoundedJson(request, 4096));
+      if (!parsed.success) throw new ValidationError("Invalid license command");
+      return licenseControlService.ownerCommand(user, (await context.params).id, parsed.data);
+    });
+  },
+);

@@ -16,20 +16,14 @@ describe("server experience behavior", () => {
       },
     };
 
-    expect(
-      parseIssuedServerClaimChallenge(201, payload, "srv_1"),
-    ).toEqual({
+    expect(parseIssuedServerClaimChallenge(201, payload, "srv_1")).toEqual({
       challengeId: "sch_1",
       token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
       expiresAt: "2026-10-08T12:00:00.000Z",
     });
 
-    expect(
-      parseIssuedServerClaimChallenge(201, payload, "srv_other"),
-    ).toBeNull();
-    expect(
-      parseIssuedServerClaimChallenge(500, payload, "srv_1"),
-    ).toBeNull();
+    expect(parseIssuedServerClaimChallenge(201, payload, "srv_other")).toBeNull();
+    expect(parseIssuedServerClaimChallenge(500, payload, "srv_1")).toBeNull();
   });
 
   it("confirms ownership verification only for the issued challenge", () => {
@@ -42,15 +36,9 @@ describe("server experience behavior", () => {
       },
     };
 
-    expect(
-      confirmsServerClaimVerification(200, payload, "sch_1"),
-    ).toBe(true);
-    expect(
-      confirmsServerClaimVerification(200, payload, "sch_other"),
-    ).toBe(false);
-    expect(
-      confirmsServerClaimVerification(409, payload, "sch_1"),
-    ).toBe(false);
+    expect(confirmsServerClaimVerification(200, payload, "sch_1")).toBe(true);
+    expect(confirmsServerClaimVerification(200, payload, "sch_other")).toBe(false);
+    expect(confirmsServerClaimVerification(409, payload, "sch_1")).toBe(false);
   });
 
   it("localizes history, update, follow, claim, and management surfaces", () => {

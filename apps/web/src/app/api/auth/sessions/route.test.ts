@@ -11,28 +11,31 @@ const state = vi.hoisted(() => ({
 }));
 const revokeSession = vi.hoisted(() => vi.fn(async () => state.owned));
 const revokeOthers = vi.hoisted(() => vi.fn(async () => state.revokedCount));
-const listSessions = vi.hoisted(() => vi.fn(async () => [
-  {
-    id: "ses_current",
-    expiresAt: new Date("2030-01-01T00:00:00.000Z"),
-    ipAddress: "203.0.113.10",
-    userAgent: "Current browser",
-    createdAt: new Date("2029-01-01T00:00:00.000Z"),
-  },
-  {
-    id: "ses_other",
-    expiresAt: new Date("2030-01-02T00:00:00.000Z"),
-    ipAddress: undefined,
-    userAgent: "Other browser",
-    createdAt: new Date("2029-01-02T00:00:00.000Z"),
-  },
-]));
+const listSessions = vi.hoisted(() =>
+  vi.fn(async () => [
+    {
+      id: "ses_current",
+      expiresAt: new Date("2030-01-01T00:00:00.000Z"),
+      ipAddress: "203.0.113.10",
+      userAgent: "Current browser",
+      createdAt: new Date("2029-01-01T00:00:00.000Z"),
+    },
+    {
+      id: "ses_other",
+      expiresAt: new Date("2030-01-02T00:00:00.000Z"),
+      ipAddress: undefined,
+      userAgent: "Other browser",
+      createdAt: new Date("2029-01-02T00:00:00.000Z"),
+    },
+  ]),
+);
 
 vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
-    getSessionIdentity: vi.fn(async () => state.user
-      ? { user: state.user, sessionId: state.currentSessionId } : null),
+    getSessionIdentity: vi.fn(async () =>
+      state.user ? { user: state.user, sessionId: state.currentSessionId } : null,
+    ),
     getCurrentSessionId: vi.fn(async () => state.currentSessionId),
     revokeSession,
     revokeOtherSessions: revokeOthers,
@@ -58,7 +61,11 @@ function listRequest() {
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/auth/sessions", {
     method: "DELETE",
-    headers: { origin: "http://nexus.test", "content-type": "application/json", cookie: "nexus_session=token_owner" },
+    headers: {
+      origin: "http://nexus.test",
+      "content-type": "application/json",
+      cookie: "nexus_session=token_owner",
+    },
     body: JSON.stringify(body),
   });
 }
@@ -75,9 +82,7 @@ describe("session listing HTTP contract", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
 
     const body = await response.json();
     expect(body.sessions).toEqual([
@@ -113,9 +118,7 @@ describe("session listing HTTP contract", () => {
     const response = await GET(listRequest());
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(listSessions).not.toHaveBeenCalled();
   });
 });
@@ -131,18 +134,23 @@ describe("session revocation command matrix", () => {
   });
 
   it.each([
-    null, [], {}, { allOther: false }, { allOther: true, sessionId: "ses_other" },
-    { sessionId: "" }, { sessionId: " ".repeat(4) },
-    { sessionId: "s".repeat(129) }, { sessionId: 42 },
-    { sessionId: "ses_other", extra: true }, JSON.parse('{"__proto__":{}}'),
+    null,
+    [],
+    {},
+    { allOther: false },
+    { allOther: true, sessionId: "ses_other" },
+    { sessionId: "" },
+    { sessionId: " ".repeat(4) },
+    { sessionId: "s".repeat(129) },
+    { sessionId: 42 },
+    { sessionId: "ses_other", extra: true },
+    JSON.parse('{"__proto__":{}}'),
   ])("rejects ambiguous or invalid command %j without revoking anything", async (body) => {
     expect(parseSessionRevocation(body)).toBeNull();
     const response = await DELETE(request(body));
     expect(response.status).toBe(400);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(revokeSession).not.toHaveBeenCalled();
     expect(revokeOthers).not.toHaveBeenCalled();
   });
@@ -151,7 +159,9 @@ describe("session revocation command matrix", () => {
     const response = await DELETE(request({ sessionId: "ses_other" }));
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
-      success: true, scope: "single", sessionId: "ses_other",
+      success: true,
+      scope: "single",
+      sessionId: "ses_other",
     });
     expect(revokeSession).toHaveBeenCalledWith("usr_owner", "ses_other", "token_owner");
     expect(revokeOthers).not.toHaveBeenCalled();
@@ -173,7 +183,9 @@ describe("session revocation command matrix", () => {
   it("revokes only other sessions when requested explicitly", async () => {
     const response = await DELETE(request({ allOther: true }));
     expect(await response.json()).toEqual({
-      success: true, scope: "others", revokedCount: 2,
+      success: true,
+      scope: "others",
+      revokedCount: 2,
     });
     expect(revokeOthers).toHaveBeenCalledWith("usr_owner", "token_owner");
     expect(revokeSession).not.toHaveBeenCalled();
@@ -188,4 +200,3 @@ describe("session revocation command matrix", () => {
     expect(revokeOthers).not.toHaveBeenCalled();
   });
 });
-

@@ -20,9 +20,6 @@ export const resourceBrowserAcceptance = Object.freeze({
   }),
 });
 
-if (
-  process.argv[1] &&
-  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-) {
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   process.stdout.write(JSON.stringify(resourceBrowserAcceptance));
 }

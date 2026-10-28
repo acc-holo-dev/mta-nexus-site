@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
 
-export const DEFAULT_WEB_PUSH_HEALTH_FILE =
-  "/tmp/nexus-web-push-worker-health.json";
+export const DEFAULT_WEB_PUSH_HEALTH_FILE = "/tmp/nexus-web-push-worker-health.json";
 
 const ALERT_REASONS = [
   "delivery_disabled_with_pending_jobs",
@@ -16,15 +15,22 @@ function inRange(value, min, max) {
 
 function expectedAlertReasons(input) {
   const reasons = [];
-  if (!input.configured && input.queuePending > 0) reasons.push("delivery_disabled_with_pending_jobs");
-  if (input.queuePending * 100 >= input.queueCapacity * input.queueAlertThresholds.pendingPercent) reasons.push("capacity_pressure");
+  if (!input.configured && input.queuePending > 0)
+    reasons.push("delivery_disabled_with_pending_jobs");
+  if (input.queuePending * 100 >= input.queueCapacity * input.queueAlertThresholds.pendingPercent)
+    reasons.push("capacity_pressure");
   if (input.queueDue >= input.queueAlertThresholds.dueJobs) reasons.push("due_backlog");
-  if (input.queuePending > 0 && input.queueOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds) reasons.push("oldest_job_age");
+  if (
+    input.queuePending > 0 &&
+    input.queueOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds
+  )
+    reasons.push("oldest_job_age");
   return reasons;
 }
 
 export async function readWebPushWorkerHealthSnapshot(options = {}) {
-  const healthFile = options.healthFile || process.env.NEXUS_WEB_PUSH_HEALTH_FILE || DEFAULT_WEB_PUSH_HEALTH_FILE;
+  const healthFile =
+    options.healthFile || process.env.NEXUS_WEB_PUSH_HEALTH_FILE || DEFAULT_WEB_PUSH_HEALTH_FILE;
   const now = options.now ?? Date.now();
   const data = JSON.parse(await readFile(healthFile, "utf8"));
 
@@ -47,10 +53,13 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   });
 
   const queueStateValid =
-    [queuePending, queueDue, queueLeased, queueCapacity, queueOldestAgeSeconds]
-      .every((value) => Number.isInteger(value) && value >= 0) &&
-    queueCapacity >= 1 && queueCapacity <= 50_000 &&
-    queueDue <= queuePending && queueLeased <= queuePending &&
+    [queuePending, queueDue, queueLeased, queueCapacity, queueOldestAgeSeconds].every(
+      (value) => Number.isInteger(value) && value >= 0,
+    ) &&
+    queueCapacity >= 1 &&
+    queueCapacity <= 50_000 &&
+    queueDue <= queuePending &&
+    queueLeased <= queuePending &&
     queuePending <= queueCapacity;
 
   const thresholdsValid =
@@ -66,9 +75,12 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     !Number.isFinite(progressAt) ||
     !inRange(progressStaleAfterMs, 120_000, 600_000) ||
     progressAt > heartbeatAt + 5_000 ||
-    !Number.isSafeInteger(pid) || pid < 1 ||
-    !Number.isSafeInteger(batch) || batch < 0 ||
-    !queueStateValid || !thresholdsValid ||
+    !Number.isSafeInteger(pid) ||
+    pid < 1 ||
+    !Number.isSafeInteger(batch) ||
+    batch < 0 ||
+    !queueStateValid ||
+    !thresholdsValid ||
     now - heartbeatAt > staleAfterMs ||
     now - progressAt > progressStaleAfterMs
   ) {
@@ -76,8 +88,12 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   }
 
   const expectedReasons = expectedAlertReasons({
-    configured, queuePending, queueDue, queueCapacity,
-    queueOldestAgeSeconds, queueAlertThresholds,
+    configured,
+    queuePending,
+    queueDue,
+    queueCapacity,
+    queueOldestAgeSeconds,
+    queueAlertThresholds,
   });
   const expectedStatus = expectedReasons.length > 0 ? "alert" : "ok";
   const reasons = data?.queueAlertReasons;
@@ -85,23 +101,29 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     data?.queueAlert !== expectedStatus ||
     !Array.isArray(reasons) ||
     reasons.length !== expectedReasons.length ||
-    reasons.some((reason, index) =>
-      typeof reason !== "string" ||
-      !ALERT_REASONS.includes(reason) ||
-      reason !== expectedReasons[index]
+    reasons.some(
+      (reason, index) =>
+        typeof reason !== "string" ||
+        !ALERT_REASONS.includes(reason) ||
+        reason !== expectedReasons[index],
     )
   ) {
     throw new Error("Invalid Web Push worker alert metadata");
   }
 
   return Object.freeze({
-    configured, pid, batch,
+    configured,
+    pid,
+    batch,
     heartbeatAt: new Date(heartbeatAt).toISOString(),
     staleAfterMs,
     progressAt: new Date(progressAt).toISOString(),
     progressStaleAfterMs,
-    queuePending, queueDue, queueLeased,
-    queueCapacity, queueOldestAgeSeconds,
+    queuePending,
+    queueDue,
+    queueLeased,
+    queueCapacity,
+    queueOldestAgeSeconds,
     queueAlert: expectedStatus,
     queueAlertReasons: Object.freeze([...reasons]),
     queueAlertThresholds,

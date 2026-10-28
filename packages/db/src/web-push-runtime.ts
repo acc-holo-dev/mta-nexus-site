@@ -11,10 +11,7 @@ import { lookup as dnsLookup } from "node:dns/promises";
 import { request as httpsRequest } from "node:https";
 import { BlockList, isIP } from "node:net";
 import type { WebPushVapidConfig } from "@nexus/config";
-import {
-  isValidWebPushAuthSecret,
-  isValidWebPushP256PublicKey,
-} from "@nexus/config";
+import { isValidWebPushAuthSecret, isValidWebPushP256PublicKey } from "@nexus/config";
 
 const DEFAULT_RECORD_SIZE = 4096;
 const MAX_WEB_PUSH_BODY_BYTES = 4096;
@@ -69,9 +66,7 @@ export type WebPushResolvedAddress = {
   family: 4 | 6;
 };
 
-export type WebPushHostResolver = (
-  hostname: string,
-) => Promise<WebPushResolvedAddress[]>;
+export type WebPushHostResolver = (hostname: string) => Promise<WebPushResolvedAddress[]>;
 
 export type WebPushHttpsRequest = {
   body: Buffer;
@@ -85,9 +80,7 @@ export type WebPushHttpsRequest = {
   signal?: AbortSignal;
 };
 
-export type WebPushHttpsTransport = (
-  request: WebPushHttpsRequest,
-) => Promise<WebPushSendResult>;
+export type WebPushHttpsTransport = (request: WebPushHttpsRequest) => Promise<WebPushSendResult>;
 
 export function parseWebPushRetryAfter(
   value: string | string[] | undefined,
@@ -106,10 +99,7 @@ export function parseWebPushRetryAfter(
 
   const timestamp = Date.parse(trimmed);
   if (!Number.isFinite(timestamp)) return undefined;
-  return Math.min(
-    Math.max(0, timestamp - nowMs),
-    24 * 60 * 60 * 1_000,
-  );
+  return Math.min(Math.max(0, timestamp - nowMs), 24 * 60 * 60 * 1_000);
 }
 
 export type WebPushSendOptions = {
@@ -167,29 +157,17 @@ for (const [address, prefix] of [
   RESERVED_ADDRESSES.addSubnet(address, prefix, "ipv6");
 }
 
-function hmacSha256(
-  key: Uint8Array,
-  ...parts: Uint8Array[]
-): Buffer {
+function hmacSha256(key: Uint8Array, ...parts: Uint8Array[]): Buffer {
   const hmac = createHmac("sha256", key);
   for (const part of parts) hmac.update(part);
   return hmac.digest();
 }
 
-function hkdfExpandSingle(
-  prk: Uint8Array,
-  info: Uint8Array,
-  length: number,
-): Buffer {
+function hkdfExpandSingle(prk: Uint8Array, info: Uint8Array, length: number): Buffer {
   if (!Number.isInteger(length) || length < 1 || length > 32) {
-    throw new RangeError(
-      "Single-block HKDF length must be between 1 and 32",
-    );
+    throw new RangeError("Single-block HKDF length must be between 1 and 32");
   }
-  return hmacSha256(prk, info, Uint8Array.of(1)).subarray(
-    0,
-    length,
-  );
+  return hmacSha256(prk, info, Uint8Array.of(1)).subarray(0, length);
 }
 
 function decodeBase64Url(value: string): Buffer {
@@ -197,23 +175,14 @@ function decodeBase64Url(value: string): Buffer {
 }
 
 function base64UrlJson(value: Record<string, unknown>): string {
-  return Buffer.from(JSON.stringify(value), "utf8").toString(
-    "base64url",
-  );
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64url");
 }
 
 function normalizedHostname(url: URL): string {
-  return url.hostname
-    .replace(/^\[/u, "")
-    .replace(/\]$/u, "")
-    .replace(/\.$/u, "")
-    .toLowerCase();
+  return url.hostname.replace(/^\[/u, "").replace(/\]$/u, "").replace(/\.$/u, "").toLowerCase();
 }
 
-function boundedText(
-  value: unknown,
-  maxLength: number,
-): string | undefined {
+function boundedText(value: unknown, maxLength: number): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed ? trimmed.slice(0, maxLength) : undefined;
@@ -221,11 +190,7 @@ function boundedText(
 
 function safeNotificationTarget(value: unknown): string | undefined {
   const bounded = boundedText(value, 2048);
-  if (
-    !bounded ||
-    !bounded.startsWith("/") ||
-    bounded.startsWith("//")
-  ) {
+  if (!bounded?.startsWith("/") || bounded.startsWith("//")) {
     return undefined;
   }
   try {
@@ -245,9 +210,7 @@ export function normalizeWebPushPayload(
   const tag = boundedText(value.tag, 120);
   return {
     title: boundedText(value.title, 120) ?? "MTA NEXUS",
-    body:
-      boundedText(value.body, 280) ??
-      "You have a new notification.",
+    body: boundedText(value.body, 280) ?? "You have a new notification.",
     ...(url ? { url } : {}),
     ...(tag ? { tag } : {}),
   };
@@ -259,39 +222,25 @@ export function encryptWebPushMessage(
   options: WebPushEncryptionOptions = {},
 ): Buffer {
   if (!isValidWebPushP256PublicKey(subscription.p256dh)) {
-    throw new WebPushPermanentSubscriptionError(
-      "Invalid Web Push receiver public key",
-    );
+    throw new WebPushPermanentSubscriptionError("Invalid Web Push receiver public key");
   }
   if (!isValidWebPushAuthSecret(subscription.auth)) {
-    throw new WebPushPermanentSubscriptionError(
-      "Invalid Web Push authentication secret",
-    );
+    throw new WebPushPermanentSubscriptionError("Invalid Web Push authentication secret");
   }
 
   const recordSize = options.recordSize ?? DEFAULT_RECORD_SIZE;
-  if (
-    !Number.isInteger(recordSize) ||
-    recordSize < 18 ||
-    recordSize > 0xffff_ffff
-  ) {
+  if (!Number.isInteger(recordSize) || recordSize < 18 || recordSize > 0xffff_ffff) {
     throw new RangeError("Invalid aes128gcm record size");
   }
 
   const payload = Buffer.from(plaintext);
   if (payload.length + 1 + AES_GCM_TAG_BYTES >= recordSize) {
-    throw new WebPushPermanentPayloadError(
-      "Web Push payload does not fit one encrypted record",
-    );
+    throw new WebPushPermanentPayloadError("Web Push payload does not fit one encrypted record");
   }
 
-  const salt = options.salt
-    ? Buffer.from(options.salt)
-    : randomBytes(16);
+  const salt = options.salt ? Buffer.from(options.salt) : randomBytes(16);
   if (salt.length !== 16) {
-    throw new RangeError(
-      "Web Push salt must be exactly 16 bytes",
-    );
+    throw new RangeError("Web Push salt must be exactly 16 bytes");
   }
 
   const receiverPublic = decodeBase64Url(subscription.p256dh);
@@ -300,81 +249,41 @@ export function encryptWebPushMessage(
   if (options.senderPrivateKey) {
     const privateKey = Buffer.from(options.senderPrivateKey);
     if (privateKey.length !== 32) {
-      throw new RangeError(
-        "Web Push sender private key must be 32 bytes",
-      );
+      throw new RangeError("Web Push sender private key must be 32 bytes");
     }
     sender.setPrivateKey(privateKey);
   } else {
     sender.generateKeys();
   }
 
-  const senderPublic = sender.getPublicKey(
-    undefined,
-    "uncompressed",
-  );
+  const senderPublic = sender.getPublicKey(undefined, "uncompressed");
   const encryptedBodySize =
-    AES128GCM_HEADER_FIXED_BYTES +
-    senderPublic.length +
-    payload.length +
-    1 +
-    AES_GCM_TAG_BYTES;
+    AES128GCM_HEADER_FIXED_BYTES + senderPublic.length + payload.length + 1 + AES_GCM_TAG_BYTES;
   if (encryptedBodySize > MAX_WEB_PUSH_BODY_BYTES) {
-    throw new WebPushPermanentPayloadError(
-      "Web Push encrypted body exceeds 4096 bytes",
-    );
+    throw new WebPushPermanentPayloadError("Web Push encrypted body exceeds 4096 bytes");
   }
 
   const sharedSecret = sender.computeSecret(receiverPublic);
-  const authenticationPrk = hmacSha256(
-    authSecret,
-    sharedSecret,
-  );
-  const keyInfo = Buffer.concat([
-    WEB_PUSH_INFO,
-    Uint8Array.of(0),
-    receiverPublic,
-    senderPublic,
-  ]);
-  const inputKeyMaterial = hkdfExpandSingle(
-    authenticationPrk,
-    keyInfo,
-    32,
-  );
+  const authenticationPrk = hmacSha256(authSecret, sharedSecret);
+  const keyInfo = Buffer.concat([WEB_PUSH_INFO, Uint8Array.of(0), receiverPublic, senderPublic]);
+  const inputKeyMaterial = hkdfExpandSingle(authenticationPrk, keyInfo, 32);
   const contentPrk = hmacSha256(salt, inputKeyMaterial);
-  const contentEncryptionKey = hkdfExpandSingle(
-    contentPrk,
-    CEK_INFO,
-    16,
-  );
+  const contentEncryptionKey = hkdfExpandSingle(contentPrk, CEK_INFO, 16);
   const nonce = hkdfExpandSingle(contentPrk, NONCE_INFO, 12);
 
-  const cipher = createCipheriv(
-    "aes-128-gcm",
-    contentEncryptionKey,
-    nonce,
-  );
+  const cipher = createCipheriv("aes-128-gcm", contentEncryptionKey, nonce);
   const ciphertext = Buffer.concat([
-    cipher.update(
-      Buffer.concat([payload, Uint8Array.of(0x02)]),
-    ),
+    cipher.update(Buffer.concat([payload, Uint8Array.of(0x02)])),
     cipher.final(),
   ]);
   const tag = cipher.getAuthTag();
 
-  const header = Buffer.allocUnsafe(
-    AES128GCM_HEADER_FIXED_BYTES,
-  );
+  const header = Buffer.allocUnsafe(AES128GCM_HEADER_FIXED_BYTES);
   salt.copy(header, 0);
   header.writeUInt32BE(recordSize, 16);
   header[20] = senderPublic.length;
 
-  return Buffer.concat([
-    header,
-    senderPublic,
-    ciphertext,
-    tag,
-  ]);
+  return Buffer.concat([header, senderPublic, ciphertext, tag]);
 }
 
 export function createVapidAuthorization(
@@ -415,14 +324,10 @@ export function createVapidAuthorization(
     sub: config.subject,
   });
   const signingInput = `${encodedHeader}.${encodedClaims}`;
-  const signature = signJwt(
-    "sha256",
-    Buffer.from(signingInput, "ascii"),
-    {
-      key: signingKey,
-      dsaEncoding: "ieee-p1363",
-    },
-  ).toString("base64url");
+  const signature = signJwt("sha256", Buffer.from(signingInput, "ascii"), {
+    key: signingKey,
+    dsaEncoding: "ieee-p1363",
+  }).toString("base64url");
 
   const token = `${signingInput}.${signature}`;
   return {
@@ -436,18 +341,14 @@ export function createVapidAuthorization(
 export function parseWebPushEndpoint(value: string): URL {
   const endpoint = value.trim();
   if (!endpoint || endpoint.length > 2048) {
-    throw new WebPushPermanentSubscriptionError(
-      "Invalid Web Push endpoint",
-    );
+    throw new WebPushPermanentSubscriptionError("Invalid Web Push endpoint");
   }
 
   let url: URL;
   try {
     url = new URL(endpoint);
   } catch {
-    throw new WebPushPermanentSubscriptionError(
-      "Invalid Web Push endpoint",
-    );
+    throw new WebPushPermanentSubscriptionError("Invalid Web Push endpoint");
   }
 
   if (
@@ -457,9 +358,7 @@ export function parseWebPushEndpoint(value: string): URL {
     url.hash ||
     (url.port && url.port !== "443")
   ) {
-    throw new WebPushPermanentSubscriptionError(
-      "Unsafe Web Push endpoint",
-    );
+    throw new WebPushPermanentSubscriptionError("Unsafe Web Push endpoint");
   }
 
   const hostname = normalizedHostname(url);
@@ -472,49 +371,36 @@ export function parseWebPushEndpoint(value: string): URL {
     hostname.endsWith(".local") ||
     isIP(hostname) !== 0
   ) {
-    throw new WebPushPermanentSubscriptionError(
-      "Unsafe Web Push endpoint",
-    );
+    throw new WebPushPermanentSubscriptionError("Unsafe Web Push endpoint");
   }
 
   return url;
 }
 
-export function isPublicWebPushAddress(
-  address: string,
-): boolean {
+export function isPublicWebPushAddress(address: string): boolean {
   const family = isIP(address);
   if (family === 0) return false;
-  if (
-    family === 6 &&
-    address.toLowerCase().startsWith("::ffff:")
-  ) {
+  if (family === 6 && address.toLowerCase().startsWith("::ffff:")) {
     return false;
   }
-  return !RESERVED_ADDRESSES.check(
-    address,
-    family === 4 ? "ipv4" : "ipv6",
-  );
+  return !RESERVED_ADDRESSES.check(address, family === 4 ? "ipv4" : "ipv6");
 }
 
-export const systemWebPushHostResolver: WebPushHostResolver =
-  async (hostname) => {
-    const records = await dnsLookup(hostname, {
-      all: true,
-      verbatim: true,
-    });
-    return records
-      .filter(
-        (
-          record,
-        ): record is { address: string; family: 4 | 6 } =>
-          record.family === 4 || record.family === 6,
-      )
-      .map((record) => ({
-        address: record.address,
-        family: record.family,
-      }));
-  };
+export const systemWebPushHostResolver: WebPushHostResolver = async (hostname) => {
+  const records = await dnsLookup(hostname, {
+    all: true,
+    verbatim: true,
+  });
+  return records
+    .filter(
+      (record): record is { address: string; family: 4 | 6 } =>
+        record.family === 4 || record.family === 6,
+    )
+    .map((record) => ({
+      address: record.address,
+      family: record.family,
+    }));
+};
 
 export async function resolveWebPushTarget(
   endpoint: string,
@@ -534,9 +420,7 @@ export async function resolveWebPushTarget(
   }
   if (
     records.some(
-      (record) =>
-        isIP(record.address) !== record.family ||
-        !isPublicWebPushAddress(record.address),
+      (record) => isIP(record.address) !== record.family || !isPublicWebPushAddress(record.address),
     )
   ) {
     throw new WebPushPermanentSubscriptionError(
@@ -577,27 +461,16 @@ export function prepareWebPushRequest(
   } = {},
 ): PreparedWebPushRequest {
   const ttlSeconds = options.ttlSeconds ?? DEFAULT_TTL_SECONDS;
-  if (
-    !Number.isInteger(ttlSeconds) ||
-    ttlSeconds < 0 ||
-    ttlSeconds > 2_147_483_648
-  ) {
+  if (!Number.isInteger(ttlSeconds) || ttlSeconds < 0 || ttlSeconds > 2_147_483_648) {
     throw new RangeError("Invalid Web Push TTL");
   }
 
   const url = parseWebPushEndpoint(endpoint);
   const body = encryptWebPushMessage(
     subscription,
-    Buffer.from(
-      JSON.stringify(normalizeWebPushPayload(payload)),
-      "utf8",
-    ),
+    Buffer.from(JSON.stringify(normalizeWebPushPayload(payload)), "utf8"),
   );
-  const authorization = createVapidAuthorization(
-    endpoint,
-    config,
-    options.nowSeconds,
-  );
+  const authorization = createVapidAuthorization(endpoint, config, options.nowSeconds);
 
   return {
     body,
@@ -612,47 +485,37 @@ export function prepareWebPushRequest(
   };
 }
 
-export const sendWebPushHttpsRequest: WebPushHttpsTransport =
-  async (prepared) =>
-    await new Promise<WebPushSendResult>(
-      (resolve, reject) => {
-        const request = httpsRequest(
-          {
-            protocol: "https:",
-            hostname: prepared.connectAddress,
-            family: prepared.family,
-            port: prepared.port,
-            servername: prepared.servername,
-            path: prepared.path,
-            method: "POST",
-            headers: prepared.headers,
-            rejectUnauthorized: true,
-            signal: prepared.signal
-              ? AbortSignal.any([
-                  prepared.signal,
-                  AbortSignal.timeout(prepared.timeoutMs),
-                ])
-              : AbortSignal.timeout(prepared.timeoutMs),
-          },
-          (response) => {
-            const statusCode = response.statusCode ?? 0;
-            const retryAfterMs = parseWebPushRetryAfter(
-              response.headers["retry-after"],
-            );
-            response.destroy();
-            resolve({
-              statusCode,
-              ...(retryAfterMs !== undefined
-                ? { retryAfterMs }
-                : {}),
-            });
-          },
-        );
-
-        request.once("error", reject);
-        request.end(prepared.body);
+export const sendWebPushHttpsRequest: WebPushHttpsTransport = async (prepared) =>
+  await new Promise<WebPushSendResult>((resolve, reject) => {
+    const request = httpsRequest(
+      {
+        protocol: "https:",
+        hostname: prepared.connectAddress,
+        family: prepared.family,
+        port: prepared.port,
+        servername: prepared.servername,
+        path: prepared.path,
+        method: "POST",
+        headers: prepared.headers,
+        rejectUnauthorized: true,
+        signal: prepared.signal
+          ? AbortSignal.any([prepared.signal, AbortSignal.timeout(prepared.timeoutMs)])
+          : AbortSignal.timeout(prepared.timeoutMs),
+      },
+      (response) => {
+        const statusCode = response.statusCode ?? 0;
+        const retryAfterMs = parseWebPushRetryAfter(response.headers["retry-after"]);
+        response.destroy();
+        resolve({
+          statusCode,
+          ...(retryAfterMs !== undefined ? { retryAfterMs } : {}),
+        });
       },
     );
+
+    request.once("error", reject);
+    request.end(prepared.body);
+  });
 
 export function createWebPushHttpSender(
   config: WebPushVapidConfig,
@@ -664,35 +527,20 @@ export function createWebPushHttpSender(
     nowSeconds?: () => number;
   } = {},
 ): WebPushSender {
-  const resolver =
-    options.resolver ?? systemWebPushHostResolver;
-  const transport =
-    options.transport ?? sendWebPushHttpsRequest;
+  const resolver = options.resolver ?? systemWebPushHostResolver;
+  const transport = options.transport ?? sendWebPushHttpsRequest;
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
-  if (
-    !Number.isInteger(timeoutMs) ||
-    timeoutMs < 250 ||
-    timeoutMs > 60_000
-  ) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 250 || timeoutMs > 60_000) {
     throw new RangeError("Invalid Web Push timeout");
   }
 
   return async (subscription, payload, sendOptions) => {
-    const target = await resolveWebPushTarget(
-      subscription.endpoint,
-      resolver,
-    );
-    const prepared = prepareWebPushRequest(
-      target.url.toString(),
-      subscription,
-      payload,
-      config,
-      {
-        ttlSeconds: options.ttlSeconds,
-        nowSeconds: options.nowSeconds?.(),
-      },
-    );
+    const target = await resolveWebPushTarget(subscription.endpoint, resolver);
+    const prepared = prepareWebPushRequest(target.url.toString(), subscription, payload, config, {
+      ttlSeconds: options.ttlSeconds,
+      nowSeconds: options.nowSeconds?.(),
+    });
 
     return await transport({
       body: prepared.body,

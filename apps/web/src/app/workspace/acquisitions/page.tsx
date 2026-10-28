@@ -52,7 +52,9 @@ export default async function AcquisitionHistoryPage({
           {copy.library}
         </Link>
         <h1 className="font-display text-primary">{copy.history}</h1>
-        <Link href="/workspace/acquisitions/receipts" className="text-accent underline">{resourceCartReceiptsCopy(locale).title}</Link>
+        <Link href="/workspace/acquisitions/receipts" className="text-accent underline">
+          {resourceCartReceiptsCopy(locale).title}
+        </Link>
         <p className="max-w-3xl text-sm text-secondary" role="note">
           {copy.historyNote}
         </p>

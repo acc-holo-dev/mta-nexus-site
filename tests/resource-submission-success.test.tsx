@@ -24,29 +24,18 @@ describe("resource submission success state", () => {
     "describes moderator review instead of claiming publication in %s",
     (locale) => {
       const html = renderToStaticMarkup(
-        <ResourceSubmissionSuccess
-          resultId="prd_review"
-          locale={locale}
-        />,
+        <ResourceSubmissionSuccess resultId="prd_review" locale={locale} />,
       );
       const copy = getDictionary(locale).publishing;
 
       expect(html).toContain(copy.submittedTitle);
       expect(html).toContain(copy.submittedDescription);
-      expect(html).toContain(
-        'href="/workspace/resources/prd_review"',
-      );
+      expect(html).toContain('href="/workspace/resources/prd_review"');
       if (locale === "en") {
-        expect(copy.submittedTitle).toBe(
-          "Resource submitted for review",
-        );
-        expect(copy.submittedDescription).toContain(
-          "moderator approval",
-        );
+        expect(copy.submittedTitle).toBe("Resource submitted for review");
+        expect(copy.submittedDescription).toContain("moderator approval");
       } else {
-        expect(copy.submittedDescription).toContain(
-          "одобрения модератора",
-        );
+        expect(copy.submittedDescription).toContain("одобрения модератора");
       }
       expect(html).not.toContain("Resource published");
       expect(html).not.toContain("Ресурс опубликован");

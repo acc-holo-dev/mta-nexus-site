@@ -45,7 +45,7 @@ Require block/mute, message requests, rate limits, reports, attachment safety an
 Prefer weekly active community members, returning users, meaningful sessions, answered threads, discovery conversion, creator retention and successful updates/purchases over raw page views.
 
 
-## 9. Round 3 community ownership and moderation
+## 9. community ownership and moderation
 
 ### 9.1 Managed spaces
 
@@ -72,7 +72,7 @@ DECISION: new/low-trust accounts receive progressive limits for DMs, topics, com
 
 Target notification channels: in-app, email, Web Push, Telegram and Discord. Integrations must respect user preferences, rate limits and security/privacy policy.
 
-## 18. Round 4 social scope
+## 18. social scope
 
 К первой коммерческой версии нужны:
 
@@ -98,7 +98,7 @@ Trust/verification badges и platform enforcement labels не смешивают
 Пользователь может отключить personalization и получить neutral recent/trending/filter-based experience.
 
 
-## Round 9 owner sync — content moderation by trust
+## content moderation by trust
 
 The content system uses progressive moderation rather than one policy for every author:
 

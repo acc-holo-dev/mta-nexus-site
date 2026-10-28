@@ -14,9 +14,7 @@ const state = vi.hoisted(() => ({
   allowed: true,
 }));
 
-const getSession = vi.hoisted(() =>
-  vi.fn(async () => state.user),
-);
+const getSession = vi.hoisted(() => vi.fn(async () => state.user));
 const getSessionIdentity = vi.hoisted(() =>
   vi.fn(async () => (state.user ? { user: state.user, sessionId: "ses_context" } : null)),
 );
@@ -59,9 +57,12 @@ const findOrganization = vi.hoisted(() =>
   ),
 );
 const findSummaries = vi.hoisted(() =>
-  vi.fn(async (ids: readonly string[]): Promise<Array<{ id: string; name: string; slug: string }>> => ids
-    .filter(id => id === "org_member")
-    .map(id => ({ id, name: "Member Org", slug: "member-org" }))),
+  vi.fn(
+    async (ids: readonly string[]): Promise<Array<{ id: string; name: string; slug: string }>> =>
+      ids
+        .filter((id) => id === "org_member")
+        .map((id) => ({ id, name: "Member Org", slug: "member-org" })),
+  ),
 );
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -87,45 +88,32 @@ vi.mock("@nexus/security", () => ({
   })),
 }));
 
-import {
-  GET,
-  POST,
-} from "../apps/web/src/app/api/auth/context/route";
+import { GET, POST } from "../apps/web/src/app/api/auth/context/route";
 
 function getRequest() {
-  return new NextRequest(
-    "https://nexus.test/api/auth/context",
-    {
-      headers: {
-        cookie: "nexus_session=context-token",
-      },
+  return new NextRequest("https://nexus.test/api/auth/context", {
+    headers: {
+      cookie: "nexus_session=context-token",
     },
-  );
+  });
 }
 
 function postRequest(body: unknown) {
-  return new NextRequest(
-    "https://nexus.test/api/auth/context",
-    {
-      method: "POST",
-      headers: {
-        origin: "https://nexus.test",
-        "content-type": "application/json",
-        cookie: "nexus_session=context-token",
-      },
-      body: JSON.stringify(body),
+  return new NextRequest("https://nexus.test/api/auth/context", {
+    method: "POST",
+    headers: {
+      origin: "https://nexus.test",
+      "content-type": "application/json",
+      cookie: "nexus_session=context-token",
     },
-  );
+    body: JSON.stringify(body),
+  });
 }
 
 function expectPrivateCorrelation(response: Response) {
-  expect(response.headers.get("cache-control")).toBe(
-    "private, no-store",
-  );
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
-  expect(response.headers.get("x-request-id")).toMatch(
-    /^[0-9a-f-]{20,}$/u,
-  );
+  expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 describe("account context switching HTTP contract", () => {
@@ -169,52 +157,75 @@ describe("account context switching HTTP contract", () => {
         },
       ],
     });
-    expect(owned).toHaveBeenCalledWith(
-      "usr_context",
-      50,
-    );
+    expect(owned).toHaveBeenCalledWith("usr_context", 50);
     expect(findOrganization).not.toHaveBeenCalled();
     expect(findSummaries).toHaveBeenCalledExactlyOnceWith(["org_member"]);
   });
 
-  it.each([0, 1, 50])("reads at most the remaining context capacity with %s owned organizations", async ownerCount => {
-    owned.mockResolvedValueOnce(Array.from({ length: ownerCount }, (_, index) => ({
-      id: `org_owned_${index}`, name: `Owned ${index}`, slug: `owned-${index}`,
-    })));
-    const memberRows = Array.from({ length: 100 }, (_, index) => ({
-      organizationId: `org_member_${index}`, role: index % 2 ? "member" : "admin",
-    }));
-    memberships.mockResolvedValueOnce([
-      ...Array.from({ length: ownerCount }, (_, index) => ({
-        organizationId: `org_owned_${index}`, role: "member",
-      })),
-      ...memberRows,
-    ]);
-    const selected = memberRows.slice(0, 50 - ownerCount);
-    if (selected.length) findSummaries.mockResolvedValueOnce(selected.map(row => ({
-      id: row.organizationId, name: row.organizationId, slug: row.organizationId,
-    })).reverse());
+  it.each([0, 1, 50])(
+    "reads at most the remaining context capacity with %s owned organizations",
+    async (ownerCount) => {
+      owned.mockResolvedValueOnce(
+        Array.from({ length: ownerCount }, (_, index) => ({
+          id: `org_owned_${index}`,
+          name: `Owned ${index}`,
+          slug: `owned-${index}`,
+        })),
+      );
+      const memberRows = Array.from({ length: 100 }, (_, index) => ({
+        organizationId: `org_member_${index}`,
+        role: index % 2 ? "member" : "admin",
+      }));
+      memberships.mockResolvedValueOnce([
+        ...Array.from({ length: ownerCount }, (_, index) => ({
+          organizationId: `org_owned_${index}`,
+          role: "member",
+        })),
+        ...memberRows,
+      ]);
+      const selected = memberRows.slice(0, 50 - ownerCount);
+      if (selected.length)
+        findSummaries.mockResolvedValueOnce(
+          selected
+            .map((row) => ({
+              id: row.organizationId,
+              name: row.organizationId,
+              slug: row.organizationId,
+            }))
+            .reverse(),
+        );
 
-    const response = await GET(getRequest());
-    const body = await response.json();
-    expect(response.status).toBe(200);
-    expectPrivateCorrelation(response);
-    expect(body.contexts).toHaveLength(51);
-    expect(body.contexts.slice(1, ownerCount + 1)).toEqual(
-      Array.from({ length: ownerCount }, (_, index) => expect.objectContaining({
-        id: `org_owned_${index}`, role: "owner",
-      })),
-    );
-    expect(body.contexts.slice(ownerCount + 1)).toEqual(selected.map(row => expect.objectContaining({
-      id: row.organizationId, role: row.role,
-    })));
-    expect(findOrganization).not.toHaveBeenCalled();
-    if (selected.length) {
-      expect(findSummaries).toHaveBeenCalledExactlyOnceWith(selected.map(row => row.organizationId));
-    } else {
-      expect(findSummaries).not.toHaveBeenCalled();
-    }
-  });
+      const response = await GET(getRequest());
+      const body = await response.json();
+      expect(response.status).toBe(200);
+      expectPrivateCorrelation(response);
+      expect(body.contexts).toHaveLength(51);
+      expect(body.contexts.slice(1, ownerCount + 1)).toEqual(
+        Array.from({ length: ownerCount }, (_, index) =>
+          expect.objectContaining({
+            id: `org_owned_${index}`,
+            role: "owner",
+          }),
+        ),
+      );
+      expect(body.contexts.slice(ownerCount + 1)).toEqual(
+        selected.map((row) =>
+          expect.objectContaining({
+            id: row.organizationId,
+            role: row.role,
+          }),
+        ),
+      );
+      expect(findOrganization).not.toHaveBeenCalled();
+      if (selected.length) {
+        expect(findSummaries).toHaveBeenCalledExactlyOnceWith(
+          selected.map((row) => row.organizationId),
+        );
+      } else {
+        expect(findSummaries).not.toHaveBeenCalled();
+      }
+    },
+  );
 
   it("omits missing membership organizations and falls back from a removed context", async () => {
     state.user = { id: "usr_context", displayName: "Context User", activeContextId: "org_missing" };
@@ -226,7 +237,9 @@ describe("account context switching HTTP contract", () => {
     const body = await response.json();
     expect(body.activeContextId).toBe("personal");
     expect(body.contexts.map((context: { id: string }) => context.id)).toEqual([
-      "personal", "org_owned", "org_member",
+      "personal",
+      "org_owned",
+      "org_member",
     ]);
     expect(findSummaries).toHaveBeenCalledExactlyOnceWith(["org_member", "org_missing"]);
   });
@@ -236,7 +249,9 @@ describe("account context switching HTTP contract", () => {
     const response = await GET(getRequest());
     expect(response.status).toBe(503);
     expectPrivateCorrelation(response);
-    await expect(response.json()).resolves.toEqual({ error: "Account contexts are temporarily unavailable." });
+    await expect(response.json()).resolves.toEqual({
+      error: "Account contexts are temporarily unavailable.",
+    });
   });
 
   it("falls back to personal if the saved context is no longer available", async () => {
@@ -276,18 +291,14 @@ describe("account context switching HTTP contract", () => {
     expect(switchContext).not.toHaveBeenCalled();
 
     state.allowed = false;
-    const limited = await POST(
-      postRequest({ contextId: "org_member" }),
-    );
+    const limited = await POST(postRequest({ contextId: "org_member" }));
     expect(limited.status).toBe(429);
     expectPrivateCorrelation(limited);
     expect(switchContext).not.toHaveBeenCalled();
   });
 
   it("returns the authoritative switched context with request correlation", async () => {
-    const response = await POST(
-      postRequest({ contextId: "org_member" }),
-    );
+    const response = await POST(postRequest({ contextId: "org_member" }));
 
     expect(response.status).toBe(200);
     expectPrivateCorrelation(response);
@@ -298,11 +309,7 @@ describe("account context switching HTTP contract", () => {
     expect(getSessionIdentity).toHaveBeenCalledOnce();
     expect(getSessionIdentity).toHaveBeenCalledWith("context-token");
     expect(getSession).not.toHaveBeenCalled();
-    expect(switchContext).toHaveBeenCalledWith(
-      "usr_context",
-      "org_member",
-      "context-token",
-    );
+    expect(switchContext).toHaveBeenCalledWith("usr_context", "org_member", "context-token");
   });
 
   it("does not switch context without a session identity", async () => {
@@ -314,4 +321,3 @@ describe("account context switching HTTP contract", () => {
     expect(switchContext).not.toHaveBeenCalled();
   });
 });
-

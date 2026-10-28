@@ -81,14 +81,12 @@ beforeEach(() => {
   state.command.mockReset().mockResolvedValue({ plan: {} });
   state.adminPage.mockReset().mockResolvedValue({ plans: [] });
   state.detail.mockReset().mockResolvedValue({ attempts: [], canCancel: false });
-  state.cancel
-    .mockReset()
-    .mockResolvedValue({
-      kind: "unpaid_order_cancelled",
-      orderId: "ord_a",
-      requestId: cancellation.requestId,
-      cancelledAt: new Date("2026-10-10T12:00:00.001Z"),
-    });
+  state.cancel.mockReset().mockResolvedValue({
+    kind: "unpaid_order_cancelled",
+    orderId: "ord_a",
+    requestId: cancellation.requestId,
+    cancelledAt: new Date("2026-10-10T12:00:00.001Z"),
+  });
 });
 it("serves a bounded public catalog without a session", async () => {
   state.user = null;

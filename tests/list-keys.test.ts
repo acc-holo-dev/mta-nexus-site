@@ -5,7 +5,7 @@ const keyed = (items: string[]) => withOccurrenceKeys(items, (item) => item);
 
 describe("value-list occurrence keys", () => {
   it("preserves duplicate and empty values without key collisions", () => {
-    const input = ["", "same", "same", "", 'same-1', '["same",1]'];
+    const input = ["", "same", "same", "", "same-1", '["same",1]'];
     const result = keyed(input);
     expect(result.map(({ item }) => item)).toEqual(input);
     expect(new Set(result.map(({ key }) => key)).size).toBe(input.length);

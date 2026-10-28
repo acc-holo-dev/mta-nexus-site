@@ -23,8 +23,14 @@ vi.mock("../packages/db/src/client", () => ({
       const query = {
         from: () => query,
         where: () => query,
-        orderBy(...fields: SQL[]) { capture.order = fields; return query; },
-        limit(limit: number) { capture.limit = limit; return Promise.resolve([]); },
+        orderBy(...fields: SQL[]) {
+          capture.order = fields;
+          return query;
+        },
+        limit(limit: number) {
+          capture.limit = limit;
+          return Promise.resolve([]);
+        },
       };
       return query;
     },
@@ -34,7 +40,11 @@ import { ServerRepository } from "../packages/db/src/repositories/servers";
 
 const dialect = new PgDialect();
 const repository = new ServerRepository();
-beforeEach(() => { capture.values = null; capture.order = []; capture.limit = 0; });
+beforeEach(() => {
+  capture.values = null;
+  capture.order = [];
+  capture.limit = 0;
+});
 
 describe("server endpoint update SQL", () => {
   it("does not touch live fields for a profile-only update", async () => {
@@ -47,7 +57,8 @@ describe("server endpoint update SQL", () => {
 
   it("uses atomic IS DISTINCT FROM checks on IP and port edits", async () => {
     await repository.update("srv_test", {
-      ipAddress: "example.com", port: 22003,
+      ipAddress: "example.com",
+      port: 22003,
     });
     const values = capture.values ?? {};
     for (const field of ["currentPlayers", "lastObservedAt", "observationSource", "maxPlayers"]) {
@@ -62,7 +73,8 @@ describe("server endpoint update SQL", () => {
 
   it("preserves an explicitly supplied owner capacity when endpoint changes", async () => {
     await repository.update("srv_test", {
-      port: 22004, maxPlayers: 128,
+      port: 22004,
+      maxPlayers: 128,
     });
     expect(capture.values?.maxPlayers).toBe(128);
     expect(capture.values).toHaveProperty("currentPlayers");
@@ -71,7 +83,7 @@ describe("server endpoint update SQL", () => {
   it("uses a stable unique ID sort for bounded public listings", async () => {
     await repository.listActivePublic(25);
     expect(capture.limit).toBe(25);
-    expect(capture.order.map(column => dialect.sqlToQuery(column).sql)).toEqual([
+    expect(capture.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
       '"servers"."updated_at" desc',
       '"servers"."id" desc',
     ]);

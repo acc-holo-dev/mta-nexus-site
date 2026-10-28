@@ -6,7 +6,7 @@ describe("social API hardening", () => {
   it("turns malformed abuse-report bodies into a validation response", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/reports/route.ts"),
-      "utf8"
+      "utf8",
     );
 
     expect(route).toContain("request.json().catch(() => null)");

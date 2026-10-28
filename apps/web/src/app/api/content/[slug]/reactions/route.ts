@@ -28,19 +28,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     true,
   );
 }
-export const PUT = withBrowserMutation(async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
-  return userPlatformApi(
-    request,
-    async (actor) => {
-      validQuery(request);
-      if (!(await consumeRateLimit("contentReaction", actor.id)).success)
-        throw new RateLimitExceededError();
-      requireServerJsonContentType(request);
-      const parsed = reactionCommandSchema.safeParse(await readBoundedJson(request, 4 * 1024));
-      if (!parsed.success) throw new AppError("Invalid reaction", 400, "VALIDATION_ERROR");
-      return contentReactionService.set(actor, (await params).slug, parsed.data.reaction);
-    },
-    200,
-    reactionError,
-  );
-});
+export const PUT = withBrowserMutation(
+  async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
+    return userPlatformApi(
+      request,
+      async (actor) => {
+        validQuery(request);
+        if (!(await consumeRateLimit("contentReaction", actor.id)).success)
+          throw new RateLimitExceededError();
+        requireServerJsonContentType(request);
+        const parsed = reactionCommandSchema.safeParse(await readBoundedJson(request, 4 * 1024));
+        if (!parsed.success) throw new AppError("Invalid reaction", 400, "VALIDATION_ERROR");
+        return contentReactionService.set(actor, (await params).slug, parsed.data.reaction);
+      },
+      200,
+      reactionError,
+    );
+  },
+);

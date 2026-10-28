@@ -14,27 +14,46 @@ const captured = vi.hoisted(() => ({
 
 vi.mock("../packages/db/src/client", () => ({
   db: {
-    transaction: async (run: (tx: unknown) => Promise<unknown>) => run({
-      execute: async (statement: SQL) => { captured.lock = statement; },
-      select: () => ({ from: () => ({ where: (filter: SQL) => ({
-        limit: async () => { captured.filter = filter; return captured.existing ? [captured.existing] : []; },
-      }) }) }),
-      insert(table: unknown) {
-        captured.inserts.push(table);
-        return { values: () => table === reports
-          ? { returning: async () => {
-            captured.existing = { id: "rpt_1" };
-            return [captured.existing];
-          } }
-          : Promise.resolve() };
-      },
-    }),
+    transaction: async (run: (tx: unknown) => Promise<unknown>) =>
+      run({
+        execute: async (statement: SQL) => {
+          captured.lock = statement;
+        },
+        select: () => ({
+          from: () => ({
+            where: (filter: SQL) => ({
+              limit: async () => {
+                captured.filter = filter;
+                return captured.existing ? [captured.existing] : [];
+              },
+            }),
+          }),
+        }),
+        insert(table: unknown) {
+          captured.inserts.push(table);
+          return {
+            values: () =>
+              table === reports
+                ? {
+                    returning: async () => {
+                      captured.existing = { id: "rpt_1" };
+                      return [captured.existing];
+                    },
+                  }
+                : Promise.resolve(),
+          };
+        },
+      }),
     select(selection: Record<string, unknown>) {
       captured.selected = selection;
-      return { from: () => ({ where: (filter: SQL) => {
-        captured.filter = filter;
-        return Promise.resolve([{ id: "mod_1" }]);
-      } }) };
+      return {
+        from: () => ({
+          where: (filter: SQL) => {
+            captured.filter = filter;
+            return Promise.resolve([{ id: "mod_1" }]);
+          },
+        }),
+      };
     },
   },
 }));
@@ -47,12 +66,23 @@ describe("report write and notification lookup", () => {
     captured.existing = null;
     captured.inserts = [];
     const data: Omit<Report, "createdAt" | "resolvedAt"> = {
-      id: "rpt_1", reporterId: "member_1", targetType: "product", targetId: "prd_1",
-      type: "scam", reason: "An unsafe product", evidenceUrls: [], status: "open",
+      id: "rpt_1",
+      reporterId: "member_1",
+      targetType: "product",
+      targetId: "prd_1",
+      type: "scam",
+      reason: "An unsafe product",
+      evidenceUrls: [],
+      status: "open",
     };
     const audit: Omit<AuditEvent, "createdAt"> = {
-      id: "aud_1", actorId: "member_1", actorType: "user", action: "report.created",
-      targetId: "rpt_1", targetType: "report", details: {},
+      id: "aud_1",
+      actorId: "member_1",
+      actorType: "user",
+      action: "report.created",
+      targetId: "rpt_1",
+      targetType: "report",
+      details: {},
     };
     const result = await new ReportRepository().createWithAudit(data, audit);
     expect(result).toMatchObject({ report: { id: "rpt_1" }, created: true });

@@ -64,11 +64,23 @@ export async function ResourceBuildScreen({
           {copy.title} · {copy.statuses[build.status]} · {copy.revision}: {build.revision}
         </p>
       </header>
-      <Link href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`} className="text-accent underline">{resourceRequirementsCopy(locale).title}</Link>
+      <Link
+        href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`}
+        className="text-accent underline"
+      >
+        {resourceRequirementsCopy(locale).title}
+      </Link>
       {product.metadataReviewRequired && (
         <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
       )}
-      {staff && <Link href={`/admin/resources/${encodeURIComponent(productId)}/media`} className="text-accent underline">{resourceMediaCopy(locale).title}</Link>}
+      {staff && (
+        <Link
+          href={`/admin/resources/${encodeURIComponent(productId)}/media`}
+          className="text-accent underline"
+        >
+          {resourceMediaCopy(locale).title}
+        </Link>
+      )}
       {staff && (
         <section className="nexus-panel space-y-3 p-5" aria-label={publisherCopy.description}>
           <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
@@ -134,9 +146,17 @@ export async function ResourceBuildScreen({
           <p className="whitespace-pre-wrap break-words text-secondary">{build.releaseNotes}</p>
         </section>
       )}
-      <Link href={`/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`} className="text-sm text-accent underline">{buildPackageCopy(locale).inventory}</Link>
-      <BuildPackageEvidencePanel evidence={build.packageEvidence} locale={locale}
-        reportHref={`/api/${staff ? "admin/resources" : "products"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`} />
+      <Link
+        href={`/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`}
+        className="text-sm text-accent underline"
+      >
+        {buildPackageCopy(locale).inventory}
+      </Link>
+      <BuildPackageEvidencePanel
+        evidence={build.packageEvidence}
+        locale={locale}
+        reportHref={`/api/${staff ? "admin/resources" : "products"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`}
+      />
       {staff ? (
         build.status === "pending_review" &&
         product.status !== "archived" &&

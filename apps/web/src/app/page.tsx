@@ -20,10 +20,7 @@ export default async function HomePage() {
     contentService.listArticles(4),
   ]);
   const playersOnline =
-    directory?.servers.reduce(
-      (total, server) => total + (server.players ?? 0),
-      0,
-    ) ?? 0;
+    directory?.servers.reduce((total, server) => total + (server.players ?? 0), 0) ?? 0;
   const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
@@ -77,9 +74,7 @@ export default async function HomePage() {
           tone="accent"
           icon={<ServerIcon className="h-4 w-4" />}
           context={
-            directory?.isStale
-              ? dictionary.home.latestSnapshot
-              : dictionary.home.officialDirectory
+            directory?.isStale ? dictionary.home.latestSnapshot : dictionary.home.officialDirectory
           }
         />
         <StatCard
@@ -121,8 +116,7 @@ export default async function HomePage() {
                     `${server.address}:${server.port}`}
                 </div>
                 <div className="mt-4 text-sm font-semibold text-success">
-                  {server.players ?? 0} / {server.maxPlayers ?? "?"}{" "}
-                  {dictionary.home.players}
+                  {server.players ?? 0} / {server.maxPlayers ?? "?"} {dictionary.home.players}
                 </div>
               </a>
             ))}

@@ -1,9 +1,6 @@
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import { resourceDownloadUrl } from "./build-download-selection";
-import {
-  isValidDownloadSha256Header,
-  matchesDownloadedSha256,
-} from "./resource-download-sha256";
+import { isValidDownloadSha256Header, matchesDownloadedSha256 } from "./resource-download-sha256";
 
 export type DownloadFailure =
   | "signIn"
@@ -45,16 +42,23 @@ export async function fetchResourceDownload(
   };
   resetTimeout();
   try {
-    return await readResourceDownload(productId, active.signal, (received, total) => {
-      resetTimeout();
-      onProgress(received, total);
-    }, request, () => {
-      // Idle means *network* inactivity. The full Blob is already received;
-      // large SHA-256 calculations on slower devices must not trigger a
-      // spurious transfer timeout. Manual AbortSignal cancellation still works.
-      clearTimeout(timer);
-      timer = undefined;
-    }, buildId);
+    return await readResourceDownload(
+      productId,
+      active.signal,
+      (received, total) => {
+        resetTimeout();
+        onProgress(received, total);
+      },
+      request,
+      () => {
+        // Idle means *network* inactivity. The full Blob is already received;
+        // large SHA-256 calculations on slower devices must not trigger a
+        // spurious transfer timeout. Manual AbortSignal cancellation still works.
+        clearTimeout(timer);
+        timer = undefined;
+      },
+      buildId,
+    );
   } catch (error) {
     // Explicit cancellation takes precedence over a concurrent idle timeout.
     signal.throwIfAborted();
@@ -172,11 +176,7 @@ async function readResourceDownload(
   });
   // The HTTP length protects against truncation, not same-length corruption.
   // Do not hand an unverified artifact to the browser's save dialog.
-  const validHash = await matchesDownloadedSha256(
-    blob,
-    expectedSha256,
-    signal,
-  );
+  const validHash = await matchesDownloadedSha256(blob, expectedSha256, signal);
   signal.throwIfAborted();
   if (!validHash) throw new ResourceDownloadError("failed");
   const receipt = response.headers.get("X-Resource-Delivery-Id");

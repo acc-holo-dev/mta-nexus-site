@@ -5,9 +5,18 @@ import { resolve } from "node:path";
 import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
-  assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md"]), { code: false, full: false });
-  assert.deepEqual(classifyChanges(["docs/handbook/13-DECISION-REGISTER.md", "docs/handbook/deep/note.md"]), { code: false, full: false });
-  assert.deepEqual(classifyChanges(["docs/handbook/schema.sql", "docs/handbook/.config.yml"]), { code: true, full: false });
+  assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md"]), {
+    code: false,
+    full: false,
+  });
+  assert.deepEqual(
+    classifyChanges(["docs/handbook/13-DECISION-REGISTER.md", "docs/handbook/deep/note.md"]),
+    { code: false, full: false },
+  );
+  assert.deepEqual(classifyChanges(["docs/handbook/schema.sql", "docs/handbook/.config.yml"]), {
+    code: true,
+    full: false,
+  });
   assert.deepEqual(classifyChanges(["docs/migration.sql"]), { code: true, full: false });
   assert.deepEqual(classifyChanges(["compose.production.yaml"]), { code: true, full: true });
 });
@@ -40,14 +49,15 @@ test("migration, database tooling, workflow and explicit release changes run ful
 });
 test("skipped or missing required gates never report successful acceptance", () => {
   const policy = { code: true, full: true };
-  const needs = Object.fromEntries(requiredJobs(policy).map(name => [name, { result: "success" }]));
+  const needs = Object.fromEntries(
+    requiredJobs(policy).map((name) => [name, { result: "success" }]),
+  );
   assert.equal(summarizeJobs(policy, needs).status, "PASS");
   for (const result of ["skipped", "failure", "cancelled"]) {
     const invalid = { ...needs, "resource-browser": { result } };
     assert.deepEqual(summarizeJobs(policy, invalid).failedOrMissing, ["resource-browser"]);
   }
 });
-
 
 test("expensive production startup waits for core verification", () => {
   const workflow = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");

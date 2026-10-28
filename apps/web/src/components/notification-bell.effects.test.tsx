@@ -3,10 +3,12 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "./locale-context";
 import { NotificationBell } from "./notification-bell";
 
-const effects = vi.hoisted(() => [] as Array<() => void | (() => void)>);
-vi.mock("react", async importOriginal => ({
-  ...await importOriginal<typeof import("react")>(),
-  useEffect: (setup: () => void | (() => void)) => { effects.push(setup); },
+const effects = vi.hoisted(() => [] as Array<import("react").EffectCallback>);
+vi.mock("react", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("react")>()),
+  useEffect: (setup: import("react").EffectCallback) => {
+    effects.push(setup);
+  },
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 
@@ -38,7 +40,11 @@ afterEach(() => {
 function startEffects() {
   effects.length = 0;
   // Execute actual effect setup/cleanup from an SSR hook adapter. No DOM mount.
-  renderToStaticMarkup(<LocaleProvider locale="en"><NotificationBell /></LocaleProvider>);
+  renderToStaticMarkup(
+    <LocaleProvider locale="en">
+      <NotificationBell />
+    </LocaleProvider>,
+  );
   for (const setup of effects) {
     const cleanup = setup();
     if (cleanup) cleanups.push(cleanup);
@@ -50,9 +56,14 @@ it("coalesces visibility events while the actual notification GET is pending", a
   for (let count = 0; count < 10; count++) visibility.change("visible");
   await vi.advanceTimersByTimeAsync(60_000);
   expect(fetchMock).toHaveBeenCalledTimes(1);
-  expect(fetchMock).toHaveBeenCalledWith("/api/notifications?limit=6", expect.objectContaining({
-    cache: "no-store", credentials: "same-origin", signal: expect.any(AbortSignal),
-  }));
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/notifications?limit=6",
+    expect.objectContaining({
+      cache: "no-store",
+      credentials: "same-origin",
+      signal: expect.any(AbortSignal),
+    }),
+  );
 });
 
 it("cancels the actual GET signal on effect cleanup", () => {

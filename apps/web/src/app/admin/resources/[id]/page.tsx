@@ -1,4 +1,4 @@
-import {resourceRequirementsCopy} from "../../../../lib/resource-requirements-i18n";
+import { resourceRequirementsCopy } from "../../../../lib/resource-requirements-i18n";
 import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -56,8 +56,18 @@ export default async function ResourceModerationDetail({
       <p role="note" className="text-sm text-secondary">
         {copy.moderationNote}
       </p>
-      <Link href={`/admin/resources/${encodeURIComponent(id)}/media`} className="text-accent underline">{resourceMediaCopy(locale).title}</Link>
-      <Link href={`/admin/resources/${encodeURIComponent(id)}/requirements`} className="text-accent underline">{resourceRequirementsCopy(locale).title}</Link>
+      <Link
+        href={`/admin/resources/${encodeURIComponent(id)}/media`}
+        className="text-accent underline"
+      >
+        {resourceMediaCopy(locale).title}
+      </Link>
+      <Link
+        href={`/admin/resources/${encodeURIComponent(id)}/requirements`}
+        className="text-accent underline"
+      >
+        {resourceRequirementsCopy(locale).title}
+      </Link>
       <ResourceModerationControls
         key={`${id}:${product.updatedAt.toISOString()}`}
         product={{ id, status: product.status, updatedAt: product.updatedAt.toISOString() }}

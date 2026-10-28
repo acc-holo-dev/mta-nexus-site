@@ -7,9 +7,7 @@ assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert(process.env.NEXUS_BROWSER_TOOLS);
 
-const require = createRequire(
-  join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"),
-);
+const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { chromium } = require("@playwright/test");
 
 const dictionary = getDictionary("en");
@@ -36,10 +34,7 @@ try {
     assert.equal(response?.status(), 200, `${origin.name}: login route status`);
 
     await page.waitForFunction(
-      () =>
-        document
-          .querySelector("[data-theme-toggle]")
-          ?.getAttribute("data-hydrated") === "true",
+      () => document.querySelector("[data-theme-toggle]")?.getAttribute("data-hydrated") === "true",
     );
     await page
       .getByRole("button", {
@@ -71,34 +66,24 @@ try {
         exact: true,
       })
       .click();
-    await page.waitForFunction(
-      () => localStorage.getItem("nexus-theme") === "system",
-    );
+    await page.waitForFunction(() => localStorage.getItem("nexus-theme") === "system");
 
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.waitForFunction(() =>
-      document.documentElement.classList.contains("dark"),
-    );
+    await page.waitForFunction(() => document.documentElement.classList.contains("dark"));
     await page.emulateMedia({ colorScheme: "light" });
-    await page.waitForFunction(
-      () => !document.documentElement.classList.contains("dark"),
-    );
+    await page.waitForFunction(() => !document.documentElement.classList.contains("dark"));
 
-    await page.getByLabel(dictionary.auth.email, { exact: true }).fill(
-      "dev-origin-check@example.invalid",
-    );
-    await page.getByLabel(dictionary.auth.password, { exact: true }).fill(
-      "not-the-right-password",
-    );
+    await page
+      .getByLabel(dictionary.auth.email, { exact: true })
+      .fill("dev-origin-check@example.invalid");
+    await page.getByLabel(dictionary.auth.password, { exact: true }).fill("not-the-right-password");
 
     const loginResponsePromise = page.waitForResponse(
       (candidate) =>
         candidate.url() === `${origin.url}/api/auth/login` &&
         candidate.request().method() === "POST",
     );
-    await page
-      .getByRole("button", { name: dictionary.auth.signIn, exact: true })
-      .click();
+    await page.getByRole("button", { name: dictionary.auth.signIn, exact: true }).click();
     const loginResponse = await loginResponsePromise;
     assert(
       [400, 401, 403].includes(loginResponse.status()),
@@ -117,9 +102,7 @@ try {
     );
 
     await context.close();
-    process.stdout.write(
-      `PASS: ${origin.name} hydrated theme + client-side login POST\n`,
-    );
+    process.stdout.write(`PASS: ${origin.name} hydrated theme + client-side login POST\n`);
   }
 } finally {
   await browser.close();

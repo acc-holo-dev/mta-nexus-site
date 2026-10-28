@@ -65,10 +65,7 @@ export function communityTopicRequest(
   };
 }
 
-export function confirmedCommunityTopicPath(
-  status: number,
-  payload: unknown,
-): string | null {
+export function confirmedCommunityTopicPath(status: number, payload: unknown): string | null {
   if (
     status < 200 ||
     status >= 300 ||
@@ -88,11 +85,7 @@ export function confirmedCommunityTopicPath(
     return null;
   }
   const slug = (record.content as Record<string, unknown>).slug;
-  if (
-    typeof slug !== "string" ||
-    !slug.trim() ||
-    slug.length > 200
-  ) {
+  if (typeof slug !== "string" || !slug.trim() || slug.length > 200) {
     return null;
   }
   return `/articles/${encodeURIComponent(slug)}`;

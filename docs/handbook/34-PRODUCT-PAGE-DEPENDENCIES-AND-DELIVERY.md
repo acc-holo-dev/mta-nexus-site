@@ -1,6 +1,6 @@
 # MTA NEXUS — Product Page, Dependencies и Delivery
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 6.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Карточка и product page
 

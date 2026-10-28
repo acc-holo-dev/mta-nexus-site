@@ -32,26 +32,15 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
 vi.mock("../apps/web/src/components/nexus-shell", async () => {
   const ReactModule = await import("react");
   return {
-    NexusShell: ({
-      children,
-      locale,
-    }: {
-      children?: React.ReactNode;
-      locale: string;
-    }) =>
-      ReactModule.createElement(
-        "main",
-        { "data-shell-locale": locale },
-        children,
-      ),
+    NexusShell: ({ children, locale }: { children?: React.ReactNode; locale: string }) =>
+      ReactModule.createElement("main", { "data-shell-locale": locale }, children),
   };
 });
 
 vi.mock("../apps/web/src/components/pwa-service-worker", async () => {
   const ReactModule = await import("react");
   return {
-    PwaServiceWorker: () =>
-      ReactModule.createElement("span", { "data-pwa": "registered" }),
+    PwaServiceWorker: () => ReactModule.createElement("span", { "data-pwa": "registered" }),
   };
 });
 
@@ -71,9 +60,7 @@ vi.mock("next/link", async () => {
 });
 
 import RootLayout from "../apps/web/src/app/layout";
-import GlobalError, {
-  detectGlobalErrorLocale,
-} from "../apps/web/src/app/global-error";
+import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
 import ErrorPage from "../apps/web/src/app/error";
 import NotFound from "../apps/web/src/app/not-found";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
@@ -144,9 +131,7 @@ describe("Next.js root runtime shell behavior", () => {
   });
 
   it("parses the root-error locale cookie without shell context", () => {
-    expect(detectGlobalErrorLocale("foo=1; nexus_locale=ru; bar=2")).toBe(
-      "ru",
-    );
+    expect(detectGlobalErrorLocale("foo=1; nexus_locale=ru; bar=2")).toBe("ru");
     expect(detectGlobalErrorLocale("nexus_locale=en")).toBe("en");
     expect(detectGlobalErrorLocale("")).toBe("en");
   });
@@ -180,9 +165,7 @@ describe("Next.js root runtime shell behavior", () => {
       expect(html).toContain(`>${dictionary.errors.retry}</span>`);
       expect(html).toContain(`>${dictionary.errors.home}</span>`);
       expect(html).toContain('href="/"');
-      expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(
-        2,
-      );
+      expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(2);
     },
   );
 
@@ -199,9 +182,7 @@ describe("Next.js root runtime shell behavior", () => {
       expect(html).toContain(dictionary.errors.resourceLibrary);
       expect(html).toContain('href="/"');
       expect(html).toContain(dictionary.errors.home);
-      expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(
-        3,
-      );
+      expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(3);
     },
   );
 });

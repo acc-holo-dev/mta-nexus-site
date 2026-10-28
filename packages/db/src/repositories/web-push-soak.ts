@@ -30,40 +30,17 @@ function integer(
 ): number {
   const raw = env[key]?.trim();
   const value = raw ? Number(raw) : fallback;
-  if (
-    !Number.isSafeInteger(value) ||
-    value < minimum ||
-    value > maximum
-  ) {
-    throw new RangeError(
-      `${key} must be an integer between ${minimum} and ${maximum}`,
-    );
+  if (!Number.isSafeInteger(value) || value < minimum || value > maximum) {
+    throw new RangeError(`${key} must be an integer between ${minimum} and ${maximum}`);
   }
   return value;
 }
 
-export function readWebPushSoakConfig(
-  env: Record<string, string | undefined>,
-): WebPushSoakConfig {
+export function readWebPushSoakConfig(env: Record<string, string | undefined>): WebPushSoakConfig {
   return Object.freeze({
-    durationMs: integer(
-      env,
-      "NEXUS_WEB_PUSH_SOAK_DURATION_MS",
-      15 * 60 * 1_000,
-      limits.durationMs,
-    ),
-    workers: integer(
-      env,
-      "NEXUS_WEB_PUSH_SOAK_WORKERS",
-      4,
-      limits.workers,
-    ),
-    subscriptions: integer(
-      env,
-      "NEXUS_WEB_PUSH_SOAK_SUBSCRIPTIONS",
-      4,
-      limits.subscriptions,
-    ),
+    durationMs: integer(env, "NEXUS_WEB_PUSH_SOAK_DURATION_MS", 15 * 60 * 1_000, limits.durationMs),
+    workers: integer(env, "NEXUS_WEB_PUSH_SOAK_WORKERS", 4, limits.workers),
+    subscriptions: integer(env, "NEXUS_WEB_PUSH_SOAK_SUBSCRIPTIONS", 4, limits.subscriptions),
     notificationsPerWave: integer(
       env,
       "NEXUS_WEB_PUSH_SOAK_NOTIFICATIONS_PER_WAVE",
@@ -76,30 +53,15 @@ export function readWebPushSoakConfig(
       5_000,
       limits.waveIntervalMs,
     ),
-    pollMs: integer(
-      env,
-      "NEXUS_WEB_PUSH_SOAK_POLL_MS",
-      100,
-      limits.pollMs,
-    ),
+    pollMs: integer(env, "NEXUS_WEB_PUSH_SOAK_POLL_MS", 100, limits.pollMs),
     drainTimeoutMs: integer(
       env,
       "NEXUS_WEB_PUSH_SOAK_DRAIN_TIMEOUT_MS",
       2 * 60 * 1_000,
       limits.drainTimeoutMs,
     ),
-    batchLimit: integer(
-      env,
-      "NEXUS_WEB_PUSH_SOAK_BATCH_LIMIT",
-      100,
-      limits.batchLimit,
-    ),
-    retryEvery: integer(
-      env,
-      "NEXUS_WEB_PUSH_SOAK_RETRY_EVERY",
-      10,
-      limits.retryEvery,
-    ),
+    batchLimit: integer(env, "NEXUS_WEB_PUSH_SOAK_BATCH_LIMIT", 100, limits.batchLimit),
+    retryEvery: integer(env, "NEXUS_WEB_PUSH_SOAK_RETRY_EVERY", 10, limits.retryEvery),
   });
 }
 
@@ -124,9 +86,7 @@ export type WebPushSoakVerdict = Readonly<{
   failures: readonly string[];
 }>;
 
-export function evaluateWebPushSoak(
-  input: WebPushSoakVerdictInput,
-): WebPushSoakVerdict {
+export function evaluateWebPushSoak(input: WebPushSoakVerdictInput): WebPushSoakVerdict {
   const failures: string[] = [];
   if (input.durationActualMs < input.durationTargetMs) {
     failures.push("duration_shortfall");
@@ -152,10 +112,7 @@ export function evaluateWebPushSoak(
   if (input.forcedRetries < 1 || input.retried < input.forcedRetries) {
     failures.push("retry_path_not_exercised");
   }
-  if (
-    input.queueCapacity < 1 ||
-    input.maxFixturePending > input.queueCapacity
-  ) {
+  if (input.queueCapacity < 1 || input.maxFixturePending > input.queueCapacity) {
     failures.push("queue_capacity_violation");
   }
   return Object.freeze({

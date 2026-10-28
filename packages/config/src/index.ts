@@ -49,17 +49,10 @@ export function isValidWebPushP256PrivateKey(value: string): boolean {
   }
 }
 
-export function isMatchingWebPushVapidKeyPair(
-  publicKey: string,
-  privateKey: string,
-): boolean {
+export function isMatchingWebPushVapidKeyPair(publicKey: string, privateKey: string): boolean {
   const decodedPublic = decodeBase64Url(publicKey);
   const decodedPrivate = decodeBase64Url(privateKey);
-  if (
-    decodedPublic?.length !== 65 ||
-    decodedPublic[0] !== 0x04 ||
-    decodedPrivate?.length !== 32
-  ) {
+  if (decodedPublic?.length !== 65 || decodedPublic[0] !== 0x04 || decodedPrivate?.length !== 32) {
     return false;
   }
 
@@ -68,10 +61,7 @@ export function isMatchingWebPushVapidKeyPair(
     ecdh.setPrivateKey(Buffer.from(decodedPrivate));
     const derived = ecdh.getPublicKey(undefined, "uncompressed");
     const supplied = Buffer.from(decodedPublic);
-    return (
-      derived.length === supplied.length &&
-      timingSafeEqual(derived, supplied)
-    );
+    return derived.length === supplied.length && timingSafeEqual(derived, supplied);
   } catch {
     return false;
   }
@@ -174,9 +164,7 @@ function parseMtaMasterMirrorUrls(raw: string): string[] {
 export function readMtaMasterMirrorUrls(
   env: Record<string, string | undefined> = process.env,
 ): string[] {
-  return parseMtaMasterMirrorUrls(
-    env.MTA_MASTER_MIRROR_URLS ?? "",
-  );
+  return parseMtaMasterMirrorUrls(env.MTA_MASTER_MIRROR_URLS ?? "");
 }
 
 const developmentDefaults = {
@@ -213,16 +201,24 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]),
     PORT: z.coerce.number().int().positive().max(65535),
-    NEXT_PUBLIC_APP_URL: z.string().url().refine((value) => {
-      try {
-        const url = new URL(value);
-        return (url.protocol === "http:" || url.protocol === "https:") &&
-          !url.username && !url.password && url.pathname === "/" &&
-          !url.search && !url.hash;
-      } catch {
-        return false;
-      }
-    }, "Application URL must be an HTTP(S) origin without credentials, path, query or fragment"),
+    NEXT_PUBLIC_APP_URL: z
+      .string()
+      .url()
+      .refine((value) => {
+        try {
+          const url = new URL(value);
+          return (
+            (url.protocol === "http:" || url.protocol === "https:") &&
+            !url.username &&
+            !url.password &&
+            url.pathname === "/" &&
+            !url.search &&
+            !url.hash
+          );
+        } catch {
+          return false;
+        }
+      }, "Application URL must be an HTTP(S) origin without credentials, path, query or fragment"),
     DATABASE_URL: z.string().min(1),
     AUTH_SECRET: z.string().min(32),
     DISCORD_CLIENT_ID: z.string(),
@@ -280,10 +276,7 @@ export const envSchema = z
       value.WEB_PUSH_VAPID_PRIVATE_KEY &&
       !isValidWebPushP256PrivateKey(value.WEB_PUSH_VAPID_PRIVATE_KEY)
     ) {
-      addIssue(
-        "WEB_PUSH_VAPID_PRIVATE_KEY",
-        "Web Push private key must be a valid P-256 scalar",
-      );
+      addIssue("WEB_PUSH_VAPID_PRIVATE_KEY", "Web Push private key must be a valid P-256 scalar");
     }
     if (
       value.WEB_PUSH_VAPID_PUBLIC_KEY &&
@@ -300,14 +293,8 @@ export const envSchema = z
         "Web Push VAPID public and private keys must form the same P-256 key pair",
       );
     }
-    if (
-      value.WEB_PUSH_VAPID_SUBJECT &&
-      !isValidVapidSubject(value.WEB_PUSH_VAPID_SUBJECT)
-    ) {
-      addIssue(
-        "WEB_PUSH_VAPID_SUBJECT",
-        "Web Push VAPID subject must use mailto: or HTTPS",
-      );
+    if (value.WEB_PUSH_VAPID_SUBJECT && !isValidVapidSubject(value.WEB_PUSH_VAPID_SUBJECT)) {
+      addIssue("WEB_PUSH_VAPID_SUBJECT", "Web Push VAPID subject must use mailto: or HTTPS");
     }
 
     try {
@@ -315,9 +302,7 @@ export const envSchema = z
     } catch (error) {
       addIssue(
         "MTA_MASTER_MIRROR_URLS",
-        error instanceof Error
-          ? error.message
-          : "Invalid MTA master mirror configuration",
+        error instanceof Error ? error.message : "Invalid MTA master mirror configuration",
       );
     }
 
@@ -353,7 +338,10 @@ export const envSchema = z
         addIssue("NEXT_PUBLIC_APP_URL", "Production application URL cannot point to localhost");
       }
       if (value.STORAGE_PROVIDER === "local" && !value.STORAGE_LOCAL_PATH.startsWith("/")) {
-        addIssue("STORAGE_LOCAL_PATH", "Production local storage must use an absolute mounted path");
+        addIssue(
+          "STORAGE_LOCAL_PATH",
+          "Production local storage must use an absolute mounted path",
+        );
       }
       if (value.EMAIL_PROVIDER === "log") {
         addIssue("EMAIL_PROVIDER", "Production email must be disabled or use SMTP");
@@ -406,4 +394,3 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
 }
 
 export const config = getEnvConfig();
-

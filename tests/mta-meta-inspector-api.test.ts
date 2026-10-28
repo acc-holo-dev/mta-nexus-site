@@ -28,23 +28,20 @@ vi.mock("@nexus/security", () => ({
 import { POST } from "../apps/web/src/app/api/resources/inspect-meta/route";
 
 function request(
-  body = "<meta><info name=\"NEXUS\" /></meta>",
+  body = '<meta><info name="NEXUS" /></meta>',
   contentType = "text/plain; charset=utf-8",
   extraHeaders: Record<string, string> = {},
 ) {
-  const value = new NextRequest(
-    "https://nexus.test/api/resources/inspect-meta",
-    {
-      method: "POST",
-      headers: {
-        ...browserMutationHeaders(),
-        "content-type": contentType,
-        cookie: "nexus_session=test-session",
-        ...extraHeaders,
-      },
-      body,
+  const value = new NextRequest("https://nexus.test/api/resources/inspect-meta", {
+    method: "POST",
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": contentType,
+      cookie: "nexus_session=test-session",
+      ...extraHeaders,
     },
-  );
+    body,
+  });
   return value;
 }
 
@@ -100,10 +97,7 @@ describe("resource meta inspector HTTP behavior", () => {
 
     expect(response.status).toBe(429);
     expectPrivate(response);
-    expect(rate).toHaveBeenCalledWith(
-      "resourceInspection",
-      "usr_inspector",
-    );
+    expect(rate).toHaveBeenCalledWith("resourceInspection", "usr_inspector");
     expect(read).not.toHaveBeenCalled();
   });
 
@@ -115,13 +109,9 @@ describe("resource meta inspector HTTP behavior", () => {
     expectPrivate(wrongType);
     expect(unsupportedRead).not.toHaveBeenCalled();
 
-    const oversized = request(
-      "<meta />",
-      "text/plain",
-      {
-        "content-length": String(metaInspectionLimits.maxBytes + 1),
-      },
-    );
+    const oversized = request("<meta />", "text/plain", {
+      "content-length": String(metaInspectionLimits.maxBytes + 1),
+    });
     const oversizedRead = vi.spyOn(oversized, "text");
     const tooLarge = await POST(oversized);
     expect(tooLarge.status).toBe(413);
@@ -153,8 +143,6 @@ describe("resource meta inspector HTTP behavior", () => {
         serverScripts: 1,
       },
     });
-    expect(body.note).toContain(
-      "not a malware, trust, or archive-integrity verdict",
-    );
+    expect(body.note).toContain("not a malware, trust, or archive-integrity verdict");
   });
 });

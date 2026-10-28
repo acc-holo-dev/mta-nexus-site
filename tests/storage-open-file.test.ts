@@ -43,20 +43,24 @@ it("rejects directories as download objects and refuses a root-directory key", a
 });
 
 it("rejects an oversized direct provider upload before touching the filesystem", async () => {
-  await expect(storage.put(
-    "oversized-direct.zip",
-    Buffer.alloc(MAX_UPLOAD_FILE_SIZE_BYTES + 1),
-    "application/zip",
-  )).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
-  await expect(fs.stat(join(root, "oversized-direct.zip")))
-    .rejects.toMatchObject({ code: "ENOENT" });
+  await expect(
+    storage.put(
+      "oversized-direct.zip",
+      Buffer.alloc(MAX_UPLOAD_FILE_SIZE_BYTES + 1),
+      "application/zip",
+    ),
+  ).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+  await expect(fs.stat(join(root, "oversized-direct.zip"))).rejects.toMatchObject({
+    code: "ENOENT",
+  });
 });
 
 it("rejects an oversized on-disk object before expensive hashing or streaming", async () => {
   await storage.put("oversized.zip", Buffer.from("original"), "application/zip");
   await fs.truncate(join(root, "oversized.zip"), MAX_UPLOAD_FILE_SIZE_BYTES + 1);
-  await expect(storage.get("oversized.zip"))
-    .rejects.toThrow("Storage object exceeds maximum supported size");
+  await expect(storage.get("oversized.zip")).rejects.toThrow(
+    "Storage object exceeds maximum supported size",
+  );
 });
 
 it("hashes multi-chunk files without consuming the returned download stream", async () => {
@@ -82,7 +86,9 @@ it("does not open a file for an already cancelled download", async () => {
   const open = vi.spyOn(fs, "open");
   const controller = new AbortController();
   controller.abort();
-  await expect(storage.get("missing.zip", controller.signal)).rejects.toMatchObject({ name: "AbortError" });
+  await expect(storage.get("missing.zip", controller.signal)).rejects.toMatchObject({
+    name: "AbortError",
+  });
   expect(open).not.toHaveBeenCalled();
 });
 
@@ -99,14 +105,23 @@ it("stops hashing between chunks and closes the file on cancellation", async () 
     if (!String(args[0]).endsWith("/large.zip")) return handle;
     const originalRead = handle.read.bind(handle);
     const originalClose = handle.close.bind(handle);
-    vi.spyOn(handle, "read").mockImplementation(async (...readArgs: Parameters<typeof handle.read>) => {
-      const result = await originalRead(...readArgs);
-      read(); controller.abort(); return result;
+    vi.spyOn(handle, "read").mockImplementation(
+      async (...readArgs: Parameters<typeof handle.read>) => {
+        const result = await originalRead(...readArgs);
+        read();
+        controller.abort();
+        return result;
+      },
+    );
+    vi.spyOn(handle, "close").mockImplementation(async () => {
+      closed();
+      await originalClose();
     });
-    vi.spyOn(handle, "close").mockImplementation(async () => { closed(); await originalClose(); });
     return handle;
   });
-  await expect(storage.get("large.zip", controller.signal)).rejects.toMatchObject({ name: "AbortError" });
+  await expect(storage.get("large.zip", controller.signal)).rejects.toMatchObject({
+    name: "AbortError",
+  });
   expect(read).toHaveBeenCalledOnce();
   expect(closed).toHaveBeenCalledOnce();
 });
@@ -141,8 +156,9 @@ it("rejects and destroys a download cancelled inside createReadStream", async ()
     return handle;
   });
 
-  await expect(storage.get("build.zip", controller.signal))
-    .rejects.toMatchObject({ name: "AbortError" });
+  await expect(storage.get("build.zip", controller.signal)).rejects.toMatchObject({
+    name: "AbortError",
+  });
   expect(openedStream).toBeDefined();
   expect(openedStream?.destroyed).toBe(true);
 });
@@ -152,6 +168,8 @@ it("removes the request abort listener after a completed download", async () => 
   const controller = new AbortController();
   const remove = vi.spyOn(controller.signal, "removeEventListener");
   const opened = await storage.get("build.zip", controller.signal);
-  for await (const _chunk of opened.stream as Readable) { /* drain */ }
+  for await (const _chunk of opened.stream as Readable) {
+    /* drain */
+  }
   expect(remove).toHaveBeenCalledWith("abort", expect.any(Function));
 });

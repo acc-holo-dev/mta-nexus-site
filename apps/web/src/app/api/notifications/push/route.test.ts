@@ -48,12 +48,9 @@ vi.mock("../../../../lib/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(),
 }));
 
-vi.mock(
-  "../../../../lib/services/web-push-endpoint-policy",
-  () => ({
-    parseWebPushEndpoint: vi.fn((value: string) => new URL(value)),
-  }),
-);
+vi.mock("../../../../lib/services/web-push-endpoint-policy", () => ({
+  parseWebPushEndpoint: vi.fn((value: string) => new URL(value)),
+}));
 
 import { NextRequest } from "next/server";
 import { GET } from "./route";
@@ -82,11 +79,7 @@ describe("Web Push exact subscription status", () => {
     });
 
     const different = await GET(
-      request(
-        fingerprint(
-          "https://push.example.net/subscriptions/not-this-browser",
-        ),
-      ),
+      request(fingerprint("https://push.example.net/subscriptions/not-this-browser")),
     );
     expect(different.status).toBe(200);
     expect(await different.json()).toMatchObject({

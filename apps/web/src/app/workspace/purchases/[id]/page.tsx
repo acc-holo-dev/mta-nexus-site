@@ -76,11 +76,24 @@ export default async function OrderDetailsPage({
           </div>
         </dl>
       </header>
-      <Link href={`/workspace/purchases/${encodeURIComponent(id)}/operations`} className="inline-block text-sm text-accent underline">
+      <Link
+        href={`/workspace/purchases/${encodeURIComponent(id)}/operations`}
+        className="inline-block text-sm text-accent underline"
+      >
         {getCommercialCopy(locale).paymentOperations}
       </Link>
-      <Link href={`/workspace/purchases/${encodeURIComponent(id)}/support`} className="inline-block text-sm text-accent underline">{orderCaseCopy(locale).title}</Link>
-      <Link href={`/workspace/purchases/${encodeURIComponent(id)}/terms`} className="inline-block text-sm text-accent underline">{orderTermsCopy(locale).title}</Link>
+      <Link
+        href={`/workspace/purchases/${encodeURIComponent(id)}/support`}
+        className="inline-block text-sm text-accent underline"
+      >
+        {orderCaseCopy(locale).title}
+      </Link>
+      <Link
+        href={`/workspace/purchases/${encodeURIComponent(id)}/terms`}
+        className="inline-block text-sm text-accent underline"
+      >
+        {orderTermsCopy(locale).title}
+      </Link>
       <p
         role="note"
         className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"

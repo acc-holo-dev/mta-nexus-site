@@ -24,9 +24,7 @@ const auditList = vi.hoisted(() => vi.fn());
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
     get: (name: string) =>
-      name === "nexus_session" && state.user
-        ? { value: "session-token" }
-        : undefined,
+      name === "nexus_session" && state.user ? { value: "session-token" } : undefined,
   })),
 }));
 
@@ -68,8 +66,9 @@ describe("Security Center behavior", () => {
     vi.clearAllMocks();
     state.user = null;
     auth.getSession.mockImplementation(async () => state.user);
-    auth.getSessionIdentity.mockImplementation(async () => state.user
-      ? { user: state.user, sessionId: "ses_current" } : null);
+    auth.getSessionIdentity.mockImplementation(async () =>
+      state.user ? { user: state.user, sessionId: "ses_current" } : null,
+    );
     auth.listSessions.mockResolvedValue([]);
     auth.getCurrentSessionId.mockResolvedValue(null);
     auth.getRecoveryEmailStatus.mockResolvedValue(null);
@@ -125,11 +124,7 @@ describe("Security Center behavior", () => {
     expect(auth.getSession).not.toHaveBeenCalled();
     expect(auth.getCurrentSessionId).not.toHaveBeenCalled();
     expect(auth.getRecoveryEmailStatus).toHaveBeenCalledWith("usr_security");
-    expect(auditList).toHaveBeenCalledWith(
-      "usr_security",
-      [...SECURITY_ACTIVITY_ACTIONS],
-      30,
-    );
+    expect(auditList).toHaveBeenCalledWith("usr_security", [...SECURITY_ACTIVITY_ACTIONS], 30);
     expect(html).toContain("recovery@example.test");
     expect(html).toContain("Test Browser");
     expect(html).toContain("203.0.113.10");
@@ -159,11 +154,7 @@ describe("Security Center behavior", () => {
     const service = new SecurityCenterService();
     const result = await service.listActivity("usr_security", 999);
 
-    expect(auditList).toHaveBeenCalledWith(
-      "usr_security",
-      [...SECURITY_ACTIVITY_ACTIONS],
-      50,
-    );
+    expect(auditList).toHaveBeenCalledWith("usr_security", [...SECURITY_ACTIVITY_ACTIONS], 50);
     expect(result).toEqual([
       expect.objectContaining({
         id: "aud_allowed",

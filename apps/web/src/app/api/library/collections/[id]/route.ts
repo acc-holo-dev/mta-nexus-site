@@ -14,14 +14,16 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     ),
   );
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    if (request.nextUrl.searchParams.size)
-      throw new AppError("Unexpected mutation query", 400, "COLLECTION_INVALID");
-    return libraryCollectionsService.command(
-      actor,
-      await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
-      (await params).id,
-    );
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      if (request.nextUrl.searchParams.size)
+        throw new AppError("Unexpected mutation query", 400, "COLLECTION_INVALID");
+      return libraryCollectionsService.command(
+        actor,
+        await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
+        (await params).id,
+      );
+    });
+  },
+);

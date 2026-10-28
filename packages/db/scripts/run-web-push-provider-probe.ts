@@ -1,10 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import {
-  mkdir,
-  rename,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -21,29 +16,16 @@ import {
 } from "../src/web-push-runtime";
 
 if (process.env.NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK !== "YES") {
-  throw new Error(
-    "Refusing live Web Push probe without NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK=YES",
-  );
+  throw new Error("Refusing live Web Push probe without NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK=YES");
 }
 
-const endpoint =
-  process.env.NEXUS_WEB_PUSH_PROBE_ENDPOINT?.trim() ?? "";
-const p256dh =
-  process.env.NEXUS_WEB_PUSH_PROBE_P256DH?.trim() ?? "";
-const auth =
-  process.env.NEXUS_WEB_PUSH_PROBE_AUTH?.trim() ?? "";
-const timeoutMs = Number(
-  process.env.NEXUS_WEB_PUSH_PROBE_TIMEOUT_MS ?? "15000",
-);
+const endpoint = process.env.NEXUS_WEB_PUSH_PROBE_ENDPOINT?.trim() ?? "";
+const p256dh = process.env.NEXUS_WEB_PUSH_PROBE_P256DH?.trim() ?? "";
+const auth = process.env.NEXUS_WEB_PUSH_PROBE_AUTH?.trim() ?? "";
+const timeoutMs = Number(process.env.NEXUS_WEB_PUSH_PROBE_TIMEOUT_MS ?? "15000");
 
-if (
-  !Number.isSafeInteger(timeoutMs) ||
-  timeoutMs < 250 ||
-  timeoutMs > 60_000
-) {
-  throw new RangeError(
-    "NEXUS_WEB_PUSH_PROBE_TIMEOUT_MS must be between 250 and 60000",
-  );
+if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 250 || timeoutMs > 60_000) {
+  throw new RangeError("NEXUS_WEB_PUSH_PROBE_TIMEOUT_MS must be between 250 and 60000");
 }
 if (!isValidWebPushP256PublicKey(p256dh)) {
   throw new Error("Invalid live probe p256dh key");
@@ -70,11 +52,7 @@ async function writeEvidence(value: unknown) {
   await mkdir(dirname(evidencePath), { recursive: true });
   const temporary = `${evidencePath}.tmp-${process.pid}`;
   try {
-    await writeFile(
-      temporary,
-      `${JSON.stringify(value, null, 2)}\n`,
-      { mode: 0o600 },
-    );
+    await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
     await rename(temporary, evidencePath);
   } finally {
     await rm(temporary, { force: true }).catch(() => undefined);
@@ -122,11 +100,7 @@ try {
 }
 
 const completedAt = Date.now();
-const passed =
-  errorClass === null &&
-  statusCode !== null &&
-  statusCode >= 200 &&
-  statusCode < 300;
+const passed = errorClass === null && statusCode !== null && statusCode >= 200 && statusCode < 300;
 
 const evidenceCore = {
   schemaVersion: 1,
@@ -134,17 +108,11 @@ const evidenceCore = {
   generatedAt: new Date().toISOString(),
   target: {
     origin: target.origin,
-    endpointSha256: createHash("sha256")
-      .update(endpoint, "utf8")
-      .digest("hex"),
+    endpointSha256: createHash("sha256").update(endpoint, "utf8").digest("hex"),
   },
   vapid: {
-    publicKeySha256: createHash("sha256")
-      .update(vapid.publicKey, "utf8")
-      .digest("hex"),
-    subjectScheme: vapid.subject.startsWith("mailto:")
-      ? "mailto"
-      : "https",
+    publicKeySha256: createHash("sha256").update(vapid.publicKey, "utf8").digest("hex"),
+    subjectScheme: vapid.subject.startsWith("mailto:") ? "mailto" : "https",
   },
   request: {
     timeoutMs,
@@ -158,12 +126,7 @@ const evidenceCore = {
   },
   verdict: {
     passed,
-    failures: passed
-      ? []
-      : [
-          errorClass ??
-            `provider_status_${statusCode ?? "unknown"}`,
-        ],
+    failures: passed ? [] : [errorClass ?? `provider_status_${statusCode ?? "unknown"}`],
   },
   runtime: {
     node: process.version,
@@ -171,9 +134,7 @@ const evidenceCore = {
     arch: process.arch,
   },
 };
-const evidenceSha256 = createHash("sha256")
-  .update(JSON.stringify(evidenceCore))
-  .digest("hex");
+const evidenceSha256 = createHash("sha256").update(JSON.stringify(evidenceCore)).digest("hex");
 await writeEvidence({
   ...evidenceCore,
   evidenceSha256,

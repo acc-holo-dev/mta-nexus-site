@@ -124,7 +124,10 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
     expect(suppressed).toBeNull();
 
-    await notificationRepository.updatePreferences(devUser.id, { followsEnabled: true, systemEnabled: false });
+    await notificationRepository.updatePreferences(devUser.id, {
+      followsEnabled: true,
+      systemEnabled: false,
+    });
     const securityNotification = await notificationRepository.create({
       id: `not_security_${Date.now()}`,
       recipientId: devUser.id,
@@ -144,7 +147,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     const hasInitial = await commerceService.checkEntitlement(
       { type: "user", id: playerUser.id },
       testProduct.id,
-      "product.download"
+      "product.download",
     );
     expect(hasInitial).toBe(false);
 
@@ -161,7 +164,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     const hasEntitled = await commerceService.checkEntitlement(
       { type: "user", id: playerUser.id },
       testProduct.id,
-      "product.download"
+      "product.download",
     );
     expect(hasEntitled).toBe(true);
   });
@@ -204,15 +207,21 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     expect(report.status).toBe("open");
 
     // Resolve report
-    const resolved = await reportRepository.resolve(report.id, "resolved", "Case verified and closed", {
-      id: `aud_${Date.now()}`,
-      actorId: playerUser.id,
-      actorType: "admin",
-      action: "admin.resolve",
-      targetId: report.id,
-      targetType: "report",
-      details: { notes: "Case verified and closed" },
-    }, `tok_${playerUser.id}`);
+    const resolved = await reportRepository.resolve(
+      report.id,
+      "resolved",
+      "Case verified and closed",
+      {
+        id: `aud_${Date.now()}`,
+        actorId: playerUser.id,
+        actorType: "admin",
+        action: "admin.resolve",
+        targetId: report.id,
+        targetType: "report",
+        details: { notes: "Case verified and closed" },
+      },
+      `tok_${playerUser.id}`,
+    );
     expect(resolved?.status).toBe("resolved");
   });
 });

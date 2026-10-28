@@ -1,19 +1,15 @@
 import type { Server } from "@nexus/domain";
-import {
-  indexMtaObservations,
-  type MtaMasterDirectory,
-} from "./mta-master-directory-service";
+import { indexMtaObservations, type MtaMasterDirectory } from "./mta-master-directory-service";
 import type { RecordServerObservationInput } from "@nexus/db";
 import { observationSequenceForEndpoint } from "./server-observation-sequence.mjs";
 
 export function buildMasterObservationCandidates(
-  knownServers: readonly (
-    Pick<Server, "id" | "ipAddress" | "port"> & { endpointRevision?: number }
-  )[],
+  knownServers: readonly (Pick<Server, "id" | "ipAddress" | "port"> & {
+    endpointRevision?: number;
+  })[],
   directory: MtaMasterDirectory,
   observationFor = indexMtaObservations(directory.servers),
 ): RecordServerObservationInput[] {
-
   const observedAt = new Date(directory.fetchedAt);
   if (!Number.isFinite(observedAt.getTime())) {
     // Do not propagate an invalid timestamp into a persisted SQL row.

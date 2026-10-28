@@ -16,7 +16,13 @@ const port = Number(process.env.SMTP_TEST_PORT || 2465);
 const caFile = process.env.SMTP_TEST_CA_FILE;
 if (!caFile) throw new Error("SMTP_TEST_CA_FILE is required");
 const ca = readFileSync(caFile);
-const common = { host: "127.0.0.1", port, servername: "localhost", from: "no-reply@nexus-mta.test", ca };
+const common = {
+  host: "127.0.0.1",
+  port,
+  servername: "localhost",
+  from: "no-reply@nexus-mta.test",
+  ca,
+};
 
 const send = async (recipient: string, timeoutMs = 1000, trust: string | Buffer | undefined = ca) =>
   new AccountMailSmtpTransport({ ...common, ca: trust, timeoutMs }).send({
@@ -81,11 +87,16 @@ assert.equal(timedOut.outcome, "retry");
 assert.equal(timedOut.uncertain, true);
 
 const untrusted = await new AccountMailSmtpTransport({
-  host: "127.0.0.1", port, servername: "localhost",
-  from: "no-reply@nexus-mta.test", timeoutMs: 1000,
+  host: "127.0.0.1",
+  port,
+  servername: "localhost",
+  from: "no-reply@nexus-mta.test",
+  timeoutMs: 1000,
 }).send({
-  recipient: "accept@example.invalid", subject: "Synthetic D2c untrusted certificate check",
-  text: "No production delivery.", sendBefore: new Date(Date.now() + 5_000),
+  recipient: "accept@example.invalid",
+  subject: "Synthetic D2c untrusted certificate check",
+  text: "No production delivery.",
+  sendBefore: new Date(Date.now() + 5_000),
   messageId: "ame_untrusted_transport",
 });
 assert.equal(untrusted.outcome, "retry");
@@ -101,10 +112,16 @@ try {
   const stored = await userRepository.findByEmail(email);
   assert.ok(stored?.passwordHash);
   const cipher = new AccountMailCipher("d2c", { d2c: randomBytes(32) });
-  const queued = await accountMailOutboxRepository.enqueue({
-    purpose: "email_verify", userId, currentToken: registered.token,
-    expectedPasswordHash: stored.passwordHash, auditId: generateId("aud"),
-  }, cipher);
+  const queued = await accountMailOutboxRepository.enqueue(
+    {
+      purpose: "email_verify",
+      userId,
+      currentToken: registered.token,
+      expectedPasswordHash: stored.passwordHash,
+      auditId: generateId("aud"),
+    },
+    cipher,
+  );
   const dispatcher = new AccountMailDispatcher({
     cipher,
     transport: new AccountMailSmtpTransport({ ...common, timeoutMs: 1000 }),
@@ -112,14 +129,24 @@ try {
   });
   const summary = await dispatcher.runBatch(10);
   assert.equal(summary.accepted, 1);
-  assert.equal((await db.select().from(accountMailOutbox).where(eq(accountMailOutbox.id, queued.id))).length, 0);
-  const audits = await db.select().from(auditEvents).where(and(
-    eq(auditEvents.action, "auth.mail_transport_accepted"),
-    eq(auditEvents.targetId, queued.id),
-  ));
+  assert.equal(
+    (await db.select().from(accountMailOutbox).where(eq(accountMailOutbox.id, queued.id))).length,
+    0,
+  );
+  const audits = await db
+    .select()
+    .from(auditEvents)
+    .where(
+      and(
+        eq(auditEvents.action, "auth.mail_transport_accepted"),
+        eq(auditEvents.targetId, queued.id),
+      ),
+    );
   assert.equal(audits.length, 1);
 } finally {
   if (userId) await db.delete(users).where(eq(users.id, userId));
 }
 
-process.stdout.write("PASS: isolated TLS SMTP acceptance, AUTH, refusal, timeout, uncertainty, trust and DB dispatcher\n");
+process.stdout.write(
+  "PASS: isolated TLS SMTP acceptance, AUTH, refusal, timeout, uncertainty, trust and DB dispatcher\n",
+);

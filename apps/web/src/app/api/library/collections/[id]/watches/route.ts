@@ -18,18 +18,20 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     );
   });
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    if (request.nextUrl.searchParams.size)
-      throw new AppError("Invalid watch query", 400, "RELEASE_WATCH_INVALID");
-    const parsed = resourceReleaseWatchEnableCommandSchema.safeParse(
-      await readBoundedJson(request, 8192),
-    );
-    if (!parsed.success) throw new AppError("Invalid watch batch", 400, "RELEASE_WATCH_INVALID");
-    return resourceReleaseWatchesService.enableCollectionBatch(
-      actor,
-      (await params).id,
-      parsed.data,
-    );
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      if (request.nextUrl.searchParams.size)
+        throw new AppError("Invalid watch query", 400, "RELEASE_WATCH_INVALID");
+      const parsed = resourceReleaseWatchEnableCommandSchema.safeParse(
+        await readBoundedJson(request, 8192),
+      );
+      if (!parsed.success) throw new AppError("Invalid watch batch", 400, "RELEASE_WATCH_INVALID");
+      return resourceReleaseWatchesService.enableCollectionBatch(
+        actor,
+        (await params).id,
+        parsed.data,
+      );
+    });
+  },
+);

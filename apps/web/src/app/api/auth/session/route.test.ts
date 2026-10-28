@@ -33,32 +33,22 @@ vi.mock("../../../../lib/services/auth-service", () => ({
   },
 }));
 
-import {
-  DELETE,
-  GET,
-} from "./route";
+import { DELETE, GET } from "./route";
 
 function request(method = "GET") {
-  return new NextRequest(
-    "https://nexus.test/api/auth/session",
-    {
-      method,
-      headers: {
-        origin: "https://nexus.test",
-        cookie: "nexus_session=session-token",
-      },
+  return new NextRequest("https://nexus.test/api/auth/session", {
+    method,
+    headers: {
+      origin: "https://nexus.test",
+      cookie: "nexus_session=session-token",
     },
-  );
+  });
 }
 
 function expectPrivateCorrelation(response: Response) {
-  expect(response.headers.get("cache-control")).toBe(
-    "private, no-store",
-  );
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
-  expect(response.headers.get("x-request-id")).toMatch(
-    /^[0-9a-f-]{20,}$/u,
-  );
+  expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 describe("current auth session HTTP contract", () => {
@@ -105,12 +95,8 @@ describe("current auth session HTTP contract", () => {
     const response = await DELETE(request("DELETE"));
     expect(response.status).toBe(200);
     expectPrivateCorrelation(response);
-    expect(response.headers.get("set-cookie")).toContain(
-      "nexus_session=",
-    );
-    expect(response.headers.get("set-cookie")).toContain(
-      "Max-Age=0",
-    );
+    expect(response.headers.get("set-cookie")).toContain("nexus_session=");
+    expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
     expect(logout).toHaveBeenCalledWith("session-token");
 
     state.logoutFails = true;
@@ -120,4 +106,3 @@ describe("current auth session HTTP contract", () => {
     expect(failed.headers.get("set-cookie")).toBeNull();
   });
 });
-

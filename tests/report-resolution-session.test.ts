@@ -11,7 +11,8 @@ vi.mock("../packages/db/src/client", async () => {
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
     return {
-      rows: sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
+      rows:
+        sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
     };
   });
   const proxy: typeof database = new Proxy(database, {
@@ -50,19 +51,21 @@ it("locks the actor and initiating session before resolving a report", async () 
   state.rows = [
     [["mod_1"]],
     [["ses_mod", "2099-01-01T00:00:00.000Z"]],
-    [row(reports, {
-      id: "rpt_1",
-      reporterId: "member_1",
-      targetType: "product",
-      targetId: "prd_1",
-      type: "scam",
-      reason: "Unsafe",
-      evidenceUrls: [],
-      status: "resolved",
-      moderatorNotes: "Reviewed",
-      createdAt: "2026-10-26T00:00:00.000Z",
-      resolvedAt: "2026-10-26T00:00:00.000Z",
-    })],
+    [
+      row(reports, {
+        id: "rpt_1",
+        reporterId: "member_1",
+        targetType: "product",
+        targetId: "prd_1",
+        type: "scam",
+        reason: "Unsafe",
+        evidenceUrls: [],
+        status: "resolved",
+        moderatorNotes: "Reviewed",
+        createdAt: "2026-10-26T00:00:00.000Z",
+        resolvedAt: "2026-10-26T00:00:00.000Z",
+      }),
+    ],
   ];
   const result = await new ReportRepository().resolve(
     "rpt_1",

@@ -8,7 +8,10 @@ import {
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   user: { id: "usr_1", username: "tester" } as { id: string; username: string } | null,
-  follow: { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" } as Record<string, string> | null,
+  follow: { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" } as Record<
+    string,
+    string
+  > | null,
   following: true,
   notificationFails: false,
 }));
@@ -42,9 +45,7 @@ const markSingle = vi.hoisted(() => vi.fn(async () => false));
 const markAll = vi.hoisted(() => vi.fn(async () => undefined));
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return {
     ...actual,
     after: afterMock,
@@ -82,7 +83,9 @@ vi.mock("@nexus/db", async () => ({
     unfollow: vi.fn(async () => undefined),
   },
   notificationRepository: {
-    listByUser: vi.fn(async () => Array.from({ length: 100 }, (_, index) => ({ id: `not_${index}`, isRead: true }))),
+    listByUser: vi.fn(async () =>
+      Array.from({ length: 100 }, (_, index) => ({ id: `not_${index}`, isRead: true })),
+    ),
     countUnread: vi.fn(async () => 137),
     markAsRead: markSingle,
     markAllAsRead: markAll,
@@ -129,42 +132,35 @@ describe("social and notification HTTP state contract", () => {
   it("keeps anonymous and authenticated follow-state reads private", async () => {
     state.user = null;
     const anonymous = await followState(
-      makeRequest(
-        "/api/follow?targetType=server&targetId=srv_1",
-        "GET",
-      ),
+      makeRequest("/api/follow?targetType=server&targetId=srv_1", "GET"),
     );
     expect(anonymous.status).toBe(200);
     expectPrivate(anonymous);
     expect(await anonymous.json()).toEqual({
       authenticated: false,
       following: false,
-      targetType: "server", targetId: "srv_1",
+      targetType: "server",
+      targetId: "srv_1",
     });
 
     state.user = { id: "usr_1", username: "tester" };
     state.following = true;
     const authenticated = await followState(
-      makeRequest(
-        "/api/follow?targetType=user&targetId=usr_2",
-        "GET",
-      ),
+      makeRequest("/api/follow?targetType=user&targetId=usr_2", "GET"),
     );
     expect(authenticated.status).toBe(200);
     expectPrivate(authenticated);
     expect(await authenticated.json()).toEqual({
       authenticated: true,
       following: true,
-      targetType: "user", targetId: "usr_2",
+      targetType: "user",
+      targetId: "usr_2",
     });
   });
 
   it("keeps follow-state validation errors private", async () => {
     const response = await followState(
-      makeRequest(
-        "/api/follow?targetType=invalid&targetId=x",
-        "GET",
-      ),
+      makeRequest("/api/follow?targetType=invalid&targetId=x", "GET"),
     );
     expect(response.status).toBe(400);
     expectPrivate(response);
@@ -175,11 +171,7 @@ describe("social and notification HTTP state contract", () => {
     const log = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
       const response = await follow(
-        makeRequest(
-          "/api/follow",
-          "POST",
-          '{"targetType":"user","targetId":"usr_2"}',
-        ),
+        makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
       );
       expect(response.status).toBe(200);
       expectPrivate(response);
@@ -203,11 +195,7 @@ describe("social and notification HTTP state contract", () => {
 
   it("pushes only the successfully stored follower notification after response", async () => {
     const response = await follow(
-      makeRequest(
-        "/api/follow",
-        "POST",
-        '{"targetType":"user","targetId":"usr_2"}',
-      ),
+      makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
     );
 
     expect(response.status).toBe(200);
@@ -226,15 +214,29 @@ describe("social and notification HTTP state contract", () => {
   it("checks the exact follow key before confirming a conflict", async () => {
     state.follow = null;
     state.following = false;
-    const response = await follow(makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'));
+    const response = await follow(
+      makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
+    );
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ code: "UNCONFIRMED" });
   });
 
   it("returns canonical unfollow state and rejects unbounded IDs", async () => {
-    const response = await unfollow(makeRequest("/api/follow", "DELETE", '{"targetType":"user","targetId":"usr_2"}'));
-    expect(await response.json()).toMatchObject({ success: true, following: false, targetId: "usr_2" });
-    const invalid = await follow(makeRequest("/api/follow", "POST", JSON.stringify({ targetType: "user", targetId: "x".repeat(129) })));
+    const response = await unfollow(
+      makeRequest("/api/follow", "DELETE", '{"targetType":"user","targetId":"usr_2"}'),
+    );
+    expect(await response.json()).toMatchObject({
+      success: true,
+      following: false,
+      targetId: "usr_2",
+    });
+    const invalid = await follow(
+      makeRequest(
+        "/api/follow",
+        "POST",
+        JSON.stringify({ targetType: "user", targetId: "x".repeat(129) }),
+      ),
+    );
     expect(invalid.status).toBe(400);
   });
 
@@ -258,7 +260,9 @@ describe("social and notification HTTP state contract", () => {
   });
 
   it("keeps single ownership errors separate from confirmed bulk operations", async () => {
-    const forbidden = await markRead(makeRequest("/api/notifications/mark-read", "POST", '{"id":"not_other"}'));
+    const forbidden = await markRead(
+      makeRequest("/api/notifications/mark-read", "POST", '{"id":"not_other"}'),
+    );
     expect(forbidden.status).toBe(404);
     expect(markAll).not.toHaveBeenCalled();
 

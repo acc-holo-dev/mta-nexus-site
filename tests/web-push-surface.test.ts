@@ -56,9 +56,7 @@ describe("Web Push service worker behavior", () => {
     const harness = createServiceWorkerHarness(await serviceWorkerSource());
 
     await expect(
-      harness.dispatchFetch(
-        makeServiceWorkerRequest("https://nexus.test/api/notifications"),
-      ),
+      harness.dispatchFetch(makeServiceWorkerRequest("https://nexus.test/api/notifications")),
     ).resolves.toMatchObject({ intercepted: false });
     await expect(
       harness.dispatchFetch(

@@ -78,16 +78,14 @@ it("denies a private server and hides a formerly public server after privacy cha
   const follower = await actor();
   const id = `srv_follow_${randomUUID()}`;
   serverIds.push(id);
-  await db
-    .insert(servers)
-    .values({
-      id,
-      name: "Private server marker",
-      slug: `follow-${randomUUID()}`,
-      ipAddress: `follow-${randomUUID()}.test`,
-      port: 22003,
-      visibility: "private",
-    });
+  await db.insert(servers).values({
+    id,
+    name: "Private server marker",
+    slug: `follow-${randomUUID()}`,
+    ipAddress: `follow-${randomUUID()}.test`,
+    port: 22003,
+    visibility: "private",
+  });
   await expect(
     repository.setFollowing(follower.id, "server", id, true, `fol_${randomUUID()}`),
   ).rejects.toMatchObject({ code: "NOT_FOUND" });
@@ -107,16 +105,14 @@ it("traverses forty-five equal-microsecond follow keys exactly once", async () =
   const follower = await actor(),
     target = await actor();
   const ids = Array.from({ length: 45 }, () => `fol_${randomUUID()}`);
-  await db
-    .insert(follows)
-    .values(
-      ids.map((id, index) => ({
-        id,
-        followerId: follower.id,
-        targetType: "user",
-        targetId: `${target.id}-${index}`,
-      })),
-    );
+  await db.insert(follows).values(
+    ids.map((id, index) => ({
+      id,
+      followerId: follower.id,
+      targetType: "user",
+      targetId: `${target.id}-${index}`,
+    })),
+  );
   await db
     .update(follows)
     .set({ createdAt: sql`'2026-10-10T12:00:00.123456Z'::timestamptz` })

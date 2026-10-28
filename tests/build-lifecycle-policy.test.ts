@@ -50,14 +50,11 @@ const retireBody = {
 };
 
 function request(body: unknown) {
-  const value = new NextRequest(
-    "http://nexus.test/api/products/prd_1/builds/bld_1",
-    {
-      method: "PATCH",
-      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
-      body: JSON.stringify(body),
-    },
-  );
+  const value = new NextRequest("http://nexus.test/api/products/prd_1/builds/bld_1", {
+    method: "PATCH",
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
   value.cookies.set("nexus_session", "test-session");
   return value;
 }

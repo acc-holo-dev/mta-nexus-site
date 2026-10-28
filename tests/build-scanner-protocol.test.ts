@@ -14,10 +14,7 @@ async function scannerFor(
     connections.add(connection);
     connection.once("close", () => connections.delete(connection));
     connection.on("data", (chunk) => {
-      request = Buffer.concat([
-        request,
-        Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk),
-      ]);
+      request = Buffer.concat([request, Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)]);
     });
     connection.on("end", () => {
       if (reply !== null) connection.end(reply);
@@ -64,22 +61,37 @@ describe("ClamAV scanner TCP protocol", () => {
 
   it("distinguishes malware from archives ClamAV could not fully inspect", async () => {
     const { scanner: malwareScanner } = await scannerFor("stream: Eicar-Test-Signature FOUND\0");
-    const { scanner: limitedScanner } = await scannerFor("stream: Heuristics.Limits.Exceeded.MaxRecursion FOUND\0");
+    const { scanner: limitedScanner } = await scannerFor(
+      "stream: Heuristics.Limits.Exceeded.MaxRecursion FOUND\0",
+    );
 
-    expect((await malwareScanner.scan({ bytes: new Uint8Array([1]), fileName: "malware.zip" })).status)
-      .toBe("malicious");
-    expect((await limitedScanner.scan({ bytes: new Uint8Array([1]), fileName: "complex.zip" })).status)
-      .toBe("rejected");
+    expect(
+      (await malwareScanner.scan({ bytes: new Uint8Array([1]), fileName: "malware.zip" })).status,
+    ).toBe("malicious");
+    expect(
+      (await limitedScanner.scan({ bytes: new Uint8Array([1]), fileName: "complex.zip" })).status,
+    ).toBe("rejected");
   });
 
   it("fails closed on malformed, oversized, or stalled daemon responses", async () => {
     const { scanner: malformedScanner } = await scannerFor("unexpected response\0");
-    const { scanner: oversizedScanner } = await scannerFor("x".repeat(32), { maxResponseBytes: 16 });
+    const { scanner: oversizedScanner } = await scannerFor("x".repeat(32), {
+      maxResponseBytes: 16,
+    });
     const { scanner: stalledScanner } = await scannerFor(null, { timeoutMs: 40 });
 
-    const malformed = await malformedScanner.scan({ bytes: new Uint8Array([1]), fileName: "build.zip" });
-    const oversized = await oversizedScanner.scan({ bytes: new Uint8Array([1]), fileName: "build.zip" });
-    const stalled = await stalledScanner.scan({ bytes: new Uint8Array([1]), fileName: "build.zip" });
+    const malformed = await malformedScanner.scan({
+      bytes: new Uint8Array([1]),
+      fileName: "build.zip",
+    });
+    const oversized = await oversizedScanner.scan({
+      bytes: new Uint8Array([1]),
+      fileName: "build.zip",
+    });
+    const stalled = await stalledScanner.scan({
+      bytes: new Uint8Array([1]),
+      fileName: "build.zip",
+    });
 
     expect(malformed).toMatchObject({ status: "error", reason: "unexpected response" });
     expect(oversized).toMatchObject({ status: "error", reason: "Scanner response exceeded limit" });

@@ -1,26 +1,37 @@
 import { createHash } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
-import { DOWNLOAD_IDLE_TIMEOUT_MS, fetchResourceDownload } from "../apps/web/src/lib/resource-download-client";
+import {
+  DOWNLOAD_IDLE_TIMEOUT_MS,
+  fetchResourceDownload,
+} from "../apps/web/src/lib/resource-download-client";
 
 afterEach(() => vi.useRealTimers());
 
 const controller = () => new AbortController();
-const sha256 = (body: string | Uint8Array) =>
-  createHash("sha256").update(body).digest("hex");
+const sha256 = (body: string | Uint8Array) => createHash("sha256").update(body).digest("hex");
 const response = (body = "archive", headers: Record<string, string> = {}) =>
-  new Response(body, { headers: {
-    "Content-Length": String(new TextEncoder().encode(body).byteLength),
-    "X-Content-SHA256": sha256(body),
-    ...headers,
-  } });
+  new Response(body, {
+    headers: {
+      "Content-Length": String(new TextEncoder().encode(body).byteLength),
+      "X-Content-SHA256": sha256(body),
+      ...headers,
+    },
+  });
 
 describe("browser resource download preparation", () => {
-  it.each(["dlv_receipt", "../private", "usr_other", "dlv_bad\n", ""])("accepts only safe optional receipt links after byte verification: %j", async (id) => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response("archive", { "X-Resource-Delivery-Id": id.replaceAll("\n", "%0A") }));
-    const result = await fetchResourceDownload("prd_a", controller().signal, vi.fn(), fetcher);
-    expect(result.receiptId).toBe(id === "dlv_receipt" ? id : null);
-  });
+  it.each(["dlv_receipt", "../private", "usr_other", "dlv_bad\n", ""])(
+    "accepts only safe optional receipt links after byte verification: %j",
+    async (id) => {
+      const fetcher = vi
+        .fn<typeof fetch>()
+        .mockResolvedValue(
+          response("archive", { "X-Resource-Delivery-Id": id.replaceAll("\n", "%0A") }),
+        );
+      const result = await fetchResourceDownload("prd_a", controller().signal, vi.fn(), fetcher);
+      expect(result.receiptId).toBe(id === "dlv_receipt" ? id : null);
+    },
+  );
   it("fetches privately and returns complete bytes with the server filename", async () => {
     const fetcher = vi
       .fn<typeof fetch>()
@@ -82,9 +93,11 @@ describe("browser resource download preparation", () => {
   );
 
   it("supports a bounded response without a declared length", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("archive", {
-      headers: { "X-Content-SHA256": sha256("archive") },
-    }));
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response("archive", {
+        headers: { "X-Content-SHA256": sha256("archive") },
+      }),
+    );
     const progress = vi.fn();
     const result = await fetchResourceDownload("id", controller().signal, progress, fetcher);
     expect(await result.blob.text()).toBe("archive");
@@ -109,7 +122,9 @@ describe("browser resource download preparation", () => {
       },
       cancel: cancelled,
     });
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
     await expect(
       fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
     ).rejects.toMatchObject({ reason: "failed" });
@@ -169,7 +184,9 @@ it("cancels a pending read even when no next chunk arrives", async () => {
     },
     { highWaterMark: 0 },
   );
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
+  const fetcher = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
   const download = fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
   await reading;
   active.abort();
@@ -195,7 +212,9 @@ it("does not await a stalled underlying cancel operation", async () => {
     },
     { highWaterMark: 0 },
   );
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
+  const fetcher = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
   const download = fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
   await reading;
   active.abort();
@@ -225,10 +244,11 @@ it("removes the abort listener after successful reading", async () => {
 
 it("times out while waiting for response headers and clears its timer", async () => {
   vi.useFakeTimers();
-  const fetcher = vi.fn<typeof fetch>().mockImplementation((_url, init) =>
-    new Promise((_resolve, reject) => {
-      init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), { once: true });
-    }),
+  const fetcher = vi.fn<typeof fetch>().mockImplementation(
+    (_url, init) =>
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), { once: true });
+      }),
   );
   const download = fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
   const rejected = expect(download).rejects.toMatchObject({ reason: "timeout" });
@@ -241,10 +261,14 @@ it("cancels a stalled response body without saving partial bytes", async () => {
   vi.useFakeTimers();
   const cancel = vi.fn();
   const body = new ReadableStream<Uint8Array>({
-    start(stream) { stream.enqueue(new Uint8Array([1])); },
+    start(stream) {
+      stream.enqueue(new Uint8Array([1]));
+    },
     cancel,
   });
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
+  const fetcher = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
   const download = fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
   const rejected = expect(download).rejects.toMatchObject({ reason: "timeout" });
   await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS);
@@ -257,11 +281,17 @@ it("cancels a stalled response body without saving partial bytes", async () => {
 it("allows a slow download to exceed the timeout while bytes keep arriving", async () => {
   vi.useFakeTimers();
   let stream!: ReadableStreamDefaultController<Uint8Array>;
-  const body = new ReadableStream<Uint8Array>({ start(value) { stream = value; } });
+  const body = new ReadableStream<Uint8Array>({
+    start(value) {
+      stream = value;
+    },
+  });
   const progress = vi.fn();
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, {
-    headers: { "X-Content-SHA256": sha256(new Uint8Array([0, 1, 2])) },
-  }));
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+    new Response(body, {
+      headers: { "X-Content-SHA256": sha256(new Uint8Array([0, 1, 2])) },
+    }),
+  );
   const download = fetchResourceDownload("id", controller().signal, progress, fetcher);
   for (let i = 0; i < 3; i++) {
     await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS - 1);
@@ -274,15 +304,20 @@ it("allows a slow download to exceed the timeout while bytes keep arriving", asy
   expect(vi.getTimerCount()).toBe(0);
 });
 
-
 it("does not time out a complete download while its SHA-256 is being calculated", async () => {
   vi.useFakeTimers();
   const original = Blob.prototype.arrayBuffer;
   let started!: () => void;
-  const hashing = new Promise<void>(resolve => { started = resolve; });
+  const hashing = new Promise<void>((resolve) => {
+    started = resolve;
+  });
   let resume!: () => void;
-  const paused = new Promise<void>(resolve => { resume = resolve; });
-  const hashSpy = vi.spyOn(Blob.prototype, "arrayBuffer").mockImplementation(async function(this: Blob) {
+  const paused = new Promise<void>((resolve) => {
+    resume = resolve;
+  });
+  const hashSpy = vi.spyOn(Blob.prototype, "arrayBuffer").mockImplementation(async function (
+    this: Blob,
+  ) {
     started();
     await paused;
     return original.call(this);
@@ -307,7 +342,9 @@ it("preserves manual cancellation and releases the idle timer", async () => {
   vi.useFakeTimers();
   const active = controller();
   const body = new ReadableStream<Uint8Array>();
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
+  const fetcher = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
   const download = fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
   const rejected = expect(download).rejects.toMatchObject({ name: "AbortError" });
   await vi.advanceTimersByTimeAsync(1);
@@ -321,9 +358,16 @@ it("does not let empty chunks keep a stalled download alive", async () => {
   vi.useFakeTimers();
   let stream!: ReadableStreamDefaultController<Uint8Array>;
   const cancel = vi.fn();
-  const body = new ReadableStream<Uint8Array>({ start(value) { stream = value; }, cancel });
+  const body = new ReadableStream<Uint8Array>({
+    start(value) {
+      stream = value;
+    },
+    cancel,
+  });
   const progress = vi.fn();
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
+  const fetcher = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response(body, { headers: { "X-Content-SHA256": sha256("") } }));
   const download = fetchResourceDownload("id", controller().signal, progress, fetcher);
   const rejected = expect(download).rejects.toMatchObject({ reason: "timeout" });
   await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS - 1);
@@ -335,21 +379,28 @@ it("does not let empty chunks keep a stalled download alive", async () => {
   expect(vi.getTimerCount()).toBe(0);
 });
 
-
 it("snapshots reused stream buffers before subsequent reads mutate them", async () => {
   const buffer = new Uint8Array(4);
   let block = 0;
-  const body = new ReadableStream<Uint8Array>({
-    pull(stream) {
-      if (block === 3) { stream.close(); return; }
-      buffer.fill(++block);
-      stream.enqueue(buffer);
+  const body = new ReadableStream<Uint8Array>(
+    {
+      pull(stream) {
+        if (block === 3) {
+          stream.close();
+          return;
+        }
+        buffer.fill(++block);
+        stream.enqueue(buffer);
+      },
     },
-  }, { highWaterMark: 0 });
+    { highWaterMark: 0 },
+  );
   const expectedBytes = new Uint8Array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]);
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, {
-    headers: { "X-Content-SHA256": sha256(expectedBytes) },
-  }));
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+    new Response(body, {
+      headers: { "X-Content-SHA256": sha256(expectedBytes) },
+    }),
+  );
   const result = await fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
   expect(new Uint8Array(await result.blob.arrayBuffer())).toEqual(
     new Uint8Array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]),
@@ -358,11 +409,15 @@ it("snapshots reused stream buffers before subsequent reads mutate them", async 
 
 describe("explicit version download URL", () => {
   it("pins a selected release while retaining same-origin, no-store and the original API", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
-      response("archive", { "X-Resource-Build-Id": "bld_version_1" }),
-    );
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(response("archive", { "X-Resource-Build-Id": "bld_version_1" }));
     const result = await fetchResourceDownload(
-      "prd_resource", controller().signal, vi.fn(), fetcher, "bld_version_1",
+      "prd_resource",
+      controller().signal,
+      vi.fn(),
+      fetcher,
+      "bld_version_1",
     );
     expect(fetcher).toHaveBeenCalledWith(
       "/api/products/prd_resource/download?buildId=bld_version_1",
@@ -376,82 +431,99 @@ describe("explicit version download URL", () => {
   });
 
   it("does not hand off a different build from the requested pinned version", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
-      response("archive", { "X-Resource-Build-Id": "bld_different" }),
-    );
-    await expect(fetchResourceDownload(
-      "prd_resource", controller().signal, vi.fn(), fetcher, "bld_version_1",
-    )).rejects.toMatchObject({ reason: "failed" });
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(response("archive", { "X-Resource-Build-Id": "bld_different" }));
+    await expect(
+      fetchResourceDownload("prd_resource", controller().signal, vi.fn(), fetcher, "bld_version_1"),
+    ).rejects.toMatchObject({ reason: "failed" });
   });
 
   it("refuses a pinned download without the selected-build echo header", async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response("archive"));
-    await expect(fetchResourceDownload(
-      "prd_resource", controller().signal, vi.fn(), fetcher, "bld_version_1",
-    )).rejects.toMatchObject({ reason: "failed" });
+    await expect(
+      fetchResourceDownload("prd_resource", controller().signal, vi.fn(), fetcher, "bld_version_1"),
+    ).rejects.toMatchObject({ reason: "failed" });
   });
 
   it("does not send a request when the pinned version identifier is invalid", async () => {
     const fetcher = vi.fn<typeof fetch>();
-    await expect(fetchResourceDownload(
-      "prd_resource", controller().signal, vi.fn(), fetcher, "../private-file",
-    )).rejects.toThrow("Invalid resource build identifier");
+    await expect(
+      fetchResourceDownload(
+        "prd_resource",
+        controller().signal,
+        vi.fn(),
+        fetcher,
+        "../private-file",
+      ),
+    ).rejects.toThrow("Invalid resource build identifier");
     expect(fetcher).not.toHaveBeenCalled();
   });
 });
 
-
 describe("SHA-256 verification before saving", () => {
-
-  it.each([null, "invalid", "a".repeat(63), "a".repeat(65), `${"a".repeat(64)}, ${"b".repeat(64)}`])(
-    "rejects invalid digest headers before reading archive bytes: %s",
-    async (digest) => {
-      const cancelled = vi.fn();
-      let pulls = 0;
-      const body = new ReadableStream<Uint8Array>({
+  it.each([
+    null,
+    "invalid",
+    "a".repeat(63),
+    "a".repeat(65),
+    `${"a".repeat(64)}, ${"b".repeat(64)}`,
+  ])("rejects invalid digest headers before reading archive bytes: %s", async (digest) => {
+    const cancelled = vi.fn();
+    let pulls = 0;
+    const body = new ReadableStream<Uint8Array>(
+      {
         pull(controller) {
           pulls++;
           controller.enqueue(new Uint8Array(1024));
         },
         cancel: cancelled,
-      }, { highWaterMark: 0 });
-      const headers = digest === null ? undefined : { "X-Content-SHA256": digest };
-      const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers }));
-      await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
-        .rejects.toMatchObject({ reason: "failed" });
-      expect(cancelled).toHaveBeenCalledOnce();
-      expect(pulls).toBe(0);
-    },
-  );
-  it("refuses a successful response without a digest", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
-      new Response("archive", { headers: { "Content-Length": "7" } }),
+      },
+      { highWaterMark: 0 },
     );
-    await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
-      .rejects.toMatchObject({ reason: "failed" });
+    const headers = digest === null ? undefined : { "X-Content-SHA256": digest };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { headers }));
+    await expect(
+      fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
+    ).rejects.toMatchObject({ reason: "failed" });
+    expect(cancelled).toHaveBeenCalledOnce();
+    expect(pulls).toBe(0);
+  });
+  it("refuses a successful response without a digest", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response("archive", { headers: { "Content-Length": "7" } }));
+    await expect(
+      fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
+    ).rejects.toMatchObject({ reason: "failed" });
   });
 
-  it.each(["bad", "0".repeat(64)])("rejects invalid or mismatched digest %s", async digest => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
-      response("archive", { "X-Content-SHA256": digest }),
-    );
-    await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
-      .rejects.toMatchObject({ reason: "failed" });
+  it.each(["bad", "0".repeat(64)])("rejects invalid or mismatched digest %s", async (digest) => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(response("archive", { "X-Content-SHA256": digest }));
+    await expect(
+      fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
+    ).rejects.toMatchObject({ reason: "failed" });
   });
 
   it("refuses altered bytes that retain the expected Content-Length", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
-      response("corrupt", { "X-Content-SHA256": sha256("archive") }),
-    );
-    await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
-      .rejects.toMatchObject({ reason: "failed" });
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(response("corrupt", { "X-Content-SHA256": sha256("archive") }));
+    await expect(
+      fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
+    ).rejects.toMatchObject({ reason: "failed" });
   });
 
   it("accepts uppercase canonical SHA-256", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
-      response("archive", { "X-Content-SHA256": sha256("archive").toUpperCase() }),
-    );
-    expect((await fetchResourceDownload("id", controller().signal, vi.fn(), fetcher)).blob.size)
-      .toBe(7);
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(
+        response("archive", { "X-Content-SHA256": sha256("archive").toUpperCase() }),
+      );
+    expect(
+      (await fetchResourceDownload("id", controller().signal, vi.fn(), fetcher)).blob.size,
+    ).toBe(7);
   });
 });

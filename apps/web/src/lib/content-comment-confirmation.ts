@@ -1,7 +1,4 @@
-export function confirmedCommentId(
-  status: number,
-  payload: unknown,
-): string | null {
+export function confirmedCommentId(status: number, payload: unknown): string | null {
   if (
     !Number.isSafeInteger(status) ||
     status < 200 ||

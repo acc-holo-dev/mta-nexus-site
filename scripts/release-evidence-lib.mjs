@@ -43,26 +43,22 @@ export const EXTERNAL_RELEASE_EVIDENCE_SPECS = Object.freeze({
 });
 
 export function repositoryStayedStable({ initialSha, finalSha, statusAvailable, dirty }) {
-  return typeof initialSha === "string" && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(initialSha)
-    && finalSha === initialSha && statusAvailable === true && dirty === false;
+  return (
+    typeof initialSha === "string" &&
+    /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(initialSha) &&
+    finalSha === initialSha &&
+    statusAvailable === true &&
+    dirty === false
+  );
 }
 
 export function summarizeReleaseEvidence({ dirty, gates }) {
-  const failedGates = gates
-    .filter((gate) => gate.status === "failed")
-    .map((gate) => gate.name);
-  const blockedGates = gates
-    .filter((gate) => gate.status === "blocked")
-    .map((gate) => gate.name);
-  const passedGates = gates
-    .filter((gate) => gate.status === "passed")
-    .map((gate) => gate.name);
+  const failedGates = gates.filter((gate) => gate.status === "failed").map((gate) => gate.name);
+  const blockedGates = gates.filter((gate) => gate.status === "blocked").map((gate) => gate.name);
+  const passedGates = gates.filter((gate) => gate.status === "passed").map((gate) => gate.name);
   const incompleteGates = gates
     .filter(
-      (gate) =>
-        gate.status !== "passed" &&
-        gate.status !== "failed" &&
-        gate.status !== "blocked",
+      (gate) => gate.status !== "passed" && gate.status !== "failed" && gate.status !== "blocked",
     )
     .map((gate) => gate.name);
   const noGatesRecorded = gates.length === 0;
@@ -109,8 +105,7 @@ export function summarizeExternalEvidence(items) {
     )
     .map(([name]) => name);
   return Object.freeze({
-    complete:
-      entries.length > 0 && missingOrInvalid.length === 0,
+    complete: entries.length > 0 && missingOrInvalid.length === 0,
     missingOrInvalid,
   });
 }
@@ -119,13 +114,22 @@ export function buildEvidenceChecksum(evidence) {
   return createHash("sha256").update(JSON.stringify(evidence)).digest("hex");
 }
 
-export function executeReleaseCommand(command, args, { cwd, env, timeoutMs = 30 * 60_000, stdio = "inherit" } = {}) {
+export function executeReleaseCommand(
+  command,
+  args,
+  { cwd, env, timeoutMs = 30 * 60_000, stdio = "inherit" } = {},
+) {
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1) {
     throw new RangeError("Release command timeout must be a positive integer");
   }
   const startedAt = performance.now();
   const result = spawnSync(command, args, {
-    cwd, env, stdio, shell: false, timeout: timeoutMs, killSignal: "SIGKILL",
+    cwd,
+    env,
+    stdio,
+    shell: false,
+    timeout: timeoutMs,
+    killSignal: "SIGKILL",
   });
   const exitCode = typeof result.status === "number" ? result.status : null;
   const timedOut = result.error?.code === "ETIMEDOUT";
@@ -147,7 +151,12 @@ export function writeReleaseEvidence(outputPath, evidence) {
   const temporaryDirectory = mkdtempSync(join(dirname(outputPath), ".release-evidence-"));
   try {
     const temporaryPath = join(temporaryDirectory, "evidence.json");
-    writeFileSync(temporaryPath, serialized, { encoding: "utf8", mode: 0o600, flag: "wx", flush: true });
+    writeFileSync(temporaryPath, serialized, {
+      encoding: "utf8",
+      mode: 0o600,
+      flag: "wx",
+      flush: true,
+    });
     renameSync(temporaryPath, outputPath);
   } finally {
     rmSync(temporaryDirectory, { recursive: true, force: true });

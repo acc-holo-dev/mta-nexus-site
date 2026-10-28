@@ -23,7 +23,8 @@ export function parseServerOrganizations(payload: unknown): ServerOrganizationOp
       name.length > 100 ||
       typeof slug !== "string" ||
       !/^[a-z0-9-]{2,100}$/u.test(slug)
-    ) return null;
+    )
+      return null;
     if (!seen.has(id)) {
       organizations.push({ id, name, slug });
       seen.add(id);

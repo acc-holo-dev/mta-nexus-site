@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("private authenticated mutation responses", () => {
   it.each([
@@ -23,9 +22,7 @@ describe("private authenticated mutation responses", () => {
   it("keeps login and registration session cookies hardened", () => {
     const cookiePolicy = read("apps/web/src/lib/session-cookie.ts");
     expect(cookiePolicy).toContain("httpOnly: true");
-    expect(cookiePolicy).toContain(
-      'secure: process.env.NODE_ENV === "production"',
-    );
+    expect(cookiePolicy).toContain('secure: process.env.NODE_ENV === "production"');
     expect(cookiePolicy).toContain('sameSite: "lax"');
     expect(cookiePolicy).toContain('path: "/"');
 
@@ -41,25 +38,15 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps context switching non-optimistic", () => {
-    const source = read(
-      "apps/web/src/components/context-switcher.tsx",
-    );
+    const source = read("apps/web/src/components/context-switcher.tsx");
 
-    const requestStart = source.indexOf(
-      'fetch("/api/auth/context"',
-    );
-    const confirmation = source.indexOf(
-      "data?.success !== true",
-    );
-    const stateUpdate = source.indexOf(
-      "setActiveContextId(data.activeContextId)",
-    );
+    const requestStart = source.indexOf('fetch("/api/auth/context"');
+    const confirmation = source.indexOf("data?.success !== true");
+    const stateUpdate = source.indexOf("setActiveContextId(data.activeContextId)");
 
     expect(requestStart).toBeGreaterThan(-1);
     expect(confirmation).toBeGreaterThan(requestStart);
     expect(stateUpdate).toBeGreaterThan(confirmation);
-    expect(source).not.toContain(
-      "setActiveContextId(contextId);",
-    );
+    expect(source).not.toContain("setActiveContextId(contextId);");
   });
 });

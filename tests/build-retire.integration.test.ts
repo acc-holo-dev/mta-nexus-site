@@ -1,13 +1,8 @@
+import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
+import { auditEvents, buildRepository, db, productRepository, userRepository } from "@nexus/db";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
-import {
-  auditEvents,
-  buildRepository,
-  db,
-  productRepository,
-  userRepository,
-} from "@nexus/db";
 
 async function fixture(label: string, versions: string[]) {
   const suffix = `${label}_${randomBytes(5).toString("hex")}`;
@@ -54,7 +49,9 @@ async function fixture(label: string, versions: string[]) {
       releaseNotes: `Release ${version}`,
       status: "published",
       storageKey: `test/${buildId}.zip`,
-      sha256Hash: String(index + 1).repeat(64).slice(0, 64),
+      sha256Hash: String(index + 1)
+        .repeat(64)
+        .slice(0, 64),
       fileSizeBytes: 10 + index,
       fileName: `${version}.zip`,
       mimeType: "application/zip",
@@ -68,11 +65,7 @@ async function fixture(label: string, versions: string[]) {
   return { userId, productId, buildIds };
 }
 
-function audit(
-  id: string,
-  actorId: string,
-  buildId: string,
-) {
+function audit(id: string, actorId: string, buildId: string) {
   return {
     id,
     actorId,
@@ -87,7 +80,8 @@ function audit(
 describe("build retirement persistence", () => {
   it("retires the last published build and returns the product to draft", async () => {
     const f = await fixture("last", ["1.0.0"]);
-    const buildId = f.buildIds[0]!;
+    const buildId = f.buildIds[0];
+    assert.ok(buildId);
 
     await expect(
       buildRepository.retireAndRefreshProduct(
@@ -119,17 +113,14 @@ describe("build retirement persistence", () => {
 
   it("promotes the remaining published version when the current build retires", async () => {
     const f = await fixture("fallback", ["1.0.0", "2.0.0"]);
-    const latestBuildId = f.buildIds[1]!;
+    const latestBuildId = f.buildIds[1];
+    assert.ok(latestBuildId);
 
     await expect(
       buildRepository.retireAndRefreshProduct(
         latestBuildId,
         "published",
-        audit(
-          `aud_${latestBuildId}`,
-          f.userId,
-          latestBuildId,
-        ),
+        audit(`aud_${latestBuildId}`, f.userId, latestBuildId),
       ),
     ).resolves.toMatchObject({
       id: latestBuildId,

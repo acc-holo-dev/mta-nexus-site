@@ -89,15 +89,11 @@ describe("organization resource management integration", () => {
     expect(await productService.canManageProduct(product, creator)).toBe(false);
     expect(await productService.canManageProduct(product, outsider)).toBe(false);
 
-    expect(
-      (await productService.getProductPreviewBySlug(product.slug, owner))?.id,
-    ).toBe(productId);
-    expect(
-      (await productService.getProductPreviewBySlug(product.slug, manager))?.id,
-    ).toBe(productId);
-    expect(
-      await productService.getProductPreviewBySlug(product.slug, outsider),
-    ).toBeNull();
+    expect((await productService.getProductPreviewBySlug(product.slug, owner))?.id).toBe(productId);
+    expect((await productService.getProductPreviewBySlug(product.slug, manager))?.id).toBe(
+      productId,
+    );
+    expect(await productService.getProductPreviewBySlug(product.slug, outsider)).toBeNull();
   });
 
   it("requires explicit server-management rights for organization server creation", async () => {
@@ -188,39 +184,44 @@ describe("organization resource management integration", () => {
 
     expect(created.organizationId).toBe(organizationId);
     expect(created.ownerId).toBeFalsy();
-    expect(
-      await serverService.canManageServer(created, manager),
-    ).toBe(true);
+    expect(await serverService.canManageServer(created, manager)).toBe(true);
 
     // The owner-picker is only a hint. Authorization is re-read by the
     // same transaction that inserts the server and its audit event.
-    await db.delete(organizationMembers).where(and(
-      eq(organizationMembers.organizationId, organizationId),
-      eq(organizationMembers.userId, managerId),
-    ));
+    await db
+      .delete(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.userId, managerId),
+        ),
+      );
     // Display permissions must be revoked alongside the write permissions.
     expect(await serverService.canManageServer(created, manager)).toBe(false);
-    await expect(serverService.updateServer(
-      created.id,
-      { description: "Attempted stale-manager edit" },
-      manager,
-    )).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+    await expect(
+      serverService.updateServer(
+        created.id,
+        { description: "Attempted stale-manager edit" },
+        manager,
+      ),
+    ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
 
-    await expect(serverService.createServer(
-      {
-        name: "Revoked Organization Server",
-        slug: `revoked-org-server-${suffix}`,
-        ipAddress: "198.51.100.223",
-        port: basePort + 2,
-        organizationId,
-        visibility: "private",
-        gameplayTags: [],
-        mediaUrls: [],
-      },
-      manager,
-    )).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
-    expect(await serverRepository.findBySlug(`revoked-org-server-${suffix}`))
-      .toBeNull();
+    await expect(
+      serverService.createServer(
+        {
+          name: "Revoked Organization Server",
+          slug: `revoked-org-server-${suffix}`,
+          ipAddress: "198.51.100.223",
+          port: basePort + 2,
+          organizationId,
+          visibility: "private",
+          gameplayTags: [],
+          mediaUrls: [],
+        },
+        manager,
+      ),
+    ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+    expect(await serverRepository.findBySlug(`revoked-org-server-${suffix}`)).toBeNull();
   });
 
   it("revokes organization resource authority when manage_products membership is removed", async () => {
@@ -267,8 +268,7 @@ describe("organization resource management integration", () => {
       {
         title: "Delegated Organization Resource",
         slug: `delegated-organization-resource-${suffix}`,
-        description:
-          "Organization-owned resource created by a delegated product manager.",
+        description: "Organization-owned resource created by a delegated product manager.",
         type: "script",
         status: "draft",
         authorId: managerId,
@@ -299,9 +299,7 @@ describe("organization resource management integration", () => {
       );
 
     expect(await productService.canManageProduct(product, manager)).toBe(false);
-    expect(
-      await productService.getProductPreviewBySlug(product.slug, manager),
-    ).toBeNull();
+    expect(await productService.getProductPreviewBySlug(product.slug, manager)).toBeNull();
 
     const owner = await userRepository.findById(ownerId);
     expect(owner).toBeTruthy();
@@ -355,9 +353,7 @@ describe("organization resource management integration", () => {
 
     // Simulate a historical ownerId directly; production update deliberately
     // cannot transfer organization authority through a server edit.
-    await db.update(servers)
-      .set({ ownerId: legacyOwnerId })
-      .where(eq(servers.id, legacy.id));
+    await db.update(servers).set({ ownerId: legacyOwnerId }).where(eq(servers.id, legacy.id));
     const withLegacyOwner = await serverRepository.findById(legacy.id);
     expect(withLegacyOwner?.organizationId).toBe(organizationId);
     expect(withLegacyOwner?.ownerId).toBe(legacyOwnerId);
@@ -367,11 +363,7 @@ describe("organization resource management integration", () => {
     expect(legacyOwner && orgOwner && withLegacyOwner).toBeTruthy();
     if (!legacyOwner || !orgOwner || !withLegacyOwner) return;
 
-    expect(
-      await serverService.canManageServer(withLegacyOwner, legacyOwner),
-    ).toBe(false);
-    expect(await serverService.canManageServer(withLegacyOwner, orgOwner)).toBe(
-      true,
-    );
+    expect(await serverService.canManageServer(withLegacyOwner, legacyOwner)).toBe(false);
+    expect(await serverService.canManageServer(withLegacyOwner, orgOwner)).toBe(true);
   });
 });

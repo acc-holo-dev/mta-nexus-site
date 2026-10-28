@@ -85,7 +85,9 @@ async function cleanupPrivateServerOwner(tx: ScenarioTransaction) {
 }
 
 async function cleanupModerationQueue(tx: ScenarioTransaction) {
-  await tx.delete(moderationCases).where(eq(moderationCases.id, ids.moderationQueue.moderationCase));
+  await tx
+    .delete(moderationCases)
+    .where(eq(moderationCases.id, ids.moderationQueue.moderationCase));
   await tx.delete(reports).where(eq(reports.id, ids.moderationQueue.report));
   await tx.delete(servers).where(eq(servers.id, ids.moderationQueue.server));
   await tx.delete(sessions).where(eq(sessions.id, ids.moderationQueue.reporterSession));
@@ -101,10 +103,7 @@ async function cleanupResourceScanPending(tx: ScenarioTransaction) {
   await tx.delete(users).where(eq(users.id, ids.resourceScanPending.developer));
 }
 
-const cleanupByScenario: Record<
-  ScenarioId,
-  (tx: ScenarioTransaction) => Promise<void>
-> = {
+const cleanupByScenario: Record<ScenarioId, (tx: ScenarioTransaction) => Promise<void>> = {
   "expired-session": cleanupExpiredSession,
   "private-server-owner": cleanupPrivateServerOwner,
   "moderation-queue": cleanupModerationQueue,

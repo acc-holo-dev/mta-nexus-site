@@ -69,7 +69,7 @@ Click analytics считается intent signal, не confirmed player join.
 
 Directory/server page не публикует список player names по умолчанию. Используются aggregate online/slots. Любое расширение этой политики требует отдельного privacy decision.
 
-## 13. Round 7 — server presentation, recruitment и analytics
+## 13. server presentation, recruitment и analytics
 
 ### 13.1 Safe customization
 

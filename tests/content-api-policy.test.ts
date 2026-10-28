@@ -95,9 +95,7 @@ describe("community content API behavior", () => {
   });
 
   it("bounds public reads and returns explicitly public cache headers", async () => {
-    const response = await GET(
-      new NextRequest("http://nexus.test/api/content?limit=999"),
-    );
+    const response = await GET(new NextRequest("http://nexus.test/api/content?limit=999"));
 
     expect(response.status).toBe(200);
     expect(mocks.listPublished).toHaveBeenCalledWith(100);
@@ -114,9 +112,7 @@ describe("community content API behavior", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
@@ -125,17 +121,12 @@ describe("community content API behavior", () => {
     const response = await POST(request(body()));
 
     expect(response.status).toBe(429);
-    expect(mocks.rateLimit).toHaveBeenCalledWith(
-      "contentCreation",
-      "usr_writer",
-    );
+    expect(mocks.rateLimit).toHaveBeenCalledWith("contentCreation", "usr_writer");
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
   it("downgrades a non-moderator editorial publication request to draft", async () => {
-    const response = await POST(
-      request(body({ status: "published", type: "article" })),
-    );
+    const response = await POST(request(body({ status: "published", type: "article" })));
 
     expect(response.status).toBe(201);
     expect(mocks.createWithAudit).toHaveBeenCalledWith(
@@ -154,9 +145,7 @@ describe("community content API behavior", () => {
   it.each(["post", "question"] as const)(
     "publishes community %s server-side without trusting a client status",
     async (type) => {
-      const response = await POST(
-        request(body({ type, status: "draft" })),
-      );
+      const response = await POST(request(body({ type, status: "draft" })));
 
       expect(response.status).toBe(201);
       expect(mocks.createWithAudit).toHaveBeenCalledWith(
@@ -172,9 +161,7 @@ describe("community content API behavior", () => {
 
   it("allows moderator editorial publication", async () => {
     state.canModerate = true;
-    const response = await POST(
-      request(body({ status: "published", type: "news" })),
-    );
+    const response = await POST(request(body({ status: "published", type: "news" })));
 
     expect(response.status).toBe(201);
     expect(mocks.createWithAudit).toHaveBeenCalledWith(
@@ -192,9 +179,7 @@ describe("community content API behavior", () => {
       id: "org_1",
       ownerId: "usr_owner",
     });
-    const response = await POST(
-      request(body({ organizationId: "org_1" })),
-    );
+    const response = await POST(request(body({ organizationId: "org_1" })));
 
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({

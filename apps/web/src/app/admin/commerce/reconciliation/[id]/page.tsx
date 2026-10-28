@@ -48,7 +48,12 @@ export default async function ReconciliationDetail({
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">{result.order.orderNumber}</h1>
-      <Link href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`} className="inline-block text-sm text-accent underline">{orderTermsCopy(locale).title}</Link>
+      <Link
+        href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`}
+        className="inline-block text-sm text-accent underline"
+      >
+        {orderTermsCopy(locale).title}
+      </Link>
       <p role="note" className="text-sm text-secondary">
         {copy.reviewNote}
       </p>

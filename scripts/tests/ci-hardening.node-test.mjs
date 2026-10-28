@@ -6,14 +6,22 @@ import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
 
 test("dependency, runtime and trust-boundary changes require full acceptance", () => {
   for (const file of [
-    ".nvmrc", ".node-version", "apps/web/package.json",
-    "packages/db/package.json", "packages/security/src/auth.ts",
-    "packages/storage/src/local-provider.ts", "packages/config/src/env.ts",
-    "apps/web/next.config.mjs", "apps/web/src/app/api/auth/login/route.ts",
+    ".nvmrc",
+    ".node-version",
+    "apps/web/package.json",
+    "packages/db/package.json",
+    "packages/security/src/auth.ts",
+    "packages/storage/src/local-provider.ts",
+    "packages/config/src/env.ts",
+    "apps/web/next.config.mjs",
+    "apps/web/src/app/api/auth/login/route.ts",
   ]) {
     assert.deepEqual(classifyChanges([file]), { code: true, full: true }, file);
   }
-  assert.deepEqual(classifyChanges(["apps/web/src/components/server-card.tsx"]), { code: true, full: false });
+  assert.deepEqual(classifyChanges(["apps/web/src/components/server-card.tsx"]), {
+    code: true,
+    full: false,
+  });
   assert.deepEqual(classifyChanges(["docs/handbook/notes.md"]), { code: false, full: false });
 });
 

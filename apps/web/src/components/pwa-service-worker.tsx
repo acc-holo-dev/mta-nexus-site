@@ -4,16 +4,11 @@ import { useEffect } from "react";
 
 export function PwaServiceWorker() {
   useEffect(() => {
-    if (
-      process.env.NODE_ENV !== "production" ||
-      !("serviceWorker" in navigator)
-    ) {
+    if (process.env.NODE_ENV !== "production" || !("serviceWorker" in navigator)) {
       return;
     }
 
-    void navigator.serviceWorker
-      .register("/sw.js", { scope: "/" })
-      .catch(() => undefined);
+    void navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => undefined);
   }, []);
 
   return null;

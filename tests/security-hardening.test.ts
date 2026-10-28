@@ -107,7 +107,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   it("Review integrity: paid product rejects review without purchase, self-review, and duplicates", async () => {
     // Rule: no purchase => cannot review (checked at API layer; repository supports state)
     const hasBought = (await licenseRepository.listByUser(userB.id)).some(
-      (l) => l.productId === product.id
+      (l) => l.productId === product.id,
     );
     expect(hasBought).toBe(false);
 

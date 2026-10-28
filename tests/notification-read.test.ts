@@ -8,14 +8,22 @@ describe("notification read target", () => {
 
   it("normalizes a single id without changing scope", () => {
     expect(parseNotificationReadTarget('{"id":"  not_123  "}')).toEqual({
-      scope: "single", id: "not_123",
+      scope: "single",
+      id: "not_123",
     });
   });
 
   it.each([
-    "null", "[]", "not-json", '{"id":null}', '{"id":""}',
-    '{"id":"   "}', '{"id":123}', '{"unexpected":true}',
-    '{"id":"not_123","unexpected":true}', '{"__proto__":{}}',
+    "null",
+    "[]",
+    "not-json",
+    '{"id":null}',
+    '{"id":""}',
+    '{"id":"   "}',
+    '{"id":123}',
+    '{"unexpected":true}',
+    '{"id":"not_123","unexpected":true}',
+    '{"__proto__":{}}',
     JSON.stringify({ id: "x".repeat(129) }),
     " ".repeat(1025),
   ])("rejects malformed and ambiguous bulk action %j", (body) => {

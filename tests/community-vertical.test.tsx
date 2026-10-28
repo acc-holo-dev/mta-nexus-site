@@ -28,14 +28,8 @@ vi.mock("next/navigation", () => ({
 vi.mock("next/link", async () => {
   const ReactModule = await import("react");
   return {
-    default: ({
-      href,
-      children,
-      ...props
-    }: {
-      href: string;
-      children?: React.ReactNode;
-    }) => ReactModule.createElement("a", { href, ...props }, children),
+    default: ({ href, children, ...props }: { href: string; children?: React.ReactNode }) =>
+      ReactModule.createElement("a", { href, ...props }, children),
   };
 });
 
@@ -164,11 +158,7 @@ describe("community topic submission behavior", () => {
 
   it("renders community navigation and a creation form without publication controls", async () => {
     const sidebar = renderToStaticMarkup(
-      <Sidebar
-        locale="en"
-        isCollapsed={false}
-        onToggle={() => undefined}
-      />,
+      <Sidebar locale="en" isCollapsed={false} onToggle={() => undefined} />,
     );
     const form = renderToStaticMarkup(<CommunityTopicForm />);
 

@@ -68,7 +68,13 @@ export type ServerObservedEvent = DomainEvent<
 
 export type OrderCreatedEvent = DomainEvent<
   "order.created",
-  { orderId: string; buyerId: string; totalAmount: number; currency: string; items: { productId: string; price: number }[] }
+  {
+    orderId: string;
+    buyerId: string;
+    totalAmount: number;
+    currency: string;
+    items: { productId: string; price: number }[];
+  }
 >;
 
 export type PaymentCompletedEvent = DomainEvent<
@@ -116,7 +122,7 @@ export interface EventBus {
   publish<E extends NexusDomainEvent>(event: E): Promise<void>;
   subscribe<TType extends NexusDomainEvent["type"]>(
     type: TType,
-    handler: (event: Extract<NexusDomainEvent, { type: TType }>) => Promise<void>
+    handler: (event: Extract<NexusDomainEvent, { type: TType }>) => Promise<void>,
   ): () => void;
 }
 
@@ -131,9 +137,7 @@ export class InMemoryEventBus implements EventBus {
     // Capture synchronous throws as rejected promises as well. Persistence
     // may already be committed when this best-effort bus is called.
     const results = await Promise.allSettled(
-      [...list, ...wildcard].map((handler) =>
-        Promise.resolve().then(() => handler(event)),
-      ),
+      [...list, ...wildcard].map((handler) => Promise.resolve().then(() => handler(event))),
     );
     const failed = results.filter((result) => result.status === "rejected").length;
     if (failed > 0) {
@@ -148,7 +152,7 @@ export class InMemoryEventBus implements EventBus {
 
   subscribe<TType extends NexusDomainEvent["type"]>(
     type: TType,
-    handler: (event: Extract<NexusDomainEvent, { type: TType }>) => Promise<void>
+    handler: (event: Extract<NexusDomainEvent, { type: TType }>) => Promise<void>,
   ): () => void {
     const wrapped: EventHandler = (event) =>
       handler(event as Extract<NexusDomainEvent, { type: TType }>);

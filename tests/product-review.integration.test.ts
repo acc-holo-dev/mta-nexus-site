@@ -18,17 +18,14 @@ function databaseErrorCode(error: unknown): string | undefined {
     cause?: { code?: unknown };
   };
   if (typeof record.code === "string") return record.code;
-  return typeof record.cause?.code === "string"
-    ? record.cause.code
-    : undefined;
+  return typeof record.cause?.code === "string" ? record.cause.code : undefined;
 }
 
 describe("product review repository integration", () => {
   it("serializes concurrent review aggregation and enforces one review per author", async () => {
-    const suffix =
-      `${Date.now().toString(36)}_${process.pid}_${Math.random()
-        .toString(36)
-        .slice(2, 8)}`;
+    const suffix = `${Date.now().toString(36)}_${process.pid}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
     const ownerId = `usr_review_owner_${suffix}`;
     const reviewerA = `usr_review_a_${suffix}`;
     const reviewerB = `usr_review_b_${suffix}`;
@@ -72,13 +69,26 @@ describe("product review repository integration", () => {
     });
 
     await db.insert(builds).values({
-      id: `bld_review_${suffix}`, productId, version: "1.0.0", status: "published",
-      storageKey: "fixtures/review.zip", sha256Hash: "a".repeat(64), fileSizeBytes: 100,
-      scanStatus: "clean", scanner: "integration-fixture", scannedAt: new Date(),
+      id: `bld_review_${suffix}`,
+      productId,
+      version: "1.0.0",
+      status: "published",
+      storageKey: "fixtures/review.zip",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 100,
+      scanStatus: "clean",
+      scanner: "integration-fixture",
+      scannedAt: new Date(),
     });
-    await db.insert(entitlements).values([reviewerA, reviewerB, reviewerC].map((subjectId, i) => ({
-      id: `ent_review_${i}_${suffix}`, subjectType: "user", subjectId, permission: "product.download", resourceId: productId,
-    })));
+    await db.insert(entitlements).values(
+      [reviewerA, reviewerB, reviewerC].map((subjectId, i) => ({
+        id: `ent_review_${i}_${suffix}`,
+        subjectType: "user",
+        subjectId,
+        permission: "product.download",
+        resourceId: productId,
+      })),
+    );
 
     const [first, second] = await Promise.all([
       contentRepository.addProductReview({
@@ -99,9 +109,7 @@ describe("product review repository integration", () => {
       }),
     ]);
 
-    expect(
-      [first.ratingCount, second.ratingCount].sort((a, b) => a - b),
-    ).toEqual([1, 2]);
+    expect([first.ratingCount, second.ratingCount].sort((a, b) => a - b)).toEqual([1, 2]);
 
     const [aggregate] = await db
       .select({
@@ -115,18 +123,8 @@ describe("product review repository integration", () => {
       ratingCount: 2,
       ratingAverage: 40,
     });
-    await expect(
-      contentRepository.hasReviewFromUser(
-        productId,
-        reviewerA,
-      ),
-    ).resolves.toBe(true);
-    await expect(
-      contentRepository.hasReviewFromUser(
-        productId,
-        reviewerC,
-      ),
-    ).resolves.toBe(false);
+    await expect(contentRepository.hasReviewFromUser(productId, reviewerA)).resolves.toBe(true);
+    await expect(contentRepository.hasReviewFromUser(productId, reviewerC)).resolves.toBe(false);
 
     let duplicateError: unknown;
     try {
@@ -144,9 +142,17 @@ describe("product review repository integration", () => {
     expect(duplicateError).toMatchObject({ code: "REVIEW_CHANGED", statusCode: 409 });
     // The unique database constraint also protects callers outside the repository.
     try {
-      await db.insert(comments).values({id: `cmt_raw_duplicate_${suffix}`, productId, authorId: reviewerA, text: "Raw duplicate", rating: 1});
+      await db.insert(comments).values({
+        id: `cmt_raw_duplicate_${suffix}`,
+        productId,
+        authorId: reviewerA,
+        text: "Raw duplicate",
+        rating: 1,
+      });
       throw new Error("Duplicate was accepted");
-    } catch (error) { expect(databaseErrorCode(error)).toBe("23505"); }
+    } catch (error) {
+      expect(databaseErrorCode(error)).toBe("23505");
+    }
 
     const [afterDuplicate] = await db
       .select({
@@ -160,10 +166,7 @@ describe("product review repository integration", () => {
       ratingAverage: 40,
     });
 
-    await db
-      .update(products)
-      .set({ status: "draft" })
-      .where(eq(products.id, productId));
+    await db.update(products).set({ status: "draft" }).where(eq(products.id, productId));
 
     await expect(
       contentRepository.addProductReview({
@@ -176,11 +179,6 @@ describe("product review repository integration", () => {
       }),
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
 
-    await expect(
-      contentRepository.hasReviewFromUser(
-        productId,
-        reviewerC,
-      ),
-    ).resolves.toBe(false);
+    await expect(contentRepository.hasReviewFromUser(productId, reviewerC)).resolves.toBe(false);
   });
 });

@@ -1,14 +1,7 @@
 import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
 import { AppError, ValidationError } from "@nexus/domain";
-import {
-  buildReviewDownloadRepository,
-  buildRepository,
-} from "@nexus/db";
-import {
-  can,
-  consumeRateLimit,
-  generateId,
-} from "@nexus/security";
+import { buildReviewDownloadRepository, buildRepository } from "@nexus/db";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
 import {
@@ -30,24 +23,17 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
 }
 
-function destroyOpenedStream(
-  stream: NodeJS.ReadableStream,
-): void {
-  const destroyable =
-    stream as NodeJS.ReadableStream & {
-      destroy?: (error?: Error) => void;
-    };
+function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
+  const destroyable = stream as NodeJS.ReadableStream & {
+    destroy?: (error?: Error) => void;
+  };
   destroyable.destroy?.();
 }
 
@@ -62,33 +48,24 @@ export async function GET(
   const context = createRequestLogContext(request);
 
   try {
-    const token =
-      request.cookies.get("nexus_session")?.value;
+    const token = request.cookies.get("nexus_session")?.value;
     const actor = await authService.getSession(token);
-    if (
-      !actor ||
-      !can(actor, "admin.moderation")
-    ) {
+    if (!actor || !can(actor, "admin.moderation")) {
       return json(
         context,
         {
-          error:
-            "Moderator access required",
+          error: "Moderator access required",
         },
         403,
       );
     }
 
-    const rateLimit = await consumeRateLimit(
-      "download",
-      `moderator:${actor.id}`,
-    );
+    const rateLimit = await consumeRateLimit("download", `moderator:${actor.id}`);
     if (!rateLimit.success) {
       return json(
         context,
         {
-          error:
-            "Too many reviewer downloads",
+          error: "Too many reviewer downloads",
         },
         429,
       );
@@ -96,85 +73,62 @@ export async function GET(
 
     const { buildId } = await params;
     if (!buildId || buildId.length > 128) {
-      return json(
-        context,
-        { error: "Build not found" },
-        404,
-      );
+      return json(context, { error: "Build not found" }, 404);
     }
 
-    const build =
-      await buildRepository.findById(buildId);
+    const build = await buildRepository.findById(buildId);
     if (!build) {
-      return json(
-        context,
-        { error: "Build not found" },
-        404,
-      );
+      return json(context, { error: "Build not found" }, 404);
     }
 
-    if (
-      build.status !== "pending_review" &&
-      build.status !== "quarantined"
-    ) {
+    if (build.status !== "pending_review" && build.status !== "quarantined") {
       return json(
         context,
         {
-          error:
-            "Build is not available for moderator evidence review",
+          error: "Build is not available for moderator evidence review",
         },
         409,
       );
     }
 
-    if (
-      build.scanStatus !== "clean" ||
-      !build.scanner?.trim() ||
-      !build.scannedAt
-    ) {
+    if (build.scanStatus !== "clean" || !build.scanner?.trim() || !build.scannedAt) {
       return json(
         context,
         {
-          error:
-            "Reviewer download requires a provenance-backed clean malware scan",
+          error: "Reviewer download requires a provenance-backed clean malware scan",
         },
         422,
       );
     }
 
-    const stored =
-      await storageService.getDownloadStream(
-        build.storageKey,
-        request.signal,
-      );
-    const contentLength =
-      assertBuildDownloadMetadata(stored, build);
+    const stored = await storageService.getDownloadStream(build.storageKey, request.signal);
+    const contentLength = assertBuildDownloadMetadata(stored, build);
 
     try {
       request.signal.throwIfAborted();
-      await buildReviewDownloadRepository.authorize({ actorId: actor.id, auditId: generateId("aud"), expected: build });
+      await buildReviewDownloadRepository.authorize({
+        actorId: actor.id,
+        auditId: generateId("aud"),
+        expected: build,
+      });
       request.signal.throwIfAborted();
     } catch (error) {
       destroyOpenedStream(stored.stream);
       throw error;
     }
 
-    const stream =
-      toDownloadWebStream(stored.stream);
+    const stream = toDownloadWebStream(stored.stream);
 
     return new NextResponse(stream, {
       headers: {
         ...privateHeaders,
-        "Content-Type":
-          "application/octet-stream",
-        "Content-Disposition":
-          `attachment; filename="${reviewerAttachmentFileName(
-            build.id,
-            build.fileName,
-          )}"`,
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${reviewerAttachmentFileName(
+          build.id,
+          build.fileName,
+        )}"`,
         "Content-Length": String(contentLength),
-        "X-Content-SHA256":
-          build.sha256Hash,
+        "X-Content-SHA256": build.sha256Hash,
         "X-Content-Type-Options": "nosniff",
         [REQUEST_ID_HEADER]: context.requestId,
       },
@@ -191,14 +145,11 @@ export async function GET(
       );
     }
 
-    if (
-      error instanceof BuildArtifactMismatchError
-    ) {
+    if (error instanceof BuildArtifactMismatchError) {
       return json(
         context,
         {
-          error:
-            "Build file does not match its recorded metadata",
+          error: "Build file does not match its recorded metadata",
           code: "BUILD_ARTIFACT_MISMATCH",
         },
         409,
@@ -209,15 +160,18 @@ export async function GET(
       return json(
         context,
         {
-          error:
-            "Resource build file is not available",
+          error: "Resource build file is not available",
         },
         404,
       );
     }
 
     if (error instanceof AppError) {
-      return json(context, { error: "Reviewer access or build evidence changed", code: error.code }, error.statusCode);
+      return json(
+        context,
+        { error: "Reviewer access or build evidence changed", code: error.code },
+        error.statusCode,
+      );
     }
 
     logRequestEvent({
@@ -230,8 +184,7 @@ export async function GET(
     return json(
       context,
       {
-        error:
-          "Could not deliver reviewer artifact",
+        error: "Could not deliver reviewer artifact",
       },
       500,
     );

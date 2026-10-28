@@ -16,16 +16,11 @@ const getArticleBySlug = vi.hoisted(() =>
     return contentState.article;
   }),
 );
-const getComments = vi.hoisted(() =>
-  vi.fn(async () => []),
-);
+const getComments = vi.hoisted(() => vi.fn(async () => []));
 const getDirectory = vi.hoisted(() =>
   vi.fn(async () => ({
     fetchedAt: "2026-10-08T00:00:00.000Z",
-    servers: [
-      { players: 10 },
-      { players: 5 },
-    ],
+    servers: [{ players: 10 }, { players: 5 }],
   })),
 );
 
@@ -59,9 +54,7 @@ describe("public and disabled API correlation boundaries", () => {
 
   it("keeps cacheable article success free of a replayable per-request id", async () => {
     const response = await contentGET(
-      new NextRequest(
-        "https://nexus.test/api/content/article-one",
-      ),
+      new NextRequest("https://nexus.test/api/content/article-one"),
       {
         params: Promise.resolve({
           slug: "article-one",
@@ -77,31 +70,20 @@ describe("public and disabled API correlation boundaries", () => {
   });
 
   it("correlates article validation and upstream failures without caching them", async () => {
-    const invalid = await contentGET(
-      new NextRequest(
-        "https://nexus.test/api/content/INVALID",
-      ),
-      {
-        params: Promise.resolve({
-          slug: "INVALID",
-        }),
-      },
-    );
+    const invalid = await contentGET(new NextRequest("https://nexus.test/api/content/INVALID"), {
+      params: Promise.resolve({
+        slug: "INVALID",
+      }),
+    });
     expect(invalid.status).toBe(404);
     expect(invalid.headers.get("cache-control")).toBe("no-store");
-    expect(invalid.headers.get("x-request-id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(invalid.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
 
     contentState.fail = true;
-    const log = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
       const failed = await contentGET(
-        new NextRequest(
-          "https://nexus.test/api/content/article-one",
-        ),
+        new NextRequest("https://nexus.test/api/content/article-one"),
         {
           params: Promise.resolve({
             slug: "article-one",
@@ -110,12 +92,8 @@ describe("public and disabled API correlation boundaries", () => {
       );
       expect(failed.status).toBe(503);
       expect(failed.headers.get("cache-control")).toBe("no-store");
-      expect(failed.headers.get("x-request-id")).toMatch(
-        /^[0-9a-f-]{20,}$/u,
-      );
-      expect(JSON.stringify(await failed.json())).not.toContain(
-        "content db offline",
-      );
+      expect(failed.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
+      expect(JSON.stringify(await failed.json())).not.toContain("content db offline");
     } finally {
       log.mockRestore();
     }
@@ -123,36 +101,23 @@ describe("public and disabled API correlation boundaries", () => {
 
   it("returns correlated no-store closed-beta checkout failures", async () => {
     const response = await checkoutPOST(
-      new NextRequest(
-        "https://nexus.test/api/checkout",
-        { method: "POST" },
-      ),
+      new NextRequest("https://nexus.test/api/checkout", { method: "POST" }),
     );
 
     expect(response.status).toBe(503);
-    expect(response.headers.get("cache-control")).toBe(
-      "private, no-store",
-    );
-    expect(response.headers.get("x-request-id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
     await expect(response.json()).resolves.toMatchObject({
       code: "CHECKOUT_DISABLED",
     });
   });
 
   it("correlates the dynamic legacy MTA snapshot and sums players", async () => {
-    const response = await mtaGET(
-      new NextRequest(
-        "https://nexus.test/api/mta/servers",
-      ),
-    );
+    const response = await mtaGET(new NextRequest("https://nexus.test/api/mta/servers"));
 
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
-    expect(response.headers.get("x-request-id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
     await expect(response.json()).resolves.toMatchObject({
       source: "mta-master",
       playersOnline: 15,

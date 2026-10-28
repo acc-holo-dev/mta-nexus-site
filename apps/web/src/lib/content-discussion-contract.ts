@@ -34,11 +34,27 @@ export function parseDiscussionCursor(params: URLSearchParams) {
 export function encodeDiscussionCursor(cursor: z.infer<typeof discussionCursorSchema>) {
   return JSON.stringify(cursor);
 }
-const searchCursorSchema = discussionCursorSchema.extend({ contentId: z.string().min(1).max(128), query: z.string().max(120) }).strict();
+const searchCursorSchema = discussionCursorSchema
+  .extend({ contentId: z.string().min(1).max(128), query: z.string().max(120) })
+  .strict();
 export function parseDiscussionQuery(params: URLSearchParams) {
-  if ([...params.keys()].some((key) => !["q", "comment", "cursor"].includes(key) || params.getAll(key).length !== 1)) return null;
-  const query = params.get("q")?.trim() ?? "", focusId = params.get("comment") ?? undefined;
-  if ((params.get("q")?.length ?? 0) > 120 || Array.from(query).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127) || (focusId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(focusId)) || (focusId && (query || params.has("cursor")))) return null;
+  if (
+    [...params.keys()].some(
+      (key) => !["q", "comment", "cursor"].includes(key) || params.getAll(key).length !== 1,
+    )
+  )
+    return null;
+  const query = params.get("q")?.trim() ?? "",
+    focusId = params.get("comment") ?? undefined;
+  if (
+    (params.get("q")?.length ?? 0) > 120 ||
+    Array.from(query).some(
+      (character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+    ) ||
+    (focusId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(focusId)) ||
+    (focusId && (query || params.has("cursor")))
+  )
+    return null;
   if (!query) {
     const cursor = parseDiscussionCursor(params);
     return cursor === null ? null : { query, focusId, cursor };
@@ -48,12 +64,19 @@ export function parseDiscussionQuery(params: URLSearchParams) {
   if (raw.length > 1024) return null;
   try {
     const parsed = searchCursorSchema.safeParse(JSON.parse(raw));
-    return parsed.success && parsed.data.query === query ? { query, focusId, cursor: parsed.data } : null;
-  } catch { return null; }
+    return parsed.success && parsed.data.query === query
+      ? { query, focusId, cursor: parsed.data }
+      : null;
+  } catch {
+    return null;
+  }
 }
 const discussionItemSchema = z.object({
   id: z.string().min(1),
-  revision: z.string().regex(/^[a-f0-9]{64}$/u).optional(),
+  revision: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/u)
+    .optional(),
   text: z.string(),
   parentId: z.string().nullable(),
   createdAt: z.iso.datetime(),
@@ -75,7 +98,13 @@ export const discussionPageSchema = z
   })
   .refine((value) => value.hasMore === (value.nextCursor !== null));
 export type DiscussionPage = z.infer<typeof discussionPageSchema>;
-export const discussionEditSchema = z.object({
-  text: z.string().trim().min(2).max(5000), expectedRevision: z.string().regex(/^[a-f0-9]{64}$/u),
-}).strict();
-export const discussionRemoveSchema = discussionEditSchema.omit({ text: true }).extend({ reason: z.string().trim().max(1000).optional() }).strict();
+export const discussionEditSchema = z
+  .object({
+    text: z.string().trim().min(2).max(5000),
+    expectedRevision: z.string().regex(/^[a-f0-9]{64}$/u),
+  })
+  .strict();
+export const discussionRemoveSchema = discussionEditSchema
+  .omit({ text: true })
+  .extend({ reason: z.string().trim().max(1000).optional() })
+  .strict();

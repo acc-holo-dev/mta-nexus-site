@@ -24,9 +24,7 @@ export function BuildQuarantineControls({
   async function act(action: "quarantine" | "restore") {
     if (pending || !hasReason) return;
     const confirmed = window.confirm(
-      action === "quarantine"
-        ? copy.quarantineBuildConfirm
-        : copy.restoreBuildConfirm,
+      action === "quarantine" ? copy.quarantineBuildConfirm : copy.restoreBuildConfirm,
     );
     if (!confirmed) return;
 
@@ -66,9 +64,7 @@ export function BuildQuarantineControls({
     <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
       <label className="block space-y-1">
         <span className="font-label uppercase text-muted">
-          {status === "quarantined"
-            ? copy.restoreReason
-            : copy.quarantineReason}
+          {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
         </span>
         <textarea
           value={reason}
@@ -97,11 +93,13 @@ export function BuildQuarantineControls({
         ) : (
           <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
         )}
-        {action === "quarantine"
-          ? copy.quarantineBuild
-          : copy.restoreBuild}
+        {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
       </button>
-      {error && <p role="alert" className="text-[11px] text-danger">{error}</p>}
+      {error && (
+        <p role="alert" className="text-[11px] text-danger">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

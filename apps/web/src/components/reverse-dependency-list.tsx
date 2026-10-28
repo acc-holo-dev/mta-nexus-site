@@ -29,15 +29,11 @@ export function ReverseDependencyList({
             className="rounded-md border border-base bg-inset px-2.5 py-1.5 text-xs text-secondary transition-colors hover:border-strong hover:text-accent"
           >
             <span className="font-semibold">{product.title}</span>
-            <span className="ml-1 font-mono text-[10px] text-faint">
-              v{product.currentVersion}
-            </span>
+            <span className="ml-1 font-mono text-[10px] text-faint">v{product.currentVersion}</span>
           </Link>
         ))}
       </div>
-      {summary.limitReached && (
-        <p className="text-[10px] text-warning">{copy.limitReached}</p>
-      )}
+      {summary.limitReached && <p className="text-[10px] text-warning">{copy.limitReached}</p>}
       <p className="text-[10px] text-faint">{copy.reverseNotice}</p>
     </div>
   );

@@ -1,12 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import {
-  buildRepository,
-  productRepository,
-  sessionRepository,
-  userRepository,
-} from "@nexus/db";
+import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { POST as claimResource } from "../apps/web/src/app/api/resources/claim/route";
 import { GET as downloadResource } from "../apps/web/src/app/api/products/[id]/download/route";
@@ -26,8 +21,7 @@ describe("J5 free resource claim-to-download journey", () => {
     const sessionToken = `tok_j5_${suffix}`;
     const productId = `prd_j5_${suffix}`;
     const buildId = `bld_j5_${suffix}`;
-    const proxySecret =
-      `j5-${suffix}-0123456789abcdef0123456789abcdef`;
+    const proxySecret = `j5-${suffix}-0123456789abcdef0123456789abcdef`;
     const clientIp = `198.51.100.${30 + (process.pid % 190)}`;
 
     vi.stubEnv("TRUSTED_PROXY_SECRET", proxySecret);
@@ -74,9 +68,7 @@ describe("J5 free resource claim-to-download journey", () => {
       compatibility: { dependencies: [] },
     });
 
-    const bytes = new TextEncoder().encode(
-      "nexus-j5-claim-download-journey",
-    );
+    const bytes = new TextEncoder().encode("nexus-j5-claim-download-journey");
     const asset = await storageService.uploadAsset({
       data: bytes,
       fileName: "j5-resource.zip",
@@ -103,15 +95,12 @@ describe("J5 free resource claim-to-download journey", () => {
       });
 
       const downloadRequest = () =>
-        new NextRequest(
-          `http://nexus.test/api/products/${productId}/download`,
-          {
-            method: "GET",
-            headers: {
-              cookie: `nexus_session=${sessionToken}`,
-            },
+        new NextRequest(`http://nexus.test/api/products/${productId}/download`, {
+          method: "GET",
+          headers: {
+            cookie: `nexus_session=${sessionToken}`,
           },
-        );
+        });
       const downloadContext = {
         params: Promise.resolve({ id: productId }),
       };
@@ -128,14 +117,9 @@ describe("J5 free resource claim-to-download journey", () => {
           body: JSON.stringify({ productId }),
         });
 
-      const beforeClaim = await downloadResource(
-        downloadRequest(),
-        downloadContext,
-      );
+      const beforeClaim = await downloadResource(downloadRequest(), downloadContext);
       expect(beforeClaim.status).toBe(403);
-      expect(beforeClaim.headers.get("Cache-Control")).toBe(
-        "private, no-store",
-      );
+      expect(beforeClaim.headers.get("Cache-Control")).toBe("private, no-store");
       expect(beforeClaim.headers.get("Vary")).toBe("Cookie");
 
       const firstClaim = await claimResource(claimRequest());
@@ -150,21 +134,12 @@ describe("J5 free resource claim-to-download journey", () => {
         },
       });
 
-      const afterClaim = await downloadResource(
-        downloadRequest(),
-        downloadContext,
-      );
+      const afterClaim = await downloadResource(downloadRequest(), downloadContext);
       expect(afterClaim.status).toBe(200);
-      expect(afterClaim.headers.get("X-Content-SHA256")).toBe(
-        asset.sha256Hash,
-      );
-      expect(afterClaim.headers.get("Cache-Control")).toBe(
-        "private, no-store",
-      );
+      expect(afterClaim.headers.get("X-Content-SHA256")).toBe(asset.sha256Hash);
+      expect(afterClaim.headers.get("Cache-Control")).toBe("private, no-store");
       expect(afterClaim.headers.get("Vary")).toBe("Cookie");
-      expect(
-        new Uint8Array(await afterClaim.arrayBuffer()),
-      ).toEqual(bytes);
+      expect(new Uint8Array(await afterClaim.arrayBuffer())).toEqual(bytes);
 
       const retry = await claimResource(claimRequest());
       expect(retry.status).toBe(200);
@@ -177,18 +152,14 @@ describe("J5 free resource claim-to-download journey", () => {
         },
       });
 
-      const afterRetryProduct =
-        await productRepository.findById(productId);
+      const afterRetryProduct = await productRepository.findById(productId);
       expect(afterRetryProduct?.salesCount).toBe(1);
 
       await productRepository.update(productId, {
         status: "suspended",
       });
 
-      const afterSuspension = await downloadResource(
-        downloadRequest(),
-        downloadContext,
-      );
+      const afterSuspension = await downloadResource(downloadRequest(), downloadContext);
       expect(afterSuspension.status).toBe(404);
       expect(await afterSuspension.json()).toEqual({
         error: "Resource not found",

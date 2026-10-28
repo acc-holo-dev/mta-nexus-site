@@ -1,6 +1,4 @@
-export function assertServerObservationCaptureEnvironment(
-  env = process.env,
-) {
+export function assertServerObservationCaptureEnvironment(env = process.env) {
   if (env.NEXUS_SERVER_OBSERVATION_CAPTURE !== "true") {
     throw new Error(
       "Server observation capture refused: set NEXUS_SERVER_OBSERVATION_CAPTURE=true explicitly",
@@ -14,9 +12,7 @@ export function assertServerObservationCaptureEnvironment(
   }
 
   if (env.NODE_ENV !== "development") {
-    throw new Error(
-      "Server observation capture refused: NODE_ENV must be development",
-    );
+    throw new Error("Server observation capture refused: NODE_ENV must be development");
   }
 
   let database;

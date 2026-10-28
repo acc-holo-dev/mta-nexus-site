@@ -36,10 +36,7 @@ export default function ForgotPasswordPage() {
     } catch (error: unknown) {
       setNotice({
         error: true,
-        text:
-          error instanceof Error && error.message
-            ? error.message
-            : copy.unavailable,
+        text: error instanceof Error && error.message ? error.message : copy.unavailable,
       });
     } finally {
       setPending(false);
@@ -59,15 +56,11 @@ export default function ForgotPasswordPage() {
           </h1>
         </div>
 
-        <p className="text-sm leading-relaxed text-muted">
-          {copy.forgotDescription}
-        </p>
+        <p className="text-sm leading-relaxed text-muted">{copy.forgotDescription}</p>
 
         <form onSubmit={submit} aria-busy={pending} className="space-y-4">
           <label className="block space-y-1.5" htmlFor="reset-email">
-            <span className="text-sm font-semibold text-primary">
-              {copy.email}
-            </span>
+            <span className="text-sm font-semibold text-primary">{copy.email}</span>
             <input
               id="reset-email"
               name="email"
@@ -102,10 +95,7 @@ export default function ForgotPasswordPage() {
           </p>
         )}
 
-        <Link
-          href="/auth/login"
-          className="text-sm font-semibold text-accent hover:underline"
-        >
+        <Link href="/auth/login" className="text-sm font-semibold text-accent hover:underline">
           {copy.backToSignIn}
         </Link>
       </section>

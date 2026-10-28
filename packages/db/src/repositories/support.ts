@@ -199,10 +199,10 @@ export class SupportCaseRepository {
     page = 1,
     pageSize = 100,
   ): Promise<SupportPage<SupportCaseMessage>> {
-    return db.transaction(
-      (tx) => this.pageMessagesWithin(tx, caseId, page, pageSize),
-      { isolationLevel: "repeatable read", accessMode: "read only" },
-    );
+    return db.transaction((tx) => this.pageMessagesWithin(tx, caseId, page, pageSize), {
+      isolationLevel: "repeatable read",
+      accessMode: "read only",
+    });
   }
 
   async authorizedThread(caseId: string, actorId: string, page = 1) {

@@ -5,7 +5,10 @@ import { contentService } from "../../lib/services/content-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import Link from "next/link";
-import { ContentCatalogControls, ContentPageNavigation } from "../../components/content-catalog-controls";
+import {
+  ContentCatalogControls,
+  ContentPageNavigation,
+} from "../../components/content-catalog-controls";
 import { editorialTypes, parseContentPage } from "../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
@@ -16,11 +19,15 @@ export async function generateMetadata() {
   return { title: copy.title, description: copy.description };
 }
 
-export default async function ArticlesPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function ArticlesPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const platformCopy = getUserPlatformCopy(locale);
-  const { status: _status, ...filters } = parseContentPage(await searchParams ?? {});
+  const { status: _status, ...filters } = parseContentPage((await searchParams) ?? {});
   const result = await contentService.pageArticles(filters).catch(() => null);
   const articles = result?.items ?? [];
 
@@ -36,17 +43,29 @@ export default async function ArticlesPage({ searchParams }: { searchParams?: Pr
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-4 text-sm"><Link href="/workspace/content/new" className="text-accent underline">{platformCopy.create}</Link><Link href="/workspace/content" className="text-accent underline">{platformCopy.studio}</Link></div>
-      <ContentCatalogControls path="/articles" filters={filters} locale={locale} types={editorialTypes} />
+      <div className="flex flex-wrap gap-4 text-sm">
+        <Link href="/workspace/content/new" className="text-accent underline">
+          {platformCopy.create}
+        </Link>
+        <Link href="/workspace/content" className="text-accent underline">
+          {platformCopy.studio}
+        </Link>
+      </div>
+      <ContentCatalogControls
+        path="/articles"
+        filters={filters}
+        locale={locale}
+        types={editorialTypes}
+      />
 
-      {!result ? <p role="alert" className="text-sm text-danger">{platformCopy.unavailable}</p> : articles.length > 0 ? (
+      {!result ? (
+        <p role="alert" className="text-sm text-danger">
+          {platformCopy.unavailable}
+        </p>
+      ) : articles.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              locale={locale}
-            />
+            <ArticleCard key={article.id} article={article} locale={locale} />
           ))}
         </div>
       ) : (
@@ -56,7 +75,15 @@ export default async function ArticlesPage({ searchParams }: { searchParams?: Pr
           icon={<BookOpen className="h-6 w-6" />}
         />
       )}
-      {result && <ContentPageNavigation path="/articles" filters={filters} page={result.page} hasMore={result.hasMore} locale={locale} />}
+      {result && (
+        <ContentPageNavigation
+          path="/articles"
+          filters={filters}
+          page={result.page}
+          hasMore={result.hasMore}
+          locale={locale}
+        />
+      )}
     </div>
   );
 }

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  digestServerClaimToken,
-  serverClaimChallengePolicy,
-} from "@nexus/db";
+import { digestServerClaimToken, serverClaimChallengePolicy } from "@nexus/db";
 
 describe("server control challenge token contract", () => {
   it("accepts the public token format and stores a one-way digest", () => {

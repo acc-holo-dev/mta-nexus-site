@@ -1,4 +1,3 @@
-import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Avatar } from "../packages/ui/src/avatar";
@@ -8,9 +7,7 @@ import { Tabs, nextTabIndex } from "../packages/ui/src/tabs";
 
 describe("Input accessibility wiring", () => {
   it("auto-generates a stable field id for labels and errors", () => {
-    const markup = renderToStaticMarkup(
-      <Input label="Email" error="Email is required" />,
-    );
+    const markup = renderToStaticMarkup(<Input label="Email" error="Email is required" />);
 
     const id = markup.match(/<input[^>]*\sid="([^"]+)"/u)?.[1];
     expect(id).toBeTruthy();
@@ -31,9 +28,7 @@ describe("Input accessibility wiring", () => {
       />,
     );
 
-    expect(markup).toContain(
-      'aria-describedby="password-policy password-error"',
-    );
+    expect(markup).toContain('aria-describedby="password-policy password-error"');
     expect(markup).toContain('aria-errormessage="password-error"');
     expect(markup).toContain('role="alert"');
   });
@@ -95,12 +90,9 @@ describe("Tabs keyboard navigation", () => {
   });
 });
 
-
 describe("Shared non-text accessibility", () => {
   it("gives an avatar fallback an image role and accessible name", () => {
-    const markup = renderToStaticMarkup(
-      <Avatar fallback="HN" alt="Holo Nexus" />,
-    );
+    const markup = renderToStaticMarkup(<Avatar fallback="HN" alt="Holo Nexus" />);
 
     expect(markup).toContain('role="img"');
     expect(markup).toContain('aria-label="Holo Nexus"');

@@ -16,21 +16,17 @@ const directoryState = vi.hoisted(() => ({
   },
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/mta-master-directory-service",
-  () => ({
-    mtaMasterDirectoryService: {
-      getDirectory: vi.fn(async () => directoryState.current),
-    },
-    matchesMtaEndpoint: (
-      server: { ipAddress: string; port: number },
-      observed: { address: string; port: number },
-    ) =>
-      server.ipAddress.toLowerCase().replace(/\.$/u, "") ===
-        observed.address.toLowerCase().replace(/\.$/u, "") &&
-      server.port === observed.port,
-  }),
-);
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+  mtaMasterDirectoryService: {
+    getDirectory: vi.fn(async () => directoryState.current),
+  },
+  matchesMtaEndpoint: (
+    server: { ipAddress: string; port: number },
+    observed: { address: string; port: number },
+  ) =>
+    server.ipAddress.toLowerCase().replace(/\.$/u, "") ===
+      observed.address.toLowerCase().replace(/\.$/u, "") && server.port === observed.port,
+}));
 
 import {
   db,
@@ -46,11 +42,7 @@ import { POST as verifyChallenge } from "../apps/web/src/app/api/servers/[id]/cl
 import { POST as genericVerification } from "../apps/web/src/app/api/verification/route";
 import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
 
-function post(
-  url: string,
-  token: string,
-  body?: Record<string, unknown>,
-) {
+function post(url: string, token: string, body?: Record<string, unknown>) {
   return new NextRequest(url, {
     method: "POST",
     headers: browserMutationHeaders({
@@ -133,10 +125,7 @@ describe("MTA server control challenge integration", () => {
     });
 
     const issued = await issueChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge`,
-        sessionToken,
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge`, sessionToken),
       { params: Promise.resolve({ id: serverId }) },
     );
 
@@ -144,9 +133,7 @@ describe("MTA server control challenge integration", () => {
     expect(issued.headers.get("Cache-Control")).toBe("private, no-store");
     expect(issued.headers.get("Vary")).toBe("Cookie");
     const issuedBody = await issued.json();
-    expect(issuedBody.challenge.token).toMatch(
-      /^NXCLAIM-[A-F0-9]{24}$/u,
-    );
+    expect(issuedBody.challenge.token).toMatch(/^NXCLAIM-[A-F0-9]{24}$/u);
     const challengeId = issuedBody.challenge.challengeId as string;
     const controlToken = issuedBody.challenge.token as string;
 
@@ -173,11 +160,10 @@ describe("MTA server control challenge integration", () => {
       ],
     };
     const stolenToken = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        attackerToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, attackerToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(stolenToken.status).toBe(400);
@@ -186,15 +172,11 @@ describe("MTA server control challenge integration", () => {
     });
 
     const bypass = await genericVerification(
-      post(
-        "http://nexus.test/api/verification",
-        sessionToken,
-        {
-          targetType: "server",
-          targetId: serverId,
-          proofUrl: "https://example.test/manual-proof",
-        },
-      ),
+      post("http://nexus.test/api/verification", sessionToken, {
+        targetType: "server",
+        targetId: serverId,
+        proofUrl: "https://example.test/manual-proof",
+      }),
     );
     expect(bypass.status).toBe(422);
     expect(await bypass.json()).toMatchObject({
@@ -214,11 +196,10 @@ describe("MTA server control challenge integration", () => {
       ],
     };
     const stale = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        sessionToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, sessionToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(stale.status).toBe(503);
@@ -241,11 +222,10 @@ describe("MTA server control challenge integration", () => {
       ],
     };
     const tooOld = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        sessionToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, sessionToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(tooOld.status).toBe(409);
@@ -266,11 +246,10 @@ describe("MTA server control challenge integration", () => {
       ],
     };
     const missingToken = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        sessionToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, sessionToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(missingToken.status).toBe(422);
@@ -291,11 +270,10 @@ describe("MTA server control challenge integration", () => {
       ],
     };
     const offline = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        sessionToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, sessionToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(offline.status).toBe(409);
@@ -317,11 +295,10 @@ describe("MTA server control challenge integration", () => {
       ],
     };
     const verified = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        sessionToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, sessionToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(verified.status).toBe(201);
@@ -350,23 +327,14 @@ describe("MTA server control challenge integration", () => {
       .limit(1);
     expect(consumed?.consumedAt).toBeTruthy();
     expect(consumed?.sourceFetchedAt?.toISOString()).toBe(freshFetchedAt);
-    expect(consumed?.verificationRequestId).toBe(
-      verifiedBody.verificationRequest.id,
-    );
+    expect(consumed?.verificationRequestId).toBe(verifiedBody.verificationRequest.id);
 
     const [request] = await db
       .select()
       .from(verificationRequests)
-      .where(
-        eq(
-          verificationRequests.id,
-          verifiedBody.verificationRequest.id,
-        ),
-      )
+      .where(eq(verificationRequests.id, verifiedBody.verificationRequest.id))
       .limit(1);
-    expect(request?.notes).toContain(
-      "Automated MTA master-list control challenge verified",
-    );
+    expect(request?.notes).toContain("Automated MTA master-list control challenge verified");
     expect(request?.notes).not.toContain(controlToken);
 
     const beforeModeration = await serverRepository.findById(serverId);
@@ -374,11 +342,10 @@ describe("MTA server control challenge integration", () => {
     expect(beforeModeration?.isVerified).toBe(false);
 
     const retry = await verifyChallenge(
-      post(
-        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
-        sessionToken,
-        { challengeId, token: controlToken },
-      ),
+      post(`http://nexus.test/api/servers/${serverId}/claim-challenge/verify`, sessionToken, {
+        challengeId,
+        token: controlToken,
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(retry.status).toBe(400);
@@ -387,16 +354,12 @@ describe("MTA server control challenge integration", () => {
     });
 
     const approved = await adminAction(
-      post(
-        "http://nexus.test/api/admin/actions",
-        moderatorToken,
-        {
-          targetType: "verification",
-          targetId: verifiedBody.verificationRequest.id,
-          action: "approve",
-          notes: "Live MTA control proof reviewed.",
-        },
-      ),
+      post("http://nexus.test/api/admin/actions", moderatorToken, {
+        targetType: "verification",
+        targetId: verifiedBody.verificationRequest.id,
+        action: "approve",
+        notes: "Live MTA control proof reviewed.",
+      }),
     );
     expect(approved.status).toBe(200);
 
@@ -407,12 +370,7 @@ describe("MTA server control challenge integration", () => {
     const [resolvedRequest] = await db
       .select()
       .from(verificationRequests)
-      .where(
-        eq(
-          verificationRequests.id,
-          verifiedBody.verificationRequest.id,
-        ),
-      )
+      .where(eq(verificationRequests.id, verifiedBody.verificationRequest.id))
       .limit(1);
     expect(resolvedRequest?.status).toBe("approved");
     expect(resolvedRequest?.reviewerId).toBe(moderatorId);

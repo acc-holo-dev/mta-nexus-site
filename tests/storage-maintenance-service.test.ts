@@ -43,7 +43,9 @@ beforeEach(() => {
 });
 it("checks the live role before any provider or retirement operation", async () => {
   state.admin.mockRejectedValue(new ForbiddenError());
-  await expect(service.cleanup("usr_a", "tok_a", "smo_a", 1)).rejects.toMatchObject({ statusCode: 403 });
+  await expect(service.cleanup("usr_a", "tok_a", "smo_a", 1)).rejects.toMatchObject({
+    statusCode: 403,
+  });
   expect(state.retire).not.toHaveBeenCalled();
   expect(state.remove).not.toHaveBeenCalled();
 });

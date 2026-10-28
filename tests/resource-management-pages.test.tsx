@@ -68,29 +68,25 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "developer" };
   state.locale = "en";
-  state.product
-    .mockReset()
-    .mockResolvedValue({
-      id: "prd_a",
-      title: "<script>Private title</script>",
-      slug: "resource-a",
-      status: "published",
-      updatedAt: new Date(revision),
-      compatibility: { dependencies: [] },
-      privateField: "must-not-serialize",
-      authorId: "usr_a",
-    });
+  state.product.mockReset().mockResolvedValue({
+    id: "prd_a",
+    title: "<script>Private title</script>",
+    slug: "resource-a",
+    status: "published",
+    updatedAt: new Date(revision),
+    compatibility: { dependencies: [] },
+    privateField: "must-not-serialize",
+    authorId: "usr_a",
+  });
   state.managed.mockReset().mockResolvedValue({ anchorProductId: "prd_a", group: null });
   state.candidates.mockReset().mockResolvedValue({ candidates: [], page: 1, hasMore: false });
-  state.resolution
-    .mockReset()
-    .mockResolvedValue({
-      dependencies: [],
-      declaredCount: 0,
-      availableCount: 0,
-      unresolvedCount: 0,
-      selfReferenceCount: 0,
-    });
+  state.resolution.mockReset().mockResolvedValue({
+    dependencies: [],
+    declaredCount: 0,
+    availableCount: 0,
+    unresolvedCount: 0,
+    selfReferenceCount: 0,
+  });
 });
 it("does not discover private groups or requirements for a guest", async () => {
   state.user = null;

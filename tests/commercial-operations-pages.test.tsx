@@ -63,72 +63,66 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "admin" };
   state.locale = "en";
-  state.catalog
-    .mockReset()
-    .mockResolvedValue({
-      plans: [
-        {
-          ...terms,
-          id: "cplan_a",
-          slug: "seller-plan",
-          scope: "organization",
-          status: "published",
-          revision: 2,
-          secret: "PRIVATE",
-        },
-      ],
-      total: 21,
-      totalPages: 2,
-      page: 2,
-    });
-  state.adminDetail
-    .mockReset()
-    .mockResolvedValue({
-      plan: {
+  state.catalog.mockReset().mockResolvedValue({
+    plans: [
+      {
         ...terms,
         id: "cplan_a",
         slug: "seller-plan",
-        scope: "user",
+        scope: "organization",
         status: "published",
         revision: 2,
-        actorId: "PRIVATE-ADMIN",
-        updatedAt: now,
+        secret: "PRIVATE",
       },
-      history: [
-        {
-          revision: 2,
-          status: "published",
-          reason: "<script>Reviewed</script>",
-          terms,
-          createdAt: now,
-          actorId: "PRIVATE-ADMIN",
-        },
-      ],
-      total: 21,
-      page: 2,
-      totalPages: 2,
-    });
-  state.detail
-    .mockReset()
-    .mockResolvedValue({
-      order: { id: "ord_a", orderNumber: "N-1", status: "pending", updatedAt: now },
-      attempts: [
-        {
-          id: "pay_a",
-          status: "unrecognized-private-state",
-          amount: 999,
-          currency: "USD",
-          createdAt: now,
-          updatedAt: now,
-          providerTransactionId: "PRIVATE-TX",
-          failureReason: "PRIVATE-FAILURE",
-        },
-      ],
-      canCancel: false,
-      total: 21,
-      totalPages: 2,
-      page: 2,
-    });
+    ],
+    total: 21,
+    totalPages: 2,
+    page: 2,
+  });
+  state.adminDetail.mockReset().mockResolvedValue({
+    plan: {
+      ...terms,
+      id: "cplan_a",
+      slug: "seller-plan",
+      scope: "user",
+      status: "published",
+      revision: 2,
+      actorId: "PRIVATE-ADMIN",
+      updatedAt: now,
+    },
+    history: [
+      {
+        revision: 2,
+        status: "published",
+        reason: "<script>Reviewed</script>",
+        terms,
+        createdAt: now,
+        actorId: "PRIVATE-ADMIN",
+      },
+    ],
+    total: 21,
+    page: 2,
+    totalPages: 2,
+  });
+  state.detail.mockReset().mockResolvedValue({
+    order: { id: "ord_a", orderNumber: "N-1", status: "pending", updatedAt: now },
+    attempts: [
+      {
+        id: "pay_a",
+        status: "unrecognized-private-state",
+        amount: 999,
+        currency: "USD",
+        createdAt: now,
+        updatedAt: now,
+        providerTransactionId: "PRIVATE-TX",
+        failureReason: "PRIVATE-FAILURE",
+      },
+    ],
+    canCancel: false,
+    total: 21,
+    totalPages: 2,
+    page: 2,
+  });
 });
 it.each(["en", "ru"] as const)(
   "renders published %s terms and explicitly unavailable activation",

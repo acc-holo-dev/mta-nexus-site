@@ -58,9 +58,6 @@ describe("content feed separation behavior", () => {
 
   it("queries only post/question for community topics", async () => {
     await service.listCommunityTopics(18);
-    expect(mocks.listByTypes).toHaveBeenCalledWith(
-      ["post", "question"],
-      18,
-    );
+    expect(mocks.listByTypes).toHaveBeenCalledWith(["post", "question"], 18);
   });
 });

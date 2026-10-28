@@ -55,7 +55,12 @@ export interface SectionHeaderProps {
 
 export function SectionHeader({ title, description, action, className }: SectionHeaderProps) {
   return (
-    <div className={cn("flex items-center justify-between border-b border-base pb-2.5 mb-4", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between border-b border-base pb-2.5 mb-4",
+        className,
+      )}
+    >
       <div>
         <h2 className="font-heading text-primary">{title}</h2>
         {description && <p className="font-caption text-muted mt-0.5">{description}</p>}
@@ -134,7 +139,7 @@ export function TrustBadge({ variant, label, className }: TrustBadgeProps) {
       className={cn(
         "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border",
         config.css,
-        className
+        className,
       )}
     >
       <Icon className="w-3 h-3" aria-hidden="true" />
@@ -168,7 +173,7 @@ export function StatusBadge({ status, tone = "neutral", className }: StatusBadge
       className={cn(
         "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-numeric font-bold uppercase border",
         STATUS_TONES[tone],
-        className
+        className,
       )}
     >
       {status}
@@ -179,7 +184,13 @@ export function StatusBadge({ status, tone = "neutral", className }: StatusBadge
 /* ============================================================
    DataTable primitives — consistent table system (TASK-019)
    ============================================================ */
-export function DataTable({ children, className }: { children: React.ReactNode; className?: string }) {
+export function DataTable({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={cn("overflow-x-auto", className)}>
       <table className="w-full text-left text-xs">{children}</table>
@@ -192,7 +203,10 @@ export function DataTableHeader({ columns }: { columns: string[] }) {
     <thead className="font-label text-faint uppercase border-b border-base">
       <tr>
         {withOccurrenceKeys(columns, (column) => column).map(({ key, item: col }, i) => (
-          <th key={key} className={cn("py-2.5 pr-4", i === columns.length - 1 && "text-right pr-0")}>
+          <th
+            key={key}
+            className={cn("py-2.5 pr-4", i === columns.length - 1 && "text-right pr-0")}
+          >
             {col}
           </th>
         ))}
@@ -218,4 +232,3 @@ export function DataTableEmpty({ colSpan, message }: { colSpan: number; message:
     </tr>
   );
 }
-

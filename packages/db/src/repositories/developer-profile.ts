@@ -20,8 +20,12 @@ class DeveloperProfileRepository {
     const [row] = await db
       .select({
         ...publicFields,
-        githubUrl: sql<string | null>`case when coalesce(${userProfilePreferences.showProfessionalContacts}, true) then ${developerProfiles.githubUrl} else null end`,
-        discordTag: sql<string | null>`case when coalesce(${userProfilePreferences.showProfessionalContacts}, true) then ${developerProfiles.discordTag} else null end`,
+        githubUrl: sql<
+          string | null
+        >`case when coalesce(${userProfilePreferences.showProfessionalContacts}, true) then ${developerProfiles.githubUrl} else null end`,
+        discordTag: sql<
+          string | null
+        >`case when coalesce(${userProfilePreferences.showProfessionalContacts}, true) then ${developerProfiles.discordTag} else null end`,
       })
       .from(developerProfiles)
       .innerJoin(users, eq(users.id, developerProfiles.userId))
@@ -94,20 +98,18 @@ class DeveloperProfileRepository {
         })
         .where(eq(users.id, input.actorId))
         .returning({ updatedAt: users.updatedAt });
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.actorId,
-          actorType: "user",
-          action: "developer.profile_updated",
-          targetType: "user",
-          targetId: input.actorId,
-          details: {
-            fields: ["specialties", "githubUrl", "discordTag"],
-            experienceVerificationInvalidated: !!previous?.verifiedDeveloper && changed,
-          },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.actorId,
+        actorType: "user",
+        action: "developer.profile_updated",
+        targetType: "user",
+        targetId: input.actorId,
+        details: {
+          fields: ["specialties", "githubUrl", "discordTag"],
+          experienceVerificationInvalidated: !!previous?.verifiedDeveloper && changed,
+        },
+      });
       return {
         id: input.actorId,
         ...fields,

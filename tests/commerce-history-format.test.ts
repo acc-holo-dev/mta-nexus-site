@@ -13,7 +13,11 @@ import { commerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
 describe("bounded private commerce history", () => {
   it("bounds pages without accepting large or malformed offsets", () => {
     expect(historyPageBounds(0, 100)).toEqual({
-      page: 1, pageSize: 20, total: 0, totalPages: 1, offset: 0,
+      page: 1,
+      pageSize: 20,
+      total: 0,
+      totalPages: 1,
+      offset: 0,
     });
     expect(historyPageBounds(21, 1)).toMatchObject({ page: 1, offset: 0, totalPages: 2 });
     expect(historyPageBounds(21, 2)).toMatchObject({ page: 2, offset: 20, totalPages: 2 });
@@ -43,12 +47,18 @@ describe("bounded private commerce history", () => {
   });
 
   it("fails closed when the formatter does not report currency fraction digits", () => {
-    const options = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).resolvedOptions();
-    const spy = vi.spyOn(Intl.NumberFormat.prototype, "resolvedOptions")
+    const options = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).resolvedOptions();
+    const spy = vi
+      .spyOn(Intl.NumberFormat.prototype, "resolvedOptions")
       .mockReturnValue({ ...options, maximumFractionDigits: undefined });
     try {
       expect(formatHistoryAmount(12345, "USD", "en")).toBe("—");
-    } finally { spy.mockRestore(); }
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it("calculates effective expiry without changing the stored license status", () => {
@@ -63,14 +73,19 @@ describe("bounded private commerce history", () => {
     expect(effectiveLicenseStatus("suspended", prior, now)).toBe("suspended");
   });
 
-  it.each(["en", "ru"] as const)("provides localized status, navigation and stable dates in %s", locale => {
-    const copy = commerceHistoryCopy[locale];
-    expect(orderStatusLabel("completed", copy.orderStatuses)).toBe(copy.orderStatuses.completed);
-    expect(licenseStatusLabel("expired", copy.licenseStatuses)).toBe(copy.licenseStatuses.expired);
-    expect(orderStatusLabel("future_status", copy.orderStatuses)).toBe("future_status");
-    expect(licenseStatusLabel("future_status", copy.licenseStatuses)).toBe("future_status");
-    expect(copy.tabs.purchases).not.toBe("");
-    expect(copy.tabs.sales).not.toBe("");
-    expect(formatHistoryDate(new Date("2026-10-09T22:00:00Z"), locale)).toContain("2026");
-  });
+  it.each(["en", "ru"] as const)(
+    "provides localized status, navigation and stable dates in %s",
+    (locale) => {
+      const copy = commerceHistoryCopy[locale];
+      expect(orderStatusLabel("completed", copy.orderStatuses)).toBe(copy.orderStatuses.completed);
+      expect(licenseStatusLabel("expired", copy.licenseStatuses)).toBe(
+        copy.licenseStatuses.expired,
+      );
+      expect(orderStatusLabel("future_status", copy.orderStatuses)).toBe("future_status");
+      expect(licenseStatusLabel("future_status", copy.licenseStatuses)).toBe("future_status");
+      expect(copy.tabs.purchases).not.toBe("");
+      expect(copy.tabs.sales).not.toBe("");
+      expect(formatHistoryDate(new Date("2026-10-09T22:00:00Z"), locale)).toContain("2026");
+    },
+  );
 });

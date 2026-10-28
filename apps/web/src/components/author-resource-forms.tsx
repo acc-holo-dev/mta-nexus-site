@@ -19,12 +19,19 @@ import {
 } from "../lib/author-resource-requests";
 
 import {
-  authorResourceDraftKey, parseAuthorResourceDraft, sameAuthorDetails, reconcileAuthorDetails,
-  emptyAuthorVersion, hasAuthorVersionDraft,
-  type AuthorDetailsDraft, type AuthorResourceDraft,
+  authorResourceDraftKey,
+  parseAuthorResourceDraft,
+  sameAuthorDetails,
+  reconcileAuthorDetails,
+  emptyAuthorVersion,
+  hasAuthorVersionDraft,
+  type AuthorDetailsDraft,
+  type AuthorResourceDraft,
 } from "../lib/author-resource-draft";
 import {
-  confirmedAuthorDetails, confirmedAuthorBuild, confirmedRetiredBuild,
+  confirmedAuthorDetails,
+  confirmedAuthorBuild,
+  confirmedRetiredBuild,
 } from "../lib/author-resource-response";
 
 const inputClass =
@@ -33,7 +40,9 @@ const buttonClass =
   "rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
 
 export function AuthorResourceForms({
-  product, actorId, uploadBlocked = false,
+  product,
+  actorId,
+  uploadBlocked = false,
 }: {
   actorId: string;
   uploadBlocked?: boolean;
@@ -58,8 +67,10 @@ export function AuthorResourceForms({
   const [uploadError, setUploadError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [baseline, setBaseline] = useState<AuthorDetailsDraft>(() => ({
-    title: product.title, shortDescription: product.shortDescription,
-    description: product.description, tagsText: product.tags.join(", "),
+    title: product.title,
+    shortDescription: product.shortDescription,
+    description: product.description,
+    tagsText: product.tags.join(", "),
   }));
   const [details, setDetails] = useState(baseline);
   const [versionDraft, setVersionDraft] = useState({ ...emptyAuthorVersion });
@@ -90,7 +101,9 @@ export function AuthorResourceForms({
           setRecovered(true);
         }
       } else if (raw) sessionStorage.removeItem(storageKey);
-    } catch { setStorageFailed(true); }
+    } catch {
+      setStorageFailed(true);
+    }
     setReady(true);
   }, [storageKey]);
 
@@ -99,14 +112,31 @@ export function AuthorResourceForms({
     try {
       if (detailsDirty || hasAuthorVersionDraft(versionDraft)) {
         const draft: AuthorResourceDraft = {
-          schemaVersion: 1, actorId, productId: product.id, savedAt: Date.now(),
-          baseUpdatedAt, details, version: versionDraft,
+          schemaVersion: 1,
+          actorId,
+          productId: product.id,
+          savedAt: Date.now(),
+          baseUpdatedAt,
+          details,
+          version: versionDraft,
         };
         sessionStorage.setItem(storageKey, JSON.stringify(draft));
       } else sessionStorage.removeItem(storageKey);
       setStorageFailed(false);
-    } catch { setStorageFailed(true); }
-  }, [ready, conflict, detailsDirty, details, versionDraft, actorId, product.id, baseUpdatedAt, storageKey]);
+    } catch {
+      setStorageFailed(true);
+    }
+  }, [
+    ready,
+    conflict,
+    detailsDirty,
+    details,
+    versionDraft,
+    actorId,
+    product.id,
+    baseUpdatedAt,
+    storageKey,
+  ]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -120,21 +150,35 @@ export function AuthorResourceForms({
 
   useEffect(() => {
     if (!ready) return;
-    const currentServer = { title: product.title, shortDescription: product.shortDescription,
-      description: product.description, tagsText: product.tags.join(", ") };
-    const reconciled = reconcileAuthorDetails({ baseline, details, baseUpdatedAt },
-      { details: currentServer, updatedAt: product.updatedAt });
+    const currentServer = {
+      title: product.title,
+      shortDescription: product.shortDescription,
+      description: product.description,
+      tagsText: product.tags.join(", "),
+    };
+    const reconciled = reconcileAuthorDetails(
+      { baseline, details, baseUpdatedAt },
+      { details: currentServer, updatedAt: product.updatedAt },
+    );
     if (!reconciled.changed) return;
     if (reconciled.needsChoice && !conflict) {
       // Keep the user's complete draft, including the other form, until they
       // explicitly choose how to resolve the changed server metadata.
       const pendingDraft: AuthorResourceDraft = {
-        schemaVersion: 1, actorId, productId: product.id, savedAt: Date.now(),
-        baseUpdatedAt, details, version: versionDraft,
+        schemaVersion: 1,
+        actorId,
+        productId: product.id,
+        savedAt: Date.now(),
+        baseUpdatedAt,
+        details,
+        version: versionDraft,
       };
       setConflict(pendingDraft);
-      try { sessionStorage.setItem(storageKey, JSON.stringify(pendingDraft)); }
-      catch { setStorageFailed(true); }
+      try {
+        sessionStorage.setItem(storageKey, JSON.stringify(pendingDraft));
+      } catch {
+        setStorageFailed(true);
+      }
     }
     if (!sameAuthorDetails(currentServer, baseline)) {
       setSaved(false);
@@ -143,9 +187,22 @@ export function AuthorResourceForms({
     setBaseline(reconciled.baseline);
     setDetails(reconciled.details);
     setBaseUpdatedAt(reconciled.baseUpdatedAt);
-  }, [ready, product.title, product.shortDescription, product.description, product.tags,
-    product.updatedAt, baseline, details, baseUpdatedAt, conflict, actorId, product.id,
-    versionDraft, storageKey]);
+  }, [
+    ready,
+    product.title,
+    product.shortDescription,
+    product.description,
+    product.tags,
+    product.updatedAt,
+    baseline,
+    details,
+    baseUpdatedAt,
+    conflict,
+    actorId,
+    product.id,
+    versionDraft,
+    storageKey,
+  ]);
 
   function changeDetails(field: keyof AuthorDetailsDraft, value: string) {
     setDetails((current) => ({ ...current, [field]: value }));
@@ -161,7 +218,6 @@ export function AuthorResourceForms({
     setSaved(false);
     setSubmitted(false);
   }
-
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -186,15 +242,14 @@ export function AuthorResourceForms({
     try {
       const response = await fetch(
         `/api/products/${product.id}`,
-        authorDetailsMutationRequest(
-          parsed.data,
-          baseUpdatedAt,
-          AbortSignal.timeout(15_000),
-        ),
+        authorDetailsMutationRequest(parsed.data, baseUpdatedAt, AbortSignal.timeout(15_000)),
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
-        if (body?.code === "PRODUCT_STATE_CHANGED" || body?.code === "PRODUCT_METADATA_REVISION_REQUIRED") {
+        if (
+          body?.code === "PRODUCT_STATE_CHANGED" ||
+          body?.code === "PRODUCT_METADATA_REVISION_REQUIRED"
+        ) {
           setError(resourceCommerceError(locale, body.code));
           router.refresh();
           return;
@@ -222,8 +277,12 @@ export function AuthorResourceForms({
         setError(copy.failed);
         return;
       }
-      const cleanDetails = { title: confirmed.title, shortDescription: confirmed.shortDescription,
-        description: confirmed.description, tagsText: confirmed.tags.join(", ") };
+      const cleanDetails = {
+        title: confirmed.title,
+        shortDescription: confirmed.shortDescription,
+        description: confirmed.description,
+        tagsText: confirmed.tags.join(", "),
+      };
       setDetails(cleanDetails);
       setBaseline(cleanDetails);
       setBaseUpdatedAt(confirmed.updatedAt);
@@ -257,39 +316,40 @@ export function AuthorResourceForms({
     try {
       const response = await fetch(
         `/api/products/${product.id}/builds`,
-        authorBuildUploadRequest(
-          data,
-          AbortSignal.timeout(120_000),
-        ),
+        authorBuildUploadRequest(data, AbortSignal.timeout(120_000)),
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
         setUploadError(
-          body?.code === "PRODUCT_STATE_CHANGED" ? resourceCommerceError(locale, body.code) : getResourceSubmissionErrorMessage(body?.code, {
-            packageInvalid: buildPackageCopy(locale).invalid,
-            packageUnsupported: buildPackageCopy(locale).unsupported,
-            packageUnsafePath: buildPackageCopy(locale).path,
-            packageLimitExceeded: buildPackageCopy(locale).limit,
-            packageInspectorBusy: buildPackageCopy(locale).busy,
-            fileTooLarge: publishing.buildFileTooLarge.replace("{maxFileSize}", "64"),
-            malwareDetected: publishing.scannerMalwareDetected,
-            scanLimitExceeded: publishing.scannerLimitExceeded,
-            scannerUnavailable: publishing.scannerUnavailable,
-            authenticationRequired: publishing.authenticationRequired,
-            uploadRateLimited: publishing.uploadRateLimited,
-            resourceNotFound: publishing.resourceNotFound,
-            buildForbidden: publishing.buildForbidden,
-            versionAlreadyExists: publishing.versionAlreadyExists,
-            metadataInvalid: publishing.metadataInvalid,
-            buildFileTypeNotAllowed: publishing.buildFileTypeNotAllowed,
-            buildContentMismatch: publishing.buildContentMismatch,
-            buildFileNameInvalid: publishing.buildFileNameInvalid,
-            paidPublishingUnavailable: publishing.paidPublishingUnavailable,
-          }) ?? copy.uploadFailed,
+          body?.code === "PRODUCT_STATE_CHANGED"
+            ? resourceCommerceError(locale, body.code)
+            : (getResourceSubmissionErrorMessage(body?.code, {
+                packageInvalid: buildPackageCopy(locale).invalid,
+                packageUnsupported: buildPackageCopy(locale).unsupported,
+                packageUnsafePath: buildPackageCopy(locale).path,
+                packageLimitExceeded: buildPackageCopy(locale).limit,
+                packageInspectorBusy: buildPackageCopy(locale).busy,
+                fileTooLarge: publishing.buildFileTooLarge.replace("{maxFileSize}", "64"),
+                malwareDetected: publishing.scannerMalwareDetected,
+                scanLimitExceeded: publishing.scannerLimitExceeded,
+                scannerUnavailable: publishing.scannerUnavailable,
+                authenticationRequired: publishing.authenticationRequired,
+                uploadRateLimited: publishing.uploadRateLimited,
+                resourceNotFound: publishing.resourceNotFound,
+                buildForbidden: publishing.buildForbidden,
+                versionAlreadyExists: publishing.versionAlreadyExists,
+                metadataInvalid: publishing.metadataInvalid,
+                buildFileTypeNotAllowed: publishing.buildFileTypeNotAllowed,
+                buildContentMismatch: publishing.buildContentMismatch,
+                buildFileNameInvalid: publishing.buildFileNameInvalid,
+                paidPublishingUnavailable: publishing.paidPublishingUnavailable,
+              }) ?? copy.uploadFailed),
         );
         return;
       }
-      if (!confirmedAuthorBuild(response.status, body, product.id, String(data.get("version") ?? ""))) {
+      if (
+        !confirmedAuthorBuild(response.status, body, product.id, String(data.get("version") ?? ""))
+      ) {
         setUploadError(copy.uploadFailed);
         return;
       }
@@ -313,20 +373,39 @@ export function AuthorResourceForms({
           <div role="alert" className="space-y-3 rounded-lg border border-base bg-surface p-4">
             <p>{copy.draftConflict}</p>
             <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={recoverDraft} className={buttonClass}>{copy.restoreDraft}</button>
-              <button type="button" onClick={() => {
-                setDetails(baseline);
-                setConflict(null);
-                setRecovered(false);
-                setSaved(false);
-              }}
-                className="rounded-md border border-base px-4 py-2">{copy.discardDraft}</button>
+              <button type="button" onClick={recoverDraft} className={buttonClass}>
+                {copy.restoreDraft}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDetails(baseline);
+                  setConflict(null);
+                  setRecovered(false);
+                  setSaved(false);
+                }}
+                className="rounded-md border border-base px-4 py-2"
+              >
+                {copy.discardDraft}
+              </button>
             </div>
           </div>
         )}
-        {recovered && <p role="status" className="text-sm text-secondary">{copy.draftRestored}</p>}
-        {dirty && <p role="status" className="text-sm text-secondary">{copy.unsaved}</p>}
-        {storageFailed && <p role="alert" className="text-sm text-error">{copy.draftUnavailable}</p>}
+        {recovered && (
+          <p role="status" className="text-sm text-secondary">
+            {copy.draftRestored}
+          </p>
+        )}
+        {dirty && (
+          <p role="status" className="text-sm text-secondary">
+            {copy.unsaved}
+          </p>
+        )}
+        {storageFailed && (
+          <p role="alert" className="text-sm text-error">
+            {copy.draftUnavailable}
+          </p>
+        )}
         {(fileSelected || hasAuthorVersionDraft(versionDraft)) && (
           <p className="text-sm text-muted">{copy.fileReselect}</p>
         )}
@@ -337,8 +416,15 @@ export function AuthorResourceForms({
         className="space-y-4 rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
-        <p className="text-sm text-secondary">{uploadBlocked ? getResourcePublisherCopy(locale).readonly : getResourcePublisherCopy(locale).editNote}</p>
-        <fieldset disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
+        <p className="text-sm text-secondary">
+          {uploadBlocked
+            ? getResourcePublisherCopy(locale).readonly
+            : getResourcePublisherCopy(locale).editNote}
+        </p>
+        <fieldset
+          disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
+          className="space-y-4"
+        >
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.title}</span>
             <input
@@ -377,8 +463,13 @@ export function AuthorResourceForms({
           </div>
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.tags}</span>
-            <input name="tags" value={details.tagsText} maxLength={4096}
-              onChange={(event) => changeDetails("tagsText", event.target.value)} className={inputClass} />
+            <input
+              name="tags"
+              value={details.tagsText}
+              maxLength={4096}
+              onChange={(event) => changeDetails("tagsText", event.target.value)}
+              className={inputClass}
+            />
           </label>
         </fieldset>
         {error && (
@@ -391,7 +482,11 @@ export function AuthorResourceForms({
             {copy.saved}
           </p>
         )}
-        <button type="submit" disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
+        <button
+          type="submit"
+          disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
+          className={buttonClass}
+        >
           {saving ? copy.saving : copy.save}
         </button>
       </form>
@@ -401,14 +496,24 @@ export function AuthorResourceForms({
         className="space-y-4 rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.newVersion}</h2>
-        <p className="text-sm text-secondary">{uploadBlocked ? getResourceCommerceCopy(locale).errors.PRODUCT_STATE_CHANGED : publishing.submittedDescription}</p>
-        <fieldset disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
+        <p className="text-sm text-secondary">
+          {uploadBlocked
+            ? getResourceCommerceCopy(locale).errors.PRODUCT_STATE_CHANGED
+            : publishing.submittedDescription}
+        </p>
+        <fieldset
+          disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending}
+          className="space-y-4"
+        >
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.version}</span>
             <input
               name="version"
               value={versionDraft.version}
-              onChange={(event) => { setVersionDraft((draft) => ({ ...draft, version: event.target.value })); setSubmitted(false); }}
+              onChange={(event) => {
+                setVersionDraft((draft) => ({ ...draft, version: event.target.value }));
+                setSubmitted(false);
+              }}
               required
               maxLength={64}
               placeholder="1.1.0"
@@ -421,7 +526,10 @@ export function AuthorResourceForms({
             <input
               name="mtaVersionTarget"
               value={versionDraft.mtaVersionTarget}
-              onChange={(event) => { setVersionDraft((draft) => ({ ...draft, mtaVersionTarget: event.target.value })); setSubmitted(false); }}
+              onChange={(event) => {
+                setVersionDraft((draft) => ({ ...draft, mtaVersionTarget: event.target.value }));
+                setSubmitted(false);
+              }}
               maxLength={64}
               placeholder="1.6.0"
               className={inputClass}
@@ -429,15 +537,28 @@ export function AuthorResourceForms({
           </label>
           <div className="block space-y-1 text-sm text-secondary">
             <label htmlFor={`${fieldId}-release-notes`}>{publishing.releaseNotes}</label>
-            <textarea id={`${fieldId}-release-notes`} name="releaseNotes" value={versionDraft.releaseNotes}
-              onChange={(event) => { setVersionDraft((draft) => ({ ...draft, releaseNotes: event.target.value })); setSubmitted(false); }} maxLength={5000} rows={4} className={inputClass} />
+            <textarea
+              id={`${fieldId}-release-notes`}
+              name="releaseNotes"
+              value={versionDraft.releaseNotes}
+              onChange={(event) => {
+                setVersionDraft((draft) => ({ ...draft, releaseNotes: event.target.value }));
+                setSubmitted(false);
+              }}
+              maxLength={5000}
+              rows={4}
+              className={inputClass}
+            />
           </div>
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.buildArchive}</span>
             <input
               name="file"
               type="file"
-              onChange={(event) => { setFileSelected(Boolean(event.target.files?.length)); setSubmitted(false); }}
+              onChange={(event) => {
+                setFileSelected(Boolean(event.target.files?.length));
+                setSubmitted(false);
+              }}
               required
               accept=".zip,.rar,.7z,.lua"
               className={inputClass}
@@ -457,7 +578,11 @@ export function AuthorResourceForms({
             {copy.versionSubmitted}
           </p>
         )}
-        <button type="submit" disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
+        <button
+          type="submit"
+          disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending}
+          className={buttonClass}
+        >
           {uploading ? publishing.submitting : copy.newVersion}
         </button>
       </form>

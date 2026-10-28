@@ -40,9 +40,7 @@ const addComment = vi.hoisted(() =>
 );
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return {
     ...actual,
     after: afterMock,
@@ -83,24 +81,19 @@ import { POST } from "./route";
 function expectPrivate(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");
   expect(response.headers.get("Vary")).toBe("Cookie");
-  expect(response.headers.get("X-Request-Id")).toMatch(
-    /^[0-9a-f-]{20,}$/u,
-  );
+  expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 function request() {
-  return new NextRequest(
-    "https://nexus.test/api/content/article-one/comments",
-    {
-      method: "POST",
-      headers: {
-        ...browserMutationHeaders(),
-        "content-type": "application/json",
-        cookie: "nexus_session=test-session",
-      },
-      body: JSON.stringify({ text: "Useful comment" }),
+  return new NextRequest("https://nexus.test/api/content/article-one/comments", {
+    method: "POST",
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=test-session",
     },
-  );
+    body: JSON.stringify({ text: "Useful comment" }),
+  });
 }
 
 describe("article comment notification side effects", () => {

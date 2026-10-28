@@ -7,18 +7,9 @@ import { ProfileResourcePagination } from "../../../components/profile-resource-
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  Building2,
-  ExternalLink,
-  Globe,
-  ShieldCheck,
-} from "lucide-react";
+import { Building2, ExternalLink, Globe, ShieldCheck } from "lucide-react";
 import { StatCard } from "@nexus/ui";
-import {
-  contentRepository,
-  organizationRepository,
-  productRepository,
-} from "@nexus/db";
+import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
 import { ProductCard } from "../../../components/product-card";
 import { ArticleCard } from "../../../components/article-card";
 import { getDictionary } from "../../../lib/i18n";
@@ -35,10 +26,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const [locale, organization] = await Promise.all([
-    getRequestLocale(),
-    getProfile(slug),
-  ]);
+  const [locale, organization] = await Promise.all([getRequestLocale(), getProfile(slug)]);
   const dictionary = getDictionary(locale);
   if (!organization) {
     return {
@@ -48,7 +36,8 @@ export async function generateMetadata({
   }
   return {
     title: organization.name,
-    description: organization.description?.trim().slice(0, 155) || dictionary.organizations.fallback,
+    description:
+      organization.description?.trim().slice(0, 155) || dictionary.organizations.fallback,
     alternates: { canonical: `/organizations/${encodeURIComponent(organization.slug)}` },
   };
 }
@@ -73,8 +62,16 @@ export default async function OrganizationProfilePage({
   const websiteUrl = safeExternalWebUrl(organization.websiteUrl);
   const query = await searchParams;
   const [resourcePage, articlePage] = await Promise.all([
-    productRepository.pagePublishedFreeByOrganization(organization.id, parseProfilePage(query?.page), 24),
-    contentRepository.pagePublishedEditorialByOrganization(organization.id, parseProfilePage(query?.articlePage), 12),
+    productRepository.pagePublishedFreeByOrganization(
+      organization.id,
+      parseProfilePage(query?.page),
+      24,
+    ),
+    contentRepository.pagePublishedEditorialByOrganization(
+      organization.id,
+      parseProfilePage(query?.articlePage),
+      12,
+    ),
   ]);
   const products = resourcePage.products;
   const articles = articlePage.items;
@@ -103,15 +100,10 @@ export default async function OrganizationProfilePage({
 
           <div className="min-w-0 space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="truncate text-2xl font-black text-primary">
-                {organization.name}
-              </h1>
+              <h1 className="truncate text-2xl font-black text-primary">{organization.name}</h1>
               {organization.isVerified && (
                 <span title={copy.verified}>
-                  <ShieldCheck
-                    className="h-5 w-5 text-success"
-                    aria-hidden="true"
-                  />
+                  <ShieldCheck className="h-5 w-5 text-success" aria-hidden="true" />
                 </span>
               )}
               <span className="rounded border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-2 py-0.5 font-label uppercase text-warning">
@@ -119,16 +111,23 @@ export default async function OrganizationProfilePage({
               </span>
             </div>
 
-            <div className="truncate text-xs text-faint">
-              @{organization.slug}
-            </div>
+            <div className="truncate text-xs text-faint">@{organization.slug}</div>
 
             <p className="max-w-xl text-sm leading-relaxed text-muted">
               {organization.description || copy.fallback}
             </p>
 
-            <FollowButton targetType="organization" targetId={organization.id} targetName={organization.name} />
-            <Link href={`/organizations/${encodeURIComponent(organization.slug)}/activity`} className="inline-flex min-h-11 items-center text-sm text-accent underline">{publicationCopy(locale).activity}</Link>
+            <FollowButton
+              targetType="organization"
+              targetId={organization.id}
+              targetName={organization.name}
+            />
+            <Link
+              href={`/organizations/${encodeURIComponent(organization.slug)}/activity`}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {publicationCopy(locale).activity}
+            </Link>
             <Link
               href={`/organizations/${encodeURIComponent(organization.slug)}/trust`}
               className="inline-flex min-h-11 items-center text-xs text-accent underline"
@@ -151,11 +150,7 @@ export default async function OrganizationProfilePage({
         </div>
 
         <div className="min-w-28">
-          <StatCard
-            label={copy.releases}
-            value={resourcePage.total}
-            tone="accent"
-          />
+          <StatCard label={copy.releases} value={resourcePage.total} tone="accent" />
         </div>
       </section>
 
@@ -166,14 +161,17 @@ export default async function OrganizationProfilePage({
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                locale={locale}
-              />
+              <ProductCard key={product.id} product={product} locale={locale} />
             ))}
           </div>
-          <ProfileResourcePagination basePath={`/organizations/${encodeURIComponent(organization.slug)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} otherSection="articles" otherPage={articlePage.page} />
+          <ProfileResourcePagination
+            basePath={`/organizations/${encodeURIComponent(organization.slug)}`}
+            page={resourcePage.page}
+            totalPages={resourcePage.totalPages}
+            locale={locale}
+            otherSection="articles"
+            otherPage={articlePage.page}
+          />
         </section>
       )}
 
@@ -184,14 +182,17 @@ export default async function OrganizationProfilePage({
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {articles.map((article) => (
-              <ArticleCard
-                key={article.id}
-                article={article}
-                locale={locale}
-              />
+              <ArticleCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
-          <ProfileResourcePagination basePath={`/organizations/${encodeURIComponent(organization.slug)}`} page={articlePage.page} totalPages={articlePage.totalPages} locale={locale} section="articles" otherPage={resourcePage.page} />
+          <ProfileResourcePagination
+            basePath={`/organizations/${encodeURIComponent(organization.slug)}`}
+            page={articlePage.page}
+            totalPages={articlePage.totalPages}
+            locale={locale}
+            section="articles"
+            otherPage={resourcePage.page}
+          />
         </section>
       )}
     </div>

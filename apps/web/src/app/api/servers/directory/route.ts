@@ -13,24 +13,9 @@ export const dynamic = "force-dynamic";
 
 const directoryQuerySchema = z.object({
   query: z.string().trim().max(100).optional(),
-  minPlayers: z.coerce
-    .number()
-    .int()
-    .min(0)
-    .max(10_000)
-    .default(0),
-  limit: z.coerce
-    .number()
-    .int()
-    .min(1)
-    .max(100)
-    .default(50),
-  offset: z.coerce
-    .number()
-    .int()
-    .min(0)
-    .max(10_000)
-    .default(0),
+  minPlayers: z.coerce.number().int().min(0).max(10_000).default(0),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  offset: z.coerce.number().int().min(0).max(10_000).default(0),
 });
 
 const errorHeaders = {
@@ -39,20 +24,16 @@ const errorHeaders = {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
-  const parsedQuery =
-    directoryQuerySchema.safeParse(
-      Object.fromEntries(
-        request.nextUrl.searchParams,
-      ),
-    );
+  const parsedQuery = directoryQuerySchema.safeParse(
+    Object.fromEntries(request.nextUrl.searchParams),
+  );
 
   if (!parsedQuery.success) {
     return jsonWithRequestId(
       context,
       {
         error: "Invalid directory query",
-        details:
-          parsedQuery.error.flatten(),
+        details: parsedQuery.error.flatten(),
       },
       {
         status: 400,
@@ -62,16 +43,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const directory =
-      await mtaMasterDirectoryService.getDirectory();
-    const {
+    const directory = await mtaMasterDirectoryService.getDirectory();
+    const { query, minPlayers, limit, offset } = parsedQuery.data;
+    const page = selectMtaDirectoryPage(directory.servers, {
       query,
       minPlayers,
       limit,
       offset,
-    } = parsedQuery.data;
-    const page = selectMtaDirectoryPage(directory.servers, {
-      query, minPlayers, limit, offset,
     });
 
     // Unique request IDs are intentionally omitted from cacheable public
@@ -102,8 +80,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error:
-          "The official MTA server directory is temporarily unavailable",
+        error: "The official MTA server directory is temporarily unavailable",
       },
       {
         status: 503,

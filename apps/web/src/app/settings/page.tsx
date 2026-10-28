@@ -68,10 +68,7 @@ async function request<T>(
 
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new SettingsError(
-      data?.error || unavailableMessage,
-      response.status,
-    );
+    throw new SettingsError(data?.error || unavailableMessage, response.status);
   }
   if (!data) {
     throw new SettingsError(unreadableMessage, response.status);
@@ -95,8 +92,7 @@ export default function SettingsPage() {
     currentPassword: "",
     newPassword: "",
   });
-  const [recoveryEmail, setRecoveryEmail] =
-    useState<RecoveryEmail | null>(null);
+  const [recoveryEmail, setRecoveryEmail] = useState<RecoveryEmail | null>(null);
   const [recoveryPassword, setRecoveryPassword] = useState("");
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
@@ -132,18 +128,8 @@ export default function SettingsPage() {
     },
   ];
 
-  function requestSettings<T>(
-    path: string,
-    method = "GET",
-    body: unknown = undefined,
-  ) {
-    return request<T>(
-      path,
-      method,
-      body,
-      copy.backendUnavailable,
-      copy.unreadableResponse,
-    );
+  function requestSettings<T>(path: string, method = "GET", body: unknown = undefined) {
+    return request<T>(path, method, body, copy.backendUnavailable, copy.unreadableResponse);
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(revision): Explicit refresh trigger; changing it must restart this request.
@@ -178,9 +164,7 @@ export default function SettingsPage() {
     ])
       .then(([preferenceData, sessionData, recovery]) => {
         if (!active) return;
-        const confirmedPreferences = parseNotificationPreferences(
-          preferenceData.preferences,
-        );
+        const confirmedPreferences = parseNotificationPreferences(preferenceData.preferences);
         if (
           !confirmedPreferences ||
           !Array.isArray(sessionData.sessions) ||
@@ -251,10 +235,7 @@ export default function SettingsPage() {
 
       setNotice({
         error: true,
-        text:
-          error instanceof SettingsError
-            ? error.message
-            : copy.requestUnconfirmed,
+        text: error instanceof SettingsError ? error.message : copy.requestUnconfirmed,
       });
     } finally {
       actionInFlight.current = false;
@@ -265,9 +246,7 @@ export default function SettingsPage() {
   async function refreshAfterSuccess(text: string) {
     setNotice({ text, error: false });
     try {
-      const data = await requestSettings<{ sessions: Session[] }>(
-        "/api/auth/sessions",
-      );
+      const data = await requestSettings<{ sessions: Session[] }>("/api/auth/sessions");
       if (!Array.isArray(data.sessions)) {
         throw new Error(copy.invalidSessionResponse);
       }
@@ -295,9 +274,7 @@ export default function SettingsPage() {
       setRecoveryPassword("");
 
       if (data.alreadyVerified) {
-        const refreshed = await requestSettings<RecoveryEmail>(
-          "/api/auth/email-verification",
-        );
+        const refreshed = await requestSettings<RecoveryEmail>("/api/auth/email-verification");
         setRecoveryEmail(refreshed);
         setNotice({
           text: copy.recoveryAlreadyVerified,
@@ -382,8 +359,7 @@ export default function SettingsPage() {
         [key]: value,
       });
 
-      const confirmedPreferences =
-        confirmedNotificationPreferences(data);
+      const confirmedPreferences = confirmedNotificationPreferences(data);
       if (!confirmedPreferences) {
         throw new SettingsError(copy.requestUnconfirmed, 502);
       }
@@ -398,10 +374,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div
-        role="status"
-        className="py-20 text-center text-sm text-muted"
-      >
+      <div role="status" className="py-20 text-center text-sm text-muted">
         {copy.loading}
       </div>
     );
@@ -410,13 +383,8 @@ export default function SettingsPage() {
   if (signedOut) {
     return (
       <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <ShieldCheck
-          className="mx-auto h-10 w-10 text-accent"
-          aria-hidden="true"
-        />
-        <h1 className="font-display text-primary">
-          {copy.signInRequired}
-        </h1>
+        <ShieldCheck className="mx-auto h-10 w-10 text-accent" aria-hidden="true" />
+        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <p className="text-sm text-muted">{copy.signInAgain}</p>
         <Link
           href="/auth/login"
@@ -435,10 +403,7 @@ export default function SettingsPage() {
         <p role="alert" className="text-sm text-muted">
           {notice?.text}
         </p>
-        <Button
-          type="button"
-          onClick={() => setRevision((current) => current + 1)}
-        >
+        <Button type="button" onClick={() => setRevision((current) => current + 1)}>
           {copy.retry}
         </Button>
       </div>
@@ -475,7 +440,10 @@ export default function SettingsPage() {
       <ContextSwitcher />
       <PublicProfileForm />
       <ProfileChangeHistoryLink locale={locale} />
-      <Link href="/settings/privacy" className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <Link
+        href="/settings/privacy"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+      >
         {profilePrivacyCopy(locale).title}
       </Link>
 
@@ -485,16 +453,11 @@ export default function SettingsPage() {
       >
         <div className="flex items-center gap-2">
           <Bell className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2
-            id="notification-heading"
-            className="text-sm font-semibold text-primary"
-          >
+          <h2 id="notification-heading" className="text-sm font-semibold text-primary">
             {copy.notificationPreferences}
           </h2>
         </div>
-        <p className="text-xs text-muted">
-          {copy.notificationDescription}
-        </p>
+        <p className="text-xs text-muted">{copy.notificationDescription}</p>
         <div className="divide-y divide-base">
           {preferences &&
             preferenceLabels.map(({ key, label, description }) => (
@@ -503,20 +466,14 @@ export default function SettingsPage() {
                 className="flex cursor-pointer items-center justify-between gap-4 py-3"
               >
                 <span>
-                  <span className="block text-sm text-primary">
-                    {label}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-muted">
-                    {description}
-                  </span>
+                  <span className="block text-sm text-primary">{label}</span>
+                  <span className="mt-0.5 block text-xs text-muted">{description}</span>
                 </span>
                 <input
                   type="checkbox"
                   checked={preferences[key]}
                   disabled={pending}
-                  onChange={(event) =>
-                    updatePreference(key, event.target.checked)
-                  }
+                  onChange={(event) => updatePreference(key, event.target.checked)}
                   className="h-4 w-4 accent-[var(--nexus-accent)]"
                 />
               </label>
@@ -531,10 +488,7 @@ export default function SettingsPage() {
       >
         <div className="flex items-center gap-2">
           <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2
-            id="recovery-email-heading"
-            className="text-sm font-semibold text-primary"
-          >
+          <h2 id="recovery-email-heading" className="text-sm font-semibold text-primary">
             {copy.recoveryEmail}
           </h2>
         </div>
@@ -542,16 +496,14 @@ export default function SettingsPage() {
         {recoveryEmail && (
           <>
             <div className="rounded-md border border-base bg-inset px-3 py-3">
-              <div className="break-all text-sm text-primary">
-                {recoveryEmail.email}
-              </div>
+              <div className="break-all text-sm text-primary">{recoveryEmail.email}</div>
               <div className="mt-1 text-xs text-muted">
                 {recoveryEmail.verified
                   ? `${copy.verifiedForRecovery}${
                       recoveryEmail.verifiedAt
-                        ? ` ${copy.verifiedOn} ${new Date(
-                            recoveryEmail.verifiedAt,
-                          ).toLocaleString(dateLocale)}`
+                        ? ` ${copy.verifiedOn} ${new Date(recoveryEmail.verifiedAt).toLocaleString(
+                            dateLocale,
+                          )}`
                         : ""
                     }.`
                   : recoveryEmail.eligible
@@ -566,18 +518,12 @@ export default function SettingsPage() {
                 aria-label={copy.verifyRecoveryEmail}
                 className="space-y-3"
               >
-                <p
-                  id="recovery-email-policy"
-                  className="text-sm text-muted"
-                >
+                <p id="recovery-email-policy" className="text-sm text-muted">
                   {copy.recoveryPolicy}
                 </p>
 
                 <div className="max-w-sm space-y-1">
-                  <label
-                    htmlFor="recovery-current-password"
-                    className="block text-sm text-primary"
-                  >
+                  <label htmlFor="recovery-current-password" className="block text-sm text-primary">
                     {copy.recoveryPassword}
                   </label>
                   <input
@@ -590,19 +536,13 @@ export default function SettingsPage() {
                     maxLength={128}
                     disabled={pending}
                     value={recoveryPassword}
-                    onChange={(event) =>
-                      setRecoveryPassword(event.target.value)
-                    }
+                    onChange={(event) => setRecoveryPassword(event.target.value)}
                     aria-describedby="recovery-email-policy"
                     className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  size="sm"
-                  isLoading={pending}
-                >
+                <Button type="submit" size="sm" isLoading={pending}>
                   {copy.sendVerification}
                 </Button>
               </form>
@@ -617,10 +557,7 @@ export default function SettingsPage() {
       >
         <div className="flex items-center gap-2">
           <KeyRound className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2
-            id="password-heading"
-            className="text-sm font-semibold text-primary"
-          >
+          <h2 id="password-heading" className="text-sm font-semibold text-primary">
             {copy.changePassword}
           </h2>
         </div>
@@ -636,10 +573,7 @@ export default function SettingsPage() {
           className="grid gap-3 sm:grid-cols-2"
         >
           <div className="min-w-0 space-y-1">
-            <label
-              htmlFor="current-password"
-              className="block text-sm text-primary"
-            >
+            <label htmlFor="current-password" className="block text-sm text-primary">
               {copy.currentPassword}
             </label>
             <input
@@ -663,10 +597,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="min-w-0 space-y-1">
-            <label
-              htmlFor="new-password"
-              className="block text-sm text-primary"
-            >
+            <label htmlFor="new-password" className="block text-sm text-primary">
               {copy.newPassword}
             </label>
             <input
@@ -711,10 +642,7 @@ export default function SettingsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />
-            <h2
-              id="sessions-heading"
-              className="text-sm font-semibold text-primary"
-            >
+            <h2 id="sessions-heading" className="text-sm font-semibold text-primary">
               {copy.activeSessions}
             </h2>
           </div>
@@ -759,9 +687,7 @@ export default function SettingsPage() {
               </div>
 
               {session.isCurrent ? (
-                <span className="text-xs font-semibold text-accent">
-                  {copy.thisBrowser}
-                </span>
+                <span className="text-xs font-semibold text-accent">{copy.thisBrowser}</span>
               ) : (
                 <button
                   type="button"
@@ -775,18 +701,11 @@ export default function SettingsPage() {
             </div>
           ))}
 
-          {sessions === null && (
-            <p className="text-sm text-muted">
-              {copy.sessionUnavailable}
-            </p>
-          )}
+          {sessions === null && <p className="text-sm text-muted">{copy.sessionUnavailable}</p>}
 
-          {sessions?.length === 0 && (
-            <p className="text-sm text-muted">{copy.noSessions}</p>
-          )}
+          {sessions?.length === 0 && <p className="text-sm text-muted">{copy.noSessions}</p>}
         </div>
       </section>
     </div>
   );
 }
-

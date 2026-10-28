@@ -1,6 +1,6 @@
 # 22. Subscriptions, promotion и monetization inventory
 
-> Статус: OWNER DECISIONS rounds 1–4 + target design. Prices and exact launch SKUs remain OPEN.
+> Статус: OWNER-CONFIRMED TARGET. Prices and exact launch SKUs remain OPEN.
 
 ## 1. Monetization philosophy
 
@@ -100,7 +100,7 @@ Never sell:
 - false `Clean Build`/security labels;
 - reputation points detached from real evidence.
 
-## 18. Round 4 promotion refinements
+## 18. promotion refinements
 
 - Fixed-price promotion остаётся initial advertising model.
 - Server promotion может входить в конкретный subscription tier и/или продаваться отдельным fixed-price inventory item — это задаётся тарифом.

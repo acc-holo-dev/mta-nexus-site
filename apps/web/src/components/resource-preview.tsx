@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { safeResourceImageUrl } from "../lib/resource-image-url";
 
-export function ResourcePreview({ src, title, fallback, priority = false }: {
+export function ResourcePreview({
+  src,
+  title,
+  fallback,
+  priority = false,
+}: {
   src?: string | null;
   title: string;
   fallback: string;
@@ -12,7 +17,11 @@ export function ResourcePreview({ src, title, fallback, priority = false }: {
   const url = safeResourceImageUrl(src);
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   if (!url || failedUrl === url) {
-    return <div className="flex h-full w-full items-center justify-center text-sm text-faint">{fallback}</div>;
+    return (
+      <div className="flex h-full w-full items-center justify-center text-sm text-faint">
+        {fallback}
+      </div>
+    );
   }
   return (
     // biome-ignore lint/performance/noImgElement: external community previews use arbitrary hosts; browser decoding failures must display the fallback.

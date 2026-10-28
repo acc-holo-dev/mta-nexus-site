@@ -17,17 +17,16 @@ export const MAX_BUILD_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES;
 
 export function getSupportedBuildExtension(fileName: string): "zip" | "rar" | "7z" | "lua" | null {
   const extension = fileName.split(".").pop()?.toLowerCase();
-  return extension === "zip" || extension === "rar" || extension === "7z" || extension === "lua" ? extension : null;
+  return extension === "zip" || extension === "rar" || extension === "7z" || extension === "lua"
+    ? extension
+    : null;
 }
 
 export function exceedsBuildFileSizeLimit(sizeBytes: number): boolean {
   return sizeBytes > MAX_BUILD_FILE_SIZE_BYTES;
 }
 
-export type BuildFileSelectionIssue =
-  | "missing"
-  | "too_large"
-  | "unsupported_type";
+export type BuildFileSelectionIssue = "missing" | "too_large" | "unsupported_type";
 
 export function validateBuildFileSelection(
   file: Readonly<{ name: string; size: number }> | null,
@@ -46,8 +45,7 @@ export function validateBuildFileSelection(
 
 function startsWithSignature(bytes: Uint8Array, signature: readonly number[]): boolean {
   return (
-    bytes.length >= signature.length &&
-    signature.every((byte, index) => bytes[index] === byte)
+    bytes.length >= signature.length && signature.every((byte, index) => bytes[index] === byte)
   );
 }
 

@@ -11,14 +11,24 @@ describe("free catalog page boundary", () => {
     mocks.list.mockResolvedValueOnce(rows);
 
     const result = await new ProductService().listPublicPage({
-      page: 2, pageSize: 24, sort: "newest", type: "script", query: "map",
+      page: 2,
+      pageSize: 24,
+      sort: "newest",
+      type: "script",
+      query: "map",
     });
     expect(result.products).toHaveLength(24);
     expect(result.products).not.toContain(rows[24]);
     expect(result.hasMore).toBe(true);
     expect(mocks.list).toHaveBeenCalledWith({
-      type: "script", featuredOnly: undefined, minPrice: 0, maxPrice: 0,
-      sort: "newest", query: "map", limit: 25, offset: 24,
+      type: "script",
+      featuredOnly: undefined,
+      minPrice: 0,
+      maxPrice: 0,
+      sort: "newest",
+      query: "map",
+      limit: 25,
+      offset: 24,
     });
   });
 

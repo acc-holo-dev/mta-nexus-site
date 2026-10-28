@@ -109,7 +109,7 @@ Owner chose ecosystem-wide success, so dashboards should observe together:
 - moderation/safety load;
 - platform reliability.
 
-## 10. Round 7 — release experience gates
+## 10. release experience gates
 
 OWNER DECISION: к публичному release target должны войти не только responsive pages, но и product-quality requirements:
 

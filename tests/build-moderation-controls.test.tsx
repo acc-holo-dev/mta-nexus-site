@@ -1,4 +1,3 @@
-import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -78,15 +77,9 @@ describe("build moderation control behavior", () => {
   it("renders reviewer download only for provenance-backed clean builds", () => {
     const copy = getDictionary("en").admin;
     const trusted = renderToStaticMarkup(
-      <BuildModerationControls
-        buildId="bld_clean"
-        scanStatus="clean"
-        hasScanProvenance
-      />,
+      <BuildModerationControls buildId="bld_clean" scanStatus="clean" hasScanProvenance />,
     );
-    expect(trusted).toContain(
-      'href="/api/admin/builds/bld_clean/download"',
-    );
+    expect(trusted).toContain('href="/api/admin/builds/bld_clean/download"');
     expect(trusted).toContain(copy.reviewArtifact);
     expect(trusted).not.toContain(copy.artifactRequiresCleanScan);
 
@@ -97,9 +90,7 @@ describe("build moderation control behavior", () => {
         hasScanProvenance={false}
       />,
     );
-    expect(untrusted).not.toContain(
-      'href="/api/admin/builds/bld_unknown/download"',
-    );
+    expect(untrusted).not.toContain('href="/api/admin/builds/bld_unknown/download"');
     expect(untrusted).toContain(copy.artifactRequiresCleanScan);
   });
 });

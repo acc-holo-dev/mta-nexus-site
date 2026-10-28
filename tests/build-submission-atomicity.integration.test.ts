@@ -84,15 +84,10 @@ describe("build submission transaction atomicity", () => {
       ),
     ).rejects.toBeTruthy();
 
-    const storedBuilds = await db
-      .select()
-      .from(builds)
-      .where(eq(builds.id, buildId));
+    const storedBuilds = await db.select().from(builds).where(eq(builds.id, buildId));
     expect(storedBuilds).toHaveLength(0);
 
-    await expect(
-      productRepository.findById(productId),
-    ).resolves.toMatchObject({
+    await expect(productRepository.findById(productId)).resolves.toMatchObject({
       id: productId,
       status: "draft",
       currentVersion: "0.1.0",

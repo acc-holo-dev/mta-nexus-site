@@ -32,21 +32,28 @@ describe("MTA address canonicalization across directory, forms and persistence",
   });
 
   it("canonicalizes both registration and partial edits", () => {
-    expect(createServerSchema.parse({
-      name: "MTA Racing",
-      slug: "mta-racing",
-      ipAddress: "  PLAY.Example.COM.  ",
-    }).ipAddress).toBe("play.example.com");
-    expect(updateServerSchema.parse({ ipAddress: " PLAY.Example.COM. " }))
-      .toEqual({ ipAddress: "play.example.com" });
-    expect(matchesMtaEndpoint(
-      { ipAddress: " PLAY.Example.COM. ", port: 22003 },
-      { address: "play.example.com", port: 22003 },
-    )).toBe(true);
-    expect(matchesMtaEndpoint(
-      { ipAddress: "[2001:DB8::1]", port: 22003 },
-      { address: "[2001:db8::1]", port: 22004 },
-    )).toBe(false);
+    expect(
+      createServerSchema.parse({
+        name: "MTA Racing",
+        slug: "mta-racing",
+        ipAddress: "  PLAY.Example.COM.  ",
+      }).ipAddress,
+    ).toBe("play.example.com");
+    expect(updateServerSchema.parse({ ipAddress: " PLAY.Example.COM. " })).toEqual({
+      ipAddress: "play.example.com",
+    });
+    expect(
+      matchesMtaEndpoint(
+        { ipAddress: " PLAY.Example.COM. ", port: 22003 },
+        { address: "play.example.com", port: 22003 },
+      ),
+    ).toBe(true);
+    expect(
+      matchesMtaEndpoint(
+        { ipAddress: "[2001:DB8::1]", port: 22003 },
+        { address: "[2001:db8::1]", port: 22004 },
+      ),
+    ).toBe(false);
   });
 
   it.each([
@@ -72,11 +79,13 @@ describe("MTA address canonicalization across directory, forms and persistence",
     "a".repeat(256),
   ])("refuses invalid or ambiguous host %j", (value) => {
     expect(isValidMtaAddress(normalizeMtaAddress(value))).toBe(false);
-    expect(createServerSchema.safeParse({
-      name: "MTA Racing",
-      slug: "mta-racing",
-      ipAddress: value,
-    }).success).toBe(false);
+    expect(
+      createServerSchema.safeParse({
+        name: "MTA Racing",
+        slug: "mta-racing",
+        ipAddress: value,
+      }).success,
+    ).toBe(false);
     expect(updateServerSchema.safeParse({ ipAddress: value }).success).toBe(false);
   });
 });

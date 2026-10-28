@@ -23,11 +23,7 @@ const command = {
 };
 const get = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/collections/lcol_a/watches${query}`);
-const post = (
-  body: unknown = command,
-  query = "",
-  headers: Record<string, string> = {},
-) =>
+const post = (body: unknown = command, query = "", headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test/api/library/collections/lcol_a/watches${query}`, {
     method: "POST",
     headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },

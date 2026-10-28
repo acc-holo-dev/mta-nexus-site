@@ -26,9 +26,8 @@ export async function matchesDownloadedSha256(
     signal.throwIfAborted();
     const digest = await crypto.subtle.digest("SHA-256", bytes);
     signal.throwIfAborted();
-    const actual = Array.from(
-      new Uint8Array(digest),
-      (byte) => byte.toString(16).padStart(2, "0"),
+    const actual = Array.from(new Uint8Array(digest), (byte) =>
+      byte.toString(16).padStart(2, "0"),
     ).join("");
     return actual === expectedHeader.toLowerCase();
   } catch {

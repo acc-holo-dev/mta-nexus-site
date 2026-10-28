@@ -26,31 +26,21 @@ describe("author-facing MTA meta inspector", () => {
     "renders the optional structural inspector before resource submission in %s",
     (locale) => {
       state.locale = locale;
-      const html = renderToStaticMarkup(
-        <NewResourceForm actorId="author" />,
-      );
+      const html = renderToStaticMarkup(<NewResourceForm actorId="author" />);
       const copy = getDictionary(locale).metaInspector;
 
       expect(html).toContain(copy.title);
       expect(html).toContain(copy.description);
-      expect(html).toContain(
-        `accept="${metaInspectorClientPolicy.fileAccept}"`,
-      );
-      expect(html.indexOf(copy.title)).toBeLessThan(
-        html.indexOf("<form"),
-      );
-      expect(html).not.toMatch(
-        /Resource is safe|Verified resource/u,
-      );
+      expect(html).toContain(`accept="${metaInspectorClientPolicy.fileAccept}"`);
+      expect(html.indexOf(copy.title)).toBeLessThan(html.indexOf("<form"));
+      expect(html).not.toMatch(/Resource is safe|Verified resource/u);
     },
   );
 
   it("keeps the inspector action separate from form submission", () => {
     state.locale = "en";
     const html = renderToStaticMarkup(
-      <MtaMetaInspectorPanel
-        onApplyMinimumVersion={() => undefined}
-      />,
+      <MtaMetaInspectorPanel onApplyMinimumVersion={() => undefined} />,
     );
     const copy = getDictionary("en").metaInspector;
 
@@ -61,26 +51,24 @@ describe("author-facing MTA meta inspector", () => {
   });
 
   it("performs one authenticated uncached bounded inspection request", async () => {
-    const fetcher = vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          inspection: {
-            byteLength: 7,
+    const fetcher = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            inspection: {
+              byteLength: 7,
+            },
+          }),
+          {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        }),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      ),
+        ),
     );
 
-    const result = await requestMtaMetaInspection(
-      "<meta/>",
-      fetcher as typeof fetch,
-    );
+    const result = await requestMtaMetaInspection("<meta/>", fetcher as typeof fetch);
 
     expect(result.response.status).toBe(200);
     expect(result.data).toMatchObject({
@@ -112,13 +100,8 @@ describe("author-facing MTA meta inspector", () => {
       fileAccept: ".xml,text/xml,text/plain",
     });
 
-    const entries = Array.from(
-      { length: 25 },
-      (_, index) => index,
-    );
-    expect(metaInspectorPreview(entries)).toEqual(
-      entries.slice(0, 20),
-    );
+    const entries = Array.from({ length: 25 }, (_, index) => index);
+    expect(metaInspectorPreview(entries)).toEqual(entries.slice(0, 20));
     expect(entries).toHaveLength(25);
   });
 });

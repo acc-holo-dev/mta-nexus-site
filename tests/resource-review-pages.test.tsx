@@ -68,36 +68,28 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
   state.locale = "en";
-  state.ownPage
-    .mockReset()
-    .mockResolvedValue({
-      items: [{ ...review, productId: "prd_a", title: null, slug: null }],
-      ...bounds,
-    });
-  state.ownDetail
-    .mockReset()
-    .mockResolvedValue({
-      product: { id: "prd_a", title: null, slug: null },
-      review,
-      canReview: false,
-    });
+  state.ownPage.mockReset().mockResolvedValue({
+    items: [{ ...review, productId: "prd_a", title: null, slug: null }],
+    ...bounds,
+  });
+  state.ownDetail.mockReset().mockResolvedValue({
+    product: { id: "prd_a", title: null, slug: null },
+    review,
+    canReview: false,
+  });
   state.publicPage.mockReset().mockResolvedValue({ reviews: [review], ...bounds });
-  state.reportsPage
-    .mockReset()
-    .mockResolvedValue({
-      items: [{ id: "rpt_a", reason: "<Complaint>", status: "open" }],
-      view: "history",
-      ...bounds,
-    });
-  state.reportDetail
-    .mockReset()
-    .mockResolvedValue({
-      id: "rpt_a",
-      reason: "<Complaint>",
-      status: "open",
-      moderatorNotes: "INTERNAL_STAFF_NOTE",
-      review: null,
-    });
+  state.reportsPage.mockReset().mockResolvedValue({
+    items: [{ id: "rpt_a", reason: "<Complaint>", status: "open" }],
+    view: "history",
+    ...bounds,
+  });
+  state.reportDetail.mockReset().mockResolvedValue({
+    id: "rpt_a",
+    reason: "<Complaint>",
+    status: "open",
+    moderatorNotes: "INTERNAL_STAFF_NOTE",
+    review: null,
+  });
 });
 it.each(["en", "ru"] as const)(
   "renders own unavailable reviews and history navigation in %s",

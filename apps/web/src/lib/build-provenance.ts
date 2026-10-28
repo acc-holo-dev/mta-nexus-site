@@ -11,7 +11,10 @@ export function formatProvenanceTimestamp(value?: Date): string | null {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toISOString().replace("T", " ").replace(/\.\d{3}Z$/u, " UTC");
+  return date
+    .toISOString()
+    .replace("T", " ")
+    .replace(/\.\d{3}Z$/u, " UTC");
 }
 
 export function getBuildProvenance(

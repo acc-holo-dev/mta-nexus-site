@@ -1,16 +1,12 @@
-import * as React from "react";
+import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
 vi.mock("next/link", () => ({
-  default: ({
-    href,
-    children,
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => <a href={href}>{children}</a>,
+  default: ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
 }));
 
 import { ReverseDependencyList } from "../apps/web/src/components/reverse-dependency-list";
@@ -22,12 +18,7 @@ describe("reverse dependency list behavior", () => {
       const copy = getDictionary(locale).dependencyUi;
 
       expect(
-        renderToStaticMarkup(
-          <ReverseDependencyList
-            summary={null}
-            locale={locale}
-          />,
-        ),
+        renderToStaticMarkup(<ReverseDependencyList summary={null} locale={locale} />),
       ).toContain(copy.reverseUnavailable);
 
       expect(
@@ -79,8 +70,6 @@ describe("reverse dependency list behavior", () => {
     expect(markup).toContain("v2.4.0");
     expect(markup).toContain(copy.limitReached);
     expect(markup).toContain(copy.reverseNotice);
-    expect(markup).not.toMatch(
-      /compatible with|guaranteed compatible|verified compatible/iu,
-    );
+    expect(markup).not.toMatch(/compatible with|guaranteed compatible|verified compatible/iu);
   });
 });

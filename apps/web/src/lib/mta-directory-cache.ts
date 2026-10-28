@@ -18,10 +18,7 @@ export function mtaDirectoryHttpCacheControl(
 
   // Round down rather than allowing cached representations to outlive the
   // master's original one-minute freshness deadline by almost a second.
-  const remainingMs = Math.min(
-    MAX_PUBLIC_HTTP_AGE_MS,
-    MTA_MASTER_FRESH_TTL_MS - (now - fetchedAt),
-  );
+  const remainingMs = Math.min(MAX_PUBLIC_HTTP_AGE_MS, MTA_MASTER_FRESH_TTL_MS - (now - fetchedAt));
   const maxAge = Math.floor(remainingMs / 1_000);
   return maxAge > 0 ? `public, max-age=${maxAge}` : "no-store";
 }

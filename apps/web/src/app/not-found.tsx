@@ -13,9 +13,7 @@ export default async function NotFound() {
         <SearchX className="h-7 w-7" aria-hidden="true" />
       </div>
       <div className="space-y-2">
-        <h1 className="font-display text-primary">
-          {dictionary.errors.notFoundTitle}
-        </h1>
+        <h1 className="font-display text-primary">{dictionary.errors.notFoundTitle}</h1>
         <p className="mx-auto max-w-sm font-caption leading-relaxed text-muted">
           {dictionary.errors.notFoundMessage}
         </p>

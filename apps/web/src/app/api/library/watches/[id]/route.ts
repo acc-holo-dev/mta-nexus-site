@@ -12,15 +12,17 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     return resourceReleaseWatchesService.detail(user, (await params).id);
   });
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (user) => {
-    if (request.nextUrl.searchParams.size)
-      throw new AppError("Unexpected watch scope", 400, "RELEASE_WATCH_INVALID");
-    const command = resourceReleaseWatchCommandSchema.safeParse(
-      await readBoundedJson(request, 2048),
-    );
-    if (!command.success)
-      throw new AppError("Invalid release preference", 400, "RELEASE_WATCH_INVALID");
-    return resourceReleaseWatchesService.command(user, (await params).id, command.data);
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (user) => {
+      if (request.nextUrl.searchParams.size)
+        throw new AppError("Unexpected watch scope", 400, "RELEASE_WATCH_INVALID");
+      const command = resourceReleaseWatchCommandSchema.safeParse(
+        await readBoundedJson(request, 2048),
+      );
+      if (!command.success)
+        throw new AppError("Invalid release preference", 400, "RELEASE_WATCH_INVALID");
+      return resourceReleaseWatchesService.command(user, (await params).id, command.data);
+    });
+  },
+);

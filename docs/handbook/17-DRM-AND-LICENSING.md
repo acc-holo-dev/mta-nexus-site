@@ -47,7 +47,7 @@ Telemetry минимальная. **DECISION:** базово допустимы 
 
 ## 10. Forensics
 
-OPEN. Round 2 не подтвердил watermark/fingerprinting отдельно. Не вводить invasive hidden telemetry без owner decision.
+Подтверждён seller-opt-in watermark/fingerprinting с индивидуальными маркерами без перекомпиляции универсального runtime (DRM-014/015). Маркер — evidence для staff-расследования, а не автоматический обвинительный вердикт. Минимизация telemetry и защита приватных сигналов обязательны.
 
 ## 11. Buyer trust
 
@@ -69,7 +69,7 @@ DRM is optional per product/SKU. A seller may sell:
 
 The product page must state what is delivered and whether DRM applies to each SKU/tier.
 
-## 16. Round 4 product-delivery rule
+## 16. product-delivery rule
 
 Для marketplace формализованы два базовых delivery mode:
 
@@ -80,7 +80,7 @@ Source code может выступать отдельной premium license/var
 
 Покупка по умолчанию включает будущие версии продукта. DRM/license state должен переживать обычные updates без ручной re-issue license, если seller не изменил compatible licensing policy.
 
-## 17. Round 6 — delist retention and paid term
+## 17. delist retention and paid term
 
 The 30-day post-delist/post-seller-ban window governs **NEXUS hosting/redownload availability**, not an automatic DRM kill switch.
 
@@ -95,7 +95,7 @@ OWNER DECISION: an already activated DRM license continues to work until the end
 Do not conflate download retention, seller status, license expiry and security revocation into one boolean.
 
 
-## Round 9 owner sync — license lifetime and forensic protection
+## license lifetime and forensic protection
 
 - A seller may offer **perpetual** or **time-limited/subscription** licenses.
 - For a perpetual DRM-protected resource, successful activation grants indefinite product-use rights unless a formal revoke, malware, legal or security action applies.

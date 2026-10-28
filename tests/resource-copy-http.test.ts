@@ -39,11 +39,7 @@ const context = { params: Promise.resolve({ id: sourceId, receiptId }) },
   base = `/api/products/${sourceId}`;
 const request = (path: string, init?: ConstructorParameters<typeof NextRequest>[1]) =>
   new NextRequest(`https://nexus.test${path}`, init);
-const post = (
-  body: unknown = command,
-  query = "",
-  headers: Record<string, string> = {},
-) =>
+const post = (body: unknown = command, query = "", headers: Record<string, string> = {}) =>
   request(`${base}/copy${query}`, {
     method: "POST",
     body: JSON.stringify(body),

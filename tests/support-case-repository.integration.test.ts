@@ -58,9 +58,7 @@ describe("support case repository", () => {
 
     expect(await supportCaseRepository.listByRequester(otherUserId)).toEqual([]);
     expect(
-      (await supportCaseRepository.listByRequester(requesterId)).map(
-        (item) => item.id,
-      ),
+      (await supportCaseRepository.listByRequester(requesterId)).map((item) => item.id),
     ).toContain(caseId);
 
     const reply = await supportCaseRepository.addMessage(
@@ -84,21 +82,24 @@ describe("support case repository", () => {
     expect(reply?.message.authorRole).toBe("staff");
 
     expect(
-      (await supportCaseRepository.listMessages(caseId)).map(
-        (message) => message.authorRole,
-      ),
+      (await supportCaseRepository.listMessages(caseId)).map((message) => message.authorRole),
     ).toEqual(["requester", "staff"]);
 
     expect(
       (
-        await supportCaseRepository.updateStatus(caseId, "closed", {
-          id: `aud_support_close_${suffix}`,
-          actorId: staffId,
-          actorType: "admin",
-          action: "support.case.status_changed",
-          targetId: caseId,
-          targetType: "support_case",
-        }, "open")
+        await supportCaseRepository.updateStatus(
+          caseId,
+          "closed",
+          {
+            id: `aud_support_close_${suffix}`,
+            actorId: staffId,
+            actorType: "admin",
+            action: "support.case.status_changed",
+            targetId: caseId,
+            targetType: "support_case",
+          },
+          "open",
+        )
       )?.status,
     ).toBe("closed");
 
@@ -140,7 +141,6 @@ describe("support case repository", () => {
     ).resolves.toBeNull();
   });
 });
-
 
 it("serializes reply-vs-status races without losing the moderation decision", async () => {
   const suffix = `support_race_${Date.now().toString(36)}_${process.pid}`;
@@ -222,18 +222,13 @@ it("serializes reply-vs-status races without losing the moderation decision", as
     ),
   ]);
 
-  expect((await supportCaseRepository.findById(caseId))?.status).toBe(
-    "resolved",
-  );
+  expect((await supportCaseRepository.findById(caseId))?.status).toBe("resolved");
   expect(statusResult?.status).toBe("resolved");
 
   const messages = await supportCaseRepository.listMessages(caseId);
-  const raced = messages.filter(
-    (message) => message.id === `spm_race_${suffix}`,
-  );
+  const raced = messages.filter((message) => message.id === `spm_race_${suffix}`);
   expect(raced).toHaveLength(replyResult ? 1 : 0);
 });
-
 
 it("filters staff queue totals, categories and pages in PostgreSQL", async () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -256,37 +251,83 @@ it("filters staff queue totals, categories and pages in PostgreSQL", async () =>
     displayName: "Filtered queue staff",
     role: "moderator",
   });
-  const beforeOpen = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "open" });
-  const beforeClosed = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "closed" });
+  const beforeOpen = await supportCaseRepository.pageStaff(1, 25, {
+    category: "integration",
+    status: "open",
+  });
+  const beforeClosed = await supportCaseRepository.pageStaff(1, 25, {
+    category: "integration",
+    status: "closed",
+  });
   const beforeCategory = await supportCaseRepository.pageStaff(1, 25, { category: "integration" });
   for (const [id, category] of [
-    [openId, "integration"], [closedId, "integration"], [otherId, "account"],
+    [openId, "integration"],
+    [closedId, "integration"],
+    [otherId, "account"],
   ] as const) {
     await supportCaseRepository.createWithInitialMessage(
       { id, requesterId, category, subject: "Queue filter integration check", status: "open" },
-      { id: `spm_${id}`, caseId: id, authorId: requesterId, authorRole: "requester", body: "Initial support queue filter test message." },
-      { id: `aud_${id}`, actorId: requesterId, actorType: "user", action: "support.case.created", targetId: id, targetType: "support_case" },
+      {
+        id: `spm_${id}`,
+        caseId: id,
+        authorId: requesterId,
+        authorRole: "requester",
+        body: "Initial support queue filter test message.",
+      },
+      {
+        id: `aud_${id}`,
+        actorId: requesterId,
+        actorType: "user",
+        action: "support.case.created",
+        targetId: id,
+        targetType: "support_case",
+      },
     );
   }
   const transitioned = await supportCaseRepository.updateStatus(
-    closedId, "closed",
-    { id: `aud_closed_${suffix}`, actorId: staffId, actorType: "admin", action: "support.case.status_changed", targetId: closedId, targetType: "support_case" },
+    closedId,
+    "closed",
+    {
+      id: `aud_closed_${suffix}`,
+      actorId: staffId,
+      actorType: "admin",
+      action: "support.case.status_changed",
+      targetId: closedId,
+      targetType: "support_case",
+    },
     "open",
   );
   expect(transitioned?.status).toBe("closed");
-  const open = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "open" });
-  const closed = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "closed" });
+  const open = await supportCaseRepository.pageStaff(1, 25, {
+    category: "integration",
+    status: "open",
+  });
+  const closed = await supportCaseRepository.pageStaff(1, 25, {
+    category: "integration",
+    status: "closed",
+  });
   const category = await supportCaseRepository.pageStaff(1, 25, { category: "integration" });
   expect(open.total).toBe(beforeOpen.total + 1);
   expect(closed.total).toBe(beforeClosed.total + 1);
   expect(category.total).toBe(beforeCategory.total + 2);
-  expect(open.items.every((row) => row.supportCase.category === "integration" && row.supportCase.status === "open")).toBe(true);
-  expect(closed.items.every((row) => row.supportCase.category === "integration" && row.supportCase.status === "closed")).toBe(true);
+  expect(
+    open.items.every(
+      (row) => row.supportCase.category === "integration" && row.supportCase.status === "open",
+    ),
+  ).toBe(true);
+  expect(
+    closed.items.every(
+      (row) => row.supportCase.category === "integration" && row.supportCase.status === "closed",
+    ),
+  ).toBe(true);
   expect(open.items.some((row) => row.supportCase.id === openId)).toBe(true);
   expect(closed.items.some((row) => row.supportCase.id === closedId)).toBe(true);
   expect(category.items.every((row) => row.supportCase.category === "integration")).toBe(true);
   expect((await supportCaseRepository.pageByRequester(requesterId)).total).toBe(3);
-  const one = await supportCaseRepository.pageStaff(1, 1, { category: "integration", status: "open" });
+  const one = await supportCaseRepository.pageStaff(1, 1, {
+    category: "integration",
+    status: "open",
+  });
   expect(one.pageSize).toBe(1);
   expect(one.items).toHaveLength(1);
   expect(one.total).toBe(open.total);
@@ -333,16 +374,8 @@ it("paginates support cases and keeps message pages bounded newest-first", async
     );
   }
 
-  const firstCasePage = await supportCaseRepository.pageByRequester(
-    requesterId,
-    1,
-    2,
-  );
-  const secondCasePage = await supportCaseRepository.pageByRequester(
-    requesterId,
-    2,
-    2,
-  );
+  const firstCasePage = await supportCaseRepository.pageByRequester(requesterId, 1, 2);
+  const secondCasePage = await supportCaseRepository.pageByRequester(requesterId, 2, 2);
   expect(firstCasePage).toMatchObject({
     page: 1,
     pageSize: 2,
@@ -384,12 +417,6 @@ it("paginates support cases and keeps message pages bounded newest-first", async
     pageSize: 2,
     totalPages: 3,
   });
-  expect(latest.items.map((item) => item.body)).toEqual([
-    "Paged message 3",
-    "Paged message 4",
-  ]);
-  expect(older.items.map((item) => item.body)).toEqual([
-    "Paged message 1",
-    "Paged message 2",
-  ]);
+  expect(latest.items.map((item) => item.body)).toEqual(["Paged message 3", "Paged message 4"]);
+  expect(older.items.map((item) => item.body)).toEqual(["Paged message 1", "Paged message 2"]);
 });

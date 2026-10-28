@@ -259,11 +259,16 @@ it("accepts complete Unicode previews and retained notes with PostgreSQL charact
 it("blocks publishing an incomplete legacy preview without issuing a write", async () => {
   mocks.detail.mockResolvedValueOnce({ item: { ...row, truncated: true } });
   await expect(
-    moderation.command(actor, "item", {
-      action: "publish",
-      notes: "Reviewed",
-      expectedUpdatedAt: date.toISOString(),
-    }, "staff-session"),
+    moderation.command(
+      actor,
+      "item",
+      {
+        action: "publish",
+        notes: "Reviewed",
+        expectedUpdatedAt: date.toISOString(),
+      },
+      "staff-session",
+    ),
   ).rejects.toMatchObject({ code: "CONTENT_REVIEW_TOO_LARGE" });
   expect(mocks.command).not.toHaveBeenCalled();
 });

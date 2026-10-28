@@ -13,9 +13,9 @@ describe("MTA minimum version suggestions", () => {
   });
 
   it("uses a single or matching side-specific minimum", () => {
-    expect(
-      getMtaVersionTargetSuggestion({ client: null, server: "1.6.0", both: null }),
-    ).toBe("1.6.0");
+    expect(getMtaVersionTargetSuggestion({ client: null, server: "1.6.0", both: null })).toBe(
+      "1.6.0",
+    );
     expect(
       getMtaVersionTargetSuggestion({
         client: "1.6.0-9.22279.0",

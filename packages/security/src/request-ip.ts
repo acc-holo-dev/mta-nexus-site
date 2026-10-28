@@ -6,7 +6,11 @@ interface HeaderReader {
 }
 
 function trustedProxy(headers: HeaderReader, expectedSecret: string): boolean {
-  if (typeof expectedSecret !== "string" || expectedSecret.length < 32 || expectedSecret.length > 512) {
+  if (
+    typeof expectedSecret !== "string" ||
+    expectedSecret.length < 32 ||
+    expectedSecret.length > 512
+  ) {
     throw new Error("Invalid trusted proxy secret");
   }
   const provided = headers.get("x-nexus-proxy-secret");

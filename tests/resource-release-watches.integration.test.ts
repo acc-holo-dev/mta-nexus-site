@@ -145,7 +145,8 @@ it("enrollment skips old events, and concurrent workers create one exact-release
         "approve",
         { ...release.audit, id: `aud_rw_replay_${f.key}` },
         1,
-      `tok_${f.staff}`),
+        `tok_${f.staff}`,
+      ),
     ).toBeNull();
     const product = present(await productRepository.findById(f.id));
     await productRepository.updateManagedDetails(
@@ -183,7 +184,8 @@ it("enrollment skips old events, and concurrent workers create one exact-release
         "approve",
         { ...release.audit, id: `aud_rw_reapprove_${f.key}` },
         pending.revision ?? 1,
-      `tok_${f.staff}`),
+        `tok_${f.staff}`,
+      ),
     );
     await worker.runBatch(100);
     expect(await f.inbox()).toHaveLength(1);
@@ -280,7 +282,8 @@ it("publication events require exact safe evidence, are immutable and roll back 
         "approve",
         { ...release.audit, targetId: buildId },
         1,
-      `tok_${f.staff}`),
+        `tok_${f.staff}`,
+      ),
     ).rejects.toThrow();
     const [total] = await db
       .select({ total: count() })
@@ -300,15 +303,13 @@ it("stops an exact watch batch after lost access, preserves notices/cursors and 
     await a.release("1.0.0");
     await b.release("1.0.0");
     await a.start();
-    await db
-      .insert(entitlements)
-      .values({
-        id: `ent_rw_batch_${a.key}`,
-        subjectType: "user",
-        subjectId: a.buyer,
-        permission: "product.download",
-        resourceId: b.id,
-      });
+    await db.insert(entitlements).values({
+      id: `ent_rw_batch_${a.key}`,
+      subjectType: "user",
+      subjectId: a.buyer,
+      permission: "product.download",
+      resourceId: b.id,
+    });
     await watches.command({
       userId: a.buyer,
       productId: b.id,

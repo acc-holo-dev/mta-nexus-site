@@ -24,11 +24,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -43,23 +39,13 @@ export async function GET(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
-    const [ownedOrganizations, memberships] =
-      await Promise.all([
-        organizationRepository.listOwnedByUser(
-          user.id,
-          50,
-        ),
-        organizationRepository.listUserMemberships(
-          user.id,
-        ),
-      ]);
+    const [ownedOrganizations, memberships] = await Promise.all([
+      organizationRepository.listOwnedByUser(user.id, 50),
+      organizationRepository.listUserMemberships(user.id),
+    ]);
 
     const contextsById = new Map<
       string,
@@ -83,24 +69,16 @@ export async function GET(request: NextRequest) {
     }
 
     const remainingMemberships = memberships
-      .filter(
-        (membership) =>
-          !contextsById.has(
-            membership.organizationId,
-          ),
-      )
-      .slice(
-        0,
-        Math.max(0, 50 - contextsById.size),
-      );
+      .filter((membership) => !contextsById.has(membership.organizationId))
+      .slice(0, Math.max(0, 50 - contextsById.size));
 
     const memberOrganizations = remainingMemberships.length
       ? await organizationRepository.findSummariesByIds(
-          remainingMemberships.map(membership => membership.organizationId),
+          remainingMemberships.map((membership) => membership.organizationId),
         )
       : [];
     const memberOrganizationsById = new Map(
-      memberOrganizations.map(organization => [organization.id, organization]),
+      memberOrganizations.map((organization) => [organization.id, organization]),
     );
 
     // An IN query can return rows in a different order from the memberships.
@@ -116,19 +94,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const organizationContexts = Array.from(
-      contextsById.values(),
-    ).slice(0, 50);
+    const organizationContexts = Array.from(contextsById.values()).slice(0, 50);
 
-    const requestedActiveContextId =
-      user.activeContextId ?? "personal";
+    const requestedActiveContextId = user.activeContextId ?? "personal";
     const activeContextId =
       requestedActiveContextId === "personal" ||
-      organizationContexts.some(
-        (organization) =>
-          organization.id ===
-          requestedActiveContextId,
-      )
+      organizationContexts.some((organization) => organization.id === requestedActiveContextId)
         ? requestedActiveContextId
         : "personal";
 
@@ -155,8 +126,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error:
-          "Account contexts are temporarily unavailable.",
+        error: "Account contexts are temporarily unavailable.",
       },
       503,
     );
@@ -164,39 +134,28 @@ export async function GET(request: NextRequest) {
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const authenticated = await authService.getSessionIdentity(token);
 
     if (!authenticated || !token) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
     const { user } = authenticated;
-    const rateLimit = await consumeRateLimit(
-      "sessionManagement",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("sessionManagement", user.id);
     if (!rateLimit.success) {
       return json(
         context,
         {
-          error:
-            "Too many context switches. Please try again shortly.",
+          error: "Too many context switches. Please try again shortly.",
         },
         429,
       );
     }
 
-    const parsed = contextSchema.safeParse(
-      await readAuthJson(request),
-    );
+    const parsed = contextSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
       return json(
         context,
@@ -208,17 +167,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const updated =
-      await authService.switchContext(
-        user.id,
-        parsed.data.contextId,
-        token,
-      );
+    const updated = await authService.switchContext(user.id, parsed.data.contextId, token);
 
     return json(context, {
       success: true,
-      activeContextId:
-        updated.activeContextId ?? "personal",
+      activeContextId: updated.activeContextId ?? "personal",
       user: updated,
     });
   } catch (error: unknown) {
@@ -240,11 +193,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json(
-      context,
-      { error: "Failed to switch context" },
-      500,
-    );
+    return json(context, { error: "Failed to switch context" }, 500);
   }
 });
-

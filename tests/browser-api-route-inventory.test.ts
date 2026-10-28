@@ -130,7 +130,7 @@ function listRouteFiles(dir: string): string[] {
   return out;
 }
 
-function classify(rel: string, source: string) {
+function classify(source: string) {
   if (!MUTATION.test(source)) return "safe-only" as const;
   if (BROWSER_MARKERS.some((marker) => source.includes(marker))) return "browser" as const;
   if (BEARER_MARKERS.some((marker) => source.includes(marker))) return "bearer" as const;
@@ -148,7 +148,7 @@ describe("browser API route adapter inventory", () => {
   const routes = listRouteFiles(apiRoot).map((full) => {
     const rel = path.relative(repoRoot, full).split(path.sep).join("/");
     const source = readFileSync(full, "utf8");
-    return { rel, source, kind: classify(rel, source) };
+    return { rel, source, kind: classify(source) };
   });
 
   it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, library watches and releases, organization writes, server visibility, follow, notifications, public content, author desk, report creates, support cases, verification, admin storage, and staff moderation on the shared browser adapter", () => {

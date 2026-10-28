@@ -9,14 +9,8 @@ describe("product detail management authority", () => {
       "utf8",
     );
 
-    expect(page).toContain(
-      "productService.canManageProduct(product, user)",
-    );
-    expect(page).toContain(
-      "const canInspectBuilds = canManageProduct || isAdmin",
-    );
-    expect(page).not.toContain(
-      "product.authorId === user.id",
-    );
+    expect(page).toContain("productService.canManageProduct(product, user)");
+    expect(page).toContain("const canInspectBuilds = canManageProduct || isAdmin");
+    expect(page).not.toContain("product.authorId === user.id");
   });
 });

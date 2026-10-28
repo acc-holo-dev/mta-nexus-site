@@ -8,7 +8,11 @@ export function isSafeRequestMethod(method: string): boolean {
 }
 
 const LOCAL_DEVELOPMENT_HOSTS = new Set([
-  "localhost", "127.0.0.1", "[::1]", "app", "nexus-local-app-1",
+  "localhost",
+  "127.0.0.1",
+  "[::1]",
+  "app",
+  "nexus-local-app-1",
 ]);
 
 /** Exact bearer-only routes. An Authorization header on any other route is no bypass. */
@@ -19,7 +23,8 @@ export function isLicenseRuntimeRequest(pathname: string): boolean {
 function httpUrl(value: string): URL | null {
   try {
     const url = new URL(value);
-    if ((url.protocol !== "http:" && url.protocol !== "https:") || url.username || url.password) return null;
+    if ((url.protocol !== "http:" && url.protocol !== "https:") || url.username || url.password)
+      return null;
     return url;
   } catch {
     return null;
@@ -52,10 +57,15 @@ export function browserRequestDecision(
   if (site !== null && site !== "same-origin") return reject;
 
   const requestUrl = httpUrl(request.url);
-  const localOrigin = env.NODE_ENV !== "production" && target.protocol === "http:" &&
-    LOCAL_DEVELOPMENT_HOSTS.has(target.hostname) && requestUrl?.protocol === "http:" &&
-    LOCAL_DEVELOPMENT_HOSTS.has(requestUrl.hostname) && requestUrl.port === target.port
-    ? requestUrl.origin : null;
+  const localOrigin =
+    env.NODE_ENV !== "production" &&
+    target.protocol === "http:" &&
+    LOCAL_DEVELOPMENT_HOSTS.has(target.hostname) &&
+    requestUrl?.protocol === "http:" &&
+    LOCAL_DEVELOPMENT_HOSTS.has(requestUrl.hostname) &&
+    requestUrl.port === target.port
+      ? requestUrl.origin
+      : null;
   const trustedOrigin = (value: string) => value === target.origin || value === localOrigin;
 
   const origin = request.headers.get("origin");

@@ -64,7 +64,9 @@ export default function RegisterServerPage() {
       }
       const command = {
         name: String(form.get("name") || "").trim(),
-        slug: String(form.get("slug") || "").trim().toLowerCase(),
+        slug: String(form.get("slug") || "")
+          .trim()
+          .toLowerCase(),
         description: String(form.get("description") || "").trim(),
         websiteUrl: String(form.get("websiteUrl") || "").trim(),
         discordUrl: String(form.get("discordUrl") || "").trim(),
@@ -104,23 +106,23 @@ export default function RegisterServerPage() {
         organizationId || null,
       );
       if (!serverId) {
-        throw new Error(serverMutationErrorMessage(data, {
-          SERVER_SLUG_TAKEN: copy.slugTaken,
-          SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
-          FORBIDDEN: copy.organizationForbidden,
-          REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
-          REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
-        }, copy.createError));
+        throw new Error(
+          serverMutationErrorMessage(
+            data,
+            {
+              SERVER_SLUG_TAKEN: copy.slugTaken,
+              SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
+              FORBIDDEN: copy.organizationForbidden,
+              REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
+              REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
+            },
+            copy.createError,
+          ),
+        );
       }
-      window.location.assign(
-        `/workspace/servers/${encodeURIComponent(serverId)}`,
-      );
+      window.location.assign(`/workspace/servers/${encodeURIComponent(serverId)}`);
     } catch (caught) {
-      setError(
-        caught instanceof Error && caught.message
-          ? caught.message
-          : copy.unexpectedError,
-      );
+      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpectedError);
       setLoading(false);
     }
   }
@@ -129,9 +131,7 @@ export default function RegisterServerPage() {
     <div className="mx-auto max-w-2xl space-y-6 py-8">
       <div className="space-y-1.5">
         <h1 className="font-display text-primary">{copy.title}</h1>
-        <p className="max-w-xl text-sm leading-relaxed text-muted">
-          {copy.description}
-        </p>
+        <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </div>
 
       {error && (
@@ -175,13 +175,7 @@ export default function RegisterServerPage() {
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.name}</span>
-          <input
-            name="name"
-            required
-            minLength={3}
-            maxLength={100}
-            className={fieldClass}
-          />
+          <input name="name" required minLength={3} maxLength={100} className={fieldClass} />
         </label>
 
         <label className={labelClass}>
@@ -200,22 +194,12 @@ export default function RegisterServerPage() {
 
         <label className={`${labelClass} sm:col-span-2`}>
           <span className={labelTextClass}>{copy.descriptionLabel}</span>
-          <textarea
-            name="description"
-            rows={4}
-            maxLength={5000}
-            className={fieldClass}
-          />
+          <textarea name="description" rows={4} maxLength={5000} className={fieldClass} />
         </label>
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.websiteUrl}</span>
-          <input
-            name="websiteUrl"
-            type="url"
-            placeholder="https://..."
-            className={fieldClass}
-          />
+          <input name="websiteUrl" type="url" placeholder="https://..." className={fieldClass} />
         </label>
 
         <label className={labelClass}>
@@ -230,12 +214,7 @@ export default function RegisterServerPage() {
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.rulesUrl}</span>
-          <input
-            name="rulesUrl"
-            type="url"
-            placeholder="https://..."
-            className={fieldClass}
-          />
+          <input name="rulesUrl" type="url" placeholder="https://..." className={fieldClass} />
         </label>
 
         <label className={labelClass}>
@@ -339,22 +318,14 @@ export default function RegisterServerPage() {
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.visibility}</span>
-          <select
-            name="visibility"
-            defaultValue="public"
-            className={fieldClass}
-          >
+          <select name="visibility" defaultValue="public" className={fieldClass}>
             <option value="public">{copy.public}</option>
             <option value="unlisted">{copy.unlisted}</option>
             <option value="private">{copy.private}</option>
           </select>
         </label>
 
-        <Button
-          type="submit"
-          isLoading={loading}
-          className="sm:col-span-2"
-        >
+        <Button type="submit" isLoading={loading} className="sm:col-span-2">
           {loading ? copy.creating : copy.create}
         </Button>
       </form>

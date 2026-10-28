@@ -73,18 +73,13 @@ export default function ResetPasswordPage() {
       setState({
         kind: "error",
         proof,
-        message:
-          error instanceof Error && error.message
-            ? error.message
-            : copy.resetFailed,
+        message: error instanceof Error && error.message ? error.message : copy.resetFailed,
       });
     }
   }
 
   const proof =
-    state.kind === "ready" ||
-    state.kind === "submitting" ||
-    state.kind === "error"
+    state.kind === "ready" || state.kind === "submitting" || state.kind === "error"
       ? state.proof
       : undefined;
 
@@ -128,9 +123,7 @@ export default function ResetPasswordPage() {
             aria-busy={state.kind === "submitting"}
             className="space-y-4"
           >
-            <p className="text-sm leading-relaxed text-muted">
-              {copy.resetDescription}
-            </p>
+            <p className="text-sm leading-relaxed text-muted">{copy.resetDescription}</p>
 
             {state.kind === "error" && (
               <p
@@ -142,9 +135,7 @@ export default function ResetPasswordPage() {
             )}
 
             <label className="block space-y-1.5" htmlFor="reset-new-password">
-              <span className="text-sm font-semibold text-primary">
-                {copy.newPassword}
-              </span>
+              <span className="text-sm font-semibold text-primary">{copy.newPassword}</span>
               <input
                 id="reset-new-password"
                 type="password"
@@ -154,20 +145,13 @@ export default function ResetPasswordPage() {
                 maxLength={128}
                 disabled={state.kind === "submitting"}
                 value={passwords.next}
-                onChange={(event) =>
-                  setPasswords({ ...passwords, next: event.target.value })
-                }
+                onChange={(event) => setPasswords({ ...passwords, next: event.target.value })}
                 className="w-full rounded-lg border border-base bg-inset px-3 py-2.5 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
               />
             </label>
 
-            <label
-              className="block space-y-1.5"
-              htmlFor="reset-confirm-password"
-            >
-              <span className="text-sm font-semibold text-primary">
-                {copy.confirmPassword}
-              </span>
+            <label className="block space-y-1.5" htmlFor="reset-confirm-password">
+              <span className="text-sm font-semibold text-primary">{copy.confirmPassword}</span>
               <input
                 id="reset-confirm-password"
                 type="password"
@@ -187,11 +171,7 @@ export default function ResetPasswordPage() {
               />
             </label>
 
-            <Button
-              type="submit"
-              isLoading={state.kind === "submitting"}
-              className="w-full"
-            >
+            <Button type="submit" isLoading={state.kind === "submitting"} className="w-full">
               {state.kind === "submitting" ? copy.resetting : copy.reset}
             </Button>
           </form>
@@ -202,10 +182,7 @@ export default function ResetPasswordPage() {
             <p role="status" className="text-sm text-success">
               {copy.resetSuccess}
             </p>
-            <Link
-              href="/auth/login"
-              className="text-sm font-semibold text-accent hover:underline"
-            >
+            <Link href="/auth/login" className="text-sm font-semibold text-accent hover:underline">
               {copy.signIn}
             </Link>
           </>

@@ -132,7 +132,16 @@ describe("content moderation behavior", () => {
     });
   });
   it("rejects a changed reviewed revision before persistence or notifications", async () => {
-    await expect(service.moderateContent("cnt_1", "publish", moderator, "staff-session", "Reviewed", new Date("2026-01-01T00:00:00.001Z"))).rejects.toMatchObject({ code: "CONTENT_STATE_CHANGED" });
+    await expect(
+      service.moderateContent(
+        "cnt_1",
+        "publish",
+        moderator,
+        "staff-session",
+        "Reviewed",
+        new Date("2026-01-01T00:00:00.001Z"),
+      ),
+    ).rejects.toMatchObject({ code: "CONTENT_STATE_CHANGED" });
     expect(mocks.moderate).not.toHaveBeenCalled();
   });
 });

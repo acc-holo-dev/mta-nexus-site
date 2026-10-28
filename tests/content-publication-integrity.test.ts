@@ -25,7 +25,7 @@ describe("published content detail HTTP behavior", () => {
     "rejects invalid public slug %j before service lookup",
     async (slug) => {
       const response = await GET(
-        new NextRequest("http://nexus.test/api/content/" + encodeURIComponent(slug)),
+        new NextRequest(`http://nexus.test/api/content/${encodeURIComponent(slug)}`),
         { params: Promise.resolve({ slug }) },
       );
       expect(response.status).toBe(404);
@@ -35,10 +35,9 @@ describe("published content detail HTTP behavior", () => {
 
   it("returns 404 when published lookup cannot find the article", async () => {
     mocks.article.mockResolvedValue(null);
-    const response = await GET(
-      new NextRequest("http://nexus.test/api/content/missing"),
-      { params: Promise.resolve({ slug: "missing" }) },
-    );
+    const response = await GET(new NextRequest("http://nexus.test/api/content/missing"), {
+      params: Promise.resolve({ slug: "missing" }),
+    });
     expect(response.status).toBe(404);
     expect(mocks.article).toHaveBeenCalledWith("missing");
     expect(mocks.comments).not.toHaveBeenCalled();
@@ -47,10 +46,9 @@ describe("published content detail HTTP behavior", () => {
   it("returns bounded comments and public cache headers for a published article", async () => {
     mocks.article.mockResolvedValue({ id: "cnt_1", slug: "published" });
     mocks.comments.mockResolvedValue([{ id: "cmt_1" }]);
-    const response = await GET(
-      new NextRequest("http://nexus.test/api/content/published"),
-      { params: Promise.resolve({ slug: "published" }) },
-    );
+    const response = await GET(new NextRequest("http://nexus.test/api/content/published"), {
+      params: Promise.resolve({ slug: "published" }),
+    });
 
     expect(response.status).toBe(200);
     expect(mocks.comments).toHaveBeenCalledWith({ contentId: "cnt_1" }, 100);

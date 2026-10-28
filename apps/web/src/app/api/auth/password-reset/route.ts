@@ -6,7 +6,12 @@ import { authService } from "../../../../lib/services/auth-service";
 import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent, type RequestLogContext } from "../../../../lib/observability";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
 import {
   PASSWORD_RESET_NEUTRAL_RESPONSE,
   PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
@@ -22,14 +27,10 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, { status, headers });
 }
 
-
 export const POST = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   const startedAt = performance.now();
-  const targetMs = passwordResetTargetMs(
-    randomInt(0, PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS + 1),
-  );
+  const targetMs = passwordResetTargetMs(randomInt(0, PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS + 1));
   try {
     const parsed = requestPasswordResetSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
@@ -54,12 +55,15 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 503,
     });
     await waitForPasswordResetFloor(startedAt, targetMs);
-    return json(context, { error: "Password reset is temporarily unavailable. Please try again later." }, 503);
+    return json(
+      context,
+      { error: "Password reset is temporarily unavailable. Please try again later." },
+      503,
+    );
   }
 });
 
 export const PATCH = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const parsed = confirmPasswordResetSchema.safeParse(await readAuthJson(request));
@@ -83,7 +87,10 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       status: 503,
       error,
     });
-    return json(context, { error: "Could not reset the password. Request a new link and try again." }, 503);
+    return json(
+      context,
+      { error: "Could not reset the password. Request a new link and try again." },
+      503,
+    );
   }
 });
-

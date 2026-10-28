@@ -7,12 +7,7 @@ import {
   serverClaimMatchesOwnershipScope,
 } from "@nexus/domain";
 import { db } from "../client";
-import {
-  auditEvents,
-  serverClaimChallenges,
-  servers,
-  verificationRequests,
-} from "../schema";
+import { auditEvents, serverClaimChallenges, servers, verificationRequests } from "../schema";
 
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 
@@ -30,9 +25,7 @@ export function digestServerClaimToken(token: string): string {
   if (typeof token !== "string" || !TOKEN_PATTERN.test(token)) {
     throw invalidChallenge();
   }
-  return createHash("sha256")
-    .update(`nexus:server-claim:v1\0${token}`)
-    .digest("hex");
+  return createHash("sha256").update(`nexus:server-claim:v1\0${token}`).digest("hex");
 }
 
 function generateServerClaimToken(): string {
@@ -40,11 +33,7 @@ function generateServerClaimToken(): string {
 }
 
 export class ServerClaimChallengeRepository {
-  async issue(input: {
-    serverId: string;
-    requesterId: string;
-    auditId: string;
-  }): Promise<{
+  async issue(input: { serverId: string; requesterId: string; auditId: string }): Promise<{
     id: string;
     token: string;
     expiresAt: Date;
@@ -85,18 +74,12 @@ export class ServerClaimChallengeRepository {
         )
         .limit(1);
       if (pendingVerification) {
-        throw new ConflictError(
-          "A server ownership request is already pending",
-        );
+        throw new ConflictError("A server ownership request is already pending");
       }
 
-      const [clock] = await tx.execute(
-        sql`select clock_timestamp()::text as now`,
-      );
+      const [clock] = await tx.execute(sql`select clock_timestamp()::text as now`);
       const createdAt = new Date(String(clock.now));
-      const expiresAt = new Date(
-        createdAt.getTime() + CHALLENGE_LIFETIME_MS,
-      );
+      const expiresAt = new Date(createdAt.getTime() + CHALLENGE_LIFETIME_MS);
 
       await tx
         .update(serverClaimChallenges)
@@ -140,7 +123,9 @@ export class ServerClaimChallengeRepository {
       });
 
       return Object.freeze({
-        id, token, expiresAt,
+        id,
+        token,
+        expiresAt,
         // The server returned to the caller must come from the same locked
         // row as the challenge, not an earlier service-layer read.
         server: Object.freeze({
@@ -171,10 +156,7 @@ export class ServerClaimChallengeRepository {
           eq(serverClaimChallenges.tokenDigest, tokenDigest),
           isNull(serverClaimChallenges.consumedAt),
           isNull(serverClaimChallenges.revokedAt),
-          gt(
-            serverClaimChallenges.expiresAt,
-            sql`clock_timestamp()`,
-          ),
+          gt(serverClaimChallenges.expiresAt, sql`clock_timestamp()`),
         ),
       )
       .limit(1);
@@ -227,16 +209,16 @@ export class ServerClaimChallengeRepository {
         .for("update")
         .limit(1);
 
-      if (
-        !challenge ||
-        challenge.consumedAt ||
-        challenge.revokedAt
-      ) {
+      if (!challenge || challenge.consumedAt || challenge.revokedAt) {
         throw invalidChallenge();
       }
 
       if (!serverClaimMatchesOwnershipScope(challenge, server)) {
-        throw new AppError("Server ownership scope changed; issue a new control challenge", 409, "SERVER_CLAIM_SCOPE_CHANGED");
+        throw new AppError(
+          "Server ownership scope changed; issue a new control challenge",
+          409,
+          "SERVER_CLAIM_SCOPE_CHANGED",
+        );
       }
 
       // The lock serializes proof verification with concurrent endpoint edits.
@@ -247,14 +229,10 @@ export class ServerClaimChallengeRepository {
         server.ipAddress !== input.expectedEndpoint.ipAddress ||
         server.port !== input.expectedEndpoint.port
       ) {
-        throw new ConflictError(
-          "Server endpoint changed; issue a new MTA control challenge",
-        );
+        throw new ConflictError("Server endpoint changed; issue a new MTA control challenge");
       }
 
-      const [clock] = await tx.execute(
-        sql`select clock_timestamp()::text as now`,
-      );
+      const [clock] = await tx.execute(sql`select clock_timestamp()::text as now`);
       const consumedAt = new Date(String(clock.now));
       if (challenge.expiresAt <= consumedAt) {
         throw invalidChallenge();
@@ -291,9 +269,7 @@ export class ServerClaimChallengeRepository {
         )
         .limit(1);
       if (pendingVerification) {
-        throw new ConflictError(
-          "A server ownership request is already pending",
-        );
+        throw new ConflictError("A server ownership request is already pending");
       }
 
       const consumed = await tx
@@ -308,10 +284,7 @@ export class ServerClaimChallengeRepository {
             eq(serverClaimChallenges.id, challenge.id),
             isNull(serverClaimChallenges.consumedAt),
             isNull(serverClaimChallenges.revokedAt),
-            gt(
-              serverClaimChallenges.expiresAt,
-              sql`clock_timestamp()`,
-            ),
+            gt(serverClaimChallenges.expiresAt, sql`clock_timestamp()`),
           ),
         )
         .returning({ id: serverClaimChallenges.id });
@@ -371,8 +344,7 @@ export class ServerClaimChallengeRepository {
   }
 }
 
-export const serverClaimChallengeRepository =
-  new ServerClaimChallengeRepository();
+export const serverClaimChallengeRepository = new ServerClaimChallengeRepository();
 
 export const serverClaimChallengePolicy = Object.freeze({
   lifetimeMs: CHALLENGE_LIFETIME_MS,

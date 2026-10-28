@@ -92,9 +92,12 @@ test("evidence checksum changes with evidence content", () => {
 
 for (const missing of REQUIRED_RELEASE_GATES) {
   test(`release summary blocks missing required gate: ${missing}`, () => {
-    const summary = summarizeReleaseEvidence({ dirty: false,
-      gates: REQUIRED_RELEASE_GATES.filter((name) => name !== missing)
-        .map((name) => ({ name, status: "passed" })),
+    const summary = summarizeReleaseEvidence({
+      dirty: false,
+      gates: REQUIRED_RELEASE_GATES.filter((name) => name !== missing).map((name) => ({
+        name,
+        status: "passed",
+      })),
     });
     assert.equal(summary.releaseCandidate, false);
     assert.equal(summary.status, "blocked");
@@ -102,10 +105,13 @@ for (const missing of REQUIRED_RELEASE_GATES) {
   });
 }
 test("duplicate successes cannot replace required evidence", () => {
-  const summary = summarizeReleaseEvidence({ dirty: false, gates: [
-    ...REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
-    { name: "tests", status: "passed" },
-  ] });
+  const summary = summarizeReleaseEvidence({
+    dirty: false,
+    gates: [
+      ...REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
+      { name: "tests", status: "passed" },
+    ],
+  });
   assert.equal(summary.status, "blocked");
   assert.deepEqual(summary.duplicateGates, ["tests"]);
 });
@@ -116,10 +122,13 @@ test("repository cleanliness must be explicitly confirmed", () => {
   assert.equal(summary.releaseCandidate, false);
 });
 test("additional successful gates do not invalidate complete evidence", () => {
-  const summary = summarizeReleaseEvidence({ dirty: false, gates: [
-    ...REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
-    { name: "extra_check", status: "passed" },
-  ] });
+  const summary = summarizeReleaseEvidence({
+    dirty: false,
+    gates: [
+      ...REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
+      { name: "extra_check", status: "passed" },
+    ],
+  });
   assert.equal(summary.releaseCandidate, true);
 });
 
@@ -128,25 +137,38 @@ test("repository stability requires the same readable clean checkout", () => {
   const baseline = { initialSha, finalSha: initialSha, statusAvailable: true, dirty: false };
   assert.equal(repositoryStayedStable(baseline), true);
   for (const change of [
-    { finalSha: "b".repeat(40) }, { finalSha: null }, { initialSha: null },
-    { initialSha: "", finalSha: "" }, { statusAvailable: false },
-    { dirty: true }, { dirty: undefined },
+    { finalSha: "b".repeat(40) },
+    { finalSha: null },
+    { initialSha: null },
+    { initialSha: "", finalSha: "" },
+    { statusAvailable: false },
+    { dirty: true },
+    { dirty: undefined },
   ]) {
     assert.equal(repositoryStayedStable({ ...baseline, ...change }), false);
   }
 });
 
 test("release commands record success and nonzero exit without command output", () => {
-  const success = executeReleaseCommand(process.execPath, ["-e", "console.log('private output')"], { stdio: "pipe", timeoutMs: 5000 });
+  const success = executeReleaseCommand(process.execPath, ["-e", "console.log('private output')"], {
+    stdio: "pipe",
+    timeoutMs: 5000,
+  });
   assert.equal(success.status, "passed");
   assert.equal(success.timedOut, false);
   assert.equal(JSON.stringify(success).includes("private output"), false);
-  const failure = executeReleaseCommand(process.execPath, ["-e", "process.exit(7)"], { stdio: "pipe", timeoutMs: 5000 });
+  const failure = executeReleaseCommand(process.execPath, ["-e", "process.exit(7)"], {
+    stdio: "pipe",
+    timeoutMs: 5000,
+  });
   assert.equal(failure.status, "failed");
   assert.equal(failure.exitCode, 7);
 });
 test("a stuck release command times out and cannot pass", () => {
-  const result = executeReleaseCommand(process.execPath, ["-e", "setInterval(() => {}, 1000)"], { stdio: "pipe", timeoutMs: 200 });
+  const result = executeReleaseCommand(process.execPath, ["-e", "setInterval(() => {}, 1000)"], {
+    stdio: "pipe",
+    timeoutMs: 200,
+  });
   assert.equal(result.status, "failed");
   assert.equal(result.timedOut, true);
   assert.equal(result.errorCode, "ETIMEDOUT");
@@ -173,7 +195,8 @@ test("serialization failure preserves the previous evidence", (t) => {
   t.after(() => rmSync(directory, { recursive: true, force: true }));
   const path = join(directory, "release-evidence.json");
   writeFileSync(path, '{"old":true}');
-  const circular = {}; circular.self = circular;
+  const circular = {};
+  circular.self = circular;
   assert.throws(() => writeReleaseEvidence(path, circular), TypeError);
   assert.equal(readFileSync(path, "utf8"), '{"old":true}');
   assert.deepEqual(readdirSync(directory), ["release-evidence.json"]);
@@ -188,7 +211,6 @@ test("failed publication cleans only its own temporary directory", (t) => {
   assert.equal(readFileSync(join(destination, "existing"), "utf8"), "keep");
   assert.deepEqual(readdirSync(directory), ["release-evidence.json"]);
 });
-
 
 test("external evidence summary requires every declared artifact to be present valid and hashed", () => {
   const valid = {

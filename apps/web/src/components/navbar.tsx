@@ -22,9 +22,7 @@ export function Navbar({ locale }: { locale: Locale }) {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
             NX
           </span>
-          <span className="hidden text-sm font-bold text-primary sm:inline">
-            MTA NEXUS
-          </span>
+          <span className="hidden text-sm font-bold text-primary sm:inline">MTA NEXUS</span>
         </Link>
 
         <div className="order-3 min-w-0 basis-full sm:order-none sm:flex-1 lg:max-w-xl">

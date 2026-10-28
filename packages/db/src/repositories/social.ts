@@ -4,20 +4,16 @@ import { follows } from "../schema";
 import type { Follow } from "@nexus/domain";
 
 export class SocialRepository {
-  async isFollowing(
-    followerId: string,
-    targetType: string,
-    targetId: string
-  ): Promise<boolean> {
-        const rows = await db
+  async isFollowing(followerId: string, targetType: string, targetId: string): Promise<boolean> {
+    const rows = await db
       .select({ id: follows.id })
       .from(follows)
       .where(
         and(
           eq(follows.followerId, followerId),
           eq(follows.targetType, targetType),
-          eq(follows.targetId, targetId)
-        )
+          eq(follows.targetId, targetId),
+        ),
       )
       .limit(1);
     return rows.length > 0;
@@ -29,23 +25,19 @@ export class SocialRepository {
       createdAt: new Date(),
     };
 
-    const rows = await db
-      .insert(follows)
-      .values(values)
-      .onConflictDoNothing()
-      .returning();
+    const rows = await db.insert(follows).values(values).onConflictDoNothing().returning();
     return (rows[0] as unknown as Follow) || null;
   }
 
   async unfollow(followerId: string, targetType: string, targetId: string): Promise<void> {
-        await db
+    await db
       .delete(follows)
       .where(
         and(
           eq(follows.followerId, followerId),
           eq(follows.targetType, targetType),
-          eq(follows.targetId, targetId)
-        )
+          eq(follows.targetId, targetId),
+        ),
       );
   }
 
@@ -60,28 +52,19 @@ export class SocialRepository {
     const rows = await db
       .select()
       .from(follows)
-      .where(
-        and(
-          eq(follows.targetType, targetType),
-          eq(follows.targetId, targetId),
-        ),
-      )
+      .where(and(eq(follows.targetType, targetType), eq(follows.targetId, targetId)))
       .orderBy(desc(follows.createdAt))
       .limit(boundedLimit);
     return rows as unknown as Follow[];
   }
 
   async listFollows(followerId: string, targetType?: string): Promise<Follow[]> {
-        if (targetType) {
+    if (targetType) {
       const rows = await db
         .select()
         .from(follows)
-        .where(
-          and(
-            eq(follows.followerId, followerId),
-            eq(follows.targetType, targetType)
-          )
-        ).orderBy(desc(follows.createdAt));
+        .where(and(eq(follows.followerId, followerId), eq(follows.targetType, targetType)))
+        .orderBy(desc(follows.createdAt));
       return rows as unknown as Follow[];
     }
     const rows = await db

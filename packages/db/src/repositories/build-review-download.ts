@@ -43,17 +43,15 @@ export class BuildReviewDownloadRepository {
       ) {
         throw new AppError("Build evidence changed; reload", 409, "BUILD_STATE_CHANGED");
       }
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.actorId,
-          actorType: actor.role === "admin" ? "admin" : "user",
-          action: "build.review_artifact_download_started",
-          targetId: build.id,
-          targetType: "build",
-          details: { productId: build.productId, version: build.version },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.actorId,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        action: "build.review_artifact_download_started",
+        targetId: build.id,
+        targetType: "build",
+        details: { productId: build.productId, version: build.version },
+      });
     });
   }
 }

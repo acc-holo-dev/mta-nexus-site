@@ -6,9 +6,8 @@ export function releaseHistoryPageBounds(total: number, requested = 1) {
     throw new RangeError("Invalid published release total");
   }
   const totalPages = Math.max(1, Math.ceil(total / RELEASE_HISTORY_PAGE_SIZE));
-  const page = Number.isSafeInteger(requested) && requested >= 1
-    ? Math.min(requested, totalPages)
-    : 1;
+  const page =
+    Number.isSafeInteger(requested) && requested >= 1 ? Math.min(requested, totalPages) : 1;
   return {
     page,
     total,

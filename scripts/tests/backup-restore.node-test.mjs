@@ -69,19 +69,10 @@ test("fixture receives only disposable database settings and an external owned v
 
   assert.deepEqual(Object.keys(fixture.services), ["postgres"]);
   assert.equal(fixture.services.postgres.network_mode, "none");
-  assert.equal(
-    fixture.services.postgres.environment.POSTGRES_PASSWORD,
-    "synthetic-token",
-  );
-  assert.equal(
-    fixture.volumes.pgdata.name,
-    "nexus-disposable-pgdata",
-  );
+  assert.equal(fixture.services.postgres.environment.POSTGRES_PASSWORD, "synthetic-token");
+  assert.equal(fixture.volumes.pgdata.name, "nexus-disposable-pgdata");
   assert.equal(fixture.volumes.pgdata.external, true);
-  assert.equal(
-    fixture.services.postgres.environment.DATABASE_URL,
-    undefined,
-  );
+  assert.equal(fixture.services.postgres.environment.DATABASE_URL, undefined);
 });
 
 test("destructive cleanup ownership requires the exact label and volume name", () => {

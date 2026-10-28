@@ -42,9 +42,7 @@ describe("resource trust surface behavior", () => {
       expect(html).toContain("1.6.0-9.22279.0");
       expect(html).toContain(copy.notAvailable);
       expect(html).toContain(copy.explanation);
-      expect(html).not.toMatch(
-        /SHA-256 (?:validated|verified)|cryptographically verified/iu,
-      );
+      expect(html).not.toMatch(/SHA-256 (?:validated|verified)|cryptographically verified/iu);
     },
   );
 

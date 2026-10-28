@@ -29,23 +29,24 @@ export default async function SalesHistoryPage({
 }: {
   searchParams: Promise<{ page?: string | string[] }>;
 }) {
-  const [locale, store, query] = await Promise.all([
-    getRequestLocale(), cookies(), searchParams,
-  ]);
+  const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getCommerceHistoryCopy(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user) return <HistorySignIn copy={copy} />;
 
-  const result = await orderRepository.pageSellerHistory(
-    user.id,
-    parseHistoryPage(query.page),
-  );
+  const result = await orderRepository.pageSellerHistory(user.id, parseHistoryPage(query.page));
 
   return (
     <HistoryShell copy={copy} area="sales">
-      <Link href="/workspace/sales/report" className="text-sm text-accent underline">{sellerSalesCopy(locale).title}</Link>
-      <Link href="/workspace/finance" className="text-sm text-accent underline">{getFinancialCopy(locale).title}</Link>
-      <p role="note" className="text-sm text-muted">{copy.grossNotice}</p>
+      <Link href="/workspace/sales/report" className="text-sm text-accent underline">
+        {sellerSalesCopy(locale).title}
+      </Link>
+      <Link href="/workspace/finance" className="text-sm text-accent underline">
+        {getFinancialCopy(locale).title}
+      </Link>
+      <p role="note" className="text-sm text-muted">
+        {copy.grossNotice}
+      </p>
       {result.sales.length === 0 ? (
         <p className="py-12 text-sm text-secondary">{copy.emptySales}</p>
       ) : (

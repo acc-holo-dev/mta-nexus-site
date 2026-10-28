@@ -14,11 +14,7 @@ export function NotificationCenterTabs({ children }: { children: ReactNode }) {
 
   return (
     <div className="space-y-4">
-      <div
-        className="flex flex-wrap items-center gap-2"
-        role="tablist"
-        aria-label={copy.title}
-      >
+      <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label={copy.title}>
         {items.map((item, index) => {
           const active = filter === item;
           const tabId = `${tabIdPrefix}-${item}`;
@@ -54,11 +50,7 @@ export function NotificationCenterTabs({ children }: { children: ReactNode }) {
           );
         })}
       </div>
-      <div
-        role="tabpanel"
-        id={panelId}
-        aria-labelledby={`${tabIdPrefix}-${filter}`}
-      >
+      <div role="tabpanel" id={panelId} aria-labelledby={`${tabIdPrefix}-${filter}`}>
         {children}
       </div>
     </div>

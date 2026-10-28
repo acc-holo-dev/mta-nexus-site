@@ -8,9 +8,14 @@ export type AccountRecoveryAbuseScope =
   | "password_reset_confirm";
 
 function digest(scope: AccountRecoveryAbuseScope, subject: string, key: Uint8Array): string {
-  if (!["email_verify_request", "password_reset_request", "password_reset_confirm"].includes(scope)
-    || typeof subject !== "string" || subject.length < 1 || subject.length > 512
-    || !(key instanceof Uint8Array) || key.byteLength !== 32) {
+  if (
+    !["email_verify_request", "password_reset_request", "password_reset_confirm"].includes(scope) ||
+    typeof subject !== "string" ||
+    subject.length < 1 ||
+    subject.length > 512 ||
+    !(key instanceof Uint8Array) ||
+    key.byteLength !== 32
+  ) {
     throw new Error("Invalid account recovery abuse-limit input");
   }
   return createHmac("sha256", key)
@@ -26,31 +31,38 @@ export class AccountRecoveryAbuseLimitRepository {
     limit: number;
     windowSeconds: number;
   }): Promise<{ success: boolean; remaining: number; resetAt: Date }> {
-    if (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > 1000
-      || !Number.isInteger(input.windowSeconds) || input.windowSeconds < 1 || input.windowSeconds > 604800) {
+    if (
+      !Number.isInteger(input.limit) ||
+      input.limit < 1 ||
+      input.limit > 1000 ||
+      !Number.isInteger(input.windowSeconds) ||
+      input.windowSeconds < 1 ||
+      input.windowSeconds > 604800
+    ) {
       throw new Error("Invalid account recovery abuse-limit policy");
     }
     const subjectDigest = digest(input.scope, input.subject, input.key);
-    return db.transaction(async (tx) => {
-      await tx.execute(sql`set local lock_timeout = '5s'`);
-      await tx.execute(sql`set local statement_timeout = '10s'`);
-      // A row lock cannot serialize the first request: there is no row yet.
-      // Lock the keyed identity before reading the clock or the current window.
-      // Only the HMAC digest reaches PostgreSQL, never the raw subject or key.
-      const lockKey = `nexus:account-recovery-limit:v1:${input.scope}:${subjectDigest}`;
-      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
-      const [clock] = await tx.execute(sql`select clock_timestamp()::text as now`);
-      const now = new Date(String(clock.now));
-      const rows = await tx.execute(sql`
+    return db.transaction(
+      async (tx) => {
+        await tx.execute(sql`set local lock_timeout = '5s'`);
+        await tx.execute(sql`set local statement_timeout = '10s'`);
+        // A row lock cannot serialize the first request: there is no row yet.
+        // Lock the keyed identity before reading the clock or the current window.
+        // Only the HMAC digest reaches PostgreSQL, never the raw subject or key.
+        const lockKey = `nexus:account-recovery-limit:v1:${input.scope}:${subjectDigest}`;
+        await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+        const [clock] = await tx.execute(sql`select clock_timestamp()::text as now`);
+        const now = new Date(String(clock.now));
+        const rows = await tx.execute(sql`
         select "count", "expires_at"::text as "expires_at"
         from "account_recovery_abuse_limits"
         where "scope" = ${input.scope} and "subject_digest" = ${subjectDigest}
         for update
       `);
-      const row = rows[0] as { count: number; expires_at: string } | undefined;
-      if (!row || new Date(row.expires_at) <= now) {
-        const resetAt = new Date(now.getTime() + input.windowSeconds * 1000);
-        await tx.execute(sql`
+        const row = rows[0] as { count: number; expires_at: string } | undefined;
+        if (!row || new Date(row.expires_at) <= now) {
+          const resetAt = new Date(now.getTime() + input.windowSeconds * 1000);
+          await tx.execute(sql`
           insert into "account_recovery_abuse_limits"
             ("scope","subject_digest","count","window_started_at","expires_at")
           values (${input.scope}, ${subjectDigest}, 1,
@@ -59,18 +71,20 @@ export class AccountRecoveryAbuseLimitRepository {
           set "count" = 1, "window_started_at" = excluded."window_started_at",
               "expires_at" = excluded."expires_at"
         `);
-        return { success: true, remaining: input.limit - 1, resetAt };
-      }
-      const count = Number(row.count);
-      const resetAt = new Date(row.expires_at);
-      if (count >= input.limit) return { success: false, remaining: 0, resetAt };
-      await tx.execute(sql`
+          return { success: true, remaining: input.limit - 1, resetAt };
+        }
+        const count = Number(row.count);
+        const resetAt = new Date(row.expires_at);
+        if (count >= input.limit) return { success: false, remaining: 0, resetAt };
+        await tx.execute(sql`
         update "account_recovery_abuse_limits"
         set "count" = "count" + 1
         where "scope" = ${input.scope} and "subject_digest" = ${subjectDigest}
       `);
-      return { success: true, remaining: input.limit - count - 1, resetAt };
-    }, { isolationLevel: "read committed" });
+        return { success: true, remaining: input.limit - count - 1, resetAt };
+      },
+      { isolationLevel: "read committed" },
+    );
   }
 
   async cleanup(limit = 100): Promise<number> {

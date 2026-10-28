@@ -1,4 +1,7 @@
-type VisibilitySource = Pick<Document, "visibilityState" | "addEventListener" | "removeEventListener">;
+type VisibilitySource = Pick<
+  Document,
+  "visibilityState" | "addEventListener" | "removeEventListener"
+>;
 
 type PollingOptions<T> = {
   read(signal: AbortSignal): Promise<T>;
@@ -38,7 +41,8 @@ export function startVisiblePolling<T>({
     clearTimer();
     const controller = new AbortController();
     current = controller;
-    const relevant = () => !stopped && current === controller && !controller.signal.aborted && visible();
+    const relevant = () =>
+      !stopped && current === controller && !controller.signal.aborted && visible();
     void (async () => {
       try {
         const value = await read(controller.signal);

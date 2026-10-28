@@ -487,7 +487,7 @@ it("ownership and database content guards reject a foreign source and a partial-
 // Selected-copy acceptance requires disposable PostgreSQL migrated through 0074.
 it("copies selected orphaned references from an archived source once while preserving existing destination dates", async () => {
   const f = await copyFixture();
-  const ids: [string,string] = [
+  const ids: [string, string] = [
     `prd_copy_missing_${randomUUID().replaceAll("-", "")}`,
     `prd_copy_missing_${randomUUID().replaceAll("-", "")}`,
   ];
@@ -577,17 +577,15 @@ it("rolls selected copying back on audit failure and rejects receipt proof for a
   await db.update(libraryCollections).set({ revision: 2 }).where(eq(libraryCollections.id, id));
   await db.insert(libraryCollectionItems).values({ collectionId: id, productId: f.productId });
   await expect(
-    db
-      .insert(libraryCollectionReceipts)
-      .values({
-        id: `lcr_${randomUUID().replaceAll("-", "")}`,
-        userId: f.userId,
-        requestId: body.requestId,
-        collectionId: id,
-        commandDigest: "a".repeat(64),
-        command: { ...body, productIds: [f.productId] },
-        snapshot: { id, name: "Atomic target", status: "active", revision: 2 },
-      }),
+    db.insert(libraryCollectionReceipts).values({
+      id: `lcr_${randomUUID().replaceAll("-", "")}`,
+      userId: f.userId,
+      requestId: body.requestId,
+      collectionId: id,
+      commandDigest: "a".repeat(64),
+      command: { ...body, productIds: [f.productId] },
+      snapshot: { id, name: "Atomic target", status: "active", revision: 2 },
+    }),
   ).rejects.toThrow();
 });
 
@@ -690,17 +688,15 @@ it("rolls both sides of a move back after audit failure and rejects a receipt if
   await db.update(libraryCollections).set({ revision: 2 }).where(eq(libraryCollections.id, id));
   await db.insert(libraryCollectionItems).values({ collectionId: id, productId });
   await expect(
-    db
-      .insert(libraryCollectionReceipts)
-      .values({
-        id: `lcr_${randomUUID().replaceAll("-", "")}`,
-        userId: f.userId,
-        requestId: body.requestId,
-        collectionId: id,
-        commandDigest: "a".repeat(64),
-        command: body,
-        snapshot: { id, name: "Atomic move target", status: "active", revision: 2 },
-      }),
+    db.insert(libraryCollectionReceipts).values({
+      id: `lcr_${randomUUID().replaceAll("-", "")}`,
+      userId: f.userId,
+      requestId: body.requestId,
+      collectionId: id,
+      commandDigest: "a".repeat(64),
+      command: body,
+      snapshot: { id, name: "Atomic move target", status: "active", revision: 2 },
+    }),
   ).rejects.toThrow();
 });
 
@@ -902,7 +898,7 @@ async function membershipBatchFixture() {
         auditId: `aud_${randomUUID()}`,
       })),
     });
-  return { ...f, source, destination, batchCommand:command, apply };
+  return { ...f, source, destination, batchCommand: command, apply };
 }
 it("atomically updates resource membership in multiple own collections and replays immutable children after later edits", async () => {
   const f = await membershipBatchFixture(),
@@ -943,11 +939,21 @@ it("rolls back every membership, revision, child/parent receipt and audit when t
     .where(eq(auditEvents.actorId, f.userId))
     .limit(1);
   if (!existing) throw Error("Missing duplicate audit fixture");
-  const receiptsBefore=await db.select().from(libraryCollectionReceipts).where(eq(libraryCollectionReceipts.userId,f.userId));
-  const auditsBefore=await db.select().from(auditEvents).where(eq(auditEvents.actorId,f.userId));
+  const receiptsBefore = await db
+    .select()
+    .from(libraryCollectionReceipts)
+    .where(eq(libraryCollectionReceipts.userId, f.userId));
+  const auditsBefore = await db.select().from(auditEvents).where(eq(auditEvents.actorId, f.userId));
   await expect(f.apply(existing.id)).rejects.toThrow();
-  expect(await db.select().from(libraryCollectionReceipts).where(eq(libraryCollectionReceipts.userId,f.userId))).toEqual(receiptsBefore);
-  expect(await db.select().from(auditEvents).where(eq(auditEvents.actorId,f.userId))).toEqual(auditsBefore);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.userId, f.userId)),
+  ).toEqual(receiptsBefore);
+  expect(await db.select().from(auditEvents).where(eq(auditEvents.actorId, f.userId))).toEqual(
+    auditsBefore,
+  );
   expect((await collections.detail(f.userId, f.source)).collection.revision).toBe(2);
   expect((await collections.detail(f.userId, f.source)).total).toBe(1);
   expect((await collections.detail(f.userId, f.destination)).collection.revision).toBe(1);
@@ -1064,15 +1070,13 @@ it("exports own orphan references but imports only current own access, then rech
   expect((await collections.detail(f.userId, destination)).total).toBe(0);
   expect((await collections.detail(f.userId, destination)).collection.revision).toBe(1);
   expect((await collections.history(f.userId, destination)).items).toHaveLength(1);
-  await db
-    .insert(entitlements)
-    .values({
-      id: `ent_col_import_${randomUUID()}`,
-      subjectType: "user",
-      subjectId: f.userId,
-      permission: "product.download",
-      resourceId: f.productId,
-    });
+  await db.insert(entitlements).values({
+    id: `ent_col_import_${randomUUID()}`,
+    subjectType: "user",
+    subjectId: f.userId,
+    permission: "product.download",
+    resourceId: f.productId,
+  });
   const saved = await f.command(request, destination),
     replay = await f.command(request, destination);
   expect(replay.replayed).toBe(true);
@@ -1100,15 +1104,13 @@ async function reconciliationFixture() {
   );
   await db.delete(products).where(eq(products.id, f.productId));
   const grant = `ent_reconcile_${randomUUID()}`;
-  await db
-    .insert(entitlements)
-    .values({
-      id: grant,
-      subjectType: "user",
-      subjectId: f.userId,
-      permission: "product.download",
-      resourceId: fresh.productId,
-    });
+  await db.insert(entitlements).values({
+    id: grant,
+    subjectType: "user",
+    subjectId: f.userId,
+    permission: "product.download",
+    resourceId: fresh.productId,
+  });
   await db
     .insert(libraryCollectionItems)
     .values(
@@ -1217,15 +1219,13 @@ async function restorationFixture() {
     id,
   );
   for (const productId of [fresh.productId, later.productId])
-    await db
-      .insert(entitlements)
-      .values({
-        id: `ent_restore_${randomUUID()}`,
-        subjectType: "user",
-        subjectId: f.userId,
-        permission: "product.download",
-        resourceId: productId,
-      });
+    await db.insert(entitlements).values({
+      id: `ent_restore_${randomUUID()}`,
+      subjectType: "user",
+      subjectId: f.userId,
+      permission: "product.download",
+      resourceId: productId,
+    });
   const original = await f.command(
     {
       requestId: randomUUID(),
@@ -1363,15 +1363,13 @@ it("finds whole own resource memberships across active/archived collections and 
     b,
   );
   await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 2 }, b);
-  await db
-    .insert(entitlements)
-    .values({
-      id: `ent_inventory_${randomUUID()}`,
-      subjectType: "user",
-      subjectId: f.userId,
-      permission: "product.download",
-      resourceId: fresh.productId,
-    });
+  await db.insert(entitlements).values({
+    id: `ent_inventory_${randomUUID()}`,
+    subjectType: "user",
+    subjectId: f.userId,
+    permission: "product.download",
+    resourceId: fresh.productId,
+  });
   await f.command(
     { requestId: randomUUID(), action: "add", productId: fresh.productId, expectedRevision: 2 },
     a,

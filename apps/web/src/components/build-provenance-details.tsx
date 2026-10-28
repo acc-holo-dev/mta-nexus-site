@@ -4,13 +4,10 @@ import { getBuildProvenance } from "../lib/build-provenance";
 import { getDictionary, type Locale } from "../lib/i18n";
 
 const toneClass = {
-  positive:
-    "border-[color:var(--nexus-success)]/20 bg-success-soft text-success",
+  positive: "border-[color:var(--nexus-success)]/20 bg-success-soft text-success",
   neutral: "border-base bg-inset text-secondary",
-  warning:
-    "border-[color:var(--nexus-warning)]/20 bg-warning-soft text-warning",
-  danger:
-    "border-[color:var(--nexus-danger)]/20 bg-danger-soft text-danger",
+  warning: "border-[color:var(--nexus-warning)]/20 bg-warning-soft text-warning",
+  danger: "border-[color:var(--nexus-danger)]/20 bg-danger-soft text-danger",
 } as const;
 
 export function BuildProvenanceDetails({
@@ -45,8 +42,7 @@ export function BuildProvenanceDetails({
 
   const scanDetail = provenance.scanner
     ? `${copy.scanner}: ${provenance.scanner}`
-    : provenance.scanStatus === "clean" ||
-        provenance.scanStatus === "malicious"
+    : provenance.scanStatus === "clean" || provenance.scanStatus === "malicious"
       ? copy.scannerIdentityMissing
       : provenance.scanStatus === "error"
         ? copy.noSuccessfulVerdict
@@ -63,11 +59,7 @@ export function BuildProvenanceDetails({
       </summary>
 
       <div className="space-y-3 border-t border-base px-3 py-3 text-[11px]">
-        <div
-          className={`rounded-md border px-2.5 py-2 ${
-            toneClass[provenance.scanTone]
-          }`}
-        >
+        <div className={`rounded-md border px-2.5 py-2 ${toneClass[provenance.scanTone]}`}>
           <div className="flex items-center gap-1.5 font-semibold">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{scanLabel}</span>
@@ -96,9 +88,7 @@ export function BuildProvenanceDetails({
 
           <dt className="text-faint">{copy.mtaTarget}</dt>
           <dd className="font-mono text-secondary">
-            {build.mtaVersionTarget
-              ? `>= ${build.mtaVersionTarget}`
-              : copy.notDeclared}
+            {build.mtaVersionTarget ? `>= ${build.mtaVersionTarget}` : copy.notDeclared}
           </dd>
 
           <dt className="text-faint">{copy.signature}</dt>
@@ -107,14 +97,10 @@ export function BuildProvenanceDetails({
           </dd>
 
           <dt className="text-faint">{copy.publicationState}</dt>
-          <dd className="text-secondary">
-            {build.status.replace(/_/g, " ")}
-          </dd>
+          <dd className="text-secondary">{build.status.replace(/_/g, " ")}</dd>
         </dl>
 
-        <p className="text-[10px] leading-relaxed text-faint">
-          {copy.explanation}
-        </p>
+        <p className="text-[10px] leading-relaxed text-faint">{copy.explanation}</p>
       </div>
     </details>
   );

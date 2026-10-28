@@ -27,22 +27,15 @@ describe("resource download HTTP integration", () => {
 
   function request(productId: string, token: string) {
     return {
-      request: new NextRequest(
-        `http://nexus.test/api/products/${productId}/download`,
-        {
-          method: "GET",
-          headers: { cookie: `nexus_session=${token}` },
-        },
-      ),
+      request: new NextRequest(`http://nexus.test/api/products/${productId}/download`, {
+        method: "GET",
+        headers: { cookie: `nexus_session=${token}` },
+      }),
       context: { params: Promise.resolve({ id: productId }) },
     };
   }
 
-  async function createProduct(input: {
-    id: string;
-    slug: string;
-    status: "published" | "draft";
-  }) {
+  async function createProduct(input: { id: string; slug: string; status: "published" | "draft" }) {
     await productRepository.create({
       id: input.id,
       title: `Download ${input.slug}`,
@@ -117,11 +110,7 @@ describe("resource download HTTP integration", () => {
       status: "published",
     });
 
-    for (const productId of [
-      publishedProductId,
-      draftProductId,
-      noBuildProductId,
-    ]) {
+    for (const productId of [publishedProductId, draftProductId, noBuildProductId]) {
       await entitlementRepository.create({
         id: `ent_${productId}`,
         subjectType: "user",
@@ -158,61 +147,37 @@ describe("resource download HTTP integration", () => {
     });
 
     const successInput = request(publishedProductId, sessionToken);
-    const success = await downloadResource(
-      successInput.request,
-      successInput.context,
-    );
+    const success = await downloadResource(successInput.request, successInput.context);
 
     expect(success.status).toBe(200);
     expect(success.headers.get("X-Content-SHA256")).toBe(asset.sha256Hash);
     expect(success.headers.get("Cache-Control")).toBe("private, no-store");
     expect(success.headers.get("Vary")).toBe("Cookie");
     expect(success.headers.get("X-Content-Type-Options")).toBe("nosniff");
-    expect(
-      new Uint8Array(await success.arrayBuffer()),
-    ).toEqual(bytes);
+    expect(new Uint8Array(await success.arrayBuffer())).toEqual(bytes);
 
     const downloadAudits = await db
       .select()
       .from(auditEvents)
       .where(eq(auditEvents.targetId, publishedProductId));
-    expect(
-      downloadAudits.some(
-        (audit) => audit.action === "product.download_started",
-      ),
-    ).toBe(true);
-    expect(
-      downloadAudits.some(
-        (audit) => audit.action === "product.downloaded",
-      ),
-    ).toBe(false);
+    expect(downloadAudits.some((audit) => audit.action === "product.download_started")).toBe(true);
+    expect(downloadAudits.some((audit) => audit.action === "product.downloaded")).toBe(false);
 
-    const noEntitlementInput = request(
-      publishedProductId,
-      otherSessionToken,
-    );
+    const noEntitlementInput = request(publishedProductId, otherSessionToken);
     const noEntitlement = await downloadResource(
       noEntitlementInput.request,
       noEntitlementInput.context,
     );
     expect(noEntitlement.status).toBe(403);
-    expect(noEntitlement.headers.get("Cache-Control")).toBe(
-      "private, no-store",
-    );
+    expect(noEntitlement.headers.get("Cache-Control")).toBe("private, no-store");
     expect(noEntitlement.headers.get("Vary")).toBe("Cookie");
 
     const draftInput = request(draftProductId, sessionToken);
-    const draft = await downloadResource(
-      draftInput.request,
-      draftInput.context,
-    );
+    const draft = await downloadResource(draftInput.request, draftInput.context);
     expect(draft.status).toBe(404);
 
     const noBuildInput = request(noBuildProductId, sessionToken);
-    const noBuild = await downloadResource(
-      noBuildInput.request,
-      noBuildInput.context,
-    );
+    const noBuild = await downloadResource(noBuildInput.request, noBuildInput.context);
     expect(noBuild.status).toBe(404);
     expect(await noBuild.json()).toEqual({
       error: "No published build is available",

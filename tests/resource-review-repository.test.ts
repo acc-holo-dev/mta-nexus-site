@@ -268,14 +268,20 @@ it("generic report reads and resolution exclude commercial review cases", async 
   await legacy.countOpen();
   await legacy.listPage("pending", 1);
   await legacy.findById("rpt_a");
-  await legacy.resolve("rpt_a", "resolved", "Bypass", {
-    id: "aud_a",
-    actorId: "usr_a",
-    actorType: "admin",
-    action: "report.resolved",
-    targetId: "rpt_a",
-    targetType: "report",
-  }, "staff-token");
+  await legacy.resolve(
+    "rpt_a",
+    "resolved",
+    "Bypass",
+    {
+      id: "aud_a",
+      actorId: "usr_a",
+      actorType: "admin",
+      action: "report.resolved",
+      targetId: "rpt_a",
+      targetType: "report",
+    },
+    "staff-token",
+  );
   expect(state.queries).toHaveLength(6);
   expect(state.queries.some((query) => query.sql.startsWith('update "reports"'))).toBe(true);
   expect(

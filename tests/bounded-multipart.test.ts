@@ -22,7 +22,7 @@ function multipartRequest(body: string): Request {
 }
 
 const validBody =
-  "--nexus-boundary\r\nContent-Disposition: form-data; name=\"version\"\r\n\r\n1.0.0\r\n--nexus-boundary--\r\n";
+  '--nexus-boundary\r\nContent-Disposition: form-data; name="version"\r\n\r\n1.0.0\r\n--nexus-boundary--\r\n';
 
 describe("bounded multipart parsing", () => {
   it("parses valid multipart data when Content-Length is absent", async () => {

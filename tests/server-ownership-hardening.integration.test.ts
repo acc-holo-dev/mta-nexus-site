@@ -62,21 +62,16 @@ describe("server ownership hardening integration", () => {
     });
 
     const response = await registerServer(
-      jsonRequest(
-        "http://nexus.test/api/servers",
-        "POST",
-        token,
-        {
-          name: "Trusted IP Registration",
-          slug: `trusted-ip-registration-${slugSuffix}`,
-          description: "Server registration route integration coverage.",
-          ipAddress: "198.51.100.201",
-          port,
-          httpPort: port + 1,
-          maxPlayers: 64,
-          visibility: "private",
-        },
-      ),
+      jsonRequest("http://nexus.test/api/servers", "POST", token, {
+        name: "Trusted IP Registration",
+        slug: `trusted-ip-registration-${slugSuffix}`,
+        description: "Server registration route integration coverage.",
+        ipAddress: "198.51.100.201",
+        port,
+        httpPort: port + 1,
+        maxPlayers: 64,
+        visibility: "private",
+      }),
     );
 
     expect(response.status).toBe(201);
@@ -150,34 +145,25 @@ describe("server ownership hardening integration", () => {
     });
 
     const ownerUpdate = await updateServer(
-      jsonRequest(
-        `http://nexus.test/api/servers/${serverId}`,
-        "PATCH",
-        ownerToken,
-        { description: "Updated by organization owner." },
-      ),
+      jsonRequest(`http://nexus.test/api/servers/${serverId}`, "PATCH", ownerToken, {
+        description: "Updated by organization owner.",
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(ownerUpdate.status).toBe(200);
 
     const managerUpdate = await updateServer(
-      jsonRequest(
-        `http://nexus.test/api/servers/${serverId}`,
-        "PATCH",
-        managerToken,
-        { description: "Updated by delegated manager." },
-      ),
+      jsonRequest(`http://nexus.test/api/servers/${serverId}`, "PATCH", managerToken, {
+        description: "Updated by delegated manager.",
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(managerUpdate.status).toBe(200);
 
     const outsiderUpdate = await updateServer(
-      jsonRequest(
-        `http://nexus.test/api/servers/${serverId}`,
-        "PATCH",
-        outsiderToken,
-        { description: "Unauthorized update." },
-      ),
+      jsonRequest(`http://nexus.test/api/servers/${serverId}`, "PATCH", outsiderToken, {
+        description: "Unauthorized update.",
+      }),
       { params: Promise.resolve({ id: serverId }) },
     );
     expect(outsiderUpdate.status).toBe(403);
@@ -220,16 +206,11 @@ describe("server ownership hardening integration", () => {
     });
 
     const response = await requestVerification(
-      jsonRequest(
-        "http://nexus.test/api/verification",
-        "POST",
-        token,
-        {
-          targetType: "server",
-          targetId: serverId,
-          proofUrl: "https://example.test/legacy-proof",
-        },
-      ),
+      jsonRequest("http://nexus.test/api/verification", "POST", token, {
+        targetType: "server",
+        targetId: serverId,
+        proofUrl: "https://example.test/legacy-proof",
+      }),
     );
 
     expect(response.status).toBe(422);
@@ -249,11 +230,6 @@ describe("server ownership hardening integration", () => {
       code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
     });
 
-    expect(
-      await verificationRepository.findPendingForAnyRequester(
-        "server",
-        serverId,
-      ),
-    ).toBeNull();
+    expect(await verificationRepository.findPendingForAnyRequester("server", serverId)).toBeNull();
   });
 });

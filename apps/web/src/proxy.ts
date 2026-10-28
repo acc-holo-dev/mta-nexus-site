@@ -9,7 +9,10 @@ import {
 } from "./lib/offline-cache-policy";
 
 export function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/api/") && !isLicenseRuntimeRequest(request.nextUrl.pathname)) {
+  if (
+    request.nextUrl.pathname.startsWith("/api/") &&
+    !isLicenseRuntimeRequest(request.nextUrl.pathname)
+  ) {
     const rejected = rejectUnsafeBrowserRequest(request);
     if (rejected) return rejected;
   }
@@ -23,26 +26,14 @@ export function proxy(request: NextRequest) {
     return response;
   }
 
-  response.headers.set(
-    PUBLIC_OFFLINE_CACHE_HEADER,
-    PUBLIC_OFFLINE_CACHE_MARKER,
-  );
+  response.headers.set(PUBLIC_OFFLINE_CACHE_HEADER, PUBLIC_OFFLINE_CACHE_MARKER);
   // App Router may replace Proxy Vary with RSC fields; production Caddy
   // re-attaches Cookie on proxied responses (deploy/Caddyfile).
-  response.headers.set(
-    "Vary",
-    appendVaryHeader(response.headers.get("Vary"), "Cookie"),
-  );
+  response.headers.set("Vary", appendVaryHeader(response.headers.get("Vary"), "Cookie"));
 
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/api/:path*",
-    "/articles/:path*",
-    "/copyright",
-    "/privacy",
-    "/terms",
-  ],
+  matcher: ["/api/:path*", "/articles/:path*", "/copyright", "/privacy", "/terms"],
 };

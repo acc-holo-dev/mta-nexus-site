@@ -6,9 +6,7 @@ export function parseLibraryFilter(value: string | string[] | undefined): UserLi
 }
 
 export function parseLibraryPage(value: string | string[] | undefined): number {
-  return typeof value === "string" && /^[1-9][0-9]{0,5}$/u.test(value)
-    ? Number(value)
-    : 1;
+  return typeof value === "string" && /^[1-9][0-9]{0,5}$/u.test(value) ? Number(value) : 1;
 }
 
 export const libraryCopy = {
@@ -27,7 +25,8 @@ export const libraryCopy = {
     empty: "Your resource library is empty.",
     emptyFilter: "There are no resources matching this filter.",
     unavailableResource: "Resource temporarily unavailable",
-    unavailableReason: "This resource is unpublished or has no approved, safely scanned build. Downloads are disabled until availability is restored.",
+    unavailableReason:
+      "This resource is unpublished or has no approved, safely scanned build. Downloads are disabled until availability is restored.",
     availableReason: "Access is rechecked whenever a download starts.",
     added: "Added",
     open: "Open resource",
@@ -51,7 +50,8 @@ export const libraryCopy = {
     empty: "В вашей библиотеке пока нет ресурсов.",
     emptyFilter: "Нет ресурсов с выбранным статусом.",
     unavailableResource: "Ресурс временно недоступен",
-    unavailableReason: "Ресурс не опубликован либо не имеет одобренной, безопасно проверенной сборки. Скачивание недоступно до восстановления публикации.",
+    unavailableReason:
+      "Ресурс не опубликован либо не имеет одобренной, безопасно проверенной сборки. Скачивание недоступно до восстановления публикации.",
     availableReason: "Права доступа проверяются заново перед каждым скачиванием.",
     added: "Добавлен",
     open: "Открыть ресурс",
@@ -71,5 +71,5 @@ export function libraryHref(filter: UserLibraryFilter, page: number) {
   if (filter !== "all") params.set("filter", filter);
   if (page > 1) params.set("page", String(page));
   const query = params.toString();
-  return `/workspace/library${query ? "?" + query : ""}`;
+  return `/workspace/library${query ? `?${query}` : ""}`;
 }

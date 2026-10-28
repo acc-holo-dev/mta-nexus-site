@@ -60,8 +60,7 @@ const en = {
     terms: "Terms",
     privacy: "Privacy",
     copyright: "Copyright",
-    disclaimer:
-      "Not affiliated with Rockstar Games, Take-Two Interactive, or Multi Theft Auto.",
+    disclaimer: "Not affiliated with Rockstar Games, Take-Two Interactive, or Multi Theft Auto.",
   },
   home: {
     liveEcosystem: "Live MTA ecosystem",
@@ -78,19 +77,16 @@ const en = {
     latestSnapshot: "latest available snapshot",
     resourcesContext: "popular published resources loaded on this page",
     networkTitle: "MTA Network",
-    networkDescription:
-      "The most populated public servers from the official MTA master-list",
+    networkDescription: "The most populated public servers from the official MTA master-list",
     openDirectory: "Open directory",
     players: "players",
-    directoryPanelUnavailable:
-      "The official MTA directory is temporarily unavailable.",
+    directoryPanelUnavailable: "The official MTA directory is temporarily unavailable.",
     resourcesTitle: "Free resources",
     resourcesDescription: "Community resources you can add without payment",
     viewAllResources: "View all free resources",
     noResources: "The first free resources are being prepared.",
     updatesTitle: "Community updates",
-    updatesDescription:
-      "News, guides, and development notes from the MTA ecosystem",
+    updatesDescription: "News, guides, and development notes from the MTA ecosystem",
     allUpdates: "All updates",
     noUpdates: "No community updates have been published yet.",
   },
@@ -144,81 +140,87 @@ const en = {
     discoverServers: "Discover servers",
   },
   authorResources: {
-  "title": "My resources",
-  "subtitle": "Manage personal resources and resources you can administer for an organization.",
-  "all": "All statuses",
-  "empty": "No resources match this status.",
-  "back": "Back to my resources",
-  "edit": "Resource details",
-  "save": "Save details",
-  "saving": "Saving…",
-  "saved": "Details saved.",
-  "unsaved": "There are changes you have not submitted yet.",
-  "draftRestored": "Your unfinished text has been restored in this tab.",
-  "metadataConflict": "The resource changed before your save completed. Your text is still here; review the latest details before saving again.",
-  "draftConflict": "The resource changed after this draft was saved. Restore your draft to review it before saving, or discard it to use the current details.",
-  "restoreDraft": "Restore draft",
-  "discardDraft": "Discard draft",
-  "draftUnavailable": "Draft recovery is unavailable in this browser. Keep this page open until you submit your changes.",
-  "fileReselect": "Only text is restored. After reopening this page, select the archive again. Text remains in this tab for up to 24 hours.",
-  "failed": "Could not save changes. Try again.",
-  "invalid": "Check the title, description and tags (up to 20).",
-  "newVersion": "Submit a new version",
-  "versionSubmitted": "Version submitted for scanning and moderator review.",
-  "uploadFailed": "Could not submit this version. Try again.",
-  "history": "Version history",
-  "noBuilds": "No versions submitted yet.",
-  "notes": "Moderation notes",
-  "quarantine": "Quarantine",
-  "quarantineRestored": "Restored from quarantine",
-  "preview": "Open resource preview",
-  "previous": "Previous",
-  "next": "Next",
-  "page": "Page",
-  "of": "of",
-  "status": "Status",
-  "scan": "Malware scan",
-  "retire": "Retire version",
-  "retireReason": "Reason for retirement",
-  "retireHint": "Retirement removes this version from downloads. Retiring the last public version also removes the resource from the catalog.",
-  "retired": "Version retired.",
-  "retireFailed": "Could not retire this version. Refresh and try again.",
-  "retiring": "Retiring…",
-  "statusLabels": {
-    "draft": "Draft",
-    "pending_review": "Awaiting review",
-    "published": "Published",
-    "suspended": "Suspended",
-    "archived": "Archived"
+    title: "My resources",
+    subtitle: "Manage personal resources and resources you can administer for an organization.",
+    all: "All statuses",
+    empty: "No resources match this status.",
+    back: "Back to my resources",
+    edit: "Resource details",
+    save: "Save details",
+    saving: "Saving…",
+    saved: "Details saved.",
+    unsaved: "There are changes you have not submitted yet.",
+    draftRestored: "Your unfinished text has been restored in this tab.",
+    metadataConflict:
+      "The resource changed before your save completed. Your text is still here; review the latest details before saving again.",
+    draftConflict:
+      "The resource changed after this draft was saved. Restore your draft to review it before saving, or discard it to use the current details.",
+    restoreDraft: "Restore draft",
+    discardDraft: "Discard draft",
+    draftUnavailable:
+      "Draft recovery is unavailable in this browser. Keep this page open until you submit your changes.",
+    fileReselect:
+      "Only text is restored. After reopening this page, select the archive again. Text remains in this tab for up to 24 hours.",
+    failed: "Could not save changes. Try again.",
+    invalid: "Check the title, description and tags (up to 20).",
+    newVersion: "Submit a new version",
+    versionSubmitted: "Version submitted for scanning and moderator review.",
+    uploadFailed: "Could not submit this version. Try again.",
+    history: "Version history",
+    noBuilds: "No versions submitted yet.",
+    notes: "Moderation notes",
+    quarantine: "Quarantine",
+    quarantineRestored: "Restored from quarantine",
+    preview: "Open resource preview",
+    previous: "Previous",
+    next: "Next",
+    page: "Page",
+    of: "of",
+    status: "Status",
+    scan: "Malware scan",
+    retire: "Retire version",
+    retireReason: "Reason for retirement",
+    retireHint:
+      "Retirement removes this version from downloads. Retiring the last public version also removes the resource from the catalog.",
+    retired: "Version retired.",
+    retireFailed: "Could not retire this version. Refresh and try again.",
+    retiring: "Retiring…",
+    statusLabels: {
+      draft: "Draft",
+      pending_review: "Awaiting review",
+      published: "Published",
+      suspended: "Suspended",
+      archived: "Archived",
+    },
+    buildLabels: {
+      draft: "Draft",
+      testing: "Testing",
+      pending_review: "Awaiting review",
+      published: "Published",
+      rejected: "Rejected",
+      deprecated: "Deprecated",
+      quarantined: "Quarantined",
+      retired: "Retired",
+    },
+    scanLabels: {
+      pending: "Awaiting scan",
+      not_scanned: "Not scanned",
+      malicious: "Malware detected",
+      clean: "Clean",
+      infected: "Malware detected",
+      failed: "Scan failed",
+      error: "Scan error",
+      unknown: "Unknown",
+    },
   },
-  "buildLabels": {
-    "draft": "Draft",
-    "testing": "Testing",
-    "pending_review": "Awaiting review",
-    "published": "Published",
-    "rejected": "Rejected",
-    "deprecated": "Deprecated",
-    "quarantined": "Quarantined",
-    "retired": "Retired"
-  },
-  "scanLabels": {
-    "pending": "Awaiting scan",
-    "not_scanned": "Not scanned",
-    "malicious": "Malware detected",
-    "clean": "Clean",
-    "infected": "Malware detected",
-    "failed": "Scan failed",
-    "error": "Scan error",
-    "unknown": "Unknown"
-  }
-},
   workspace: {
     signInRequired: "Sign in required",
     signInMessage: "Sign in to manage your resource library and MTA servers.",
     signIn: "Sign in",
     title: "Workspace",
     subtitle: "your resources and servers",
-    liveNote: "Live status comes only from the official MTA master-list; missing observations stay unknown.",
+    liveNote:
+      "Live status comes only from the official MTA master-list; missing observations stay unknown.",
     liveUnavailable: "Live status unavailable",
     publishResource: "Publish resource",
     registerServer: "Register server",
@@ -241,7 +243,8 @@ const en = {
   },
   servers: {
     title: "Multi Theft Auto servers",
-    description: "Public server data comes from the official MTA server list. No account is needed to browse.",
+    description:
+      "Public server data comes from the official MTA server list. No account is needed to browse.",
     addListing: "Add your listing",
     directory: "Server directory",
     network: "MTA Network",
@@ -254,7 +257,8 @@ const en = {
     minimumPlayers: "Minimum players",
     anyPlayers: "Any player count",
     connectHint: "Connect opens your installed MTA client. You can also copy the server address.",
-    stale: "Updates are delayed. Showing the last available snapshot; player counts may have changed.",
+    stale:
+      "Updates are delayed. Showing the last available snapshot; player counts may have changed.",
     tryAgain: "Try again",
     resetFilters: "Reset filters",
     noMatch: "No public MTA servers match these filters.",
@@ -279,22 +283,18 @@ const en = {
     unknown: "Unknown",
     freeroam: "Freeroam",
     verifiedServer: "Verified server",
-    directoryTimeout:
-      "The MTA directory took too long to respond. Please try again.",
-    directoryFetchError:
-      "The MTA directory is temporarily unavailable. Please try again.",
+    directoryTimeout: "The MTA directory took too long to respond. Please try again.",
+    directoryFetchError: "The MTA directory is temporarily unavailable. Please try again.",
     publicServersLabel: "public servers",
   },
   workspaceContext: {
     title: "Active workspace context",
-    description:
-      "Switch between your personal workspace and organizations you own or belong to.",
+    description: "Switch between your personal workspace and organizations you own or belong to.",
     label: "Context",
     loadError: "Could not load account contexts.",
     retry: "Try again",
     switchError: "Could not switch context.",
-    note:
-      "Context switching changes the active workspace only; permissions still depend on ownership or membership.",
+    note: "Context switching changes the active workspace only; permissions still depend on ownership or membership.",
   },
   serverDetail: {
     notFound: "Server not found",
@@ -326,12 +326,12 @@ const en = {
     ownerManagedDescription:
       "Public MTA availability is sourced independently from the official MTA master-list.",
     listingDetails: "Listing details",
-    listingDescription:
-      "Keep the name, address, mode and description accurate for your community.",
+    listingDescription: "Keep the name, address, mode and description accurate for your community.",
     saved: "Saved.",
     saveError: "Could not save server details",
     unexpectedSaveError: "Unexpected save error",
-    concurrentEdit: "Someone updated this server after you opened the form. Reload to review the latest details before saving.",
+    concurrentEdit:
+      "Someone updated this server after you opened the form. Reload to review the latest details before saving.",
     endpointTaken: "This server address and port are already registered.",
     forbiddenEdit: "You no longer have permission to edit this server.",
     bodyTooLarge: "The server listing is too large. Shorten its description or media list.",
@@ -371,8 +371,7 @@ const en = {
     create: "Create control challenge",
     tokenLabel: "Add this exact token to the server name",
     stepAddToken: "Temporarily add the token to the name of",
-    stepKeepVisible:
-      "Keep the server visible and responding in the official MTA master-list.",
+    stepKeepVisible: "Keep the server visible and responding in the official MTA master-list.",
     stepVerify: "Verify control before the challenge expires.",
     expires: "Expires",
     tokenEphemeral:
@@ -391,8 +390,12 @@ const en = {
   },
   serverHistory: {
     chooseWindow: "History period",
-    period24h: "24 hours", period7d: "7 days", period30d: "30 days",
-    intervalHour: "1 hour", intervalSixHours: "6 hours", intervalDay: "1 day",
+    period24h: "24 hours",
+    period7d: "7 days",
+    period30d: "30 days",
+    intervalHour: "1 hour",
+    intervalSixHours: "6 hours",
+    intervalDay: "1 day",
     summaryScope: "Statistics and chart cover all saved observations in the selected period.",
     title: "Observed player history",
     unavailable:
@@ -416,11 +419,9 @@ const en = {
   },
   serverUpdates: {
     title: "Server updates",
-    description:
-      "Published articles, news, devlogs and announcements linked to this server.",
+    description: "Published articles, news, devlogs and announcements linked to this server.",
     moderated: "Moderated content",
-    unavailable:
-      "Server updates are temporarily unavailable. Live server status is unaffected.",
+    unavailable: "Server updates are temporarily unavailable. Live server status is unaffected.",
     empty: "No published server updates yet.",
   },
   follow: {
@@ -465,15 +466,13 @@ const en = {
     submitting: "Submitting...",
     sendReset: "Send reset link",
     unavailable: "Password reset is temporarily unavailable.",
-    accepted:
-      "If an eligible account uses that email, a password reset link will be sent.",
+    accepted: "If an eligible account uses that email, a password reset link will be sent.",
     backToSignIn: "Back to sign in",
     resetTitle: "Reset password",
     checkingReset: "Checking this reset link...",
     invalidReset: "This reset link is incomplete or invalid.",
     requestNew: "Request a new link",
-    resetDescription:
-      "Choose a new password. A successful reset signs out every existing session.",
+    resetDescription: "Choose a new password. A successful reset signs out every existing session.",
     passwordsMismatch: "Passwords do not match.",
     resetFailed: "Could not reset the password.",
     newPassword: "New password",
@@ -553,7 +552,8 @@ const en = {
       signIn: "Your session has expired. Sign in and try again.",
       access: "Download access is unavailable. Check your resource library.",
       missing: "The build file is unavailable. Try again later.",
-      unavailable: "This build cannot be downloaded right now. Try again after it has been checked.",
+      unavailable:
+        "This build cannot be downloaded right now. Try again after it has been checked.",
       rateLimit: "Too many download attempts. Wait a moment and try again.",
       timeout: "The download stopped responding. Check your connection and try again.",
       failed: "The download could not be completed. Check your connection and try again.",
@@ -627,12 +627,14 @@ const en = {
     exportFunctionNameMissing: "[function name missing]",
     exportTypeLabel: "type",
     httpAttribute: "http",
-    exportsNote: "Manifest values shown as written; this preview does not test endpoint behavior or security.",
+    exportsNote:
+      "Manifest values shown as written; this preview does not test endpoint behavior or security.",
     aclRights: "Requested ACL rights",
     aclRightsCount: "Showing {shown} of {total} rights",
     aclRightNameMissing: "[right name missing]",
     aclAccess: "access",
-    aclRightsNote: "Manifest declarations shown as written; the inspector does not evaluate ACL policy.",
+    aclRightsNote:
+      "Manifest declarations shown as written; the inspector does not evaluate ACL policy.",
     server: "server",
     client: "client",
     shared: "shared",
@@ -641,7 +643,8 @@ const en = {
     declaredAuthor: "Declared author",
     minimumMta: "Minimum MTA",
     structuralIssues: {
-      unclosedComment: "An XML comment appears unfinished; some manifest entries may be missing from the preview.",
+      unclosedComment:
+        "An XML comment appears unfinished; some manifest entries may be missing from the preview.",
       incompleteMeta: "A complete <meta>...</meta> root was not confirmed.",
       missingInfo: "The manifest has no <info> metadata tag.",
       multipleInfo: "The manifest has multiple <info> tags; only the first is summarized.",
@@ -657,15 +660,15 @@ const en = {
       multipleMinimumVersions: "Multiple minimum MTA tags were found; only the first is used.",
       minimumVersionMissing: "The MTA minimum tag has no client, server, or both version.",
       minimumVersionInvalid: "This minimum MTA version does not use a supported release format.",
-      minimumVersionConflict: "Client and server minimums differ, so one resource target cannot represent both.",
+      minimumVersionConflict:
+        "Client and server minimums differ, so one resource target cannot represent both.",
     },
     formTarget: "Resource form target",
     applyMinimumVersion: "Use this version",
     notDeclared: "Not declared",
     includedResources: "Included resources",
     structuralNotes: "Structural notes",
-    note:
-      "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
+    note: "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
   },
   checkout: {
     title: "Add resource to library",
@@ -746,14 +749,16 @@ const en = {
     paidPublishingUnavailable: "Paid resource publishing is unavailable during the closed beta.",
     versionAlreadyExists: "This build version already exists. Choose a different version.",
     multipartRequired: "The build upload form could not be read. Choose the file again and retry.",
-    multipartInvalid: "The build upload was incomplete or invalid. Choose the file again and retry.",
+    multipartInvalid:
+      "The build upload was incomplete or invalid. Choose the file again and retry.",
     metadataInvalid: "Check the build version and release notes, then try again.",
     buildFileTypeNotAllowed: "Only ZIP, RAR, 7z and Lua build files are supported.",
     buildContentMismatch: "The file contents do not match the selected file type.",
     buildFileNameInvalid: "Choose a valid file name and try again.",
     resourceMetadataInvalid: "Check the resource details and try again.",
     resourceSlugAlreadyExists: "This resource address is already in use. Choose another slug.",
-    resourceCreationFailed: "The resource could not be saved. Your details are still in the form; try again.",
+    resourceCreationFailed:
+      "The resource could not be saved. Your details are still in the form; try again.",
     chooseArchive: "Choose a build archive",
     unexpectedError: "Unexpected publishing error",
     typeScript: "Script",
@@ -771,12 +776,15 @@ const en = {
     ownerScope: "Register for",
     personalScope: "My personal account",
     organizationsLoading: "Checking organizations you manage...",
-    organizationsUnavailable: "Organizations are temporarily unavailable. You can still register a personal server.",
-    organizationSelectionUnavailable: "The selected organization is no longer available. Refresh this page and try again.",
+    organizationsUnavailable:
+      "Organizations are temporarily unavailable. You can still register a personal server.",
+    organizationSelectionUnavailable:
+      "The selected organization is no longer available. Refresh this page and try again.",
     slugTaken: "This server URL is already in use. Choose another slug.",
     endpointTaken: "This server address and port are already registered.",
     organizationForbidden: "You do not have permission to register for this organization.",
-    bodyTooLarge: "The listing contains too much data. Shorten the description or remove some images.",
+    bodyTooLarge:
+      "The listing contains too much data. Shorten the description or remove some images.",
     bodyTimedOut: "The request took too long. Check your connection and try again.",
     description:
       "Create a listing you can manage. Live MTA network data comes from the official master-list.",
@@ -828,8 +836,7 @@ const en = {
   },
   developers: {
     title: "MTA Developer & Studio Network",
-    description:
-      "Discover MTA:SA scripters, 3D modelers, UI designers, and systems architects.",
+    description: "Discover MTA:SA scripters, 3D modelers, UI designers, and systems architects.",
     bioFallback: "MTA community contributor and resource author.",
     verifiedIdentity: "Verified identity",
     creatorProfile: "Creator profile",
@@ -851,8 +858,7 @@ const en = {
     retry: "Retry account",
     signIn: "Sign in",
     checkError: "Could not check your account. Try again.",
-    signOutError:
-      "Could not confirm sign out. Your session may still be active. Try again.",
+    signOutError: "Could not confirm sign out. Your session may still be active. Try again.",
   },
   notificationBell: {
     close: "Close notifications",
@@ -873,16 +879,15 @@ const en = {
     useSystem: "Use system theme",
   },
   buildReviewNotifications: {
-  "approved": "Resource version approved",
-  "rejected": "Resource version rejected",
-  "version": "Version",
-  "notes": "Moderator comment"
-},
+    approved: "Resource version approved",
+    rejected: "Resource version rejected",
+    version: "Version",
+    notes: "Moderator comment",
+  },
   notifications: {
     workspace: "Workspace",
     title: "Notification center",
-    description:
-      "Track resource updates, followed servers, and important account events.",
+    description: "Track resource updates, followed servers, and important account events.",
     settings: "Settings",
     markAllRead: "Mark all as read",
     markedAllRead: "All notifications marked as read.",
@@ -1007,9 +1012,11 @@ const en = {
     sendReply: "Send reply",
     sending: "Sending...",
     replyError: "Could not send the reply.",
-    replyConflict: "This case changed while you were writing. Review the updated thread before sending again.",
+    replyConflict:
+      "This case changed while you were writing. Review the updated thread before sending again.",
     statusError: "Could not update the case status.",
-    statusConflict: "Another staff member updated this case. Review the latest status before trying again.",
+    statusConflict:
+      "Another staff member updated this case. Review the latest status before trying again.",
     resolve: "Resolve",
     close: "Close",
     reopen: "Reopen",
@@ -1026,13 +1033,11 @@ const en = {
   },
   admin: {
     accessDenied: "Access denied",
-    accessDeniedDescription:
-      "Administration requires an administrator or moderator account.",
+    accessDeniedDescription: "Administration requires an administrator or moderator account.",
     signIn: "Sign in",
     title: "Administration",
     supportQueue: "Support queue",
-    description:
-      "Platform moderation, verification queue, resource review, and audit trail.",
+    description: "Platform moderation, verification queue, resource review, and audit trail.",
     authorizedSession: "Authorized admin session",
     users: "Users",
     servers: "Servers",
@@ -1070,7 +1075,8 @@ const en = {
     restoreReason: "Restore reason",
     quarantineReasonHint: "Record at least 3 characters of evidence or operational context.",
     quarantineBuildConfirm: "Quarantine this published build and stop its public delivery?",
-    restoreBuildConfirm: "Restore this quarantined build to publication if its trusted clean scan is still valid?",
+    restoreBuildConfirm:
+      "Restore this quarantined build to publication if its trusted clean scan is still valid?",
     quarantineBuildFailed: "Build quarantine action failed.",
     quarantineBuildUnavailable: "Build quarantine is temporarily unavailable.",
     quarantinedAt: "Quarantined",
@@ -1082,7 +1088,8 @@ const en = {
     noDrafts: "No community drafts are waiting for review.",
     readDraft: "Read full draft",
     reports: "Reports & moderation",
-    caseHistory: "Review the evidence and record a decision. Closing a report does not change its target.",
+    caseHistory:
+      "Review the evidence and record a decision. Closing a report does not change its target.",
     reportQueue: "Awaiting review",
     reportHistory: "Decision history",
     reportPages: "Report pages",
@@ -1116,8 +1123,7 @@ const en = {
     approve: "Approve",
     reject: "Reject",
     reviewArtifact: "Review artifact",
-    artifactRequiresCleanScan:
-      "Artifact download requires a trusted clean scan",
+    artifactRequiresCleanScan: "Artifact download requires a trusted clean scan",
     approveBuildConfirm: "Approve this clean build for publication?",
     rejectBuildConfirm: "Reject this build?",
     buildFailed: "Build moderation failed.",
@@ -1125,8 +1131,7 @@ const en = {
     approveVerificationConfirm: "Approve this verification request?",
     rejectVerificationConfirm: "Reject this verification request?",
     verificationFailed: "Verification moderation failed.",
-    verificationUnavailable:
-      "Verification moderation is temporarily unavailable.",
+    verificationUnavailable: "Verification moderation is temporarily unavailable.",
     publish: "Publish",
     archive: "Archive",
     publishContentConfirm: "Publish this content item?",
@@ -1136,8 +1141,7 @@ const en = {
   },
   dev: {
     title: "Development status",
-    description:
-      "Local development diagnostics. This route is unavailable in production.",
+    description: "Local development diagnostics. This route is unavailable in production.",
     environment: "Environment",
     version: "Version",
     database: "Database",
@@ -1164,8 +1168,7 @@ const en = {
     recoveryNeedsVerification: "Recovery email still needs verification",
     recoveryUnavailable: "Recovery status is unavailable",
     sessions: "Active sessions",
-    sessionsDescription:
-      "Only active, unexpired sessions owned by this account are shown.",
+    sessionsDescription: "Only active, unexpired sessions owned by this account are shown.",
     currentSession: "Current session",
     started: "Started",
     expires: "Expires",
@@ -1198,8 +1201,7 @@ const en = {
     retry: "Try again",
     saving: "Saving account changes...",
     notificationPreferences: "Notification preferences",
-    notificationDescription:
-      "These preferences do not control security-related messages.",
+    notificationDescription: "These preferences do not control security-related messages.",
     newFollowers: "Followers and followed discussions",
     newFollowersDescription: "New followers and replies to publications you follow.",
     contentUpdates: "Content updates",
@@ -1207,11 +1209,9 @@ const en = {
     serverUpdates: "Server updates",
     serverUpdatesDescription: "Updates related to followed MTA servers.",
     resourceActivity: "Resource activity",
-    resourceActivityDescription:
-      "Library additions and resource delivery events.",
+    resourceActivityDescription: "Library additions and resource delivery events.",
     systemNotifications: "System notifications",
-    systemNotificationsDescription:
-      "Important non-security account messages.",
+    systemNotificationsDescription: "Important non-security account messages.",
     webPush: "Browser push",
     webPushDescription:
       "Receive browser notifications using the same NEXUS notification preferences.",
@@ -1220,17 +1220,14 @@ const en = {
     webPushEnabled:
       "Enabled for this signed-in browser. Ending this session also removes its server-side push subscription.",
     webPushUnsupported: "This browser does not support Web Push.",
-    webPushUnconfigured:
-      "Web Push is not configured on this deployment yet.",
+    webPushUnconfigured: "Web Push is not configured on this deployment yet.",
     webPushDenied:
       "Browser notification permission is blocked. Change the site permission in your browser to enable push.",
-    webPushError:
-      "Web Push state could not be confirmed. Reload settings before retrying.",
+    webPushError: "Web Push state could not be confirmed. Reload settings before retrying.",
     webPushLoading: "Checking browser push...",
     recoveryEmail: "Recovery email",
     recoveryNotVerified: "Not verified for recovery yet.",
-    recoveryUnavailable:
-      "Recovery email verification is unavailable for this account.",
+    recoveryUnavailable: "Recovery email verification is unavailable for this account.",
     recoveryPassword: "Current password for recovery email",
     verifyRecoveryEmail: "Verify recovery email",
     recoveryAlreadyVerified: "This recovery email is already verified.",
@@ -1255,21 +1252,16 @@ const en = {
     ipUnavailable: "IP unavailable",
     endSession: "End session",
     unconfirmedSessionRevocation: "Unconfirmed session revocation",
-    sessionEnded:
-      "Session ended. That sign-in can no longer access your account.",
-    sessionUnavailable:
-      "The session list is unavailable. Reload settings to check it.",
-    noSessions:
-      "No active sessions found. Reload settings to confirm your sign-in.",
+    sessionEnded: "Session ended. That sign-in can no longer access your account.",
+    sessionUnavailable: "The session list is unavailable. Reload settings to check it.",
+    noSessions: "No active sessions found. Reload settings to confirm your sign-in.",
     preferenceSaved: "Notification preference saved.",
     backendUnavailable: "Account settings are temporarily unavailable.",
     unreadableResponse: "The server returned an unreadable response.",
     invalidResponse: "Invalid settings response",
-    loadFailed:
-      "Could not load account settings. Your sign-in status has not been confirmed.",
+    loadFailed: "Could not load account settings. Your sign-in status has not been confirmed.",
     authRequired: "Authentication required",
-    requestUnconfirmed:
-      "The request could not be confirmed. Reload settings before retrying.",
+    requestUnconfirmed: "The request could not be confirmed. Reload settings before retrying.",
     invalidSessionResponse: "Invalid session response",
     recoveryPolicy:
       "Enter your current password. We will queue a confirmation link for the email already stored on this account.",
@@ -1279,8 +1271,7 @@ const en = {
     passwordChanged: "Password changed.",
     otherSessionsEnded: "Other sessions ended",
     browserRemainsSignedIn: "This browser remains signed in.",
-    sessionRefreshFailed:
-      "The session list could not be refreshed. Reload settings to check it.",
+    sessionRefreshFailed: "The session list could not be refreshed. Reload settings to check it.",
     started: "Started",
   },
   legal: {
@@ -1294,23 +1285,19 @@ const en = {
       sections: [
         {
           title: "What the beta provides",
-          body:
-            "MTA Nexus provides discovery features, community content, server listings, and free resources for Multi Theft Auto. Paid resources, balances, payouts, and cryptocurrency settlement are not available in this beta.",
+          body: "MTA Nexus provides discovery features, community content, server listings, and free resources for Multi Theft Auto. Paid resources, balances, payouts, and cryptocurrency settlement are not available in this beta.",
         },
         {
           title: "Your account and content",
-          body:
-            "You are responsible for activity under your account and for content you submit. Do not upload malware, stolen resources, personal data you do not have the right to share, or content that infringes intellectual-property rights.",
+          body: "You are responsible for activity under your account and for content you submit. Do not upload malware, stolen resources, personal data you do not have the right to share, or content that infringes intellectual-property rights.",
         },
         {
           title: "Beta availability",
-          body:
-            "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the closed beta.",
+          body: "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the closed beta.",
         },
         {
           title: "Moderation",
-          body:
-            "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
+          body: "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
         },
       ],
       contactLabel: "Questions about these terms",
@@ -1319,29 +1306,24 @@ const en = {
     privacy: {
       metadataTitle: "Privacy notice",
       title: "Privacy notice",
-      lead:
-        "This notice describes the data used to operate and protect the MTA Nexus closed beta.",
+      lead: "This notice describes the data used to operate and protect the MTA Nexus closed beta.",
       updated: "16 September 2026",
       sections: [
         {
           title: "Data we use",
-          body:
-            "We process account details such as email address, username, display name, password hash, session security data, and any profile, server, resource, or community content you choose to submit. Public server observations may include availability, player counts, MTA version, game mode, map, and the time and public source of the observation.",
+          body: "We process account details such as email address, username, display name, password hash, session security data, and any profile, server, resource, or community content you choose to submit. Public server observations may include availability, player counts, MTA version, game mode, map, and the time and public source of the observation.",
         },
         {
           title: "Why we use it",
-          body:
-            "We use this data to operate accounts, prevent abuse, deliver requested resources, display public profiles and servers, maintain security logs, and moderate content. Passwords are never stored in readable form.",
+          body: "We use this data to operate accounts, prevent abuse, deliver requested resources, display public profiles and servers, maintain security logs, and moderate content. Passwords are never stored in readable form.",
         },
         {
           title: "Visibility and retention",
-          body:
-            "Profile, server, and published resource information can be public according to your chosen visibility settings. Security and audit records are retained only as long as reasonably needed to operate and protect the beta. We do not sell personal data.",
+          body: "Profile, server, and published resource information can be public according to your chosen visibility settings. Security and audit records are retained only as long as reasonably needed to operate and protect the beta. We do not sell personal data.",
         },
         {
           title: "Your choices",
-          body:
-            "You may request access, correction, or deletion of your account data by contacting us. Some limited data may need to remain temporarily for security, fraud prevention, or legal claims.",
+          body: "You may request access, correction, or deletion of your account data by contacting us. Some limited data may need to remain temporarily for security, fraud prevention, or legal claims.",
         },
       ],
       contactLabel: "Privacy requests",
@@ -1350,24 +1332,20 @@ const en = {
     copyright: {
       metadataTitle: "Copyright & abuse",
       title: "Copyright & abuse reports",
-      lead:
-        "Use this process to report harmful, stolen, or rights-infringing material on MTA Nexus.",
+      lead: "Use this process to report harmful, stolen, or rights-infringing material on MTA Nexus.",
       updated: "16 September 2026",
       sections: [
         {
           title: "Report harmful or infringing content",
-          body:
-            "Use this channel to report copyright infringement, impersonation, malware, stolen resources, or other abuse. Include the URL or resource identifier, a clear explanation, and material supporting your report. Do not send passwords or private keys.",
+          body: "Use this channel to report copyright infringement, impersonation, malware, stolen resources, or other abuse. Include the URL or resource identifier, a clear explanation, and material supporting your report. Do not send passwords or private keys.",
         },
         {
           title: "Our response",
-          body:
-            "We review reports, preserve relevant audit evidence, and may temporarily restrict content or accounts while investigating. Repeat or serious violations may lead to removal and suspension.",
+          body: "We review reports, preserve relevant audit evidence, and may temporarily restrict content or accounts while investigating. Repeat or serious violations may lead to removal and suspension.",
         },
         {
           title: "Important platform notice",
-          body:
-            "MTA Nexus is an independent community platform. It is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.",
+          body: "MTA Nexus is an independent community platform. It is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.",
         },
       ],
       contactLabel: "Copyright and abuse reports",
@@ -1461,8 +1439,7 @@ const ru: typeof en = {
     latestSnapshot: "последний доступный снимок",
     resourcesContext: "популярные опубликованные ресурсы на этой странице",
     networkTitle: "Сеть MTA",
-    networkDescription:
-      "Самые населённые публичные серверы из официального master-list MTA",
+    networkDescription: "Самые населённые публичные серверы из официального master-list MTA",
     openDirectory: "Открыть каталог",
     players: "игроков",
     directoryPanelUnavailable: "Официальный каталог MTA временно недоступен.",
@@ -1471,8 +1448,7 @@ const ru: typeof en = {
     viewAllResources: "Все бесплатные ресурсы",
     noResources: "Первые бесплатные ресурсы ещё готовятся.",
     updatesTitle: "Обновления сообщества",
-    updatesDescription:
-      "Новости, руководства и заметки разработчиков из экосистемы MTA",
+    updatesDescription: "Новости, руководства и заметки разработчиков из экосистемы MTA",
     allUpdates: "Все обновления",
     noUpdates: "Обновления сообщества пока не опубликованы.",
   },
@@ -1526,81 +1502,87 @@ const ru: typeof en = {
     discoverServers: "Найти серверы",
   },
   authorResources: {
-  "title": "Мои ресурсы",
-  "subtitle": "Личные ресурсы и ресурсы организаций, которыми вы можете управлять.",
-  "all": "Все статусы",
-  "empty": "Ресурсов с этим статусом пока нет.",
-  "back": "Вернуться к моим ресурсам",
-  "edit": "Карточка ресурса",
-  "save": "Сохранить изменения",
-  "saving": "Сохранение…",
-  "saved": "Изменения сохранены.",
-  "unsaved": "Есть изменения, которые вы ещё не отправили.",
-  "draftRestored": "Незавершённый текст восстановлен в этой вкладке.",
-  "metadataConflict": "Ресурс изменился до завершения сохранения. Ваш текст сохранён в форме; проверьте актуальные данные перед повторной отправкой.",
-  "draftConflict": "Ресурс изменился после сохранения черновика. Восстановите черновик и проверьте его перед отправкой или удалите его, чтобы использовать актуальные данные.",
-  "restoreDraft": "Восстановить черновик",
-  "discardDraft": "Удалить черновик",
-  "draftUnavailable": "В этом браузере восстановление черновика недоступно. Не закрывайте страницу до отправки изменений.",
-  "fileReselect": "Восстанавливается только текст. После возвращения на страницу выберите архив заново. Текст хранится в этой вкладке до 24 часов.",
-  "failed": "Не удалось сохранить изменения. Повторите попытку.",
-  "invalid": "Проверьте название, описание и теги (не более 20).",
-  "newVersion": "Отправить новую версию",
-  "versionSubmitted": "Версия отправлена на проверку файла и модерацию.",
-  "uploadFailed": "Не удалось отправить версию. Повторите попытку.",
-  "history": "История версий",
-  "noBuilds": "Версий пока нет.",
-  "notes": "Комментарий модерации",
-  "quarantine": "Карантин",
-  "quarantineRestored": "Восстановлена после карантина",
-  "preview": "Открыть превью ресурса",
-  "previous": "Назад",
-  "next": "Далее",
-  "page": "Страница",
-  "of": "из",
-  "status": "Статус",
-  "scan": "Проверка на вредоносный код",
-  "retire": "Снять версию с публикации",
-  "retireReason": "Причина снятия",
-  "retireHint": "Снятая версия недоступна для скачивания. Если снять последнюю опубликованную версию, ресурс исчезнет из каталога.",
-  "retired": "Версия снята с публикации.",
-  "retireFailed": "Не удалось снять версию. Обновите страницу и повторите попытку.",
-  "retiring": "Снятие…",
-  "statusLabels": {
-    "draft": "Черновик",
-    "pending_review": "На модерации",
-    "published": "Опубликован",
-    "suspended": "Приостановлен",
-    "archived": "В архиве"
+    title: "Мои ресурсы",
+    subtitle: "Личные ресурсы и ресурсы организаций, которыми вы можете управлять.",
+    all: "Все статусы",
+    empty: "Ресурсов с этим статусом пока нет.",
+    back: "Вернуться к моим ресурсам",
+    edit: "Карточка ресурса",
+    save: "Сохранить изменения",
+    saving: "Сохранение…",
+    saved: "Изменения сохранены.",
+    unsaved: "Есть изменения, которые вы ещё не отправили.",
+    draftRestored: "Незавершённый текст восстановлен в этой вкладке.",
+    metadataConflict:
+      "Ресурс изменился до завершения сохранения. Ваш текст сохранён в форме; проверьте актуальные данные перед повторной отправкой.",
+    draftConflict:
+      "Ресурс изменился после сохранения черновика. Восстановите черновик и проверьте его перед отправкой или удалите его, чтобы использовать актуальные данные.",
+    restoreDraft: "Восстановить черновик",
+    discardDraft: "Удалить черновик",
+    draftUnavailable:
+      "В этом браузере восстановление черновика недоступно. Не закрывайте страницу до отправки изменений.",
+    fileReselect:
+      "Восстанавливается только текст. После возвращения на страницу выберите архив заново. Текст хранится в этой вкладке до 24 часов.",
+    failed: "Не удалось сохранить изменения. Повторите попытку.",
+    invalid: "Проверьте название, описание и теги (не более 20).",
+    newVersion: "Отправить новую версию",
+    versionSubmitted: "Версия отправлена на проверку файла и модерацию.",
+    uploadFailed: "Не удалось отправить версию. Повторите попытку.",
+    history: "История версий",
+    noBuilds: "Версий пока нет.",
+    notes: "Комментарий модерации",
+    quarantine: "Карантин",
+    quarantineRestored: "Восстановлена после карантина",
+    preview: "Открыть превью ресурса",
+    previous: "Назад",
+    next: "Далее",
+    page: "Страница",
+    of: "из",
+    status: "Статус",
+    scan: "Проверка на вредоносный код",
+    retire: "Снять версию с публикации",
+    retireReason: "Причина снятия",
+    retireHint:
+      "Снятая версия недоступна для скачивания. Если снять последнюю опубликованную версию, ресурс исчезнет из каталога.",
+    retired: "Версия снята с публикации.",
+    retireFailed: "Не удалось снять версию. Обновите страницу и повторите попытку.",
+    retiring: "Снятие…",
+    statusLabels: {
+      draft: "Черновик",
+      pending_review: "На модерации",
+      published: "Опубликован",
+      suspended: "Приостановлен",
+      archived: "В архиве",
+    },
+    buildLabels: {
+      draft: "Черновик",
+      testing: "Тестирование",
+      pending_review: "На модерации",
+      published: "Опубликована",
+      rejected: "Отклонена",
+      deprecated: "Устарела",
+      quarantined: "В карантине",
+      retired: "Снята с публикации",
+    },
+    scanLabels: {
+      pending: "Ожидает проверки",
+      not_scanned: "Не проверена",
+      malicious: "Обнаружена угроза",
+      clean: "Без угроз",
+      infected: "Обнаружена угроза",
+      failed: "Проверка не пройдена",
+      error: "Ошибка проверки",
+      unknown: "Неизвестно",
+    },
   },
-  "buildLabels": {
-    "draft": "Черновик",
-    "testing": "Тестирование",
-    "pending_review": "На модерации",
-    "published": "Опубликована",
-    "rejected": "Отклонена",
-    "deprecated": "Устарела",
-    "quarantined": "В карантине",
-    "retired": "Снята с публикации"
-  },
-  "scanLabels": {
-    "pending": "Ожидает проверки",
-    "not_scanned": "Не проверена",
-    "malicious": "Обнаружена угроза",
-    "clean": "Без угроз",
-    "infected": "Обнаружена угроза",
-    "failed": "Проверка не пройдена",
-    "error": "Ошибка проверки",
-    "unknown": "Неизвестно"
-  }
-},
   workspace: {
     signInRequired: "Требуется вход",
     signInMessage: "Войдите, чтобы управлять библиотекой ресурсов и MTA-серверами.",
     signIn: "Войти",
     title: "Рабочая зона",
     subtitle: "ваши ресурсы и серверы",
-    liveNote: "Онлайн-статус берётся только из официального master-list MTA; отсутствие наблюдения означает неизвестный статус.",
+    liveNote:
+      "Онлайн-статус берётся только из официального master-list MTA; отсутствие наблюдения означает неизвестный статус.",
     liveUnavailable: "Онлайн-статус недоступен",
     publishResource: "Опубликовать ресурс",
     registerServer: "Добавить сервер",
@@ -1623,7 +1605,8 @@ const ru: typeof en = {
   },
   servers: {
     title: "Серверы Multi Theft Auto",
-    description: "Данные публичных серверов поступают из официального списка MTA. Для просмотра аккаунт не требуется.",
+    description:
+      "Данные публичных серверов поступают из официального списка MTA. Для просмотра аккаунт не требуется.",
     addListing: "Добавить свой сервер",
     directory: "Каталог серверов",
     network: "Сеть MTA",
@@ -1635,8 +1618,10 @@ const ru: typeof en = {
     searchPlaceholder: "Название, IP, режим или карта",
     minimumPlayers: "Минимум игроков",
     anyPlayers: "Любое количество",
-    connectHint: "Кнопка подключения откроет установленный клиент MTA. Адрес также можно скопировать.",
-    stale: "Обновления задерживаются. Показан последний доступный снимок; число игроков могло измениться.",
+    connectHint:
+      "Кнопка подключения откроет установленный клиент MTA. Адрес также можно скопировать.",
+    stale:
+      "Обновления задерживаются. Показан последний доступный снимок; число игроков могло измениться.",
     tryAgain: "Повторить",
     resetFilters: "Сбросить фильтры",
     noMatch: "Публичные MTA-серверы по этим фильтрам не найдены.",
@@ -1661,10 +1646,8 @@ const ru: typeof en = {
     unknown: "Неизвестно",
     freeroam: "Свободная игра",
     verifiedServer: "Проверенный сервер",
-    directoryTimeout:
-      "Каталог MTA слишком долго не отвечал. Попробуйте ещё раз.",
-    directoryFetchError:
-      "Каталог MTA временно недоступен. Попробуйте ещё раз.",
+    directoryTimeout: "Каталог MTA слишком долго не отвечал. Попробуйте ещё раз.",
+    directoryFetchError: "Каталог MTA временно недоступен. Попробуйте ещё раз.",
     publicServersLabel: "публичных серверов",
   },
   workspaceContext: {
@@ -1675,8 +1658,7 @@ const ru: typeof en = {
     loadError: "Не удалось загрузить контексты аккаунта.",
     retry: "Повторить",
     switchError: "Не удалось переключить контекст.",
-    note:
-      "Переключение меняет только активную рабочую зону; права определяются владением или членством.",
+    note: "Переключение меняет только активную рабочую зону; права определяются владением или членством.",
   },
   serverDetail: {
     notFound: "Сервер не найден",
@@ -1713,10 +1695,12 @@ const ru: typeof en = {
     saved: "Сохранено.",
     saveError: "Не удалось сохранить данные сервера",
     unexpectedSaveError: "Непредвиденная ошибка сохранения",
-    concurrentEdit: "Данные сервера изменились после открытия формы. Обновите страницу, проверьте изменения и сохраните снова.",
+    concurrentEdit:
+      "Данные сервера изменились после открытия формы. Обновите страницу, проверьте изменения и сохраните снова.",
     endpointTaken: "Сервер с таким адресом и портом уже зарегистрирован.",
     forbiddenEdit: "У вас больше нет прав на редактирование этого сервера.",
-    bodyTooLarge: "Карточка содержит слишком много данных. Сократите описание или список изображений.",
+    bodyTooLarge:
+      "Карточка содержит слишком много данных. Сократите описание или список изображений.",
     bodyTimedOut: "Время ожидания сохранения истекло. Проверьте соединение и повторите попытку.",
     name: "Название",
     visibility: "Видимость",
@@ -1753,8 +1737,7 @@ const ru: typeof en = {
     create: "Создать проверку контроля",
     tokenLabel: "Добавьте этот точный токен в название сервера",
     stepAddToken: "Временно добавьте токен в название",
-    stepKeepVisible:
-      "Оставьте сервер видимым и отвечающим в официальном master-list MTA.",
+    stepKeepVisible: "Оставьте сервер видимым и отвечающим в официальном master-list MTA.",
     stepVerify: "Подтвердите контроль до истечения срока проверки.",
     expires: "Истекает",
     tokenEphemeral:
@@ -1773,8 +1756,12 @@ const ru: typeof en = {
   },
   serverHistory: {
     chooseWindow: "Период истории",
-    period24h: "24 часа", period7d: "7 дней", period30d: "30 дней",
-    intervalHour: "1 час", intervalSixHours: "6 часов", intervalDay: "1 день",
+    period24h: "24 часа",
+    period7d: "7 дней",
+    period30d: "30 дней",
+    intervalHour: "1 час",
+    intervalSixHours: "6 часов",
+    intervalDay: "1 день",
     summaryScope: "Статистика и график учитывают все сохранённые наблюдения за выбранный период.",
     title: "История игроков",
     unavailable:
@@ -1798,11 +1785,9 @@ const ru: typeof en = {
   },
   serverUpdates: {
     title: "Обновления сервера",
-    description:
-      "Опубликованные статьи, новости, devlog и объявления, связанные с этим сервером.",
+    description: "Опубликованные статьи, новости, devlog и объявления, связанные с этим сервером.",
     moderated: "Модерируемый контент",
-    unavailable:
-      "Обновления сервера временно недоступны. Живой статус сервера не затронут.",
+    unavailable: "Обновления сервера временно недоступны. Живой статус сервера не затронут.",
     empty: "Опубликованных обновлений сервера пока нет.",
   },
   follow: {
@@ -1836,7 +1821,8 @@ const ru: typeof en = {
     already: "Уже есть аккаунт?",
     newUser: "Впервые в MTA Nexus?",
     genericError: "Не удалось выполнить запрос. Попробуйте ещё раз.",
-    registerError: "Не удалось подтвердить регистрацию. Перед повторной регистрацией попробуйте войти.",
+    registerError:
+      "Не удалось подтвердить регистрацию. Перед повторной регистрацией попробуйте войти.",
     loginError: "Не удалось подтвердить вход. Проверьте соединение и попробуйте ещё раз.",
   },
   recovery: {
@@ -1862,8 +1848,7 @@ const ru: typeof en = {
     confirmPassword: "Подтвердите новый пароль",
     resetting: "Сброс...",
     reset: "Сбросить пароль",
-    resetSuccess:
-      "Пароль сброшен. Все существующие сессии завершены. Войдите с новым паролем.",
+    resetSuccess: "Пароль сброшен. Все существующие сессии завершены. Войдите с новым паролем.",
     signIn: "Войти",
     verifyTitle: "Подтвердить email восстановления",
     checkingVerification: "Проверка ссылки подтверждения...",
@@ -1943,7 +1928,8 @@ const ru: typeof en = {
 
     openLibrary: "Открыть библиотеку ресурсов",
     addToLibrary: "Добавить в библиотеку",
-    claimRequired: "Для скачивания бесплатного ресурса необходимо войти и добавить его в библиотеку.",
+    claimRequired:
+      "Для скачивания бесплатного ресурса необходимо войти и добавить его в библиотеку.",
     compatibility: "Техническая совместимость",
     mtaVersion: "Версия MTA",
     dependencies: "Зависимости",
@@ -2009,7 +1995,8 @@ const ru: typeof en = {
     exportFunctionNameMissing: "[имя функции не указано]",
     exportTypeLabel: "тип",
     httpAttribute: "http",
-    exportsNote: "Показаны значения из манифеста; предпросмотр не проверяет работу и безопасность endpoint.",
+    exportsNote:
+      "Показаны значения из манифеста; предпросмотр не проверяет работу и безопасность endpoint.",
     aclRights: "Запрошенные ACL-права",
     aclRightsCount: "Показано прав: {shown} из {total}",
     aclRightNameMissing: "[название права не указано]",
@@ -2023,7 +2010,8 @@ const ru: typeof en = {
     declaredAuthor: "Указанный автор",
     minimumMta: "Минимальная MTA",
     structuralIssues: {
-      unclosedComment: "Похоже, XML-комментарий не закрыт; часть элементов манифеста может отсутствовать в предпросмотре.",
+      unclosedComment:
+        "Похоже, XML-комментарий не закрыт; часть элементов манифеста может отсутствовать в предпросмотре.",
       incompleteMeta: "Не удалось подтвердить полный корневой тег <meta>...</meta>.",
       missingInfo: "В манифесте нет тега метаданных <info>.",
       multipleInfo: "В манифесте несколько тегов <info>; для сводки используется первый.",
@@ -2036,18 +2024,20 @@ const ru: typeof en = {
       unknownExportType: "В записи экспорта указан неизвестный тип.",
       entryLimitReached: "Достигнут лимит проверки; часть элементов манифеста не показана.",
       issueLimitReached: "Найдено больше структурных замечаний, чем можно отобразить.",
-      multipleMinimumVersions: "Найдено несколько тегов минимальной версии MTA; используется первый.",
-      minimumVersionMissing: "В теге минимальной версии MTA не указана версия для клиента, сервера или обоих.",
+      multipleMinimumVersions:
+        "Найдено несколько тегов минимальной версии MTA; используется первый.",
+      minimumVersionMissing:
+        "В теге минимальной версии MTA не указана версия для клиента, сервера или обоих.",
       minimumVersionInvalid: "Эта минимальная версия MTA указана в неподдерживаемом формате.",
-      minimumVersionConflict: "Минимумы для клиента и сервера различаются — одно поле ресурса не может передать оба значения.",
+      minimumVersionConflict:
+        "Минимумы для клиента и сервера различаются — одно поле ресурса не может передать оба значения.",
     },
     formTarget: "Версия для формы ресурса",
     applyMinimumVersion: "Использовать эту версию",
     notDeclared: "Не указано",
     includedResources: "Включённые ресурсы",
     structuralNotes: "Структурные замечания",
-    note:
-      "Только статическая проверка манифеста. Результат не является вердиктом о вредоносности, доверии или целостности архива.",
+    note: "Только статическая проверка манифеста. Результат не является вердиктом о вредоносности, доверии или целостности архива.",
   },
   checkout: {
     title: "Добавить ресурс в библиотеку",
@@ -2071,8 +2061,7 @@ const ru: typeof en = {
     freeResource: "Бесплатный доступ",
     paidCheckout: "Платные ресурсы отключены",
     noPaymentRequired: "Платёжные данные не требуются.",
-    paidDisabled:
-      "Платные ресурсы отключены на время закрытой беты. Попытка оплаты не создаётся.",
+    paidDisabled: "Платные ресурсы отключены на время закрытой беты. Попытка оплаты не создаётся.",
     adding: "Добавление ресурса...",
     addToLibrary: "Добавить в библиотеку",
     paidUnavailable: "Платные ресурсы недоступны",
@@ -2119,23 +2108,25 @@ const ru: typeof en = {
     scannerMalwareDetected: "Сканер обнаружил вредоносный код. Сборка не сохранена.",
     scannerLimitExceeded:
       "Архив не удалось проверить полностью из-за лимитов сканирования. Уменьшите его размер или сложность и попробуйте снова.",
-    scannerUnavailable:
-      "Сканер временно недоступен. Сборка не сохранена; попробуйте позже.",
+    scannerUnavailable: "Сканер временно недоступен. Сборка не сохранена; попробуйте позже.",
     authenticationRequired: "Войдите в аккаунт, чтобы отправить сборку ресурса.",
     uploadRateLimited: "Слишком много попыток загрузки. Подождите немного и попробуйте снова.",
     resourceNotFound: "Ресурс не найден.",
     buildForbidden: "У вас нет прав отправлять сборки этого ресурса.",
     paidPublishingUnavailable: "Публикация платных ресурсов недоступна в закрытой бета-версии.",
     versionAlreadyExists: "Такая версия сборки уже существует. Укажите другой номер версии.",
-    multipartRequired: "Не удалось прочитать форму загрузки. Выберите файл ещё раз и повторите попытку.",
-    multipartInvalid: "Загрузка сборки неполная или повреждена. Выберите файл ещё раз и повторите попытку.",
+    multipartRequired:
+      "Не удалось прочитать форму загрузки. Выберите файл ещё раз и повторите попытку.",
+    multipartInvalid:
+      "Загрузка сборки неполная или повреждена. Выберите файл ещё раз и повторите попытку.",
     metadataInvalid: "Проверьте номер версии и примечания к выпуску, затем попробуйте снова.",
     buildFileTypeNotAllowed: "Поддерживаются только файлы сборки ZIP, RAR, 7z и Lua.",
     buildContentMismatch: "Содержимое файла не соответствует выбранному типу.",
     buildFileNameInvalid: "Укажите корректное имя файла и попробуйте снова.",
     resourceMetadataInvalid: "Проверьте данные ресурса и попробуйте снова.",
     resourceSlugAlreadyExists: "Этот адрес ресурса уже занят. Укажите другой slug.",
-    resourceCreationFailed: "Не удалось сохранить ресурс. Данные остались в форме — попробуйте снова.",
+    resourceCreationFailed:
+      "Не удалось сохранить ресурс. Данные остались в форме — попробуйте снова.",
     chooseArchive: "Выберите архив сборки",
     unexpectedError: "Непредвиденная ошибка публикации",
     typeScript: "Скрипт",
@@ -2153,8 +2144,10 @@ const ru: typeof en = {
     ownerScope: "От чьего имени добавить сервер",
     personalScope: "Личный аккаунт",
     organizationsLoading: "Проверяем доступные организации...",
-    organizationsUnavailable: "Организации временно недоступны. Личный сервер всё ещё можно зарегистрировать.",
-    organizationSelectionUnavailable: "Выбранная организация больше недоступна. Обновите страницу и повторите попытку.",
+    organizationsUnavailable:
+      "Организации временно недоступны. Личный сервер всё ещё можно зарегистрировать.",
+    organizationSelectionUnavailable:
+      "Выбранная организация больше недоступна. Обновите страницу и повторите попытку.",
     slugTaken: "Этот адрес карточки уже занят. Выберите другой slug.",
     endpointTaken: "Сервер с таким адресом и портом уже зарегистрирован.",
     organizationForbidden: "У вас нет прав на регистрацию сервера от этой организации.",
@@ -2255,16 +2248,15 @@ const ru: typeof en = {
     useSystem: "Использовать системную тему",
   },
   buildReviewNotifications: {
-  "approved": "Версия ресурса одобрена",
-  "rejected": "Версия ресурса отклонена",
-  "version": "Версия",
-  "notes": "Комментарий модератора"
-},
+    approved: "Версия ресурса одобрена",
+    rejected: "Версия ресурса отклонена",
+    version: "Версия",
+    notes: "Комментарий модератора",
+  },
   notifications: {
     workspace: "Рабочая зона",
     title: "Центр уведомлений",
-    description:
-      "Следите за обновлениями ресурсов, серверов и важными событиями аккаунта.",
+    description: "Следите за обновлениями ресурсов, серверов и важными событиями аккаунта.",
     settings: "Настройки",
     markAllRead: "Отметить всё прочитанным",
     markedAllRead: "Все уведомления отмечены прочитанными.",
@@ -2389,13 +2381,16 @@ const ru: typeof en = {
     sendReply: "Отправить ответ",
     sending: "Отправка...",
     replyError: "Не удалось отправить ответ.",
-    replyConflict: "Статус обращения изменился, пока вы писали ответ. Проверьте обновлённую переписку перед повторной отправкой.",
+    replyConflict:
+      "Статус обращения изменился, пока вы писали ответ. Проверьте обновлённую переписку перед повторной отправкой.",
     statusError: "Не удалось изменить статус обращения.",
-    statusConflict: "Другой сотрудник изменил статус обращения. Проверьте актуальное состояние перед повторной попыткой.",
+    statusConflict:
+      "Другой сотрудник изменил статус обращения. Проверьте актуальное состояние перед повторной попыткой.",
     resolve: "Решено",
     close: "Закрыть",
     reopen: "Переоткрыть",
-    closedReply: "Обращение закрыто. Сотрудник может переоткрыть его, если работа должна продолжиться.",
+    closedReply:
+      "Обращение закрыто. Сотрудник может переоткрыть его, если работа должна продолжиться.",
     categoryAccount: "Аккаунт",
     categoryResource: "Ресурс",
     categoryServer: "Сервер",
@@ -2413,8 +2408,7 @@ const ru: typeof en = {
     signIn: "Войти",
     title: "Администрирование",
     supportQueue: "Очередь поддержки",
-    description:
-      "Модерация платформы, проверки, ревью ресурсов и журнал аудита.",
+    description: "Модерация платформы, проверки, ревью ресурсов и журнал аудита.",
     authorizedSession: "Авторизованная админ-сессия",
     users: "Пользователи",
     servers: "Серверы",
@@ -2451,8 +2445,10 @@ const ru: typeof en = {
     quarantineReason: "Причина карантина",
     restoreReason: "Причина восстановления",
     quarantineReasonHint: "Укажите минимум 3 символа контекста или доказательства.",
-    quarantineBuildConfirm: "Поместить эту опубликованную сборку в карантин и прекратить её публичную выдачу?",
-    restoreBuildConfirm: "Вернуть эту сборку в публикацию, если trusted clean scan всё ещё действителен?",
+    quarantineBuildConfirm:
+      "Поместить эту опубликованную сборку в карантин и прекратить её публичную выдачу?",
+    restoreBuildConfirm:
+      "Вернуть эту сборку в публикацию, если trusted clean scan всё ещё действителен?",
     quarantineBuildFailed: "Не удалось изменить карантин сборки.",
     quarantineBuildUnavailable: "Управление карантином временно недоступно.",
     quarantinedAt: "Помещена в карантин",
@@ -2464,7 +2460,8 @@ const ru: typeof en = {
     noDrafts: "Черновиков, ожидающих модерации, нет.",
     readDraft: "Читать текст целиком",
     reports: "Жалобы и модерация",
-    caseHistory: "Проверьте доказательства и запишите решение. Закрытие жалобы не меняет её объект.",
+    caseHistory:
+      "Проверьте доказательства и запишите решение. Закрытие жалобы не меняет её объект.",
     reportQueue: "Ожидают решения",
     reportHistory: "История решений",
     reportPages: "Страницы жалоб",
@@ -2498,8 +2495,7 @@ const ru: typeof en = {
     approve: "Одобрить",
     reject: "Отклонить",
     reviewArtifact: "Проверить артефакт",
-    artifactRequiresCleanScan:
-      "Скачивание доступно только после доверенной чистой проверки",
+    artifactRequiresCleanScan: "Скачивание доступно только после доверенной чистой проверки",
     approveBuildConfirm: "Одобрить эту чистую сборку для публикации?",
     rejectBuildConfirm: "Отклонить эту сборку?",
     buildFailed: "Не удалось выполнить модерацию сборки.",
@@ -2507,8 +2503,7 @@ const ru: typeof en = {
     approveVerificationConfirm: "Одобрить этот запрос на верификацию?",
     rejectVerificationConfirm: "Отклонить этот запрос на верификацию?",
     verificationFailed: "Не удалось выполнить модерацию верификации.",
-    verificationUnavailable:
-      "Модерация верификации временно недоступна.",
+    verificationUnavailable: "Модерация верификации временно недоступна.",
     publish: "Опубликовать",
     archive: "Архивировать",
     publishContentConfirm: "Опубликовать этот материал?",
@@ -2518,8 +2513,7 @@ const ru: typeof en = {
   },
   dev: {
     title: "Состояние разработки",
-    description:
-      "Диагностика локального режима разработки. В production этот маршрут недоступен.",
+    description: "Диагностика локального режима разработки. В production этот маршрут недоступен.",
     environment: "Окружение",
     version: "Версия",
     database: "База данных",
@@ -2546,8 +2540,7 @@ const ru: typeof en = {
     recoveryNeedsVerification: "Email для восстановления ещё нужно подтвердить",
     recoveryUnavailable: "Статус восстановления недоступен",
     sessions: "Активные сессии",
-    sessionsDescription:
-      "Показаны только активные непросроченные сессии этого аккаунта.",
+    sessionsDescription: "Показаны только активные непросроченные сессии этого аккаунта.",
     currentSession: "Текущая сессия",
     started: "Начало",
     expires: "Истекает",
@@ -2580,8 +2573,7 @@ const ru: typeof en = {
     retry: "Повторить",
     saving: "Сохранение изменений...",
     notificationPreferences: "Настройки уведомлений",
-    notificationDescription:
-      "Эти параметры не отключают сообщения, связанные с безопасностью.",
+    notificationDescription: "Эти параметры не отключают сообщения, связанные с безопасностью.",
     newFollowers: "Подписчики и обсуждения",
     newFollowersDescription: "Новые подписчики и ответы в публикациях, на которые вы подписаны.",
     contentUpdates: "Обновления контента",
@@ -2589,8 +2581,7 @@ const ru: typeof en = {
     serverUpdates: "Обновления серверов",
     serverUpdatesDescription: "События серверов MTA, за которыми вы следите.",
     resourceActivity: "События ресурсов",
-    resourceActivityDescription:
-      "Добавления в библиотеку и события доставки ресурсов.",
+    resourceActivityDescription: "Добавления в библиотеку и события доставки ресурсов.",
     systemNotifications: "Системные уведомления",
     systemNotificationsDescription:
       "Важные сообщения аккаунта, не связанные напрямую с безопасностью.",
@@ -2602,8 +2593,7 @@ const ru: typeof en = {
     webPushEnabled:
       "Включено для этого авторизованного браузера. Завершение этой сессии также удалит её серверную push-подписку.",
     webPushUnsupported: "Этот браузер не поддерживает Web Push.",
-    webPushUnconfigured:
-      "Web Push пока не настроен на этом окружении.",
+    webPushUnconfigured: "Web Push пока не настроен на этом окружении.",
     webPushDenied:
       "Разрешение на уведомления заблокировано. Измените разрешение сайта в браузере, чтобы включить push.",
     webPushError:
@@ -2611,8 +2601,7 @@ const ru: typeof en = {
     webPushLoading: "Проверка push-уведомлений...",
     recoveryEmail: "Email для восстановления",
     recoveryNotVerified: "Email для восстановления ещё не подтверждён.",
-    recoveryUnavailable:
-      "Подтверждение email для восстановления недоступно для этого аккаунта.",
+    recoveryUnavailable: "Подтверждение email для восстановления недоступно для этого аккаунта.",
     recoveryPassword: "Текущий пароль для подтверждения email",
     verifyRecoveryEmail: "Подтвердить email для восстановления",
     recoveryAlreadyVerified: "Email для восстановления уже подтверждён.",
@@ -2638,16 +2627,14 @@ const ru: typeof en = {
     endSession: "Завершить сессию",
     unconfirmedSessionRevocation: "Завершение сессии не подтверждено",
     sessionEnded: "Сессия завершена и больше не имеет доступа к аккаунту.",
-    sessionUnavailable:
-      "Список сессий недоступен. Обновите настройки, чтобы проверить его.",
+    sessionUnavailable: "Список сессий недоступен. Обновите настройки, чтобы проверить его.",
     noSessions:
       "Активные сессии не найдены. Обновите настройки, чтобы подтвердить состояние входа.",
     preferenceSaved: "Настройка уведомлений сохранена.",
     backendUnavailable: "Настройки аккаунта временно недоступны.",
     unreadableResponse: "Сервер вернул нечитаемый ответ.",
     invalidResponse: "Некорректный ответ настроек",
-    loadFailed:
-      "Не удалось загрузить настройки аккаунта. Статус входа не подтверждён.",
+    loadFailed: "Не удалось загрузить настройки аккаунта. Статус входа не подтверждён.",
     authRequired: "Требуется авторизация",
     requestUnconfirmed:
       "Не удалось подтвердить запрос. Обновите настройки перед повторной попыткой.",
@@ -2675,23 +2662,19 @@ const ru: typeof en = {
       sections: [
         {
           title: "Что предоставляет бета",
-          body:
-            "MTA Nexus предоставляет поиск серверов и ресурсов, материалы сообщества, карточки серверов и бесплатные ресурсы для Multi Theft Auto. Платные ресурсы, балансы, выплаты и расчёты в криптовалюте в этой бете недоступны.",
+          body: "MTA Nexus предоставляет поиск серверов и ресурсов, материалы сообщества, карточки серверов и бесплатные ресурсы для Multi Theft Auto. Платные ресурсы, балансы, выплаты и расчёты в криптовалюте в этой бете недоступны.",
         },
         {
           title: "Ваш аккаунт и контент",
-          body:
-            "Вы отвечаете за действия в своём аккаунте и за отправляемый контент. Не загружайте вредоносный код, украденные ресурсы, персональные данные без права на их публикацию или материалы, нарушающие права интеллектуальной собственности.",
+          body: "Вы отвечаете за действия в своём аккаунте и за отправляемый контент. Не загружайте вредоносный код, украденные ресурсы, персональные данные без права на их публикацию или материалы, нарушающие права интеллектуальной собственности.",
         },
         {
           title: "Доступность беты",
-          body:
-            "Сервис является экспериментальным и во время разработки может меняться, приостанавливаться или удалять данные. Храните собственную копию каждого загруженного ресурса. В закрытой бете непрерывная доступность не гарантируется.",
+          body: "Сервис является экспериментальным и во время разработки может меняться, приостанавливаться или удалять данные. Храните собственную копию каждого загруженного ресурса. В закрытой бете непрерывная доступность не гарантируется.",
         },
         {
           title: "Модерация",
-          body:
-            "Мы можем удалять контент, ограничивать доступ или приостанавливать аккаунты, когда это необходимо для защиты пользователей, платформы или правообладателей. Решения модерации фиксируются в журнале аудита.",
+          body: "Мы можем удалять контент, ограничивать доступ или приостанавливать аккаунты, когда это необходимо для защиты пользователей, платформы или правообладателей. Решения модерации фиксируются в журнале аудита.",
         },
       ],
       contactLabel: "Вопросы по условиям",
@@ -2700,29 +2683,24 @@ const ru: typeof en = {
     privacy: {
       metadataTitle: "Конфиденциальность",
       title: "Уведомление о конфиденциальности",
-      lead:
-        "Здесь описаны данные, используемые для работы и защиты закрытой беты MTA Nexus.",
+      lead: "Здесь описаны данные, используемые для работы и защиты закрытой беты MTA Nexus.",
       updated: "16 сентября 2026",
       sections: [
         {
           title: "Какие данные мы используем",
-          body:
-            "Мы обрабатываем данные аккаунта, включая email, имя пользователя, отображаемое имя, хэш пароля и данные безопасности сессий, а также профиль, серверы, ресурсы и материалы сообщества, которые вы решаете отправить. Публичные наблюдения серверов могут включать доступность, число игроков, версию MTA, игровой режим, карту, время и публичный источник наблюдения.",
+          body: "Мы обрабатываем данные аккаунта, включая email, имя пользователя, отображаемое имя, хэш пароля и данные безопасности сессий, а также профиль, серверы, ресурсы и материалы сообщества, которые вы решаете отправить. Публичные наблюдения серверов могут включать доступность, число игроков, версию MTA, игровой режим, карту, время и публичный источник наблюдения.",
         },
         {
           title: "Зачем мы их используем",
-          body:
-            "Данные используются для работы аккаунтов, предотвращения злоупотреблений, выдачи запрошенных ресурсов, отображения публичных профилей и серверов, журналов безопасности и модерации. Пароли никогда не хранятся в читаемом виде.",
+          body: "Данные используются для работы аккаунтов, предотвращения злоупотреблений, выдачи запрошенных ресурсов, отображения публичных профилей и серверов, журналов безопасности и модерации. Пароли никогда не хранятся в читаемом виде.",
         },
         {
           title: "Публичность и хранение",
-          body:
-            "Данные профиля, сервера и опубликованного ресурса могут быть публичными в соответствии с выбранной видимостью. Записи безопасности и аудита хранятся только столько, сколько обоснованно необходимо для работы и защиты беты. Мы не продаём персональные данные.",
+          body: "Данные профиля, сервера и опубликованного ресурса могут быть публичными в соответствии с выбранной видимостью. Записи безопасности и аудита хранятся только столько, сколько обоснованно необходимо для работы и защиты беты. Мы не продаём персональные данные.",
         },
         {
           title: "Ваши возможности",
-          body:
-            "Вы можете запросить доступ, исправление или удаление данных аккаунта. Ограниченная часть данных может временно сохраняться для безопасности, предотвращения мошенничества или юридических требований.",
+          body: "Вы можете запросить доступ, исправление или удаление данных аккаунта. Ограниченная часть данных может временно сохраняться для безопасности, предотвращения мошенничества или юридических требований.",
         },
       ],
       contactLabel: "Запросы по конфиденциальности",
@@ -2731,24 +2709,20 @@ const ru: typeof en = {
     copyright: {
       metadataTitle: "Авторские права и злоупотребления",
       title: "Авторские права и жалобы",
-      lead:
-        "Используйте этот порядок, чтобы сообщить о вредоносных, украденных или нарушающих права материалах в MTA Nexus.",
+      lead: "Используйте этот порядок, чтобы сообщить о вредоносных, украденных или нарушающих права материалах в MTA Nexus.",
       updated: "16 сентября 2026",
       sections: [
         {
           title: "Сообщить о вредоносном или нарушающем права контенте",
-          body:
-            "Через этот канал можно сообщить о нарушении авторских прав, выдаче себя за другое лицо, вредоносном коде, украденных ресурсах или других злоупотреблениях. Укажите URL или идентификатор ресурса, понятное описание и подтверждающие материалы. Не отправляйте пароли или приватные ключи.",
+          body: "Через этот канал можно сообщить о нарушении авторских прав, выдаче себя за другое лицо, вредоносном коде, украденных ресурсах или других злоупотреблениях. Укажите URL или идентификатор ресурса, понятное описание и подтверждающие материалы. Не отправляйте пароли или приватные ключи.",
         },
         {
           title: "Как мы реагируем",
-          body:
-            "Мы рассматриваем обращения, сохраняем относящиеся к делу данные аудита и можем временно ограничить контент или аккаунт на время проверки. Повторные или серьёзные нарушения могут привести к удалению контента и блокировке.",
+          body: "Мы рассматриваем обращения, сохраняем относящиеся к делу данные аудита и можем временно ограничить контент или аккаунт на время проверки. Повторные или серьёзные нарушения могут привести к удалению контента и блокировке.",
         },
         {
           title: "Важное уведомление о платформе",
-          body:
-            "MTA Nexus — независимая платформа сообщества. Она не связана с Rockstar Games, Take-Two Interactive или проектом Multi Theft Auto.",
+          body: "MTA Nexus — независимая платформа сообщества. Она не связана с Rockstar Games, Take-Two Interactive или проектом Multi Theft Auto.",
         },
       ],
       contactLabel: "Жалобы по авторским правам и злоупотреблениям",

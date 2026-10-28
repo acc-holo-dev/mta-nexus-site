@@ -65,7 +65,7 @@ export function can(
   user: User | null | undefined,
   action: Action,
   resource?: unknown,
-  context?: PolicyContext
+  context?: PolicyContext,
 ): boolean {
   if (!user) {
     return false;
@@ -100,9 +100,14 @@ export function can(
       if (!product.organizationId && product.authorId === user.id) return true;
       if (product.organizationId && context?.organizationMemberships) {
         const mem = context.organizationMemberships.find(
-          (m) => m.organizationId === product.organizationId
+          (m) => m.organizationId === product.organizationId,
         );
-        if (mem && (mem.role === "owner" || mem.role === "admin" || mem.permissions.includes("manage_products"))) {
+        if (
+          mem &&
+          (mem.role === "owner" ||
+            mem.role === "admin" ||
+            mem.permissions.includes("manage_products"))
+        ) {
           return true;
         }
       }
@@ -119,7 +124,7 @@ export function can(
       if (!server.organizationId && server.ownerId === user.id) return true;
       if (server.organizationId && context?.organizationMemberships) {
         const mem = context.organizationMemberships.find(
-          (m) => m.organizationId === server.organizationId
+          (m) => m.organizationId === server.organizationId,
         );
         if (grantsServerManagement(mem)) {
           return true;
@@ -152,12 +157,15 @@ export function can(
 
     case "organization.manage": {
       if (!resource) return false;
-      const orgId = typeof resource === "string"
-        ? resource
-        : typeof resource === "object" && resource !== null
-          && "id" in resource && typeof resource.id === "string"
-          ? resource.id
-          : undefined;
+      const orgId =
+        typeof resource === "string"
+          ? resource
+          : typeof resource === "object" &&
+              resource !== null &&
+              "id" in resource &&
+              typeof resource.id === "string"
+            ? resource.id
+            : undefined;
       if (!orgId) return false;
       if (context?.organizationMemberships) {
         const mem = context.organizationMemberships.find((m) => m.organizationId === orgId);

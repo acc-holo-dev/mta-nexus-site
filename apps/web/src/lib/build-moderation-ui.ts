@@ -12,8 +12,7 @@ export function buildModerationUiState(input: {
   pending: "approve" | "reject" | null;
 }): BuildModerationUiState {
   const hasNotes = input.notes.trim().length >= 3;
-  const hasTrustedCleanScan =
-    input.scanStatus === "clean" && input.hasScanProvenance;
+  const hasTrustedCleanScan = input.scanStatus === "clean" && input.hasScanProvenance;
   const idle = input.pending === null;
 
   return {

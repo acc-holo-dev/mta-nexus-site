@@ -30,10 +30,6 @@ describe("J5 resource browser acceptance contract", () => {
   });
 
   it("does not depend on a test-only application API namespace", () => {
-    expect(
-      existsSync(
-        resolve(process.cwd(), "apps/web/src/app/api/test"),
-      ),
-    ).toBe(false);
+    expect(existsSync(resolve(process.cwd(), "apps/web/src/app/api/test"))).toBe(false);
   });
 });

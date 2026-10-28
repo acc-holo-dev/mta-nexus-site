@@ -1,6 +1,6 @@
 # Plans, Quotas and Protected Admin Configuration
 
-Status: **OWNER-CONFIRMED TARGET / Round 10**
+Status: **OWNER-CONFIRMED TARGET**
 
 ## 1. Why three levels
 

@@ -12,11 +12,7 @@ export function requireServerJsonContentType(request: Pick<Request, "headers">):
     value.length > 256 ||
     value.split(";", 1)[0]?.trim().toLowerCase() !== "application/json"
   ) {
-    throw new AppError(
-      "Content-Type application/json is required",
-      415,
-      "UNSUPPORTED_MEDIA_TYPE",
-    );
+    throw new AppError("Content-Type application/json is required", 415, "UNSUPPORTED_MEDIA_TYPE");
   }
 }
 
@@ -52,8 +48,7 @@ export async function readBoundedJson(
 
   const declared = request.headers.get("content-length");
   if (declared !== null) {
-    if (!/^(?:0|[1-9][0-9]*)$/u.test(declared) ||
-      !Number.isSafeInteger(Number(declared))) {
+    if (!/^(?:0|[1-9][0-9]*)$/u.test(declared) || !Number.isSafeInteger(Number(declared))) {
       void request.body?.cancel().catch(() => {});
       throw new AppError("Invalid Content-Length", 400, "INVALID_BODY_LENGTH");
     }

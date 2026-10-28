@@ -95,9 +95,7 @@ describe("closed-beta product behavior", () => {
   });
 
   it("rejects paid product creation before permission or persistence work", async () => {
-    await expect(
-      service.createProduct(createInput(1500), actor),
-    ).rejects.toMatchObject({
+    await expect(service.createProduct(createInput(1500), actor)).rejects.toMatchObject({
       statusCode: 422,
       code: "PAID_RESOURCES_DISABLED",
     });
@@ -109,9 +107,7 @@ describe("closed-beta product behavior", () => {
   it("rejects build release preflight for a legacy paid product", async () => {
     mocks.findById.mockResolvedValue(product({ price: 1000 }));
 
-    await expect(
-      service.assertCanReleaseBuild("prd_1", actor),
-    ).rejects.toMatchObject({
+    await expect(service.assertCanReleaseBuild("prd_1", actor)).rejects.toMatchObject({
       statusCode: 422,
       code: "PAID_RESOURCES_DISABLED",
     });

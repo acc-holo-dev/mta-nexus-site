@@ -38,16 +38,13 @@ export function AccountControls() {
         if (
           !response.ok ||
           typeof data?.authenticated !== "boolean" ||
-          (data.authenticated &&
-            typeof data.user?.username !== "string")
+          (data.authenticated && typeof data.user?.username !== "string")
         ) {
           throw new Error(copy.checkError);
         }
 
         if (active) {
-          setAccount(
-            data.authenticated ? { username: data.user.username } : null,
-          );
+          setAccount(data.authenticated ? { username: data.user.username } : null);
         }
       })
       .catch(() => {
@@ -113,10 +110,7 @@ export function AccountControls() {
       className="relative flex min-w-0 items-center gap-1.5 sm:gap-2"
     >
       {checking ? (
-        <span
-          role="status"
-          className="hidden max-w-28 truncate text-xs text-muted sm:block"
-        >
+        <span role="status" className="hidden max-w-28 truncate text-xs text-muted sm:block">
           {copy.checking}
         </span>
       ) : account ? (
@@ -127,9 +121,7 @@ export function AccountControls() {
             className={control}
           >
             <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden max-w-24 truncate sm:block">
-              @{account.username}
-            </span>
+            <span className="hidden max-w-24 truncate sm:block">@{account.username}</span>
           </Link>
           <button
             type="button"
@@ -140,17 +132,11 @@ export function AccountControls() {
             className={`${control} disabled:opacity-50`}
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:block">
-              {signingOut ? copy.signingOut : copy.signOut}
-            </span>
+            <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
           </button>
         </>
       ) : error ? (
-        <button
-          type="button"
-          onClick={() => setAttempt((value) => value + 1)}
-          className={control}
-        >
+        <button type="button" onClick={() => setAttempt((value) => value + 1)} className={control}>
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>
           <span className="sr-only sm:hidden">{copy.retry}</span>
@@ -174,4 +160,3 @@ export function AccountControls() {
     </div>
   );
 }
-

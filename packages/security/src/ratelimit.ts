@@ -1,5 +1,9 @@
 export interface RateLimiter {
-  consume(key: string, limit: number, windowSeconds: number): Promise<{ success: boolean; remaining: number; resetAt: number }>;
+  consume(
+    key: string,
+    limit: number,
+    windowSeconds: number,
+  ): Promise<{ success: boolean; remaining: number; resetAt: number }>;
 }
 
 export class MemoryRateLimiter implements RateLimiter {
@@ -8,7 +12,7 @@ export class MemoryRateLimiter implements RateLimiter {
 
   constructor(
     private readonly maxKeys = 50_000,
-    private readonly sweepInterval = 1_000
+    private readonly sweepInterval = 1_000,
   ) {
     if (maxKeys < 1 || sweepInterval < 1) {
       throw new RangeError("Rate limiter bounds must be positive");
@@ -18,7 +22,7 @@ export class MemoryRateLimiter implements RateLimiter {
   async consume(
     key: string,
     limit: number,
-    windowSeconds: number
+    windowSeconds: number,
   ): Promise<{ success: boolean; remaining: number; resetAt: number }> {
     if (limit < 1 || windowSeconds < 1) {
       throw new RangeError("Rate limit and window must be positive");

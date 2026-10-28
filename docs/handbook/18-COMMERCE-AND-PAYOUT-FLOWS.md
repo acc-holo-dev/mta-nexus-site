@@ -22,7 +22,7 @@ Keep separate: `Order`, `Payment`, `Purchase`, `License/Entitlement`, `Ledger`, 
 
 ## 4. Commission
 
-Confirmed fee = **10%**. OPEN before launch: fee base after discounts, taxes, PSP fee allocation, refunds, chargebacks, minimum price and rounding.
+Baseline commission = **10% of the amount actually paid after discounts**. Seller sets the price without a hard minimum. Provider fees, tax/accounting, rounding, refunds and chargeback allocation follow the approved provider/legal contract; see [economics](52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md).
 
 ## 5. Provider strategy
 
@@ -73,7 +73,7 @@ DECISION: normal internal marketplace disputes are decided by authorized NEXUS s
 
 One-time products are primarily promotion/advertising and specific publishing/operational services. They must not bypass malware/integrity checks, buy verification or convert sponsored ranking into hidden organic ranking. Auto-publish remains a subscription capability under the earlier owner decision unless the owner explicitly changes it.
 
-## 19. Round 4 financial rules
+## 19. financial rules
 
 ### Commission base
 
@@ -91,7 +91,7 @@ Seller не имеет untracked unilateral refund control. Refund создаё�
 
 Commercial target включает services/custom development и Deal/Guarantee. Их funds flow нельзя реализовывать как самодельный неаудируемый wallet; предпочтительны PSP marketplace/escrow-like capabilities там, где они legally/provider-supported.
 
-## 20. Round 5 — billing UX, tax и provider responsibility
+## 20. billing UX, tax и provider responsibility
 
 ### 20.1 Cart checkout
 

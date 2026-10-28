@@ -12,13 +12,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import {
-  CheckCircle2,
-  Key,
-  Layers,
-  MessageSquare,
-  ShieldCheck,
-} from "lucide-react";
+import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
 import { resourceReviewService } from "../../../lib/services/resource-review-service";
 import { ResourceReviewList } from "../../../components/resource-review-list";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
@@ -94,10 +88,11 @@ export async function generateMetadata({
     return { title: dictionary.product.notFound, robots: { index: false, follow: false } };
   }
 
-  const description =
-    product.shortDescription || product.description.slice(0, 155);
+  const description = product.shortDescription || product.description.slice(0, 155);
   const previewUrl = safeResourceImageUrl(product.thumbnailUrl);
-  const thumbnailUrl = previewUrl?.startsWith("/") ? new URL(previewUrl, config.NEXT_PUBLIC_APP_URL).href : previewUrl;
+  const thumbnailUrl = previewUrl?.startsWith("/")
+    ? new URL(previewUrl, config.NEXT_PUBLIC_APP_URL).href
+    : previewUrl;
 
   return {
     title: product.title,
@@ -107,22 +102,18 @@ export async function generateMetadata({
       title: product.title,
       description,
       type: "website",
-      images: thumbnailUrl
-        ? [{ url: thumbnailUrl }]
-        : undefined,
+      images: thumbnailUrl ? [{ url: thumbnailUrl }] : undefined,
     },
   };
 }
 
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [locale, user] = await Promise.all([
     getRequestLocale(),
-    cookies().then(cookieStore => authService.getSession(cookieStore.get("nexus_session")?.value)),
+    cookies().then((cookieStore) =>
+      authService.getSession(cookieStore.get("nexus_session")?.value),
+    ),
   ]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.product;
@@ -156,25 +147,28 @@ export default async function ProductDetailPage({
           "product.download",
         )
       : false,
-    managementAccess.then(canManageProduct => {
+    managementAccess.then((canManageProduct) => {
       const canInspectBuilds = canManageProduct || isAdmin;
       return productService.getProductBuilds(product.id, canInspectBuilds);
     }),
-    isPublished ? resourceReviewService.publicPage(product.id).catch(error => { if (error instanceof AppError && error.statusCode === 404) return null; throw error; }) : null,
+    isPublished
+      ? resourceReviewService.publicPage(product.id).catch((error) => {
+          if (error instanceof AppError && error.statusCode === 404) return null;
+          throw error;
+        })
+      : null,
     productService.getDependencyResolution(product).catch(() => null),
-    productService
-      .getReverseDependencySummary(product.slug)
-      .catch(() => null),
+    productService.getReverseDependencySummary(product.slug).catch(() => null),
     isPublished ? resourceManagementService.publicVariants(product.id) : null,
-    isPublished ? resourceMediaRepository.publicItems(product.id) : managementAccess.then(async (allowed) => allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : []),
+    isPublished
+      ? resourceMediaRepository.publicItems(product.id)
+      : managementAccess.then(async (allowed) =>
+          allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : [],
+        ),
   ]);
-  const hasAccess =
-    isPublished && (canManageProduct || isLicensed || isAdmin);
+  const hasAccess = isPublished && (canManageProduct || isLicensed || isAdmin);
 
-  const formattedPrice =
-    product.price === 0
-      ? copy.free
-      : dictionary.checkout.paidUnavailable;
+  const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
   return (
     <div className="space-y-10">
@@ -186,10 +180,7 @@ export default async function ProductDetailPage({
       )}
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-        <Link
-          href="/market"
-          className="transition-colors hover:text-primary"
-        >
+        <Link href="/market" className="transition-colors hover:text-primary">
           {copy.market}
         </Link>
         <span aria-hidden="true">/</span>
@@ -207,7 +198,12 @@ export default async function ProductDetailPage({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-lg">
-            <ResourcePreview src={product.thumbnailUrl} title={product.title} fallback={copy.previewUnavailable} priority />
+            <ResourcePreview
+              src={product.thumbnailUrl}
+              title={product.title}
+              fallback={copy.previewUnavailable}
+              priority
+            />
             <div className="absolute left-4 top-4 flex gap-2">
               <span className="rounded bg-accent px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-nexus-sm">
                 {dictionary.publishing[PRODUCT_PUBLISHING_KEYS[product.type]]}
@@ -246,14 +242,10 @@ export default async function ProductDetailPage({
                 <Layers className="h-4 w-4 text-accent" aria-hidden="true" />
                 <span>{copy.releaseHistory}</span>
               </h2>
-              <span className="font-numeric text-[11px] text-faint">
-                {copy.shaRecorded}
-              </span>
+              <span className="font-numeric text-[11px] text-faint">{copy.shaRecorded}</span>
             </div>
 
-            <p className="text-xs leading-relaxed text-muted">
-              {copy.latestBuildNotice}
-            </p>
+            <p className="text-xs leading-relaxed text-muted">{copy.latestBuildNotice}</p>
             {isPublished && (
               <Link
                 href={releaseHistoryHref(product.slug)}
@@ -301,15 +293,9 @@ export default async function ProductDetailPage({
                       </span>
                       <span>
                         MTA:{" "}
-                        {build.mtaVersionTarget
-                          ? `>= ${build.mtaVersionTarget}`
-                          : copy.notDeclared}
+                        {build.mtaVersionTarget ? `>= ${build.mtaVersionTarget}` : copy.notDeclared}
                       </span>
-                      <span>
-                        {build.isSigned
-                          ? copy.signaturePresent
-                          : copy.signatureMissing}
-                      </span>
+                      <span>{build.isSigned ? copy.signaturePresent : copy.signatureMissing}</span>
                       <span>{formatScanStatus(build.scanStatus, copy)}</span>
                     </div>
 
@@ -332,39 +318,51 @@ export default async function ProductDetailPage({
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.usedBy}
             </h2>
-            <ReverseDependencyList
-              summary={reverseDependencySummary}
-              locale={locale}
-            />
+            <ReverseDependencyList summary={reverseDependencySummary} locale={locale} />
           </section>
 
           <section className="nexus-panel space-y-4 p-6">
             <h2 className="flex items-center gap-2 border-b border-base pb-3 text-base font-bold text-primary">
-              <MessageSquare
-                className="h-4 w-4 text-warning"
-                aria-hidden="true"
-              />
+              <MessageSquare className="h-4 w-4 text-warning" aria-hidden="true" />
               <span>{copy.reviews}</span>
             </h2>
 
-            {reviewPage ? <ResourceReviewList reviews={reviewPage.reviews} productId={product.id} authenticated={!!user} locale={locale} /> : <p className="text-xs text-faint">{resourceReviewCopy(locale).unavailable}</p>}
-            {reviewPage && <Link href={`/market/${encodeURIComponent(product.slug)}/reviews`} className="text-sm text-accent underline">{resourceReviewCopy(locale).all} ({reviewPage.total})</Link>}
-            {reviewPage && user && <Link href={`/workspace/library/review/${encodeURIComponent(product.id)}`} className="ml-4 text-sm text-accent underline">{resourceReviewCopy(locale).write}</Link>}
-
+            {reviewPage ? (
+              <ResourceReviewList
+                reviews={reviewPage.reviews}
+                productId={product.id}
+                authenticated={!!user}
+                locale={locale}
+              />
+            ) : (
+              <p className="text-xs text-faint">{resourceReviewCopy(locale).unavailable}</p>
+            )}
+            {reviewPage && (
+              <Link
+                href={`/market/${encodeURIComponent(product.slug)}/reviews`}
+                className="text-sm text-accent underline"
+              >
+                {resourceReviewCopy(locale).all} ({reviewPage.total})
+              </Link>
+            )}
+            {reviewPage && user && (
+              <Link
+                href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
+                className="ml-4 text-sm text-accent underline"
+              >
+                {resourceReviewCopy(locale).write}
+              </Link>
+            )}
           </section>
         </div>
 
         <aside className="space-y-6">
           <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
             <div>
-              <div className="text-3xl font-black text-primary">
-                {formattedPrice}
-              </div>
+              <div className="text-3xl font-black text-primary">{formattedPrice}</div>
               <div className="mt-1 text-xs text-muted">
                 {copy.licenseModel}:{" "}
-                <span className="capitalize">
-                  {product.licenseModel.replace(/_/g, " ")}
-                </span>
+                <span className="capitalize">{product.licenseModel.replace(/_/g, " ")}</span>
               </div>
             </div>
 
@@ -373,19 +371,10 @@ export default async function ProductDetailPage({
                 <div className="space-y-3">
                   <div className="space-y-1 rounded-lg border border-[color:var(--nexus-success)]/20 bg-success-soft p-3.5">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-success">
-                      <CheckCircle2
-                        className="h-4 w-4"
-                        aria-hidden="true"
-                      />
-                      <span>
-                        {canManageProduct
-                          ? copy.managementAccess
-                          : copy.inLibrary}
-                      </span>
+                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                      <span>{canManageProduct ? copy.managementAccess : copy.inLibrary}</span>
                     </div>
-                    <p className="text-[11px] text-muted">
-                      {copy.authorized}
-                    </p>
+                    <p className="text-[11px] text-muted">{copy.authorized}</p>
                   </div>
 
                   <ResourceDownloadButton productId={product.id} version={product.currentVersion} />
@@ -406,10 +395,10 @@ export default async function ProductDetailPage({
                   >
                     {copy.addToLibrary}
                   </Link>
-                  <p className="text-center text-[11px] text-faint">
-                    {copy.claimRequired}
-                  </p>
-                  {isPublished && <AddResourceToCart key={product.id} productId={product.id} signedIn={!!user} />}
+                  <p className="text-center text-[11px] text-faint">{copy.claimRequired}</p>
+                  {isPublished && (
+                    <AddResourceToCart key={product.id} productId={product.id} signedIn={!!user} />
+                  )}
                 </div>
               ) : (
                 <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
@@ -419,9 +408,7 @@ export default async function ProductDetailPage({
             </div>
 
             <div className="space-y-3 border-t border-base pt-4 text-xs">
-              <h4 className="font-label uppercase text-primary">
-                {copy.compatibility}
-              </h4>
+              <h4 className="font-label uppercase text-primary">{copy.compatibility}</h4>
               <div className="space-y-2">
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.mtaVersion}</span>
@@ -441,28 +428,20 @@ export default async function ProductDetailPage({
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.libraryAdditions}</span>
-                  <span className="font-mono text-secondary">
-                    {product.salesCount}
-                  </span>
+                  <span className="font-mono text-secondary">{product.salesCount}</span>
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.rating}</span>
                   <span className="font-mono text-warning">
-                    {(product.ratingAverage / 10).toFixed(1)} / 5.0 (
-                    {product.ratingCount})
+                    {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
                   </span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-start gap-2.5 rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3 text-xs">
-              <ShieldCheck
-                className="mt-0.5 h-4 w-4 shrink-0 text-accent"
-                aria-hidden="true"
-              />
-              <div className="text-[11px] leading-relaxed text-secondary">
-                {copy.security}
-              </div>
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <div className="text-[11px] leading-relaxed text-secondary">{copy.security}</div>
             </div>
           </div>
         </aside>

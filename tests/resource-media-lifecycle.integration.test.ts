@@ -113,7 +113,8 @@ async function fixture() {
         targetId: buildId,
       },
       1,
-    `tok_${moderator}`);
+      `tok_${moderator}`,
+    );
   }
   async function cleanup() {
     await db.delete(products).where(eq(products.id, productId));

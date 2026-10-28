@@ -1,6 +1,6 @@
 # 21. Reputation, verification и reviews
 
-> Статус: OWNER DECISIONS round 3 + target design.
+> Статус: OWNER-CONFIRMED TARGET.
 
 ## 1. Core distinction
 

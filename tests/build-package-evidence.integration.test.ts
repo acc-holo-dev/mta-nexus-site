@@ -99,7 +99,8 @@ async function fixture() {
       targetId: old.build.id,
     },
     1,
-  `tok_${moderator}`);
+    `tok_${moderator}`,
+  );
   const current = await submit("current", "updated", "2.0.0");
   const query = { actorId: owner, productId, buildId: current.build.id, baselineId: old.build.id };
   async function cleanup() {
@@ -153,10 +154,7 @@ it("retains immutable byte evidence across metadata edits and rejects report/has
         .where(eq(builds.id, f.current.build.id)),
     ).rejects.toThrow();
     // release_notes may change only when OLD.status in (draft,rejected) and NEW=draft.
-    await db
-      .update(builds)
-      .set({ status: "draft" })
-      .where(eq(builds.id, f.current.build.id));
+    await db.update(builds).set({ status: "draft" }).where(eq(builds.id, f.current.build.id));
     await db
       .update(builds)
       .set({ releaseNotes: "Editorial correction" })

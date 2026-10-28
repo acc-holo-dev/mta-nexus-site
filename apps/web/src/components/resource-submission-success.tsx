@@ -17,22 +17,15 @@ export function ResourceSubmissionSuccess({
         <div className="inline-flex rounded-full bg-success-soft px-2.5 py-1 font-label text-success">
           {dictionary.nav.closedBeta}
         </div>
-        <h1 className="text-2xl font-black text-primary">
-          {copy.submittedTitle}
-        </h1>
-        <p className="text-sm leading-relaxed text-muted">
-          {copy.submittedDescription}
-        </p>
+        <h1 className="text-2xl font-black text-primary">{copy.submittedTitle}</h1>
+        <p className="text-sm leading-relaxed text-muted">{copy.submittedDescription}</p>
         <Link
           href={`/workspace/resources/${encodeURIComponent(resultId)}`}
           className="inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {copy.openStatus}
         </Link>
-        <Link
-          href="/workspace/resources"
-          className="block text-accent underline"
-        >
+        <Link href="/workspace/resources" className="block text-accent underline">
           {dictionary.authorResources.title}
         </Link>
       </div>

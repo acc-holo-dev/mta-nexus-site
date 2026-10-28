@@ -6,8 +6,10 @@ const delegated = { id: "org_manager", name: "Delegated Team", slug: "delegated-
 
 describe("server registration organization options", () => {
   it("parses bounded options and deduplicates organization IDs", () => {
-    expect(parseServerOrganizations({ organizations: [owned, delegated, owned] }))
-      .toEqual([owned, delegated]);
+    expect(parseServerOrganizations({ organizations: [owned, delegated, owned] })).toEqual([
+      owned,
+      delegated,
+    ]);
     expect(parseServerOrganizations({ organizations: [] })).toEqual([]);
   });
 

@@ -12,7 +12,10 @@ export function grantsServerManagement(
   membership: ServerManagementMembership | null | undefined,
 ): boolean {
   if (!membership) return false;
-  return membership.role === "admin" ||
-    (["member", "developer"].includes(membership.role) && Array.isArray(membership.permissions) &&
-      membership.permissions.includes("manage_servers"));
+  return (
+    membership.role === "admin" ||
+    (["member", "developer"].includes(membership.role) &&
+      Array.isArray(membership.permissions) &&
+      membership.permissions.includes("manage_servers"))
+  );
 }

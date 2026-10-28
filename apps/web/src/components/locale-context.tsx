@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from "react";
-import {
-  getDictionary,
-  type Locale,
-} from "../lib/i18n";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { getDictionary, type Locale } from "../lib/i18n";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -18,23 +10,10 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-export function LocaleProvider({
-  locale,
-  children,
-}: {
-  locale: Locale;
-  children: ReactNode;
-}) {
-  const value = useMemo(
-    () => ({ locale, dictionary: getDictionary(locale) }),
-    [locale],
-  );
+export function LocaleProvider({ locale, children }: { locale: Locale; children: ReactNode }) {
+  const value = useMemo(() => ({ locale, dictionary: getDictionary(locale) }), [locale]);
 
-  return (
-    <LocaleContext.Provider value={value}>
-      {children}
-    </LocaleContext.Provider>
-  );
+  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
 export function useNexusLocale(): LocaleContextValue {

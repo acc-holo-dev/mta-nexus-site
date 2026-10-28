@@ -47,29 +47,25 @@ async function fixture() {
     await db
       .insert(organizations)
       .values({ id, name: "Claim organization", slug: id, ownerId: owner });
-  await db
-    .insert(organizationMembers)
-    .values({
-      id: memberId,
-      organizationId: organization,
-      userId: manager,
-      role: "member",
-      permissions: ["manage_servers"],
-    });
+  await db.insert(organizationMembers).values({
+    id: memberId,
+    organizationId: organization,
+    userId: manager,
+    role: "member",
+    permissions: ["manage_servers"],
+  });
   const port = ++nextPort;
-  await db
-    .insert(servers)
-    .values({
-      id: serverId,
-      name: "Organization server",
-      slug: serverId,
-      ipAddress: "198.51.100.205",
-      port,
-      organizationId: organization,
-      ownerId: owner,
-      visibility: "private",
-      isVerified: false,
-    });
+  await db.insert(servers).values({
+    id: serverId,
+    name: "Organization server",
+    slug: serverId,
+    ipAddress: "198.51.100.205",
+    port,
+    organizationId: organization,
+    ownerId: owner,
+    visibility: "private",
+    isVerified: false,
+  });
   const issue = () =>
     serverClaimChallengeRepository.issue({
       serverId,

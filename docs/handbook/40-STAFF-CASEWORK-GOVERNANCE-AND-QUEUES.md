@@ -1,6 +1,6 @@
 # MTA NEXUS — Staff Casework, Governance и Queues
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 7.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Case-centric operations
 

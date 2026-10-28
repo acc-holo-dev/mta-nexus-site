@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../lib/i18n";
@@ -39,14 +39,13 @@ describe("global shell controls behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        <LocaleProvider locale={locale}><Navbar locale={locale} /></LocaleProvider>,
+        <LocaleProvider locale={locale}>
+          <Navbar locale={locale} />
+        </LocaleProvider>,
       );
 
       expect(html).toMatch(
-        new RegExp(
-          `<a[^>]*href="/discover"[^>]*aria-label="${dictionary.nav.search}"`,
-          "u",
-        ),
+        new RegExp(`<a[^>]*href="/discover"[^>]*aria-label="${dictionary.nav.search}"`, "u"),
       );
     },
   );
@@ -56,7 +55,9 @@ describe("global shell controls behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        <LocaleProvider locale={locale}><AccountControls /></LocaleProvider>,
+        <LocaleProvider locale={locale}>
+          <AccountControls />
+        </LocaleProvider>,
       );
 
       expect(html).toContain('role="status"');
@@ -69,12 +70,12 @@ describe("global shell controls behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        <LocaleProvider locale={locale}><NotificationBell /></LocaleProvider>,
+        <LocaleProvider locale={locale}>
+          <NotificationBell />
+        </LocaleProvider>,
       );
 
-      expect(html).toContain(
-        `aria-label="${dictionary.notificationBell.title}"`,
-      );
+      expect(html).toContain(`aria-label="${dictionary.notificationBell.title}"`);
       expect(html).toContain('aria-expanded="false"');
       expect(html).not.toContain('aria-controls="notification-popover"');
       expect(html).not.toContain('id="notification-popover"');
@@ -85,12 +86,12 @@ describe("global shell controls behavior", () => {
     "renders the theme control with an accessible localized name in %s",
     (locale) => {
       const html = renderToStaticMarkup(
-        <LocaleProvider locale={locale}><ThemeToggle /></LocaleProvider>,
+        <LocaleProvider locale={locale}>
+          <ThemeToggle />
+        </LocaleProvider>,
       );
       expect(html).toContain('type="button"');
-      expect(html).toContain(
-        `aria-label="${getDictionary(locale).theme.switchToLight}"`,
-      );
+      expect(html).toContain(`aria-label="${getDictionary(locale).theme.switchToLight}"`);
       expect(html).toContain('aria-hidden="true"');
     },
   );
@@ -99,11 +100,7 @@ describe("global shell controls behavior", () => {
     const en = getDictionary("en");
     const ru = getDictionary("ru");
 
-    expect(en.accountControls.signOut).not.toBe(
-      ru.accountControls.signOut,
-    );
-    expect(en.notificationBell.markAllRead).not.toBe(
-      ru.notificationBell.markAllRead,
-    );
+    expect(en.accountControls.signOut).not.toBe(ru.accountControls.signOut);
+    expect(en.notificationBell.markAllRead).not.toBe(ru.notificationBell.markAllRead);
   });
 });

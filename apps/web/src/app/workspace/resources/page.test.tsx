@@ -22,25 +22,23 @@ import Page, { metadata } from "./page";
 beforeEach(() => {
   mocks.actor = { id: "author" };
   mocks.locale = "en";
-  mocks.list
-    .mockReset()
-    .mockResolvedValue({
-      items: [
-        {
-          id: "resource",
-          title: "Owned resource",
-          currentVersion: "1.0.0",
-          status: "pending_review",
-          type: "script",
-          readiness: "in_review",
-          scope: "personal",
-          buildCount: 1,
-        },
-      ],
-      statusCounts: { pending_review: 41 },
-      page: 2,
-      totalPages: 3,
-    });
+  mocks.list.mockReset().mockResolvedValue({
+    items: [
+      {
+        id: "resource",
+        title: "Owned resource",
+        currentVersion: "1.0.0",
+        status: "pending_review",
+        type: "script",
+        readiness: "in_review",
+        scope: "personal",
+        buildCount: 1,
+      },
+    ],
+    statusCounts: { pending_review: 41 },
+    page: 2,
+    totalPages: 3,
+  });
 });
 it.each(["en", "ru"] as const)(
   "localizes the author list and preserves status during pagination in %s",

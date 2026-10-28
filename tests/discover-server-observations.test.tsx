@@ -21,10 +21,19 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: async () => sources.locale,
 }));
 vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
-  discoveryService: { page: async (input: { query: string; page: number }) => ({ type: "servers", items: input.query ? await sources.search(input.query, 24) : await sources.servers(24), page: input.page, hasMore: false }) },
+  discoveryService: {
+    page: async (input: { query: string; page: number }) => ({
+      type: "servers",
+      items: input.query ? await sources.search(input.query, 24) : await sources.servers(24),
+      page: input.page,
+      hasMore: false,
+    }),
+  },
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: { getSession: async () => null } }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: { getSession: async () => null },
+}));
 vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
 vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
 vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));

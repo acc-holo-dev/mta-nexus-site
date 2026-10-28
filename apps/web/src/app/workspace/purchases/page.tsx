@@ -30,22 +30,21 @@ export default async function PurchasesHistoryPage({
 }: {
   searchParams: Promise<{ page?: string | string[] }>;
 }) {
-  const [locale, store, query] = await Promise.all([
-    getRequestLocale(), cookies(), searchParams,
-  ]);
+  const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getCommerceHistoryCopy(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user) return <HistorySignIn copy={copy} />;
 
-  const result = await orderRepository.pageBuyerHistory(
-    user.id,
-    parseHistoryPage(query.page),
-  );
+  const result = await orderRepository.pageBuyerHistory(user.id, parseHistoryPage(query.page));
 
   return (
     <HistoryShell copy={copy} area="purchases">
-      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">{getCommercialCopy(locale).catalog}</Link>
-      <Link href="/workspace/order-cases" className="inline-block text-sm text-accent underline">{orderCaseCopy(locale).buyerCases}</Link>
+      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">
+        {getCommercialCopy(locale).catalog}
+      </Link>
+      <Link href="/workspace/order-cases" className="inline-block text-sm text-accent underline">
+        {orderCaseCopy(locale).buyerCases}
+      </Link>
       {result.orders.length === 0 ? (
         <p className="py-12 text-sm text-secondary">{copy.emptyPurchases}</p>
       ) : (
@@ -76,7 +75,12 @@ export default async function PurchasesHistoryPage({
                   </dd>
                 </div>
               </dl>
-              <Link href={`/workspace/purchases/${encodeURIComponent(order.id)}`} className="inline-block text-sm text-accent underline">{copy.details}</Link>
+              <Link
+                href={`/workspace/purchases/${encodeURIComponent(order.id)}`}
+                className="inline-block text-sm text-accent underline"
+              >
+                {copy.details}
+              </Link>
             </li>
           ))}
         </ol>

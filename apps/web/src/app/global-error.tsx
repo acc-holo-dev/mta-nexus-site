@@ -61,8 +61,7 @@ export default function GlobalError({
           boxSizing: "border-box",
           background: "#0b0d10",
           color: "#f5f7fa",
-          fontFamily:
-            "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
         }}
       >
         <main

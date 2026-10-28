@@ -13,10 +13,7 @@ vi.mock("@nexus/db", () => ({
 
 import { GET } from "../apps/web/src/app/api/health/route";
 
-function healthResponse(
-  status: number,
-  body: Record<string, unknown>,
-) {
+function healthResponse(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { "content-type": "application/json" },
@@ -29,9 +26,7 @@ describe("production runtime readiness", () => {
   });
 
   it("proves database health plus real private-storage publication semantics", async () => {
-    const storagePath = await mkdtemp(
-      join(tmpdir(), "nexus-readiness-test-"),
-    );
+    const storagePath = await mkdtemp(join(tmpdir(), "nexus-readiness-test-"));
     try {
       const result = await checkLocalReadiness({
         storagePath,
@@ -51,9 +46,7 @@ describe("production runtime readiness", () => {
       });
 
       expect(
-        (await readdir(storagePath)).filter((name) =>
-          name.startsWith(".nexus-readiness-"),
-        ),
+        (await readdir(storagePath)).filter((name) => name.startsWith(".nexus-readiness-")),
       ).toEqual([]);
     } finally {
       await rm(storagePath, { recursive: true, force: true });
@@ -61,9 +54,7 @@ describe("production runtime readiness", () => {
   });
 
   it("fails closed before touching storage when application/database health is unavailable", async () => {
-    const storagePath = await mkdtemp(
-      join(tmpdir(), "nexus-readiness-fail-"),
-    );
+    const storagePath = await mkdtemp(join(tmpdir(), "nexus-readiness-fail-"));
     try {
       await expect(
         checkLocalReadiness({
@@ -83,9 +74,7 @@ describe("production runtime readiness", () => {
   });
 
   it("fails closed when atomic no-replace publication is unavailable", async () => {
-    const storagePath = await mkdtemp(
-      join(tmpdir(), "nexus-readiness-link-"),
-    );
+    const storagePath = await mkdtemp(join(tmpdir(), "nexus-readiness-link-"));
     try {
       await expect(
         checkLocalReadiness({
@@ -105,9 +94,7 @@ describe("production runtime readiness", () => {
       ).rejects.toThrow("hard links unsupported");
 
       expect(
-        (await readdir(storagePath)).filter((name) =>
-          name.startsWith(".nexus-readiness-"),
-        ),
+        (await readdir(storagePath)).filter((name) => name.startsWith(".nexus-readiness-")),
       ).toEqual([]);
     } finally {
       await rm(storagePath, { recursive: true, force: true });
@@ -126,9 +113,7 @@ describe("production runtime readiness", () => {
   it("keeps the public health endpoint database-only and non-cacheable on success", async () => {
     checkDatabaseConnection.mockResolvedValueOnce(undefined);
 
-    const response = await GET(
-      new NextRequest("https://nexus.test/api/health"),
-    );
+    const response = await GET(new NextRequest("https://nexus.test/api/health"));
 
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
@@ -140,17 +125,11 @@ describe("production runtime readiness", () => {
   });
 
   it("returns a private non-cacheable 503 when database health fails", async () => {
-    checkDatabaseConnection.mockRejectedValueOnce(
-      new Error("database offline"),
-    );
-    const errorLog = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
+    checkDatabaseConnection.mockRejectedValueOnce(new Error("database offline"));
+    const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
 
     try {
-      const response = await GET(
-        new NextRequest("https://nexus.test/api/health"),
-      );
+      const response = await GET(new NextRequest("https://nexus.test/api/health"));
 
       expect(response.status).toBe(503);
       expect(response.headers.get("cache-control")).toBe("no-store");

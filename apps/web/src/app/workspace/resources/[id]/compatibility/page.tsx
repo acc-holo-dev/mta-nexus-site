@@ -1,4 +1,4 @@
-import {resourceRequirementsCopy} from "../../../../../lib/resource-requirements-i18n";
+import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -48,7 +48,12 @@ export default async function ResourceCompatibilityPage({
         <h1 className="font-display text-primary">{copy.compatibility}</h1>
         <p className="break-words text-secondary">{product.title}</p>
       </header>
-      <Link href={`/workspace/resources/${encodeURIComponent(id)}/requirements`} className="text-accent underline">{resourceRequirementsCopy(locale).title}</Link>
+      <Link
+        href={`/workspace/resources/${encodeURIComponent(id)}/requirements`}
+        className="text-accent underline"
+      >
+        {resourceRequirementsCopy(locale).title}
+      </Link>
       <ResourceCompatibilityForm
         key={`${product.id}:${new Date(product.updatedAt).toISOString()}`}
         product={{

@@ -25,7 +25,13 @@ function readiness() {
     when not exists (select 1 from ${builds} where ${builds.productId} = ${products.id}) then 'no_build'
     else 'needs_version' end`;
 }
-const changeActions = ["product.details_updated", "product.compatibility_updated", "product.media.add", "product.media.save", "product.media.remove"];
+const changeActions = [
+  "product.details_updated",
+  "product.compatibility_updated",
+  "product.media.add",
+  "product.media.save",
+  "product.media.remove",
+];
 const publicationActions = [
   "product.created",
   "product.archive",

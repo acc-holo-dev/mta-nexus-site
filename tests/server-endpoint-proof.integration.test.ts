@@ -61,7 +61,9 @@ async function issue(target: Awaited<ReturnType<typeof fixture>>) {
     requesterId: target.requesterId,
     auditId: `aud_issue_${target.suffix}`,
   });
-  const [saved] = await db.select().from(serverClaimChallenges)
+  const [saved] = await db
+    .select()
+    .from(serverClaimChallenges)
     .where(eq(serverClaimChallenges.id, challenge.id));
   expect(saved?.endpointRevision).toBe(0);
   if (!saved) throw new Error("Missing challenge");
@@ -99,19 +101,24 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
   it("rejects a future-dated proof before writing a verification request", async () => {
     const target = await fixture();
     const challenge = await issue(target);
-    await expect(serverClaimChallengeRepository.consumeVerifiedProof({
-      id: challenge.id,
-      serverId: target.serverId,
-      requesterId: target.requesterId,
-      token: challenge.token,
-      expectedEndpoint: target.endpoint,
-      sourceFetchedAt: new Date(Date.now() + 5 * 60_000),
-      verificationRequestId: `ver_future_${target.suffix}`,
-      auditId: `aud_future_${target.suffix}`,
-    })).rejects.toMatchObject({
-      statusCode: 503, code: "MTA_DIRECTORY_TIMESTAMP_INVALID",
+    await expect(
+      serverClaimChallengeRepository.consumeVerifiedProof({
+        id: challenge.id,
+        serverId: target.serverId,
+        requesterId: target.requesterId,
+        token: challenge.token,
+        expectedEndpoint: target.endpoint,
+        sourceFetchedAt: new Date(Date.now() + 5 * 60_000),
+        verificationRequestId: `ver_future_${target.suffix}`,
+        auditId: `aud_future_${target.suffix}`,
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 503,
+      code: "MTA_DIRECTORY_TIMESTAMP_INVALID",
     });
-    const [stored] = await db.select().from(serverClaimChallenges)
+    const [stored] = await db
+      .select()
+      .from(serverClaimChallenges)
       .where(eq(serverClaimChallenges.id, challenge.id));
     expect(stored?.consumedAt).toBeNull();
   });
@@ -122,7 +129,9 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
     await serverRepository.update(target.serverId, { port: target.endpoint.port + 1 });
     await serverRepository.update(target.serverId, { port: target.endpoint.port });
     await expect(consume(target, challenge)).rejects.toMatchObject({ statusCode: 409 });
-    const [stored] = await db.select().from(serverClaimChallenges)
+    const [stored] = await db
+      .select()
+      .from(serverClaimChallenges)
       .where(eq(serverClaimChallenges.id, challenge.id));
     expect(stored?.consumedAt).toBeNull();
   });
@@ -133,13 +142,17 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
     const completed = await consume(target, challenge);
     await serverRepository.update(target.serverId, { ipAddress: "198.51.100.78" });
     await serverRepository.update(target.serverId, { ipAddress: target.endpoint.ipAddress });
-    await expect(verificationRepository.resolveRequest({
-      id: completed.verificationRequest.id,
-      reviewerId: target.reviewerId,
-      decision: "approved",
-      currentToken: target.reviewerToken,
-    })).rejects.toMatchObject({ statusCode: 409 });
-    const [request] = await db.select().from(verificationRequests)
+    await expect(
+      verificationRepository.resolveRequest({
+        id: completed.verificationRequest.id,
+        reviewerId: target.reviewerId,
+        decision: "approved",
+        currentToken: target.reviewerToken,
+      }),
+    ).rejects.toMatchObject({ statusCode: 409 });
+    const [request] = await db
+      .select()
+      .from(verificationRequests)
       .where(eq(verificationRequests.id, completed.verificationRequest.id));
     expect(request?.status).toBe("pending");
     const server = await serverRepository.findById(target.serverId);
@@ -149,8 +162,7 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
 
   it("invalidates verification through audited endpoint edits", async () => {
     const target = await fixture();
-    await db.update(servers).set({ isVerified: true })
-      .where(eq(servers.id, target.serverId));
+    await db.update(servers).set({ isVerified: true }).where(eq(servers.id, target.serverId));
     await serverRepository.updateWithAudit(
       target.serverId,
       { port: target.endpoint.port + 1 },
@@ -164,10 +176,13 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
         details: { fields: ["port"] },
       },
     );
-    const [row] = await db.select({
-      revision: servers.endpointRevision,
-      verified: servers.isVerified,
-    }).from(servers).where(eq(servers.id, target.serverId));
+    const [row] = await db
+      .select({
+        revision: servers.endpointRevision,
+        verified: servers.isVerified,
+      })
+      .from(servers)
+      .where(eq(servers.id, target.serverId));
     expect(row).toMatchObject({ revision: 1, verified: false });
   });
 
@@ -175,12 +190,16 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
     const target = await fixture();
     const challenge = await issue(target);
     // Simulate a pre-0034 row that has no endpoint binding.
-    await db.update(serverClaimChallenges).set({ endpointRevision: null })
+    await db
+      .update(serverClaimChallenges)
+      .set({ endpointRevision: null })
       .where(eq(serverClaimChallenges.id, challenge.id));
     await expect(consume(target, challenge)).rejects.toMatchObject({
       statusCode: 409,
     });
-    const [stored] = await db.select().from(serverClaimChallenges)
+    const [stored] = await db
+      .select()
+      .from(serverClaimChallenges)
       .where(eq(serverClaimChallenges.id, challenge.id));
     expect(stored?.consumedAt).toBeNull();
   });
@@ -191,15 +210,21 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
     const completed = await consume(target, challenge);
     // Existing consumed rows are NULL after schema upgrade; they cannot
     // transfer ownership without a new endpoint-bound challenge.
-    await db.update(serverClaimChallenges).set({ endpointRevision: null })
+    await db
+      .update(serverClaimChallenges)
+      .set({ endpointRevision: null })
       .where(eq(serverClaimChallenges.id, challenge.id));
-    await expect(verificationRepository.resolveRequest({
-      id: completed.verificationRequest.id,
-      reviewerId: target.reviewerId,
-      decision: "approved",
-      currentToken: target.reviewerToken,
-    })).rejects.toMatchObject({ statusCode: 409 });
-    const [request] = await db.select().from(verificationRequests)
+    await expect(
+      verificationRepository.resolveRequest({
+        id: completed.verificationRequest.id,
+        reviewerId: target.reviewerId,
+        decision: "approved",
+        currentToken: target.reviewerToken,
+      }),
+    ).rejects.toMatchObject({ statusCode: 409 });
+    const [request] = await db
+      .select()
+      .from(verificationRequests)
       .where(eq(verificationRequests.id, completed.verificationRequest.id));
     expect(request?.status).toBe("pending");
     const server = await serverRepository.findById(target.serverId);

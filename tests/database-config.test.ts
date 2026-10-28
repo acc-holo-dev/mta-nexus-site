@@ -12,8 +12,9 @@ describe("isolated database configuration", () => {
   it.each(["", "https://user:private@example.com/db", "postgres://", "private"])(
     "rejects invalid production URLs without exposing their contents",
     (DATABASE_URL) => {
-      expect(() => readDatabaseUrl({ NODE_ENV: "production", DATABASE_URL }))
-        .toThrow("A valid PostgreSQL DATABASE_URL is required");
+      expect(() => readDatabaseUrl({ NODE_ENV: "production", DATABASE_URL })).toThrow(
+        "A valid PostgreSQL DATABASE_URL is required",
+      );
     },
   );
   it("never falls back to local credentials in production", () => {

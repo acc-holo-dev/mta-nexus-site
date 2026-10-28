@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { count, eq, inArray, sql } from "drizzle-orm";
+import { count, inArray, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import {
   db,
@@ -84,20 +84,10 @@ describe("Web Push outbox capacity gate", () => {
         ),
       );
 
-      expect(
-        results.filter((result) => result.pushQueueState === "queued"),
-      ).toHaveLength(2);
-      expect(
-        results.filter(
-          (result) => result.pushQueueState === "saturated",
-        ),
-      ).toHaveLength(1);
-      expect(
-        results.every((result) => result.notification !== null),
-      ).toBe(true);
-      expect(
-        results.reduce((sum, result) => sum + result.pushJobs, 0),
-      ).toBe(2);
+      expect(results.filter((result) => result.pushQueueState === "queued")).toHaveLength(2);
+      expect(results.filter((result) => result.pushQueueState === "saturated")).toHaveLength(1);
+      expect(results.every((result) => result.notification !== null)).toBe(true);
+      expect(results.reduce((sum, result) => sum + result.pushJobs, 0)).toBe(2);
 
       const [inboxCount] = await db
         .select({ total: count() })
@@ -116,9 +106,7 @@ describe("Web Push outbox capacity gate", () => {
         pending: baseline.pending + 2,
       });
     } finally {
-      await db
-        .delete(notifications)
-        .where(inArray(notifications.id, notificationIds));
+      await db.delete(notifications).where(inArray(notifications.id, notificationIds));
       await db.execute(sql`
         update web_push_queue_gate
         set capacity = ${Number(originalGate.capacity)}

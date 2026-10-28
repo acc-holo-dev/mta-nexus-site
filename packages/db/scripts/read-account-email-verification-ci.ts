@@ -5,9 +5,11 @@ import { authChallenges } from "../src/account-recovery-schema";
 import { accountMailOutbox } from "../src/account-mail-schema";
 import { createAccountMailProducerCipher } from "../src/repositories/account-mail-runtime";
 
-if (process.env.GITHUB_ACTIONS !== "true"
-  || process.env.RUNNER_ENVIRONMENT !== "github-hosted"
-  || process.env.NEXUS_ACCOUNT_MAIL_TEST_READ !== "true") {
+if (
+  process.env.GITHUB_ACTIONS !== "true" ||
+  process.env.RUNNER_ENVIRONMENT !== "github-hosted" ||
+  process.env.NEXUS_ACCOUNT_MAIL_TEST_READ !== "true"
+) {
   throw new Error("Refusing account mail test read outside disposable CI");
 }
 const email = process.argv[2]?.toLowerCase();
@@ -20,26 +22,38 @@ if (purpose !== "email_verify" && purpose !== "password_reset") {
 }
 
 try {
-  const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
   if (!user) throw new Error("Synthetic CI recipient not found");
-  const [challenge] = await db.select({
-    id: authChallenges.id,
-    expiresAt: authChallenges.expiresAt,
-  }).from(authChallenges)
+  const [challenge] = await db
+    .select({
+      id: authChallenges.id,
+      expiresAt: authChallenges.expiresAt,
+    })
+    .from(authChallenges)
     .where(and(eq(authChallenges.userId, user.id), eq(authChallenges.purpose, purpose)))
     .orderBy(desc(authChallenges.createdAt))
     .limit(1);
   if (!challenge) throw new Error("Synthetic CI challenge not found");
-  const [mail] = await db.select().from(accountMailOutbox)
-    .where(eq(accountMailOutbox.challengeId, challenge.id)).limit(1);
+  const [mail] = await db
+    .select()
+    .from(accountMailOutbox)
+    .where(eq(accountMailOutbox.challengeId, challenge.id))
+    .limit(1);
   if (!mail) throw new Error("Synthetic CI mail not found");
-  const payload = createAccountMailProducerCipher().open({
-    id: mail.id,
-    challengeId: mail.challengeId,
-    userId: user.id,
-    purpose,
-    expiresAt: mail.expiresAt,
-  }, mail.payload);
+  const payload = createAccountMailProducerCipher().open(
+    {
+      id: mail.id,
+      challengeId: mail.challengeId,
+      userId: user.id,
+      purpose,
+      expiresAt: mail.expiresAt,
+    },
+    mail.payload,
+  );
   if (payload.recipient !== email) throw new Error("Synthetic CI recipient mismatch");
   process.stdout.write(JSON.stringify({ challengeId: challenge.id, token: payload.token }));
 } finally {

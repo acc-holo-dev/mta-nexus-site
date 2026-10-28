@@ -23,30 +23,31 @@ vi.mock("@nexus/security", async () => {
 
 import { serverService } from "../apps/web/src/lib/services/server-service";
 
-const actor = (id: string, role: User["role"] = "user") => ({
-  id, role,
-}) as User;
-const server = (
-  organizationId?: string,
-  ownerId?: string,
-) => ({ id: "srv_1", organizationId, ownerId }) as Server;
+const actor = (id: string, role: User["role"] = "user") =>
+  ({
+    id,
+    role,
+  }) as User;
+const server = (organizationId?: string, ownerId?: string) =>
+  ({ id: "srv_1", organizationId, ownerId }) as Server;
 
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.organization.mockResolvedValue({
-    id: "org_1", ownerId: "usr_owner",
+    id: "org_1",
+    ownerId: "usr_owner",
   });
   mocks.member.mockResolvedValue(null);
 });
 
 describe("server management access is scoped to one live organization", () => {
   it("permits personal ownership without loading any organization memberships", async () => {
-    expect(await serverService.canManageServer(
-      server(undefined, "usr_owner"), actor("usr_owner"),
-    )).toBe(true);
-    expect(await serverService.canManageServer(
-      server(undefined, "usr_owner"), actor("usr_stranger"),
-    )).toBe(false);
+    expect(
+      await serverService.canManageServer(server(undefined, "usr_owner"), actor("usr_owner")),
+    ).toBe(true);
+    expect(
+      await serverService.canManageServer(server(undefined, "usr_owner"), actor("usr_stranger")),
+    ).toBe(false);
     expect(mocks.organization).not.toHaveBeenCalled();
     expect(mocks.member).not.toHaveBeenCalled();
     expect(mocks.legacyAllMemberships).not.toHaveBeenCalled();
@@ -55,18 +56,18 @@ describe("server management access is scoped to one live organization", () => {
   it("denies an orphaned organization listing even with stale manage_servers rights", async () => {
     mocks.organization.mockResolvedValue(null);
     mocks.member.mockResolvedValue({
-      organizationId: "org_1", role: "member", permissions: ["manage_servers"],
+      organizationId: "org_1",
+      role: "member",
+      permissions: ["manage_servers"],
     });
-    expect(await serverService.canManageServer(
-      server("org_1", "usr_manager"), actor("usr_manager"),
-    )).toBe(false);
+    expect(
+      await serverService.canManageServer(server("org_1", "usr_manager"), actor("usr_manager")),
+    ).toBe(false);
     expect(mocks.member).not.toHaveBeenCalled();
   });
 
   it("permits the current organization owner without loading membership records", async () => {
-    expect(await serverService.canManageServer(
-      server("org_1"), actor("usr_owner"),
-    )).toBe(true);
+    expect(await serverService.canManageServer(server("org_1"), actor("usr_owner"))).toBe(true);
     expect(mocks.organization).toHaveBeenCalledWith("org_1");
     expect(mocks.member).not.toHaveBeenCalled();
   });
@@ -76,11 +77,13 @@ describe("server management access is scoped to one live organization", () => {
     { role: "member", permissions: ["manage_servers"] },
   ])("allows one scoped delegated membership: %j", async ({ role, permissions }) => {
     mocks.member.mockResolvedValue({
-      organizationId: "org_1", role, permissions,
+      organizationId: "org_1",
+      role,
+      permissions,
     });
-    expect(await serverService.canManageServer(
-      server("org_1", "usr_legacy"), actor("usr_manager"),
-    )).toBe(true);
+    expect(
+      await serverService.canManageServer(server("org_1", "usr_legacy"), actor("usr_manager")),
+    ).toBe(true);
     expect(mocks.member).toHaveBeenCalledExactlyOnceWith("org_1", "usr_manager");
     expect(mocks.legacyAllMemberships).not.toHaveBeenCalled();
   });
@@ -93,16 +96,16 @@ describe("server management access is scoped to one live organization", () => {
     { organizationId: "org_other", role: "admin", permissions: [] },
   ])("rejects wrong or revoked scoped memberships: %j", async (membership) => {
     mocks.member.mockResolvedValue(membership);
-    expect(await serverService.canManageServer(
-      server("org_1", "usr_legacy"), actor("usr_manager"),
-    )).toBe(false);
+    expect(
+      await serverService.canManageServer(server("org_1", "usr_legacy"), actor("usr_manager")),
+    ).toBe(false);
     expect(mocks.member).toHaveBeenCalledExactlyOnceWith("org_1", "usr_manager");
   });
 
   it("preserves the platform administrator override without a DB lookup", async () => {
-    expect(await serverService.canManageServer(
-      server("org_1"), actor("usr_admin", "admin"),
-    )).toBe(true);
+    expect(await serverService.canManageServer(server("org_1"), actor("usr_admin", "admin"))).toBe(
+      true,
+    );
     expect(mocks.organization).not.toHaveBeenCalled();
     expect(mocks.member).not.toHaveBeenCalled();
   });

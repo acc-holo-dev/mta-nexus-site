@@ -85,12 +85,8 @@ describe("free resource claim idempotency", () => {
       ),
     );
 
-    expect(
-      attempts.filter((attempt) => attempt.alreadyClaimed === false),
-    ).toHaveLength(1);
-    expect(
-      attempts.filter((attempt) => attempt.alreadyClaimed === true),
-    ).toHaveLength(9);
+    expect(attempts.filter((attempt) => attempt.alreadyClaimed === false)).toHaveLength(1);
+    expect(attempts.filter((attempt) => attempt.alreadyClaimed === true)).toHaveLength(9);
 
     const entitlements = await entitlementRepository.listBySubject({
       type: "user",
@@ -98,8 +94,7 @@ describe("free resource claim idempotency", () => {
     });
     const productClaims = entitlements.filter(
       (entitlement) =>
-        entitlement.resourceId === productId &&
-        entitlement.permission === "product.download",
+        entitlement.resourceId === productId && entitlement.permission === "product.download",
     );
 
     expect(productClaims).toHaveLength(1);

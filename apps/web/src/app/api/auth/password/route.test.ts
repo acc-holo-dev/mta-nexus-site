@@ -12,9 +12,7 @@ const changePassword = vi.hoisted(() =>
     revokedSessionCount: 2,
   })),
 );
-const consumeRateLimit = vi.hoisted(() =>
-  vi.fn(async () => ({ success: state.allowed })),
-);
+const consumeRateLimit = vi.hoisted(() => vi.fn(async () => ({ success: state.allowed })));
 
 vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
@@ -85,10 +83,16 @@ describe("password change HTTP contract", () => {
     expect(changePassword).not.toHaveBeenCalled();
 
     state.allowed = true;
-    expect((await POST(request({
-      currentPassword: "short",
-      newPassword: "short",
-    }))).status).toBe(400);
+    expect(
+      (
+        await POST(
+          request({
+            currentPassword: "short",
+            newPassword: "short",
+          }),
+        )
+      ).status,
+    ).toBe(400);
     expect(changePassword).not.toHaveBeenCalled();
   });
 
@@ -107,4 +111,3 @@ describe("password change HTTP contract", () => {
     expect(serialized).not.toContain(validBody.newPassword);
   });
 });
-

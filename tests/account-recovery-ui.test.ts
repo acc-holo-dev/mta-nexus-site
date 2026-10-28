@@ -69,12 +69,9 @@ describe("password-reset request timing policy", () => {
   it("bounds randomized response-floor targets", () => {
     expect(passwordResetTargetMs(0)).toBe(PASSWORD_RESET_REQUEST_FLOOR_MIN_MS);
     expect(passwordResetTargetMs(PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS)).toBe(
-      PASSWORD_RESET_REQUEST_FLOOR_MIN_MS +
-        PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
+      PASSWORD_RESET_REQUEST_FLOOR_MIN_MS + PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
     );
-    expect(() => passwordResetTargetMs(-1)).toThrow(
-      "Invalid password-reset timing jitter",
-    );
+    expect(() => passwordResetTargetMs(-1)).toThrow("Invalid password-reset timing jitter");
   });
 
   it("waits only for the remaining floor duration", async () => {

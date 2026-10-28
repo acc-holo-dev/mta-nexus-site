@@ -20,8 +20,11 @@ export function confirmsFollowMutation(
     result.targetType !== targetType ||
     result.targetId !== targetId ||
     result.following !== expectedFollowing
-  ) return false;
+  )
+    return false;
 
-  return (status >= 200 && status < 300 && result.success === true) ||
-    (status === 409 && expectedFollowing && result.success !== true);
+  return (
+    (status >= 200 && status < 300 && result.success === true) ||
+    (status === 409 && expectedFollowing && result.success !== true)
+  );
 }

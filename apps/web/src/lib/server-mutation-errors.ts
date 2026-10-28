@@ -17,7 +17,7 @@ export function serverMutationErrorMessage(
   return typeof message === "string" &&
     message.length > 0 &&
     message.length <= 300 &&
-    !Array.from(message).some(character => character.charCodeAt(0) < 32)
+    !Array.from(message).some((character) => character.charCodeAt(0) < 32)
     ? message
     : fallback;
 }

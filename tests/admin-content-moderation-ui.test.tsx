@@ -13,9 +13,9 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("../apps/web/src/components/locale-context", async () => {
-  const actual = await vi.importActual<
-    typeof import("../apps/web/src/lib/i18n")
-  >("../apps/web/src/lib/i18n");
+  const actual = await vi.importActual<typeof import("../apps/web/src/lib/i18n")>(
+    "../apps/web/src/lib/i18n",
+  );
   return {
     useNexusLocale: () => ({
       locale: state.locale,
@@ -38,7 +38,10 @@ describe("admin content moderation controls", () => {
       state.locale = locale;
       const copy = getDictionary(locale).admin;
       const html = renderToStaticMarkup(
-        <ContentModerationControls contentId="cnt_behavior" expectedUpdatedAt="2026-10-11T00:00:00.000Z" />,
+        <ContentModerationControls
+          contentId="cnt_behavior"
+          expectedUpdatedAt="2026-10-11T00:00:00.000Z"
+        />,
       );
 
       expect(html).toContain(copy.reviewNote);
@@ -54,7 +57,10 @@ describe("admin content moderation controls", () => {
   it("keeps RU controls free of hard-coded English moderation labels", () => {
     state.locale = "ru";
     const html = renderToStaticMarkup(
-      <ContentModerationControls contentId="cnt_behavior" expectedUpdatedAt="2026-10-11T00:00:00.000Z" />,
+      <ContentModerationControls
+        contentId="cnt_behavior"
+        expectedUpdatedAt="2026-10-11T00:00:00.000Z"
+      />,
     );
     const en = getDictionary("en").admin;
 

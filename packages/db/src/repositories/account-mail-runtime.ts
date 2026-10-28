@@ -65,8 +65,7 @@ function secretSource(
     const fd = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
     try {
       const stat = fstatSync(fd);
-      if (!stat.isFile() || (stat.mode & 0o002) !== 0
-        || stat.size < 1 || stat.size > maxBytes) {
+      if (!stat.isFile() || (stat.mode & 0o002) !== 0 || stat.size < 1 || stat.size > maxBytes) {
         throw new Error("unsafe secret file");
       }
       const buffer = Buffer.alloc(maxBytes + 1);
@@ -91,7 +90,13 @@ function secretSource(
   return value;
 }
 
-function integer(value: string | undefined, fallback: number, min: number, max: number, name: string): number {
+function integer(
+  value: string | undefined,
+  fallback: number,
+  min: number,
+  max: number,
+  name: string,
+): number {
   const parsed = value === undefined || value === "" ? fallback : Number(value);
   if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
     throw new Error(`Invalid account mail configuration: ${name}`);
@@ -102,13 +107,15 @@ function integer(value: string | undefined, fallback: number, min: number, max: 
 function decodeKey(value: string, label: string): Uint8Array {
   if (!/^[A-Za-z0-9_-]{43}$/.test(value)) throw new Error(`Invalid ${label}`);
   const decoded = Buffer.from(value, "base64url");
-  if (decoded.length !== 32 || decoded.toString("base64url") !== value) throw new Error(`Invalid ${label}`);
+  if (decoded.length !== 32 || decoded.toString("base64url") !== value)
+    throw new Error(`Invalid ${label}`);
   return new Uint8Array(decoded);
 }
 
-function readActiveMailKeyMaterial(
-  env: Record<string, string | undefined>,
-): { activeKeyId: string; activeKey: Uint8Array } {
+function readActiveMailKeyMaterial(env: Record<string, string | undefined>): {
+  activeKeyId: string;
+  activeKey: Uint8Array;
+} {
   const rawKey = secretSource(
     env,
     "ACCOUNT_MAIL_KEY",
@@ -127,9 +134,7 @@ function readActiveMailKeyMaterial(
   return { activeKeyId, activeKey: decodeKey(rawKey, "account mail encryption key") };
 }
 
-function readRecoveryAbuseKeyMaterial(
-  env: Record<string, string | undefined>,
-): Uint8Array {
+function readRecoveryAbuseKeyMaterial(env: Record<string, string | undefined>): Uint8Array {
   const raw = secretSource(
     env,
     "ACCOUNT_RECOVERY_ABUSE_KEY",
@@ -154,12 +159,8 @@ function keyFingerprint(label: string, key: Uint8Array, keyId = ""): string {
     .digest("hex");
 }
 
-let productionProducerPin:
-  | { fingerprint: string; cipher: AccountMailCipher }
-  | undefined;
-let productionAbusePin:
-  | { fingerprint: string; key: Uint8Array }
-  | undefined;
+let productionProducerPin: { fingerprint: string; cipher: AccountMailCipher } | undefined;
+let productionAbusePin: { fingerprint: string; key: Uint8Array } | undefined;
 
 export function readAccountRecoveryAbuseKey(
   env: Record<string, string | undefined> = process.env,
@@ -223,19 +224,25 @@ export function readAccountMailRuntimeConfig(
   if (Boolean(previousKeyId) !== Boolean(previousRawKey)) {
     throw new Error("Previous account mail key ID and key must be configured together");
   }
-  if (previousKeyId && (!/^[A-Za-z0-9_-]{1,32}$/.test(previousKeyId) || previousKeyId === activeKeyId)) {
+  if (
+    previousKeyId &&
+    (!/^[A-Za-z0-9_-]{1,32}$/.test(previousKeyId) || previousKeyId === activeKeyId)
+  ) {
     throw new Error("Invalid previous account mail key identifier");
   }
   if (previousRawKey && env.AUTH_SECRET && previousRawKey === env.AUTH_SECRET) {
     throw new Error("Previous account mail encryption key must not reuse AUTH_SECRET");
   }
-  const previousKey = previousRawKey ? decodeKey(previousRawKey, "previous account mail encryption key") : undefined;
+  const previousKey = previousRawKey
+    ? decodeKey(previousRawKey, "previous account mail encryption key")
+    : undefined;
   if (previousKey && Buffer.from(previousKey).equals(Buffer.from(activeKey))) {
     throw new Error("Previous account mail encryption key must differ from active key");
   }
-  const keys = previousKeyId && previousKey
-    ? Object.freeze({ [activeKeyId]: activeKey, [previousKeyId]: previousKey })
-    : Object.freeze({ [activeKeyId]: activeKey });
+  const keys =
+    previousKeyId && previousKey
+      ? Object.freeze({ [activeKeyId]: activeKey, [previousKeyId]: previousKey })
+      : Object.freeze({ [activeKeyId]: activeKey });
   const appUrl = required(env, "ACCOUNT_MAIL_APP_URL");
   const allowLocalHttp = env.NODE_ENV === "development";
   const parsedUrl = parseAccountMailAppUrl(appUrl, allowLocalHttp);
@@ -270,7 +277,8 @@ export function readAccountMailRuntimeConfig(
     "account mail SMTP CA",
     { maxBytes: 32_768 },
   );
-  if (smtpCa !== undefined && smtpCa.length > 32_768) throw new Error("Invalid account mail SMTP CA");
+  if (smtpCa !== undefined && smtpCa.length > 32_768)
+    throw new Error("Invalid account mail SMTP CA");
   return Object.freeze({
     activeKeyId,
     keys,
@@ -293,27 +301,57 @@ export function readAccountMailRuntimeConfig(
     smtpUsername,
     smtpPassword,
     smtpCa,
-    smtpTimeoutMs: integer(env.ACCOUNT_MAIL_SMTP_TIMEOUT_MS, 5_000, 100, 30_000, "ACCOUNT_MAIL_SMTP_TIMEOUT_MS"),
+    smtpTimeoutMs: integer(
+      env.ACCOUNT_MAIL_SMTP_TIMEOUT_MS,
+      5_000,
+      100,
+      30_000,
+      "ACCOUNT_MAIL_SMTP_TIMEOUT_MS",
+    ),
     batchSize: integer(env.ACCOUNT_MAIL_BATCH_SIZE, 10, 1, 100, "ACCOUNT_MAIL_BATCH_SIZE"),
-    pollIntervalMs: integer(env.ACCOUNT_MAIL_POLL_INTERVAL_MS, 5_000, 100, 60_000, "ACCOUNT_MAIL_POLL_INTERVAL_MS"),
+    pollIntervalMs: integer(
+      env.ACCOUNT_MAIL_POLL_INTERVAL_MS,
+      5_000,
+      100,
+      60_000,
+      "ACCOUNT_MAIL_POLL_INTERVAL_MS",
+    ),
   });
 }
 
-export function createAccountMailDispatcher(config: AccountMailRuntimeConfig): AccountMailDispatcher {
+export function createAccountMailDispatcher(
+  config: AccountMailRuntimeConfig,
+): AccountMailDispatcher {
   const cipher = new AccountMailCipher(config.activeKeyId, config.keys);
   const transport = new AccountMailSmtpTransport({
-    host: config.smtpHost, port: config.smtpPort, servername: config.smtpServername,
-    from: config.smtpFrom, envelopeFrom: config.smtpEnvelopeFrom,
-    mode: config.smtpMode, authMode: config.smtpAuthMode,
-    username: config.smtpUsername, password: config.smtpPassword,
-    ca: config.smtpCa, timeoutMs: config.smtpTimeoutMs,
+    host: config.smtpHost,
+    port: config.smtpPort,
+    servername: config.smtpServername,
+    from: config.smtpFrom,
+    envelopeFrom: config.smtpEnvelopeFrom,
+    mode: config.smtpMode,
+    authMode: config.smtpAuthMode,
+    username: config.smtpUsername,
+    password: config.smtpPassword,
+    ca: config.smtpCa,
+    timeoutMs: config.smtpTimeoutMs,
   });
-  return new AccountMailDispatcher({ cipher, transport, appUrl: config.appUrl, allowLocalHttp: config.allowLocalHttp });
+  return new AccountMailDispatcher({
+    cipher,
+    transport,
+    appUrl: config.appUrl,
+    allowLocalHttp: config.allowLocalHttp,
+  });
 }
 
 export type AccountMailLoopSummary = Readonly<{
-  batches: number; accepted: number; retried: number; discarded: number;
-  skipped: number; unsettled: number; cleaned: number;
+  batches: number;
+  accepted: number;
+  retried: number;
+  discarded: number;
+  skipped: number;
+  unsettled: number;
+  cleaned: number;
 }>;
 
 export type AccountMailBatchResult = Readonly<{
@@ -355,25 +393,38 @@ export async function runAccountMailLoop(input: {
   pollIntervalMs: number;
   once?: boolean;
   onProgress?: () => void;
-  onBatch?: (input: Readonly<{
-    batch: number;
-    result: AccountMailBatchResult;
-    total: AccountMailLoopSummary;
-  }>) => void | Promise<void>;
+  onBatch?: (
+    input: Readonly<{
+      batch: number;
+      result: AccountMailBatchResult;
+      total: AccountMailLoopSummary;
+    }>,
+  ) => void | Promise<void>;
 }): Promise<AccountMailLoopSummary> {
-  if (!input?.dispatcher || !input?.signal
-    || !Number.isInteger(input.batchSize) || input.batchSize < 1 || input.batchSize > 100
-    || !Number.isInteger(input.pollIntervalMs) || input.pollIntervalMs < 100 || input.pollIntervalMs > 60_000) {
+  if (
+    !input?.dispatcher ||
+    !input?.signal ||
+    !Number.isInteger(input.batchSize) ||
+    input.batchSize < 1 ||
+    input.batchSize > 100 ||
+    !Number.isInteger(input.pollIntervalMs) ||
+    input.pollIntervalMs < 100 ||
+    input.pollIntervalMs > 60_000
+  ) {
     throw new Error("Invalid account mail worker loop configuration");
   }
-  const total = { batches: 0, accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0 };
+  const total = {
+    batches: 0,
+    accepted: 0,
+    retried: 0,
+    discarded: 0,
+    skipped: 0,
+    unsettled: 0,
+    cleaned: 0,
+  };
   do {
     if (input.signal.aborted) break;
-    const result = await input.dispatcher.runBatch(
-      input.batchSize,
-      input.signal,
-      input.onProgress,
-    );
+    const result = await input.dispatcher.runBatch(input.batchSize, input.signal, input.onProgress);
     total.batches++;
     total.accepted += result.accepted;
     total.retried += result.retried;
@@ -398,11 +449,26 @@ export async function runAccountMailLoop(input: {
 }
 
 export function runtimeFingerprint(config: AccountMailRuntimeConfig): string {
-  return createHash("sha256").update(JSON.stringify({
-    keyId: config.activeKeyId, keyRingSize: Object.keys(config.keys).length,
-    appUrl: config.appUrl, localHttp: Boolean(config.allowLocalHttp), smtpHost: config.smtpHost, smtpMode: config.smtpMode,
-    smtpPort: config.smtpPort, smtpServername: config.smtpServername, smtpFrom: config.smtpFrom,
-    smtpEnvelopeFrom: config.smtpEnvelopeFrom ?? config.smtpFrom,
-    smtpAuth: Boolean(config.smtpUsername), smtpAuthMode: config.smtpAuthMode, smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
-  })).digest("hex").slice(0, 16);
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        keyId: config.activeKeyId,
+        keyRingSize: Object.keys(config.keys).length,
+        appUrl: config.appUrl,
+        localHttp: Boolean(config.allowLocalHttp),
+        smtpHost: config.smtpHost,
+        smtpMode: config.smtpMode,
+        smtpPort: config.smtpPort,
+        smtpServername: config.smtpServername,
+        smtpFrom: config.smtpFrom,
+        smtpEnvelopeFrom: config.smtpEnvelopeFrom ?? config.smtpFrom,
+        smtpAuth: Boolean(config.smtpUsername),
+        smtpAuthMode: config.smtpAuthMode,
+        smtpTimeoutMs: config.smtpTimeoutMs,
+        batchSize: config.batchSize,
+        pollIntervalMs: config.pollIntervalMs,
+      }),
+    )
+    .digest("hex")
+    .slice(0, 16);
 }

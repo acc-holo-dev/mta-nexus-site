@@ -7,9 +7,7 @@ export type MinimumMtaVersions = Readonly<{
 }>;
 
 /** Return a single declared minimum only when it applies to the whole resource. */
-export function getMtaVersionTargetSuggestion(
-  minimum: MinimumMtaVersions | null,
-): string | null {
+export function getMtaVersionTargetSuggestion(minimum: MinimumMtaVersions | null): string | null {
   if (!minimum) return null;
 
   if (minimum.both) {

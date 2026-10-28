@@ -62,28 +62,24 @@ async function fixture() {
   await db
     .insert(organizations)
     .values({ id: orgId, name: "Team", slug: `team-${randomUUID()}`, ownerId: owner.id });
-  await db
-    .insert(organizationMembers)
-    .values(
-      [writer, manager].map((user) => ({
-        id: `mem_${randomUUID()}`,
-        organizationId: orgId,
-        userId: user.id,
-        role: "member",
-        permissions: ["manage_servers"],
-      })),
-    );
-  await db
-    .insert(servers)
-    .values({
-      id: serverId,
-      name: "Private test server",
-      slug: `server-${randomUUID()}`,
-      ipAddress: `${randomUUID()}.test`,
-      port: 22003,
-      visibility: "private",
+  await db.insert(organizationMembers).values(
+    [writer, manager].map((user) => ({
+      id: `mem_${randomUUID()}`,
       organizationId: orgId,
-    });
+      userId: user.id,
+      role: "member",
+      permissions: ["manage_servers"],
+    })),
+  );
+  await db.insert(servers).values({
+    id: serverId,
+    name: "Private test server",
+    slug: `server-${randomUUID()}`,
+    ipAddress: `${randomUUID()}.test`,
+    port: 22003,
+    visibility: "private",
+    organizationId: orgId,
+  });
   const [item] = await db
     .insert(content)
     .values({
@@ -258,7 +254,8 @@ it("never publishes an unreviewed parallel draft and rechecks the moderator's li
   ).toHaveLength(1);
   const [stored] = await db.select().from(content).where(eq(content.id, f.item.id));
   if (stored.status === "published") expect(stored.body).toBe("Original private body");
-  if (stored.status !== "published" && stored.status !== "draft") throw new Error("Unexpected fixture status");
+  if (stored.status !== "published" && stored.status !== "draft")
+    throw new Error("Unexpected fixture status");
   await db.update(users).set({ role: "user" }).where(eq(users.id, f.moderator.id));
   await expect(
     contentRepository.moderateStatusWithAudit(

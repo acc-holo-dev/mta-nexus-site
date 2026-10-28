@@ -20,33 +20,19 @@ export type ProductDependencyResolution = Readonly<{
   dependencies: readonly ProductDependencyResolutionItem[];
 }>;
 
-export function normalizeDependencySlugs(
-  values: readonly string[] | undefined,
-): string[] {
+export function normalizeDependencySlugs(values: readonly string[] | undefined): string[] {
   return Array.from(
-    new Set(
-      (values ?? [])
-        .map((value) => value.trim().toLowerCase())
-        .filter(Boolean),
-    ),
+    new Set((values ?? []).map((value) => value.trim().toLowerCase()).filter(Boolean)),
   ).slice(0, 25);
 }
 
 export function buildProductDependencyResolution(
   product: Pick<Product, "slug" | "compatibility">,
-  publishedProducts: readonly Pick<
-    Product,
-    "id" | "slug" | "title" | "type" | "currentVersion"
-  >[],
+  publishedProducts: readonly Pick<Product, "id" | "slug" | "title" | "type" | "currentVersion">[],
 ): ProductDependencyResolution {
-  const declared = normalizeDependencySlugs(
-    product.compatibility.dependencies,
-  );
+  const declared = normalizeDependencySlugs(product.compatibility.dependencies);
   const publishedBySlug = new Map(
-    publishedProducts.map((dependency) => [
-      dependency.slug.toLowerCase(),
-      dependency,
-    ]),
+    publishedProducts.map((dependency) => [dependency.slug.toLowerCase(), dependency]),
   );
 
   const dependencies = declared.map((slug) => {
@@ -82,15 +68,9 @@ export function buildProductDependencyResolution(
 
   return Object.freeze({
     declaredCount: dependencies.length,
-    availableCount: dependencies.filter(
-      (item) => item.status === "available",
-    ).length,
-    unresolvedCount: dependencies.filter(
-      (item) => item.status === "unresolved",
-    ).length,
-    selfReferenceCount: dependencies.filter(
-      (item) => item.status === "self_reference",
-    ).length,
+    availableCount: dependencies.filter((item) => item.status === "available").length,
+    unresolvedCount: dependencies.filter((item) => item.status === "unresolved").length,
+    selfReferenceCount: dependencies.filter((item) => item.status === "self_reference").length,
     dependencies,
   });
 }

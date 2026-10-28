@@ -1,4 +1,3 @@
-import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -45,11 +44,7 @@ describe("resource dependency resolution behavior", () => {
     const result = await service.getDependencyResolution({
       slug: "vehicle-pack",
       compatibility: {
-        dependencies: [
-          " Core-UI ",
-          "core-ui",
-          "missing-pack",
-        ],
+        dependencies: [" Core-UI ", "core-ui", "missing-pack"],
       },
     });
 
@@ -101,11 +96,7 @@ describe("resource dependency resolution behavior", () => {
         {
           slug: "vehicle-pack",
           compatibility: {
-            dependencies: [
-              "core-ui",
-              "missing-pack",
-              "vehicle-pack",
-            ],
+            dependencies: ["core-ui", "missing-pack", "vehicle-pack"],
           },
         },
         [
@@ -122,11 +113,7 @@ describe("resource dependency resolution behavior", () => {
 
       const markup = renderToStaticMarkup(
         <ProductDependencyList
-          declared={[
-            "core-ui",
-            "missing-pack",
-            "vehicle-pack",
-          ]}
+          declared={["core-ui", "missing-pack", "vehicle-pack"]}
           resolution={resolution}
           locale={locale}
         />,
@@ -139,9 +126,7 @@ describe("resource dependency resolution behavior", () => {
       expect(markup).toContain("vehicle-pack");
       expect(markup).toContain(copy.selfReference);
       expect(markup).toContain(copy.resolutionNotice);
-      expect(markup).not.toMatch(
-        /compatible|incompatible|guaranteed|verified/iu,
-      );
+      expect(markup).not.toMatch(/compatible|incompatible|guaranteed|verified/iu);
     },
   );
 
@@ -158,11 +143,7 @@ describe("resource dependency resolution behavior", () => {
     expect(unavailable).toContain(copy.resolutionUnavailable);
 
     const empty = renderToStaticMarkup(
-      <ProductDependencyList
-        declared={[]}
-        resolution={null}
-        locale="en"
-      />,
+      <ProductDependencyList declared={[]} resolution={null} locale="en" />,
     );
     expect(empty).toContain(copy.noneDeclared);
   });

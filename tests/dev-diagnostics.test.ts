@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("development diagnostics", () => {
   it("is unavailable in production and reports only sanitized runtime state", () => {

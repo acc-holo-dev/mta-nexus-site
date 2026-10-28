@@ -10,8 +10,7 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "user.other_sessions_revoked",
 ] as const;
 
-export type SecurityActivityAction =
-  (typeof SECURITY_ACTIVITY_ACTIONS)[number];
+export type SecurityActivityAction = (typeof SECURITY_ACTIVITY_ACTIONS)[number];
 
 export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "user.registered": "registered",
@@ -27,9 +26,7 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);
 
-export function isSecurityActivityAction(
-  action: string,
-): action is SecurityActivityAction {
+export function isSecurityActivityAction(action: string): action is SecurityActivityAction {
   return SECURITY_ACTIVITY_SET.has(action);
 }
 

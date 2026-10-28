@@ -10,16 +10,11 @@ async function serviceWorkerSource() {
   return getServiceWorker().text();
 }
 
-function publicDocumentResponse(options: {
-  marker?: boolean;
-  vary?: string;
-} = {}) {
+function publicDocumentResponse(options: { marker?: boolean; vary?: string } = {}) {
   const clone = { kind: "public-document-clone" };
   const headers = new Headers({
     "Content-Type": "text/html; charset=utf-8",
-    ...(options.marker === false
-      ? {}
-      : { "X-Nexus-Offline-Cache": "public-readonly-v1" }),
+    ...(options.marker === false ? {} : { "X-Nexus-Offline-Cache": "public-readonly-v1" }),
     Vary: options.vary ?? "Cookie",
   });
   return {
@@ -53,9 +48,7 @@ describe("PWA release surface", () => {
   it("serves the worker with strict service-worker headers", async () => {
     const response = getServiceWorker();
 
-    expect(response.headers.get("content-type")).toContain(
-      "application/javascript",
-    );
+    expect(response.headers.get("content-type")).toContain("application/javascript");
     expect(response.headers.get("service-worker-allowed")).toBe("/");
     expect(response.headers.get("cache-control")).toContain("no-store");
   });
@@ -76,9 +69,7 @@ describe("PWA release surface", () => {
       ),
     ).resolves.toMatchObject({ intercepted: false });
     await expect(
-      harness.dispatchFetch(
-        makeServiceWorkerRequest("https://nexus.test/api/notifications"),
-      ),
+      harness.dispatchFetch(makeServiceWorkerRequest("https://nexus.test/api/notifications")),
     ).resolves.toMatchObject({ intercepted: false });
 
     expect(harness.fetchCalls).toEqual([]);
@@ -128,9 +119,7 @@ describe("PWA release surface", () => {
         };
       },
     });
-    const request = makeServiceWorkerRequest(
-      "https://nexus.test/_next/static/chunks/new.js",
-    );
+    const request = makeServiceWorkerRequest("https://nexus.test/_next/static/chunks/new.js");
 
     await harness.dispatchFetch(request);
 
@@ -144,9 +133,7 @@ describe("PWA release surface", () => {
     });
 
     const result = await harness.dispatchFetch(
-      makeServiceWorkerRequest(
-        "https://nexus.test/_next/static/css/app-abc123.css",
-      ),
+      makeServiceWorkerRequest("https://nexus.test/_next/static/css/app-abc123.css"),
     );
 
     expect(result.intercepted).toBe(true);
@@ -162,10 +149,9 @@ describe("PWA release surface", () => {
         return response;
       },
     });
-    const request = makeServiceWorkerRequest(
-      "https://nexus.test/articles/release-notes",
-      { mode: "navigate" },
-    );
+    const request = makeServiceWorkerRequest("https://nexus.test/articles/release-notes", {
+      mode: "navigate",
+    });
 
     const result = await harness.dispatchFetch(request);
 
@@ -183,20 +169,16 @@ describe("PWA release surface", () => {
       publicDocumentResponse({ marker: false }),
       publicDocumentResponse({ vary: "Accept-Encoding" }),
     ]) {
-      const harness = createServiceWorkerHarness(
-        await serviceWorkerSource(),
-        {
-          async fetch() {
-            return response;
-          },
+      const harness = createServiceWorkerHarness(await serviceWorkerSource(), {
+        async fetch() {
+          return response;
         },
-      );
+      });
 
       await harness.dispatchFetch(
-        makeServiceWorkerRequest(
-          "https://nexus.test/articles/security-update",
-          { mode: "navigate" },
-        ),
+        makeServiceWorkerRequest("https://nexus.test/articles/security-update", {
+          mode: "navigate",
+        }),
       );
 
       expect(harness.cachePuts).toEqual([]);
@@ -234,10 +216,7 @@ describe("PWA release surface", () => {
     });
 
     const result = await harness.dispatchFetch(
-      makeServiceWorkerRequest(
-        "https://nexus.test/articles/release-notes",
-        { mode: "navigate" },
-      ),
+      makeServiceWorkerRequest("https://nexus.test/articles/release-notes", { mode: "navigate" }),
     );
 
     expect(result.response).toBe(cachedResponse);
@@ -253,10 +232,9 @@ describe("PWA release surface", () => {
         return publicDocumentResponse();
       },
     });
-    const request = makeServiceWorkerRequest(
-      "https://nexus.test/articles/new-release",
-      { mode: "navigate" },
-    );
+    const request = makeServiceWorkerRequest("https://nexus.test/articles/new-release", {
+      mode: "navigate",
+    });
 
     await harness.dispatchFetch(request);
 
@@ -281,9 +259,7 @@ describe("PWA release surface", () => {
     expect(result.response).toBeInstanceOf(Response);
     const response = result.response as Response;
     expect(response.status).toBe(503);
-    await expect(response.text()).resolves.toContain(
-      "never confirms purchases",
-    );
+    await expect(response.text()).resolves.toContain("never confirms purchases");
     expect(harness.cachePuts).toEqual([]);
   });
 });

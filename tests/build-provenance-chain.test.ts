@@ -4,12 +4,8 @@ import { describe, expect, it } from "vitest";
 import { BuildProvenanceDetails } from "../apps/web/src/components/build-provenance-details";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
-function renderBuild(
-  build: React.ComponentProps<typeof BuildProvenanceDetails>["build"],
-) {
-  return renderToStaticMarkup(
-    React.createElement(BuildProvenanceDetails, { build }),
-  );
+function renderBuild(build: React.ComponentProps<typeof BuildProvenanceDetails>["build"]) {
+  return renderToStaticMarkup(React.createElement(BuildProvenanceDetails, { build }));
 }
 
 describe("build provenance chain behavior", () => {
@@ -48,8 +44,6 @@ describe("build provenance chain behavior", () => {
     expect(html).toContain(copy.blockedMalicious);
     expect(html).toContain(copy.recordedAsSigned);
     expect(html).toContain(copy.explanation);
-    expect(html).not.toMatch(
-      /SHA-256 verified|cryptographically verified/iu,
-    );
+    expect(html).not.toMatch(/SHA-256 verified|cryptographically verified/iu);
   });
 });

@@ -26,21 +26,20 @@ export type WebPushSubscriptionUpsertResult =
   | { status: "session_limit" };
 
 export class WebPushSubscriptionRepository {
-  async upsertWithResult(input: {
-    id: string;
-    userId: string;
-    sessionId: string;
-    endpoint: string;
-    p256dh: string;
-    auth: string;
-    expirationAt: Date | null;
-    userAgent?: string | null;
-  }, maxPerSession = MAX_WEB_PUSH_SUBSCRIPTIONS_PER_SESSION): Promise<WebPushSubscriptionUpsertResult> {
-    if (
-      !Number.isSafeInteger(maxPerSession) ||
-      maxPerSession < 1 ||
-      maxPerSession > 32
-    ) {
+  async upsertWithResult(
+    input: {
+      id: string;
+      userId: string;
+      sessionId: string;
+      endpoint: string;
+      p256dh: string;
+      auth: string;
+      expirationAt: Date | null;
+      userAgent?: string | null;
+    },
+    maxPerSession = MAX_WEB_PUSH_SUBSCRIPTIONS_PER_SESSION,
+  ): Promise<WebPushSubscriptionUpsertResult> {
+    if (!Number.isSafeInteger(maxPerSession) || maxPerSession < 1 || maxPerSession > 32) {
       throw new RangeError("Invalid Web Push subscription limit");
     }
 
@@ -74,10 +73,7 @@ export class WebPushSubscriptionRepository {
         .limit(1);
 
       if (existing) {
-        if (
-          existing.userId !== input.userId ||
-          existing.sessionId !== input.sessionId
-        ) {
+        if (existing.userId !== input.userId || existing.sessionId !== input.sessionId) {
           return { status: "endpoint_conflict" } as const;
         }
 
@@ -149,10 +145,7 @@ export class WebPushSubscriptionRepository {
     return result.status === "stored" ? result.subscription : null;
   }
 
-  async listForSession(
-    userId: string,
-    sessionId: string,
-  ): Promise<WebPushSubscriptionRecord[]> {
+  async listForSession(userId: string, sessionId: string): Promise<WebPushSubscriptionRecord[]> {
     const now = new Date();
     const rows = await db
       .select({
@@ -174,10 +167,7 @@ export class WebPushSubscriptionRepository {
           eq(webPushSubscriptions.userId, userId),
           eq(webPushSubscriptions.sessionId, sessionId),
           gt(sessions.expiresAt, now),
-          or(
-            isNull(webPushSubscriptions.expirationAt),
-            gt(webPushSubscriptions.expirationAt, now),
-          ),
+          or(isNull(webPushSubscriptions.expirationAt), gt(webPushSubscriptions.expirationAt, now)),
         ),
       )
       .limit(32);
@@ -195,23 +185,23 @@ export class WebPushSubscriptionRepository {
           eq(webPushSubscriptions.userId, userId),
           eq(webPushSubscriptions.sessionId, sessionId),
           gt(sessions.expiresAt, now),
-          or(
-            isNull(webPushSubscriptions.expirationAt),
-            gt(webPushSubscriptions.expirationAt, now),
-          ),
+          or(isNull(webPushSubscriptions.expirationAt), gt(webPushSubscriptions.expirationAt, now)),
         ),
       );
     return row.total;
   }
 
   async removeForSession(userId: string, sessionId: string, endpoint: string): Promise<boolean> {
-    const rows = await db.delete(webPushSubscriptions).where(
-      and(
-        eq(webPushSubscriptions.userId, userId),
-        eq(webPushSubscriptions.sessionId, sessionId),
-        eq(webPushSubscriptions.endpoint, endpoint),
-      ),
-    ).returning({ id: webPushSubscriptions.id });
+    const rows = await db
+      .delete(webPushSubscriptions)
+      .where(
+        and(
+          eq(webPushSubscriptions.userId, userId),
+          eq(webPushSubscriptions.sessionId, sessionId),
+          eq(webPushSubscriptions.endpoint, endpoint),
+        ),
+      )
+      .returning({ id: webPushSubscriptions.id });
     return rows.length > 0;
   }
 
@@ -236,10 +226,7 @@ export class WebPushSubscriptionRepository {
         and(
           eq(webPushSubscriptions.userId, userId),
           gt(sessions.expiresAt, now),
-          or(
-            isNull(webPushSubscriptions.expirationAt),
-            gt(webPushSubscriptions.expirationAt, now),
-          ),
+          or(isNull(webPushSubscriptions.expirationAt), gt(webPushSubscriptions.expirationAt, now)),
         ),
       );
     return rows as WebPushSubscriptionRecord[];

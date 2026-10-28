@@ -24,18 +24,30 @@ async function account() {
   const target = await sessionRepository.findValidSession(second.token);
   const hash = (await userRepository.findByEmail(input.email))?.passwordHash;
   if (!current || !target || !hash) throw new Error("Synthetic account setup failed");
-  return { userId: first.user.id, currentToken: first.token, targetToken: second.token,
-    thirdToken: third.token, currentId: current.session.id, sessionId: target.session.id,
-    expiresAt: current.session.expiresAt, hash, input };
+  return {
+    userId: first.user.id,
+    currentToken: first.token,
+    targetToken: second.token,
+    thirdToken: third.token,
+    currentId: current.session.id,
+    sessionId: target.session.id,
+    expiresAt: current.session.expiresAt,
+    hash,
+    input,
+  };
 }
 type Account = Awaited<ReturnType<typeof account>>;
 function revoke(mode: Mode, a: Account, auditId = generateId("aud")): Promise<boolean | number> {
   const data = { userId: a.userId, currentToken: a.currentToken, sessionId: a.sessionId, auditId };
-  return mode === "selected" ? authRepository.revokeOwnedSession(data) : authRepository.revokeOtherSessions(data);
+  return mode === "selected"
+    ? authRepository.revokeOwnedSession(data)
+    : authRepository.revokeOtherSessions(data);
 }
 async function events(userId: string) {
   const rows = await db.select().from(auditEvents).where(eq(auditEvents.actorId, userId));
-  return rows.filter((row) => ["user.session_revoked", "user.other_sessions_revoked"].includes(row.action));
+  return rows.filter((row) =>
+    ["user.session_revoked", "user.other_sessions_revoked"].includes(row.action),
+  );
 }
 async function valid(token: string, userId: string) {
   expect((await authService.getSession(token))?.id === userId).toBe(true);
@@ -47,8 +59,11 @@ async function unchanged(a: Account) {
   expect((await userRepository.findByEmail(a.input.email))?.passwordHash === a.hash).toBe(true);
 }
 async function settled<T>(promise: Promise<T>) {
-  try { return { ok: true as const, value: await promise }; }
-  catch (error) { return { ok: false as const, error }; }
+  try {
+    return { ok: true as const, value: await promise };
+  } catch (error) {
+    return { ok: false as const, error };
+  }
 }
 function postgresCode(error: unknown): string | undefined {
   for (let i = 0; i < 6 && typeof error === "object" && error !== null; i++) {
@@ -68,7 +83,10 @@ async function afterLockWait(a: Account, mode: Mode, invalidate: (tx: Tx) => Pro
       await tx.select({ id: users.id }).from(users).where(eq(users.id, a.userId)).for("update");
       const pids = await tx.execute(sql`select pg_backend_pid() as pid`);
       const pid = Number(pids[0].pid);
-      state.pending = settled(revoke(mode, a)).then((result) => { completed = true; return result; });
+      state.pending = settled(revoke(mode, a)).then((result) => {
+        completed = true;
+        return result;
+      });
       const deadline = Date.now() + 3_000;
       while (true) {
         expect(completed, "Revocation must wait for the common user lock").toBe(false);
@@ -76,7 +94,8 @@ async function afterLockWait(a: Account, mode: Mode, invalidate: (tx: Tx) => Pro
           select 1 from pg_stat_activity where ${pid}::integer = any(pg_blocking_pids(pid))
         ) as waiting`);
         if (rows[0].waiting === true) break;
-        if (Date.now() >= deadline) throw new Error("Did not observe the expected database lock wait");
+        if (Date.now() >= deadline)
+          throw new Error("Did not observe the expected database lock wait");
         await delay(10);
       }
       await invalidate(tx);
@@ -147,8 +166,12 @@ describe("manual session revocation transaction", () => {
   it("ends others atomically, counts active sessions only and preserves this browser and another account", async () => {
     const a = await account();
     const b = await account();
-    await sessionRepository.create({ id: generateId("ses"), userId: a.userId,
-      token: generateSessionToken(), expiresAt: new Date(Date.now() - 60_000) });
+    await sessionRepository.create({
+      id: generateId("ses"),
+      userId: a.userId,
+      token: generateSessionToken(),
+      expiresAt: new Date(Date.now() - 60_000),
+    });
     expect(await authService.revokeOtherSessions(a.userId, a.currentToken)).toBe(2);
     expect(await authService.getSession(a.targetToken)).toBeNull();
     expect(await authService.getSession(a.thirdToken)).toBeNull();
@@ -157,7 +180,9 @@ describe("manual session revocation transaction", () => {
     expect(current?.session.expiresAt.getTime()).toBe(a.expiresAt.getTime());
     expect((await userRepository.findByEmail(a.input.email))?.passwordHash === a.hash).toBe(true);
     await unchanged(b);
-    expect(await db.select({ id: sessions.id }).from(sessions).where(eq(sessions.userId, a.userId))).toHaveLength(1);
+    expect(
+      await db.select({ id: sessions.id }).from(sessions).where(eq(sessions.userId, a.userId)),
+    ).toHaveLength(1);
     const rows = await events(a.userId);
     expect(rows).toHaveLength(1);
     expect(rows[0].details).toEqual({ revokedCount: 2, removedSessionCount: 3 });
@@ -168,8 +193,14 @@ describe("manual session revocation transaction", () => {
   it.each(modes)("%s: audit insertion conflict rolls back every deletion", async (mode) => {
     const a = await account();
     const auditId = generateId("aud");
-    await auditRepository.record({ id: auditId, actorId: a.userId, actorType: "user",
-      action: "test.audit_collision", targetId: a.userId, targetType: "user" });
+    await auditRepository.record({
+      id: auditId,
+      actorId: a.userId,
+      actorType: "user",
+      action: "test.audit_collision",
+      targetId: a.userId,
+      targetType: "user",
+    });
     const result = await settled(revoke(mode, a, auditId));
     expect(result.ok).toBe(false);
     if (!result.ok) expect(postgresCode(result.error)).toBe("23505");
@@ -177,27 +208,40 @@ describe("manual session revocation transaction", () => {
     expect(await events(a.userId)).toHaveLength(0);
   });
 
-  it.each(modes)("%s: rejects missing, foreign, expired and revoked initiators before deleting", async (mode) => {
-    const a = await account();
-    const b = await account();
-    const expired = generateSessionToken();
-    await sessionRepository.create({ id: generateId("ses"), userId: a.userId,
-      token: expired, expiresAt: new Date(Date.now() - 60_000) });
-    const revoked = await authService.login(a.input);
-    await authService.logout(revoked.token);
-    for (const token of ["", generateSessionToken(), b.currentToken, expired, revoked.token]) {
-      await expect(revoke(mode, { ...a, currentToken: token })).rejects.toBeInstanceOf(UnauthorizedError);
-    }
-    await expect(revoke(mode, { ...a, userId: generateId("usr") })).rejects.toBeInstanceOf(UnauthorizedError);
-    await unchanged(a);
-    await unchanged(b);
-    expect(await events(a.userId)).toHaveLength(0);
-  });
+  it.each(modes)(
+    "%s: rejects missing, foreign, expired and revoked initiators before deleting",
+    async (mode) => {
+      const a = await account();
+      const b = await account();
+      const expired = generateSessionToken();
+      await sessionRepository.create({
+        id: generateId("ses"),
+        userId: a.userId,
+        token: expired,
+        expiresAt: new Date(Date.now() - 60_000),
+      });
+      const revoked = await authService.login(a.input);
+      await authService.logout(revoked.token);
+      for (const token of ["", generateSessionToken(), b.currentToken, expired, revoked.token]) {
+        await expect(revoke(mode, { ...a, currentToken: token })).rejects.toBeInstanceOf(
+          UnauthorizedError,
+        );
+      }
+      await expect(revoke(mode, { ...a, userId: generateId("usr") })).rejects.toBeInstanceOf(
+        UnauthorizedError,
+      );
+      await unchanged(a);
+      await unchanged(b);
+      expect(await events(a.userId)).toHaveLength(0);
+    },
+  );
 
   it("protects current and foreign sessions inside the repository, not just the route", async () => {
     const a = await account();
     const b = await account();
-    await expect(revoke("selected", { ...a, sessionId: a.currentId })).rejects.toBeInstanceOf(ConflictError);
+    await expect(revoke("selected", { ...a, sessionId: a.currentId })).rejects.toBeInstanceOf(
+      ConflictError,
+    );
     expect(await revoke("selected", { ...a, sessionId: b.currentId })).toBe(false);
     expect(await revoke("selected", { ...a, sessionId: generateId("ses") })).toBe(false);
     await unchanged(a);
@@ -238,10 +282,23 @@ describe("manual session revocation transaction", () => {
     const nextHash = await hashPassword("Synthetic-revocation-next-password!");
     const [manual, passwordChange] = await Promise.all([
       settled(revoke("selected", a)),
-      settled(authRepository.changePassword({ userId: a.userId, expectedPasswordHash: a.hash,
-        passwordHash: nextHash, currentToken: a.targetToken, nextToken,
-        audit: { id: generateId("aud"), actorId: a.userId, actorType: "user",
-          action: "user.password_changed", targetId: a.userId, targetType: "user" } })),
+      settled(
+        authRepository.changePassword({
+          userId: a.userId,
+          expectedPasswordHash: a.hash,
+          passwordHash: nextHash,
+          currentToken: a.targetToken,
+          nextToken,
+          audit: {
+            id: generateId("aud"),
+            actorId: a.userId,
+            actorType: "user",
+            action: "user.password_changed",
+            targetId: a.userId,
+            targetType: "user",
+          },
+        }),
+      ),
     ]);
     expect(Number(manual.ok) + Number(passwordChange.ok)).toBe(1);
     const currentHash = (await userRepository.findByEmail(a.input.email))?.passwordHash;
@@ -269,10 +326,23 @@ describe("manual session revocation transaction", () => {
     const token = generateSessionToken();
     const [count] = await Promise.all([
       authService.revokeOtherSessions(a.userId, a.currentToken),
-      authRepository.createLoginSession({ id: generateId("ses"), userId: a.userId,
-        token, expiresAt: new Date(Date.now() + 60_000) },
-        { id: generateId("aud"), actorId: a.userId, actorType: "user",
-          action: "user.logged_in", targetId: a.userId, targetType: "user" }, a.hash),
+      authRepository.createLoginSession(
+        {
+          id: generateId("ses"),
+          userId: a.userId,
+          token,
+          expiresAt: new Date(Date.now() + 60_000),
+        },
+        {
+          id: generateId("aud"),
+          actorId: a.userId,
+          actorType: "user",
+          action: "user.logged_in",
+          targetId: a.userId,
+          targetType: "user",
+        },
+        a.hash,
+      ),
     ]);
     const laterLogin = await authService.getSession(token);
     expect(count).toBe(laterLogin ? 2 : 3);
@@ -297,8 +367,12 @@ describe("manual session revocation transaction", () => {
 
     it(`${mode}: rechecks expiry after the real lock wait`, async () => {
       const a = await account();
-      await afterLockWait(a, mode, (tx) => tx.update(sessions)
-        .set({ expiresAt: new Date(Date.now() - 60_000) }).where(eq(sessions.id, a.currentId)));
+      await afterLockWait(a, mode, (tx) =>
+        tx
+          .update(sessions)
+          .set({ expiresAt: new Date(Date.now() - 60_000) })
+          .where(eq(sessions.id, a.currentId)),
+      );
       expect(await authService.getSession(a.currentToken)).toBeNull();
       await valid(a.targetToken, a.userId);
       await valid(a.thirdToken, a.userId);
@@ -308,8 +382,12 @@ describe("manual session revocation transaction", () => {
     it(`${mode}: rejects a token rotated while waiting instead of trusting the prior route check`, async () => {
       const a = await account();
       const nextToken = generateSessionToken();
-      await afterLockWait(a, mode, (tx) => tx.update(sessions)
-        .set({ token: digestSessionToken(nextToken) }).where(eq(sessions.id, a.currentId)));
+      await afterLockWait(a, mode, (tx) =>
+        tx
+          .update(sessions)
+          .set({ token: digestSessionToken(nextToken) })
+          .where(eq(sessions.id, a.currentId)),
+      );
       expect(await authService.getSession(a.currentToken)).toBeNull();
       await valid(nextToken, a.userId);
       await valid(a.targetToken, a.userId);

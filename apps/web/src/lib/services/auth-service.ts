@@ -95,10 +95,7 @@ class AuthService {
     }
   }
 
-  async login(input: {
-    email: string;
-    password: string;
-  }): Promise<{ user: User; token: string }> {
+  async login(input: { email: string; password: string }): Promise<{ user: User; token: string }> {
     const userWithHash = await userRepository.findByEmail(input.email);
     if (!userWithHash?.passwordHash) {
       throw new UnauthorizedError("Invalid email or password");
@@ -128,7 +125,7 @@ class AuthService {
         targetType: "user",
         details: { email: userWithHash.email },
       },
-      userWithHash.passwordHash
+      userWithHash.passwordHash,
     );
 
     return { user: toPublicUser(userWithHash), token };
@@ -176,7 +173,10 @@ class AuthService {
     if (!user) throw new NotFoundError("User", input.userId);
 
     const stored = await userRepository.findByEmail(user.email);
-    if (!stored?.passwordHash || !(await verifyPassword(input.currentPassword, stored.passwordHash))) {
+    if (
+      !stored?.passwordHash ||
+      !(await verifyPassword(input.currentPassword, stored.passwordHash))
+    ) {
       throw new UnauthorizedError("Current password is incorrect");
     }
 
@@ -208,10 +208,16 @@ class AuthService {
     userId: string;
     currentToken: string;
     currentPassword: string;
-  }): Promise<{ accepted: boolean; alreadyVerified: boolean; challengeId?: string; expiresAt?: Date }> {
+  }): Promise<{
+    accepted: boolean;
+    alreadyVerified: boolean;
+    challengeId?: string;
+    expiresAt?: Date;
+  }> {
     const status = await accountEmailEnrollmentRepository.status(input.userId);
     if (!status) throw new NotFoundError("User", input.userId);
-    if (!status.eligible) throw new ForbiddenError("Recovery email verification is unavailable for this account");
+    if (!status.eligible)
+      throw new ForbiddenError("Recovery email verification is unavailable for this account");
     if (status.verified) return { accepted: false, alreadyVerified: true };
 
     const limit = await accountRecoveryAbuseLimitRepository.consume({
@@ -221,10 +227,16 @@ class AuthService {
       limit: 5,
       windowSeconds: 3600,
     });
-    if (!limit.success) throw new RateLimitExceededError("Too many email verification attempts. Please try again later.");
+    if (!limit.success)
+      throw new RateLimitExceededError(
+        "Too many email verification attempts. Please try again later.",
+      );
 
     const stored = await userRepository.findByEmail(status.email);
-    if (!stored?.passwordHash || !(await verifyPassword(input.currentPassword, stored.passwordHash))) {
+    if (
+      !stored?.passwordHash ||
+      !(await verifyPassword(input.currentPassword, stored.passwordHash))
+    ) {
       throw new UnauthorizedError("Current password is incorrect");
     }
 
@@ -235,7 +247,12 @@ class AuthService {
       auditId: generateId("aud"),
       cipher: getPinnedAccountMailProducerCipher(),
     });
-    return { accepted: true, alreadyVerified: false, challengeId: queued.challengeId, expiresAt: queued.expiresAt };
+    return {
+      accepted: true,
+      alreadyVerified: false,
+      challengeId: queued.challengeId,
+      expiresAt: queued.expiresAt,
+    };
   }
 
   async confirmRecoveryEmailVerification(input: {
@@ -246,9 +263,11 @@ class AuthService {
   }): Promise<{ email: string; verifiedAt: Date }> {
     const status = await accountEmailEnrollmentRepository.status(input.userId);
     if (!status) throw new NotFoundError("User", input.userId);
-    if (!status.eligible) throw new ForbiddenError("Recovery email verification is unavailable for this account");
+    if (!status.eligible)
+      throw new ForbiddenError("Recovery email verification is unavailable for this account");
     const stored = await userRepository.findByEmail(status.email);
-    if (!stored?.passwordHash) throw new ForbiddenError("Recovery email verification is unavailable for this account");
+    if (!stored?.passwordHash)
+      throw new ForbiddenError("Recovery email verification is unavailable for this account");
     return accountEmailEnrollmentRepository.confirm({
       userId: input.userId,
       currentToken: input.currentToken,
@@ -260,10 +279,7 @@ class AuthService {
     });
   }
 
-  async requestPasswordReset(input: {
-    email: string;
-    ip: string;
-  }): Promise<{ accepted: true }> {
+  async requestPasswordReset(input: { email: string; ip: string }): Promise<{ accepted: true }> {
     // Read dedicated configuration before account lookup so missing production
     // wiring cannot reveal whether a valid address exists.
     const cipher = getPinnedAccountMailProducerCipher();
@@ -359,13 +375,18 @@ class AuthService {
 
   async revokeSession(userId: string, sessionId: string, currentToken: string): Promise<boolean> {
     return authRepository.revokeOwnedSession({
-      userId, sessionId, currentToken, auditId: generateId("aud"),
+      userId,
+      sessionId,
+      currentToken,
+      auditId: generateId("aud"),
     });
   }
 
   async revokeOtherSessions(userId: string, currentToken: string): Promise<number> {
     return authRepository.revokeOtherSessions({
-      userId, currentToken, auditId: generateId("aud"),
+      userId,
+      currentToken,
+      auditId: generateId("aud"),
     });
   }
 
@@ -409,4 +430,3 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-

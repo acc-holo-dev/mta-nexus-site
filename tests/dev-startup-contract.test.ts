@@ -2,39 +2,28 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("deterministic development startup contract", () => {
   it("makes pnpm dev start the full preflighted Docker development stack", () => {
     const pkg = JSON.parse(read("package.json"));
 
     expect(pkg.scripts.dev).toBe("pnpm dev:docker");
-    expect(pkg.scripts["dev:host"]).toBe(
-      "pnpm --filter @nexus/web dev",
-    );
+    expect(pkg.scripts["dev:host"]).toBe("pnpm --filter @nexus/web dev");
     expect(pkg.scripts["dev:preflight"]).toBe("pnpm nexus:doctor");
-    expect(pkg.scripts["dev:docker"]).toContain(
-      "pnpm dev:preflight && docker compose",
-    );
-    expect(pkg.scripts["dev:docker:up"]).toContain(
-      "pnpm dev:preflight && docker compose",
-    );
+    expect(pkg.scripts["dev:docker"]).toContain("pnpm dev:preflight && docker compose");
+    expect(pkg.scripts["dev:docker:up"]).toContain("pnpm dev:preflight && docker compose");
   });
 
   it("keeps the local stack private except for the loopback application port", () => {
     const compose = read("compose.yaml");
 
     const dollar = "$";
-    expect(compose).toContain(
-      `"127.0.0.1:${dollar}{NEXUS_DEV_PORT:-3000}:3000"`,
-    );
+    expect(compose).toContain(`"127.0.0.1:${dollar}{NEXUS_DEV_PORT:-3000}:3000"`);
     expect(compose).not.toMatch(/5432:5432/u);
     expect(compose).not.toMatch(/3310:3310/u);
     expect(compose).toContain("condition: service_healthy");
-    expect(compose).toContain(
-      'test: ["CMD", "node", "scripts/check-local-readiness.mjs"]',
-    );
+    expect(compose).toContain('test: ["CMD", "node", "scripts/check-local-readiness.mjs"]');
   });
 
   it("documents full-stack and host-only startup as different modes", () => {

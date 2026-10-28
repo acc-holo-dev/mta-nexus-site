@@ -36,9 +36,7 @@ test("capture refuses GitHub Actions", () => {
 });
 
 test("capture is development-only until production collection is accepted", () => {
-  assert.doesNotThrow(() =>
-    assertServerObservationCaptureEnvironment(base),
-  );
+  assert.doesNotThrow(() => assertServerObservationCaptureEnvironment(base));
   assert.throws(
     () =>
       assertServerObservationCaptureEnvironment({

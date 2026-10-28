@@ -1,4 +1,6 @@
-vi.mock("../../../components/follow-button", () => ({ FollowButton: () => <button type="button">Follow</button> }));
+vi.mock("../../../components/follow-button", () => ({
+  FollowButton: () => <button type="button">Follow</button>,
+}));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -28,7 +30,9 @@ vi.mock("../../../lib/services/auth-service", () => ({
 vi.mock("@nexus/db", () => ({ productRepository: { pagePublishedFreeByAuthor: state.products } }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../../../lib/services/profile-privacy-service", () => ({
-  profilePrivacyService: { visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }) },
+  profilePrivacyService: {
+    visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
+  },
 }));
 vi.mock("../../../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,

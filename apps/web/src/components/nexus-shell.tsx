@@ -8,13 +8,7 @@ import { Sidebar } from "./sidebar";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { LocaleProvider } from "./locale-context";
 
-export function NexusShell({
-  children,
-  locale,
-}: {
-  children: ReactNode;
-  locale: Locale;
-}) {
+export function NexusShell({ children, locale }: { children: ReactNode; locale: Locale }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const dictionary = getDictionary(locale);
 
@@ -47,11 +41,7 @@ export function NexusShell({
 
       <div className="min-h-screen bg-page text-primary">
         <div className="flex min-h-screen">
-          <Sidebar
-            locale={locale}
-            isCollapsed={isSidebarCollapsed}
-            onToggle={toggle}
-          />
+          <Sidebar locale={locale} isCollapsed={isSidebarCollapsed} onToggle={toggle} />
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Navbar locale={locale} />

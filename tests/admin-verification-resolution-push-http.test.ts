@@ -10,17 +10,11 @@ const state = vi.hoisted(() => ({
 }));
 
 const afterMock = vi.hoisted(() => vi.fn());
-const resolveRequest = vi.hoisted(() =>
-  vi.fn(async () => state.resolution),
-);
-const findVerification = vi.hoisted(() =>
-  vi.fn(async () => ({ id: "ver_1", status: "pending" })),
-);
+const resolveRequest = vi.hoisted(() => vi.fn(async () => state.resolution));
+const findVerification = vi.hoisted(() => vi.fn(async () => ({ id: "ver_1", status: "pending" })));
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return { ...actual, after: afterMock };
 });
 
@@ -46,12 +40,9 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: { moderateContent: vi.fn() },
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/server-follow-notification-service",
-  () => ({
-    notifyServerFollowersOfPublishedContent: vi.fn(),
-  }),
-);
+vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+  notifyServerFollowersOfPublishedContent: vi.fn(),
+}));
 
 vi.mock("@nexus/db", () => ({
   productRepository: {

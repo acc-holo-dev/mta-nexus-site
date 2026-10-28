@@ -113,7 +113,8 @@ async function fixture(privateDependency = false) {
           targetId: build.id,
         },
         1,
-      `tok_${staff}`);
+        `tok_${staff}`,
+      );
   }
   await db.insert(entitlements).values({
     id: `ent_req_${key}`,
@@ -163,7 +164,8 @@ async function fixture(privateDependency = false) {
         targetId: build.id,
       },
       1,
-    `tok_${staff}`);
+      `tok_${staff}`,
+    );
   }
   async function cleanup() {
     await db.delete(entitlements).where(eq(entitlements.subjectId, buyer));
@@ -1055,17 +1057,15 @@ it("projects collection enrollment and batch stopping as own watch operations wh
 it("keeps malformed watch audit details neutral instead of exposing raw fields or inferred state", async () => {
   const f = await fixture();
   try {
-    await db
-      .insert(auditEvents)
-      .values({
-        id: `aud_bad_watch_${f.key}`,
-        actorId: f.buyer,
-        actorType: "user",
-        action: "library.release_watch_changed",
-        targetType: "product",
-        targetId: f.ids[0] ?? "",
-        details: { enabled: "false", revision: 1, private: "DO-NOT-EXPORT", lastSequence: "999" },
-      });
+    await db.insert(auditEvents).values({
+      id: `aud_bad_watch_${f.key}`,
+      actorId: f.buyer,
+      actorType: "user",
+      action: "library.release_watch_changed",
+      targetType: "product",
+      targetId: f.ids[0] ?? "",
+      details: { enabled: "false", revision: 1, private: "DO-NOT-EXPORT", lastSequence: "999" },
+    });
     const report = await resourceReleaseWatchesRepository.history(f.buyer, {
       days: 7,
       page: 1,

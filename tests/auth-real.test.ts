@@ -42,7 +42,7 @@ describe("Real Auth & Session Engine", () => {
       authService.register({
         ...testUser,
         username: `diff_${Date.now().toString(36)}`,
-      })
+      }),
     ).rejects.toThrow("already exists");
   });
 
@@ -51,7 +51,7 @@ describe("Real Auth & Session Engine", () => {
       authService.register({
         ...testUser,
         email: `other_${Date.now()}@nexus.test`,
-      })
+      }),
     ).rejects.toThrow("already taken");
   });
 
@@ -70,7 +70,7 @@ describe("Real Auth & Session Engine", () => {
       authService.login({
         email: testUser.email,
         password: "WrongPassword999",
-      })
+      }),
     ).rejects.toThrow("Invalid email or password");
   });
 
@@ -79,7 +79,7 @@ describe("Real Auth & Session Engine", () => {
       authService.login({
         email: "nonexistent@nexus.test",
         password: "password123",
-      })
+      }),
     ).rejects.toThrow("Invalid email or password");
   });
 

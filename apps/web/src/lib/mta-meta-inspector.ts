@@ -73,11 +73,7 @@ function byteLength(value: string): number {
   return new TextEncoder().encode(value).byteLength;
 }
 
-function decodeCodePoint(
-  whole: string,
-  raw: string,
-  radix: 10 | 16,
-): string {
+function decodeCodePoint(whole: string, raw: string, radix: 10 | 16): string {
   const value = Number.parseInt(raw, radix);
   if (
     !Number.isInteger(value) ||
@@ -92,9 +88,7 @@ function decodeCodePoint(
 
 function decodeXmlEntities(value: string): string {
   return value
-    .replace(/&#x([0-9a-f]+);/giu, (whole: string, hex: string) =>
-      decodeCodePoint(whole, hex, 16),
-    )
+    .replace(/&#x([0-9a-f]+);/giu, (whole: string, hex: string) => decodeCodePoint(whole, hex, 16))
     .replace(/&#([0-9]+);/gu, (whole: string, decimal: string) =>
       decodeCodePoint(whole, decimal, 10),
     )
@@ -107,8 +101,7 @@ function decodeXmlEntities(value: string): string {
 
 function parseAttributes(source: string): AttributeMap {
   const attributes: Record<string, string> = {};
-  const attributePattern =
-    /([A-Za-z_:][A-Za-z0-9_.:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/gu;
+  const attributePattern = /([A-Za-z_:][A-Za-z0-9_.:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/gu;
 
   for (const match of source.matchAll(attributePattern)) {
     const name = match[1]?.toLowerCase();
@@ -123,10 +116,7 @@ function tags(
   source: string,
   tagName: string,
 ): Readonly<{ items: AttributeMap[]; truncated: boolean }> {
-  const pattern = new RegExp(
-    `<\\s*${tagName}\\b([^<>]*?)(?:\\/\\s*)?>`,
-    "giu",
-  );
+  const pattern = new RegExp(`<\\s*${tagName}\\b([^<>]*?)(?:\\/\\s*)?>`, "giu");
   const items: AttributeMap[] = [];
 
   for (const match of source.matchAll(pattern)) {
@@ -140,10 +130,7 @@ function tags(
 }
 
 function containerContents(source: string, tagName: string): string[] {
-  const pattern = new RegExp(
-    `<\\s*${tagName}\\b[^>]*>([\\s\\S]*?)<\\/\\s*${tagName}\\s*>`,
-    "giu",
-  );
+  const pattern = new RegExp(`<\\s*${tagName}\\b[^>]*>([\\s\\S]*?)<\\/\\s*${tagName}\\s*>`, "giu");
   return Array.from(source.matchAll(pattern), (match) => match[1] ?? "").slice(
     0,
     MAX_TAG_ENTRIES_PER_KIND,
@@ -171,11 +158,7 @@ function issue(
   issues.push(Object.freeze({ code, severity, message }));
 }
 
-function tagItems(
-  source: string,
-  tagName: string,
-  issues: MetaInspectionIssue[],
-): AttributeMap[] {
+function tagItems(source: string, tagName: string, issues: MetaInspectionIssue[]): AttributeMap[] {
   const extraction = tags(source, tagName);
   if (extraction.truncated) {
     issue(
@@ -229,11 +212,7 @@ function normalizedScriptType(
 ): "client" | "server" | "shared" | "unknown" {
   if (value === undefined || value === "") return "server";
   const normalized = value.toLowerCase();
-  if (
-    normalized === "client" ||
-    normalized === "server" ||
-    normalized === "shared"
-  ) {
+  if (normalized === "client" || normalized === "server" || normalized === "shared") {
     return normalized;
   }
   return "unknown";
@@ -263,8 +242,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
   const withoutBom = xml.replace(/^\uFEFF/u, "");
   const hasUnclosedComment =
     withoutBom.includes("<!--") &&
-    (withoutBom.match(/<!--/gu)?.length ?? 0) !==
-      (withoutBom.match(/-->/gu)?.length ?? 0);
+    (withoutBom.match(/<!--/gu)?.length ?? 0) !== (withoutBom.match(/-->/gu)?.length ?? 0);
   if (hasUnclosedComment) {
     issue(
       issues,
@@ -293,12 +271,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
 
   const infoTags = tagItems(source, "info", issues);
   if (infoTags.length === 0) {
-    issue(
-      issues,
-      "INFO_NOT_DECLARED",
-      "warning",
-      "No <info> metadata tag was found.",
-    );
+    issue(issues, "INFO_NOT_DECLARED", "warning", "No <info> metadata tag was found.");
   } else if (infoTags.length > 1) {
     issue(
       issues,
@@ -341,24 +314,14 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
   const files = tagItems(source, "file", issues);
   files.forEach((attributes, index) => {
     if (!attributes.src?.trim()) {
-      issue(
-        issues,
-        "FILE_SRC_MISSING",
-        "error",
-        `File entry ${index + 1} does not declare src.`,
-      );
+      issue(issues, "FILE_SRC_MISSING", "error", `File entry ${index + 1} does not declare src.`);
     }
   });
 
   const maps = tagItems(source, "map", issues);
   maps.forEach((attributes, index) => {
     if (!attributes.src?.trim()) {
-      issue(
-        issues,
-        "MAP_SRC_MISSING",
-        "error",
-        `Map entry ${index + 1} does not declare src.`,
-      );
+      issue(issues, "MAP_SRC_MISSING", "error", `Map entry ${index + 1} does not declare src.`);
     }
   });
 
@@ -399,12 +362,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
   });
 
   const html = tagItems(source, "html", issues);
-  const settings = containedTagItems(
-    source,
-    "settings",
-    "setting",
-    issues,
-  );
+  const settings = containedTagItems(source, "settings", "setting", issues);
   const minVersionTags = tagItems(source, "min_mta_version", issues);
   const minVersionTag = minVersionTags[0] ?? null;
   if (minVersionTags.length > 1) {
@@ -455,12 +413,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
       );
     }
   }
-  const aclRights = containedTagItems(
-    source,
-    "aclrequest",
-    "right",
-    issues,
-  );
+  const aclRights = containedTagItems(source, "aclrequest", "right", issues);
 
   const dependencyResources = Array.from(
     new Set(
@@ -479,9 +432,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     clientCacheDisabledScripts: scripts.filter(
       (item) => item.type === "client" && isFalse(item.cache),
     ).length,
-    validationDisabledScripts: scripts.filter((item) =>
-      isFalse(item.validate),
-    ).length,
+    validationDisabledScripts: scripts.filter((item) => isFalse(item.validate)).length,
     fileCount: files.length,
     mapCount: maps.length,
     dependencyCount: dependencyResources.length,

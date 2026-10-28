@@ -13,9 +13,7 @@ assert.equal(
 );
 assert(process.env.NEXUS_BROWSER_HOME, "A disposable browser HOME is required");
 
-const require = createRequire(
-  join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"),
-);
+const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { defineConfig } = require("@playwright/test");
 const reportRoot = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
 
@@ -28,10 +26,7 @@ export default defineConfig({
   retries: 0,
   preserveOutput: "failures-only",
   outputDir: join(reportRoot, "playwright-results"),
-  reporter: [
-    ["line"],
-    ["json", { outputFile: join(reportRoot, "playwright-report.json") }],
-  ],
+  reporter: [["line"], ["json", { outputFile: join(reportRoot, "playwright-report.json") }]],
   use: {
     baseURL: process.env.NEXUS_BROWSER_BASE_URL,
     ignoreHTTPSErrors: false,

@@ -6,13 +6,8 @@ import {
 } from "../security-activity";
 
 export class SecurityCenterService {
-  async listActivity(
-    userId: string,
-    limit = 30,
-  ): Promise<SecurityActivityItem[]> {
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 30;
+  async listActivity(userId: string, limit = 30): Promise<SecurityActivityItem[]> {
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 30;
     const events = await auditRepository.listByActor(
       userId,
       [...SECURITY_ACTIVITY_ACTIONS],

@@ -15,10 +15,7 @@ import {
 } from "@nexus/db";
 import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
 
-function adminRequest(
-  token: string,
-  body: Record<string, unknown>,
-) {
+function adminRequest(token: string, body: Record<string, unknown>) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
     headers: browserMutationHeaders({
@@ -94,16 +91,8 @@ describe("moderation atomicity integration", () => {
     const publishedId = `prd_mod_published_${suffix}`;
 
     await makeProduct(draftId, `mod-draft-${suffix}`, "draft");
-    await makeProduct(
-      suspendedNoBuildId,
-      `mod-suspended-${suffix}`,
-      "suspended",
-    );
-    await makeProduct(
-      publishedId,
-      `mod-published-${suffix}`,
-      "published",
-    );
+    await makeProduct(suspendedNoBuildId, `mod-suspended-${suffix}`, "suspended");
+    await makeProduct(publishedId, `mod-published-${suffix}`, "published");
     await buildRepository.create({
       id: `bld_mod_published_${suffix}`,
       productId: publishedId,
@@ -138,7 +127,9 @@ describe("moderation atomicity integration", () => {
         targetId: suspendedNoBuildId,
         action: "restore",
         notes: "Release into draft without publication.",
-        expectedUpdatedAt: (await productRepository.findById(suspendedNoBuildId))?.updatedAt.toISOString(),
+        expectedUpdatedAt: (
+          await productRepository.findById(suspendedNoBuildId)
+        )?.updatedAt.toISOString(),
       }),
     );
     expect(noBuildRestore.status).toBe(200);
@@ -154,20 +145,32 @@ describe("moderation atomicity integration", () => {
       }),
     );
     expect(suspend.status).toBe(200);
-    expect((await productRepository.findById(publishedId))?.status).toBe(
-      "suspended",
-    );
+    expect((await productRepository.findById(publishedId))?.status).toBe("suspended");
 
-    const [suspensionAudit] = await db.select().from(auditEvents).where(eq(auditEvents.targetId, publishedId));
+    const [suspensionAudit] = await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.targetId, publishedId));
     expect(suspensionAudit).toBeDefined();
     const suspendedProduct = await productRepository.findById(publishedId);
     if (!suspendedProduct) throw new Error("Expected suspended resource fixture");
-    await expect(resourceModerationRepository.command({
-      actorId: adminId, productId: publishedId, auditId: suspensionAudit.id, currentToken: token,
-      command: { action: "release", reason: "Must roll back every transition.", expectedUpdatedAt: suspendedProduct.updatedAt.toISOString() },
-    })).rejects.toBeTruthy();
+    await expect(
+      resourceModerationRepository.command({
+        actorId: adminId,
+        productId: publishedId,
+        auditId: suspensionAudit.id,
+        currentToken: token,
+        command: {
+          action: "release",
+          reason: "Must roll back every transition.",
+          expectedUpdatedAt: suspendedProduct.updatedAt.toISOString(),
+        },
+      }),
+    ).rejects.toBeTruthy();
     expect((await productRepository.findById(publishedId))?.status).toBe("suspended");
-    expect((await buildRepository.findById(`bld_mod_published_${suffix}`))?.status).toBe("published");
+    expect((await buildRepository.findById(`bld_mod_published_${suffix}`))?.status).toBe(
+      "published",
+    );
 
     const restore = await adminAction(
       adminRequest(token, {
@@ -182,10 +185,7 @@ describe("moderation atomicity integration", () => {
     expect((await productRepository.findById(publishedId))?.status).toBe("draft");
     expect((await buildRepository.findById(`bld_mod_published_${suffix}`))?.status).toBe("draft");
 
-    const audits = await db
-      .select()
-      .from(auditEvents)
-      .where(eq(auditEvents.targetId, publishedId));
+    const audits = await db.select().from(auditEvents).where(eq(auditEvents.targetId, publishedId));
     expect(
       audits.filter(
         (event) =>
@@ -255,9 +255,7 @@ describe("moderation atomicity integration", () => {
       ),
     ).rejects.toBeTruthy();
 
-    expect((await contentRepository.findById(contentId))?.status).toBe(
-      "draft",
-    );
+    expect((await contentRepository.findById(contentId))?.status).toBe("draft");
   });
 
   it("resolves a report only once and commits its audit with the resolution", async () => {
@@ -331,15 +329,10 @@ describe("moderation atomicity integration", () => {
     );
     expect(second).toBeNull();
 
-    const audits = await db
-      .select()
-      .from(auditEvents)
-      .where(eq(auditEvents.targetId, reportId));
+    const audits = await db.select().from(auditEvents).where(eq(auditEvents.targetId, reportId));
     expect(
       audits.filter(
-        (event) =>
-          event.action === "admin.resolve" ||
-          event.action === "admin.dismiss",
+        (event) => event.action === "admin.resolve" || event.action === "admin.dismiss",
       ),
     ).toHaveLength(1);
   });

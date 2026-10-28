@@ -8,9 +8,7 @@ import {
 
 describe("security activity contract", () => {
   it("uses an explicit allowlist with a label for every action", () => {
-    expect(new Set(SECURITY_ACTIVITY_ACTIONS).size).toBe(
-      SECURITY_ACTIVITY_ACTIONS.length,
-    );
+    expect(new Set(SECURITY_ACTIVITY_ACTIONS).size).toBe(SECURITY_ACTIVITY_ACTIONS.length);
     for (const action of SECURITY_ACTIVITY_ACTIONS) {
       expect(isSecurityActivityAction(action)).toBe(true);
       expect(SECURITY_ACTIVITY_LABEL_KEYS[action]).toBeTruthy();
@@ -41,11 +39,13 @@ describe("security activity contract", () => {
   });
 
   it("rejects non-security audit events", () => {
-    expect(toSecurityActivityItem({
-      id: "aud_other",
-      action: "product.created",
-      targetType: "product",
-      createdAt: new Date(),
-    })).toBeNull();
+    expect(
+      toSecurityActivityItem({
+        id: "aud_other",
+        action: "product.created",
+        targetType: "product",
+        createdAt: new Date(),
+      }),
+    ).toBeNull();
   });
 });

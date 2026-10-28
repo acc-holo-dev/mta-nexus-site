@@ -97,7 +97,8 @@ describe("published build/currentVersion consistency", () => {
         targetType: "build",
       },
       1,
-    `tok_${staffId}`);
+      `tok_${staffId}`,
+    );
     expect(newer?.status).toBe("published");
 
     const older = await buildRepository.moderatePending(
@@ -112,7 +113,8 @@ describe("published build/currentVersion consistency", () => {
         targetType: "build",
       },
       1,
-    `tok_${staffId}`);
+      `tok_${staffId}`,
+    );
     expect(older?.status).toBe("published");
 
     const product = await productRepository.findById(productId);
@@ -192,7 +194,8 @@ describe("published build/currentVersion consistency", () => {
           targetType: "build",
         },
         1,
-      `tok_${staffId}`),
+        `tok_${staffId}`,
+      ),
       buildRepository.moderatePending(
         secondId,
         "approve",
@@ -205,7 +208,8 @@ describe("published build/currentVersion consistency", () => {
           targetType: "build",
         },
         1,
-      `tok_${staffId}`),
+        `tok_${staffId}`,
+      ),
     ]);
 
     const product = await productRepository.findById(concurrentProductId);

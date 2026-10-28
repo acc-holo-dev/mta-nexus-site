@@ -13,15 +13,10 @@ export default async function ServersPage() {
       <div className="flex flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2.5 text-2xl font-extrabold text-primary sm:text-3xl">
-            <ServerIcon
-              className="h-7 w-7 shrink-0 text-accent"
-              aria-hidden="true"
-            />
+            <ServerIcon className="h-7 w-7 shrink-0 text-accent" aria-hidden="true" />
             <span>{dictionary.servers.title}</span>
           </h1>
-          <p className="mt-1 text-xs text-secondary">
-            {dictionary.servers.description}
-          </p>
+          <p className="mt-1 text-xs text-secondary">{dictionary.servers.description}</p>
         </div>
         <Link
           href="/workspace/servers/new"

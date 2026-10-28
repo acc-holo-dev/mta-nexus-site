@@ -10,11 +10,12 @@ test("retains the historical identity for endpoint revision zero", () => {
 });
 
 test("records each endpoint revision separately within the same master snapshot", () => {
-  const ids = [0, 1, 2, 10, 2_147_483_647]
-    .map(revision => observationSequenceForEndpoint(SNAPSHOT, revision));
+  const ids = [0, 1, 2, 10, 2_147_483_647].map((revision) =>
+    observationSequenceForEndpoint(SNAPSHOT, revision),
+  );
   assert.equal(new Set(ids).size, ids.length);
-  assert.equal(ids[1], SNAPSHOT + "#endpoint-revision=1");
-  assert.equal(ids[2], SNAPSHOT + "#endpoint-revision=2");
+  assert.equal(ids[1], `${SNAPSHOT}#endpoint-revision=1`);
+  assert.equal(ids[2], `${SNAPSHOT}#endpoint-revision=2`);
   assert.equal(observationSequenceForEndpoint(SNAPSHOT, 2), ids[2]);
 });
 

@@ -10,34 +10,33 @@ import { queueCommunityReportBatchNotices } from "../../../../../../../../../lib
 import { communityReportService } from "../../../../../../../../../lib/services/community-report-service";
 import { userPlatformApi } from "../../../../../../../../../lib/user-platform-api";
 import { withBrowserMutation } from "../../../../../../../../../lib/browser-route-adapter";
-export const POST = withBrowserMutation((
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string; commentId: string }> },
-) => {
-  return userPlatformApi(
-    request,
-    async (actor) => {
-      if (request.nextUrl.searchParams.size)
-        throw new AppError("Unexpected batch filters", 400, "VALIDATION_ERROR");
-      requireServerJsonContentType(request);
-      await reportRateLimit(actor.id, "moderationAction");
-      const scope = await params;
-      const result = await communityReportService.decideDiscussionBatch(
-        actor,
-        scope.id,
-        scope.commentId,
-        await readBoundedJson(request, 8192),
-      );
-      queueCommunityReportBatchNotices(result.items);
-      return {
-        contentId: result.contentId,
-        commentId: result.commentId,
-        action: result.action,
-        previewRevision: result.previewRevision,
-        items: result.items.map((item) => ({ id: item.id, status: item.status })),
-      };
-    },
-    200,
-    reportBatchError,
-  );
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string; commentId: string }> }) => {
+    return userPlatformApi(
+      request,
+      async (actor) => {
+        if (request.nextUrl.searchParams.size)
+          throw new AppError("Unexpected batch filters", 400, "VALIDATION_ERROR");
+        requireServerJsonContentType(request);
+        await reportRateLimit(actor.id, "moderationAction");
+        const scope = await params;
+        const result = await communityReportService.decideDiscussionBatch(
+          actor,
+          scope.id,
+          scope.commentId,
+          await readBoundedJson(request, 8192),
+        );
+        queueCommunityReportBatchNotices(result.items);
+        return {
+          contentId: result.contentId,
+          commentId: result.commentId,
+          action: result.action,
+          previewRevision: result.previewRevision,
+          items: result.items.map((item) => ({ id: item.id, status: item.status })),
+        };
+      },
+      200,
+      reportBatchError,
+    );
+  },
+);

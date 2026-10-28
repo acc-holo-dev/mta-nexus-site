@@ -1,6 +1,6 @@
 # MTA NEXUS — Security Center, Quarantine, Admin Search и API Policy
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 6.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Security Center
 
@@ -111,7 +111,7 @@ OWNER DECISION: self-service API keys/webhooks **не являются обяз�
 
 ## 8. Public API policy
 
-Ответ владельца Round 6 `только` трактуется как: **на первом этапе не открывать анонимный read-only API всему интернету; API при появлении сначала предназначен только authenticated partners/Pro/integrations**.
+Утверждённая граница внешнего API: **на первом этапе не открывать анонимный read-only API всему интернету; API при появлении сначала предназначен только authenticated partners/Pro/integrations**.
 
 Следовательно:
 
@@ -137,7 +137,7 @@ OWNER DECISION: отдельная публичная Status Page самой NEX
 - security actions должны быть server-authoritative;
 - malware/takedown decisions должны распространяться на cached/private delivery paths, а не только скрывать UI card.
 
-## 11. Round 7 — sensitive action policy
+## 11. sensitive action policy
 
 Security-sensitive operations должны поддерживать step-up/re-authentication независимо от optional 2FA policy. Это относится как минимум к ownership/payout/finance privilege changes и другим действиям, определённым risk model.
 

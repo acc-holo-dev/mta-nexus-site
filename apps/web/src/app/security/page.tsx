@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import {
-  Clock3,
-  MailCheck,
-  Monitor,
-  Settings,
-  ShieldCheck,
-} from "lucide-react";
+import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
 import { authService } from "../../lib/services/auth-service";
 import { securityCenterService } from "../../lib/services/security-center-service";
 import { SECURITY_ACTIVITY_LABEL_KEYS } from "../../lib/security-activity";
@@ -38,12 +32,11 @@ export default async function SecurityPage() {
   }
 
   const { user, sessionId: currentSessionId } = authenticated;
-  const [sessions, recoveryEmail, activity] =
-    await Promise.all([
-      authService.listSessions(user.id),
-      authService.getRecoveryEmailStatus(user.id),
-      securityCenterService.listActivity(user.id, 30),
-    ]);
+  const [sessions, recoveryEmail, activity] = await Promise.all([
+    authService.listSessions(user.id),
+    authService.getRecoveryEmailStatus(user.id),
+    securityCenterService.listActivity(user.id, 30),
+  ]);
 
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
@@ -55,9 +48,7 @@ export default async function SecurityPage() {
             <ShieldCheck className="h-6 w-6 text-accent" aria-hidden="true" />
             {copy.title}
           </h1>
-          <p className="mt-1 max-w-2xl font-caption text-muted">
-            {copy.description}
-          </p>
+          <p className="mt-1 max-w-2xl font-caption text-muted">{copy.description}</p>
         </div>
         <Link
           href="/settings"
@@ -78,9 +69,7 @@ export default async function SecurityPage() {
             {copy.recovery}
           </h2>
         </div>
-        <p className="mt-3 break-all text-sm text-primary">
-          {recoveryEmail?.email ?? user.email}
-        </p>
+        <p className="mt-3 break-all text-sm text-primary">{recoveryEmail?.email ?? user.email}</p>
         <p className="mt-1 text-xs text-muted">
           {recoveryEmail
             ? recoveryEmail.verified

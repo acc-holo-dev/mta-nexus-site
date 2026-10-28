@@ -4,10 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import process from "node:process";
 
-const path = resolve(
-  process.cwd(),
-  process.argv[2] || "artifacts/web-push-soak-evidence.json",
-);
+const path = resolve(process.cwd(), process.argv[2] || "artifacts/web-push-soak-evidence.json");
 
 function fail(message) {
   process.stderr.write(`web-push-soak-evidence: ${message}\n`);
@@ -22,30 +19,19 @@ try {
   process.exit();
 }
 
-if (
-  evidence?.schemaVersion !== 1 ||
-  evidence?.kind !== "web_push_production_duration_soak"
-) {
+if (evidence?.schemaVersion !== 1 || evidence?.kind !== "web_push_production_duration_soak") {
   fail("unexpected schema or evidence kind");
   process.exit();
 }
 
 const { evidenceSha256, ...core } = evidence;
-const expected = createHash("sha256")
-  .update(JSON.stringify(core))
-  .digest("hex");
-if (
-  typeof evidenceSha256 !== "string" ||
-  evidenceSha256 !== expected
-) {
+const expected = createHash("sha256").update(JSON.stringify(core)).digest("hex");
+if (typeof evidenceSha256 !== "string" || evidenceSha256 !== expected) {
   fail("evidence checksum mismatch");
 }
 
 if (evidence?.verdict?.passed !== true) {
-  fail(
-    "soak verdict is not passed: " +
-      JSON.stringify(evidence?.verdict?.failures ?? []),
-  );
+  fail(`soak verdict is not passed: ${JSON.stringify(evidence?.verdict?.failures ?? [])}`);
 }
 
 if (
@@ -58,17 +44,13 @@ if (
   fail("delivery/queue invariants are incomplete");
 }
 
-if (
-  evidence?.cleanup?.attempted !== true ||
-  evidence?.cleanup?.succeeded !== true
-) {
+if (evidence?.cleanup?.attempted !== true || evidence?.cleanup?.succeeded !== true) {
   fail("fixture cleanup was not proven");
 }
 
 if (
   !Number.isSafeInteger(evidence?.timing?.durationActualMs) ||
-  evidence.timing.durationActualMs <
-    evidence?.timing?.durationTargetMs
+  evidence.timing.durationActualMs < evidence?.timing?.durationTargetMs
 ) {
   fail("duration evidence is incomplete");
 }

@@ -8,18 +8,20 @@ describe("server endpoint revision migration", () => {
   it("registers 0034 exactly once and preserves chronological migration history", () => {
     const journal = JSON.parse(read("packages/db/migrations/meta/_journal.json"));
     const entries = journal.entries as { idx: number; tag: string }[];
-    const revisions = entries.filter(entry => entry.tag === "0034_server_endpoint_revision");
+    const revisions = entries.filter((entry) => entry.tag === "0034_server_endpoint_revision");
     expect(revisions).toHaveLength(1);
     expect(revisions[0]).toMatchObject({ idx: 34, tag: "0034_server_endpoint_revision" });
     expect(entries[34]?.idx).toBe(34);
     expect(entries[33]?.idx).toBe(33);
-    expect(entries.map(entry => entry.idx)).toEqual(entries.map((_, index) => index));
+    expect(entries.map((entry) => entry.idx)).toEqual(entries.map((_, index) => index));
   });
 
   it("assigns revision zero to existing servers and null to legacy proofs", () => {
     const migration = read("packages/db/migrations/0034_server_endpoint_revision.sql");
     expect(migration).toContain('"endpoint_revision" integer DEFAULT 0 NOT NULL');
-    expect(migration).toContain('ALTER TABLE "server_claim_challenges" ADD COLUMN "endpoint_revision" integer');
+    expect(migration).toContain(
+      'ALTER TABLE "server_claim_challenges" ADD COLUMN "endpoint_revision" integer',
+    );
     expect(migration).toContain('"endpoint_revision" IS NULL OR "endpoint_revision" >= 0');
     expect(migration).not.toContain('UPDATE "server_claim_challenges"');
   });

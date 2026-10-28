@@ -33,11 +33,7 @@ const errorHeaders = {
   "Cache-Control": "no-store",
 };
 
-function privateJson(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function privateJson(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -48,18 +44,9 @@ export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
 
   try {
-    const requestedLimit = Number(
-      request.nextUrl.searchParams.get("limit") ||
-        "100",
-    );
+    const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "100");
     const limit = Number.isFinite(requestedLimit)
-      ? Math.min(
-          Math.max(
-            Math.floor(requestedLimit),
-            1,
-          ),
-          100,
-        )
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
       : 100;
 
     // Editorial data and the official directory are independent reads.
@@ -73,10 +60,11 @@ export async function GET(request: NextRequest) {
     const observations = directory?.servers ?? [];
     // One server benefits from an early Array.find; for many listings,
     // reuse the incremental endpoint index instead of N full-array scans.
-    const observationFor = servers.length > 1
-      ? indexMtaObservations(observations)
-      : (server: { ipAddress: string; port: number }) =>
-          observations.find((observation) => matchesMtaEndpoint(server, observation));
+    const observationFor =
+      servers.length > 1
+        ? indexMtaObservations(observations)
+        : (server: { ipAddress: string; port: number }) =>
+            observations.find((observation) => matchesMtaEndpoint(server, observation));
 
     const enrichedServers = servers.map((server) => {
       const liveObservation = observationFor(server);
@@ -111,8 +99,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error:
-          "Server listings are temporarily unavailable",
+        error: "Server listings are temporarily unavailable",
       },
       {
         status: 503,
@@ -126,36 +113,25 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
-    const rateLimit = await consumeRateLimit(
-      "serverMutation",
-      ip,
-    );
+    const rateLimit = await consumeRateLimit("serverMutation", ip);
     if (!rateLimit.success) {
       return privateJson(
         context,
         {
-          error:
-            "Server registration limit exceeded",
+          error: "Server registration limit exceeded",
         },
         429,
       );
     }
 
-    const token =
-      request.cookies.get("nexus_session")?.value;
+    const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return privateJson(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return privateJson(context, { error: "Authentication required" }, 401);
     }
 
     requireServerJsonContentType(request);
-    const parsed = serverRegistrationSchema.safeParse(
-      await readBoundedJson(request),
-    );
+    const parsed = serverRegistrationSchema.safeParse(await readBoundedJson(request));
     if (!parsed.success) {
       return privateJson(
         context,
@@ -170,17 +146,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const server = await serverService.createServer(
       {
         ...parsed.data,
-        ownerId: parsed.data.organizationId
-          ? undefined
-          : user.id,
+        ownerId: parsed.data.organizationId ? undefined : user.id,
       },
       user,
     );
-    return privateJson(
-      context,
-      { server },
-      201,
-    );
+    return privateJson(context, { server }, 201);
   } catch (error: unknown) {
     const appError = error instanceof AppError ? error : null;
     logRequestEvent({

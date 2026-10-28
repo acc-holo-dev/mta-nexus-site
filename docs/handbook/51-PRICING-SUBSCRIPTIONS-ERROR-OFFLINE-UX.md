@@ -80,7 +80,7 @@ Release target includes:
 - WCAG 2.2 AA target for key account and commerce flows.
 
 
-## Round 9 pricing contract additions
+## pricing contract additions
 
 Pricing must communicate the following even before exact amounts are finalized:
 

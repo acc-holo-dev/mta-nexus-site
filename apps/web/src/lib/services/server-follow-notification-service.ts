@@ -1,8 +1,4 @@
-import {
-  notificationRepository,
-  serverRepository,
-  socialRepository,
-} from "@nexus/db";
+import { notificationRepository, serverRepository, socialRepository } from "@nexus/db";
 import type { Content } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { buildServerPublicationNotification } from "../server-follow-notifications";
@@ -35,10 +31,7 @@ function skippedResult(): ServerFollowerNotificationResult {
 }
 
 export async function notifyServerFollowersOfPublishedContent(
-  content: Pick<
-    Content,
-    "authorId" | "serverId" | "slug" | "status" | "title"
-  >,
+  content: Pick<Content, "authorId" | "serverId" | "slug" | "status" | "title">,
 ): Promise<ServerFollowerNotificationResult> {
   if (content.status !== "published" || !content.serverId) {
     return skippedResult();
@@ -46,11 +39,7 @@ export async function notifyServerFollowersOfPublishedContent(
 
   try {
     const server = await serverRepository.findById(content.serverId);
-    if (
-      !server ||
-      server.visibility === "private" ||
-      server.status === "suspended"
-    ) {
+    if (!server || server.visibility === "private" || server.status === "suspended") {
       return skippedResult();
     }
 
@@ -62,12 +51,8 @@ export async function notifyServerFollowersOfPublishedContent(
     const eligibleFollowers = fetchedFollowers.filter(
       (follow) => follow.followerId !== content.authorId,
     );
-    const followerLimitReached =
-      eligibleFollowers.length > MAX_SERVER_FOLLOWERS_PER_PUBLICATION;
-    const followers = eligibleFollowers.slice(
-      0,
-      MAX_SERVER_FOLLOWERS_PER_PUBLICATION,
-    );
+    const followerLimitReached = eligibleFollowers.length > MAX_SERVER_FOLLOWERS_PER_PUBLICATION;
+    const followers = eligibleFollowers.slice(0, MAX_SERVER_FOLLOWERS_PER_PUBLICATION);
     const notification = buildServerPublicationNotification(server, content);
 
     let delivered = 0;
@@ -80,19 +65,15 @@ export async function notifyServerFollowersOfPublishedContent(
       offset < followers.length;
       offset += SERVER_FOLLOW_NOTIFICATION_CONCURRENCY
     ) {
-      const batch = followers.slice(
-        offset,
-        offset + SERVER_FOLLOW_NOTIFICATION_CONCURRENCY,
-      );
+      const batch = followers.slice(offset, offset + SERVER_FOLLOW_NOTIFICATION_CONCURRENCY);
       const results = await Promise.all(
         batch.map(async (follow) => {
           try {
-            const created =
-              await notificationRepository.createWithPushOutbox({
-                id: generateId("not"),
-                recipientId: follow.followerId,
-                ...notification,
-              });
+            const created = await notificationRepository.createWithPushOutbox({
+              id: generateId("not"),
+              recipientId: follow.followerId,
+              ...notification,
+            });
             if (!created.notification) {
               return {
                 inbox: "suppressed" as const,

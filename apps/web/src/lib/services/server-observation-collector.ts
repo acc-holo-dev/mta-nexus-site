@@ -1,11 +1,5 @@
-import {
-  serverObservationRepository,
-  serverRepository,
-} from "@nexus/db";
-import {
-  indexMtaObservations,
-  mtaMasterDirectoryService,
-} from "./mta-master-directory-service";
+import { serverObservationRepository, serverRepository } from "@nexus/db";
+import { indexMtaObservations, mtaMasterDirectoryService } from "./mta-master-directory-service";
 import { buildMasterObservationCandidates } from "./server-observation-matching";
 
 const RECORD_CONCURRENCY = 5;
@@ -71,7 +65,8 @@ export async function captureKnownServerObservations(options?: {
 
   for (let page = 0; page < maxPages; page++) {
     const knownServers = pageRows.slice(0, limit);
-    if (knownServers.length === 0) {
+    const lastServer = knownServers.at(-1);
+    if (!lastServer) {
       nextCursor = null;
       break;
     }
@@ -84,31 +79,25 @@ export async function captureKnownServerObservations(options?: {
       }
     }
 
-    const candidates = buildMasterObservationCandidates(
-      knownServers,
-      directory,
-      observationFor,
-    );
+    const candidates = buildMasterObservationCandidates(knownServers, directory, observationFor);
     const recordable = directory.isStale ? [] : candidates;
-    const endpointById = new Map(
-      knownServers.map(server => [server.id, server] as const),
-    );
+    const endpointById = new Map(knownServers.map((server) => [server.id, server] as const));
     for (let offset = 0; offset < recordable.length; offset += RECORD_CONCURRENCY) {
       const results = await Promise.allSettled(
-        recordable.slice(offset, offset + RECORD_CONCURRENCY)
-          .map(async candidate => serverObservationRepository.record(
-            candidate,
-            endpointById.get(candidate.serverId),
-          )),
+        recordable
+          .slice(offset, offset + RECORD_CONCURRENCY)
+          .map(async (candidate) =>
+            serverObservationRepository.record(candidate, endpointById.get(candidate.serverId)),
+          ),
       );
       // Drain the batch before failing; never begin later pages on failure.
-      const failure = results.find(result => result.status === "rejected");
+      const failure = results.find((result) => result.status === "rejected");
       if (failure) throw failure.reason;
       // The repository returns null when an owner changes endpoint between
       // page selection and the locked observation transaction. It inserts
       // neither history nor live data for that stale endpoint.
       recordSkippedEndpointChanges += results.filter(
-        result => result.status === "fulfilled" && result.value === null,
+        (result) => result.status === "fulfilled" && result.value === null,
       ).length;
     }
 
@@ -116,24 +105,24 @@ export async function captureKnownServerObservations(options?: {
     knownServersCount += knownServers.length;
     matchedServers += candidates.length;
     recordAttempts += recordable.length;
-    cursor = knownServers[knownServers.length - 1]!.id;
+    cursor = lastServer.id;
     listingHasMore = pageRows.length > limit;
     // Stale snapshots cannot prove that any current observation was written.
     // Reporting an afterId for them would let an operator skip untouched
     // rows on the next fresh capture.
-    nextCursor = directory.isStale
-      ? null
-      : listingHasMore ? cursor : null;
+    nextCursor = directory.isStale ? null : listingHasMore ? cursor : null;
     if (!directory.isStale) {
-      options?.onPageCompleted?.(Object.freeze({
-        afterId: cursor,
-        pagesProcessed,
-        knownServers: knownServersCount,
-        matchedServers,
-        recordAttempts,
-        recordSkippedEndpointChanges,
-        hasMore: nextCursor !== null,
-      }));
+      options?.onPageCompleted?.(
+        Object.freeze({
+          afterId: cursor,
+          pagesProcessed,
+          knownServers: knownServersCount,
+          matchedServers,
+          recordAttempts,
+          recordSkippedEndpointChanges,
+          hasMore: nextCursor !== null,
+        }),
+      );
     }
     if (directory.isStale || !nextCursor || page + 1 >= maxPages) break;
     pageRows = await serverRepository.listObservableAfter(limit + 1, nextCursor);

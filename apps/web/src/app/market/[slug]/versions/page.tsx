@@ -48,19 +48,21 @@ export default async function PublicResourceVersionsPage({
 
   const user = await authService.getSession(cookieStore.get("nexus_session")?.value);
   const [history, canDownload] = await Promise.all([
-    buildRepository.pagePublishedReleases(
-      product.id,
-      parseReleaseHistoryPage(query.page),
-    ),
+    buildRepository.pagePublishedReleases(product.id, parseReleaseHistoryPage(query.page)),
     user
-      ? (user.role === "admin"
+      ? user.role === "admin"
         ? Promise.resolve(true)
-        : productService.canManageProduct(product, user)
-          .then(async canManage => canManage || commerceService.checkEntitlement(
-            { type: "user", id: user.id },
-            product.id,
-            "product.download",
-          )))
+        : productService
+            .canManageProduct(product, user)
+            .then(
+              async (canManage) =>
+                canManage ||
+                commerceService.checkEntitlement(
+                  { type: "user", id: user.id },
+                  product.id,
+                  "product.download",
+                ),
+            )
       : Promise.resolve(false),
   ]);
   const copy = getReleaseHistoryCopy(locale);
@@ -86,7 +88,7 @@ export default async function PublicResourceVersionsPage({
         <p className="py-10 text-sm text-secondary">{copy.noBuilds}</p>
       ) : (
         <ol className="space-y-4">
-          {history.releases.map(release => (
+          {history.releases.map((release) => (
             <li key={release.id} className="nexus-panel space-y-4 p-5">
               <header className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
@@ -125,7 +127,9 @@ export default async function PublicResourceVersionsPage({
                       <time dateTime={release.scannedAt.toISOString()}>
                         {formatHistoryDate(release.scannedAt, locale)}
                       </time>
-                    ) : copy.notDeclared}
+                    ) : (
+                      copy.notDeclared
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -163,23 +167,46 @@ export default async function PublicResourceVersionsPage({
 
       {!canDownload && (
         <div className="text-sm text-secondary">
-          {user
-            ? <Link href={`/acquire?productId=${encodeURIComponent(product.id)}`} className="text-accent underline">{copy.acquire}</Link>
-            : <Link href="/auth/login" className="text-accent underline">{copy.signIn}</Link>}
+          {user ? (
+            <Link
+              href={`/acquire?productId=${encodeURIComponent(product.id)}`}
+              className="text-accent underline"
+            >
+              {copy.acquire}
+            </Link>
+          ) : (
+            <Link href="/auth/login" className="text-accent underline">
+              {copy.signIn}
+            </Link>
+          )}
         </div>
       )}
 
       {history.totalPages > 1 && (
         <nav aria-label={copy.title} className="flex items-center justify-between gap-4 text-sm">
-          {history.page > 1
-            ? <Link className="text-accent underline" href={releaseHistoryHref(product.slug, history.page - 1)}>{copy.previous}</Link>
-            : <span />}
+          {history.page > 1 ? (
+            <Link
+              className="text-accent underline"
+              href={releaseHistoryHref(product.slug, history.page - 1)}
+            >
+              {copy.previous}
+            </Link>
+          ) : (
+            <span />
+          )}
           <span className="text-secondary">
             {copy.page} {history.page} {copy.of} {history.totalPages}
           </span>
-          {history.page < history.totalPages
-            ? <Link className="text-accent underline" href={releaseHistoryHref(product.slug, history.page + 1)}>{copy.next}</Link>
-            : <span />}
+          {history.page < history.totalPages ? (
+            <Link
+              className="text-accent underline"
+              href={releaseHistoryHref(product.slug, history.page + 1)}
+            >
+              {copy.next}
+            </Link>
+          ) : (
+            <span />
+          )}
         </nav>
       )}
     </div>

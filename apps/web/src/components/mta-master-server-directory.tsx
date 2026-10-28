@@ -20,13 +20,7 @@ type DirectoryResponse = {
   isStale: boolean;
 };
 
-function ServerCard({
-  server,
-  locale,
-}: {
-  server: MtaMasterServer;
-  locale: Locale;
-}) {
+function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Locale }) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
   const address = `${server.address}:${server.port}`;
@@ -54,24 +48,16 @@ function ServerCard({
   }
 
   return (
-    <article
-      aria-label={name}
-      className="nexus-panel min-w-0 space-y-3 p-4"
-    >
+    <article aria-label={name} className="nexus-panel min-w-0 space-y-3 p-4">
       <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h3 className="font-semibold text-primary [overflow-wrap:anywhere]">
-            {name}
-          </h3>
+          <h3 className="font-semibold text-primary [overflow-wrap:anywhere]">{name}</h3>
           <p className="text-xs text-secondary [overflow-wrap:anywhere]">
-            {[server.gameMode, server.mapName, server.version]
-              .filter(Boolean)
-              .join(" / ") || copy.noDetails}
+            {[server.gameMode, server.mapName, server.version].filter(Boolean).join(" / ") ||
+              copy.noDetails}
           </p>
           {server.passworded && (
-            <p className="mt-1 text-xs text-secondary">
-              {copy.passwordRequired}
-            </p>
+            <p className="mt-1 text-xs text-secondary">{copy.passwordRequired}</p>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-1.5 text-sm text-secondary">
@@ -80,8 +66,7 @@ function ServerCard({
             {server.players === undefined
               ? copy.playersUnknown
               : `${server.players} ${copy.players}`}
-            {server.maxPlayers !== undefined &&
-              ` / ${server.maxPlayers} ${copy.slots}`}
+            {server.maxPlayers !== undefined && ` / ${server.maxPlayers} ${copy.slots}`}
           </span>
         </div>
       </div>
@@ -118,21 +103,14 @@ function ServerCard({
           </button>
         </div>
       </div>
-      <p
-        role="status"
-        className="text-xs text-secondary [overflow-wrap:anywhere]"
-      >
+      <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
         {copyMessage}
       </p>
     </article>
   );
 }
 
-export function MtaMasterServerDirectory({
-  locale = "en",
-}: {
-  locale?: Locale;
-}) {
+export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale }) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
   const [query, setQuery] = useState("");
@@ -175,10 +153,7 @@ export function MtaMasterServerDirectory({
         })
         .then((result) => {
           if (!active) return;
-          const lastPage = Math.max(
-            0,
-            Math.ceil(result.total / PAGE_SIZE) - 1,
-          );
+          const lastPage = Math.max(0, Math.ceil(result.total / PAGE_SIZE) - 1);
           if (page > lastPage) {
             setPage(lastPage);
             return;
@@ -187,9 +162,7 @@ export function MtaMasterServerDirectory({
         })
         .catch(() => {
           if (!active) return;
-          setError(
-            timedOut ? copy.directoryTimeout : copy.directoryFetchError,
-          );
+          setError(timedOut ? copy.directoryTimeout : copy.directoryFetchError);
         })
         .finally(() => {
           window.clearTimeout(timeout);
@@ -205,10 +178,7 @@ export function MtaMasterServerDirectory({
     };
   }, [minimumPlayers, page, query, attempt, copy.directoryFetchError, copy.directoryTimeout]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil((directory?.total ?? 0) / PAGE_SIZE),
-  );
+  const totalPages = Math.max(1, Math.ceil((directory?.total ?? 0) / PAGE_SIZE));
   const hasFilters = Boolean(query.trim()) || minimumPlayers > 0;
   const fetchedDate = directory ? new Date(directory.fetchedAt) : null;
   const validDate = fetchedDate && !Number.isNaN(fetchedDate.getTime());
@@ -231,10 +201,7 @@ export function MtaMasterServerDirectory({
   }
 
   return (
-    <section
-      aria-label={copy.directory}
-      className="min-w-0 space-y-4"
-    >
+    <section aria-label={copy.directory} className="min-w-0 space-y-4">
       <div className="nexus-panel space-y-3 p-4">
         <div>
           <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
@@ -243,8 +210,7 @@ export function MtaMasterServerDirectory({
               copy.loading
             ) : directory ? (
               <>
-                {directory.total.toLocaleString(dateLocale)}{" "}
-                {copy.publicServersLabel}.{" "}
+                {directory.total.toLocaleString(dateLocale)} {copy.publicServersLabel}.{" "}
                 {validDate ? (
                   <>
                     {copy.updated}{" "}
@@ -286,9 +252,7 @@ export function MtaMasterServerDirectory({
             {copy.minimumPlayers}
             <select
               value={minimumPlayers}
-              onChange={(event) =>
-                updateMinimumPlayers(Number(event.target.value))
-              }
+              onChange={(event) => updateMinimumPlayers(Number(event.target.value))}
               className={`${controlClass} mt-1 block w-full`}
             >
               <option value={0}>{copy.anyPlayers}</option>
@@ -303,19 +267,13 @@ export function MtaMasterServerDirectory({
       </div>
 
       {directory?.isStale && !loading && (
-        <p
-          role="status"
-          className="nexus-panel bg-warning-soft p-4 text-sm text-secondary"
-        >
+        <p role="status" className="nexus-panel bg-warning-soft p-4 text-sm text-secondary">
           {copy.stale}
         </p>
       )}
 
       {error && (
-        <div
-          role="alert"
-          className="nexus-panel space-y-3 p-6 text-sm text-secondary"
-        >
+        <div role="alert" className="nexus-panel space-y-3 p-6 text-sm text-secondary">
           <p>{error}</p>
           <button
             type="button"
@@ -330,21 +288,13 @@ export function MtaMasterServerDirectory({
       {!error && !loading && directory && (
         <div className="space-y-2">
           {directory.servers.map((server) => (
-            <ServerCard
-              key={`${server.address}:${server.port}`}
-              server={server}
-              locale={locale}
-            />
+            <ServerCard key={`${server.address}:${server.port}`} server={server} locale={locale} />
           ))}
           {directory.servers.length === 0 && (
             <div className="nexus-panel space-y-3 p-6 text-center text-sm text-secondary">
               <p>{hasFilters ? copy.noMatch : copy.none}</p>
               {hasFilters ? (
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className={controlClass}
-                >
+                <button type="button" onClick={resetFilters} className={controlClass}>
                   {copy.resetFilters}
                 </button>
               ) : (
@@ -361,44 +311,34 @@ export function MtaMasterServerDirectory({
         </div>
       )}
 
-      {!error &&
-        !loading &&
-        directory &&
-        directory.total > PAGE_SIZE && (
-          <nav
-            className="flex flex-wrap items-center justify-between gap-3"
-            aria-label={copy.directory}
+      {!error && !loading && directory && directory.total > PAGE_SIZE && (
+        <nav
+          className="flex flex-wrap items-center justify-between gap-3"
+          aria-label={copy.directory}
+        >
+          <button
+            type="button"
+            onClick={() => setPage((current) => Math.max(0, current - 1))}
+            disabled={page === 0}
+            className={`${controlClass} inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50`}
           >
-            <button
-              type="button"
-              onClick={() =>
-                setPage((current) => Math.max(0, current - 1))
-              }
-              disabled={page === 0}
-              className={`${controlClass} inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-              {copy.previous}
-            </button>
-            <span className="text-xs text-secondary">
-              {copy.page} {page + 1} {copy.of} {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                setPage((current) =>
-                  Math.min(totalPages - 1, current + 1),
-                )
-              }
-              disabled={page >= totalPages - 1}
-              className={`${controlClass} inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              {copy.next}
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </nav>
-        )}
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            {copy.previous}
+          </button>
+          <span className="text-xs text-secondary">
+            {copy.page} {page + 1} {copy.of} {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}
+            disabled={page >= totalPages - 1}
+            className={`${controlClass} inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50`}
+          >
+            {copy.next}
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </nav>
+      )}
     </section>
   );
 }
-

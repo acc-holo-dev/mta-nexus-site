@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
 import { buildMasterObservationCandidates } from "../apps/web/src/lib/services/server-observation-matching";
 
@@ -38,21 +39,22 @@ describe("server observation collector", () => {
       mtaVersion: "1.6.0",
       responding: true,
     });
-    expect(candidates[0]?.observedAt.toISOString()).toBe(
-      "2026-09-25T12:00:00.000Z",
-    );
+    expect(candidates[0]?.observedAt.toISOString()).toBe("2026-09-25T12:00:00.000Z");
   });
 
   it.each(["", "invalid", "2026-99-01T00:00:00Z"])(
     "fails before creating observations for an invalid snapshot time %s",
-    fetchedAt => {
-      expect(() => buildMasterObservationCandidates(
-        [{ id: "srv_one", ipAddress: "example.com", port: 22003 }],
-        {
-          fetchedAt, isStale: false,
-          servers: [{ address: "example.com", port: 22003, players: 20 }],
-        },
-      )).toThrow("Invalid MTA master-list observation timestamp");
+    (fetchedAt) => {
+      expect(() =>
+        buildMasterObservationCandidates(
+          [{ id: "srv_one", ipAddress: "example.com", port: 22003 }],
+          {
+            fetchedAt,
+            isStale: false,
+            servers: [{ address: "example.com", port: 22003, players: 20 }],
+          },
+        ),
+      ).toThrow("Invalid MTA master-list observation timestamp");
     },
   );
 
@@ -69,11 +71,13 @@ describe("server observation collector", () => {
         directory,
       );
       expect(rows).toHaveLength(1);
-      return rows[0]!;
+      const [row] = rows;
+      assert.ok(row);
+      return row;
     };
     expect(collect(0).sourceSequence).toBe(fetchedAt);
-    expect(collect(1).sourceSequence).toBe(fetchedAt + "#endpoint-revision=1");
-    expect(collect(2).sourceSequence).toBe(fetchedAt + "#endpoint-revision=2");
+    expect(collect(1).sourceSequence).toBe(`${fetchedAt}#endpoint-revision=1`);
+    expect(collect(2).sourceSequence).toBe(`${fetchedAt}#endpoint-revision=2`);
     expect(collect(2).observedAt.toISOString()).toBe(fetchedAt);
     expect(collect(1).currentPlayers).toBe(12);
     expect(collect(1).sourceSequence).not.toBe(collect(2).sourceSequence);

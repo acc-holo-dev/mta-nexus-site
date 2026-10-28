@@ -117,13 +117,19 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           ...(lastSavedAt ? { expectedUpdatedAt: lastSavedAt } : {}),
         })
       ) {
-        throw new Error(serverMutationErrorMessage(data, {
-          SERVER_METADATA_CONFLICT: copy.concurrentEdit,
-          SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
-          FORBIDDEN: copy.forbiddenEdit,
-          REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
-          REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
-        }, copy.saveError));
+        throw new Error(
+          serverMutationErrorMessage(
+            data,
+            {
+              SERVER_METADATA_CONFLICT: copy.concurrentEdit,
+              SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
+              FORBIDDEN: copy.forbiddenEdit,
+              REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
+              REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
+            },
+            copy.saveError,
+          ),
+        );
       }
 
       setLastSavedAt(revisionToken(data?.server?.updatedAt));
@@ -132,10 +138,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
     } catch (caught) {
       setNotice({
         error: true,
-        text:
-          caught instanceof Error && caught.message
-            ? caught.message
-            : copy.unexpectedSaveError,
+        text: caught instanceof Error && caught.message ? caught.message : copy.unexpectedSaveError,
       });
     } finally {
       setLoading(false);
@@ -174,20 +177,12 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
   );
 
   return (
-    <form
-      onSubmit={submit}
-      aria-busy={loading}
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-    >
+    <form onSubmit={submit} aria-busy={loading} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {field("name", copy.name, server.name, { required: true, minLength: 3, maxLength: 100 })}
 
       <label className="space-y-1.5">
         <span className="font-label text-secondary">{copy.visibility}</span>
-        <select
-          name="visibility"
-          defaultValue={server.visibility}
-          className={fieldClass}
-        >
+        <select name="visibility" defaultValue={server.visibility} className={fieldClass}>
           <option value="public">{copy.public}</option>
           <option value="unlisted">{copy.unlisted}</option>
           <option value="private">{copy.private}</option>

@@ -150,12 +150,6 @@ describe("audited creation atomicity", () => {
       ),
     ).rejects.toBeTruthy();
 
-    expect(
-      await verificationRepository.findPendingForTarget(
-        userId,
-        "user",
-        userId,
-      ),
-    ).toBeNull();
+    expect(await verificationRepository.findPendingForTarget(userId, "user", userId)).toBeNull();
   });
 });

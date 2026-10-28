@@ -1,7 +1,6 @@
 export const PASSWORD_RESET_NEUTRAL_RESPONSE = {
   accepted: true,
-  message:
-    "If an eligible account uses that email, a password reset link will be sent.",
+  message: "If an eligible account uses that email, a password reset link will be sent.",
 } as const;
 
 export const PASSWORD_RESET_REQUEST_FLOOR_MIN_MS = 900;
@@ -23,11 +22,7 @@ export function passwordResetRemainingFloorMs(
   targetMs: number,
   now = performance.now(),
 ): number {
-  if (
-    !Number.isFinite(startedAt) ||
-    !Number.isFinite(targetMs) ||
-    !Number.isFinite(now)
-  ) {
+  if (!Number.isFinite(startedAt) || !Number.isFinite(targetMs) || !Number.isFinite(now)) {
     throw new RangeError("Invalid password-reset timing input");
   }
   return Math.max(0, targetMs - (now - startedAt));
@@ -48,10 +43,6 @@ export async function waitForPasswordResetFloor(
       new Promise<void>((resolve) => {
         setTimeout(resolve, milliseconds);
       }));
-  const remaining = passwordResetRemainingFloorMs(
-    startedAt,
-    targetMs,
-    now(),
-  );
+  const remaining = passwordResetRemainingFloorMs(startedAt, targetMs, now());
   if (remaining > 0) await sleep(remaining);
 }

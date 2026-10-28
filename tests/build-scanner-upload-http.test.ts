@@ -55,23 +55,18 @@ function uploadRequest(mtaVersionTarget?: string) {
   const form = new FormData();
   form.set(
     "file",
-    new File(
-      [new Uint8Array(Buffer.from(packageFixtures.stored, "base64"))],
-      "resource.zip",
-      { type: "application/zip" },
-    ),
+    new File([new Uint8Array(Buffer.from(packageFixtures.stored, "base64"))], "resource.zip", {
+      type: "application/zip",
+    }),
   );
   form.set("version", "1.0.0");
   if (mtaVersionTarget) form.set("mtaVersionTarget", mtaVersionTarget);
 
-  return new NextRequest(
-    "http://nexus.test/api/products/prd_scanner/builds",
-    {
-      method: "POST",
-      headers: browserMutationHeaders({ cookie: "nexus_session=tok_scanner" }),
-      body: form,
-    },
-  );
+  return new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
+    method: "POST",
+    headers: browserMutationHeaders({ cookie: "nexus_session=tok_scanner" }),
+    body: form,
+  });
 }
 
 const context = {
@@ -91,7 +86,9 @@ describe("build upload scanner HTTP behavior", () => {
       key: "assets/usr_scanner_author/ast_scanner_resource.zip",
       sizeBytes: Buffer.from(packageFixtures.stored, "base64").length,
       mimeType: "application/zip",
-      sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"),
+      sha256Hash: createHash("sha256")
+        .update(Buffer.from(packageFixtures.stored, "base64"))
+        .digest("hex"),
       isPrivate: true,
       uploadedAt: new Date(),
     });
@@ -105,23 +102,38 @@ describe("build upload scanner HTTP behavior", () => {
 
   it("rejects unsafe packages before scanner, storage and release work", async () => {
     const form = new FormData();
-    form.set("file", new File([new Uint8Array(Buffer.from(packageFixtures.traversal, "base64"))], "resource.zip"));
+    form.set(
+      "file",
+      new File([new Uint8Array(Buffer.from(packageFixtures.traversal, "base64"))], "resource.zip"),
+    );
     form.set("version", "1.0.0");
-    const response = await POST(new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
-      method: "POST", headers: browserMutationHeaders(), body: form,
-    }), context);
+    const response = await POST(
+      new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
+        method: "POST",
+        headers: browserMutationHeaders(),
+        body: form,
+      }),
+      context,
+    );
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({ code: "BUILD_PACKAGE_UNSAFE_PATH" });
-    expect(scan).not.toHaveBeenCalled(); expect(uploadAsset).not.toHaveBeenCalled(); expect(releaseBuild).not.toHaveBeenCalled();
+    expect(scan).not.toHaveBeenCalled();
+    expect(uploadAsset).not.toHaveBeenCalled();
+    expect(releaseBuild).not.toHaveBeenCalled();
   });
 
   it("does not save or recover a stored artifact which differs from inspected bytes", async () => {
     scan.mockResolvedValue({ status: "clean", scanner: "clamav", scannedAt: new Date() });
-    uploadAsset.mockResolvedValueOnce({ key: "private/wrong.zip", sha256Hash: "0".repeat(64), sizeBytes: 8 });
+    uploadAsset.mockResolvedValueOnce({
+      key: "private/wrong.zip",
+      sha256Hash: "0".repeat(64),
+      sizeBytes: 8,
+    });
     const response = await POST(uploadRequest(), context);
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ code: "BUILD_PACKAGE_IDENTITY_CONFLICT" });
-    expect(releaseBuild).not.toHaveBeenCalled(); expect(deleteAsset).toHaveBeenCalledWith("private/wrong.zip");
+    expect(releaseBuild).not.toHaveBeenCalled();
+    expect(deleteAsset).toHaveBeenCalledWith("private/wrong.zip");
   });
 
   it("rejects malicious verdicts before storage or release persistence", async () => {
@@ -206,11 +218,17 @@ describe("build upload scanner HTTP behavior", () => {
       expect.objectContaining({
         productId: "prd_scanner",
         version: "1.0.0",
-        sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"),
+        sha256Hash: createHash("sha256")
+          .update(Buffer.from(packageFixtures.stored, "base64"))
+          .digest("hex"),
         scanStatus: "clean",
         scanner: "clamav",
         scannedAt,
-        packageEvidence: expect.objectContaining({ status: "checked", manifestStatus: "single", files: expect.any(Array) }),
+        packageEvidence: expect.objectContaining({
+          status: "checked",
+          manifestStatus: "single",
+          files: expect.any(Array),
+        }),
       }),
       expect.objectContaining({ id: "usr_scanner_author" }),
     );

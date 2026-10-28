@@ -15,48 +15,70 @@ describe("localized server mutation errors", () => {
         REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
       };
       for (const [code, expected] of Object.entries(translations)) {
-        expect(serverMutationErrorMessage({
-          code,
-          error: "Raw unlocalized backend error",
-        }, translations, copy.createError)).toBe(expected);
+        expect(
+          serverMutationErrorMessage(
+            {
+              code,
+              error: "Raw unlocalized backend error",
+            },
+            translations,
+            copy.createError,
+          ),
+        ).toBe(expected);
       }
     },
   );
 
-  it.each(["en", "ru"] as const)(
-    "maps editor conflicts and transport timeouts (%s)",
-    (locale) => {
-      const copy = getDictionary(locale).serverManagement;
-      expect(serverMutationErrorMessage({
-        code: "SERVER_METADATA_CONFLICT",
-        error: "Stale update",
-      }, { SERVER_METADATA_CONFLICT: copy.concurrentEdit }, copy.saveError))
-        .toBe(copy.concurrentEdit);
-      expect(serverMutationErrorMessage({
-        code: "REQUEST_BODY_TIMEOUT",
-      }, { REQUEST_BODY_TIMEOUT: copy.bodyTimedOut }, copy.saveError))
-        .toBe(copy.bodyTimedOut);
-    },
-  );
+  it.each(["en", "ru"] as const)("maps editor conflicts and transport timeouts (%s)", (locale) => {
+    const copy = getDictionary(locale).serverManagement;
+    expect(
+      serverMutationErrorMessage(
+        {
+          code: "SERVER_METADATA_CONFLICT",
+          error: "Stale update",
+        },
+        { SERVER_METADATA_CONFLICT: copy.concurrentEdit },
+        copy.saveError,
+      ),
+    ).toBe(copy.concurrentEdit);
+    expect(
+      serverMutationErrorMessage(
+        {
+          code: "REQUEST_BODY_TIMEOUT",
+        },
+        { REQUEST_BODY_TIMEOUT: copy.bodyTimedOut },
+        copy.saveError,
+      ),
+    ).toBe(copy.bodyTimedOut);
+  });
 
   it("does not trust arbitrary payloads or prototype keys", () => {
     const messages = { FORBIDDEN: "Not allowed" };
     expect(serverMutationErrorMessage(null, messages, "Fallback")).toBe("Fallback");
     expect(serverMutationErrorMessage([], messages, "Fallback")).toBe("Fallback");
-    expect(serverMutationErrorMessage({ code: "__proto__" }, messages, "Fallback"))
-      .toBe("Fallback");
-    expect(serverMutationErrorMessage({ error: "unsafe\nmessage" }, messages, "Fallback"))
-      .toBe("Fallback");
-    expect(serverMutationErrorMessage({ error: "ordinary error" }, messages, "Fallback"))
-      .toBe("ordinary error");
+    expect(serverMutationErrorMessage({ code: "__proto__" }, messages, "Fallback")).toBe(
+      "Fallback",
+    );
+    expect(serverMutationErrorMessage({ error: "unsafe\nmessage" }, messages, "Fallback")).toBe(
+      "Fallback",
+    );
+    expect(serverMutationErrorMessage({ error: "ordinary error" }, messages, "Fallback")).toBe(
+      "ordinary error",
+    );
   });
 
   it("rejects every C0 control character while permitting ordinary multilingual text", () => {
     for (let code = 0; code < 32; code++) {
-      expect(serverMutationErrorMessage({ error: `error${String.fromCharCode(code)}message` }, {}, "Fallback"))
-        .toBe("Fallback");
+      expect(
+        serverMutationErrorMessage(
+          { error: `error${String.fromCharCode(code)}message` },
+          {},
+          "Fallback",
+        ),
+      ).toBe("Fallback");
     }
-    expect(serverMutationErrorMessage({ error: "Сервер недоступен 🌍" }, {}, "Fallback"))
-      .toBe("Сервер недоступен 🌍");
+    expect(serverMutationErrorMessage({ error: "Сервер недоступен 🌍" }, {}, "Fallback")).toBe(
+      "Сервер недоступен 🌍",
+    );
   });
 });

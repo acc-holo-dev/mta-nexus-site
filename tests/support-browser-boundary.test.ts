@@ -28,7 +28,10 @@ vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
 }));
 
 import { POST as createCase } from "../apps/web/src/app/api/support/route";
-import { PATCH as updateCase, POST as addMessage } from "../apps/web/src/app/api/support/[id]/route";
+import {
+  PATCH as updateCase,
+  POST as addMessage,
+} from "../apps/web/src/app/api/support/[id]/route";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const context = { params: Promise.resolve({ id: caseId }) };

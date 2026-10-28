@@ -12,12 +12,14 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     return resourceManagementService.managedVariants(id, actor);
   });
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    const { id } = await params;
-    const parsed = resourceVariantCommandSchema.safeParse(await readBoundedJson(request, 16_384));
-    if (!parsed.success)
-      throw new AppError("Invalid variant command", 400, "RESOURCE_VARIANTS_INVALID");
-    return resourceManagementService.saveVariants(id, actor, parsed.data);
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      const { id } = await params;
+      const parsed = resourceVariantCommandSchema.safeParse(await readBoundedJson(request, 16_384));
+      if (!parsed.success)
+        throw new AppError("Invalid variant command", 400, "RESOURCE_VARIANTS_INVALID");
+      return resourceManagementService.saveVariants(id, actor, parsed.data);
+    });
+  },
+);

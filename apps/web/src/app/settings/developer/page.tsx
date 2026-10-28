@@ -41,7 +41,12 @@ export default async function DeveloperSettingsPage() {
         <p className="mt-2 text-sm text-muted">{copy.profileDescription}</p>
       </header>
       <DeveloperProfileEditor key={actor.id} initial={initial} locale={locale} />
-      <Link href="/settings/privacy" className="inline-flex min-h-11 items-center text-sm text-accent underline">{profilePrivacyCopy(locale).title}</Link>
+      <Link
+        href="/settings/privacy"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+      >
+        {profilePrivacyCopy(locale).title}
+      </Link>
     </div>
   );
 }

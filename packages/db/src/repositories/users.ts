@@ -21,24 +21,32 @@ export class UserRepository {
           avatarUrl: fields.avatarUrl || null,
           updatedAt: sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${users.updatedAt}) + interval '1 millisecond')`,
         })
-        .where(and(
-          eq(users.id, id),
-          sql`date_trunc('milliseconds', ${users.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz`,
-        ))
+        .where(
+          and(
+            eq(users.id, id),
+            sql`date_trunc('milliseconds', ${users.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz`,
+          ),
+        )
         .returning(publicUserColumns);
       if (!row) return null;
       await tx.insert(auditEvents).values({
-        id: auditId, actorId: id, actorType: "user",
-        action: "user.profile_updated", targetId: id, targetType: "user",
-        details: { fields: ["displayName", "bio", "avatarUrl"] }, createdAt: new Date(),
+        id: auditId,
+        actorId: id,
+        actorType: "user",
+        action: "user.profile_updated",
+        targetId: id,
+        targetType: "user",
+        details: { fields: ["displayName", "bio", "avatarUrl"] },
+        createdAt: new Date(),
       });
       return toUserWithoutPassword(row);
     });
   }
   async listModeratorIds(): Promise<string[]> {
-    const rows = await db.select({ id: users.id }).from(users).where(
-      inArray(users.role, ["moderator", "admin"]),
-    );
+    const rows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(inArray(users.role, ["moderator", "admin"]));
     return rows.map((row) => row.id);
   }
 
@@ -49,13 +57,22 @@ export class UserRepository {
 
   async searchDevelopers(term: string, limit = 50): Promise<User[]> {
     const pattern = containsPattern(term);
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
-    const rows = await db.select(publicUserColumns).from(users).where(and(
-      eq(users.role, "developer"),
-      or(ilike(users.username, pattern), ilike(users.displayName, pattern), ilike(users.bio, pattern)),
-    )).orderBy(desc(users.updatedAt), desc(users.id)).limit(boundedLimit);
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
+    const rows = await db
+      .select(publicUserColumns)
+      .from(users)
+      .where(
+        and(
+          eq(users.role, "developer"),
+          or(
+            ilike(users.username, pattern),
+            ilike(users.displayName, pattern),
+            ilike(users.bio, pattern),
+          ),
+        ),
+      )
+      .orderBy(desc(users.updatedAt), desc(users.id))
+      .limit(boundedLimit);
     return rows.map(toUserWithoutPassword);
   }
 
@@ -66,11 +83,15 @@ export class UserRepository {
 
   async findByEmail(email: string): Promise<(User & { passwordHash?: string | null }) | null> {
     const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
-    return (rows[0] as unknown as (User & { passwordHash?: string | null })) || null;
+    return (rows[0] as unknown as User & { passwordHash?: string | null }) || null;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const rows = await db.select(publicUserColumns).from(users).where(eq(users.username, username)).limit(1);
+    const rows = await db
+      .select(publicUserColumns)
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
     return rows[0] ? toUserWithoutPassword(rows[0]) : null;
   }
 

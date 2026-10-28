@@ -8,7 +8,13 @@ import { assertProductMutationAuthority } from "./product-mutation-authority";
 export class ResourceDownloadAuthorizationRepository {
   /** Final gate after opening storage. Locks live access and exact build evidence
    * through the start audit; revocation denies subsequent transfers. */
-  async authorize(input: { actorId: string; auditId: string; receiptId: string; expected: Build; pinned: boolean }) {
+  async authorize(input: {
+    actorId: string;
+    auditId: string;
+    receiptId: string;
+    expected: Build;
+    pinned: boolean;
+  }) {
     return db.transaction(async (tx) => {
       const [product] = await tx
         .select({
@@ -74,27 +80,31 @@ export class ResourceDownloadAuthorizationRepository {
       if (accessExpiresAt && new Date(accessExpiresAt).getTime() <= Date.now())
         throw new ForbiddenError("Current download access is required");
       await tx.insert(resourceDeliveryReceipts).values({
-        id: input.receiptId, userId: input.actorId, resourceId: product.id,
-        buildId: build.id, version: build.version, sha256Hash: build.sha256Hash,
-        expectedBytes: build.fileSizeBytes, pinned: input.pinned, accessSource,
+        id: input.receiptId,
+        userId: input.actorId,
+        resourceId: product.id,
+        buildId: build.id,
+        version: build.version,
+        sha256Hash: build.sha256Hash,
+        expectedBytes: build.fileSizeBytes,
+        pinned: input.pinned,
+        accessSource,
       });
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.actorId,
-          actorType: actorRole === "admin" ? "admin" : "user",
-          action: "product.download_started",
-          targetId: product.id,
-          targetType: "product",
-          details: {
-            buildId: build.id,
-            version: build.version,
-            pinned: input.pinned,
-            accessSource,
-            receiptId: input.receiptId,
-          },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.actorId,
+        actorType: actorRole === "admin" ? "admin" : "user",
+        action: "product.download_started",
+        targetId: product.id,
+        targetType: "product",
+        details: {
+          buildId: build.id,
+          version: build.version,
+          pinned: input.pinned,
+          accessSource,
+          receiptId: input.receiptId,
+        },
+      });
       return { slug: product.slug, receiptId: input.receiptId };
     });
   }

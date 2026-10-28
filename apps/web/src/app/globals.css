@@ -44,13 +44,17 @@
   --nexus-purple-soft: #f0eafc;
 
   /* Typography scale */
-  --font-display: 700 1.375rem/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-heading: 650 1rem/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: 400 0.8125rem/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-label: 600 0.6875rem/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-caption: 400 0.6875rem/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-numeric: 650 0.875rem/1.2 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
-  --font-code: 400 0.75rem/1.5 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --font-display:
+    700 1.375rem / 1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 650 1rem / 1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body:
+    400 0.8125rem / 1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-label:
+    600 0.6875rem / 1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-caption:
+    400 0.6875rem / 1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-numeric: 650 0.875rem / 1.2 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --font-code: 400 0.75rem / 1.5 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 
   /* Radius scale */
   --nexus-radius-sm: 0.375rem;
@@ -117,47 +121,116 @@
 
 @layer utilities {
   /* Semantic surface utilities — use these instead of hardcoded hex */
-  .bg-page { background-color: var(--nexus-page); }
-  .bg-surface { background-color: var(--nexus-surface); }
-  .bg-elevated { background-color: var(--nexus-elevated); }
-  .bg-inset { background-color: var(--nexus-inset); }
-  .bg-hover { background-color: var(--nexus-hover); }
+  .bg-page {
+    background-color: var(--nexus-page);
+  }
+  .bg-surface {
+    background-color: var(--nexus-surface);
+  }
+  .bg-elevated {
+    background-color: var(--nexus-elevated);
+  }
+  .bg-inset {
+    background-color: var(--nexus-inset);
+  }
+  .bg-hover {
+    background-color: var(--nexus-hover);
+  }
 
-  .border-base { border-color: var(--nexus-border); }
-  .border-strong { border-color: var(--nexus-border-strong); }
+  .border-base {
+    border-color: var(--nexus-border);
+  }
+  .border-strong {
+    border-color: var(--nexus-border-strong);
+  }
 
-  .text-primary { color: var(--nexus-text); }
-  .text-secondary { color: var(--nexus-text-secondary); }
-  .text-muted { color: var(--nexus-text-muted); }
-  .text-faint { color: var(--nexus-text-faint); }
+  .text-primary {
+    color: var(--nexus-text);
+  }
+  .text-secondary {
+    color: var(--nexus-text-secondary);
+  }
+  .text-muted {
+    color: var(--nexus-text-muted);
+  }
+  .text-faint {
+    color: var(--nexus-text-faint);
+  }
 
-  .text-accent { color: var(--nexus-accent-text); }
-  .text-success { color: var(--nexus-success); }
-  .text-warning { color: var(--nexus-warning); }
-  .text-danger { color: var(--nexus-danger); }
-  .text-purple { color: var(--nexus-purple); }
+  .text-accent {
+    color: var(--nexus-accent-text);
+  }
+  .text-success {
+    color: var(--nexus-success);
+  }
+  .text-warning {
+    color: var(--nexus-warning);
+  }
+  .text-danger {
+    color: var(--nexus-danger);
+  }
+  .text-purple {
+    color: var(--nexus-purple);
+  }
 
-  .bg-accent { background-color: var(--nexus-accent); }
-  .bg-accent-soft { background-color: var(--nexus-accent-soft); }
-  .bg-success-solid { background-color: var(--nexus-success-solid); }
-  .bg-success-soft { background-color: var(--nexus-success-soft); }
-  .bg-warning-solid { background-color: var(--nexus-warning-solid); }
-  .bg-warning-soft { background-color: var(--nexus-warning-soft); }
-  .bg-danger-solid { background-color: var(--nexus-danger-solid); }
-  .bg-danger-soft { background-color: var(--nexus-danger-soft); }
-  .bg-purple-soft { background-color: var(--nexus-purple-soft); }
+  .bg-accent {
+    background-color: var(--nexus-accent);
+  }
+  .bg-accent-soft {
+    background-color: var(--nexus-accent-soft);
+  }
+  .bg-success-solid {
+    background-color: var(--nexus-success-solid);
+  }
+  .bg-success-soft {
+    background-color: var(--nexus-success-soft);
+  }
+  .bg-warning-solid {
+    background-color: var(--nexus-warning-solid);
+  }
+  .bg-warning-soft {
+    background-color: var(--nexus-warning-soft);
+  }
+  .bg-danger-solid {
+    background-color: var(--nexus-danger-solid);
+  }
+  .bg-danger-soft {
+    background-color: var(--nexus-danger-soft);
+  }
+  .bg-purple-soft {
+    background-color: var(--nexus-purple-soft);
+  }
 
-  .shadow-nexus-sm { box-shadow: var(--nexus-shadow-sm); }
-  .shadow-nexus { box-shadow: var(--nexus-shadow); }
-  .shadow-nexus-lg { box-shadow: var(--nexus-shadow-lg); }
+  .shadow-nexus-sm {
+    box-shadow: var(--nexus-shadow-sm);
+  }
+  .shadow-nexus {
+    box-shadow: var(--nexus-shadow);
+  }
+  .shadow-nexus-lg {
+    box-shadow: var(--nexus-shadow-lg);
+  }
 
   /* Typography utilities */
-  .font-display { font: var(--font-display); }
-  .font-heading { font: var(--font-heading); }
-  .font-label { font: var(--font-label); letter-spacing: 0.04em; }
-  .font-caption { font: var(--font-caption); }
-  .font-numeric { font: var(--font-numeric); }
-  .font-code { font: var(--font-code); }
+  .font-display {
+    font: var(--font-display);
+  }
+  .font-heading {
+    font: var(--font-heading);
+  }
+  .font-label {
+    font: var(--font-label);
+    letter-spacing: 0.04em;
+  }
+  .font-caption {
+    font: var(--font-caption);
+  }
+  .font-numeric {
+    font: var(--font-numeric);
+  }
+  .font-code {
+    font: var(--font-code);
+  }
 
   .nexus-panel {
     background-color: var(--nexus-surface);

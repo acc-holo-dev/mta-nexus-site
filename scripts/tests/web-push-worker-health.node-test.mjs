@@ -1,44 +1,26 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import {
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
-const checker = new URL(
-  "../check-web-push-worker-health.mjs",
-  import.meta.url,
-);
+const checker = new URL("../check-web-push-worker-health.mjs", import.meta.url);
 
 function run(payload) {
-  const root = mkdtempSync(
-    join(tmpdir(), "nexus-web-push-health-"),
-  );
+  const root = mkdtempSync(join(tmpdir(), "nexus-web-push-health-"));
   const file = join(root, "health.json");
   try {
     if (payload !== undefined) {
-      writeFileSync(
-        file,
-        typeof payload === "string"
-          ? payload
-          : JSON.stringify(payload),
-      );
+      writeFileSync(file, typeof payload === "string" ? payload : JSON.stringify(payload));
     }
-    const result = spawnSync(
-      process.execPath,
-      [checker.pathname],
-      {
-        encoding: "utf8",
-        env: {
-          ...process.env,
-          NEXUS_WEB_PUSH_HEALTH_FILE: file,
-        },
+    const result = spawnSync(process.execPath, [checker.pathname], {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        NEXUS_WEB_PUSH_HEALTH_FILE: file,
       },
-    );
+    });
     assert.ifError(result.error);
     return result.status;
   } finally {
@@ -96,11 +78,7 @@ test("accepts queue alerts without converting backlog pressure into liveness fai
         queueDue: 100,
         queueOldestAgeSeconds: 900,
         queueAlert: "alert",
-        queueAlertReasons: [
-          "capacity_pressure",
-          "due_backlog",
-          "oldest_job_age",
-        ],
+        queueAlertReasons: ["capacity_pressure", "due_backlog", "oldest_job_age"],
       }),
     ),
     0,
@@ -113,9 +91,7 @@ test("fails closed for missing, malformed and stale heartbeat state", () => {
   assert.notEqual(
     run(
       healthy({
-        heartbeatAt: new Date(
-          Date.now() - 120_000,
-        ).toISOString(),
+        heartbeatAt: new Date(Date.now() - 120_000).toISOString(),
       }),
     ),
     0,
@@ -123,10 +99,7 @@ test("fails closed for missing, malformed and stale heartbeat state", () => {
 });
 
 test("rejects impossible queue counters and invalid capacity", () => {
-  assert.notEqual(
-    run(healthy({ queueDue: 5, queuePending: 4 })),
-    0,
-  );
+  assert.notEqual(run(healthy({ queueDue: 5, queuePending: 4 })), 0);
   assert.notEqual(
     run(
       healthy({
@@ -134,29 +107,15 @@ test("rejects impossible queue counters and invalid capacity", () => {
         queueDue: 100,
         queueCapacity: 100,
         queueAlert: "alert",
-        queueAlertReasons: [
-          "capacity_pressure",
-          "due_backlog",
-        ],
+        queueAlertReasons: ["capacity_pressure", "due_backlog"],
       }),
     ),
     0,
   );
-  assert.notEqual(
-    run(healthy({ queueLeased: 5, queuePending: 4 })),
-    0,
-  );
-  assert.notEqual(
-    run(healthy({ queueCapacity: 50_001 })),
-    0,
-  );
-  assert.notEqual(
-    run(healthy({ configured: "true" })),
-    0,
-  );
+  assert.notEqual(run(healthy({ queueLeased: 5, queuePending: 4 })), 0);
+  assert.notEqual(run(healthy({ queueCapacity: 50_001 })), 0);
+  assert.notEqual(run(healthy({ configured: "true" })), 0);
 });
-
-
 
 test("rejects inconsistent queue alert metadata", () => {
   assert.notEqual(run(healthy({ queuePending: 8_000 })), 0);
@@ -181,25 +140,19 @@ test("reports capacity pressure without invalidating a full durable queue", () =
         queueCapacity: 100,
         queueOldestAgeSeconds: 10,
         queueAlert: "alert",
-        queueAlertReasons: [
-          "capacity_pressure",
-          "due_backlog",
-        ],
+        queueAlertReasons: ["capacity_pressure", "due_backlog"],
       }),
     ),
     0,
   );
 });
 
-
 test("fails closed when heartbeat is fresh but dispatcher progress is stale", () => {
   assert.notEqual(
     run(
       healthy({
         heartbeatAt: new Date().toISOString(),
-        progressAt: new Date(
-          Date.now() - 240_000,
-        ).toISOString(),
+        progressAt: new Date(Date.now() - 240_000).toISOString(),
       }),
     ),
     0,
@@ -218,9 +171,7 @@ test("rejects impossible progress metadata", () => {
   assert.notEqual(
     run(
       healthy({
-        progressAt: new Date(
-          Date.now() + 60_000,
-        ).toISOString(),
+        progressAt: new Date(Date.now() + 60_000).toISOString(),
       }),
     ),
     0,

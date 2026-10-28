@@ -1,4 +1,6 @@
-vi.mock("@nexus/db", () => ({ resourceMediaRepository: { publicItems: async () => [], managed: async () => ({ items: [] }) } }));
+vi.mock("@nexus/db", () => ({
+  resourceMediaRepository: { publicItems: async () => [], managed: async () => ({ items: [] }) },
+}));
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -34,9 +36,7 @@ vi.mock("../apps/web/src/lib/services/resource-management-service", () => ({
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
     get: (name: string) =>
-      name === "nexus_session" && state.user
-        ? { value: "session-token" }
-        : undefined,
+      name === "nexus_session" && state.user ? { value: "session-token" } : undefined,
   })),
 }));
 
@@ -78,7 +78,9 @@ vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
 }));
 
 vi.mock("../apps/web/src/lib/services/resource-review-service", () => ({
-  resourceReviewService: { publicPage: vi.fn(async () => ({reviews: [], total: 0, page: 1, totalPages: 1})) },
+  resourceReviewService: {
+    publicPage: vi.fn(async () => ({ reviews: [], total: 0, page: 1, totalPages: 1 })),
+  },
 }));
 
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
@@ -99,13 +101,7 @@ vi.mock("../apps/web/src/components/resource-preview", async () => {
 vi.mock("../apps/web/src/components/resource-download-button", async () => {
   const ReactModule = await import("react");
   return {
-    ResourceDownloadButton: ({
-      productId,
-      version,
-    }: {
-      productId: string;
-      version: string;
-    }) =>
+    ResourceDownloadButton: ({ productId, version }: { productId: string; version: string }) =>
       ReactModule.createElement("button", {
         "data-testid": "resource-download",
         "data-product-id": productId,
@@ -158,7 +154,10 @@ function renderPage(element: React.ReactNode) {
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((done, fail) => { resolve = done; reject = fail; });
+  const promise = new Promise<T>((done, fail) => {
+    resolve = done;
+    reject = fail;
+  });
   return { promise, resolve, reject };
 }
 
@@ -214,10 +213,7 @@ describe("resource detail acquisition behavior", () => {
     state.canManage = false;
     state.locale = "en";
     state.product = product(0);
-    state.builds = [
-      build("bld_latest", "2.0.0"),
-      build("bld_old", "1.0.0"),
-    ];
+    state.builds = [build("bld_latest", "2.0.0"), build("bld_old", "1.0.0")];
   });
 
   it("starts public metadata lookup while locale resolution is pending", async () => {
@@ -247,43 +243,53 @@ describe("resource detail acquisition behavior", () => {
     }
   });
 
-  it.each([true, false])("starts independent reads and waits for management decision %s before builds", async canManage => {
-    state.user = { id: "usr_manager", username: "manager", role: "user" };
-    const management = deferred<boolean>();
-    const entitlement = deferred<boolean>();
-    productService.canManageProduct.mockReturnValueOnce(management.promise);
-    vi.mocked(commerceService.checkEntitlement).mockReturnValueOnce(entitlement.promise);
-    let settled = false;
-    const page = ProductDetailPage({ params: Promise.resolve({ slug: "detail-resource" }) })
-      .then(element => { settled = true; return element; });
-    try {
-      await vi.waitFor(() => expect(productService.canManageProduct).toHaveBeenCalledOnce());
-      expect(commerceService.checkEntitlement).toHaveBeenCalledOnce();
-      expect(resourceReviewService.publicPage).toHaveBeenCalledOnce();
-      expect(productService.getDependencyResolution).toHaveBeenCalledOnce();
-      expect(productService.getReverseDependencySummary).toHaveBeenCalledOnce();
-      expect(productService.getProductBuilds).not.toHaveBeenCalled();
-      management.resolve(canManage);
-      await vi.waitFor(() => expect(productService.getProductBuilds).toHaveBeenCalledWith("prd_detail", canManage));
-      expect(settled).toBe(false);
-    } finally {
-      management.resolve(canManage);
-      entitlement.resolve(false);
-      const html = renderPage(await page);
-      if (canManage) {
-        expect(html).toContain(getDictionary("en").product.managementAccess);
-        expect(html).toContain('data-testid="resource-download"');
-      } else {
-        expect(html).toContain('href="/acquire?productId=prd_detail"');
-        expect(html).not.toContain('data-testid="resource-download"');
+  it.each([true, false])(
+    "starts independent reads and waits for management decision %s before builds",
+    async (canManage) => {
+      state.user = { id: "usr_manager", username: "manager", role: "user" };
+      const management = deferred<boolean>();
+      const entitlement = deferred<boolean>();
+      productService.canManageProduct.mockReturnValueOnce(management.promise);
+      vi.mocked(commerceService.checkEntitlement).mockReturnValueOnce(entitlement.promise);
+      let settled = false;
+      const page = ProductDetailPage({ params: Promise.resolve({ slug: "detail-resource" }) }).then(
+        (element) => {
+          settled = true;
+          return element;
+        },
+      );
+      try {
+        await vi.waitFor(() => expect(productService.canManageProduct).toHaveBeenCalledOnce());
+        expect(commerceService.checkEntitlement).toHaveBeenCalledOnce();
+        expect(resourceReviewService.publicPage).toHaveBeenCalledOnce();
+        expect(productService.getDependencyResolution).toHaveBeenCalledOnce();
+        expect(productService.getReverseDependencySummary).toHaveBeenCalledOnce();
+        expect(productService.getProductBuilds).not.toHaveBeenCalled();
+        management.resolve(canManage);
+        await vi.waitFor(() =>
+          expect(productService.getProductBuilds).toHaveBeenCalledWith("prd_detail", canManage),
+        );
+        expect(settled).toBe(false);
+      } finally {
+        management.resolve(canManage);
+        entitlement.resolve(false);
+        const html = renderPage(await page);
+        if (canManage) {
+          expect(html).toContain(getDictionary("en").product.managementAccess);
+          expect(html).toContain('data-testid="resource-download"');
+        } else {
+          expect(html).toContain('href="/acquire?productId=prd_detail"');
+          expect(html).not.toContain('data-testid="resource-download"');
+        }
       }
-    }
-  });
+    },
+  );
 
   it("does not load detail data after a denied or missing preview", async () => {
     state.product = null;
-    await expect(ProductDetailPage({ params: Promise.resolve({ slug: "private-resource" }) }))
-      .rejects.toThrow("NEXT_NOT_FOUND");
+    await expect(
+      ProductDetailPage({ params: Promise.resolve({ slug: "private-resource" }) }),
+    ).rejects.toThrow("NEXT_NOT_FOUND");
     expect(productService.canManageProduct).not.toHaveBeenCalled();
     expect(commerceService.checkEntitlement).not.toHaveBeenCalled();
     expect(productService.getProductBuilds).not.toHaveBeenCalled();
@@ -327,19 +333,13 @@ describe("resource detail acquisition behavior", () => {
       );
 
       expect(html).toContain("Detail Resource");
-      expect(html).toContain(
-        'href="/acquire?productId=prd_detail"',
-      );
+      expect(html).toContain('href="/acquire?productId=prd_detail"');
       expect(html).toContain(copy.addToLibrary);
       expect(html).toContain(copy.latestBuildNotice);
       expect(html).toContain('href="/market/detail-resource/versions"');
-      expect(
-        (html.match(/data-testid="build-provenance"/gu) ?? []).length,
-      ).toBe(2);
+      expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(2);
       expect(html).not.toContain('data-testid="resource-download"');
-      expect(html).not.toContain(
-        getDictionary(locale).checkout.paidDisabled,
-      );
+      expect(html).not.toContain(getDictionary(locale).checkout.paidDisabled);
     },
   );
 
@@ -374,13 +374,8 @@ describe("resource detail acquisition behavior", () => {
       }),
     );
 
-    expect(productService.getProductBuilds).toHaveBeenCalledWith(
-      "prd_detail",
-      false,
-    );
-    expect(
-      (html.match(/data-testid="resource-download"/gu) ?? []).length,
-    ).toBe(1);
+    expect(productService.getProductBuilds).toHaveBeenCalledWith("prd_detail", false);
+    expect((html.match(/data-testid="resource-download"/gu) ?? []).length).toBe(1);
     expect(html).toContain('data-product-id="prd_detail"');
     expect(html).toContain('data-version="2.0.0"');
     expect(html).toContain('href="/workspace"');
@@ -401,13 +396,8 @@ describe("resource detail acquisition behavior", () => {
       }),
     );
 
-    expect(productService.getProductBuilds).toHaveBeenCalledWith(
-      "prd_detail",
-      true,
-    );
-    expect(
-      (html.match(/data-testid="resource-download"/gu) ?? []).length,
-    ).toBe(1);
+    expect(productService.getProductBuilds).toHaveBeenCalledWith("prd_detail", true);
+    expect((html.match(/data-testid="resource-download"/gu) ?? []).length).toBe(1);
     expect(html).toContain(getDictionary("en").product.managementAccess);
   });
 });

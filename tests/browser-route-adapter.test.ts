@@ -55,10 +55,12 @@ describe("withBrowserMutation", () => {
   });
 
   it("forwards same-origin requests including route context", async () => {
-    const handler = vi.fn(async (_request: NextRequest, context: { params: Promise<{ id: string }> }) => {
-      const { id } = await context.params;
-      return NextResponse.json({ id });
-    });
+    const handler = vi.fn(
+      async (_request: NextRequest, context: { params: Promise<{ id: string }> }) => {
+        const { id } = await context.params;
+        return NextResponse.json({ id });
+      },
+    );
     const route = withBrowserMutation(handler);
     const response = await route(
       new NextRequest("https://nexus.test/api/products/p1/builds", {

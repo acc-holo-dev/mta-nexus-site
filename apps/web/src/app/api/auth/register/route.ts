@@ -23,7 +23,6 @@ function json(body: unknown, status = 200) {
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -31,8 +30,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (!rl.success) {
       return json(
         {
-          error:
-            "Too many registration attempts. Please try again later.",
+          error: "Too many registration attempts. Please try again later.",
         },
         429,
       );
@@ -62,10 +60,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(
-        { error: error.message, code: error.code },
-        error.statusCode,
-      );
+      return json({ error: error.message, code: error.code }, error.statusCode);
     }
 
     logRequestEvent({
@@ -78,4 +73,3 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json({ error: "Failed to register" }, 500);
   }
 });
-

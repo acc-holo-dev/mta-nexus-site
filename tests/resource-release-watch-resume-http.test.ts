@@ -24,11 +24,7 @@ import { POST as resume } from "../apps/web/src/app/api/library/watches/resume/r
 const command = { items: [{ productId: "prd_a", expectedRevision: 1 }] };
 const get = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/watches/export${query}`);
-const post = (
-  body: unknown = command,
-  query = "",
-  headers: Record<string, string> = {},
-) =>
+const post = (body: unknown = command, query = "", headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test/api/library/watches/resume${query}`, {
     method: "POST",
     headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },

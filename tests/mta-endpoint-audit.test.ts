@@ -5,7 +5,13 @@ describe("read-only MTA endpoint audit", () => {
   it("detects canonical DNS and IPv6 aliases without merging identities", () => {
     const audit = new ServerEndpointAuditCollector();
     for (const row of [
-      { id: "s1", ipAddress: "PLAY.Example.COM.", port: 22003, ownerId: "owner_a", isVerified: true },
+      {
+        id: "s1",
+        ipAddress: "PLAY.Example.COM.",
+        port: 22003,
+        ownerId: "owner_a",
+        isVerified: true,
+      },
       { id: "s2", ipAddress: "play.example.com", port: 22003, ownerId: "owner_b" },
       { id: "s3", ipAddress: "play.example.com", port: 22004, ownerId: "owner_a" },
       { id: "s4", ipAddress: "fe80::abcd", port: 22003, organizationId: "team", isVerified: true },
@@ -27,32 +33,46 @@ describe("read-only MTA endpoint audit", () => {
       collisionGroupsWithOwnershipConflict: 1,
       collisionGroupsWithVerifiedServers: 2,
     });
-    expect(result.details.collisions.map((group) => group.serverIds))
-      .toEqual([["s4", "s5"], ["s1", "s2"]]);
-    expect(result.details.collisions.map((group) => group.ownerScopes))
-      .toEqual([["organization:team"], ["user:owner_a", "user:owner_b"]]);
-    expect(result.details.collisions.map((group) => group.ownershipConflict))
-      .toEqual([false, true]);
-    expect(result.details.collisions.map((group) => group.verifiedServerIds))
-      .toEqual([["s4"], ["s1"]]);
+    expect(result.details.collisions.map((group) => group.serverIds)).toEqual([
+      ["s4", "s5"],
+      ["s1", "s2"],
+    ]);
+    expect(result.details.collisions.map((group) => group.ownerScopes)).toEqual([
+      ["organization:team"],
+      ["user:owner_a", "user:owner_b"],
+    ]);
+    expect(result.details.collisions.map((group) => group.ownershipConflict)).toEqual([
+      false,
+      true,
+    ]);
+    expect(result.details.collisions.map((group) => group.verifiedServerIds)).toEqual([
+      ["s4"],
+      ["s1"],
+    ]);
     // Conflicts are reported for remediation, not silently reassigned.
-    expect(result.details.invalidRows.map((row) => row.id))
-      .toEqual(["s6", "s7"]);
+    expect(result.details.invalidRows.map((row) => row.id)).toEqual(["s6", "s7"]);
   });
 
   it("detects expanded IPv6 aliases within one game port without changing owners", () => {
     const audit = new ServerEndpointAuditCollector();
     audit.add({
-      id: "server_owner_a", ipAddress: "FE80:0:0:0:0:0:0:ABCD",
-      port: 22003, ownerId: "owner_a", isVerified: true,
+      id: "server_owner_a",
+      ipAddress: "FE80:0:0:0:0:0:0:ABCD",
+      port: 22003,
+      ownerId: "owner_a",
+      isVerified: true,
     });
     audit.add({
-      id: "server_owner_b", ipAddress: "fe80::abcd",
-      port: 22003, ownerId: "owner_b",
+      id: "server_owner_b",
+      ipAddress: "fe80::abcd",
+      port: 22003,
+      ownerId: "owner_b",
     });
     audit.add({
-      id: "server_owner_c", ipAddress: "[fe80::abcd]",
-      port: 22004, ownerId: "owner_c",
+      id: "server_owner_c",
+      ipAddress: "[fe80::abcd]",
+      port: 22004,
+      ownerId: "owner_c",
     });
     const result = audit.result();
     expect(result.summary).toMatchObject({
@@ -63,14 +83,16 @@ describe("read-only MTA endpoint audit", () => {
       collisionGroupsWithOwnershipConflict: 1,
       collisionGroupsWithVerifiedServers: 1,
     });
-    expect(result.details.collisions).toEqual([{
-      canonicalAddress: "[fe80::abcd]",
-      port: 22003,
-      serverIds: ["server_owner_a", "server_owner_b"],
-      ownerScopes: ["user:owner_a", "user:owner_b"],
-      verifiedServerIds: ["server_owner_a"],
-      ownershipConflict: true,
-    }]);
+    expect(result.details.collisions).toEqual([
+      {
+        canonicalAddress: "[fe80::abcd]",
+        port: 22003,
+        serverIds: ["server_owner_a", "server_owner_b"],
+        ownerScopes: ["user:owner_a", "user:owner_b"],
+        verifiedServerIds: ["server_owner_a"],
+        ownershipConflict: true,
+      },
+    ]);
   });
 
   it("keeps distinct ports separate and reports a clean canonical collection", () => {
@@ -93,12 +115,19 @@ describe("read-only MTA endpoint audit", () => {
   it("marks mixed ownership and unclaimed collision groups as manual review", () => {
     const audit = new ServerEndpointAuditCollector();
     audit.add({
-      id: "owned", ipAddress: "PLAY.EXAMPLE.COM.", port: 22003,
-      organizationId: "team_a", isVerified: false,
+      id: "owned",
+      ipAddress: "PLAY.EXAMPLE.COM.",
+      port: 22003,
+      organizationId: "team_a",
+      isVerified: false,
     });
     audit.add({
-      id: "unclaimed", ipAddress: "play.example.com", port: 22003,
-      ownerId: null, organizationId: null, isVerified: false,
+      id: "unclaimed",
+      ipAddress: "play.example.com",
+      port: 22003,
+      ownerId: null,
+      organizationId: null,
+      isVerified: false,
     });
     expect(audit.result().summary).toMatchObject({
       unclaimedRows: 1,
@@ -116,8 +145,19 @@ describe("read-only MTA endpoint audit", () => {
     const detailed = new ServerEndpointAuditCollector();
     const compact = new ServerEndpointAuditCollector(false);
     const rows = [
-      { id: "first_private_id", ipAddress: "PLAY.Private.Example.", port: 22003, ownerId: "private_owner_a", isVerified: true },
-      { id: "second_private_id", ipAddress: "play.private.example", port: 22003, ownerId: "private_owner_b" },
+      {
+        id: "first_private_id",
+        ipAddress: "PLAY.Private.Example.",
+        port: 22003,
+        ownerId: "private_owner_a",
+        isVerified: true,
+      },
+      {
+        id: "second_private_id",
+        ipAddress: "play.private.example",
+        port: 22003,
+        ownerId: "private_owner_b",
+      },
       { id: "invalid_private_id", ipAddress: "invalid host", port: 22003 },
       { id: "orphan_private_id", ipAddress: "another.private.example", port: 22004 },
     ];
@@ -135,8 +175,12 @@ describe("read-only MTA endpoint audit", () => {
     });
     const serialized = JSON.stringify(compactReport);
     for (const secret of [
-      "first_private_id", "second_private_id", "private_owner_a",
-      "private_owner_b", "invalid host", "play.private.example",
+      "first_private_id",
+      "second_private_id",
+      "private_owner_a",
+      "private_owner_b",
+      "invalid host",
+      "play.private.example",
     ]) {
       expect(serialized).not.toContain(secret);
     }
@@ -158,7 +202,9 @@ describe("read-only MTA endpoint audit", () => {
       });
     }
     audit.add({
-      id: "duplicate", ipAddress: "GAME-0.EXAMPLE.COM.", port: 22003,
+      id: "duplicate",
+      ipAddress: "GAME-0.EXAMPLE.COM.",
+      port: 22003,
       ownerId: "different_owner",
     });
     expect(audit.result().summary).toMatchObject({

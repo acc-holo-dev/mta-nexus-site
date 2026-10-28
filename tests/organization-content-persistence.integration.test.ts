@@ -44,14 +44,12 @@ async function fixture() {
     outsider = await actor("admin");
   const orgId = `org_editor_${randomUUID()}`;
   orgs.push(orgId);
-  await db
-    .insert(organizations)
-    .values({
-      id: orgId,
-      name: "Editorial team",
-      slug: `editor-${randomUUID()}`,
-      ownerId: owner.id,
-    });
+  await db.insert(organizations).values({
+    id: orgId,
+    name: "Editorial team",
+    slug: `editor-${randomUUID()}`,
+    ownerId: owner.id,
+  });
   await db.insert(organizationMembers).values([
     { id: `mem_${randomUUID()}`, organizationId: orgId, userId: admin.id, role: "admin" },
     { id: `mem_${randomUUID()}`, organizationId: orgId, userId: writer.id, role: "developer" },
@@ -71,14 +69,12 @@ async function fixture() {
       commentCount: 1,
     })
     .returning();
-  await db
-    .insert(comments)
-    .values({
-      id: `cmt_${randomUUID()}`,
-      authorId: writer.id,
-      contentId: item.id,
-      text: "Existing discussion",
-    });
+  await db.insert(comments).values({
+    id: `cmt_${randomUUID()}`,
+    authorId: writer.id,
+    contentId: item.id,
+    text: "Existing discussion",
+  });
   return { owner, admin, writer, outsider, orgId, item };
 }
 const fields = {

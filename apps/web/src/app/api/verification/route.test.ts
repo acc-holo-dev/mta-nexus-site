@@ -31,9 +31,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return {
     ...actual,
     after: afterMock,
@@ -66,45 +64,31 @@ vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
-import {
-  GET,
-  POST,
-} from "./route";
+import { GET, POST } from "./route";
 
-function postRequest(
-  body: unknown = { targetType: "user", targetId: "u_1" },
-) {
-  const request = new NextRequest(
-    "https://nexus.test/api/verification",
-    {
-      method: "POST",
-      headers: {
-        ...browserMutationHeaders(),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+function postRequest(body: unknown = { targetType: "user", targetId: "u_1" }) {
+  const request = new NextRequest("https://nexus.test/api/verification", {
+    method: "POST",
+    headers: {
+      ...browserMutationHeaders(),
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify(body),
+  });
   request.cookies.set("nexus_session", "session");
   return request;
 }
 
 function getRequest() {
-  const request = new NextRequest(
-    "https://nexus.test/api/verification",
-  );
+  const request = new NextRequest("https://nexus.test/api/verification");
   request.cookies.set("nexus_session", "session");
   return request;
 }
 
 function expectPrivate(response: Response) {
-  expect(response.headers.get("Cache-Control")).toBe(
-    "private, no-store",
-  );
+  expect(response.headers.get("Cache-Control")).toBe("private, no-store");
   expect(response.headers.get("Vary")).toBe("Cookie");
-  expect(response.headers.get("X-Request-Id")).toMatch(
-    /^[0-9a-f-]{20,}$/u,
-  );
+  expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 beforeEach(() => {
@@ -149,9 +133,7 @@ describe("verification HTTP behavior", () => {
     expectPrivate(denied);
 
     state.user = { id: "u_1", isVerified: false };
-    mocks.listByRequester.mockResolvedValue([
-      { id: "ver_history", status: "approved" },
-    ]);
+    mocks.listByRequester.mockResolvedValue([{ id: "ver_history", status: "approved" }]);
     const allowed = await GET(getRequest());
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
@@ -196,12 +178,8 @@ describe("verification HTTP behavior", () => {
   });
 
   it("keeps a committed application successful when moderator lookup fails", async () => {
-    mocks.moderators.mockRejectedValueOnce(
-      new Error("moderator lookup unavailable"),
-    );
-    const warning = vi
-      .spyOn(console, "warn")
-      .mockImplementation(() => undefined);
+    mocks.moderators.mockRejectedValueOnce(new Error("moderator lookup unavailable"));
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
     try {
       const response = await POST(postRequest());
@@ -235,9 +213,7 @@ describe("verification HTTP behavior", () => {
         deliveryErrors: 0,
       },
     });
-    const warning = vi
-      .spyOn(console, "warn")
-      .mockImplementation(() => undefined);
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
     try {
       const response = await POST(postRequest());
@@ -246,9 +222,7 @@ describe("verification HTTP behavior", () => {
 
       expect(warning).toHaveBeenCalledOnce();
       const line = String(warning.mock.calls[0]?.[0] ?? "");
-      expect(line).toContain(
-        "verification.moderator_notification_partial_failure",
-      );
+      expect(line).toContain("verification.moderator_notification_partial_failure");
       expect(line).toContain('"storageFailed":1');
     } finally {
       warning.mockRestore();
@@ -344,9 +318,7 @@ describe("verification HTTP behavior", () => {
 
   it("does not schedule moderator delivery when the application transaction fails", async () => {
     mocks.create.mockRejectedValueOnce(new Error("insert failed"));
-    const error = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
       const response = await POST(postRequest());

@@ -8,19 +8,18 @@ import {
   storageCleanupSchema,
   storageParse,
 } from "../../../../../../../lib/storage-maintenance-query";
-export const POST = withBrowserMutation((
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    const token = request.cookies.get("nexus_session")?.value;
-    if (!token) throw new UnauthorizedError();
-    const command = storageParse(storageCleanupSchema, await readBoundedJson(request));
-    return storageMaintenanceService.cleanup(
-      actor.id,
-      token,
-      (await params).id,
-      command.expectedRevision,
-    );
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      const token = request.cookies.get("nexus_session")?.value;
+      if (!token) throw new UnauthorizedError();
+      const command = storageParse(storageCleanupSchema, await readBoundedJson(request));
+      return storageMaintenanceService.cleanup(
+        actor.id,
+        token,
+        (await params).id,
+        command.expectedRevision,
+      );
+    });
+  },
+);

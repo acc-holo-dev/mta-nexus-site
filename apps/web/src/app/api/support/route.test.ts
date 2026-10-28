@@ -404,7 +404,10 @@ describe("support HTTP authorization and privacy", () => {
   it("limits private thread reads before loading message bodies", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     mocks.rate.mockResolvedValue({ success: false });
-    const response = await getCase(new NextRequest(`https://nexus.test/api/support/${caseId}`), params);
+    const response = await getCase(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`),
+      params,
+    );
     expect(response.status).toBe(429);
     expectPrivate(response);
     expect(mocks.authorizedThread).not.toHaveBeenCalled();

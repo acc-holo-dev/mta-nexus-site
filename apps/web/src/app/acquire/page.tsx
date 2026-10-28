@@ -3,11 +3,7 @@
 import { Suspense, useEffect, useId, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {
-  CheckCircle2,
-  Library,
-  ShieldCheck,
-} from "lucide-react";
+import { CheckCircle2, Library, ShieldCheck } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../components/locale-context";
 import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";
@@ -37,7 +33,8 @@ function AcquireContent() {
   const [loadRevision, setLoadRevision] = useState(0);
   const [loading, setLoading] = useState(false);
   const [claimedProductId, setClaimedProductId] = useState<string | null>(null);
-  const [claimedAccess, setClaimedAccess] = useState<ReturnType<typeof confirmedResourceClaim>>(null);
+  const [claimedAccess, setClaimedAccess] =
+    useState<ReturnType<typeof confirmedResourceClaim>>(null);
   const [error, setError] = useState<string | null>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(loadRevision): Explicit refresh trigger; changing it must restart this request.
@@ -112,11 +109,7 @@ function AcquireContent() {
       setClaimedAccess(confirmed);
       setClaimedProductId(product.id);
     } catch (caught: unknown) {
-      setError(
-        caught instanceof Error && caught.message
-          ? caught.message
-          : copy.unexpected,
-      );
+      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpected);
     } finally {
       setLoading(false);
     }
@@ -139,11 +132,26 @@ function AcquireContent() {
               {claimedAccess?.kind === "license" ? activityCopy.licenseTitle : copy.resourceAdded}
             </h1>
             <p className="mt-2 text-sm text-muted">
-              {claimedAccess?.kind === "license" ? activityCopy.licenseNote : copy.resourceAddedMessage}
+              {claimedAccess?.kind === "license"
+                ? activityCopy.licenseNote
+                : copy.resourceAddedMessage}
             </p>
-            {claimedAccess?.kind === "license" ? <p className="mt-3 text-sm text-secondary">{claimedAccess.expiresAt
-              ? <>{activityCopy.expires} <time dateTime={claimedAccess.expiresAt}>{new Date(claimedAccess.expiresAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}</time></>
-              : activityCopy.perpetual}</p> : null}
+            {claimedAccess?.kind === "license" ? (
+              <p className="mt-3 text-sm text-secondary">
+                {claimedAccess.expiresAt ? (
+                  <>
+                    {activityCopy.expires}{" "}
+                    <time dateTime={claimedAccess.expiresAt}>
+                      {new Date(claimedAccess.expiresAt).toLocaleString(
+                        locale === "ru" ? "ru-RU" : "en-US",
+                      )}
+                    </time>
+                  </>
+                ) : (
+                  activityCopy.perpetual
+                )}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">
@@ -172,9 +180,7 @@ function AcquireContent() {
         aria-live={productError ? "assertive" : undefined}
         className="mx-auto max-w-xl space-y-4 py-16 text-center"
       >
-        <h1 className="font-display text-primary">
-          {productId ? productError : copy.noProduct}
-        </h1>
+        <h1 className="font-display text-primary">{productId ? productError : copy.noProduct}</h1>
         {(!productId || productError === copy.productNotFound) && (
           <p className="text-sm text-muted">{copy.chooseResource}</p>
         )}
@@ -199,10 +205,7 @@ function AcquireContent() {
 
   if (!product || product.id !== productId) {
     return (
-      <div
-        role="status"
-        className="mx-auto max-w-2xl py-12 text-center text-sm text-muted"
-      >
+      <div role="status" className="mx-auto max-w-2xl py-12 text-center text-sm text-muted">
         {copy.loadingProduct}
       </div>
     );
@@ -223,9 +226,7 @@ function AcquireContent() {
           <Library className="h-6 w-6 text-accent" aria-hidden="true" />
           <span>{copy.title}</span>
         </h1>
-        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
-          {copy.description}
-        </p>
+        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </header>
 
       {error && (
@@ -241,24 +242,17 @@ function AcquireContent() {
         aria-labelledby={summaryHeadingId}
         className="nexus-panel space-y-4 p-6 shadow-nexus-sm"
       >
-        <h2
-          id={summaryHeadingId}
-          className="font-label uppercase text-muted"
-        >
+        <h2 id={summaryHeadingId} className="font-label uppercase text-muted">
           {copy.orderSummary}
         </h2>
         <dl className="divide-y divide-[color:var(--nexus-border)] text-sm">
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.resource}</dt>
-            <dd className="text-right font-semibold text-primary">
-              {product.title}
-            </dd>
+            <dd className="text-right font-semibold text-primary">{product.title}</dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.price}</dt>
-            <dd className="font-numeric font-bold text-primary">
-              {formattedPrice}
-            </dd>
+            <dd className="font-numeric font-bold text-primary">{formattedPrice}</dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.licenseModel}</dt>
@@ -268,15 +262,11 @@ function AcquireContent() {
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.version}</dt>
-            <dd className="font-numeric text-primary">
-              v{product.currentVersion}
-            </dd>
+            <dd className="font-numeric text-primary">v{product.currentVersion}</dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-3 font-bold">
             <dt className="text-primary">{copy.totalDue}</dt>
-            <dd className="font-numeric text-success">
-              {formattedPrice}
-            </dd>
+            <dd className="font-numeric text-success">{formattedPrice}</dd>
           </div>
         </dl>
       </section>
@@ -289,16 +279,10 @@ function AcquireContent() {
         aria-describedby={accessDescriptionId}
         className="nexus-panel space-y-2 p-6"
       >
-        <h2
-          id={accessHeadingId}
-          className="text-sm font-bold text-primary"
-        >
+        <h2 id={accessHeadingId} className="text-sm font-bold text-primary">
           {product.price === 0 ? copy.freeResource : copy.paidCheckout}
         </h2>
-        <p
-          id={accessDescriptionId}
-          className="text-sm leading-relaxed text-muted"
-        >
+        <p id={accessDescriptionId} className="text-sm leading-relaxed text-muted">
           {product.price === 0 ? copy.noPaymentRequired : copy.paidDisabled}
         </p>
       </section>
@@ -311,17 +295,10 @@ function AcquireContent() {
         isLoading={loading}
         className="w-full"
       >
-        {loading
-          ? copy.adding
-          : product.price === 0
-            ? copy.addToLibrary
-            : copy.paidUnavailable}
+        {loading ? copy.adding : product.price === 0 ? copy.addToLibrary : copy.paidUnavailable}
       </Button>
 
-      <div
-        role="note"
-        className="flex items-center justify-center gap-2 text-xs text-muted"
-      >
+      <div role="note" className="flex items-center justify-center gap-2 text-xs text-muted">
         <ShieldCheck className="h-4 w-4 text-success" aria-hidden="true" />
         <span>{copy.noSimulatedPayments}</span>
       </div>
@@ -335,10 +312,7 @@ export default function AcquirePage() {
   return (
     <Suspense
       fallback={
-        <div
-          role="status"
-          className="mx-auto max-w-2xl py-12 text-center text-sm text-muted"
-        >
+        <div role="status" className="mx-auto max-w-2xl py-12 text-center text-sm text-muted">
           {dictionary.checkout.loadingSession}
         </div>
       }
@@ -347,4 +321,3 @@ export default function AcquirePage() {
     </Suspense>
   );
 }
-

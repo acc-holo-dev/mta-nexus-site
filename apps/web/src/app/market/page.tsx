@@ -6,7 +6,12 @@ import { ProductCard } from "../../components/product-card";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../../lib/market-query";
+import {
+  MARKET_PAGE_SIZE,
+  MAX_MARKET_PAGE,
+  marketHref,
+  parseMarketQuery,
+} from "../../lib/market-query";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +68,9 @@ export default async function MarketPage({
         <form action="/market" method="get" className="flex flex-wrap gap-2">
           <input type="hidden" name="type" value={type} />
           <input type="hidden" name="sort" value={sort} />
-          <label htmlFor="market-query" className="sr-only">{dictionary.market.searchLabel}</label>
+          <label htmlFor="market-query" className="sr-only">
+            {dictionary.market.searchLabel}
+          </label>
           <input
             id="market-query"
             name="q"
@@ -73,14 +80,20 @@ export default async function MarketPage({
             placeholder={dictionary.market.searchPlaceholder}
             className="min-h-11 min-w-0 flex-1 rounded-lg border border-base bg-surface px-3 text-sm text-primary placeholder:text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           />
-          <button type="submit" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+          <button
+            type="submit"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
             <Search className="h-4 w-4" aria-hidden="true" />
             {dictionary.market.searchButton}
           </button>
         </form>
       </search>
 
-      <nav aria-label={dictionary.market.sortLabel} className="flex items-center gap-1 overflow-x-auto border-b border-base">
+      <nav
+        aria-label={dictionary.market.sortLabel}
+        className="flex items-center gap-1 overflow-x-auto border-b border-base"
+      >
         {SORTS.map((option) => {
           const isActive = option.id === sort;
           return (
@@ -100,7 +113,10 @@ export default async function MarketPage({
         })}
       </nav>
 
-      <nav aria-label={dictionary.market.categoryLabel} className="flex flex-wrap items-center gap-1.5">
+      <nav
+        aria-label={dictionary.market.categoryLabel}
+        className="flex flex-wrap items-center gap-1.5"
+      >
         {CATEGORIES.map((category) => {
           const isActive = type === category.id;
           return (
@@ -128,7 +144,9 @@ export default async function MarketPage({
         </div>
       ) : (
         <div className="nexus-panel py-16 text-center">
-          <p className="font-caption text-muted">{page > 1 ? dictionary.market.endOfResults : dictionary.market.empty}</p>
+          <p className="font-caption text-muted">
+            {page > 1 ? dictionary.market.endOfResults : dictionary.market.empty}
+          </p>
           <Link
             href={page > 1 ? buildHref(type, sort) : "/market"}
             className="mt-3 inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
@@ -139,20 +157,35 @@ export default async function MarketPage({
       )}
 
       {(page > 1 || hasMore) && (
-        <nav aria-label={dictionary.market.paginationLabel} className="flex items-center justify-between gap-4 border-t border-base pt-4">
+        <nav
+          aria-label={dictionary.market.paginationLabel}
+          className="flex items-center justify-between gap-4 border-t border-base pt-4"
+        >
           {page > 1 ? (
-            <Link href={buildHref(type, sort, page - 1)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent">
+            <Link
+              href={buildHref(type, sort, page - 1)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
+            >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               {dictionary.market.previousPage}
             </Link>
-          ) : <span />}
-          <span className="text-sm text-muted">{dictionary.market.pageLabel} {page}</span>
+          ) : (
+            <span />
+          )}
+          <span className="text-sm text-muted">
+            {dictionary.market.pageLabel} {page}
+          </span>
           {hasMore && page < MAX_MARKET_PAGE ? (
-            <Link href={buildHref(type, sort, page + 1)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent">
+            <Link
+              href={buildHref(type, sort, page + 1)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
+            >
               {dictionary.market.nextPage}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-          ) : <span />}
+          ) : (
+            <span />
+          )}
         </nav>
       )}
     </div>

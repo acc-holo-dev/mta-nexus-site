@@ -68,20 +68,12 @@ describe("localized resource submission failures", () => {
       [key]: copy[key],
     });
 
-    expect(getResourceSubmissionErrorMessage(code, messages(english))).toBe(
-      english[key],
-    );
-    expect(getResourceSubmissionErrorMessage(code, messages(russian))).toBe(
-      russian[key],
-    );
+    expect(getResourceSubmissionErrorMessage(code, messages(english))).toBe(english[key]);
+    expect(getResourceSubmissionErrorMessage(code, messages(russian))).toBe(russian[key]);
   });
 
   it("describes resumable and reset actions in both languages", () => {
-    expect(getDictionary("en").publishing.startNewResource).toBe(
-      "Start a new resource",
-    );
-    expect(getDictionary("ru").publishing.startNewResource).toBe(
-      "Начать новый ресурс",
-    );
+    expect(getDictionary("en").publishing.startNewResource).toBe("Start a new resource");
+    expect(getDictionary("ru").publishing.startNewResource).toBe("Начать новый ресурс");
   });
 });

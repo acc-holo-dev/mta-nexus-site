@@ -18,9 +18,10 @@ describe("release workspace version consistency", () => {
   it("keeps every private workspace manifest aligned with the root version", () => {
     const manifests = packagePaths.map((path) => ({
       path,
-      manifest: JSON.parse(
-        readFileSync(resolve(process.cwd(), path), "utf8"),
-      ) as { version?: string; private?: boolean },
+      manifest: JSON.parse(readFileSync(resolve(process.cwd(), path), "utf8")) as {
+        version?: string;
+        private?: boolean;
+      },
     }));
 
     const rootVersion = manifests[0]?.manifest.version;

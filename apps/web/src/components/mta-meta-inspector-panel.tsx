@@ -51,9 +51,7 @@ export const metaInspectorClientPolicy = Object.freeze({
   fileAccept: ".xml,text/xml,text/plain",
 });
 
-export function metaInspectorPreview<T>(
-  entries: readonly T[],
-): readonly T[] {
+export function metaInspectorPreview<T>(entries: readonly T[]): readonly T[] {
   return entries.slice(0, metaInspectorClientPolicy.previewEntries);
 }
 
@@ -72,13 +70,9 @@ export async function requestMtaMetaInspection(
       "Content-Type": "text/plain; charset=utf-8",
     },
     body: source,
-    signal: AbortSignal.timeout(
-      metaInspectorClientPolicy.requestTimeoutMs,
-    ),
+    signal: AbortSignal.timeout(metaInspectorClientPolicy.requestTimeoutMs),
   });
-  const data = (await response.json().catch(() => null)) as
-    | InspectionResponse
-    | null;
+  const data = (await response.json().catch(() => null)) as InspectionResponse | null;
   return { response, data };
 }
 
@@ -116,8 +110,7 @@ export function MtaMetaInspectorPanel({
       }
 
       const source = await file.text();
-      const { response, data } =
-        await requestMtaMetaInspection(source);
+      const { response, data } = await requestMtaMetaInspection(source);
 
       if (!response.ok || !data) {
         setResult({ error: responseError(data) });
@@ -133,30 +126,17 @@ export function MtaMetaInspectorPanel({
   }
 
   const inspection = result?.inspection;
-  const versionSuggestion = getMtaVersionTargetSuggestion(
-    inspection?.minMtaVersion ?? null,
-  );
+  const versionSuggestion = getMtaVersionTargetSuggestion(inspection?.minMtaVersion ?? null);
 
   return (
-    <section
-      className="nexus-panel space-y-4 p-5"
-      aria-labelledby="meta-inspector-heading"
-    >
+    <section className="nexus-panel space-y-4 p-5" aria-labelledby="meta-inspector-heading">
       <div className="flex items-start gap-3">
-        <FileSearch
-          className="mt-0.5 h-5 w-5 text-accent"
-          aria-hidden="true"
-        />
+        <FileSearch className="mt-0.5 h-5 w-5 text-accent" aria-hidden="true" />
         <div>
-          <h2
-            id="meta-inspector-heading"
-            className="text-sm font-bold text-primary"
-          >
+          <h2 id="meta-inspector-heading" className="text-sm font-bold text-primary">
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted">
-            {copy.description}
-          </p>
+          <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
         </div>
       </div>
 
@@ -180,12 +160,7 @@ export function MtaMetaInspectorPanel({
           onClick={() => void inspect()}
           className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] disabled:opacity-50"
         >
-          {loading && (
-            <LoaderCircle
-              className="h-4 w-4 animate-spin"
-              aria-hidden="true"
-            />
-          )}
+          {loading && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />}
           {loading ? copy.inspecting : copy.inspect}
         </button>
       </div>
@@ -203,9 +178,7 @@ export function MtaMetaInspectorPanel({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <div className="rounded-lg border border-base bg-inset p-3">
-              <div className="font-label uppercase text-faint">
-                {copy.scripts}
-              </div>
+              <div className="font-label uppercase text-faint">{copy.scripts}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.scriptCount}
               </div>
@@ -217,27 +190,21 @@ export function MtaMetaInspectorPanel({
             </div>
 
             <div className="rounded-lg border border-base bg-inset p-3">
-              <div className="font-label uppercase text-faint">
-                {copy.files}
-              </div>
+              <div className="font-label uppercase text-faint">{copy.files}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.fileCount}
               </div>
             </div>
 
             <div className="rounded-lg border border-base bg-inset p-3">
-              <div className="font-label uppercase text-faint">
-                {copy.dependencies}
-              </div>
+              <div className="font-label uppercase text-faint">{copy.dependencies}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.dependencyCount}
               </div>
             </div>
 
             <div className="rounded-lg border border-base bg-inset p-3">
-              <div className="font-label uppercase text-faint">
-                {copy.exports}
-              </div>
+              <div className="font-label uppercase text-faint">{copy.exports}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.exportCount}
               </div>
@@ -249,24 +216,18 @@ export function MtaMetaInspectorPanel({
             </div>
           </div>
 
-          {(inspection.info?.name ||
-            inspection.info?.author ||
-            inspection.minMtaVersion) && (
+          {(inspection.info?.name || inspection.info?.author || inspection.minMtaVersion) && (
             <dl className="grid gap-2 text-xs sm:grid-cols-[8rem_minmax(0,1fr)]">
               {inspection.info?.name && (
                 <>
                   <dt className="text-faint">{copy.resourceName}</dt>
-                  <dd className="text-secondary">
-                    {inspection.info.name}
-                  </dd>
+                  <dd className="text-secondary">{inspection.info.name}</dd>
                 </>
               )}
               {inspection.info?.author && (
                 <>
                   <dt className="text-faint">{copy.declaredAuthor}</dt>
-                  <dd className="text-secondary">
-                    {inspection.info.author}
-                  </dd>
+                  <dd className="text-secondary">{inspection.info.author}</dd>
                 </>
               )}
               {inspection.minMtaVersion && (
@@ -307,9 +268,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.dependencyResources.length > 0 && (
             <div>
-              <div className="font-label uppercase text-faint">
-                {copy.includedResources}
-              </div>
+              <div className="font-label uppercase text-faint">{copy.includedResources}</div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {inspection.dependencyResources.map((dependency) => (
                   <span
@@ -324,63 +283,50 @@ export function MtaMetaInspectorPanel({
           )}
 
           {inspection.aclRights.length > 0 && (
-            <section
-              aria-labelledby="meta-inspector-acl-heading"
-              className="space-y-2"
-            >
+            <section aria-labelledby="meta-inspector-acl-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3
-                  id="meta-inspector-acl-heading"
-                  className="font-label uppercase text-faint"
-                >
+                <h3 id="meta-inspector-acl-heading" className="font-label uppercase text-faint">
                   {copy.aclRights}
                 </h3>
                 <span className="text-[10px] text-faint">
-                  {copy.aclRightsCount.replace(
-                    "{shown}",
-                    String(
-                      Math.min(
-                        inspection.aclRights.length,
-                        metaInspectorClientPolicy.previewEntries,
+                  {copy.aclRightsCount
+                    .replace(
+                      "{shown}",
+                      String(
+                        Math.min(
+                          inspection.aclRights.length,
+                          metaInspectorClientPolicy.previewEntries,
+                        ),
                       ),
-                    ),
-                  ).replace("{total}", String(inspection.aclRights.length))}
+                    )
+                    .replace("{total}", String(inspection.aclRights.length))}
                 </span>
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
-                {withOccurrenceKeys(
-                  metaInspectorPreview(inspection.aclRights),
-                  (right) => JSON.stringify([right.name, right.access]),
+                {withOccurrenceKeys(metaInspectorPreview(inspection.aclRights), (right) =>
+                  JSON.stringify([right.name, right.access]),
                 ).map(({ key, item: right }) => (
-                    <li
-                      key={key}
-                      className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
-                    >
-                      <code className="break-all text-secondary">
-                        {right.name || copy.aclRightNameMissing}
-                      </code>
-                      <span className="shrink-0 text-faint">
-                        {copy.aclAccess}: {right.access ?? copy.notDeclared}
-                      </span>
-                    </li>
-                  ))}
+                  <li
+                    key={key}
+                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                  >
+                    <code className="break-all text-secondary">
+                      {right.name || copy.aclRightNameMissing}
+                    </code>
+                    <span className="shrink-0 text-faint">
+                      {copy.aclAccess}: {right.access ?? copy.notDeclared}
+                    </span>
+                  </li>
+                ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">
-                {copy.aclRightsNote}
-              </p>
+              <p className="text-[10px] leading-relaxed text-faint">{copy.aclRightsNote}</p>
             </section>
           )}
 
           {inspection.exports.length > 0 && (
-            <section
-              aria-labelledby="meta-inspector-exports-heading"
-              className="space-y-2"
-            >
+            <section aria-labelledby="meta-inspector-exports-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3
-                  id="meta-inspector-exports-heading"
-                  className="font-label uppercase text-faint"
-                >
+                <h3 id="meta-inspector-exports-heading" className="font-label uppercase text-faint">
                   {copy.exportsDetails}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -388,43 +334,41 @@ export function MtaMetaInspectorPanel({
                     .replace(
                       "{shown}",
                       String(
-                        Math.min(inspection.exports.length, metaInspectorClientPolicy.previewEntries),
+                        Math.min(
+                          inspection.exports.length,
+                          metaInspectorClientPolicy.previewEntries,
+                        ),
                       ),
                     )
                     .replace("{total}", String(inspection.exports.length))}
                 </span>
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
-                {withOccurrenceKeys(
-                  metaInspectorPreview(inspection.exports),
-                  (entry) => JSON.stringify([entry.function, entry.type, entry.http]),
+                {withOccurrenceKeys(metaInspectorPreview(inspection.exports), (entry) =>
+                  JSON.stringify([entry.function, entry.type, entry.http]),
                 ).map(({ key, item: entry }) => (
-                    <li
-                      key={key}
-                      className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
-                    >
-                      <code className="break-all text-secondary">
-                        {entry.function || copy.exportFunctionNameMissing}
-                      </code>
-                      <span className="text-faint">
-                        {copy.exportTypeLabel}: {entry.type ?? copy.notDeclared}
-                        {" · "}
-                        {copy.httpAttribute}: {entry.http ?? copy.notDeclared}
-                      </span>
-                    </li>
-                  ))}
+                  <li
+                    key={key}
+                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                  >
+                    <code className="break-all text-secondary">
+                      {entry.function || copy.exportFunctionNameMissing}
+                    </code>
+                    <span className="text-faint">
+                      {copy.exportTypeLabel}: {entry.type ?? copy.notDeclared}
+                      {" · "}
+                      {copy.httpAttribute}: {entry.http ?? copy.notDeclared}
+                    </span>
+                  </li>
+                ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">
-                {copy.exportsNote}
-              </p>
+              <p className="text-[10px] leading-relaxed text-faint">{copy.exportsNote}</p>
             </section>
           )}
 
           {inspection.issues.length > 0 && (
             <div className="space-y-2">
-              <div className="font-label uppercase text-faint">
-                {copy.structuralNotes}
-              </div>
+              <div className="font-label uppercase text-faint">{copy.structuralNotes}</div>
               <ul className="space-y-1.5">
                 {withOccurrenceKeys(inspection.issues, (issue) =>
                   JSON.stringify([issue.code, issue.severity, issue.message]),
@@ -432,27 +376,19 @@ export function MtaMetaInspectorPanel({
                   <li
                     key={key}
                     className={
-                      issue.severity === "error"
-                        ? "text-xs text-danger"
-                        : "text-xs text-warning"
+                      issue.severity === "error" ? "text-xs text-danger" : "text-xs text-warning"
                     }
                   >
-                    {getMtaMetaInspectorIssueMessage(
-                      issue,
-                      copy.structuralIssues,
-                    )}
+                    {getMtaMetaInspectorIssueMessage(issue, copy.structuralIssues)}
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          <p className="text-[10px] leading-relaxed text-faint">
-            {copy.note}
-          </p>
+          <p className="text-[10px] leading-relaxed text-faint">{copy.note}</p>
         </div>
       )}
     </section>
   );
 }
-
