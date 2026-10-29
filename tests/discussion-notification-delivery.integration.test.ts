@@ -123,6 +123,43 @@ async function drain(commentId: string, limit = 20) {
   throw Error("Discussion delivery did not complete");
 }
 
+async function failInsert(table: "notifications", value: string) {
+  const name = `discussion_delivery_failure_${randomUUID().replaceAll("-", "")}`;
+  if (!/^[A-Za-z0-9_]+$/u.test(value)) throw Error("Unsafe fixture ID");
+  await db.execute(
+    sql.raw(
+      `create function ${name}() returns trigger language plpgsql as $$ begin raise exception 'PRIVATE_INSERT_FAILURE'; end $$`,
+    ),
+  );
+  triggers.push({ table, name });
+  await db.execute(
+    sql.raw(
+      `create trigger ${name} before insert on ${table} for each row when (new.recipient_id = '${value}') execute function ${name}()`,
+    ),
+  );
+  return async () => {
+    await db.execute(sql.raw(`drop trigger ${name} on ${table}`));
+    await db.execute(sql.raw(`drop function ${name}()`));
+    triggers.splice(
+      triggers.findIndex((entry) => entry.name === name),
+      1,
+    );
+  };
+}
+
+async function noticesFor(contentId: string, commentId: string, recipientIds: string[]) {
+  return db
+    .select()
+    .from(notifications)
+    .where(
+      inArray(
+        notifications.id,
+        recipientIds.map((recipientId) => noticeId(contentId, commentId, recipientId)),
+      ),
+    )
+    .orderBy(asc(notifications.recipientId));
+}
+
 it("atomically creates the comment with its delivery source", async () => {
   const authorId = await actor();
   const contentId = await publication(authorId);
@@ -216,14 +253,110 @@ it("pages followers with stable cursors across concurrent workers", async () => 
     new DiscussionNotificationDeliveryRepository().processNext(2),
   ]);
   await drain(comment.id, 2);
-  const ids = [ownerId, ...followers].map((recipientId) =>
-    noticeId(contentId, comment.id, recipientId),
-  );
-  const stored = await db
-    .select()
-    .from(notifications)
-    .where(inArray(notifications.id, ids))
-    .orderBy(asc(notifications.recipientId));
+  const stored = await noticesFor(contentId, comment.id, [ownerId, ...followers]);
   expect(stored).toHaveLength(6);
   expect((await source(comment.id)).completedAt).not.toBeNull();
+});
+
+it("rolls back a failed follower page, bounds retries and resumes after an operator reset", async () => {
+  const ownerId = await actor("own");
+  const firstFollower = await actor("fol");
+  const secondFollower = await actor("fol");
+  const commenterId = await actor("cmt");
+  const contentId = await publication(ownerId);
+  await follow(firstFollower, contentId);
+  await follow(secondFollower, contentId);
+  const comment = await reply(commenterId, contentId);
+  await ready(comment.id);
+  expect(await delivery.processNext(20)).toMatchObject({ state: "progress" });
+  expect(await source(comment.id)).toMatchObject({ directCompleted: true });
+  // Owner was delivered in the direct phase; keep that durable page.
+  expect(await noticesFor(contentId, comment.id, [ownerId])).toHaveLength(1);
+  const removeFailure = await failInsert("notifications", secondFollower);
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    await ready(comment.id);
+    expect(await delivery.processNext(2)).toEqual({
+      state: attempt === 5 ? "failed" : "retry",
+      recipients: 0,
+      stored: 0,
+      pushDeferred: 0,
+    });
+    expect(await source(comment.id)).toMatchObject({
+      attempts: attempt,
+      directCompleted: true,
+      completedAt: null,
+      lastFollowerId: null,
+    });
+    expect((await source(comment.id)).availableAt.getTime()).toBeGreaterThan(Date.now());
+    expect(await noticesFor(contentId, comment.id, [firstFollower, secondFollower])).toEqual([]);
+  }
+  expect((await delivery.stats()).failed).toBeGreaterThanOrEqual(1);
+  expect(await delivery.processNext(2)).toEqual({
+    state: "idle",
+    recipients: 0,
+    stored: 0,
+    pushDeferred: 0,
+  });
+  await removeFailure();
+  await ready(comment.id);
+  await delivery.processNext(2);
+  expect(await noticesFor(contentId, comment.id, [firstFollower, secondFollower])).toEqual([]);
+  await db.update(jobs).set({ attempts: 0 }).where(eq(jobs.commentId, comment.id));
+  await drain(comment.id, 2);
+  expect(
+    (await noticesFor(contentId, comment.id, [ownerId, firstFollower, secondFollower])).map(
+      (row) => row.recipientId,
+    ),
+  ).toEqual([firstFollower, secondFollower, ownerId].sort());
+});
+
+it("recovers a lost process before commit with no partial follower page", async () => {
+  const ownerId = await actor("own");
+  const followerId = await actor("fol");
+  const commenterId = await actor("cmt");
+  const contentId = await publication(ownerId);
+  await follow(followerId, contentId);
+  const comment = await reply(commenterId, contentId);
+  await ready(comment.id);
+  expect(await delivery.processNext()).toMatchObject({ state: "progress" });
+  expect(await noticesFor(contentId, comment.id, [ownerId])).toHaveLength(1);
+  const original = db.transaction.bind(db);
+  vi.spyOn(db, "transaction").mockImplementationOnce((run) =>
+    original(async (tx) => {
+      await run(tx);
+      throw Error("SIMULATED_PROCESS_EXIT");
+    }),
+  );
+  await expect(delivery.processNext()).rejects.toThrow("SIMULATED_PROCESS_EXIT");
+  vi.restoreAllMocks();
+  expect(await source(comment.id)).toMatchObject({
+    attempts: 0,
+    directCompleted: true,
+    lastFollowerId: null,
+    completedAt: null,
+  });
+  expect(await noticesFor(contentId, comment.id, [followerId])).toEqual([]);
+  await drain(comment.id);
+  expect(
+    (await noticesFor(contentId, comment.id, [ownerId, followerId])).map((row) => row.recipientId),
+  ).toEqual([followerId, ownerId].sort());
+});
+
+it("does not duplicate notices or clear read state after completed delivery", async () => {
+  const ownerId = await actor("own");
+  const commenterId = await actor("cmt");
+  const contentId = await publication(ownerId);
+  const comment = await reply(commenterId, contentId);
+  await drain(comment.id);
+  const notice = noticeId(contentId, comment.id, ownerId);
+  await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, notice));
+  expect(await delivery.processNext()).toEqual({
+    state: "idle",
+    recipients: 0,
+    stored: 0,
+    pushDeferred: 0,
+  });
+  expect(await noticesFor(contentId, comment.id, [ownerId])).toEqual([
+    expect.objectContaining({ id: notice, isRead: true }),
+  ]);
 });

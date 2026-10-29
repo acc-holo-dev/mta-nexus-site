@@ -120,6 +120,7 @@ services:
       - ./packages/db/scripts:/app/packages/db/scripts:ro
       - ./packages/domain/src:/app/packages/domain/src:ro
       - ./packages/security/src:/app/packages/security/src:ro
+      - ./packages/validation/src:/app/packages/validation/src:ro
     depends_on:
       app:
         condition: service_healthy

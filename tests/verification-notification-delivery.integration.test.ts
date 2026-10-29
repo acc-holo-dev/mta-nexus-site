@@ -301,9 +301,17 @@ it("rolls back a failed page, bounds retries and resumes after an operator reset
       lastRecipientId: null,
       completedAt: null,
     });
+    expect((await source(request.id)).availableAt.getTime()).toBeGreaterThan(Date.now());
     expect(await notices(request.id)).toEqual([]);
   }
   expect((await delivery.stats()).failed).toBeGreaterThanOrEqual(1);
+  // Exhausted jobs stay unclaimed until an operator reset.
+  expect(await delivery.processNext(2)).toEqual({
+    state: "idle",
+    recipients: 0,
+    stored: 0,
+    pushDeferred: 0,
+  });
   await removeFailure();
   await ready(request.id);
   await delivery.processNext(2);
@@ -311,4 +319,99 @@ it("rolls back a failed page, bounds retries and resumes after an operator reset
   await db.update(jobs).set({ attempts: 0 }).where(eq(jobs.verificationRequestId, request.id));
   await drain(request.id, 2);
   expect((await notices(request.id)).map((row) => row.recipientId)).toEqual([first, second]);
+});
+
+it("recovers a lost process before commit with no partial inbox or cursor", async () => {
+  const recipient = await actor("moderator");
+  const requesterId = await actor();
+  const request = await apply(requesterId);
+  await isolated(request.id);
+  const original = db.transaction.bind(db);
+  vi.spyOn(db, "transaction").mockImplementationOnce((run) =>
+    original(async (tx) => {
+      await run(tx);
+      throw Error("SIMULATED_PROCESS_EXIT");
+    }),
+  );
+  await expect(delivery.processNext()).rejects.toThrow("SIMULATED_PROCESS_EXIT");
+  vi.restoreAllMocks();
+  expect(await source(request.id)).toMatchObject({
+    attempts: 0,
+    lastRecipientId: null,
+    completedAt: null,
+  });
+  expect(await notices(request.id)).toEqual([]);
+  await drain(request.id);
+  expect((await notices(request.id)).map((row) => row.recipientId)).toEqual([recipient]);
+});
+
+function deferred() {
+  let resolve = () => {};
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
+it("retries a locked recipient without advancing, then rechecks a committed demotion", async () => {
+  const demoted = await actor("moderator", "aaa");
+  const retained = await actor("admin", "bbb");
+  const requesterId = await actor();
+  const request = await apply(requesterId);
+  await isolated(request.id);
+  const locked = deferred();
+  const release = deferred();
+  const blocker = db.transaction(async (tx) => {
+    await tx.update(users).set({ role: "user" }).where(eq(users.id, demoted));
+    locked.resolve();
+    await release.promise;
+  });
+  await Promise.race([locked.promise, blocker]);
+  try {
+    expect(await delivery.processNext(1)).toEqual({
+      state: "retry",
+      recipients: 0,
+      stored: 0,
+      pushDeferred: 0,
+    });
+    expect(await source(request.id)).toMatchObject({ attempts: 1, lastRecipientId: null });
+    expect(await notices(request.id)).toEqual([]);
+  } finally {
+    release.resolve();
+    await blocker;
+  }
+  await drain(request.id, 1);
+  expect((await notices(request.id)).map((row) => row.recipientId)).toEqual([retained]);
+});
+
+it("keeps stable notice IDs across restart so completed delivery is idempotent", async () => {
+  const moderator = await actor("moderator");
+  const requesterId = await actor();
+  const request = await apply(requesterId);
+  await isolated(request.id);
+  await drain(request.id);
+  const first = await notices(request.id);
+  expect(first).toEqual([
+    expect.objectContaining({
+      id: noticeId(request.id, moderator),
+      recipientId: moderator,
+      isRead: false,
+    }),
+  ]);
+  await db
+    .update(notifications)
+    .set({ isRead: true })
+    .where(eq(notifications.id, noticeId(request.id, moderator)));
+  expect(await delivery.processNext()).toEqual({
+    state: "idle",
+    recipients: 0,
+    stored: 0,
+    pushDeferred: 0,
+  });
+  expect(await notices(request.id)).toEqual([
+    expect.objectContaining({
+      id: noticeId(request.id, moderator),
+      isRead: true,
+    }),
+  ]);
 });
