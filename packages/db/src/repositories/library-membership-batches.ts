@@ -2,26 +2,27 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   LIBRARY_COLLECTION_COMMAND_LIMIT,
-  NotFoundError,
+  type LibraryCollectionReceipt,
   type LibraryMembershipBatchCommand,
   type LibraryMembershipBatchResult,
-  type LibraryCollectionReceipt,
+  NotFoundError,
 } from "@nexus/domain";
-import { libraryMembershipBatchCommandSchema, libraryCollectionIdSchema } from "@nexus/validation";
+import { libraryCollectionIdSchema, libraryMembershipBatchCommandSchema } from "@nexus/validation";
 import { and, count, eq, inArray, sql } from "drizzle-orm";
 import {
   auditEvents,
   libraryMembershipBatchReceipts as batches,
-  libraryCollectionReceipts as receipts,
   libraryCollections as collections,
   libraryCollectionItems as members,
   products,
+  libraryCollectionReceipts as receipts,
 } from "../schema";
-import {
-  applyLibraryCollectionCommand,
-  withLibraryCollectionTransaction,
-} from "./library-collections";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
+import { lockInitiatingSession } from "./initiating-session";
+import {
+  prepareLibraryCollectionCommand,
+  withLibraryCollectionTransaction,
+} from "./library-collection-command";
 
 const conflict = () => new AppError("Collection membership changed", 409, "COLLECTION_CONFLICT");
 function childRequestId(requestId: string, collectionId: string) {
@@ -65,6 +66,7 @@ async function childrenFor(
 }
 export async function applyLibraryMembershipBatch(input: {
   userId: string;
+  currentToken: string;
   productId: string;
   command: LibraryMembershipBatchCommand;
   receiptId: string;
@@ -102,6 +104,8 @@ export async function applyLibraryMembershipBatch(input: {
     if (previous) {
       if (previous.productId !== input.productId || previous.commandDigest !== digest)
         throw new AppError("Membership request reused", 409, "COLLECTION_REQUEST_REUSED");
+      const children = await childrenFor(tx, input.userId, previous.childReceiptIds);
+      await lockInitiatingSession(tx, input.userId, input.currentToken);
       return {
         replayed: true,
         receipt: {
@@ -109,7 +113,7 @@ export async function applyLibraryMembershipBatch(input: {
           requestId: previous.requestId,
           productId: previous.productId,
           command: previous.command,
-          children: await childrenFor(tx, input.userId, previous.childReceiptIds),
+          children,
           createdAt: previous.createdAt,
         },
       };
@@ -152,12 +156,13 @@ export async function applyLibraryMembershipBatch(input: {
         : null;
       if (!access) throw new NotFoundError("Library resource", input.productId);
     }
-    const children: LibraryCollectionReceipt[] = [];
+    const preparedChildren: Awaited<ReturnType<typeof prepareLibraryCollectionCommand>>[] = [];
     for (const change of command.changes) {
       const identity = input.children.find((child) => child.collectionId === change.collectionId);
       if (!identity) throw new AppError("Invalid batch identity", 500, "COLLECTION_BATCH_INVALID");
-      const result = await applyLibraryCollectionCommand(tx, {
+      const result = await prepareLibraryCollectionCommand(tx, {
         userId: input.userId,
+        currentToken: input.currentToken,
         collectionId: change.collectionId,
         newCollectionId: change.collectionId,
         receiptId: identity.receiptId,
@@ -173,8 +178,11 @@ export async function applyLibraryMembershipBatch(input: {
       // A child receipt from outside this parent transaction must never be adopted.
       if (result.replayed)
         throw new AppError("Membership child request reused", 409, "COLLECTION_REQUEST_REUSED");
-      children.push(result.receipt);
+      preparedChildren.push(result);
     }
+    await lockInitiatingSession(tx, input.userId, input.currentToken);
+    const children: LibraryCollectionReceipt[] = [];
+    for (const child of preparedChildren) children.push((await child.write()).receipt);
     if (access) {
       const [term] = await tx.execute<{ valid: boolean }>(
         sql`SELECT ${access.expiresAt === null ? sql`true` : sql`${access.expiresAt}::timestamptz>clock_timestamp()`} AS valid`,

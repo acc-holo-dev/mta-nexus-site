@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   queries: [] as { sql: string; params: unknown[] }[],
@@ -10,6 +11,7 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('from "sessions"')) return { rows: [["ses_a", "2099-01-01T00:00:00Z"]] };
     if (state.failAudit && sql.startsWith('insert into "audit_events"'))
       throw Error("audit failed");
     return { rows: state.rows.shift() ?? [] };
@@ -28,14 +30,23 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
-vi.mock("../packages/db/src/repositories/library-collections", async (original) => ({
-  ...(await original<typeof import("../packages/db/src/repositories/library-collections")>()),
-  applyLibraryCollectionCommand: state.apply,
+
+vi.mock("../packages/db/src/repositories/library-collection-command", async (original) => ({
+  ...(await original<
+    typeof import("../packages/db/src/repositories/library-collection-command")
+  >()),
+  prepareLibraryCollectionCommand: async (...args: unknown[]) => {
+    const result = await state.apply(...args);
+    return { replayed: result.replayed, write: async () => result };
+  },
 }));
+
 import { applyLibraryMembershipBatch } from "../packages/db/src/repositories/library-membership-batches";
 import { libraryMembershipBatchReceipts } from "../packages/db/src/schema";
+
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
   change = {
@@ -46,6 +57,7 @@ const date = "2026-10-12T00:00:00.000Z",
   };
 const input = (changes = [change]) => ({
   userId: "usr_a",
+  currentToken: "session_a",
   productId: "prd_a",
   command: { requestId, changes },
   receiptId: "lmb_a",

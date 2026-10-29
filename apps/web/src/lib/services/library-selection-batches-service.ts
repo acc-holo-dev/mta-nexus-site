@@ -13,12 +13,13 @@ export const librarySelectionBatchesService = {
       throw new AppError("Invalid selection batch", 400, "SELECTION_BATCH_INVALID");
     return librarySelectionBatchesRepository.preview(actor.id, collectionId(id), parsed.data);
   },
-  command(actor: User, id: string, input: unknown) {
+  command(actor: User, id: string, input: unknown, currentToken: string) {
     const parsed = librarySelectionBatchCommandSchema.safeParse(input);
     if (!parsed.success)
       throw new AppError("Invalid selection batch", 400, "SELECTION_BATCH_INVALID");
     return librarySelectionBatchesRepository.command({
       userId: actor.id,
+      currentToken,
       collectionId: collectionId(id),
       command: parsed.data,
       receiptId: generateId("lsbr"),

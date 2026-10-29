@@ -1,32 +1,31 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
-  libraryCollectionsRepository,
   auditEvents,
-  librarySelectionBatchesRepository,
-  librarySelectionBatchReceipts,
-  resourceLibrarySelectionsRepository,
-  resourceReleaseWatchesRepository,
   buildRepository,
-  sessionRepository,
   builds,
   db,
   entitlements,
-  products,
-  resourceRequirementsRepository as repo,
-  resourceLibrarySelections as selections,
-  resourceReleaseWatches as releaseWatches,
-  resourceReleaseEvents as releaseEvents,
-  userRepository,
+  libraryCollectionsRepository,
+  librarySelectionBatchesRepository,
+  librarySelectionBatchReceipts,
   notifications,
+  products,
+  resourceReleaseEvents as releaseEvents,
+  resourceReleaseWatches as releaseWatches,
+  resourceRequirementsRepository as repo,
+  resourceLibrarySelectionsRepository,
+  resourceReleaseWatchesRepository,
+  resourceLibrarySelections as selections,
+  sessionRepository,
   sessions,
+  userRepository,
   users,
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
-import archives from "./fixtures/build-packages.json";
-
 import { resourceReleaseWorkerRepository } from "../packages/db/src/repositories/resource-release-worker";
+import archives from "./fixtures/build-packages.json";
 
 // Requires a disposable PostgreSQL database migrated through 0061. No storage writes.
 async function fixture(privateDependency = false) {
@@ -46,6 +45,12 @@ async function fixture(privateDependency = false) {
       username: id,
       displayName: id,
     });
+  await sessionRepository.create({
+    id: `ses_${buyer}`,
+    userId: buyer,
+    token: `tok_${buyer}`,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   await sessionRepository.create({
     id: `ses_${staff}`,
     userId: staff,
@@ -275,6 +280,7 @@ async function batchFixture() {
   const collectionId = `lcol_req_${f.key}`;
   const creation = await libraryCollectionsRepository.command({
     userId: f.buyer,
+    currentToken: `tok_${f.buyer}`,
     command: { action: "create", name: "Batch fixture", requestId: randomUUID() },
     newCollectionId: collectionId,
     receiptId: `lcr_req_${f.key}_0`,
@@ -283,6 +289,7 @@ async function batchFixture() {
   for (let i = 0; i < 2; i++)
     await libraryCollectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId,
       command: {
         action: "add",
@@ -304,6 +311,7 @@ async function batchFixture() {
   const apply = (auditId = `aud_batch_${randomUUID()}`) =>
     librarySelectionBatchesRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId,
       command,
       receiptId: `lsbr_${randomUUID()}`,
@@ -468,6 +476,7 @@ it("collection release overview permits archived inspection and refuses foreign 
   try {
     await libraryCollectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       command: { requestId: randomUUID(), action: "archive", expectedRevision: 3 },
       newCollectionId: "unused",
@@ -986,6 +995,7 @@ it("rolls collection enrollment back on audit failure and rejects revoked grants
     ).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
     await libraryCollectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       command: {
         action: "remove",

@@ -1,21 +1,21 @@
 import {
-  libraryCollectionsRepository,
-  readLibraryCollectionHistory,
-  readLibraryCollectionComparison,
   applyLibraryMembershipBatch,
+  exportLibraryCollection,
+  libraryCollectionsRepository,
+  previewLibraryCollectionImport,
+  readLibraryCollectionComparison,
+  readLibraryCollectionHistory,
   readLibraryCollectionInventory,
   readLibraryCollectionReceiptDetail,
-  exportLibraryCollection,
-  previewLibraryCollectionImport,
   readLibraryMembershipHistory,
   readLibraryMembershipHistoryDetail,
 } from "@nexus/db";
 import {
   AppError,
+  type LibraryCollectionComparisonQuery,
   type LibraryCollectionHistoryQuery,
   type LibraryCollectionInventoryQuery,
   type LibraryMembershipHistoryQuery,
-  type LibraryCollectionComparisonQuery,
   type LibraryReleaseFilter,
   type User,
 } from "@nexus/domain";
@@ -39,11 +39,12 @@ export const libraryCollectionsService = {
     readLibraryMembershipHistory(actor.id, query),
   membershipReceipt: (actor: User, id: string) =>
     readLibraryMembershipHistoryDetail(actor.id, collectionId(id)),
-  membershipBatch(actor: User, productId: string, input: unknown) {
+  membershipBatch(actor: User, currentToken: string, productId: string, input: unknown) {
     const command = libraryMembershipBatchCommandSchema.safeParse(input);
     if (!command.success) throw new AppError("Invalid membership batch", 400, "COLLECTION_INVALID");
     return applyLibraryMembershipBatch({
       userId: actor.id,
+      currentToken,
       productId: collectionId(productId),
       command: command.data,
       receiptId: generateId("lmb"),
@@ -89,7 +90,7 @@ export const libraryCollectionsService = {
     libraryCollectionsRepository.copyPreview(actor.id, collectionId(id)),
   history: (actor: User, id: string, page: number) =>
     libraryCollectionsRepository.history(actor.id, collectionId(id), page),
-  command(actor: User, input: unknown, id?: string) {
+  command(actor: User, currentToken: string, input: unknown, id?: string) {
     const parsed = libraryCollectionCommandSchema.safeParse(input);
     if (
       !parsed.success ||
@@ -98,6 +99,7 @@ export const libraryCollectionsService = {
       throw new AppError("Invalid collection command", 400, "COLLECTION_INVALID");
     return libraryCollectionsRepository.command({
       userId: actor.id,
+      currentToken,
       command: parsed.data,
       collectionId: id === undefined ? undefined : collectionId(id),
       newCollectionId: generateId("lcol"),

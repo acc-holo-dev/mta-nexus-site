@@ -1,19 +1,19 @@
-import { GET as inventory } from "../apps/web/src/app/api/library/collections/resources/route";
-import { GET as inventoryExport } from "../apps/web/src/app/api/library/collections/resources/export/route";
-import { GET as receiptDetail } from "../apps/web/src/app/api/library/collections/receipts/[id]/route";
-import { GET as receiptExport } from "../apps/web/src/app/api/library/collections/receipts/[id]/export/route";
-import { POST as reconcilePreview } from "../apps/web/src/app/api/library/collections/[id]/reconcile-preview/route";
-import { GET as exportManifest } from "../apps/web/src/app/api/library/collections/[id]/export/route";
-import { POST as importPreview } from "../apps/web/src/app/api/library/collections/[id]/import-preview/route";
-import { GET as membershipHistory } from "../apps/web/src/app/api/library/collections/membership-history/route";
-import { GET as membershipHistoryExport } from "../apps/web/src/app/api/library/collections/membership-history/export/route";
-import { GET as membershipReceipt } from "../apps/web/src/app/api/library/collections/membership-history/[id]/route";
-import { GET as comparison } from "../apps/web/src/app/api/library/collections/[id]/compare/route";
-import { GET as accountHistory } from "../apps/web/src/app/api/library/collections/history/route";
-import { GET as historyExport } from "../apps/web/src/app/api/library/collections/history/export/route";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { GET as comparison } from "../apps/web/src/app/api/library/collections/[id]/compare/route";
+import { GET as exportManifest } from "../apps/web/src/app/api/library/collections/[id]/export/route";
+import { POST as importPreview } from "../apps/web/src/app/api/library/collections/[id]/import-preview/route";
+import { POST as reconcilePreview } from "../apps/web/src/app/api/library/collections/[id]/reconcile-preview/route";
+import { GET as historyExport } from "../apps/web/src/app/api/library/collections/history/export/route";
+import { GET as accountHistory } from "../apps/web/src/app/api/library/collections/history/route";
+import { GET as membershipReceipt } from "../apps/web/src/app/api/library/collections/membership-history/[id]/route";
+import { GET as membershipHistoryExport } from "../apps/web/src/app/api/library/collections/membership-history/export/route";
+import { GET as membershipHistory } from "../apps/web/src/app/api/library/collections/membership-history/route";
+import { GET as receiptExport } from "../apps/web/src/app/api/library/collections/receipts/[id]/export/route";
+import { GET as receiptDetail } from "../apps/web/src/app/api/library/collections/receipts/[id]/route";
+import { GET as inventoryExport } from "../apps/web/src/app/api/library/collections/resources/export/route";
+import { GET as inventory } from "../apps/web/src/app/api/library/collections/resources/route";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
@@ -66,17 +66,17 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
 import {
   POST as membershipBatch,
   GET as resourceMemberships,
 } from "../apps/web/src/app/api/library/[id]/collections/route";
-import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
-import { GET as moveItemsPage } from "../apps/web/src/app/api/library/collections/[id]/move-items/route";
-import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
-import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
 import { GET as candidates } from "../apps/web/src/app/api/library/collections/[id]/candidates/route";
+import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
+import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
 import { GET as history } from "../apps/web/src/app/api/library/collections/[id]/history/route";
+import { GET as moveItemsPage } from "../apps/web/src/app/api/library/collections/[id]/move-items/route";
+import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
+import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
 import {
   POST as command,
   GET as detail,
@@ -96,7 +96,12 @@ const post = (
   request(path, {
     method: "POST",
     body: JSON.stringify(body),
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=raw-browser-token",
+      ...headers,
+    },
   });
 beforeEach(() => {
   vi.clearAllMocks();
@@ -141,6 +146,7 @@ it("fixes actor identity and returns private uncached records", async () => {
   expect(response.headers.get("vary")).toBe("Cookie");
   expect(state.command).toHaveBeenCalledWith({
     userId: "usr_a",
+    currentToken: "raw-browser-token",
     command: { requestId, action: "create", name: "Core" },
     collectionId: undefined,
     newCollectionId: "lcol_a",
@@ -553,6 +559,7 @@ it("applies a strict resource-bound membership batch through the session and con
   expect(state.membershipBatch).toHaveBeenCalledWith(
     expect.objectContaining({
       userId: "usr_a",
+      currentToken: "raw-browser-token",
       productId: "prd_a",
       command: { requestId, changes: [changes[1], changes[0]] },
       receiptId: "lmb_a",
@@ -844,4 +851,20 @@ it("rejects anonymous, spoofed, duplicated and throttled inventory reads before 
   expect((await inventory(request(path))).status).toBe(429);
   expect((await inventoryExport(request(`${path}/export`))).status).toBe(429);
   expect(state.inventory).not.toHaveBeenCalled();
+});
+
+it("passes only the raw cookie token to collection mutations and surfaces transactional session rejection as 401", async () => {
+  state.command.mockRejectedValueOnce(new AppError("Authentication required", 401, "UNAUTHORIZED"));
+  const response = await create(post());
+  expect(response.status).toBe(401);
+  expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({ currentToken: "raw-browser-token" }),
+  );
+  state.command.mockClear();
+  expect(
+    (await create(post({ requestId, action: "create", name: "Core", currentToken: "forged" })))
+      .status,
+  ).toBe(400);
+  expect(state.command).not.toHaveBeenCalled();
 });
