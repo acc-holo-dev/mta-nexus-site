@@ -22,7 +22,12 @@ const get = (query = "") =>
 const post = (body: unknown = command, query = "", headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test/api/library/watches/disable${query}`, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      cookie: "nexus_session=tok_a",
+      "content-type": "application/json",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
@@ -77,7 +82,12 @@ it("exports one private searched page with only masked public watch fields", asy
 it("binds bulk stop to the session and records only a strict disable command", async () => {
   const response = await disable(post());
   expect(response.status).toBe(200);
-  expect(h.disable).toHaveBeenCalledWith({ userId: "usr_a", auditId: "aud_a", command });
+  expect(h.disable).toHaveBeenCalledWith({
+    userId: "usr_a",
+    currentToken: "tok_a",
+    auditId: "aud_a",
+    command,
+  });
   expect(response.headers.get("cache-control")).toBe("private, no-store");
 });
 it.each([
@@ -113,5 +123,17 @@ it("bounds exports and rate limits both operations", async () => {
   expect((await exportPage(get())).status).toBe(429);
   expect((await disable(post())).status).toBe(429);
   expect(h.page).not.toHaveBeenCalled();
+  expect(h.disable).not.toHaveBeenCalled();
+});
+
+it("rejects a missing raw cookie before consuming a mutation body", async () => {
+  const incoming = new NextRequest("https://nexus.test/api/library/watches/prd_a", {
+    method: "POST",
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    body: "{",
+  });
+  const read = vi.spyOn(incoming, "text");
+  expect((await disable(incoming)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
   expect(h.disable).not.toHaveBeenCalled();
 });

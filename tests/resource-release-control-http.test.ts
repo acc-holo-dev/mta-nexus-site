@@ -1,7 +1,8 @@
-import { NextRequest } from "next/server";
 import { AppError, NotFoundError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   allowed: true,
@@ -37,17 +38,19 @@ vi.mock("@nexus/security", () => ({
     return { success: state.allowed };
   },
 }));
-import { GET as libraryPage } from "../apps/web/src/app/api/library/releases/route";
+
+import {
+  POST as moderate,
+  GET as staffDetail,
+} from "../apps/web/src/app/api/admin/resources/[id]/route";
+import { GET as staffPage } from "../apps/web/src/app/api/admin/resources/route";
 import {
   GET as libraryDetail,
   POST as select,
 } from "../apps/web/src/app/api/library/releases/[id]/route";
-import { GET as staffPage } from "../apps/web/src/app/api/admin/resources/route";
-import {
-  GET as staffDetail,
-  POST as moderate,
-} from "../apps/web/src/app/api/admin/resources/[id]/route";
+import { GET as libraryPage } from "../apps/web/src/app/api/library/releases/route";
 import { GET as publisher } from "../apps/web/src/app/api/products/[id]/moderation/route";
+
 const context = { params: Promise.resolve({ id: "prd_a" }) },
   fixed = { mode: "fixed", expectedRevision: 0, buildId: "bld_a" };
 const decision = {
@@ -115,6 +118,7 @@ it("binds library reads and selections exclusively to the session buyer", async 
   privateResponse(response);
   expect(state.libraryCommand).toHaveBeenCalledWith({
     userId: "usr_a",
+    currentToken: "staff-token",
     productId: "prd_a",
     command: fixed,
     auditId: "aud_a",
@@ -224,9 +228,17 @@ it("passes the reviewed artifact through the session-bound selection endpoint", 
   expect(response.status).toBe(200);
   expect(state.libraryCommand).toHaveBeenCalledWith({
     userId: "usr_a",
+    currentToken: "staff-token",
     productId: "prd_a",
     command,
     auditId: "aud_a",
   });
   privateResponse(response);
+});
+
+it("rejects a missing initiating cookie before reading the selection body", async () => {
+  const request = post("/api/library/releases/prd_a", fixed, { cookie: "" });
+  expect((await select(request, context)).status).toBe(401);
+  expect(request.bodyUsed).toBe(false);
+  expect(state.libraryCommand).not.toHaveBeenCalled();
 });

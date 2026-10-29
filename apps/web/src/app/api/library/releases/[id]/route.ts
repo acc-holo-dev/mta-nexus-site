@@ -1,11 +1,11 @@
-import type { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceControlPageQuery } from "../../../../../lib/resource-release-control-query";
 import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     libraryReleaseService.detail(
@@ -18,12 +18,14 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return resourceCommerceRequest(request, true, async (actor) => {
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      if (!currentToken) throw new UnauthorizedError();
       if (request.nextUrl.searchParams.size !== 0)
         throw new AppError("Invalid library selection query", 400, "RESOURCE_CONTROL_INVALID");
       const command = libraryReleaseCommandSchema.safeParse(await readBoundedJson(request, 2048));
       if (!command.success)
         throw new AppError("Invalid library selection", 400, "RESOURCE_CONTROL_INVALID");
-      return libraryReleaseService.command(actor, (await params).id, command.data);
+      return libraryReleaseService.command(actor, (await params).id, command.data, currentToken);
     });
   },
 );

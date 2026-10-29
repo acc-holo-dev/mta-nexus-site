@@ -352,6 +352,7 @@ it("rejects a batch reviewed before an individual selection changed", async () =
   try {
     await resourceLibrarySelectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId: f.ids[0],
       command: { mode: "fixed", buildId: `bld_req_${f.key}_0`, expectedRevision: 0 },
       auditId: `aud_single_${f.key}`,
@@ -502,6 +503,7 @@ it("private selection history combines individual and batch states and survives 
     await f.apply();
     await resourceLibrarySelectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId: rootId,
       command: { mode: "latest", expectedRevision: 1 },
       auditId: `aud_individual_${f.key}`,
@@ -652,6 +654,7 @@ it("replays a lost single-selection response once without another audit", async 
   try {
     const input = {
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId: f.ids[0] ?? "",
       command: { mode: "fixed" as const, buildId: `bld_req_${f.key}_0`, expectedRevision: 0 },
       auditId: `aud_single_${f.key}`,
@@ -682,6 +685,7 @@ it("serializes competing single selections so one revision cannot overwrite anot
       [`bld_req_${f.key}_0`, `bld_req_${f.key}_replacement`].map((buildId, index) =>
         resourceLibrarySelectionsRepository.command({
           userId: f.buyer,
+          currentToken: `tok_${f.buyer}`,
           productId: f.ids[0] ?? "",
           command: { mode: "fixed", buildId, expectedRevision: 0 },
           auditId: `aud_race_${f.key}_${index}`,
@@ -706,6 +710,7 @@ it("rolls a single selection back if its mandatory audit cannot be written", asy
     await expect(
       resourceLibrarySelectionsRepository.command({
         userId: f.buyer,
+        currentToken: `tok_${f.buyer}`,
         productId: f.ids[0] ?? "",
         command: { mode: "fixed", buildId: `bld_req_${f.key}_0`, expectedRevision: 0 },
         auditId: `aud_req_${f.key}_0`,
@@ -741,6 +746,7 @@ it("selects the exact comparison target with its observed preference revision an
     };
     const selected = await resourceLibrarySelectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId,
       command,
       auditId: `aud_compared_${f.key}`,
@@ -752,6 +758,7 @@ it("selects the exact comparison target with its observed preference revision an
     });
     const replay = await resourceLibrarySelectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId,
       command,
       auditId: `aud_compared_retry_${f.key}`,
@@ -788,6 +795,7 @@ it("rejects a comparison choice after an intervening selection or revoked access
     };
     await resourceLibrarySelectionsRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId,
       command: { mode: "fixed", buildId: comparison.from.id, expectedRevision: 0 },
       auditId: `aud_intervening_${f.key}`,
@@ -795,6 +803,7 @@ it("rejects a comparison choice after an intervening selection or revoked access
     await expect(
       resourceLibrarySelectionsRepository.command({
         userId: f.buyer,
+        currentToken: `tok_${f.buyer}`,
         productId,
         command,
         auditId: `aud_stale_review_${f.key}`,
@@ -807,6 +816,7 @@ it("rejects a comparison choice after an intervening selection or revoked access
     await expect(
       resourceLibrarySelectionsRepository.command({
         userId: f.buyer,
+        currentToken: `tok_${f.buyer}`,
         productId,
         command: { ...command, expectedRevision: 1 },
         auditId: `aud_revoked_review_${f.key}`,
@@ -922,6 +932,7 @@ it("enrolls collection resources from the current release baseline without chang
     const command = { expectedCollectionRevision: 3, items };
     const result = await resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       command,
       auditId: `aud_watch_col_${f.key}`,
@@ -929,6 +940,7 @@ it("enrolls collection resources from the current release baseline without chang
     expect(result.changedCount).toBe(2);
     const retry = await resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       command,
       auditId: `aud_watch_retry_${f.key}`,
@@ -978,6 +990,7 @@ it("rolls collection enrollment back on audit failure and rejects revoked grants
     };
     const input = {
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       command,
       auditId: `aud_req_${f.key}_0`,
@@ -1030,12 +1043,14 @@ it("projects collection enrollment and batch stopping as own watch operations wh
     };
     await resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       command,
       auditId: `aud_hist_watch_enable_${f.key}`,
     });
     await resourceReleaseWatchesRepository.disableBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       command: { items: command.items.map((item) => ({ ...item, expectedRevision: 1 })) },
       auditId: `aud_hist_watch_stop_${f.key}`,
     });
@@ -1101,10 +1116,11 @@ it("enrolls and delivers finite-access releases using database time despite appl
     await db
       .update(sessions)
       .set({ expiresAt: new Date("2099-01-01T00:00:00Z") })
-      .where(eq(sessions.userId, f.staff));
+      .where(inArray(sessions.userId, [f.staff, f.buyer]));
     clock = vi.spyOn(Date, "now").mockReturnValue(new Date("2036-01-01T00:00:00Z").getTime());
     const start = await resourceReleaseWatchesRepository.command({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId: f.ids[0] ?? "",
       command: { enabled: true, expectedRevision: 0 },
       auditId: `aud_watch_clock_${f.key}`,
@@ -1135,6 +1151,7 @@ it("rolls back an individual watch on audit failure and preserves monotonic upda
   try {
     const input = {
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       productId: f.ids[0] ?? "",
       auditId: `aud_watch_atomic_${f.key}`,
     };
@@ -1195,6 +1212,7 @@ it("resumes reviewed existing watches at current baselines while preserving pins
     const ids = f.ids.slice(0, 2);
     await resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       auditId: `aud_resume_enroll_${f.key}`,
       command: {
@@ -1204,12 +1222,14 @@ it("resumes reviewed existing watches at current baselines while preserving pins
     });
     await resourceReleaseWatchesRepository.disableBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       auditId: `aud_resume_stop_${f.key}`,
       command: { items: ids.map((productId) => ({ productId, expectedRevision: 1 })) },
     });
     await f.publishReplacement();
     const input = {
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       auditId: `aud_resume_apply_${f.key}`,
       command: { items: ids.map((productId) => ({ productId, expectedRevision: 2 })) },
     };
@@ -1266,6 +1286,7 @@ it("rolls group resumption back on required audit failure and rejects a selected
     const ids = f.ids.slice(0, 2);
     await resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       collectionId: f.collectionId,
       auditId: `aud_resume_atomic_enable_${f.key}`,
       command: {
@@ -1275,6 +1296,7 @@ it("rolls group resumption back on required audit failure and rejects a selected
     });
     await resourceReleaseWatchesRepository.disableBatch({
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       auditId: `aud_resume_atomic_stop_${f.key}`,
       command: { items: ids.map((productId) => ({ productId, expectedRevision: 1 })) },
     });
@@ -1285,6 +1307,7 @@ it("rolls group resumption back on required audit failure and rejects a selected
       .orderBy(releaseWatches.productId);
     const input = {
       userId: f.buyer,
+      currentToken: `tok_${f.buyer}`,
       auditId: `aud_resume_atomic_stop_${f.key}`,
       command: { items: ids.map((productId) => ({ productId, expectedRevision: 2 })) },
     };
@@ -1317,3 +1340,246 @@ it("rolls group resumption back on required audit failure and rejects a selected
     await f.cleanup();
   }
 });
+
+// Real PostgreSQL guards for the token which initiated each watch mutation.
+type WatchMode = "single" | "collection" | "resume" | "stop";
+type WatchFixture = Awaited<ReturnType<typeof batchFixture>>;
+type WatchTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+async function watchCommand(f: WatchFixture, mode: WatchMode) {
+  const input = { userId: f.buyer, currentToken: `tok_${f.buyer}` };
+  const ids = f.ids.slice(0, 2);
+  const enable = {
+    ...input,
+    collectionId: f.collectionId,
+    command: {
+      expectedCollectionRevision: 3,
+      items: ids.map((productId) => ({ productId, expectedRevision: 0 })),
+    },
+    auditId: `aud_guard_enroll_${f.key}`,
+  };
+  if (mode === "resume" || mode === "stop")
+    await resourceReleaseWatchesRepository.enableCollectionBatch(enable);
+  if (mode === "resume")
+    await resourceReleaseWatchesRepository.disableBatch({
+      ...input,
+      command: { items: ids.map((productId) => ({ productId, expectedRevision: 1 })) },
+      auditId: `aud_guard_stop_${f.key}`,
+    });
+  return (currentToken = input.currentToken) => {
+    const actor = { ...input, currentToken, auditId: `aud_guard_apply_${f.key}` };
+    if (mode === "single")
+      return resourceReleaseWatchesRepository.command({
+        ...actor,
+        productId: ids[0] ?? "",
+        command: { enabled: true, expectedRevision: 0 },
+      });
+    if (mode === "collection")
+      return resourceReleaseWatchesRepository.enableCollectionBatch({ ...enable, ...actor });
+    const command = {
+      items: ids.map((productId) => ({ productId, expectedRevision: mode === "resume" ? 2 : 1 })),
+    };
+    return mode === "resume"
+      ? resourceReleaseWatchesRepository.resumeBatch({ ...actor, command })
+      : resourceReleaseWatchesRepository.disableBatch({ ...actor, command });
+  };
+}
+async function watchState(f: WatchFixture) {
+  return {
+    watches: await db
+      .select()
+      .from(releaseWatches)
+      .where(eq(releaseWatches.userId, f.buyer))
+      .orderBy(releaseWatches.productId),
+    audits: await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.actorId, f.buyer))
+      .orderBy(auditEvents.id),
+  };
+}
+it.each<WatchMode>(["single", "collection", "resume", "stop"])(
+  "%s watch mutations and complete replays require the live initiating token",
+  async (mode) => {
+    const f = await batchFixture();
+    try {
+      const mutate = await watchCommand(f, mode);
+      const expired = `tok_expired_${f.key}`,
+        revoked = `tok_revoked_${f.key}`,
+        rotated = `tok_rotated_${f.key}`;
+      for (const [name, token, expiresAt] of [
+        ["expired", expired, new Date(Date.now() - 60000)],
+        ["revoked", revoked, new Date(Date.now() + 3600000)],
+        ["rotated", rotated, new Date(Date.now() + 3600000)],
+      ] as const)
+        await sessionRepository.create({
+          id: `ses_${name}_${f.key}`,
+          userId: f.buyer,
+          token,
+          expiresAt,
+        });
+      await db.delete(sessions).where(eq(sessions.id, `ses_revoked_${f.key}`));
+      await db
+        .update(sessions)
+        .set({ token: `replacement_${f.key}` })
+        .where(eq(sessions.id, `ses_rotated_${f.key}`));
+      for (const replay of [false, true]) {
+        if (replay) await mutate();
+        const before = await watchState(f);
+        for (const token of ["", `missing_${f.key}`, `tok_${f.staff}`, expired, revoked, rotated]) {
+          await expect(mutate(token)).rejects.toMatchObject({ statusCode: 401 });
+          expect(await watchState(f)).toEqual(before);
+        }
+        if (replay) {
+          await mutate();
+          expect(await watchState(f)).toEqual(before);
+        }
+      }
+    } finally {
+      await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
+      await f.cleanup();
+    }
+  },
+);
+async function watchAfterWait(
+  hold: (tx: WatchTx) => Promise<unknown>,
+  mutate: () => Promise<unknown>,
+  invalidate: (tx: WatchTx) => Promise<unknown>,
+) {
+  let pending: Promise<{ ok: true; value: unknown } | { ok: false; error: unknown }> | undefined;
+  let completed = false;
+  try {
+    await db.transaction(async (tx) => {
+      await hold(tx);
+      const [blocker] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() AS pid`);
+      pending = mutate()
+        .then(
+          (value) => ({ ok: true as const, value }),
+          (error: unknown) => ({ ok: false as const, error }),
+        )
+        .then((result) => {
+          completed = true;
+          return result;
+        });
+      const deadline = Date.now() + 3000;
+      for (;;) {
+        expect(completed, "watch command must wait for the held authority lock").toBe(false);
+        const [waiting] = await db.execute<{ blocked: boolean }>(
+          sql`select exists(select 1 from pg_stat_activity where ${blocker?.pid}::int=any(pg_blocking_pids(pid))) AS blocked`,
+        );
+        if (waiting?.blocked) break;
+        if (Date.now() >= deadline) throw new Error("Expected watch lock wait was not observed");
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      await invalidate(tx);
+    });
+  } finally {
+    if (pending) await pending;
+  }
+  if (!pending) throw new Error("Watch operation was not started");
+  return pending;
+}
+it.each([
+  ["single", "account"],
+  ["single", "product"],
+  ["single", "grant"],
+  ["collection", "advisory"],
+  ["collection", "membership"],
+  ["stop", "watch"],
+  ["resume", "session"],
+] as const)(
+  "%s rechecks a revoked initiator after a real %s lock wait without partial writes",
+  async (mode, lock) => {
+    const f = await batchFixture();
+    try {
+      const mutate = await watchCommand(f, mode),
+        before = await watchState(f);
+      const outcome = await watchAfterWait(
+        async (tx) => {
+          if (lock === "account")
+            return tx.select().from(users).where(eq(users.id, f.buyer)).for("update");
+          if (lock === "product")
+            return tx
+              .select()
+              .from(products)
+              .where(eq(products.id, f.ids[0] ?? ""))
+              .for("update");
+          if (lock === "grant")
+            return tx
+              .select()
+              .from(entitlements)
+              .where(eq(entitlements.subjectId, f.buyer))
+              .for("update");
+          if (lock === "advisory")
+            return tx.execute(
+              sql`select pg_advisory_xact_lock(hashtext(${`library-collections:${f.buyer}`}))`,
+            );
+          if (lock === "membership")
+            return tx.execute(
+              sql`select 1 from library_collection_items where collection_id=${f.collectionId} for update`,
+            );
+          if (lock === "watch")
+            return tx
+              .select()
+              .from(releaseWatches)
+              .where(eq(releaseWatches.userId, f.buyer))
+              .for("update");
+          return tx
+            .select()
+            .from(sessions)
+            .where(eq(sessions.id, `ses_${f.buyer}`))
+            .for("update");
+        },
+        mutate,
+        (tx) => tx.delete(sessions).where(eq(sessions.id, `ses_${f.buyer}`)),
+      );
+      expect(outcome).toMatchObject({ ok: false, error: { statusCode: 401 } });
+      expect(await watchState(f)).toEqual(before);
+    } finally {
+      await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
+      await f.cleanup();
+    }
+  },
+  10000,
+);
+it.each([
+  ["single", false],
+  ["single", true],
+  ["collection", false],
+  ["collection", true],
+  ["resume", false],
+  ["resume", true],
+] as const)(
+  "%s rejects finite access that expires during the final session wait (replay=%s)",
+  async (mode, replay) => {
+    const f = await batchFixture();
+    try {
+      const mutate = await watchCommand(f, mode);
+      if (replay) await mutate();
+      const before = await watchState(f);
+      await db
+        .update(entitlements)
+        .set({ expiresAt: sql`clock_timestamp()+interval '600 milliseconds'` })
+        .where(eq(entitlements.subjectId, f.buyer));
+      const outcome = await watchAfterWait(
+        async (tx) => {
+          await tx
+            .select()
+            .from(sessions)
+            .where(eq(sessions.id, `ses_${f.buyer}`))
+            .for("update");
+        },
+        mutate,
+        (tx) => tx.execute(sql`select pg_sleep(0.7)`),
+      );
+      expect(outcome).toMatchObject({
+        ok: false,
+        error: mode === "single" ? { statusCode: 404 } : { code: "RELEASE_WATCH_UNAVAILABLE" },
+      });
+      expect(await watchState(f)).toEqual(before);
+    } finally {
+      await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
+      await f.cleanup();
+    }
+  },
+  10000,
+);

@@ -3,13 +3,14 @@ import {
   ForbiddenError,
   type LibraryReleaseCommand,
   type LibraryReleaseComparisonQuery,
-  type LibraryReleaseHistoryQuery,
   type LibraryReleaseFilter,
+  type LibraryReleaseHistoryQuery,
   type ProductStatus,
   type ResourceModerationCommand,
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
+
 function moderator(user: User) {
   if (user.role !== "admin" && user.role !== "moderator") throw new ForbiddenError();
 }
@@ -22,9 +23,10 @@ export const libraryReleaseService = {
     resourceLibrarySelectionsRepository.page(user.id, page, filter),
   detail: (user: User, productId: string, page = 1) =>
     resourceLibrarySelectionsRepository.detail(user.id, productId, page),
-  command: (user: User, productId: string, command: LibraryReleaseCommand) =>
+  command: (user: User, productId: string, command: LibraryReleaseCommand, currentToken: string) =>
     resourceLibrarySelectionsRepository.command({
       userId: user.id,
+      currentToken,
       productId,
       command,
       auditId: generateId("aud"),

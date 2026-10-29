@@ -28,6 +28,7 @@ const request = (body: unknown, headers?: Record<string, string>) =>
     method: "POST",
     headers: {
       ...browserMutationHeaders(),
+      cookie: "nexus_session=tok_a",
       ...(headers ?? { "content-type": "application/json" }),
     },
     body: JSON.stringify(body),
@@ -99,6 +100,7 @@ it("revision-scoped commands use the existing mutation guard and never accept pr
   );
   expect(state.command).toHaveBeenCalledWith({
     userId: "usr_a",
+    currentToken: "tok_a",
     productId: "prd_a",
     command: { enabled: true, expectedRevision: 0 },
     auditId: "aud_a",
@@ -125,7 +127,11 @@ it("rejects query selectors on a single watch read or mutation", async () => {
       await command(
         new NextRequest(url, {
           method: "POST",
-          headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+          headers: {
+            ...browserMutationHeaders(),
+            cookie: "nexus_session=tok_a",
+            "content-type": "application/json",
+          },
           body: JSON.stringify({ enabled: true, expectedRevision: 0 }),
         }),
         context,
@@ -133,5 +139,17 @@ it("rejects query selectors on a single watch read or mutation", async () => {
     ).status,
   ).toBe(400);
   expect(state.detail).not.toHaveBeenCalled();
+  expect(state.command).not.toHaveBeenCalled();
+});
+
+it("rejects a missing raw cookie before consuming a mutation body", async () => {
+  const incoming = new NextRequest("https://nexus.test/api/library/watches/prd_a", {
+    method: "POST",
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    body: "{",
+  });
+  const read = vi.spyOn(incoming, "text");
+  expect((await command(incoming, context)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
   expect(state.command).not.toHaveBeenCalled();
 });

@@ -27,7 +27,12 @@ const get = (query = "") =>
 const post = (body: unknown = command, query = "", headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test/api/library/watches/resume${query}`, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      cookie: "nexus_session=tok_a",
+      "content-type": "application/json",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
@@ -72,7 +77,12 @@ it("binds reviewed resume commands to the session and private mutation transport
   h.resume.mockResolvedValue({ items: [], changedCount: 1 });
   const response = await resume(post());
   expect(response.status).toBe(200);
-  expect(h.resume).toHaveBeenCalledWith({ userId: "usr_a", auditId: "aud_a", command });
+  expect(h.resume).toHaveBeenCalledWith({
+    userId: "usr_a",
+    currentToken: "tok_a",
+    auditId: "aud_a",
+    command,
+  });
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
 });
@@ -97,5 +107,17 @@ it("rejects query scopes, oversized bodies, unsafe origins and rate excess", asy
   ).toBe(403);
   h.rate.mockResolvedValue({ success: false });
   expect((await resume(post())).status).toBe(429);
+  expect(h.resume).not.toHaveBeenCalled();
+});
+
+it("rejects a missing raw cookie before consuming a mutation body", async () => {
+  const incoming = new NextRequest("https://nexus.test/api/library/watches/prd_a", {
+    method: "POST",
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    body: "{",
+  });
+  const read = vi.spyOn(incoming, "text");
+  expect((await resume(incoming)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
   expect(h.resume).not.toHaveBeenCalled();
 });

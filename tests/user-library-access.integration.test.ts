@@ -1,21 +1,22 @@
-import { describe, expect, it } from "vitest";
-import { eq, inArray } from "drizzle-orm";
 import {
-  db,
-  builds,
-  entitlements,
-  licenses,
-  products,
-  users,
   auditEvents,
   buildRepository,
+  builds,
+  db,
   entitlementRepository,
+  entitlements,
   licenseRepository,
+  licenses,
   productRepository,
+  products,
+  resourceLibrarySelectionsRepository,
+  sessionRepository,
   userLibraryRepository,
   userRepository,
-  resourceLibrarySelectionsRepository,
+  users,
 } from "@nexus/db";
+import { eq, inArray } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("effective resource library and private visibility (PostgreSQL)", () => {
   it("filters active rights, legacy licenses, safe builds and account ownership", async () => {
@@ -291,9 +292,17 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
       ).toBe(true);
       expect((await licenseRepository.pageUserHistory(ownerId)).total).toBe(3);
 
+      const currentToken = `library-selection-token-${suffix}`;
+      await sessionRepository.create({
+        id: `ses_lib_selection_${suffix}`,
+        userId: ownerId,
+        token: currentToken,
+        expiresAt: new Date(Date.now() + 3600000),
+      });
       const oldBuildId = `bld_lib_ready_${suffix}`;
       const selectInput = {
         userId: ownerId,
+        currentToken,
         productId: productIds.ready,
         auditId: `aud_lib_select_${suffix}`,
         command: { mode: "fixed" as const, buildId: oldBuildId, expectedRevision: 0 },

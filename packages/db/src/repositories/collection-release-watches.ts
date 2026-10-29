@@ -29,6 +29,7 @@ import { effectiveUserDownloadSources } from "./user-library";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { containsPattern } from "./search-pattern";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 const fail = (code = "RELEASE_WATCH_BATCH_CONFLICT") =>
   new AppError("Collection watches changed or are unavailable", 409, code);
 const collectionFields = {
@@ -137,12 +138,13 @@ export async function readCollectionReleaseWatches(
     { isolationLevel: "repeatable read", accessMode: "read only" },
   );
 }
-type EnrollmentInput = { userId: string; auditId: string } & (
+type EnrollmentInput = { userId: string; currentToken: string; auditId: string } & (
   | { collectionId: string; command: ResourceReleaseWatchEnableCommand }
   | { collectionId?: undefined; command: ResourceReleaseWatchResumeCommand }
 );
 export function enableCollectionReleaseWatches(input: {
   userId: string;
+  currentToken: string;
   collectionId: string;
   command: ResourceReleaseWatchEnableCommand;
   auditId: string;
@@ -151,6 +153,7 @@ export function enableCollectionReleaseWatches(input: {
 }
 export function resumeResourceReleaseWatches(input: {
   userId: string;
+  currentToken: string;
   command: ResourceReleaseWatchResumeCommand;
   auditId: string;
 }) {
@@ -259,6 +262,7 @@ async function enrollReleaseWatches(
       if ((total?.total ?? 0) + ids.length > RESOURCE_RELEASE_WATCH_LIMIT)
         throw fail("RELEASE_WATCH_LIMIT");
     }
+    await lockInitiatingSession(tx, input.userId, input.currentToken);
     const [clock] = await tx.execute<{ observedAt: string }>(
       sql`select date_trunc('milliseconds',clock_timestamp())::text AS "observedAt"`,
     );

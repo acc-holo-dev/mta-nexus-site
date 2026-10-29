@@ -27,6 +27,7 @@ import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements
 import { effectiveUserDownloadSources } from "./user-library";
 import { safePublishedBuildCondition } from "./build-safety";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 const fields = {
   productId: watches.productId,
   enabled: watches.enabled,
@@ -94,6 +95,7 @@ export class ResourceReleaseWatchesRepository {
   }
   async command(input: {
     userId: string;
+    currentToken: string;
     productId: string;
     command: ResourceReleaseWatchCommand;
     auditId: string;
@@ -141,6 +143,7 @@ export class ResourceReleaseWatchesRepository {
         !(previous?.enabled === command.enabled && revision === command.expectedRevision + 1)
       )
         throw fail("RELEASE_WATCH_CONFLICT");
+      await lockInitiatingSession(tx, input.userId, input.currentToken);
       if (previous?.enabled === command.enabled) {
         if (command.enabled) currentAccess(access, product.id, await databaseClock(tx));
         return {

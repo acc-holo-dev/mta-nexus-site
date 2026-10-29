@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][],
@@ -25,10 +26,12 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
+import { ProductRepository } from "../packages/db/src/repositories/products";
 import { ResourceLibrarySelectionsRepository } from "../packages/db/src/repositories/resource-library-selections";
 import { ResourceModerationRepository } from "../packages/db/src/repositories/resource-moderation";
-import { ProductRepository } from "../packages/db/src/repositories/products";
 import { UserLibraryRepository } from "../packages/db/src/repositories/user-library";
+
 const library = new ResourceLibrarySelectionsRepository(),
   moderation = new ResourceModerationRepository();
 const now = new Date("2026-10-10T12:00:00.000Z"),
@@ -42,7 +45,13 @@ const product = (status = "published", updated = stamp) => [
   updated,
 ];
 const fixed = { mode: "fixed" as const, expectedRevision: 0, buildId: "bld_a" };
-const input = { userId: "usr_a", productId: "prd_a", command: fixed, auditId: "aud_a" };
+const input = {
+  currentToken: "raw-buyer-token",
+  userId: "usr_a",
+  productId: "prd_a",
+  command: fixed,
+  auditId: "aud_a",
+};
 const command = {
   action: "release" as const,
   expectedUpdatedAt: stamp,
@@ -57,7 +66,8 @@ const modInput = {
   auditId: "aud_a",
   currentToken: modToken,
 };
-const clockRows = [{ observedAt: stamp }];
+const liveBuyerSession = [["ses_buyer", "2099-01-01T00:00:00.000Z"]];
+const clockRows = [{ observedAt: stamp, sessionCurrent: true }];
 const ownedRows = (status = "published", expiry: string | null = null) => [
   [],
   [["prd_a", "PRIVATE TITLE", "private-slug", status]],
@@ -73,7 +83,15 @@ beforeEach(() => {
 });
 afterEach(() => vi.useRealTimers());
 it("locks live buyer rights and a cleared build before saving a preference with audit", async () => {
-  state.results = [...ownedRows(), [], [["bld_a"]], clockRows, [[1, "fixed", "bld_a", stamp]], []];
+  state.results = [
+    ...ownedRows(),
+    [],
+    [["bld_a"]],
+    liveBuyerSession,
+    clockRows,
+    [[1, "fixed", "bld_a", stamp]],
+    [],
+  ];
   expect(await library.command(input)).toMatchObject({
     productId: "prd_a",
     selection: { revision: 1, mode: "fixed", buildId: "bld_a" },
@@ -125,7 +143,13 @@ it("a stale preference cannot overwrite another device's selection", async () =>
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
 it("an exact command replay keeps its revision and creates no duplicate audit", async () => {
-  state.results = [...ownedRows(), [[1, "fixed", "bld_a", stamp]], [["bld_a"]], clockRows];
+  state.results = [
+    ...ownedRows(),
+    [[1, "fixed", "bld_a", stamp]],
+    [["bld_a"]],
+    liveBuyerSession,
+    clockRows,
+  ];
   expect(await library.command(input)).toMatchObject({ selection: { revision: 1 } });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
@@ -133,6 +157,7 @@ it("can clear a withdrawn preference while a resource is suspended, without gran
   state.results = [
     ...ownedRows("suspended"),
     [[3, "fixed", "withdrawn", stamp]],
+    liveBuyerSession,
     clockRows,
     [[4, "latest", null, "2026-10-10T12:00:00.001Z"]],
     [],
@@ -144,7 +169,9 @@ it("can clear a withdrawn preference while a resource is suspended, without gran
 });
 it("rechecks expiry after waiting on a build lock", async () => {
   state.results = [...ownedRows("published", "2026-10-10T12:00:00.001Z"), [], [["bld_a"]]];
-  state.results.push([{ observedAt: "2026-10-10T12:00:00.002Z" }]);
+  state.results.push(liveBuyerSession, [
+    { observedAt: "2026-10-10T12:00:00.002Z", sessionCurrent: true },
+  ]);
   // Application time remains behind the database clock after a blocking lock.
   await expect(library.command(input)).rejects.toMatchObject({ statusCode: 404 });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
@@ -361,7 +388,7 @@ it("main library reads a fixed cleared build and retains the unavailable state a
 });
 
 it("fails closed when the database clock cannot be read", async () => {
-  state.results = [...ownedRows(), [], [["bld_a"]], [{ observedAt: "invalid" }]];
+  state.results = [...ownedRows(), [], [["bld_a"]], liveBuyerSession, [{ observedAt: "invalid" }]];
   await expect(library.command(input)).rejects.toMatchObject({
     code: "LIBRARY_RELEASE_TIME_UNKNOWN",
   });
@@ -374,7 +401,7 @@ it("rejects malformed repository commands before taking locks", async () => {
   expect(state.queries).toHaveLength(0);
 });
 it("does not overwrite an unexpected insert race or write its audit", async () => {
-  state.results = [...ownedRows(), [], [["bld_a"]], clockRows, []];
+  state.results = [...ownedRows(), [], [["bld_a"]], liveBuyerSession, clockRows, []];
   await expect(library.command(input)).rejects.toMatchObject({ code: "LIBRARY_RELEASE_CONFLICT" });
   expect(state.queries.at(-1)?.sql).toContain("where false");
   expect(state.queries.some((q) => q.sql.includes('insert into "audit_events"'))).toBe(false);
@@ -384,6 +411,7 @@ it("guards an existing revision and advances a future timestamp monotonically", 
     ...ownedRows(),
     [[3, "latest", null, "2026-10-11T12:00:00.000Z"]],
     [["bld_a"]],
+    liveBuyerSession,
     clockRows,
     [[4, "fixed", "bld_a", "2026-10-11T12:00:00.001Z"]],
     [],
@@ -414,6 +442,7 @@ it("saves and replays an exact reviewed archive without duplicating audit", asyn
     ...ownedRows(),
     [],
     [["bld_a", reviewedArtifact.sha256Hash, 100]],
+    liveBuyerSession,
     clockRows,
     [[1, "fixed", "bld_a", stamp]],
     [],
@@ -425,10 +454,56 @@ it("saves and replays an exact reviewed archive without duplicating audit", asyn
     ...ownedRows(),
     [[1, "fixed", "bld_a", stamp]],
     [["bld_a", reviewedArtifact.sha256Hash, 100]],
+    liveBuyerSession,
     clockRows,
   ];
   expect(await library.command({ ...input, command: { ...fixed, reviewedArtifact } })).toEqual(
     first,
   );
+  expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
+});
+
+it("requires the initiating raw session after all authority locks and before writes", async () => {
+  state.results = [
+    ...ownedRows(),
+    [],
+    [["bld_a"]],
+    liveBuyerSession,
+    clockRows,
+    [[1, "fixed", "bld_a", stamp]],
+    [],
+  ];
+  await library.command(input);
+  const sessionIndex = state.queries.findIndex(
+    (q) => q.sql.includes('from "sessions"') && q.sql.includes("for update"),
+  );
+  expect(sessionIndex).toBeGreaterThan(
+    state.queries.findIndex((q) => q.sql.includes('from "builds"')),
+  );
+  expect(state.queries[sessionIndex].params).toContain(
+    createHash("sha256").update(input.currentToken).digest("hex"),
+  );
+  expect(state.queries[sessionIndex].params).not.toContain(input.currentToken);
+  expect(
+    state.queries
+      .slice(sessionIndex + 1)
+      .map((q) => q.sql)
+      .join("\n"),
+  ).not.toMatch(/for (?:share|update|no key update)/u);
+  expect(state.queries[sessionIndex + 1].sql).toContain("clock_timestamp()");
+});
+it("rejects missing sessions before locks and stale database session evidence before exact replay", async () => {
+  await expect(library.command({ ...input, currentToken: "" })).rejects.toMatchObject({
+    code: "UNAUTHORIZED",
+  });
+  expect(state.queries).toHaveLength(0);
+  state.results = [
+    ...ownedRows(),
+    [[1, "fixed", "bld_a", stamp]],
+    [["bld_a"]],
+    liveBuyerSession,
+    [{ observedAt: stamp, sessionCurrent: false }],
+  ];
+  await expect(library.command(input)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
