@@ -1,10 +1,10 @@
 import { AppError, LIBRARY_COLLECTION_COMMAND_BYTES } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { collectionsQuery } from "../../../../../lib/library-collections-query";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     libraryCollectionsService.detail(
@@ -21,6 +21,7 @@ export const POST = withBrowserMutation(
         throw new AppError("Unexpected mutation query", 400, "COLLECTION_INVALID");
       return libraryCollectionsService.command(
         actor,
+        request.cookies.get("nexus_session")?.value ?? "",
         await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
         (await params).id,
       );

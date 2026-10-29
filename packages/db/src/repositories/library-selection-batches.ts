@@ -32,6 +32,7 @@ import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { effectiveUserDownloadSources } from "./user-library";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 const fail = (code: string) => new AppError("Selection batch changed or is unavailable", 409, code);
 const hash = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const collectionFields = {
@@ -209,7 +210,7 @@ async function prepare(
     items,
     changedCount: items.filter((i) => i.previous.revision !== i.next.revision).length,
   };
-  return { preview, observedAt };
+  return { preview, observedAt, expiries };
 }
 function publicReceipt(row: typeof receipts.$inferSelect): LibrarySelectionBatchReceipt {
   const command = librarySelectionBatchCommandSchema.safeParse(row.command),
@@ -252,6 +253,7 @@ export class LibrarySelectionBatchesRepository {
   }
   async command(input: {
     userId: string;
+    currentToken: string;
     collectionId: string;
     command: LibrarySelectionBatchCommand;
     receiptId: string;
@@ -282,6 +284,7 @@ export class LibrarySelectionBatchesRepository {
         if (prior) {
           if (prior.commandDigest !== digest || prior.collectionId !== input.collectionId)
             throw fail("SELECTION_BATCH_REQUEST_REUSED");
+          await lockInitiatingSession(tx, input.userId, input.currentToken);
           return { receipt: publicReceipt(prior), replayed: true };
         }
         const [total] = await tx
@@ -290,14 +293,30 @@ export class LibrarySelectionBatchesRepository {
           .where(eq(receipts.userId, input.userId));
         if ((total?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
           throw fail("SELECTION_BATCH_LIMIT");
-        const { preview, observedAt } = await prepare(
+        const prepared = await prepare(
           tx,
           input.userId,
           input.collectionId,
           { mode: command.mode, productIds: command.productIds },
           true,
         );
-        if (preview.previewDigest !== command.previewDigest) throw fail("SELECTION_BATCH_CHANGED");
+        // Session is last in the authority lock order. Refresh evidence with a
+        // fresh database clock after its wait, without acquiring any more locks.
+        await lockInitiatingSession(tx, input.userId, input.currentToken);
+        const { preview, observedAt } = await prepare(
+          tx,
+          input.userId,
+          input.collectionId,
+          { mode: command.mode, productIds: command.productIds },
+          false,
+        );
+        if (prepared.expiries.some((expiry) => expiry !== null && expiry <= observedAt))
+          throw fail("SELECTION_BATCH_UNAVAILABLE");
+        if (
+          preview.previewDigest !== prepared.preview.previewDigest ||
+          preview.previewDigest !== command.previewDigest
+        )
+          throw fail("SELECTION_BATCH_CHANGED");
         const changed = preview.items.filter((i) => i.next.revision !== i.previous.revision);
         if (changed.length) {
           const updated = await tx

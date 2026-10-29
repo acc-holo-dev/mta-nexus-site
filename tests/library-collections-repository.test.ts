@@ -1,7 +1,7 @@
-import { libraryCollectionCommandSchema } from "../packages/validation/src/library-collections";
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+import { libraryCollectionCommandSchema } from "../packages/validation/src/library-collections";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
@@ -13,6 +13,7 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('from "sessions"')) return { rows: [["ses_a", "2099-01-01T00:00:00Z"]] };
     if (state.failAudit && sql.startsWith('insert into "audit_events"'))
       throw new Error("audit failed");
     return { rows: state.rows.shift() ?? [] };
@@ -74,6 +75,7 @@ const insertedReceipt = (command: LibraryCollectionCommand, snapshot = collectio
 ];
 const input = (command: LibraryCollectionCommand = create) => ({
   userId: "usr_a",
+  currentToken: "session_a",
   command,
   ...(command.action === "create" || command.action === "duplicate"
     ? {}

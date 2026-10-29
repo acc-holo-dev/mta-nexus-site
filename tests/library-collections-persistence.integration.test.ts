@@ -8,6 +8,7 @@ import {
   libraryCollectionReceipts,
   libraryCollections,
   products,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 import type { LibraryCollectionCommand } from "@nexus/domain";
@@ -29,6 +30,14 @@ async function fixture() {
       displayName: id,
       role: "user",
     });
+  for (const id of [userId, other])
+    await sessionRepository.create({
+      id: `ses_${id}`,
+      userId: id,
+      token: `tok_${id}`,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
+  const currentToken = `tok_${userId}`;
   await db.insert(products).values({
     id: productId,
     title: "Private resource",
@@ -51,6 +60,7 @@ async function fixture() {
   function command(body: LibraryCollectionCommand, id?: string, auditId = `aud_${randomUUID()}`) {
     return collections.command({
       userId,
+      currentToken,
       collectionId: id,
       command: body,
       newCollectionId: `lcol_${randomUUID().replaceAll("-", "")}`,
@@ -58,7 +68,7 @@ async function fixture() {
       auditId,
     });
   }
-  return { userId, other, productId, grantId, command };
+  return { userId, other, productId, grantId, command, currentToken };
 }
 it("concurrent creation retries persist one owned collection, receipt and audit", async () => {
   const f = await fixture(),
@@ -460,6 +470,7 @@ it("ownership and database content guards reject a foreign source and a partial-
   await expect(
     collections.command({
       userId: f.other,
+      currentToken: `tok_${f.other}`,
       command,
       newCollectionId: `lcol_${randomUUID()}`,
       receiptId: `lcr_${randomUUID()}`,
@@ -888,6 +899,7 @@ async function membershipBatchFixture() {
   const apply = (auditId = `aud_${randomUUID()}`) =>
     applyLibraryMembershipBatch({
       userId: f.userId,
+      currentToken: f.currentToken,
       productId: f.productId,
       command,
       receiptId: `lmb_${randomUUID().replaceAll("-", "")}`,
@@ -1164,6 +1176,7 @@ it("atomically swaps references in a full collection and replays original proof 
   await expect(
     collections.command({
       userId: f.other,
+      currentToken: `tok_${f.other}`,
       collectionId: f.id,
       command: { ...f.reviewed, requestId: randomUUID() },
       newCollectionId: `lcol_${randomUUID()}`,

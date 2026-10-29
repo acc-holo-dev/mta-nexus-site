@@ -1,18 +1,20 @@
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
-  db,
-  users,
-  products,
   builds,
-  entitlements,
-  userRepository,
   libraryCollectionsRepository as collections,
+  db,
+  entitlements,
+  products,
   resourceLibrarySelections,
+  sessionRepository,
+  userRepository,
+  users,
 } from "@nexus/db";
 import type { LibraryCollectionCommand } from "@nexus/domain";
+import { and, eq } from "drizzle-orm";
+import { expect, it } from "vitest";
 import { readLibraryCollectionInventory } from "../packages/db/src/repositories/library-collection-inventory";
+
 function present<T>(value: T | undefined): T {
   if (value === undefined) throw Error("Missing fixture value");
   return value;
@@ -31,6 +33,13 @@ it("deduplicates own version drift, matches the existing release overview and ma
       displayName: id,
       role: "user",
     });
+  const currentToken = `tok_${owner}`;
+  await sessionRepository.create({
+    id: `ses_${owner}`,
+    userId: owner,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   const ids = Object.fromEntries(
     ["update", "latest", "pinned", "missing", "lost"].map((name) => [
       name,
@@ -98,6 +107,7 @@ it("deduplicates own version drift, matches the existing release overview and ma
   const command = (body: LibraryCollectionCommand, id?: string) =>
     collections.command({
       userId: owner,
+      currentToken,
       command: body,
       collectionId: id,
       newCollectionId: `lcol_inv_${randomUUID().replaceAll("-", "")}`,

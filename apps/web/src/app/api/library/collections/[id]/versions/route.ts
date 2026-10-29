@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { librarySelectionBatchesService as service } from "../../../../../../lib/services/library-selection-batches-service";
@@ -7,9 +7,16 @@ import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return resourceCommerceRequest(request, true, async (actor) => {
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      if (!currentToken) throw new UnauthorizedError();
       if (request.nextUrl.searchParams.size)
         throw new AppError("Unexpected query", 400, "SELECTION_BATCH_INVALID");
-      return service.command(actor, (await params).id, await readBoundedJson(request, 8192));
+      return service.command(
+        actor,
+        (await params).id,
+        await readBoundedJson(request, 8192),
+        currentToken,
+      );
     });
   },
 );

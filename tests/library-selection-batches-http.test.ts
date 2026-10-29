@@ -31,7 +31,12 @@ function request(section = "", method = "POST", headers: Record<string, string> 
     `http://nexus.test/api/library/collections/lcol_a/versions${section}${query}`,
     {
       method,
-      headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+      headers: {
+        ...browserMutationHeaders(),
+        "content-type": "application/json",
+        cookie: "nexus_session=browser-token",
+        ...headers,
+      },
       ...(method === "POST" ? { body: JSON.stringify(body) } : {}),
     },
   );
@@ -65,7 +70,7 @@ it("binds actor and collection, applies the appropriate rate policy and disables
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
   await apply(request(), context);
-  expect(state.command).toHaveBeenCalledWith({ id: "usr_a" }, "lcol_a", body);
+  expect(state.command).toHaveBeenCalledWith({ id: "usr_a" }, "lcol_a", body, "browser-token");
 });
 it.each([apply, review])(
   "rejects cross-site JSON writes before touching the batch",
@@ -109,4 +114,12 @@ it("validates history pagination and protects downloads", async () => {
 it("bounds history exports", async () => {
   state.history.mockResolvedValue({ data: "x".repeat(524289) });
   expect((await download(request("/history/export", "GET"), context)).status).toBe(413);
+});
+
+it("rejects a missing cookie before reading the mutation body even if identity lookup is stale", async () => {
+  const incoming = request("", "POST", { cookie: "" });
+  const read = vi.spyOn(incoming, "text");
+  expect((await apply(incoming, context)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
+  expect(state.command).not.toHaveBeenCalled();
 });

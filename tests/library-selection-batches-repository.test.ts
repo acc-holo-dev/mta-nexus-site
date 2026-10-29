@@ -6,6 +6,8 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][],
   options: [] as unknown[],
   access: vi.fn(),
+  session: vi.fn(),
+  sessionQueryCount: 0,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -27,6 +29,9 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: state.session,
+}));
 vi.mock("../packages/db/src/repositories/entitlements", () => ({
   lockUserDownloadAccess: state.access,
 }));
@@ -75,6 +80,11 @@ function commandRows() {
     [["bld_a"]],
     [{ observedAt: date }],
     [row],
+    [["usr_a"]],
+    [c],
+    [["prd_a"]],
+    [{ observedAt: date }],
+    [row],
   ] as unknown[][];
 }
 function record(previewDigest: string) {
@@ -117,6 +127,7 @@ const recordRow = (r: ReturnType<typeof record>) =>
   Object.keys(getTableColumns(librarySelectionBatchReceipts)).map((k) => r[k as keyof typeof r]);
 const input = (digest: string) => ({
   userId: "usr_a",
+  currentToken: "browser-token",
   collectionId: "lcol_a",
   command: command(digest),
   receiptId: "lsbr_a",
@@ -135,6 +146,9 @@ beforeEach(() => {
   state.rows = [];
   state.options = [];
   vi.clearAllMocks();
+  state.session.mockImplementation(async () => {
+    state.sessionQueryCount = state.queries.length;
+  });
   state.access.mockResolvedValue({ source: "entitlement", expiresAt: null });
 });
 it("previews current selected builds in a read-only bounded snapshot without mutation", async () => {
@@ -159,6 +173,14 @@ it("applies exact reviewed selections with receipt and mandatory per-resource an
     receipt: { snapshot: { items: [{ next: { revision: 1, mode: "fixed", buildId: "bld_a" } }] } },
   });
   expect(state.options).toEqual([{ isolationLevel: "read committed" }]);
+  expect(state.session).toHaveBeenCalledWith(expect.anything(), "usr_a", "browser-token");
+  const firstWrite = state.queries.findIndex((q) => q.sql.includes("insert into"));
+  expect(
+    state.queries
+      .slice(state.sessionQueryCount, firstWrite)
+      .map((q) => q.sql)
+      .join("\n"),
+  ).not.toMatch(/for (?:share|update)|pg_advisory_xact_lock/iu);
   expect(state.queries[2].params).toEqual(["library-collections:usr_a"]);
   expect(state.queries[3].params).toEqual(["library-selection:usr_a:prd_a"]);
   expect(text()).toContain('"resource_library_selections"."revision"=excluded.revision-1');
@@ -254,4 +276,43 @@ it("rejects direct invalid commands before opening a transaction", async () => {
     }),
   ).rejects.toMatchObject({ statusCode: 400 });
   expect(state.queries).toHaveLength(0);
+});
+
+it.each([false, true])(
+  "requires the initiating session for a command (replay=%s)",
+  async (replay) => {
+    const d = await digest();
+    state.rows = replay
+      ? [[], [], [], [], [["usr_a"]], [c], [recordRow(record(d))]]
+      : commandRows();
+    state.session.mockRejectedValue(new Error("Session revoked"));
+    await expect(repo.command(input(d))).rejects.toThrow("Session revoked");
+    expect(text()).not.toContain("insert into");
+  },
+);
+it("refreshes finite access and evidence after the initiating session wait", async () => {
+  const d = await digest(),
+    rows = commandRows();
+  state.access.mockResolvedValue({
+    source: "entitlement",
+    expiresAt: new Date("2026-10-12T00:00:01Z"),
+  });
+  rows[21] = [{ observedAt: "2026-10-12T00:00:02Z" }];
+  state.rows = rows;
+  await expect(repo.command(input(d))).rejects.toMatchObject({
+    code: "SELECTION_BATCH_UNAVAILABLE",
+  });
+  expect(state.session).toHaveBeenCalledOnce();
+  expect(state.access).toHaveBeenCalledOnce();
+  const sessionOrder = state.session.mock.invocationCallOrder[0];
+  expect(state.access.mock.invocationCallOrder[0]).toBeLessThan(sessionOrder);
+  expect(text()).not.toContain("insert into");
+});
+it("rejects changed safe-build evidence discovered after the session wait", async () => {
+  const d = await digest(),
+    rows = commandRows();
+  rows[22] = [{ ...row, targetBuildId: "bld_new" }];
+  state.rows = rows;
+  await expect(repo.command(input(d))).rejects.toMatchObject({ code: "SELECTION_BATCH_CHANGED" });
+  expect(text()).not.toContain("insert into");
 });

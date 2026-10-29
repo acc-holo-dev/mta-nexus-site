@@ -1,7 +1,7 @@
-import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import test from "node:test";
 import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
@@ -34,6 +34,11 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ["packages/db/src/repositories/security-schema.ts"],
     ["packages/db/src/nested/migrate.ts"],
     ["packages/db/src/migrate.ts"],
+    ["packages/db/src/repositories/library-collections.ts"],
+    ["packages/db/src/repositories/library-collection-command.ts"],
+    ["packages/db/src/repositories/library-collection-internals.ts"],
+    ["packages/db/src/repositories/library-membership-batches.ts"],
+    ["packages/db/src/repositories/library-selection-batches.ts"],
     [".github/workflows/ci.yml"],
     ["Dockerfile"],
     ["tests/mainline-repository-policy.test.ts"],
