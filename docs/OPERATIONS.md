@@ -47,6 +47,14 @@ the worker half validates heartbeat/progress and queue counters. With no VAPID t
 healthy-idle and performs queue maintenance; with all three VAPID values set it
 dispatches durable Web Push jobs.
 
+`pnpm dev:docker:down` (or `docker compose … stop`) sends SIGTERM. App and workers use
+`init: true` so the signal reaches the Node process; the push worker gets a 30-second
+grace window to finish the current page, emit `stopped`, and remove its health file.
+License and resource-release workers do the same cleanup. A fresh heartbeat alone is not
+liveness: probes also require recent dispatcher progress (see [Worker liveness vs progress](#worker-liveness-vs-progress)).
+App and push-worker keep `restart: "no"` so a crash stays visible; start the stack again
+after fixing the cause rather than relying on silent restarts.
+
 ### Optional local mail capture
 
 `compose.mailpit.yaml` extends only the development `compose.yaml`. It adds

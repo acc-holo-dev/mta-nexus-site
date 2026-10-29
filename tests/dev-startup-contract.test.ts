@@ -26,6 +26,23 @@ describe("deterministic development startup contract", () => {
     expect(compose).toContain('test: ["CMD", "node", "scripts/check-local-readiness.mjs"]');
   });
 
+  it("keeps app and delivery workers under init with SIGTERM grace and health probes", () => {
+    const compose = read("compose.yaml");
+    const pkg = JSON.parse(read("package.json"));
+    const pushWorker = compose.slice(compose.indexOf("\n  push-worker:"));
+
+    expect(compose).toContain("\n    init: true\n");
+    expect(pushWorker).toContain("init: true");
+    expect(pushWorker).toContain("stop_grace_period: 30s");
+    expect(pushWorker).toContain("/app/scripts/check-web-push-worker-health.mjs");
+    expect(compose).toContain("/app/scripts/check-license-worker-health.mjs");
+    expect(compose).toContain("/app/scripts/check-resource-release-worker-health.mjs");
+    expect(compose).toContain("./packages/validation/src:/app/packages/validation/src:ro");
+    expect(pkg.scripts["dev:docker:check"]).toContain("scripts/check-local-readiness.mjs");
+    expect(pkg.scripts["dev:docker:check"]).toContain("check-web-push-worker-health.mjs");
+    expect(pkg.scripts["dev:docker:down"]).toContain("docker compose");
+  });
+
   it("documents full-stack and host-only startup as different modes", () => {
     const readme = read("README.md");
     const operations = read("docs/OPERATIONS.md");
@@ -36,6 +53,9 @@ describe("deterministic development startup contract", () => {
     }
     expect(readme).toContain("full Docker development stack");
     expect(operations).toContain("starts only the Next.js development server");
+    expect(operations).toContain("distinguish process heartbeat from dispatcher progress");
+    expect(operations).toContain("pnpm dev:docker:check");
+    expect(operations).toContain("pnpm dev:docker:down");
   });
 });
 
