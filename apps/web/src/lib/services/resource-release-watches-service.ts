@@ -25,30 +25,40 @@ export const resourceReleaseWatchesService = {
   ) => resourceReleaseWatchesRepository.collectionPage(user.id, collectionId, page, filter, query),
   enableCollectionBatch: (
     user: User,
+    currentToken: string,
     collectionId: string,
     command: ResourceReleaseWatchEnableCommand,
   ) =>
     resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: user.id,
+      currentToken,
       collectionId,
       command,
       auditId: generateId("aud"),
     }),
-  resumeBatch: (user: User, command: ResourceReleaseWatchResumeCommand) =>
+  resumeBatch: (user: User, currentToken: string, command: ResourceReleaseWatchResumeCommand) =>
     resourceReleaseWatchesRepository.resumeBatch({
       userId: user.id,
+      currentToken,
       command,
       auditId: generateId("aud"),
     }),
-  disableBatch: (user: User, command: ResourceReleaseWatchDisableCommand) =>
+  disableBatch: (user: User, currentToken: string, command: ResourceReleaseWatchDisableCommand) =>
     resourceReleaseWatchesRepository.disableBatch({
       userId: user.id,
+      currentToken,
       command,
       auditId: generateId("aud"),
     }),
-  command: (user: User, productId: string, command: ResourceReleaseWatchCommand) =>
+  command: (
+    user: User,
+    currentToken: string,
+    productId: string,
+    command: ResourceReleaseWatchCommand,
+  ) =>
     resourceReleaseWatchesRepository.command({
       userId: user.id,
+      currentToken,
       productId,
       command,
       auditId: generateId("aud"),

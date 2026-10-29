@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
+  sessionLive: true,
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
   failAudit: false,
@@ -8,6 +9,8 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('from "sessions"'))
+      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
     if (state.failAudit && sql.startsWith('insert into "audit_events"'))
       throw new Error("audit failed");
     return { rows: state.rows.shift() ?? [] };
@@ -29,6 +32,7 @@ import {
 const stamp = "2026-10-12T00:00:00.000Z";
 const input = {
   userId: "usr_a",
+  currentToken: "tok_a",
   collectionId: "lcol_a",
   auditId: "aud_a",
   command: {
@@ -68,6 +72,7 @@ function success() {
   state.rows = [...ready(), [[5]], [{ observedAt: stamp }], output, []];
 }
 beforeEach(() => {
+  state.sessionLive = true;
   state.rows = [];
   state.queries = [];
   state.failAudit = false;
@@ -187,4 +192,29 @@ it("rejects foreign collections and malformed direct commands before granting an
     enable({ ...input, command: { ...input.command, expectedCollectionRevision: 0 } }),
   ).rejects.toMatchObject({ statusCode: 400 });
   expect(state.queries).toHaveLength(0);
+});
+
+it("checks the initiating session after every authority lock before reading the enrollment clock", async () => {
+  success();
+  await enable(input);
+  const sessionIndex = state.queries.findIndex((q) => q.sql.includes('from "sessions"'));
+  expect(sessionIndex).toBeGreaterThan(
+    state.queries.findIndex((q) => q.sql.includes("for no key update")),
+  );
+  expect(state.queries[sessionIndex + 1]?.sql).toContain('AS "observedAt"');
+  expect(
+    state.queries
+      .slice(sessionIndex + 1)
+      .some((q) => /for (share|update|no key update)/u.test(q.sql)),
+  ).toBe(false);
+  state.queries = [];
+  state.sessionLive = false;
+  state.rows = [
+    ...ready([
+      ["prd_a", true, 1, stamp],
+      ["prd_b", true, 3, stamp],
+    ]),
+  ];
+  await expect(enable(input)).rejects.toMatchObject({ statusCode: 401 });
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
 });

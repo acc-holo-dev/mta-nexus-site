@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import { resourceReleaseWatchEnableCommandSchema } from "@nexus/validation";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
@@ -21,6 +21,8 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return resourceCommerceRequest(request, true, async (actor) => {
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      if (!currentToken) throw new UnauthorizedError();
       if (request.nextUrl.searchParams.size)
         throw new AppError("Invalid watch query", 400, "RELEASE_WATCH_INVALID");
       const parsed = resourceReleaseWatchEnableCommandSchema.safeParse(
@@ -29,6 +31,7 @@ export const POST = withBrowserMutation(
       if (!parsed.success) throw new AppError("Invalid watch batch", 400, "RELEASE_WATCH_INVALID");
       return resourceReleaseWatchesService.enableCollectionBatch(
         actor,
+        currentToken,
         (await params).id,
         parsed.data,
       );

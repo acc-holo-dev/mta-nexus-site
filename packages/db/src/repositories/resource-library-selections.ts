@@ -1,26 +1,30 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
 import {
   AppError,
-  NotFoundError,
   type LibraryReleaseCommand,
   type LibraryReleaseFilter,
   type LibraryReleaseSelection,
+  NotFoundError,
+  UnauthorizedError,
 } from "@nexus/domain";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   builds,
   products,
   resourceLibrarySelections as selections,
+  sessions,
   users,
 } from "../schema";
-import { readLibraryReleaseComparison } from "./library-release-comparison";
-import { readLibraryReleaseHistory } from "./library-release-history";
-import { readLibraryReleasePage } from "./library-release-page";
 import { safePublishedBuildCondition } from "./build-safety";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
+import { readLibraryReleaseComparison } from "./library-release-comparison";
+import { readLibraryReleaseHistory } from "./library-release-history";
+import { readLibraryReleasePage } from "./library-release-page";
+import { digestSessionToken } from "./sessions";
 
 const fail = (code: string) =>
   new AppError("Library selection changed or is unavailable", 409, code);
@@ -147,10 +151,12 @@ export class ResourceLibrarySelectionsRepository {
   }
   async command(input: {
     userId: string;
+    currentToken: string;
     productId: string;
     command: LibraryReleaseCommand;
     auditId: string;
   }) {
+    if (!input.currentToken) throw new UnauthorizedError("Authentication required");
     const parsed = libraryReleaseCommandSchema.safeParse(input.command);
     if (!parsed.success)
       throw new AppError("Invalid library selection", 400, "RESOURCE_CONTROL_INVALID");
@@ -194,12 +200,18 @@ export class ResourceLibrarySelectionsRepository {
         !(same && previous.revision === command.expectedRevision + 1)
       )
         throw fail("LIBRARY_RELEASE_CONFLICT");
-      // clock_timestamp advances while row/advisory locks are being awaited.
-      const [clock] = await tx.execute<{ observedAt: string }>(
-        sql`select date_trunc('milliseconds',clock_timestamp())::text AS "observedAt"`,
+      // Acquire the initiating session only after every authority/build lock.
+      await lockInitiatingSession(tx, input.userId, input.currentToken);
+      // Both session and grant expiry must use fresh database time after all waits.
+      const [clock] = await tx.execute<{ observedAt: string; sessionCurrent: boolean }>(
+        sql`select date_trunc('milliseconds',clock_timestamp())::text AS "observedAt",
+          exists(select 1 from ${sessions} where ${sessions.userId}=${input.userId}
+            and ${sessions.token}=${digestSessionToken(input.currentToken)}
+            and ${sessions.expiresAt}>clock_timestamp()) AS "sessionCurrent"`,
       );
       const observedAt = new Date(clock?.observedAt ?? "");
       if (!Number.isFinite(observedAt.getTime())) throw fail("LIBRARY_RELEASE_TIME_UNKNOWN");
+      if (!clock?.sessionCurrent) throw new UnauthorizedError("Authentication required");
       if (access.expiresAt && access.expiresAt <= observedAt)
         throw new NotFoundError("Library resource", product.id);
       if (same) return { productId: product.id, selection: previous };

@@ -47,6 +47,12 @@ async function fixture() {
       role,
     });
   await sessionRepository.create({
+    id: `ses_${buyer}`,
+    userId: buyer,
+    token: `tok_${buyer}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
+  await sessionRepository.create({
     id: `ses_${staff}`,
     userId: staff,
     token: `tok_${staff}`,
@@ -97,6 +103,7 @@ async function fixture() {
   const start = () =>
     watches.command({
       userId: buyer,
+      currentToken: `tok_${buyer}`,
       productId: id,
       command: { enabled: true, expectedRevision: 0 },
       auditId: `aud_rw_enroll_${key}`,
@@ -312,6 +319,7 @@ it("stops an exact watch batch after lost access, preserves notices/cursors and 
     });
     await watches.command({
       userId: a.buyer,
+      currentToken: `tok_${a.buyer}`,
       productId: b.id,
       command: { enabled: true, expectedRevision: 0 },
       auditId: `aud_rw_second_${a.key}`,
@@ -337,14 +345,21 @@ it("stops an exact watch batch after lost access, preserves notices/cursors and 
     };
     const result = await watches.disableBatch({
       userId: a.buyer,
+      currentToken: `tok_${a.buyer}`,
       command,
       auditId: `aud_rw_stop_${a.key}`,
     });
     expect(result.changedCount).toBe(2);
     expect(result.items.every((item) => !item.enabled && item.revision === 2)).toBe(true);
     expect(
-      (await watches.disableBatch({ userId: a.buyer, command, auditId: `aud_rw_retry_${a.key}` }))
-        .changedCount,
+      (
+        await watches.disableBatch({
+          userId: a.buyer,
+          currentToken: `tok_${a.buyer}`,
+          command,
+          auditId: `aud_rw_retry_${a.key}`,
+        })
+      ).changedCount,
     ).toBe(0);
     const audits = await db
       .select()
@@ -384,6 +399,7 @@ it("rolls a watch batch back when the required audit cannot be written", async (
     await expect(
       watches.disableBatch({
         userId: f.buyer,
+        currentToken: `tok_${f.buyer}`,
         command: { items: [{ productId: f.id, expectedRevision: 1 }] },
         auditId: `aud_rw_enroll_${f.key}`,
       }),

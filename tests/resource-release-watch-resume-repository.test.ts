@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
+  sessionLive: true,
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
   failAudit: false,
@@ -8,6 +9,8 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('from "sessions"'))
+      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
     if (state.failAudit && sql.startsWith('insert into "audit_events"'))
       throw new Error("audit failed");
     return { rows: state.rows.shift() ?? [] };
@@ -26,6 +29,7 @@ import { resumeResourceReleaseWatches as resume } from "../packages/db/src/repos
 const stamp = "2026-10-12T00:00:00.000Z";
 const input = {
   userId: "usr_a",
+  currentToken: "tok_a",
   auditId: "aud_a",
   command: {
     items: [
@@ -62,6 +66,7 @@ const success = () => {
   state.rows = [...ready(), [[4]], [{ observedAt: stamp }], output, []];
 };
 beforeEach(() => {
+  state.sessionLive = true;
   state.queries = [];
   state.rows = [];
   state.failAudit = false;
@@ -162,4 +167,15 @@ it("rejects unreviewed new enrollment and injected collection authority before d
   ])
     await expect(resume({ ...input, command })).rejects.toMatchObject({ statusCode: 400 });
   expect(state.queries).toHaveLength(0);
+});
+
+it("revalidates the initiating session before returning an already resumed batch", async () => {
+  state.sessionLive = false;
+  state.rows = ready([
+    ["prd_a", true, 2, stamp],
+    ["prd_b", true, 4, stamp],
+  ]);
+  await expect(resume(input)).rejects.toMatchObject({ statusCode: 401 });
+  expect(state.queries.at(-2)?.sql).toContain("for no key update");
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
 });

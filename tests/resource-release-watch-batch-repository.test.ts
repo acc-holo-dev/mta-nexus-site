@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
+  sessionLive: true,
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
   failAudit: false,
@@ -8,6 +9,8 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('from "sessions"'))
+      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
     if (state.failAudit && sql.startsWith('insert into "audit_events"'))
       throw new Error("audit failed");
     return { rows: state.rows.shift() ?? [] };
@@ -26,6 +29,7 @@ import { disableResourceReleaseWatchBatch as disable } from "../packages/db/src/
 const stamp = "2026-10-12T00:00:00.000Z";
 const input = {
   userId: "usr_a",
+  currentToken: "tok_a",
   auditId: "aud_a",
   command: {
     items: [
@@ -52,6 +56,7 @@ function successful() {
   state.rows = [...before(), [{ observedAt: stamp }], output, []];
 }
 beforeEach(() => {
+  state.sessionLive = true;
   state.queries = [];
   state.rows = [];
   state.failAudit = false;
@@ -115,4 +120,15 @@ it("validates direct commands before database access", async () => {
     disable({ ...input, command: { items: [{ productId: "prd_a", expectedRevision: 0 }] } }),
   ).rejects.toMatchObject({ statusCode: 400 });
   expect(state.queries).toHaveLength(0);
+});
+
+it("checks the initiating session after watch locks before acknowledging a stop replay", async () => {
+  state.sessionLive = false;
+  state.rows = before(false, false, 2, 4);
+  await expect(disable(input)).rejects.toMatchObject({ statusCode: 401 });
+  expect(state.queries.at(-2)?.sql).toContain("for no key update");
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
+  expect(state.queries.some((q) => q.sql.includes("UPDATE") || q.sql.startsWith("insert"))).toBe(
+    false,
+  );
 });

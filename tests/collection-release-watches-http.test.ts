@@ -26,7 +26,12 @@ const get = (query = "") =>
 const post = (body: unknown = command, query = "", headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test/api/library/collections/lcol_a/watches${query}`, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      cookie: "nexus_session=tok_a",
+      "content-type": "application/json",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
@@ -55,6 +60,7 @@ it("binds collection search and enrollment to the signed-in owner and route coll
   expect(saved.status).toBe(200);
   expect(h.enable).toHaveBeenCalledWith({
     userId: "usr_a",
+    currentToken: "tok_a",
     collectionId: "lcol_a",
     command,
     auditId: "aud_a",
@@ -103,5 +109,17 @@ it("sanitizes stale membership errors and rate limits both operations", async ()
   expect((await GET(get(), context)).status).toBe(429);
   expect((await POST(post(), context)).status).toBe(429);
   expect(h.page).not.toHaveBeenCalled();
+  expect(h.enable).not.toHaveBeenCalled();
+});
+
+it("rejects a missing raw cookie before consuming a mutation body", async () => {
+  const incoming = new NextRequest("https://nexus.test/api/library/watches/prd_a", {
+    method: "POST",
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    body: "{",
+  });
+  const read = vi.spyOn(incoming, "text");
+  expect((await POST(incoming, context)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
   expect(h.enable).not.toHaveBeenCalled();
 });

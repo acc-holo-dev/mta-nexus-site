@@ -8,6 +8,7 @@ import {
 import { resourceReleaseWatchDisableCommandSchema } from "@nexus/validation";
 import { db } from "../client";
 import { auditEvents, resourceReleaseWatches as watches, users } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 const fail = () => new AppError("Watch batch changed", 409, "RELEASE_WATCH_BATCH_CONFLICT");
 const fields = {
   productId: watches.productId,
@@ -17,6 +18,7 @@ const fields = {
 };
 export async function disableResourceReleaseWatchBatch(input: {
   userId: string;
+  currentToken: string;
   command: ResourceReleaseWatchDisableCommand;
   auditId: string;
 }): Promise<ResourceReleaseWatchDisableResult> {
@@ -61,6 +63,7 @@ export async function disableResourceReleaseWatchBatch(input: {
     const matching = previous.every(
       ({ item, row }) => row.enabled === false && row.revision === item.expectedRevision + 1,
     );
+    await lockInitiatingSession(tx, input.userId, input.currentToken);
     if (matching) return { items: previous.map(({ row }) => row), changedCount: 0 };
     // Reject mixed replay/current states: all changes are reviewed and applied together.
     if (

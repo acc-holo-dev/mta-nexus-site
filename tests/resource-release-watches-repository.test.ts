@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
+  sessionLive: true,
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
   clock: "2026-10-12T00:00:00.000Z",
@@ -8,6 +9,8 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('from "sessions"'))
+      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
     if (sql.startsWith("set local")) return { rows: [] };
     if (sql.includes('AS "observedAt"')) return { rows: [{ observedAt: state.clock }] };
     return { rows: state.rows.shift() ?? [] };
@@ -24,6 +27,7 @@ vi.mock("../packages/db/src/client", async () => {
 });
 import { resourceReleaseWatchesRepository as repo } from "../packages/db/src/repositories/resource-release-watches";
 beforeEach(() => {
+  state.sessionLive = true;
   state.queries = [];
   state.rows = [];
   state.clock = "2026-10-12T00:00:00.000Z";
@@ -43,6 +47,7 @@ it("enrolls at the latest committed release with held live grants, serialized qu
   ];
   const result = await repo.command({
     userId: "usr_a",
+    currentToken: "tok_a",
     productId: "prd_a",
     command: { enabled: true, expectedRevision: 0 },
     auditId: "aud_a",
@@ -69,6 +74,7 @@ it("allows a user to stop their watch after access is revoked, and handles a rep
   ];
   const input = {
     userId: "usr_a",
+    currentToken: "tok_a",
     productId: "prd_a",
     command: { enabled: false, expectedRevision: 1 },
     auditId: "aud_a",
@@ -88,6 +94,7 @@ it("allows a user to stop their watch after access is revoked, and handles a rep
 it("refuses enrollment without access, missing publication and quota overflow", async () => {
   const input = {
     userId: "usr_a",
+    currentToken: "tok_a",
     productId: "prd_a",
     command: { enabled: true, expectedRevision: 0 },
     auditId: "aud_a",
@@ -119,6 +126,7 @@ it("stale revisions cannot overwrite another user's later preference", async () 
   await expect(
     repo.command({
       userId: "usr_a",
+      currentToken: "tok_a",
       productId: "prd_a",
       command: { enabled: true, expectedRevision: 1 },
       auditId: "aud_a",
@@ -165,6 +173,7 @@ it("rejects malformed direct commands before acquiring any database lock", async
     await expect(
       repo.command({
         userId: "usr_a",
+        currentToken: "tok_a",
         productId: "prd_a",
         command: command as never,
         auditId: "aud_a",
@@ -176,6 +185,7 @@ it("rejects malformed direct commands before acquiring any database lock", async
 it("checks a finite grant at database time after the final locks, including a replay", async () => {
   const input = {
     userId: "usr_a",
+    currentToken: "tok_a",
     productId: "prd_a",
     command: { enabled: true, expectedRevision: 0 },
     auditId: "aud_a",
@@ -214,6 +224,7 @@ it("guards an existing upsert and retains monotonic progress and update time", a
   ];
   await repo.command({
     userId: "usr_a",
+    currentToken: "tok_a",
     productId: "prd_a",
     command: { enabled: true, expectedRevision: 2 },
     auditId: "aud_a",
@@ -241,6 +252,7 @@ it("never audits an unexpected insertion conflict", async () => {
   await expect(
     repo.command({
       userId: "usr_a",
+      currentToken: "tok_a",
       productId: "prd_a",
       command: { enabled: true, expectedRevision: 0 },
       auditId: "aud_a",
@@ -263,4 +275,29 @@ it("reports the account-wide active count independently of searched watch totals
   expect(state.queries).toHaveLength(2);
   expect(state.queries[0].sql).toContain("active.user_id=");
   expect(state.queries[0].sql).toContain("active.enabled=true");
+});
+
+it("rejects a revoked initiator after the watch lock, including an idempotent stop", async () => {
+  state.sessionLive = false;
+  for (const replay of [false, true]) {
+    state.queries = [];
+    state.rows = [
+      [],
+      [["prd_a", "suspended"]],
+      [["usr_a"]],
+      [["prd_a", !replay, replay ? 2 : 1, "2026-10-11T00:00:00Z", "4"]],
+    ];
+    await expect(
+      repo.command({
+        userId: "usr_a",
+        currentToken: "tok_a",
+        productId: "prd_a",
+        command: { enabled: false, expectedRevision: 1 },
+        auditId: "aud_a",
+      }),
+    ).rejects.toMatchObject({ statusCode: 401 });
+    expect(state.queries.at(-2)?.sql).toContain("for no key update");
+    expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
+    expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
+  }
 });
