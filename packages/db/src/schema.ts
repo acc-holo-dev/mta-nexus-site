@@ -1686,6 +1686,39 @@ export const verificationNotificationDeliveries = pgTable(
   ],
 );
 
+// Durable discussion reply fanout for newly created article comments.
+export const discussionNotificationDeliveries = pgTable(
+  "discussion_notification_deliveries",
+  {
+    commentId: text("comment_id")
+      .primaryKey()
+      .references(() => comments.id, { onDelete: "cascade" }),
+    contentId: text("content_id")
+      .notNull()
+      .references(() => content.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    directCompleted: boolean("direct_completed").notNull().default(false),
+    lastFollowerCreatedAt: timestamp("last_follower_created_at", { withTimezone: true }),
+    lastFollowerId: text("last_follower_id"),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("discussion_notification_deliveries_due_idx")
+      .on(table.availableAt, table.commentId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check(
+      "discussion_notification_deliveries_attempts_bounds",
+      sql`${table.attempts} BETWEEN 0 AND 5`,
+    ),
+    check(
+      "discussion_notification_deliveries_follower_cursor_pair",
+      sql`(${table.lastFollowerCreatedAt} IS NULL AND ${table.lastFollowerId} IS NULL) OR (${table.lastFollowerCreatedAt} IS NOT NULL AND ${table.lastFollowerId} IS NOT NULL)`,
+    ),
+  ],
+);
+
 export const serverClaimChallenges = pgTable(
   "server_claim_challenges",
   {

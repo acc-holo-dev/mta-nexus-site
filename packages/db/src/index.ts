@@ -3,6 +3,7 @@ export { readDatabaseUrl } from "./database-config";
 export * from "./repositories/index";
 export { supportNotificationDeliveryRepository } from "./repositories/support-notification-delivery";
 export { verificationNotificationDeliveryRepository } from "./repositories/verification-notification-delivery";
+export { discussionNotificationDeliveryRepository } from "./repositories/discussion-notification-delivery";
 export {
   WebPushAdmissionRecoveryRepository,
   type WebPushAdmissionRecoveryResult,

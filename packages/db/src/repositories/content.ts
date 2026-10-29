@@ -19,7 +19,7 @@ import { serverContentAccess } from "./server-content";
 import { publicationNotice } from "./publication-notice";
 import { lockInitiatingSession } from "./initiating-session";
 import { resourceReviewsRepository } from "./resource-reviews";
-import { auditEvents, content, comments, users } from "../schema";
+import { auditEvents, content, comments, discussionNotificationDeliveries, users } from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
@@ -497,6 +497,8 @@ export class ContentRepository {
         }
       }
       const rows = await tx.insert(comments).values(values).returning();
+      const comment = rows[0];
+      if (!comment) throw new Error("Comment insert did not return a row");
       if (data.contentId) {
         await tx
           .update(content)
@@ -504,6 +506,12 @@ export class ContentRepository {
             commentCount: sql`${content.commentCount} + 1`,
           })
           .where(eq(content.id, data.contentId));
+        const createdAt = sql`(select ${comments.createdAt} from ${comments} where ${comments.id} = ${comment.id})`;
+        await tx.insert(discussionNotificationDeliveries).values({
+          commentId: comment.id,
+          contentId: data.contentId,
+          createdAt,
+        });
       }
       if (audit) {
         await tx.insert(auditEvents).values({
@@ -512,7 +520,7 @@ export class ContentRepository {
         });
       }
 
-      return rows[0] as unknown as Comment;
+      return comment as unknown as Comment;
     });
   }
 

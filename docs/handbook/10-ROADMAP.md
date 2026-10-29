@@ -10,7 +10,7 @@
 
 | № | Цель и граница работы | Зависит от | Критерий готовности |
 |---|---|---|---|
-| 05 | Уточнить обнаружение пропущенных ответов discussion и границы непрерывной доставки (verification moderator fanout уже транзакционный). | — | Для discussion определены границы адресного replay и непрерывной доставки. Используются существующие worker/outbox/receipts, внешняя доставка не объявляется exactly-once. Verification: событие и `verification_notification_deliveries` атомарны; worker проверяет текущие права staff и не раскрывает target/notes бывшим модераторам; HTTP не зависит от `after()`. |
+| 05 | ~~Verification/discussion continuous fanout~~ (done on mainline path). Remaining: confirm addressed-replay boundaries stay operator-only for pre-0083 comments. | — | Live verification and discussion comment create commit delivery sources; workers recheck eligibility; HTTP has no `after()` for these paths. Replay CLI remains for historical windows. External push is not exactly-once. |
 | 06 | Проверить повтор и восстановление доставки. | 05 | Сбой до/после отправки, истечение lease и перезапуск worker проверены; inbox не дублируется, retry ограничен, внешняя доставка не объявляется exactly-once. |
 | 07 | Сделать запуск и остановку среды воспроизводимыми. | — | Поддерживаемый способ запуска удерживает app/workers живыми, SIGTERM завершает процессы, health различает heartbeat и progress; повторный запуск не оставляет лишних процессов. |
 | 08 | Сократить измеренное время тестов БД. | — | Есть сравнимые замеры до/после; повторная подготовка фикстур и ненужное ожидание убраны там, где это даёт выигрыш. Проверки конкуренции, отката и отдельная БД сохранены. |

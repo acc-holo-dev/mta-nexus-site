@@ -1,6 +1,7 @@
 import { AppError, NotFoundError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { after, type NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import {
   discussionCommentSchema,
@@ -16,7 +17,6 @@ import {
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { authService } from "../../../../../lib/services/auth-service";
 import { contentService } from "../../../../../lib/services/content-service";
-import { notifyDiscussionReplies } from "../../../../../lib/services/discussion-follow-notification-service";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -83,45 +83,11 @@ export const POST = withBrowserMutation(
       if (!parsed.success) throw new AppError("Invalid comment", 400, "VALIDATION_ERROR");
       const article = await contentService.getArticleBySlug(slug, { incrementView: false });
       if (!article) throw new NotFoundError("Content");
+      // Reply fanout is committed with the comment as discussion_notification_deliveries.
       const comment = await contentService.addComment(
         { contentId: article.id, parentId: parsed.data.parentId, text: parsed.data.text },
         user,
       );
-      // Notifications follow persistence and cannot turn a saved comment into a retry.
-      try {
-        after(async () => {
-          try {
-            const result = await notifyDiscussionReplies(article.id, comment.id);
-            if (result.failed || result.pushDegraded)
-              logRequestEvent({
-                level: "warn",
-                event: "content.comment.notification_failed",
-                context,
-                status: 201,
-                fields: {
-                  attempted: result.attempted,
-                  stored: result.stored,
-                  failed: result.failed,
-                  pushDegraded: result.pushDegraded,
-                },
-              });
-          } catch {
-            logRequestEvent({
-              level: "warn",
-              event: "content.comment.notification_failed",
-              context,
-              status: 201,
-            });
-          }
-        });
-      } catch {
-        logRequestEvent({
-          level: "warn",
-          event: "content.comment.notification_registration_failed",
-          context,
-          status: 201,
-        });
-      }
       return jsonWithRequestId(context, { comment }, { status: 201, headers: privateHeaders });
     } catch (error) {
       const known = error instanceof AppError;

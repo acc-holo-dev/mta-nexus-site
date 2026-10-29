@@ -83,6 +83,7 @@ export * from "./order-terms";
 export * from "./plan-reviews";
 export * from "./report-notification-delivery";
 export * from "./verification-notification-delivery";
+export * from "./discussion-notification-delivery";
 export * from "./resource-copies";
 export * from "./subscriptions";
 export * from "./library-collections";

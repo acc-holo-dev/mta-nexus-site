@@ -52,6 +52,9 @@ function healthy(overrides = {}) {
     verificationPending: 0,
     verificationFailed: 0,
     verificationOldestAgeSeconds: 0,
+    discussionPending: 0,
+    discussionFailed: 0,
+    discussionOldestAgeSeconds: 0,
     admissionPending: 0,
     admissionFailed: 0,
     admissionOldestAgeSeconds: 0,
@@ -199,6 +202,44 @@ test("validates verification fanout counters and alerts without VAPID", () => {
       verificationFailed: 1,
       queueAlert: "alert",
       queueAlertReasons: ["verification_delivery_failed", "verification_delivery_failed"],
+    },
+  ]) {
+    assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));
+  }
+});
+
+test("validates discussion fanout counters and alerts without VAPID", () => {
+  assert.equal(
+    run(
+      healthy({
+        configured: false,
+        queuePending: 0,
+        queueDue: 0,
+        queueLeased: 0,
+        discussionPending: 2,
+        discussionFailed: 1,
+        discussionOldestAgeSeconds: 900,
+        queueAlert: "alert",
+        queueAlertReasons: ["discussion_delivery_failed", "discussion_delivery_backlog"],
+      }),
+    ),
+    0,
+  );
+  for (const overrides of [
+    { discussionPending: undefined },
+    { discussionFailed: null },
+    { discussionOldestAgeSeconds: "0" },
+    { discussionPending: -1 },
+    { discussionFailed: 0.5 },
+    { discussionOldestAgeSeconds: Number.MAX_SAFE_INTEGER + 1 },
+    { discussionFailed: 1 },
+    { discussionPending: 100 },
+    { discussionPending: 1, discussionOldestAgeSeconds: 900 },
+    { queueAlert: "alert", queueAlertReasons: ["discussion_delivery_failed"] },
+    {
+      discussionFailed: 1,
+      queueAlert: "alert",
+      queueAlertReasons: ["discussion_delivery_failed", "discussion_delivery_failed"],
     },
   ]) {
     assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));

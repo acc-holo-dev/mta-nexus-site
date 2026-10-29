@@ -168,6 +168,51 @@ class FollowWorkspaceRepository {
     };
   }
 
+  async discussionAudienceWithin(tx: Transaction, contentId: string, commentId: string) {
+    if (![contentId, commentId].every(validDiscussionId))
+      throw new AppError("Invalid discussion target", 400, "VALIDATION_ERROR");
+    const [row] = await tx
+      .select({
+        authorId: comments.authorId,
+        createdAt: sql<string>`to_char(${comments.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+        ownerId: content.authorId,
+        parentId: comments.parentId,
+      })
+      .from(comments)
+      .innerJoin(content, and(eq(content.id, comments.contentId), availableDiscussion))
+      .where(
+        and(
+          eq(comments.id, commentId),
+          eq(comments.contentId, contentId),
+          isNull(comments.productId),
+        ),
+      )
+      .limit(1);
+    if (!row) return null;
+    const [parent] = row.parentId
+      ? await tx
+          .select({ authorId: comments.authorId })
+          .from(comments)
+          .where(
+            and(
+              eq(comments.id, row.parentId),
+              eq(comments.contentId, contentId),
+              isNull(comments.productId),
+            ),
+          )
+          .limit(1)
+      : [];
+    return {
+      authorId: row.authorId,
+      createdAt: row.createdAt,
+      directRecipients: [
+        ...new Set(
+          [row.ownerId, parent?.authorId].filter((id): id is string => !!id && id !== row.authorId),
+        ),
+      ],
+    };
+  }
+
   async discussionAudience(contentId: string, commentId: string) {
     if (![contentId, commentId].every(validDiscussionId))
       throw new AppError("Invalid discussion target", 400, "VALIDATION_ERROR");
@@ -212,6 +257,54 @@ class FollowWorkspaceRepository {
       ],
     };
   }
+
+  async discussionFollowersWithin(
+    tx: Transaction,
+    contentId: string,
+    until: string,
+    excluded: string[],
+    cursor: Cursor | undefined,
+    limit: number,
+  ) {
+    if (
+      !validDiscussionId(contentId) ||
+      !validAudienceTime(until) ||
+      excluded.length > 3 ||
+      excluded.some((value) => !validDiscussionId(value)) ||
+      (cursor && (!validDiscussionId(cursor.id) || !validAudienceTime(cursor.createdAt))) ||
+      !Number.isSafeInteger(limit) ||
+      limit < 1 ||
+      limit > 100
+    )
+      throw new AppError("Invalid discussion audience", 400, "VALIDATION_ERROR");
+    const rows = await tx
+      .select({
+        id: follows.id,
+        recipientId: follows.followerId,
+        createdAt: sql<string>`to_char(${follows.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+      })
+      .from(follows)
+      .where(
+        and(
+          eq(follows.targetType, "content"),
+          eq(follows.targetId, contentId),
+          sql`${follows.createdAt}<=${until}::timestamptz`,
+          ...excluded.map((id) => ne(follows.followerId, id)),
+          cursor
+            ? sql`(${follows.createdAt},${follows.id})>(${cursor.createdAt}::timestamptz,${cursor.id})`
+            : undefined,
+        ),
+      )
+      .orderBy(asc(follows.createdAt), asc(follows.id))
+      .limit(limit + 1);
+    const items = rows.slice(0, limit);
+    const last = items.at(-1);
+    return {
+      items,
+      nextCursor: rows.length > limit && last ? { createdAt: last.createdAt, id: last.id } : null,
+    };
+  }
+
   async discussionFollowers(contentId: string, until: string, excluded: string[], cursor?: Cursor) {
     if (
       !validDiscussionId(contentId) ||
@@ -241,8 +334,8 @@ class FollowWorkspaceRepository {
       )
       .orderBy(asc(follows.createdAt), asc(follows.id))
       .limit(51);
-    const items = rows.slice(0, 50),
-      last = items.at(-1);
+    const items = rows.slice(0, 50);
+    const last = items.at(-1);
     return {
       items,
       nextCursor: rows.length > 50 && last ? { createdAt: last.createdAt, id: last.id } : null,

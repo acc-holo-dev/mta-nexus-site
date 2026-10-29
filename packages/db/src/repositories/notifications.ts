@@ -417,74 +417,84 @@ export class NotificationRepository {
       pushQueueState: queued.reason,
     };
   }
+  async createDiscussionReplyWithPushWithin(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    input: {
+      recipientId: string;
+      contentId: string;
+      commentId: string;
+      repairPush?: boolean;
+    },
+  ) {
+    const source = await followWorkspaceRepository.discussionNoticeWithin(
+      tx,
+      input.recipientId,
+      input.contentId,
+      input.commentId,
+    );
+    if (!source)
+      return {
+        state: "skipped" as const,
+        pushJobs: 0,
+        pushQueueState: "no_subscriptions" as const,
+      };
+    await lockNotificationPreferencesForUsers(tx, [input.recipientId]);
+    const [preferences] = await tx
+      .select({
+        follow: notificationPreferences.followsEnabled,
+        content: notificationPreferences.contentEnabled,
+      })
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, input.recipientId))
+      .limit(1);
+    const category =
+      source.following && preferences?.follow !== false
+        ? "follow"
+        : source.direct && preferences?.content !== false
+          ? "content"
+          : null;
+    if (!category)
+      return {
+        state: "suppressed" as const,
+        pushJobs: 0,
+        pushQueueState: "no_subscriptions" as const,
+      };
+    const stored = await this.persistDiscussionWithin(
+      tx,
+      {
+        id: source.id,
+        recipientId: input.recipientId,
+        title: "New discussion reply",
+        message:
+          category === "follow"
+            ? "A publication you follow has a new reply."
+            : "A discussion you participate in has a new reply.",
+        link: source.link,
+        type: "content",
+        category,
+        isRead: false,
+        createdAt: new Date(),
+      },
+      input.repairPush === true,
+      [
+        source.following && preferences?.follow !== false ? "follow" : null,
+        source.direct && preferences?.content !== false ? "content" : null,
+      ].filter((value) => value !== null),
+    );
+    return {
+      state: stored.notification ? ("stored" as const) : ("duplicate" as const),
+      pushJobs: stored.pushJobs,
+      pushQueueState: stored.pushQueueState,
+    };
+  }
+
   async createDiscussionReplyWithPush(input: {
     recipientId: string;
     contentId: string;
     commentId: string;
     repairPush?: boolean;
   }) {
-    return db.transaction(async (tx) => {
-      const source = await followWorkspaceRepository.discussionNoticeWithin(
-        tx,
-        input.recipientId,
-        input.contentId,
-        input.commentId,
-      );
-      if (!source)
-        return {
-          state: "skipped" as const,
-          pushJobs: 0,
-          pushQueueState: "no_subscriptions" as const,
-        };
-      await lockNotificationPreferencesForUsers(tx, [input.recipientId]);
-      const [preferences] = await tx
-        .select({
-          follow: notificationPreferences.followsEnabled,
-          content: notificationPreferences.contentEnabled,
-        })
-        .from(notificationPreferences)
-        .where(eq(notificationPreferences.userId, input.recipientId))
-        .limit(1);
-      const category =
-        source.following && preferences?.follow !== false
-          ? "follow"
-          : source.direct && preferences?.content !== false
-            ? "content"
-            : null;
-      if (!category)
-        return {
-          state: "suppressed" as const,
-          pushJobs: 0,
-          pushQueueState: "no_subscriptions" as const,
-        };
-      const stored = await this.persistDiscussionWithin(
-        tx,
-        {
-          id: source.id,
-          recipientId: input.recipientId,
-          title: "New discussion reply",
-          message:
-            category === "follow"
-              ? "A publication you follow has a new reply."
-              : "A discussion you participate in has a new reply.",
-          link: source.link,
-          type: "content",
-          category,
-          isRead: false,
-          createdAt: new Date(),
-        },
-        input.repairPush === true,
-        [
-          source.following && preferences?.follow !== false ? "follow" : null,
-          source.direct && preferences?.content !== false ? "content" : null,
-        ].filter((value) => value !== null),
-      );
-      return {
-        state: stored.notification ? ("stored" as const) : ("duplicate" as const),
-        pushJobs: stored.pushJobs,
-        pushQueueState: stored.pushQueueState,
-      };
-    });
+    return db.transaction(async (tx) => this.createDiscussionReplyWithPushWithin(tx, input));
   }
 
   private async persistDiscussionWithin(

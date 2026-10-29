@@ -405,14 +405,45 @@ Never synthesize intents for historical or already accepted notifications. After
 an admission succeeds, sender cleanup of outbox rows must not cause another
 admission. Discussion replies use their existing typed receipt and explicit
 `--repair-push` replay below. Admission recovery cannot create an inbox that was
-lost before it was stored. Report, support and verification moderator fanout
-already use transactional delivery sources; discussion live delivery still relies
-on request callbacks plus addressed replay. External push delivery retains the existing lease,
-retry and provider guarantees and is not exactly-once.
+lost before it was stored. Report, support, verification and new discussion comment
+fanout use transactional delivery sources. Historical discussion comments from
+before migration 0083 still rely on addressed replay below. External push delivery
+retains the existing lease, retry and provider guarantees and is not exactly-once.
+
+### Recovering discussion moderator-style delivery jobs
+
+New article comments commit a `discussion_notification_deliveries` row with the
+comment and audit. Migration 0083 does not backfill historical comments. The push
+worker first delivers direct participants, then pages followers who predate the
+comment, rechecking publication, follow and preference eligibility on each write.
+Notices stay generic and never include comment text. Retry and operator reset match
+the support/report pattern.
+
+The queue probe reports `discussionPending`, `discussionFailed`,
+`discussionOldestAgeSeconds`, and alerts `discussion_delivery_failed` or
+`discussion_delivery_backlog`. After resolving the cause, reset one verified
+failed comment on the intended database:
+
+```sql
+SELECT comment_id, attempts, available_at
+FROM discussion_notification_deliveries
+WHERE completed_at IS NULL AND attempts = 5
+ORDER BY available_at, comment_id LIMIT 20;
+
+UPDATE discussion_notification_deliveries
+SET attempts = 0, available_at = clock_timestamp()
+WHERE comment_id = 'REPLACE_WITH_VERIFIED_COMMENT_ID'
+  AND attempts = 5 AND completed_at IS NULL
+RETURNING comment_id;
+```
+
+Do not reset all jobs or delete inbox records.
 
 ### Recovering discussion inbox delivery
 
-Run from the repository with the target database environment loaded:
+For comments created before migration 0083, or windows where delivery jobs were
+never enqueued, use the addressed replay CLI. Run from the repository with the
+target database environment loaded:
 
 ```sh
 pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100
