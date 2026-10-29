@@ -135,8 +135,9 @@ export class WebPushAdmissionRecoveryRepository {
         await tx.execute(sql`set local lock_timeout = '3s'`);
         await tx.execute(sql`set local statement_timeout = '5s'`);
         const eligible = dueIntent();
-        // Do not claim intent first: producers acquire preferences -> notification
-        // -> intent -> queue gate. Reversing that order can deadlock fanout.
+        // Do not claim intent before preferences/notification: source fanout
+        // locks preferences before writing inbox and taking the queue gate.
+        // A new failure intent is invisible to recovery until the source commits.
         // Account deletion takes the user lock before cascading into notifications.
         const [user] = await tx
           .select({ id: users.id })
