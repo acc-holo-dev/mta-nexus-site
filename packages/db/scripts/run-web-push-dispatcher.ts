@@ -4,8 +4,9 @@ import {
   checkDatabaseConnection,
   closeDatabaseConnection,
   createWebPushHttpSender,
-  WebPushDispatcher,
   reportNotificationDeliveryRepository,
+  supportNotificationDeliveryRepository,
+  WebPushDispatcher,
   webPushAdmissionRecoveryRepository,
   webPushOutboxRepository,
   webPushWorkerRepository,
@@ -59,6 +60,8 @@ type QueueAlertReason =
   | "oldest_job_age"
   | "report_delivery_failed"
   | "report_delivery_backlog"
+  | "support_delivery_failed"
+  | "support_delivery_backlog"
   | "admission_recovery_failed"
   | "admission_recovery_backlog";
 
@@ -80,6 +83,9 @@ let healthQueueOldestAgeSeconds = 0;
 let reportPending = 0;
 let reportFailed = 0;
 let reportOldestAgeSeconds = 0;
+let supportPending = 0;
+let supportFailed = 0;
+let supportOldestAgeSeconds = 0;
 let admissionPending = 0;
 let admissionFailed = 0;
 let admissionOldestAgeSeconds = 0;
@@ -132,6 +138,12 @@ function updateQueueAlertState() {
     (reportPending > 0 && reportOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
   )
     reasons.push("report_delivery_backlog");
+  if (supportFailed > 0) reasons.push("support_delivery_failed");
+  if (
+    supportPending >= QUEUE_ALERT_DUE_JOBS ||
+    (supportPending > 0 && supportOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("support_delivery_backlog");
   if (admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     admissionPending >= QUEUE_ALERT_DUE_JOBS ||
@@ -155,6 +167,9 @@ function updateQueueAlertState() {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    supportPending,
+    supportFailed,
+    supportOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -193,6 +208,9 @@ async function writeHealthSnapshot() {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    supportPending,
+    supportFailed,
+    supportOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -228,6 +246,10 @@ async function refreshQueueStats() {
   reportPending = reports.pending;
   reportFailed = reports.failed;
   reportOldestAgeSeconds = reports.oldestAgeSeconds;
+  const support = await supportNotificationDeliveryRepository.stats();
+  supportPending = support.pending;
+  supportFailed = support.failed;
+  supportOldestAgeSeconds = support.oldestAgeSeconds;
   const admissions = await webPushAdmissionRecoveryRepository.stats();
   admissionPending = admissions.pending;
   admissionFailed = admissions.failed;
@@ -298,6 +320,14 @@ try {
     if (reports.state !== "idle") {
       activity += 1;
       emit({ status: "report-delivery", batch: healthBatch, ...reports });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const support = await supportNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (support.state !== "idle") {
+      activity += 1;
+      emit({ status: "support-delivery", batch: healthBatch, ...support });
     }
     markProgress();
     if (controller.signal.aborted) break;

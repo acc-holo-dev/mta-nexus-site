@@ -43,6 +43,8 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ["packages/db/src/repositories/resource-release-watches.ts"],
     ["packages/db/src/repositories/resource-release-watch-batches.ts"],
     ["packages/db/src/repositories/collection-release-watches.ts"],
+    ["packages/db/src/repositories/support.ts"],
+    ["packages/db/src/repositories/support-notification-delivery.ts"],
     ...[
       "web-push-admission-recovery",
       "web-push-outbox",

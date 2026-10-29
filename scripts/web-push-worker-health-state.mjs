@@ -9,6 +9,8 @@ const ALERT_REASONS = [
   "oldest_job_age",
   "report_delivery_failed",
   "report_delivery_backlog",
+  "support_delivery_failed",
+  "support_delivery_backlog",
   "admission_recovery_failed",
   "admission_recovery_backlog",
 ];
@@ -36,6 +38,13 @@ function expectedAlertReasons(input) {
       input.reportOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
   )
     reasons.push("report_delivery_backlog");
+  if (input.supportFailed > 0) reasons.push("support_delivery_failed");
+  if (
+    input.supportPending >= input.queueAlertThresholds.dueJobs ||
+    (input.supportPending > 0 &&
+      input.supportOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("support_delivery_backlog");
   if (input.admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     input.admissionPending >= input.queueAlertThresholds.dueJobs ||
@@ -67,6 +76,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const reportPending = Number(data?.reportPending);
   const reportFailed = Number(data?.reportFailed);
   const reportOldestAgeSeconds = Number(data?.reportOldestAgeSeconds);
+  const supportPending = data?.supportPending;
+  const supportFailed = data?.supportFailed;
+  const supportOldestAgeSeconds = data?.supportOldestAgeSeconds;
   const admissionPending = data?.admissionPending;
   const admissionFailed = data?.admissionFailed;
   const admissionOldestAgeSeconds = data?.admissionOldestAgeSeconds;
@@ -86,6 +98,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     queueLeased <= queuePending &&
     queuePending <= queueCapacity;
   const reportStateValid = [reportPending, reportFailed, reportOldestAgeSeconds].every(
+    (value) => Number.isSafeInteger(value) && value >= 0,
+  );
+  const supportStateValid = [supportPending, supportFailed, supportOldestAgeSeconds].every(
     (value) => Number.isSafeInteger(value) && value >= 0,
   );
   const admissionStateValid = [admissionPending, admissionFailed, admissionOldestAgeSeconds].every(
@@ -111,6 +126,7 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     batch < 0 ||
     !queueStateValid ||
     !reportStateValid ||
+    !supportStateValid ||
     !admissionStateValid ||
     !thresholdsValid ||
     now - heartbeatAt > staleAfterMs ||
@@ -128,6 +144,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    supportPending,
+    supportFailed,
+    supportOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -165,6 +184,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    supportPending,
+    supportFailed,
+    supportOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,

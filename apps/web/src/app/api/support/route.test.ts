@@ -497,7 +497,7 @@ describe("support HTTP authorization and privacy", () => {
     );
   });
 
-  it("delivers support notifications only after committed mutations", async () => {
+  it("leaves support notifications to transactional repository delivery", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     const createResponse = await createCase(
       new NextRequest("https://nexus.test/api/support", {
@@ -511,15 +511,8 @@ describe("support HTTP authorization and privacy", () => {
       }),
     );
     expect(createResponse.status).toBe(201);
-    expect(afterMock).toHaveBeenCalledOnce();
+    expect(afterMock).not.toHaveBeenCalled();
     expect(mocks.dispatch).not.toHaveBeenCalled();
-    await state.afterCallbacks.shift()?.();
-    expect(mocks.dispatch).toHaveBeenCalledWith([
-      expect.objectContaining({
-        recipientId: "usr_mod",
-        link: `/admin/support/${caseId}`,
-      }),
-    ]);
 
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
@@ -728,7 +721,7 @@ describe("support HTTP authorization and privacy", () => {
       expect.objectContaining({ actorId: "usr_member", operation: "reply", caseId }),
       "initiating-token",
     );
-    expect(afterMock).toHaveBeenCalledOnce();
+    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("rejects replies to already closed tickets before repository mutation", async () => {

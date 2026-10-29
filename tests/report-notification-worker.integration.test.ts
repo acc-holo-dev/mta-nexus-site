@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -98,7 +98,14 @@ it("the real worker delivers moderator inbox without VAPID or a surviving HTTP c
     const inbox = await db
       .select()
       .from(notifications)
-      .where(eq(notifications.recipientId, actors[1]));
+      .where(
+        eq(
+          notifications.id,
+          `ntf_report_created_${createHash("sha256")
+            .update(JSON.stringify([reportId, actors[1]]))
+            .digest("hex")}`,
+        ),
+      );
     expect(inbox).toEqual([expect.objectContaining({ category: "security", link: "/admin" })]);
     const [job] = await db
       .select()

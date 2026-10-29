@@ -1,12 +1,11 @@
-import { supportCaseRepository, userRepository } from "@nexus/db";
+import { supportCaseRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
-import { after, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { parseBoundedJson } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
+import { createRequestLogContext } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
-import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 import {
   supportFailure,
   supportMutationGuard,
@@ -205,31 +204,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
     const supportCase = result.supportCase;
-    if (result.kind === "created")
-      after(async () => {
-        try {
-          const moderatorIds = await userRepository.listModeratorIds();
-          await dispatchNotificationsBestEffort(
-            moderatorIds.map((moderatorId) => ({
-              recipientId: moderatorId,
-              title: "New support case",
-              message: "A support case is awaiting review.",
-              link: `/admin/support/${supportCase.id}`,
-              type: "system" as const,
-              category: "system" as const,
-            })),
-          );
-        } catch (error) {
-          logRequestEvent({
-            level: "warn",
-            event: "support.case_notification_failed",
-            context,
-            status: 201,
-            error,
-          });
-        }
-      });
-
     return supportPrivateJson(
       context,
       request,

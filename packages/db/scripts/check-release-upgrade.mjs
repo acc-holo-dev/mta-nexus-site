@@ -29,6 +29,7 @@ const upgradePlan = releaseUpgradePlan(journal);
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
+const beforeLatestFolder = join(temp, "before-latest");
 const database = `nexus_upgrade_${randomUUID().replaceAll("-", "")}`;
 const admin = postgres(url.toString(), { max: 1, onnotice: () => {} });
 let client;
@@ -44,6 +45,7 @@ const evidence = {
   accountSubscriptionsSchemaPresent: false,
   libraryCollectionsSchemaPresent: false,
   reportNotificationDeliverySchemaPresent: false,
+  supportNotificationDeliverySchemaPresent: false,
   webPushAdmissionRecoverySchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
@@ -88,6 +90,11 @@ try {
     }),
   );
   cpSync(migrationsFolder, failureFolder, { recursive: true });
+  cpSync(migrationsFolder, beforeLatestFolder, { recursive: true });
+  writeFileSync(
+    join(beforeLatestFolder, "meta/_journal.json"),
+    JSON.stringify({ ...journal, entries: journal.entries.slice(0, -1) }),
+  );
   const targetPath = join(failureFolder, `${upgradePlan.failureTag}.sql`);
   writeFileSync(
     targetPath,
@@ -204,6 +211,11 @@ try {
   evidence.failedMigrationRolledBack = true;
 
   evidence.phase = "upgrade";
+  await migrate(db, { migrationsFolder: beforeLatestFolder });
+  await client`INSERT INTO support_cases (id, requester_id, category, subject)
+    VALUES ('upgrade-support', 'upgrade-user', 'account', 'Existing support case')`;
+  await client`INSERT INTO support_case_messages (id, case_id, author_id, author_role, body)
+    VALUES ('upgrade-support-message', 'upgrade-support', 'upgrade-user', 'requester', 'Existing support message')`;
   await migrate(db, { migrationsFolder });
   const afterLedger = await ledger();
   const count = await client`SELECT count(*)::int AS count FROM drizzle.__drizzle_migrations`;
@@ -720,6 +732,34 @@ try {
     (error) => error.code === "23503",
   );
   evidence.webPushAdmissionRecoverySchemaPresent = true;
+  assert.equal(
+    (await client`SELECT count(*)::integer AS total FROM support_notification_deliveries`)[0].total,
+    0,
+    "Upgrade must not invent delivery progress for historical support messages",
+  );
+  assert.equal(
+    (await client`SELECT body FROM support_case_messages WHERE id='upgrade-support-message'`)[0]
+      .body,
+    "Existing support message",
+  );
+  assert.equal(
+    (
+      await client`SELECT indexname FROM pg_indexes WHERE schemaname='public'
+      AND indexname='support_notification_deliveries_due_idx'`
+    ).length,
+    1,
+  );
+  await assert.rejects(
+    client`INSERT INTO support_notification_deliveries (message_id, case_id, event, created_at, attempts)
+      VALUES ('missing-message', 'missing-case', 'case_created', clock_timestamp(), 6)`,
+    (error) => error.code === "23514",
+  );
+  await assert.rejects(
+    client`INSERT INTO support_notification_deliveries (message_id, case_id, event, created_at)
+      VALUES ('missing-message', 'missing-case', 'case_created', clock_timestamp())`,
+    (error) => error.code === "23503",
+  );
+  evidence.supportNotificationDeliverySchemaPresent = true;
   const receiptColumns =
     await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
