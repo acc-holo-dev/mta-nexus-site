@@ -293,6 +293,36 @@ return `saturated`/`error`; the page logs `pushDeferred`, retains the inbox and
 leaves durable admission recovery intent described below.
 Completion of report fanout confirms inbox processing, not external push delivery.
 
+### Recovering support moderator inbox delivery
+
+New support cases and requester replies commit a `support_notification_deliveries`
+row with the message and audit. Migration 0081 does not backfill historical cases.
+The push worker processes at most twenty current moderators/admins per page,
+including without VAPID. Accounts must predate the event; later promotions behind
+the cursor do not replay it. Notices contain generic text and link to the support
+list, without case IDs, requester identity, subjects or message text. Pages and
+cursor updates commit together; retries preserve inbox read state. Five consecutive
+failures stop automatic attempts, with 5, 10, 20 and 40 second retry delays.
+
+The queue probe reports `supportPending`, `supportFailed`,
+`supportOldestAgeSeconds`, and alerts `support_delivery_failed` or
+`support_delivery_backlog`. After resolving the cause, inspect and reset one
+verified failed message on the intended database:
+
+```sql
+SELECT message_id, attempts, available_at FROM support_notification_deliveries
+WHERE completed_at IS NULL AND attempts = 5 ORDER BY available_at, message_id LIMIT 20;
+
+UPDATE support_notification_deliveries
+SET attempts = 0, available_at = clock_timestamp()
+WHERE message_id = 'REPLACE_WITH_VERIFIED_MESSAGE_ID'
+  AND attempts = 5 AND completed_at IS NULL
+RETURNING message_id;
+```
+
+Do not reset all jobs or delete inbox records. Inbox delivery does not guarantee
+external push delivery; optional push admission has its own recovery below.
+
 ### Recovering optional push admission
 
 Migration 0080 adds `web_push_admission_recovery` without backfilling old inbox
