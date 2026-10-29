@@ -25,6 +25,9 @@ function snapshot(overrides = {}) {
     reportPending: 0,
     reportFailed: 0,
     reportOldestAgeSeconds: 0,
+    admissionPending: 0,
+    admissionFailed: 0,
+    admissionOldestAgeSeconds: 0,
     queueAlert: "ok",
     queueAlertReasons: [],
     queueAlertThresholds: { pendingPercent: 80, dueJobs: 100, oldestAgeSeconds: 900 },
@@ -58,6 +61,9 @@ test("returns zero and aggregate diagnostics for a healthy queue", () => {
   assert.equal(value.heartbeatAt, payload.heartbeatAt);
   assert.equal(value.progressStaleAfterMs, 180_000);
   assert.equal(typeof value.progressAt, "string");
+  assert.equal(value.admissionPending, 0);
+  assert.equal(value.admissionFailed, 0);
+  assert.equal(value.admissionOldestAgeSeconds, 0);
   assert.equal("endpoint" in value, false);
   assert.equal("payload" in value, false);
 });
@@ -120,6 +126,57 @@ test("fails closed for stale or inconsistent snapshot", () => {
     1,
   );
   assert.equal(run(snapshot({ queuePending: 8_000 })).status, 1);
+});
+
+test("alerts on admission recovery failure and age backlog without VAPID", () => {
+  const result = run(
+    snapshot({
+      configured: false,
+      queuePending: 0,
+      queueDue: 0,
+      queueLeased: 0,
+      admissionPending: 2,
+      admissionFailed: 1,
+      admissionOldestAgeSeconds: 900,
+      queueAlert: "alert",
+      queueAlertReasons: ["admission_recovery_failed", "admission_recovery_backlog"],
+    }),
+  );
+  assert.equal(result.status, 2);
+  const value = JSON.parse(result.stdout);
+  assert.deepEqual(value.reasons, ["admission_recovery_failed", "admission_recovery_backlog"]);
+  assert.equal(value.admissionPending, 2);
+  assert.equal(value.admissionFailed, 1);
+  assert.equal(value.admissionOldestAgeSeconds, 900);
+});
+
+test("uses configured thresholds for admission recovery backlog", () => {
+  const thresholds = { pendingPercent: 80, dueJobs: 3, oldestAgeSeconds: 30 };
+  assert.equal(
+    run(
+      snapshot({
+        admissionPending: 2,
+        admissionOldestAgeSeconds: 29,
+        queueAlertThresholds: thresholds,
+      }),
+    ).status,
+    0,
+  );
+  for (const admission of [
+    { admissionPending: 3, admissionOldestAgeSeconds: 0 },
+    { admissionPending: 1, admissionOldestAgeSeconds: 30 },
+  ]) {
+    const result = run(
+      snapshot({
+        ...admission,
+        queueAlertThresholds: thresholds,
+        queueAlert: "alert",
+        queueAlertReasons: ["admission_recovery_backlog"],
+      }),
+    );
+    assert.equal(result.status, 2);
+    assert.deepEqual(JSON.parse(result.stdout).reasons, ["admission_recovery_backlog"]);
+  }
 });
 
 test("fails queue probe when worker heartbeat is fresh but loop progress is stale", () => {

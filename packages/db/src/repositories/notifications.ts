@@ -8,6 +8,7 @@ import { discussionPushReceipt, withDiscussionPushReceipt } from "./discussion-p
 import { followWorkspaceRepository } from "./follow-workspace";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { containsPattern } from "./search-pattern";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 
 function boundedNotificationLimit(value: number, fallback: number, maximum: number): number {
@@ -400,7 +401,7 @@ export class NotificationRepository {
     },
     idempotent = false,
   ) {
-    const query = tx.insert(notifications).values(values);
+    const query = tx.insert(notifications).values({ ...values, createdAt: sql`clock_timestamp()` });
     const [row] = await (idempotent ? query.onConflictDoNothing() : query).returning();
     if (!row) {
       if (idempotent)
@@ -408,23 +409,12 @@ export class NotificationRepository {
       throw new Error("Notification insert did not return a row");
     }
 
-    let pushJobs = 0;
-    let pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error" = "error";
-    try {
-      const queued = await tx.transaction((pushTx) =>
-        enqueueWebPushOutboxForNotification(pushTx, row.id, row.recipientId),
-      );
-      pushJobs = queued.queued;
-      pushQueueState = queued.reason;
-    } catch {
-      // Inbox is authoritative. A queue-local failure rolls back only
-      // the savepoint and must not erase a successfully stored notification.
-    }
+    const queued = await enqueueWebPushWithRecoveryWithin(tx, row.id, row.recipientId);
 
     return {
       notification: row as unknown as Notification,
-      pushJobs,
-      pushQueueState,
+      pushJobs: queued.queued,
+      pushQueueState: queued.reason,
     };
   }
   async createDiscussionReplyWithPush(input: {

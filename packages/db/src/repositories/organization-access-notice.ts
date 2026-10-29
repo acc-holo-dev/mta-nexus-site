@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { db } from "../client";
 import { notifications } from "../schema";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type OrganizationAccessChange =
@@ -35,25 +35,13 @@ export async function storeOrganizationAccessNotice(
     category: "security",
     isRead: false,
   });
-  try {
-    const result = await tx.transaction((pushTx) =>
-      enqueueWebPushOutboxForNotification(pushTx, id, recipientId),
-    );
-    if (result.reason === "saturated")
-      console.warn(
-        JSON.stringify({
-          event: "notification.push_outbox_degraded",
-          producer: "organization_access",
-          reason: "saturated",
-        }),
-      );
-  } catch {
+  const result = await enqueueWebPushWithRecoveryWithin(tx, id, recipientId);
+  if (result.reason === "saturated" || result.reason === "error")
     console.warn(
       JSON.stringify({
         event: "notification.push_outbox_degraded",
         producer: "organization_access",
-        reason: "error",
+        reason: result.reason,
       }),
     );
-  }
 }

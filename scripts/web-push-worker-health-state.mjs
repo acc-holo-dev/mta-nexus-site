@@ -9,6 +9,8 @@ const ALERT_REASONS = [
   "oldest_job_age",
   "report_delivery_failed",
   "report_delivery_backlog",
+  "admission_recovery_failed",
+  "admission_recovery_backlog",
 ];
 
 function inRange(value, min, max) {
@@ -34,6 +36,13 @@ function expectedAlertReasons(input) {
       input.reportOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
   )
     reasons.push("report_delivery_backlog");
+  if (input.admissionFailed > 0) reasons.push("admission_recovery_failed");
+  if (
+    input.admissionPending >= input.queueAlertThresholds.dueJobs ||
+    (input.admissionPending > 0 &&
+      input.admissionOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("admission_recovery_backlog");
   return reasons;
 }
 
@@ -58,6 +67,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const reportPending = Number(data?.reportPending);
   const reportFailed = Number(data?.reportFailed);
   const reportOldestAgeSeconds = Number(data?.reportOldestAgeSeconds);
+  const admissionPending = data?.admissionPending;
+  const admissionFailed = data?.admissionFailed;
+  const admissionOldestAgeSeconds = data?.admissionOldestAgeSeconds;
   const queueAlertThresholds = Object.freeze({
     pendingPercent: Number(data?.queueAlertThresholds?.pendingPercent),
     dueJobs: Number(data?.queueAlertThresholds?.dueJobs),
@@ -74,6 +86,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     queueLeased <= queuePending &&
     queuePending <= queueCapacity;
   const reportStateValid = [reportPending, reportFailed, reportOldestAgeSeconds].every(
+    (value) => Number.isSafeInteger(value) && value >= 0,
+  );
+  const admissionStateValid = [admissionPending, admissionFailed, admissionOldestAgeSeconds].every(
     (value) => Number.isSafeInteger(value) && value >= 0,
   );
 
@@ -96,6 +111,7 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     batch < 0 ||
     !queueStateValid ||
     !reportStateValid ||
+    !admissionStateValid ||
     !thresholdsValid ||
     now - heartbeatAt > staleAfterMs ||
     now - progressAt > progressStaleAfterMs
@@ -112,6 +128,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    admissionPending,
+    admissionFailed,
+    admissionOldestAgeSeconds,
     queueAlertThresholds,
   });
   const expectedStatus = expectedReasons.length > 0 ? "alert" : "ok";
@@ -146,6 +165,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    admissionPending,
+    admissionFailed,
+    admissionOldestAgeSeconds,
     queueAlert: expectedStatus,
     queueAlertReasons: Object.freeze([...reasons]),
     queueAlertThresholds,

@@ -6,13 +6,12 @@ const state = vi.hoisted(() => ({
   lock: vi.fn(),
   push: vi.fn(),
   failInbox: false,
-  savepoints: 0,
 }));
 vi.mock("../packages/db/src/repositories/notification-preference-lock", () => ({
   lockNotificationPreferencesForUsers: state.lock,
 }));
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: state.push,
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: state.push,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -25,7 +24,6 @@ vi.mock("../packages/db/src/client", async () => {
     get(target, key) {
       if (key === "transaction")
         return (work: (tx: typeof database) => unknown) => {
-          state.savepoints++;
           return work(proxy);
         };
       const value = Reflect.get(target, key);
@@ -47,7 +45,6 @@ beforeEach(() => {
   state.queries = [];
   state.rows = [[], [["notice"]]];
   state.failInbox = false;
-  state.savepoints = 0;
   state.push.mockResolvedValue({ queued: 1, reason: "queued" });
 });
 it("locks content preferences and stores a status-only notice with a safe target link", async () => {
@@ -62,7 +59,6 @@ it("locks content preferences and stores a status-only notice with a safe target
     ]),
   );
   expect(insert()?.sql).toContain("on conflict do nothing");
-  expect(state.savepoints).toBe(1);
   expect(state.push).toHaveBeenCalledWith(db, insert()?.params[0], "author");
 });
 it("respects explicitly disabled content preferences", async () => {
@@ -81,16 +77,21 @@ it("uses stable audit/recipient identities and skips push if already notified", 
   expect(insert()?.params[0]).toBe(id);
   expect(state.push).not.toHaveBeenCalled();
 });
-it("propagates inbox failure but keeps the authoritative inbox on push savepoint failure", async () => {
+it("propagates inbox and intent failures while preserving inbox on optional push degradation", async () => {
   state.failInbox = true;
   await expect(discussionModerationNotice(db as unknown as Tx, item)).rejects.toMatchObject({
     cause: { message: "Inbox failed" },
   });
   state.failInbox = false;
   state.rows = [[], [["notice"]]];
-  state.push.mockRejectedValue(new Error("Push failed"));
+  state.push.mockResolvedValue({ queued: 0, reason: "error" });
   await expect(discussionModerationNotice(db as unknown as Tx, item)).resolves.toBeUndefined();
-  expect(state.savepoints).toBe(1);
+  expect(state.push).toHaveBeenCalledWith(db, insert()?.params[0], "author");
+  state.rows = [[], [["notice"]]];
+  state.push.mockRejectedValue(new Error("Admission intent failed"));
+  await expect(discussionModerationNotice(db as unknown as Tx, item)).rejects.toThrow(
+    "Admission intent failed",
+  );
 });
 it.each(["en", "ru"] as const)(
   "localizes the bounded persisted moderation template in %s",

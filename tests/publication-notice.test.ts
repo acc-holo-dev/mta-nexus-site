@@ -4,15 +4,14 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   failInbox: false,
-  savepoints: 0,
   lock: vi.fn(),
   push: vi.fn(),
 }));
 vi.mock("../packages/db/src/repositories/notification-preference-lock", () => ({
   lockNotificationPreferencesForUsers: state.lock,
 }));
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: state.push,
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: state.push,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -26,7 +25,6 @@ vi.mock("../packages/db/src/client", async () => {
     get(target, key) {
       if (key === "transaction")
         return (work: (tx: typeof database) => unknown) => {
-          state.savepoints++;
           return work(proxy);
         };
       const value = Reflect.get(target, key);
@@ -48,7 +46,6 @@ beforeEach(() => {
   state.queries = [];
   state.rows = [];
   state.failInbox = false;
-  state.savepoints = 0;
   state.push.mockResolvedValue({ queued: 1, reason: "queued" });
 });
 it("deduplicates original author and actual owner, excludes the actor, locks preferences and stores no draft text", async () => {
@@ -56,7 +53,7 @@ it("deduplicates original author and actual owner, excludes the actor, locks pre
   await publicationNotice(db as unknown as Tx, item, "editor", "edited", "audit");
   expect(state.lock).toHaveBeenCalledWith(db, ["author", "owner"]);
   expect(inserts()).toHaveLength(2);
-  expect(state.savepoints).toBe(2);
+  expect(state.push).toHaveBeenCalledTimes(2);
   expect(inserts()[0].params).toContain("/workspace/content/item");
   expect(inserts()[1].params).toContain("/workspace/organizations/org/content/item");
   expect(inserts()[0].params).toContain("Publication item: edited.");
@@ -104,15 +101,20 @@ it("uses stable audit/recipient identities and propagates inbox failure to the a
     publicationNotice(db as unknown as Tx, item, "owner", "published", "audit"),
   ).rejects.toMatchObject({ cause: { message: "Inbox failed" } });
 });
-it("isolates push errors after the inbox write", async () => {
+it("preserves inbox on optional push errors and propagates intent failure", async () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
   state.rows = [[["owner"]], []];
-  state.push.mockRejectedValue(new Error("Push unavailable"));
+  state.push.mockResolvedValue({ queued: 0, reason: "error" });
   await expect(
     publicationNotice(db as unknown as Tx, item, "owner", "archived", "audit"),
   ).resolves.toBeUndefined();
   expect(inserts()).toHaveLength(1);
-  expect(state.savepoints).toBe(1);
+  expect(state.push).toHaveBeenCalledWith(db, inserts()[0].params[0], "author");
+  state.rows = [[["owner"]], []];
+  state.push.mockRejectedValue(new Error("Admission intent failed"));
+  await expect(
+    publicationNotice(db as unknown as Tx, item, "owner", "archived", "audit"),
+  ).rejects.toThrow("Admission intent failed");
   warn.mockRestore();
 });
 it.each(["created", "edited", "published", "archived", "restored"])(

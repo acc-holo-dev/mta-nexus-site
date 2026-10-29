@@ -28,8 +28,10 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: vi.fn(),
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: vi
+    .fn()
+    .mockResolvedValue({ queued: 0, reason: "no_subscriptions" }),
 }));
 
 import { supportCaseRepository as cases } from "../packages/db/src/repositories/support";

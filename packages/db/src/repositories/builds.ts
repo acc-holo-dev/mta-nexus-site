@@ -1,6 +1,6 @@
 import { and, asc, count, eq, desc, ne, sql, inArray } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { db } from "../client";
 import {
@@ -567,17 +567,13 @@ export class BuildRepository {
       let pushQueued = 0;
       let pushQueueDegraded = 0;
       for (const row of notificationRows) {
-        try {
-          const queued = await tx.transaction((pushTx) =>
-            enqueueWebPushOutboxForNotification(pushTx, String(row.id), String(row.recipient_id)),
-          );
-          pushQueued += queued.queued;
-          if (queued.reason === "saturated") {
-            pushQueueDegraded += 1;
-          }
-        } catch {
-          // Isolate each recipient in its own savepoint: one queue-local
-          // failure must not roll back another recipient's durable job.
+        const queued = await enqueueWebPushWithRecoveryWithin(
+          tx,
+          String(row.id),
+          String(row.recipient_id),
+        );
+        pushQueued += queued.queued;
+        if (queued.reason === "saturated" || queued.reason === "error") {
           pushQueueDegraded += 1;
         }
       }

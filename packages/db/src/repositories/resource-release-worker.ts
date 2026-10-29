@@ -15,7 +15,7 @@ import {
 import { lockUserDownloadAccess } from "./entitlements";
 import { safePublishedBuildCondition } from "./build-safety";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 function pending() {
   return sql`exists (select 1 from ${events} where ${events.productId} = ${watches.productId} and ${events.sequence} > ${watches.lastSequence})`;
 }
@@ -146,15 +146,9 @@ export class ResourceReleaseWorkerRepository {
               version: event.version,
             },
           });
-          try {
-            const queued = await tx.transaction((pushTx) =>
-              enqueueWebPushOutboxForNotification(pushTx, notificationId, user.id),
-            );
-            pushJobs = queued.queued;
-            if (queued.reason === "saturated") pushDegraded++;
-          } catch {
-            pushDegraded++;
-          }
+          const queued = await enqueueWebPushWithRecoveryWithin(tx, notificationId, user.id);
+          pushJobs = queued.queued;
+          if (queued.reason === "saturated" || queued.reason === "error") pushDegraded++;
         }
         const [progress] = await tx
           .update(watches)

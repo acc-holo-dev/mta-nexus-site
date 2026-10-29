@@ -19,7 +19,7 @@ import {
 } from "../schema";
 import { historyPageBounds } from "./history-pagination";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 function pendingTerm() {
   return sql`isfinite(${licenses.expiresAt}) AND (
@@ -186,15 +186,8 @@ export class LicenseMaintenanceRepository {
             isRead: false,
             createdAt: now,
           });
-          try {
-            pushJobs = (
-              await tx.transaction((pushTx) =>
-                enqueueWebPushOutboxForNotification(pushTx, notificationId, license.userId),
-              )
-            ).queued;
-          } catch {
-            /* Inbox and term processing remain authoritative after queue-local rollback. */
-          }
+          pushJobs = (await enqueueWebPushWithRecoveryWithin(tx, notificationId, license.userId))
+            .queued;
         }
         return { event, notified, pushJobs };
       });

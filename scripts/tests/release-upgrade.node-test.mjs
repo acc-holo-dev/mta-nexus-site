@@ -233,10 +233,10 @@ test("upgrade contract tracks the latest real migration journal", () => {
   assert.equal(plan.baselineEntries.at(-1)?.tag, plan.baselineTag);
 });
 
-test("upgrade contract keeps staff queue indexes and covers report delivery", () => {
+test("upgrade contract keeps staff queue indexes and covers notification delivery", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0079_report_notification_delivery");
+  assert.equal(plan.targetTag, "0080_web_push_admission_recovery");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -250,6 +250,7 @@ test("upgrade contract keeps staff queue indexes and covers report delivery", ()
   assert.match(rehearsal, /'support_cases_category_status_updated_id_idx'/u);
   assert.match(rehearsal, /supportStaffFilterIndexPresent = true/u);
   assert.match(rehearsal, /reportNotificationDeliverySchemaPresent = true/u);
+  assert.match(rehearsal, /webPushAdmissionRecoverySchemaPresent = true/u);
 });
 
 test("upgrade fixture requires indexed effective download rights", () => {

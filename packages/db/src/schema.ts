@@ -1318,6 +1318,26 @@ export const webPushQueueGate = pgTable(
   ],
 );
 
+// Only new optional admission failures enter recovery; historical inbox is never scanned.
+export const webPushAdmissionRecovery = pgTable(
+  "web_push_admission_recovery",
+  {
+    notificationId: text("notification_id")
+      .primaryKey()
+      .references(() => notifications.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+  },
+  (table) => [
+    index("web_push_admission_recovery_due_idx")
+      .on(table.availableAt, table.notificationId)
+      .where(sql`${table.attempts} < 5`),
+    index("web_push_admission_recovery_created_idx").on(table.createdAt, table.notificationId),
+    check("web_push_admission_recovery_attempts_bounds", sql`${table.attempts} between 0 and 5`),
+  ],
+);
+
 export const webPushOutbox = pgTable(
   "web_push_outbox",
   {

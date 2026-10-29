@@ -32,8 +32,8 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: state.push,
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: state.push,
 }));
 
 import { db } from "../packages/db/src/client";
@@ -218,13 +218,16 @@ it.each(["audit_events", "notifications"])(
     });
   },
 );
-it("isolates push errors while preserving both authoritative inbox messages", async () => {
+it("preserves both inbox messages on optional push failure but propagates intent failure", async () => {
   transferRows();
-  state.push.mockRejectedValue(new Error("push failure"));
+  state.push.mockResolvedValue({ queued: 0, reason: "error" });
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
   expect((await repository.transfer(input)).organization.ownerId).toBe("target");
   expect(writes("notifications")).toHaveLength(2);
   expect(warn).toHaveBeenCalledTimes(2);
+  transferRows();
+  state.push.mockRejectedValue(new Error("Admission intent failed"));
+  await expect(repository.transfer(input)).rejects.toThrow("Admission intent failed");
   warn.mockRestore();
 });
 it("records access notices in the same transaction for team changes and uses safe revoked-access links", async () => {

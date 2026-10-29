@@ -18,6 +18,9 @@ try {
       reportPending: snapshot.reportPending,
       reportFailed: snapshot.reportFailed,
       reportOldestAgeSeconds: snapshot.reportOldestAgeSeconds,
+      admissionPending: snapshot.admissionPending,
+      admissionFailed: snapshot.admissionFailed,
+      admissionOldestAgeSeconds: snapshot.admissionOldestAgeSeconds,
       thresholds: snapshot.queueAlertThresholds,
     })}\n`,
   );

@@ -1,6 +1,6 @@
 export const RELEASE_UPGRADE_BASELINE_TAG = "0024_product_type_invariant";
 export const RELEASE_UPGRADE_FAILURE_TAG = "0027_build_quarantine";
-export const RELEASE_UPGRADE_TARGET_TAG = "0079_report_notification_delivery";
+export const RELEASE_UPGRADE_TARGET_TAG = "0080_web_push_admission_recovery";
 
 function journalEntries(journal) {
   if (!journal || !Array.isArray(journal.entries)) {

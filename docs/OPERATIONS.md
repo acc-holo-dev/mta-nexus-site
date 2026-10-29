@@ -289,8 +289,65 @@ RETURNING report_id;
 ```
 
 Do not reset every source or delete inbox rows. Optional push admission can still
-return `saturated`/`error`; the page logs `pushDeferred` and retains the inbox.
+return `saturated`/`error`; the page logs `pushDeferred`, retains the inbox and
+leaves durable admission recovery intent described below.
 Completion of report fanout confirms inbox processing, not external push delivery.
+
+### Recovering optional push admission
+
+Migration 0080 adds `web_push_admission_recovery` without backfilling old inbox
+rows. New ordinary inbox producers, including report outcomes, build reviews,
+resource releases, support requester activity, verification resolutions and
+moderation notices, write intent for degraded admission in the same transaction
+as the inbox. An intent storage failure rolls back the source transaction.
+Optional enqueue errors roll back only their savepoint. Successful recovery or
+confirmed absence of eligible devices consumes intent atomically with any outbox
+jobs. Initial successful admission needs no recovery row.
+
+The existing worker examines at most twenty candidates and admits at most one
+notification per loop, including without VAPID. It locks preferences before the
+notification and intent, matching producers; account/notification lock contention
+defers that intent for five seconds without consuming a retry. Other candidates
+can advance, including when one locked account fills the entire discovery page.
+Unread state and current category preferences are checked again. Recovery only
+uses still-valid sessions and devices enrolled by the original inbox timestamp;
+it never extends the original 24-hour deadline or enrolls a later device. Read,
+suppressed, expired or deleted notices do not gain push jobs. Inbox data and read
+state are preserved. This checks device eligibility and preferences, not renewed
+authorization to the source object or staff role; source producers retain that
+responsibility.
+
+Saturation and queue errors retry after 5, 10, 20 and 40 seconds; the fifth failure
+stops automatic admission. The queue probe reports `admissionPending`,
+`admissionFailed`, `admissionOldestAgeSeconds` and alert reasons
+`admission_recovery_failed`/`admission_recovery_backlog`. Alerts exit with code 2;
+worker liveness is separate. Logs contain aggregate states/counts only. Expired
+intents, including exhausted ones, are removed in bounded worker passes.
+
+After diagnosing the cause, inspect exhausted intents and reset only one verified
+unexpired notification on the intended database:
+
+```sql
+SELECT notification_id, attempts, created_at, available_at
+FROM web_push_admission_recovery
+WHERE attempts = 5
+ORDER BY available_at, notification_id
+LIMIT 20;
+
+UPDATE web_push_admission_recovery
+SET attempts = 0, available_at = clock_timestamp()
+WHERE notification_id = 'ntf_REPLACE_WITH_VERIFIED_ID'
+  AND attempts = 5 AND created_at > clock_timestamp() - interval '24 hours'
+RETURNING notification_id;
+```
+
+Never synthesize intents for historical or already accepted notifications. After
+an admission succeeds, sender cleanup of outbox rows must not cause another
+admission. Discussion replies use their existing typed receipt and explicit
+`--repair-push` replay below. Admission recovery cannot create an inbox that was
+lost before it was stored; support/verification moderator callbacks still need
+a transactional fanout source. External push delivery retains the existing lease,
+retry and provider guarantees and is not exactly-once.
 
 ### Recovering discussion inbox delivery
 
