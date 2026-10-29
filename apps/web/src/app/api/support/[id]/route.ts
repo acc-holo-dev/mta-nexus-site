@@ -1,13 +1,12 @@
-import { supportCaseRepository, userRepository } from "@nexus/db";
+import { supportCaseRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
-import { after, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { parseBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import { createRequestLogContext } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
 import {
   supportFailure,
   supportMutationGuard,
@@ -269,33 +268,6 @@ export const POST = withBrowserMutation(
           { status: 409 },
         );
       }
-
-      if (result.kind === "created" && authorRole === "requester")
-        after(async () => {
-          try {
-            const recipientIds = await userRepository.listModeratorIds();
-            await dispatchNotificationsBestEffort(
-              recipientIds
-                .filter((recipientId) => recipientId !== access.user?.id)
-                .map((recipientId) => ({
-                  recipientId,
-                  title: "Support case updated",
-                  message: "A support case has a new requester message.",
-                  link: `/admin/support/${id}`,
-                  type: "system" as const,
-                  category: "system" as const,
-                })),
-            );
-          } catch (error) {
-            logRequestEvent({
-              level: "warn",
-              event: "support.message_notification_failed",
-              context,
-              status: 201,
-              error,
-            });
-          }
-        });
 
       return supportPrivateJson(
         context,

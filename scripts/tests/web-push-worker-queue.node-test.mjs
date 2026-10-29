@@ -25,6 +25,9 @@ function snapshot(overrides = {}) {
     reportPending: 0,
     reportFailed: 0,
     reportOldestAgeSeconds: 0,
+    supportPending: 0,
+    supportFailed: 0,
+    supportOldestAgeSeconds: 0,
     admissionPending: 0,
     admissionFailed: 0,
     admissionOldestAgeSeconds: 0,
@@ -114,6 +117,41 @@ test("alerts on report fanout failures and backlog even without VAPID", () => {
   assert.equal(value.reportPending, 2);
   assert.equal(value.reportFailed, 1);
   assert.equal(value.reportOldestAgeSeconds, 900);
+});
+
+test("reports support fanout failures and backlog with configured thresholds without VAPID", () => {
+  const thresholds = { pendingPercent: 80, dueJobs: 3, oldestAgeSeconds: 30 };
+  const base = {
+    configured: false,
+    queuePending: 0,
+    queueDue: 0,
+    queueLeased: 0,
+    queueAlertThresholds: thresholds,
+  };
+  assert.equal(
+    run(snapshot({ ...base, supportPending: 2, supportOldestAgeSeconds: 29 })).status,
+    0,
+  );
+  for (const support of [
+    { supportPending: 3, supportOldestAgeSeconds: 0 },
+    { supportPending: 1, supportOldestAgeSeconds: 30 },
+  ]) {
+    const result = run(
+      snapshot({
+        ...base,
+        ...support,
+        supportFailed: 1,
+        queueAlert: "alert",
+        queueAlertReasons: ["support_delivery_failed", "support_delivery_backlog"],
+      }),
+    );
+    assert.equal(result.status, 2);
+    const value = JSON.parse(result.stdout);
+    assert.deepEqual(value.reasons, ["support_delivery_failed", "support_delivery_backlog"]);
+    assert.equal(value.supportPending, support.supportPending);
+    assert.equal(value.supportFailed, 1);
+    assert.equal(value.supportOldestAgeSeconds, support.supportOldestAgeSeconds);
+  }
 });
 
 test("fails closed for stale or inconsistent snapshot", () => {

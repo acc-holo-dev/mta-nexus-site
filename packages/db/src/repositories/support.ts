@@ -14,6 +14,7 @@ import {
   supportCaseMessages,
   supportCases,
   supportMutationRequests,
+  supportNotificationDeliveries,
   users,
 } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
@@ -284,6 +285,12 @@ export class SupportCaseRepository {
         createdAt: now,
       });
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await tx.insert(supportNotificationDeliveries).values({
+        messageId: message.id,
+        caseId: supportCase.id,
+        event: "case_created",
+        createdAt: sql`clock_timestamp()`,
+      });
 
       return created as unknown as SupportCase;
     });
@@ -343,6 +350,14 @@ export class SupportCaseRepository {
         createdAt: now,
       });
       if (authorRole === "staff") await supportRequesterNotice(tx, updated, "reply", audit.id);
+      else
+        await tx.insert(supportNotificationDeliveries).values({
+          messageId: message.id,
+          caseId: input.caseId,
+          event: "requester_reply",
+          excludedRecipientId: input.authorId,
+          createdAt: sql`clock_timestamp()`,
+        });
 
       return {
         supportCase: updated as unknown as SupportCase,
@@ -458,6 +473,12 @@ export class SupportCaseRepository {
         createdAt: now,
       });
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await tx.insert(supportNotificationDeliveries).values({
+        messageId: message.id,
+        caseId: supportCase.id,
+        event: "case_created",
+        createdAt: sql`clock_timestamp()`,
+      });
       return { kind: "created" as const, supportCase: created as unknown as SupportCase };
     });
 
@@ -556,6 +577,14 @@ export class SupportCaseRepository {
           createdAt: now,
         });
         if (authorRole === "staff") await supportRequesterNotice(tx, updated, "reply", audit.id);
+        else
+          await tx.insert(supportNotificationDeliveries).values({
+            messageId: message.id,
+            caseId: input.caseId,
+            event: "requester_reply",
+            excludedRecipientId: input.authorId,
+            createdAt: sql`clock_timestamp()`,
+          });
         return {
           kind: "created" as const,
           supportCase: updated as unknown as SupportCase,

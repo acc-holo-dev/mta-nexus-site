@@ -1548,6 +1548,39 @@ export const supportCaseMessages = pgTable(
   ],
 );
 
+// Durable moderator inbox delivery, committed with each support mutation.
+export const supportNotificationDeliveries = pgTable(
+  "support_notification_deliveries",
+  {
+    messageId: text("message_id")
+      .primaryKey()
+      .references(() => supportCaseMessages.id, { onDelete: "cascade" }),
+    caseId: text("case_id")
+      .notNull()
+      .references(() => supportCases.id, { onDelete: "cascade" }),
+    event: text("event").$type<"case_created" | "requester_reply">().notNull(),
+    excludedRecipientId: text("excluded_recipient_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    lastRecipientId: text("last_recipient_id"),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("support_notification_deliveries_due_idx")
+      .on(table.availableAt, table.messageId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check(
+      "support_notification_deliveries_event_check",
+      sql`${table.event} IN ('case_created', 'requester_reply')`,
+    ),
+    check(
+      "support_notification_deliveries_attempts_bounds",
+      sql`${table.attempts} BETWEEN 0 AND 5`,
+    ),
+  ],
+);
+
 export const supportMutationRequests = pgTable(
   "support_mutation_requests",
   {

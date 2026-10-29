@@ -46,6 +46,9 @@ function healthy(overrides = {}) {
     reportPending: 0,
     reportFailed: 0,
     reportOldestAgeSeconds: 0,
+    supportPending: 0,
+    supportFailed: 0,
+    supportOldestAgeSeconds: 0,
     admissionPending: 0,
     admissionFailed: 0,
     admissionOldestAgeSeconds: 0,
@@ -121,6 +124,44 @@ test("keeps admission recovery alerts live without VAPID", () => {
     ),
     0,
   );
+});
+
+test("validates support fanout counters and alerts without VAPID", () => {
+  assert.equal(
+    run(
+      healthy({
+        configured: false,
+        queuePending: 0,
+        queueDue: 0,
+        queueLeased: 0,
+        supportPending: 2,
+        supportFailed: 1,
+        supportOldestAgeSeconds: 900,
+        queueAlert: "alert",
+        queueAlertReasons: ["support_delivery_failed", "support_delivery_backlog"],
+      }),
+    ),
+    0,
+  );
+  for (const overrides of [
+    { supportPending: undefined },
+    { supportFailed: null },
+    { supportOldestAgeSeconds: "0" },
+    { supportPending: -1 },
+    { supportFailed: 0.5 },
+    { supportOldestAgeSeconds: Number.MAX_SAFE_INTEGER + 1 },
+    { supportFailed: 1 },
+    { supportPending: 100 },
+    { supportPending: 1, supportOldestAgeSeconds: 900 },
+    { queueAlert: "alert", queueAlertReasons: ["support_delivery_failed"] },
+    {
+      supportFailed: 1,
+      queueAlert: "alert",
+      queueAlertReasons: ["support_delivery_failed", "support_delivery_failed"],
+    },
+  ]) {
+    assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));
+  }
 });
 
 test("rejects missing and forged admission recovery counters", () => {
