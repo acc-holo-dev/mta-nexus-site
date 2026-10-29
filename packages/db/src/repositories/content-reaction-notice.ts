@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export async function contentReactionNotice(
   tx: Transaction,
@@ -37,25 +37,13 @@ export async function contentReactionNotice(
     .onConflictDoNothing()
     .returning({ id: notifications.id });
   if (!inserted) return;
-  try {
-    const result = await tx.transaction((pushTx) =>
-      enqueueWebPushOutboxForNotification(pushTx, id, item.authorId),
-    );
-    if (result.reason === "saturated")
-      console.warn(
-        JSON.stringify({
-          event: "notification.push_outbox_degraded",
-          producer: "content_reaction",
-          reason: "saturated",
-        }),
-      );
-  } catch {
+  const result = await enqueueWebPushWithRecoveryWithin(tx, id, item.authorId);
+  if (result.reason === "saturated" || result.reason === "error")
     console.warn(
       JSON.stringify({
         event: "notification.push_outbox_degraded",
         producer: "content_reaction",
-        reason: "error",
+        reason: result.reason,
       }),
     );
-  }
 }

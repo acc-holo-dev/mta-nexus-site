@@ -33,8 +33,8 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: state.push,
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: state.push,
 }));
 
 import { supportCaseRepository as cases } from "../packages/db/src/repositories/support";
@@ -191,9 +191,9 @@ it.each(["audit_events", "notifications"])(
     ).rejects.toMatchObject({ cause: expect.objectContaining({ message: "storage failed" }) });
   },
 );
-it("isolates optional push failure after authoritative inbox storage", async () => {
+it("preserves inbox on optional push failure but propagates intent failure", async () => {
   state.rows = [[["owner", "user"]], [row()], [row({ status: "resolved", updatedAt: later })]];
-  state.push.mockRejectedValue(new Error("push unavailable"));
+  state.push.mockResolvedValue({ queued: 0, reason: "error" });
   const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
   expect(
     (await cases.updateStatus(id, "resolved", audit, "open", "current-token", new Date(time)))
@@ -201,6 +201,11 @@ it("isolates optional push failure after authoritative inbox storage", async () 
   ).toBe("resolved");
   expect(writes("notifications")).toHaveLength(1);
   expect(warning).toHaveBeenCalled();
+  state.rows = [[["owner", "user"]], [row()], [row({ status: "resolved", updatedAt: later })]];
+  state.push.mockRejectedValue(new Error("Admission intent failed"));
+  await expect(
+    cases.updateStatus(id, "resolved", audit, "open", "current-token", new Date(time)),
+  ).rejects.toThrow("Admission intent failed");
   warning.mockRestore();
 });
 const reply = {

@@ -6,8 +6,8 @@ const state = vi.hoisted(() => ({
   enqueue: vi.fn(),
   clock: "2026-10-12T00:00:00.000Z",
 }));
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: state.enqueue,
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: state.enqueue,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -121,9 +121,10 @@ it("revoked access disables a watch and advances its revision without notifying"
   expect(progress?.params).toContain(false);
   expect(progress?.params).toContain(2);
 });
-it("push degradation preserves authoritative inbox and progress", async () => {
+it("optional push degradation preserves progress while intent failure aborts processing", async () => {
   state.rows = rows();
-  state.enqueue.mockRejectedValueOnce(new Error("queue unavailable"));
+  const pending = [...state.rows];
+  state.enqueue.mockResolvedValueOnce({ queued: 0, reason: "error" });
   expect(await worker.runBatch(1)).toMatchObject({
     processed: 1,
     notified: 1,
@@ -131,6 +132,13 @@ it("push degradation preserves authoritative inbox and progress", async () => {
     pushDegraded: 1,
   });
   expect(state.queries.at(-1)?.params).toContain("library.release_notice_processed");
+  state.rows = pending;
+  state.queries = [];
+  state.enqueue.mockRejectedValueOnce(new Error("Admission intent failed"));
+  await expect(worker.runBatch(1)).rejects.toThrow("Admission intent failed");
+  expect(state.queries.some((q) => q.sql.startsWith('update "resource_release_watches"'))).toBe(
+    false,
+  );
 });
 it("skips locked scopes and excludes them when looking for subsequent work", async () => {
   state.rows = [[], [], [["usr_a", "prd_a"]], [], [], [], []];

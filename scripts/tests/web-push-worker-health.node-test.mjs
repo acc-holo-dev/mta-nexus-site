@@ -46,6 +46,9 @@ function healthy(overrides = {}) {
     reportPending: 0,
     reportFailed: 0,
     reportOldestAgeSeconds: 0,
+    admissionPending: 0,
+    admissionFailed: 0,
+    admissionOldestAgeSeconds: 0,
     queueAlert: "ok",
     queueAlertReasons: [],
     queueAlertThresholds: {
@@ -99,6 +102,57 @@ test("fails closed for missing, malformed and stale heartbeat state", () => {
     ),
     0,
   );
+});
+
+test("keeps admission recovery alerts live without VAPID", () => {
+  assert.equal(
+    run(
+      healthy({
+        configured: false,
+        queuePending: 0,
+        queueDue: 0,
+        queueLeased: 0,
+        admissionPending: 2,
+        admissionFailed: 1,
+        admissionOldestAgeSeconds: 900,
+        queueAlert: "alert",
+        queueAlertReasons: ["admission_recovery_failed", "admission_recovery_backlog"],
+      }),
+    ),
+    0,
+  );
+});
+
+test("rejects missing and forged admission recovery counters", () => {
+  for (const overrides of [
+    { admissionPending: undefined },
+    { admissionFailed: undefined },
+    { admissionOldestAgeSeconds: undefined },
+    { admissionPending: null },
+    { admissionPending: "0" },
+    { admissionFailed: -1 },
+    { admissionFailed: Number.POSITIVE_INFINITY },
+    { admissionOldestAgeSeconds: 0.5 },
+    { admissionOldestAgeSeconds: Number.MAX_SAFE_INTEGER + 1 },
+  ]) {
+    assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));
+  }
+});
+
+test("rejects omitted, invented and duplicated admission alert reasons", () => {
+  for (const overrides of [
+    { admissionFailed: 1 },
+    { admissionPending: 100 },
+    { admissionPending: 1, admissionOldestAgeSeconds: 900 },
+    { queueAlert: "alert", queueAlertReasons: ["admission_recovery_failed"] },
+    {
+      admissionFailed: 1,
+      queueAlert: "alert",
+      queueAlertReasons: ["admission_recovery_failed", "admission_recovery_failed"],
+    },
+  ]) {
+    assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));
+  }
 });
 
 test("rejects impossible queue counters and invalid capacity", () => {

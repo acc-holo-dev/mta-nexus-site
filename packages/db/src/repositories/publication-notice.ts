@@ -4,7 +4,7 @@ import { eq, inArray } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications, organizations, servers } from "../schema";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 /** Author and actual context owners receive status-only notices. At most three recipients. */
@@ -76,26 +76,14 @@ export async function publicationNotice(
       category: "content",
       isRead: false,
     });
-    try {
-      const result = await tx.transaction((pushTx) =>
-        enqueueWebPushOutboxForNotification(pushTx, id, recipientId),
-      );
-      if (result.reason === "saturated")
-        console.warn(
-          JSON.stringify({
-            event: "notification.push_outbox_degraded",
-            producer: "publication",
-            reason: "saturated",
-          }),
-        );
-    } catch {
+    const result = await enqueueWebPushWithRecoveryWithin(tx, id, recipientId);
+    if (result.reason === "saturated" || result.reason === "error")
       console.warn(
         JSON.stringify({
           event: "notification.push_outbox_degraded",
           producer: "publication",
-          reason: "error",
+          reason: result.reason,
         }),
       );
-    }
   }
 }

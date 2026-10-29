@@ -44,6 +44,7 @@ const evidence = {
   accountSubscriptionsSchemaPresent: false,
   libraryCollectionsSchemaPresent: false,
   reportNotificationDeliverySchemaPresent: false,
+  webPushAdmissionRecoverySchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -698,6 +699,27 @@ try {
     (error) => error.code === "23503",
   );
   evidence.reportNotificationDeliverySchemaPresent = true;
+  assert.equal(
+    (await client`SELECT count(*)::integer AS total FROM web_push_admission_recovery`)[0].total,
+    0,
+    "Upgrade must not invent retry evidence for historical inbox rows",
+  );
+  const admissionIndexes = await client`SELECT indexname FROM pg_indexes
+    WHERE schemaname = 'public' AND indexname IN (
+      'web_push_admission_recovery_due_idx', 'web_push_admission_recovery_created_idx'
+    )`;
+  assert.equal(admissionIndexes.length, 2);
+  await assert.rejects(
+    client`INSERT INTO web_push_admission_recovery (notification_id, created_at, attempts)
+      VALUES ('upgrade-notification', clock_timestamp(), 6)`,
+    (error) => error.code === "23514",
+  );
+  await assert.rejects(
+    client`INSERT INTO web_push_admission_recovery (notification_id, created_at)
+      VALUES ('upgrade-notification-missing', clock_timestamp())`,
+    (error) => error.code === "23503",
+  );
+  evidence.webPushAdmissionRecoverySchemaPresent = true;
   const receiptColumns =
     await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);

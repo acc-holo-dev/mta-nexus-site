@@ -33,8 +33,8 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: async () => ({ queued: 0, reason: "no_subscriptions" }),
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
 
 import { developerExperienceRevision } from "../packages/db/src/repositories/developer-profile";

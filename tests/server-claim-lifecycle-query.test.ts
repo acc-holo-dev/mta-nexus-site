@@ -48,8 +48,8 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: async () => ({ queued: 0, reason: "no_subscriptions" }),
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
 
 import { db } from "../packages/db/src/client";

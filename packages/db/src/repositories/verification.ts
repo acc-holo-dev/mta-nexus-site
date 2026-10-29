@@ -26,7 +26,7 @@ import {
   verificationEvidenceSubmission,
 } from "./verification-application-version";
 import { verificationTargetAuthority } from "./verification-authority";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -530,25 +530,13 @@ export class VerificationRepository {
       if (!resolutionNotification) {
         throw new Error("Verification notification insert failed");
       }
-      let pushQueued = 0;
-      let pushQueueDegraded = 0;
-      try {
-        const queued = await tx.transaction((pushTx) =>
-          enqueueWebPushOutboxForNotification(
-            pushTx,
-            resolutionNotification.id,
-            resolutionNotification.recipientId,
-          ),
-        );
-        pushQueued = queued.queued;
-        if (queued.reason === "saturated") {
-          pushQueueDegraded = 1;
-        }
-      } catch {
-        // Resolution/audit/inbox are authoritative. Push queue failure is
-        // isolated to this savepoint.
-        pushQueueDegraded = 1;
-      }
+      const queued = await enqueueWebPushWithRecoveryWithin(
+        tx,
+        resolutionNotification.id,
+        resolutionNotification.recipientId,
+      );
+      const pushQueued = queued.queued;
+      const pushQueueDegraded = queued.reason === "saturated" || queued.reason === "error" ? 1 : 0;
       if (pushQueueDegraded > 0) {
         console.warn(
           JSON.stringify({

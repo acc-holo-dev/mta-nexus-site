@@ -20,8 +20,8 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: database };
 });
-vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
-  enqueueWebPushOutboxForNotification: state.push,
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
+  enqueueWebPushWithRecoveryWithin: state.push,
 }));
 import { LicenseMaintenanceRepository } from "../packages/db/src/repositories/license-maintenance";
 import { LicenseRepository } from "../packages/db/src/repositories/licenses";
@@ -126,7 +126,7 @@ it("records opted-out processing without inbox/push and retains the suppression 
     state.queries.find((q) => q.sql.startsWith('insert into "license_term_events"'))?.params,
   ).toContain(false);
 });
-it("preserves committed inbox processing when the optional push savepoint fails", async () => {
+it("preserves inbox processing on optional push failure but propagates intent failure", async () => {
   state.results = [
     [],
     [],
@@ -139,9 +139,13 @@ it("preserves committed inbox processing when the optional push savepoint fails"
     [],
     [],
   ];
-  state.push.mockRejectedValue(new Error("Queue unavailable"));
+  state.push.mockResolvedValue({ queued: 0, reason: "error" });
+  const pending = [...state.results];
   expect(await repo.runBatch(1)).toMatchObject({ expired: 1, inbox: 1, pushJobs: 0 });
   expect(state.queries.some((q) => q.sql.startsWith('update "licenses"'))).toBe(false);
+  state.results = pending;
+  state.push.mockRejectedValue(new Error("Admission intent failed"));
+  await expect(repo.runBatch(1)).rejects.toThrow("Admission intent failed");
 });
 it("bounds mutation work and does nothing for an empty queue or an aborted batch", async () => {
   for (const limit of [0, 101, 1.5, Number.NaN])

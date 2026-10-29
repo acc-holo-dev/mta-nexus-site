@@ -6,6 +6,7 @@ import {
   createWebPushHttpSender,
   WebPushDispatcher,
   reportNotificationDeliveryRepository,
+  webPushAdmissionRecoveryRepository,
   webPushOutboxRepository,
   webPushWorkerRepository,
 } from "../src/index";
@@ -57,7 +58,9 @@ type QueueAlertReason =
   | "due_backlog"
   | "oldest_job_age"
   | "report_delivery_failed"
-  | "report_delivery_backlog";
+  | "report_delivery_backlog"
+  | "admission_recovery_failed"
+  | "admission_recovery_backlog";
 
 const controller = new AbortController();
 let stopping = false;
@@ -77,6 +80,9 @@ let healthQueueOldestAgeSeconds = 0;
 let reportPending = 0;
 let reportFailed = 0;
 let reportOldestAgeSeconds = 0;
+let admissionPending = 0;
+let admissionFailed = 0;
+let admissionOldestAgeSeconds = 0;
 let healthQueueAlertReasons: QueueAlertReason[] = [];
 let lastQueueAlertSignature = "";
 
@@ -126,6 +132,12 @@ function updateQueueAlertState() {
     (reportPending > 0 && reportOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
   )
     reasons.push("report_delivery_backlog");
+  if (admissionFailed > 0) reasons.push("admission_recovery_failed");
+  if (
+    admissionPending >= QUEUE_ALERT_DUE_JOBS ||
+    (admissionPending > 0 && admissionOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("admission_recovery_backlog");
 
   const previousSignature = lastQueueAlertSignature;
   const nextSignature = reasons.join(",");
@@ -143,6 +155,9 @@ function updateQueueAlertState() {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    admissionPending,
+    admissionFailed,
+    admissionOldestAgeSeconds,
     thresholds: queueAlertThresholds(),
   };
   if (reasons.length > 0) emit({ status: "queue-alert", reasons, ...queue });
@@ -178,6 +193,9 @@ async function writeHealthSnapshot() {
     reportPending,
     reportFailed,
     reportOldestAgeSeconds,
+    admissionPending,
+    admissionFailed,
+    admissionOldestAgeSeconds,
     queueAlert: healthQueueAlertReasons.length > 0 ? "alert" : "ok",
     queueAlertReasons: healthQueueAlertReasons,
     queueAlertThresholds: queueAlertThresholds(),
@@ -210,6 +228,10 @@ async function refreshQueueStats() {
   reportPending = reports.pending;
   reportFailed = reports.failed;
   reportOldestAgeSeconds = reports.oldestAgeSeconds;
+  const admissions = await webPushAdmissionRecoveryRepository.stats();
+  admissionPending = admissions.pending;
+  admissionFailed = admissions.failed;
+  admissionOldestAgeSeconds = admissions.oldestAgeSeconds;
   updateQueueAlertState();
 }
 
@@ -276,6 +298,19 @@ try {
     if (reports.state !== "idle") {
       activity += 1;
       emit({ status: "report-delivery", batch: healthBatch, ...reports });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const admission = await webPushAdmissionRecoveryRepository.processNext();
+    if (admission.state !== "idle") {
+      activity += 1;
+      emit({
+        status: "push-admission-recovery",
+        batch: healthBatch,
+        state: admission.state,
+        pushJobs: admission.pushJobs,
+      });
     }
     markProgress();
     if (controller.signal.aborted) break;
