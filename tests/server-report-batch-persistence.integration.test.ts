@@ -8,6 +8,7 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
+import { sessionRepository } from "../packages/db/src/repositories/sessions";
 import {
   auditEvents,
   comments,
@@ -43,7 +44,14 @@ async function user(role = "user") {
     role,
   });
   actors.push(actor.id);
-  return actor;
+  const currentToken = randomUUID();
+  await sessionRepository.create({
+    id: randomUUID(),
+    userId: actor.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+  return { ...actor, currentToken };
 }
 const audit = (actorId: string, targetId: string, action: string, serverId?: string) => ({
   id: id("aud"),
@@ -183,6 +191,7 @@ it("atomically decides only the selected reports, keeps comment/count and record
     f.comment.id,
     { ...selection(f), previewRevision: reviewed.previewRevision },
     [id("aud"), id("aud")],
+    f.staff.currentToken,
   );
   const stored = await db
     .select()
@@ -223,6 +232,7 @@ it("permits one concurrent reviewed batch outcome and refuses edits beyond a bou
       f.comment.id,
       { ...selection(f), previewRevision: reviewed.previewRevision },
       [id("aud"), id("aud")],
+      f.staff.currentToken,
     ),
   ).rejects.toMatchObject({ code: "REPORT_BATCH_CHANGED" });
   const fresh = await preview(f);
@@ -234,6 +244,7 @@ it("permits one concurrent reviewed batch outcome and refuses edits beyond a bou
         f.comment.id,
         { ...selection(f), previewRevision: fresh.previewRevision },
         [id("aud"), id("aud")],
+        f.staff.currentToken,
       ),
     ),
   );
@@ -254,6 +265,7 @@ it("rolls back the entire batch if any mandatory audit cannot be stored", async 
       f.comment.id,
       { ...selection(f), previewRevision: reviewed.previewRevision },
       [id("aud"), duplicate.id],
+      f.staff.currentToken,
     ),
   ).rejects.toThrow();
   const stored = await db

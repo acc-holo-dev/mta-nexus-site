@@ -1,3 +1,4 @@
+import { ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
@@ -103,4 +104,16 @@ describe("report decisions over HTTP", () => {
     expect(stale.status).toBe(409);
     expect((await stale.json()).code).toBe("REPORT_STATE_CHANGED");
   });
+
+  for (const error of [new UnauthorizedError(), new ForbiddenError()]) {
+    it(`preserves private ${error.statusCode} errors from transaction authorization`, async () => {
+      mocks.resolve.mockRejectedValue(error);
+      const response = await POST(request());
+      expect(response.status).toBe(error.statusCode);
+      expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+      expect(response.headers.get("Vary")).toBe("Cookie");
+      expect(await response.json()).toEqual({ error: error.message, code: error.code });
+      expect(mocks.findById).not.toHaveBeenCalled();
+    });
+  }
 });

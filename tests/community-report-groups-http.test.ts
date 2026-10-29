@@ -216,6 +216,13 @@ it("confirms scoped publication batches without leaking reporter fields", async 
     previewRevision: "a".repeat(64),
     items: [{ id: "report", status: "resolved" }],
   });
+  expect(mock.decidePublicationBatch).toHaveBeenCalledWith(
+    "staff",
+    "post",
+    { ...command, notes: "Recorded reason" },
+    [expect.any(String)],
+    "test",
+  );
   mock.decidePublicationBatch.mockRejectedValue(
     new AppError("private text", 409, "REPORT_BATCH_CHANGED"),
   );
@@ -231,4 +238,12 @@ it("requires bounded same-site JSON and rejects unknown fields or mutation query
   ] as const)
     expect((await preview(request("POST", body, query, headers), context)).status).toBe(status);
   expect(mock.previewPublicationBatch).not.toHaveBeenCalled();
+});
+
+it("rejects a missing initiating cookie before reading a publication batch body", async () => {
+  const req = request("POST", input, "", { cookie: "nexus_locale=ru" });
+  const read = vi.spyOn(req, "body", "get");
+  expect((await commit(req, context)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
+  expect(mock.decidePublicationBatch).not.toHaveBeenCalled();
 });

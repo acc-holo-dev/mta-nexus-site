@@ -1,7 +1,7 @@
-import { and, asc, count, eq, desc, inArray, sql } from "drizzle-orm";
+import { type AuditEvent, ForbiddenError, type Report } from "@nexus/domain";
+import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, reports, reportNotificationDeliveries, users } from "../schema";
-import type { AuditEvent, Report } from "@nexus/domain";
+import { auditEvents, reportNotificationDeliveries, reports, users } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
 
 export class ReportRepository {
@@ -136,14 +136,20 @@ export class ReportRepository {
     currentToken: string,
   ): Promise<Report | null> {
     return db.transaction(async (tx) => {
-      // Share-lock the actor before the session so revocation cannot deadlock.
-      // The role predicate stays at the route.
-      await tx
-        .select({ id: users.id })
+      // Keep actor-before-report order compatible with account deletion cascades.
+      const [actor] = await tx
+        .select({ role: users.role })
         .from(users)
         .where(eq(users.id, audit.actorId))
         .limit(1)
         .for("share");
+      if (!actor || !["admin", "moderator"].includes(actor.role)) throw new ForbiddenError();
+      await tx
+        .select({ id: reports.id })
+        .from(reports)
+        .where(and(eq(reports.id, id), sql`${reports.targetType} <> 'review'`))
+        .for("update");
+      // Authorize the exact session only after the report lock has finished waiting.
       await lockInitiatingSession(tx, audit.actorId, currentToken);
       const now = new Date();
       const rows = await tx

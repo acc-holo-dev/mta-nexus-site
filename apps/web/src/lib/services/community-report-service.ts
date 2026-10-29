@@ -73,7 +73,12 @@ class CommunityReportService {
       items: result.items.map((item) => ({ ...item, createdAt: item.createdAt.toISOString() })),
     };
   }
-  async decidePublicationBatch(actor: User, contentId: string, input: unknown) {
+  async decidePublicationBatch(
+    actor: User,
+    contentId: string,
+    input: unknown,
+    currentToken: string,
+  ) {
     this.batchScope(actor, contentId, contentId);
     const parsed = reportBatchCommandInput.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
@@ -82,6 +87,7 @@ class CommunityReportService {
       contentId,
       parsed.data,
       parsed.data.items.map(() => generateId("aud")),
+      currentToken,
     );
   }
 
@@ -129,7 +135,13 @@ class CommunityReportService {
       })),
     };
   }
-  async decideDiscussionBatch(actor: User, contentId: string, commentId: string, input: unknown) {
+  async decideDiscussionBatch(
+    actor: User,
+    contentId: string,
+    commentId: string,
+    input: unknown,
+    currentToken: string,
+  ) {
     this.batchScope(actor, contentId, commentId);
     const parsed = reportBatchCommandInput.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
@@ -139,6 +151,7 @@ class CommunityReportService {
       commentId,
       parsed.data,
       parsed.data.items.map(() => generateId("aud")),
+      currentToken,
     );
   }
 
@@ -194,7 +207,12 @@ class CommunityReportService {
         : {}),
     };
   }
-  async decide(actor: User, id: string, input: z.infer<typeof communityReportDecisionSchema>) {
+  async decide(
+    actor: User,
+    id: string,
+    input: z.infer<typeof communityReportDecisionSchema>,
+    currentToken: string,
+  ) {
     this.scope(actor, true);
     return communityReportsRepository.decide({
       ...input,
@@ -202,6 +220,7 @@ class CommunityReportService {
       actorId: actor.id,
       auditId: generateId("aud"),
       removalAuditId: generateId("aud"),
+      currentToken,
     });
   }
 }

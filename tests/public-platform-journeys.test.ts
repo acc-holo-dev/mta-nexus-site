@@ -1,16 +1,16 @@
-import { describe, it, expect, beforeAll } from "vitest";
 import {
-  userRepository,
-  productRepository,
-  socialRepository,
+  buildRepository,
+  contentRepository,
   notificationRepository,
+  productRepository,
   reportRepository,
   sessionRepository,
-  contentRepository,
-  buildRepository,
+  socialRepository,
+  userRepository,
 } from "@nexus/db";
+import type { Product, User } from "@nexus/domain";
+import { beforeAll, describe, expect, it } from "vitest";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import type { User, Product } from "@nexus/domain";
 
 describe("Nexus 1.2 Public Platform Journeys", () => {
   const ts = Date.now().toString(36);
@@ -208,21 +208,36 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
     expect(report.status).toBe("open");
 
-    // Resolve report
+    const moderator = await userRepository.create({
+      id: `usr_mod_journey_${ts}`,
+      email: `mod_journey_${ts}@nexus.test`,
+      username: `mod_journey_${ts}`,
+      displayName: "Journey Moderator",
+      role: "moderator",
+    });
+    const moderatorToken = `tok_${moderator.id}`;
+    await sessionRepository.create({
+      id: `ses_${moderator.id}`,
+      userId: moderator.id,
+      token: moderatorToken,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
+
+    // Resolve report using current moderator authority.
     const resolved = await reportRepository.resolve(
       report.id,
       "resolved",
       "Case verified and closed",
       {
         id: `aud_${Date.now()}`,
-        actorId: playerUser.id,
+        actorId: moderator.id,
         actorType: "admin",
         action: "admin.resolve",
         targetId: report.id,
         targetType: "report",
         details: { notes: "Case verified and closed" },
       },
-      `tok_${playerUser.id}`,
+      moderatorToken,
     );
     expect(resolved?.status).toBe("resolved");
   });

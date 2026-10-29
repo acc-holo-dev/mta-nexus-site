@@ -11,6 +11,7 @@ import {
 } from "@nexus/db";
 import { eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
+import { sessionRepository } from "../packages/db/src/repositories/sessions";
 
 const actorIds: string[] = [],
   publicationIds: string[] = [],
@@ -41,7 +42,14 @@ async function actor(role: "user" | "moderator" = "user") {
     role,
   });
   actorIds.push(value.id);
-  return value;
+  const currentToken = randomUUID();
+  await sessionRepository.create({
+    id: randomUUID(),
+    userId: value.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+  return { ...value, currentToken };
 }
 async function fixture() {
   const author = await actor(),
@@ -91,6 +99,7 @@ it("shows durable submission/review/resolution stages while keeping all staff no
   await repository.decide({
     id: f.report.id,
     actorId: f.staff.id,
+    currentToken: f.staff.currentToken,
     expectedStatus: "open",
     action: "review",
     notes: "PRIVATE_REVIEW_NOTE",
@@ -100,6 +109,7 @@ it("shows durable submission/review/resolution stages while keeping all staff no
   await repository.decide({
     id: f.report.id,
     actorId: f.staff.id,
+    currentToken: f.staff.currentToken,
     expectedStatus: "under_review",
     action: "resolve",
     notes: "PRIVATE_RESOLUTION_NOTE",
@@ -276,6 +286,7 @@ it("retains real batch decision context only for staff and preserves requester h
     f.commentId,
     { ...input, previewRevision: preview.previewRevision },
     input.items.map(() => key("aud")),
+    f.staff.currentToken,
   );
   expect(
     (await repository.history({ actorId: f.staff.id, staff: true }, f.report.id, base)).items[0],

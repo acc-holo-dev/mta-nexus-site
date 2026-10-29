@@ -145,7 +145,12 @@ it("confirms moderation writes without leaking reporter identity or deferring a 
     action: "remove_comment",
     removed: true,
   });
-  expect(mocks.decide).toHaveBeenCalledWith(actor, "report", { ...decision, notes: "Spam" });
+  expect(mocks.decide).toHaveBeenCalledWith(
+    actor,
+    "report",
+    { ...decision, notes: "Spam" },
+    "test",
+  );
 });
 it("propagates live authority, ownership and CAS errors without internal details or false notifications", async () => {
   for (const [code, status] of [
@@ -186,4 +191,12 @@ it("returns safe localized unavailable outcomes and rejects malformed detail IDs
   expect(JSON.stringify(body)).not.toContain("secret SQL");
   expect((await ownDetail(request(), { params: Promise.resolve({ id: "a/b" }) })).status).toBe(400);
   expect(mocks.detail).not.toHaveBeenCalled();
+});
+
+it("rejects a missing initiating cookie before reading a decision body", async () => {
+  const req = request("PATCH", decision, "", { cookie: "nexus_locale=ru" });
+  const read = vi.spyOn(req, "body", "get");
+  expect((await PATCH(req, context)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
+  expect(mocks.decide).not.toHaveBeenCalled();
 });

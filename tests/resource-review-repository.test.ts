@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -22,7 +23,9 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { resourceReviewsRepository as repo } from "../packages/db/src/repositories/resource-reviews";
+
 const product = ["prd_a", "Resource", "resource", "published", "usr_publisher", null];
 const input = {
   actorId: "usr_a",
@@ -264,7 +267,7 @@ it("removal, aggregate repair, report resolution and audit share one transaction
 it("generic report reads and resolution exclude commercial review cases", async () => {
   const { ReportRepository } = await import("../packages/db/src/repositories/reports");
   const legacy = new ReportRepository();
-  state.rows = [[], [], [], [["usr_a"]], [["ses_a", "2099-01-01T00:00:00.000Z"]], []];
+  state.rows = [[], [], [], [["moderator"]], [], [["ses_a", "2099-01-01T00:00:00.000Z"]], []];
   await legacy.countOpen();
   await legacy.listPage("pending", 1);
   await legacy.findById("rpt_a");
@@ -282,7 +285,7 @@ it("generic report reads and resolution exclude commercial review cases", async 
     },
     "staff-token",
   );
-  expect(state.queries).toHaveLength(6);
+  expect(state.queries).toHaveLength(7);
   expect(state.queries.some((query) => query.sql.startsWith('update "reports"'))).toBe(true);
   expect(
     state.queries

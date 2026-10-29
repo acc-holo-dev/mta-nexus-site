@@ -47,9 +47,10 @@ beforeEach(() => {
   state.rows = [];
 });
 
-it("locks the actor and initiating session before resolving a report", async () => {
+it("locks current authority and the report before checking the initiating session", async () => {
   state.rows = [
-    [["mod_1"]],
+    [["moderator"]],
+    [["rpt_1"]],
     [["ses_mod", "2099-01-01T00:00:00.000Z"]],
     [
       row(reports, {
@@ -77,20 +78,23 @@ it("locks the actor and initiating session before resolving a report", async () 
   expect(result?.status).toBe("resolved");
   expect(state.queries[0].sql).toContain('from "users"');
   expect(state.queries[0].sql).toContain("for share");
-  expect(state.queries[0].sql).not.toContain('"role"');
-  expect(state.queries[1].sql).toContain('from "sessions"');
+  expect(state.queries[0].sql).toContain('"role"');
+  expect(state.queries[1].sql).toContain('from "reports"');
   expect(state.queries[1].sql).toContain("for update");
-  expect(state.queries[1].params).toContain("mod_1");
-  expect(state.queries[1].params).toContain(digestSessionToken("staff-token"));
+  expect(state.queries[1].sql).toContain("\"target_type\" <> 'review'");
+  expect(state.queries[2].sql).toContain('from "sessions"');
+  expect(state.queries[2].sql).toContain("for update");
+  expect(state.queries[2].params).toContain("mod_1");
+  expect(state.queries[2].params).toContain(digestSessionToken("staff-token"));
   const update = state.queries.findIndex((query) => query.sql.startsWith('update "reports"'));
-  expect(update).toBeGreaterThan(1);
+  expect(update).toBeGreaterThan(2);
   expect(writes("audit_events")).toHaveLength(1);
 });
 
 it("refuses a missing or expired initiating session before changing the report", async () => {
   for (const session of [[], [["ses_mod", "2000-01-01T00:00:00.000Z"]]] as unknown[][][]) {
     state.queries = [];
-    state.rows = [[["mod_1"]], session];
+    state.rows = [[["moderator"]], [["rpt_1"]], session];
     await expect(
       new ReportRepository().resolve("rpt_1", "resolved", "Reviewed", audit, "staff-token"),
     ).rejects.toMatchObject({ statusCode: 401, code: "UNAUTHORIZED" });
@@ -98,3 +102,14 @@ it("refuses a missing or expired initiating session before changing the report",
     expect(writes("audit_events")).toHaveLength(0);
   }
 });
+
+for (const actor of [[], [["user"]], [["developer"]], [["server_owner"]]] as unknown[][][]) {
+  it(`refuses missing or non-moderator authority ${JSON.stringify(actor)} before writing`, async () => {
+    state.rows = [actor];
+    await expect(
+      new ReportRepository().resolve("rpt_1", "resolved", "Reviewed", audit, "staff-token"),
+    ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+    expect(writes("reports")).toHaveLength(0);
+    expect(writes("audit_events")).toHaveLength(0);
+  });
+}

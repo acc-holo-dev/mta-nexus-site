@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: vi.fn(),
+}));
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -270,6 +274,7 @@ it("commits all and only reviewed publication reports with one update and mandat
     "post",
     { ...input, previewRevision: preview.previewRevision },
     ["audit"],
+    "session",
   );
   expect(result.items).toEqual([
     { id: "report", status: "resolved", reporterId: "private-reporter" },
@@ -309,6 +314,7 @@ it.each(["publication", "report", "staff"])(
         "post",
         { ...input, previewRevision: preview.previewRevision },
         ["audit"],
+        "session",
       ),
     ).rejects.toMatchObject({ statusCode: changed === "staff" ? 403 : 409 });
     expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
@@ -335,6 +341,7 @@ it("fails closed on a foreign target/report selection and mandatory audit failur
       "post",
       { ...input, previewRevision: preview.previewRevision },
       ["audit"],
+      "session",
     ),
   ).rejects.toThrow(/audit failure|audit_events/u);
 });
