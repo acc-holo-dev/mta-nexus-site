@@ -323,6 +323,36 @@ RETURNING message_id;
 Do not reset all jobs or delete inbox records. Inbox delivery does not guarantee
 external push delivery; optional push admission has its own recovery below.
 
+### Recovering verification moderator inbox delivery
+
+New verification applications and server-claim proofs commit a
+`verification_notification_deliveries` row with the request and audit.
+Migration 0082 does not backfill historical requests. The push worker pages at
+most twenty current moderators/admins, including without VAPID. Accounts must
+predate the event; current role is rechecked on each page. Notices use generic
+copy and link to the pending verification queue without target IDs, notes or
+server names. Retry and operator reset match the support/report pattern.
+
+The queue probe reports `verificationPending`, `verificationFailed`,
+`verificationOldestAgeSeconds`, and alerts `verification_delivery_failed` or
+`verification_delivery_backlog`. After resolving the cause, reset one verified
+failed request on the intended database:
+
+```sql
+SELECT verification_request_id, attempts, available_at
+FROM verification_notification_deliveries
+WHERE completed_at IS NULL AND attempts = 5
+ORDER BY available_at, verification_request_id LIMIT 20;
+
+UPDATE verification_notification_deliveries
+SET attempts = 0, available_at = clock_timestamp()
+WHERE verification_request_id = 'REPLACE_WITH_VERIFIED_REQUEST_ID'
+  AND attempts = 5 AND completed_at IS NULL
+RETURNING verification_request_id;
+```
+
+Do not reset all jobs or delete inbox records.
+
 ### Recovering optional push admission
 
 Migration 0080 adds `web_push_admission_recovery` without backfilling old inbox
@@ -375,8 +405,9 @@ Never synthesize intents for historical or already accepted notifications. After
 an admission succeeds, sender cleanup of outbox rows must not cause another
 admission. Discussion replies use their existing typed receipt and explicit
 `--repair-push` replay below. Admission recovery cannot create an inbox that was
-lost before it was stored; support/verification moderator callbacks still need
-a transactional fanout source. External push delivery retains the existing lease,
+lost before it was stored. Report, support and verification moderator fanout
+already use transactional delivery sources; discussion live delivery still relies
+on request callbacks plus addressed replay. External push delivery retains the existing lease,
 retry and provider guarantees and is not exactly-once.
 
 ### Recovering discussion inbox delivery

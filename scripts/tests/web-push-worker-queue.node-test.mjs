@@ -28,6 +28,9 @@ function snapshot(overrides = {}) {
     supportPending: 0,
     supportFailed: 0,
     supportOldestAgeSeconds: 0,
+    verificationPending: 0,
+    verificationFailed: 0,
+    verificationOldestAgeSeconds: 0,
     admissionPending: 0,
     admissionFailed: 0,
     admissionOldestAgeSeconds: 0,
@@ -151,6 +154,44 @@ test("reports support fanout failures and backlog with configured thresholds wit
     assert.equal(value.supportPending, support.supportPending);
     assert.equal(value.supportFailed, 1);
     assert.equal(value.supportOldestAgeSeconds, support.supportOldestAgeSeconds);
+  }
+});
+
+test("reports verification fanout failures and backlog with configured thresholds without VAPID", () => {
+  const thresholds = { pendingPercent: 80, dueJobs: 3, oldestAgeSeconds: 30 };
+  const base = {
+    configured: false,
+    queuePending: 0,
+    queueDue: 0,
+    queueLeased: 0,
+    queueAlertThresholds: thresholds,
+  };
+  assert.equal(
+    run(snapshot({ ...base, verificationPending: 2, verificationOldestAgeSeconds: 29 })).status,
+    0,
+  );
+  for (const verification of [
+    { verificationPending: 3, verificationOldestAgeSeconds: 0 },
+    { verificationPending: 1, verificationOldestAgeSeconds: 30 },
+  ]) {
+    const result = run(
+      snapshot({
+        ...base,
+        ...verification,
+        verificationFailed: 1,
+        queueAlert: "alert",
+        queueAlertReasons: ["verification_delivery_failed", "verification_delivery_backlog"],
+      }),
+    );
+    assert.equal(result.status, 2);
+    const value = JSON.parse(result.stdout);
+    assert.deepEqual(value.reasons, [
+      "verification_delivery_failed",
+      "verification_delivery_backlog",
+    ]);
+    assert.equal(value.verificationPending, verification.verificationPending);
+    assert.equal(value.verificationFailed, 1);
+    assert.equal(value.verificationOldestAgeSeconds, verification.verificationOldestAgeSeconds);
   }
 });
 

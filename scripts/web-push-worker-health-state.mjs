@@ -11,6 +11,8 @@ const ALERT_REASONS = [
   "report_delivery_backlog",
   "support_delivery_failed",
   "support_delivery_backlog",
+  "verification_delivery_failed",
+  "verification_delivery_backlog",
   "admission_recovery_failed",
   "admission_recovery_backlog",
 ];
@@ -45,6 +47,13 @@ function expectedAlertReasons(input) {
       input.supportOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
   )
     reasons.push("support_delivery_backlog");
+  if (input.verificationFailed > 0) reasons.push("verification_delivery_failed");
+  if (
+    input.verificationPending >= input.queueAlertThresholds.dueJobs ||
+    (input.verificationPending > 0 &&
+      input.verificationOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("verification_delivery_backlog");
   if (input.admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     input.admissionPending >= input.queueAlertThresholds.dueJobs ||
@@ -79,6 +88,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const supportPending = data?.supportPending;
   const supportFailed = data?.supportFailed;
   const supportOldestAgeSeconds = data?.supportOldestAgeSeconds;
+  const verificationPending = data?.verificationPending;
+  const verificationFailed = data?.verificationFailed;
+  const verificationOldestAgeSeconds = data?.verificationOldestAgeSeconds;
   const admissionPending = data?.admissionPending;
   const admissionFailed = data?.admissionFailed;
   const admissionOldestAgeSeconds = data?.admissionOldestAgeSeconds;
@@ -103,6 +115,11 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const supportStateValid = [supportPending, supportFailed, supportOldestAgeSeconds].every(
     (value) => Number.isSafeInteger(value) && value >= 0,
   );
+  const verificationStateValid = [
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
+  ].every((value) => Number.isSafeInteger(value) && value >= 0);
   const admissionStateValid = [admissionPending, admissionFailed, admissionOldestAgeSeconds].every(
     (value) => Number.isSafeInteger(value) && value >= 0,
   );
@@ -127,6 +144,7 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     !queueStateValid ||
     !reportStateValid ||
     !supportStateValid ||
+    !verificationStateValid ||
     !admissionStateValid ||
     !thresholdsValid ||
     now - heartbeatAt > staleAfterMs ||
@@ -147,6 +165,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -187,6 +208,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,

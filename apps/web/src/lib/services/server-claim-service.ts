@@ -1,4 +1,4 @@
-import { serverClaimChallengeRepository, serverRepository, userRepository } from "@nexus/db";
+import { serverClaimChallengeRepository, serverRepository } from "@nexus/db";
 import {
   AppError,
   ConflictError,
@@ -10,7 +10,6 @@ import {
 import { generateId } from "@nexus/security";
 import { matchesMtaEndpoint, mtaMasterDirectoryService } from "./mta-master-directory-service";
 import { serverService } from "./server-service";
-import { dispatchNotificationsBestEffort } from "./notification-dispatch-service";
 
 async function assertRequesterCanChallenge(server: Server, requester: User): Promise<void> {
   if (server.isVerified) {
@@ -23,25 +22,6 @@ async function assertRequesterCanChallenge(server: Server, requester: User): Pro
 
   if (server.organizationId && !(await serverService.canManageServer(server, requester))) {
     throw new ForbiddenError("You do not manage the organization linked to this server");
-  }
-}
-
-export async function notifyModeratorsOfServerClaim(serverName: string): Promise<void> {
-  try {
-    const moderatorIds = await userRepository.listModeratorIds();
-    await dispatchNotificationsBestEffort(
-      moderatorIds.map((moderatorId) => ({
-        recipientId: moderatorId,
-        title: "Server ownership proof requires review",
-        message: `MTA control proof verified for ${serverName}`,
-        link: "/admin",
-        type: "security" as const,
-        category: "security" as const,
-      })),
-    );
-  } catch {
-    // The durable verification request is the source of truth. Moderator
-    // inbox/push delivery is secondary and must not affect proof success.
   }
 }
 
@@ -133,9 +113,6 @@ export const serverClaimService = {
 
     return Object.freeze({
       success: true as const,
-      moderatorNotification: Object.freeze({
-        serverName: server.name,
-      }),
       verificationRequest: completed.verificationRequest,
       proof: Object.freeze({
         method: "mta_master_name_challenge" as const,

@@ -1,4 +1,4 @@
-import { after, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { z } from "zod";
@@ -10,10 +10,7 @@ import {
   type RequestLogContext,
 } from "../../../../../../lib/observability";
 import { authService } from "../../../../../../lib/services/auth-service";
-import {
-  notifyModeratorsOfServerClaim,
-  serverClaimService,
-} from "../../../../../../lib/services/server-claim-service";
+import { serverClaimService } from "../../../../../../lib/services/server-claim-service";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
@@ -76,7 +73,8 @@ export const POST = withBrowserMutation(
         return json(context, { error: "Server not found" }, 404);
       }
 
-      const { moderatorNotification, ...result } = await serverClaimService.verifyChallenge(
+      // Moderator inbox fanout is committed with the verification request.
+      const result = await serverClaimService.verifyChallenge(
         {
           serverId,
           challengeId: parsed.data.challengeId,
@@ -84,43 +82,6 @@ export const POST = withBrowserMutation(
         },
         user,
       );
-
-      // Verification already committed — never fail the HTTP response because
-      // Next.js `after()` is unavailable (e.g. direct route invocation in tests).
-      try {
-        after(async () => {
-          try {
-            await notifyModeratorsOfServerClaim(moderatorNotification.serverName);
-          } catch (error) {
-            logRequestEvent({
-              level: "warn",
-              event: "server.claim_challenge.notification_failed",
-              context,
-              status: 201,
-              error,
-            });
-          }
-        });
-      } catch (error) {
-        logRequestEvent({
-          level: "warn",
-          event: "server.claim_challenge.after_unavailable",
-          context,
-          status: 201,
-          error,
-        });
-        try {
-          await notifyModeratorsOfServerClaim(moderatorNotification.serverName);
-        } catch (notifyError) {
-          logRequestEvent({
-            level: "warn",
-            event: "server.claim_challenge.notification_failed",
-            context,
-            status: 201,
-            error: notifyError,
-          });
-        }
-      }
 
       return json(context, result, 201);
     } catch (error: unknown) {

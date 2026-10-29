@@ -50,6 +50,7 @@ test("migration, database tooling, workflow and explicit release changes run ful
       "web-push-outbox",
       "web-push-worker",
       "report-notification-delivery",
+      "verification-notification-delivery",
       "resource-release-worker",
       "support-requester-notice",
       "verification",

@@ -6,37 +6,20 @@ import {
 } from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   user: { id: "u_1", isVerified: false } as {
     id: string;
     isVerified: boolean;
   } | null,
 }));
 
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
-
 const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
   findPending: vi.fn(),
   create: vi.fn(),
   listByRequester: vi.fn(),
-  moderators: vi.fn(),
-  dispatch: vi.fn(),
   findOrganization: vi.fn(),
   memberships: vi.fn(),
 }));
-
-vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>("next/server");
-  return {
-    ...actual,
-    after: afterMock,
-  };
-});
 
 vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
@@ -53,15 +36,10 @@ vi.mock("@nexus/db", () => ({
     createRequest: mocks.create,
     listByRequester: mocks.listByRequester,
   },
-  userRepository: { listModeratorIds: mocks.moderators },
   organizationRepository: {
     findById: mocks.findOrganization,
     listUserMemberships: mocks.memberships,
   },
-}));
-
-vi.mock("../../../lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
 import { GET, POST } from "./route";
@@ -94,7 +72,6 @@ function expectPrivate(response: Response) {
 beforeEach(() => {
   stubBrowserMutationOrigin();
   vi.clearAllMocks();
-  state.afterCallbacks.length = 0;
   state.user = { id: "u_1", isVerified: false };
   mocks.rate.mockResolvedValue({ success: true });
   mocks.findPending.mockResolvedValue(null);
@@ -103,20 +80,6 @@ beforeEach(() => {
     status: "pending",
   });
   mocks.listByRequester.mockResolvedValue([]);
-  mocks.moderators.mockResolvedValue(["mod_1", "mod_2"]);
-  mocks.dispatch.mockResolvedValue({
-    requested: 2,
-    stored: 2,
-    storageFailed: 0,
-    push: {
-      notifications: 2,
-      attempted: 0,
-      delivered: 0,
-      failed: 0,
-      stale: 0,
-      deliveryErrors: 0,
-    },
-  });
   mocks.findOrganization.mockResolvedValue(null);
   mocks.memberships.mockResolvedValue([]);
 });
@@ -143,7 +106,7 @@ describe("verification HTTP behavior", () => {
     expect(mocks.listByRequester).toHaveBeenCalledWith("u_1");
   });
 
-  it("commits the application before moderator notification dispatch", async () => {
+  it("commits the application without a post-commit moderator callback", async () => {
     const response = await POST(postRequest());
 
     expect(response.status).toBe(201);
@@ -158,75 +121,10 @@ describe("verification HTTP behavior", () => {
         action: "verification.requested",
       }),
     );
-    expect(afterMock).toHaveBeenCalledOnce();
-    expect(mocks.moderators).not.toHaveBeenCalled();
-    expect(mocks.dispatch).not.toHaveBeenCalled();
-
-    await state.afterCallbacks[0]?.();
-
-    expect(mocks.moderators).toHaveBeenCalledOnce();
-    expect(mocks.dispatch).toHaveBeenCalledWith([
-      expect.objectContaining({
-        recipientId: "mod_1",
-        type: "security",
-      }),
-      expect.objectContaining({
-        recipientId: "mod_2",
-        type: "security",
-      }),
-    ]);
-  });
-
-  it("keeps a committed application successful when moderator lookup fails", async () => {
-    mocks.moderators.mockRejectedValueOnce(new Error("moderator lookup unavailable"));
-    const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-
-    try {
-      const response = await POST(postRequest());
-      expect(response.status).toBe(201);
-      expect(await response.json()).toMatchObject({
-        success: true,
-        request: { id: "ver_test" },
-      });
-
-      await state.afterCallbacks[0]?.();
-
-      expect(mocks.create).toHaveBeenCalledOnce();
-      expect(mocks.dispatch).not.toHaveBeenCalled();
-      expect(warning).toHaveBeenCalledOnce();
-    } finally {
-      warning.mockRestore();
-    }
-  });
-
-  it("reports partial moderator inbox storage without changing the committed request", async () => {
-    mocks.dispatch.mockResolvedValueOnce({
-      requested: 2,
-      stored: 1,
-      storageFailed: 1,
-      push: {
-        notifications: 1,
-        attempted: 0,
-        delivered: 0,
-        failed: 0,
-        stale: 0,
-        deliveryErrors: 0,
-      },
+    expect(await response.json()).toMatchObject({
+      success: true,
+      request: { id: "ver_test" },
     });
-    const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-
-    try {
-      const response = await POST(postRequest());
-      expect(response.status).toBe(201);
-      await state.afterCallbacks[0]?.();
-
-      expect(warning).toHaveBeenCalledOnce();
-      const line = String(warning.mock.calls[0]?.[0] ?? "");
-      expect(line).toContain("verification.moderator_notification_partial_failure");
-      expect(line).toContain('"storageFailed":1');
-    } finally {
-      warning.mockRestore();
-    }
   });
 
   it("rejects verification of another user profile before duplicate or write checks", async () => {
@@ -244,7 +142,6 @@ describe("verification HTTP behavior", () => {
     });
     expect(mocks.findPending).not.toHaveBeenCalled();
     expect(mocks.create).not.toHaveBeenCalled();
-    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("forces server ownership through the dedicated MTA control challenge", async () => {
@@ -262,7 +159,6 @@ describe("verification HTTP behavior", () => {
     });
     expect(mocks.findPending).not.toHaveBeenCalled();
     expect(mocks.create).not.toHaveBeenCalled();
-    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("returns the canonical pending request for a duplicate target", async () => {
@@ -280,7 +176,6 @@ describe("verification HTTP behavior", () => {
       requestId: "ver_existing",
     });
     expect(mocks.create).not.toHaveBeenCalled();
-    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("rejects already-verified targets before creating another request", async () => {
@@ -313,10 +208,9 @@ describe("verification HTTP behavior", () => {
       expectPrivate(response);
     }
     expect(mocks.create).not.toHaveBeenCalled();
-    expect(afterMock).not.toHaveBeenCalled();
   });
 
-  it("does not schedule moderator delivery when the application transaction fails", async () => {
+  it("does not create a request when the application transaction fails", async () => {
     mocks.create.mockRejectedValueOnce(new Error("insert failed"));
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
@@ -324,8 +218,7 @@ describe("verification HTTP behavior", () => {
       const response = await POST(postRequest());
       expect(response.status).toBe(500);
       expectPrivate(response);
-      expect(afterMock).not.toHaveBeenCalled();
-      expect(mocks.moderators).not.toHaveBeenCalled();
+      expect(mocks.create).toHaveBeenCalledOnce();
     } finally {
       error.mockRestore();
     }

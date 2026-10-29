@@ -6,6 +6,7 @@ import {
   createWebPushHttpSender,
   reportNotificationDeliveryRepository,
   supportNotificationDeliveryRepository,
+  verificationNotificationDeliveryRepository,
   WebPushDispatcher,
   webPushAdmissionRecoveryRepository,
   webPushOutboxRepository,
@@ -62,6 +63,8 @@ type QueueAlertReason =
   | "report_delivery_backlog"
   | "support_delivery_failed"
   | "support_delivery_backlog"
+  | "verification_delivery_failed"
+  | "verification_delivery_backlog"
   | "admission_recovery_failed"
   | "admission_recovery_backlog";
 
@@ -86,6 +89,9 @@ let reportOldestAgeSeconds = 0;
 let supportPending = 0;
 let supportFailed = 0;
 let supportOldestAgeSeconds = 0;
+let verificationPending = 0;
+let verificationFailed = 0;
+let verificationOldestAgeSeconds = 0;
 let admissionPending = 0;
 let admissionFailed = 0;
 let admissionOldestAgeSeconds = 0;
@@ -144,6 +150,12 @@ function updateQueueAlertState() {
     (supportPending > 0 && supportOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
   )
     reasons.push("support_delivery_backlog");
+  if (verificationFailed > 0) reasons.push("verification_delivery_failed");
+  if (
+    verificationPending >= QUEUE_ALERT_DUE_JOBS ||
+    (verificationPending > 0 && verificationOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("verification_delivery_backlog");
   if (admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     admissionPending >= QUEUE_ALERT_DUE_JOBS ||
@@ -170,6 +182,9 @@ function updateQueueAlertState() {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -211,6 +226,9 @@ async function writeHealthSnapshot() {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -250,6 +268,10 @@ async function refreshQueueStats() {
   supportPending = support.pending;
   supportFailed = support.failed;
   supportOldestAgeSeconds = support.oldestAgeSeconds;
+  const verification = await verificationNotificationDeliveryRepository.stats();
+  verificationPending = verification.pending;
+  verificationFailed = verification.failed;
+  verificationOldestAgeSeconds = verification.oldestAgeSeconds;
   const admissions = await webPushAdmissionRecoveryRepository.stats();
   admissionPending = admissions.pending;
   admissionFailed = admissions.failed;
@@ -328,6 +350,14 @@ try {
     if (support.state !== "idle") {
       activity += 1;
       emit({ status: "support-delivery", batch: healthBatch, ...support });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const verification = await verificationNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (verification.state !== "idle") {
+      activity += 1;
+      emit({ status: "verification-delivery", batch: healthBatch, ...verification });
     }
     markProgress();
     if (controller.signal.aborted) break;

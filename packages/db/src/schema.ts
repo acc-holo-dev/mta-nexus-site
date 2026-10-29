@@ -1657,6 +1657,35 @@ export const verificationRequests = pgTable(
   ],
 );
 
+// Durable moderator inbox fanout for newly created verification requests.
+export const verificationNotificationDeliveries = pgTable(
+  "verification_notification_deliveries",
+  {
+    verificationRequestId: text("verification_request_id")
+      .primaryKey()
+      .references(() => verificationRequests.id, { onDelete: "cascade" }),
+    event: text("event").$type<"application" | "server_claim">().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    lastRecipientId: text("last_recipient_id"),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("verification_notification_deliveries_due_idx")
+      .on(table.availableAt, table.verificationRequestId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check(
+      "verification_notification_deliveries_event_check",
+      sql`${table.event} IN ('application', 'server_claim')`,
+    ),
+    check(
+      "verification_notification_deliveries_attempts_bounds",
+      sql`${table.attempts} BETWEEN 0 AND 5`,
+    ),
+  ],
+);
+
 export const serverClaimChallenges = pgTable(
   "server_claim_challenges",
   {

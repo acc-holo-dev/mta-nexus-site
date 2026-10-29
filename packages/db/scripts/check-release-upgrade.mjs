@@ -46,6 +46,7 @@ const evidence = {
   libraryCollectionsSchemaPresent: false,
   reportNotificationDeliverySchemaPresent: false,
   supportNotificationDeliverySchemaPresent: false,
+  verificationNotificationDeliverySchemaPresent: false,
   webPushAdmissionRecoverySchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
@@ -760,6 +761,30 @@ try {
     (error) => error.code === "23503",
   );
   evidence.supportNotificationDeliverySchemaPresent = true;
+  assert.equal(
+    (await client`SELECT count(*)::integer AS total FROM verification_notification_deliveries`)[0]
+      .total,
+    0,
+    "Upgrade must not invent delivery progress for historical verification requests",
+  );
+  assert.equal(
+    (
+      await client`SELECT indexname FROM pg_indexes WHERE schemaname='public'
+      AND indexname='verification_notification_deliveries_due_idx'`
+    ).length,
+    1,
+  );
+  await assert.rejects(
+    client`INSERT INTO verification_notification_deliveries (verification_request_id, event, created_at, attempts)
+      VALUES ('missing-verification', 'application', clock_timestamp(), 6)`,
+    (error) => error.code === "23514",
+  );
+  await assert.rejects(
+    client`INSERT INTO verification_notification_deliveries (verification_request_id, event, created_at)
+      VALUES ('missing-verification', 'application', clock_timestamp())`,
+    (error) => error.code === "23503",
+  );
+  evidence.verificationNotificationDeliverySchemaPresent = true;
   const receiptColumns =
     await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
