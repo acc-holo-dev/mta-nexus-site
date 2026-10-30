@@ -291,8 +291,17 @@ inbox fanout. `report_delivery_failed` and `report_delivery_backlog` produce ale
 exit code 2 while process liveness remains a separate check. Backlog uses the
 existing due-job and age thresholds. Logs contain counts and states only.
 
-After diagnosing the database/lock failure, retry one failed source on the
-intended database, retaining its cursor:
+After diagnosing the database/lock failure, list exhausted sources and reset
+**one** verified id on the intended database (retains cursor). Prefer the
+operator CLI over ad-hoc SQL:
+
+```sh
+pnpm notifications:delivery list --channel report
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel report --id rpt_REPLACE_WITH_VERIFIED_ID
+```
+
+Equivalent SQL (same predicates the CLI enforces):
 
 ```sql
 SELECT report_id, attempts, available_at
@@ -308,7 +317,7 @@ WHERE report_id = 'rpt_REPLACE_WITH_VERIFIED_ID'
 RETURNING report_id;
 ```
 
-Do not reset every source or delete inbox rows. Optional push admission can still
+Do not reset every source or delete inbox rows. The CLI never offers a bulk reset. Optional push admission can still
 return `saturated`/`error`; the page logs `pushDeferred`, retains the inbox and
 leaves durable admission recovery intent described below.
 Completion of report fanout confirms inbox processing, not external push delivery.
@@ -329,15 +338,10 @@ The queue probe reports `supportPending`, `supportFailed`,
 `support_delivery_backlog`. After resolving the cause, inspect and reset one
 verified failed message on the intended database:
 
-```sql
-SELECT message_id, attempts, available_at FROM support_notification_deliveries
-WHERE completed_at IS NULL AND attempts = 5 ORDER BY available_at, message_id LIMIT 20;
-
-UPDATE support_notification_deliveries
-SET attempts = 0, available_at = clock_timestamp()
-WHERE message_id = 'REPLACE_WITH_VERIFIED_MESSAGE_ID'
-  AND attempts = 5 AND completed_at IS NULL
-RETURNING message_id;
+```sh
+pnpm notifications:delivery list --channel support
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel support --id REPLACE_WITH_VERIFIED_MESSAGE_ID
 ```
 
 Do not reset all jobs or delete inbox records. Inbox delivery does not guarantee
@@ -358,17 +362,10 @@ The queue probe reports `verificationPending`, `verificationFailed`,
 `verification_delivery_backlog`. After resolving the cause, reset one verified
 failed request on the intended database:
 
-```sql
-SELECT verification_request_id, attempts, available_at
-FROM verification_notification_deliveries
-WHERE completed_at IS NULL AND attempts = 5
-ORDER BY available_at, verification_request_id LIMIT 20;
-
-UPDATE verification_notification_deliveries
-SET attempts = 0, available_at = clock_timestamp()
-WHERE verification_request_id = 'REPLACE_WITH_VERIFIED_REQUEST_ID'
-  AND attempts = 5 AND completed_at IS NULL
-RETURNING verification_request_id;
+```sh
+pnpm notifications:delivery list --channel verification
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel verification --id REPLACE_WITH_VERIFIED_REQUEST_ID
 ```
 
 Do not reset all jobs or delete inbox records.
@@ -407,21 +404,14 @@ intents, including exhausted ones, are removed in bounded worker passes.
 After diagnosing the cause, inspect exhausted intents and reset only one verified
 unexpired notification on the intended database:
 
-```sql
-SELECT notification_id, attempts, created_at, available_at
-FROM web_push_admission_recovery
-WHERE attempts = 5
-ORDER BY available_at, notification_id
-LIMIT 20;
-
-UPDATE web_push_admission_recovery
-SET attempts = 0, available_at = clock_timestamp()
-WHERE notification_id = 'ntf_REPLACE_WITH_VERIFIED_ID'
-  AND attempts = 5 AND created_at > clock_timestamp() - interval '24 hours'
-RETURNING notification_id;
+```sh
+pnpm notifications:delivery list --channel admission
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel admission --id ntf_REPLACE_WITH_VERIFIED_ID
 ```
 
-Never synthesize intents for historical or already accepted notifications. After
+The CLI enforces `attempts = 5` and `created_at` within 24 hours. Never synthesize
+intents for historical or already accepted notifications. After
 an admission succeeds, sender cleanup of outbox rows must not cause another
 admission. Discussion replies use their existing typed receipt and explicit
 `--repair-push` replay below. Admission recovery cannot create an inbox that was
@@ -446,19 +436,16 @@ The queue probe reports `discussionPending`, `discussionFailed`,
 `discussion_delivery_backlog`. Server-linked publishes likewise enqueue
 `publication_notification_deliveries` (newest followers first, capped at 100) with
 `publicationPending` / `publicationFailed` probe fields. After resolving the cause,
-reset one verified failed comment on the intended database:
+reset one verified failed comment or publication content id:
 
-```sql
-SELECT comment_id, attempts, available_at
-FROM discussion_notification_deliveries
-WHERE completed_at IS NULL AND attempts = 5
-ORDER BY available_at, comment_id LIMIT 20;
+```sh
+pnpm notifications:delivery list --channel discussion
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel discussion --id REPLACE_WITH_VERIFIED_COMMENT_ID
 
-UPDATE discussion_notification_deliveries
-SET attempts = 0, available_at = clock_timestamp()
-WHERE comment_id = 'REPLACE_WITH_VERIFIED_COMMENT_ID'
-  AND attempts = 5 AND completed_at IS NULL
-RETURNING comment_id;
+pnpm notifications:delivery list --channel publication
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel publication --id REPLACE_WITH_VERIFIED_CONTENT_ID
 ```
 
 Do not reset all jobs or delete inbox records.
