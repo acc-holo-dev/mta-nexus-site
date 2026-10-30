@@ -1,5 +1,6 @@
 "use client";
 import type { Product } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
 import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -9,8 +10,12 @@ import {
   getResourceManagementCopy,
   resourceManagementError,
 } from "../lib/resource-management-i18n";
-import { useNexusLocale } from "./locale-context";
 import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
+import { useNexusLocale } from "./locale-context";
+
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 font-mono text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function ResourceCompatibilityForm({
   product,
@@ -79,49 +84,44 @@ export function ResourceCompatibilityForm({
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} aria-busy={busy} className="nexus-panel space-y-4 p-5">
       <p className="text-sm text-secondary">{copy.compatibilityNote}</p>
       <p className="text-sm text-secondary">
         {product.suspended
           ? getResourcePublisherCopy(locale).readonly
           : getResourcePublisherCopy(locale).editNote}
       </p>
-      <label htmlFor={`${field}-mta`} className="block text-sm text-secondary">
-        {copy.mta}
-      </label>
-      <input
+      <Input
         id={`${field}-mta`}
+        label={copy.mta}
         value={mta}
         maxLength={64}
         disabled={disabled}
         placeholder="1.6.0"
         onChange={(event) => setMta(event.target.value)}
-        className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
       />
-      <label htmlFor={`${field}-dependencies`} className="block text-sm text-secondary">
-        {copy.dependencies}
-      </label>
-      <textarea
-        id={`${field}-dependencies`}
-        value={dependencies}
-        maxLength={4000}
-        rows={8}
-        disabled={disabled}
-        aria-describedby={`${field}-hint`}
-        onChange={(event) => setDependencies(event.target.value)}
-        className="w-full rounded-lg border border-base bg-surface px-3 py-2 font-mono text-primary"
-      />
+      <div className="space-y-1.5">
+        <label htmlFor={`${field}-dependencies`} className={nativeLabelClass}>
+          {copy.dependencies}
+        </label>
+        <textarea
+          id={`${field}-dependencies`}
+          value={dependencies}
+          maxLength={4000}
+          rows={8}
+          disabled={disabled}
+          aria-describedby={`${field}-hint`}
+          onChange={(event) => setDependencies(event.target.value)}
+          className={textareaClass}
+        />
+      </div>
       <p id={`${field}-hint`} className="text-xs text-muted">
         {copy.dependencyHint}
       </p>
       {product.suspended && <p className="text-warning">{copy.errors.PRODUCT_STATE_CHANGED}</p>}
-      <button
-        disabled={disabled}
-        type="submit"
-        className="rounded-lg bg-accent px-4 py-2 font-semibold text-white disabled:opacity-50"
-      >
+      <Button type="submit" isLoading={busy} disabled={disabled} className="min-h-11">
         {busy ? copy.working : copy.save}
-      </button>
+      </Button>
       {error && (
         <p role="alert" className="text-sm text-danger">
           {error}

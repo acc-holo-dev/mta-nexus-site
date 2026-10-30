@@ -1,7 +1,8 @@
 "use client";
-import { type FormEvent, useId, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Button } from "@nexus/ui";
 import { resourceModerationCommandSchema } from "@nexus/validation";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedResourceModeration } from "../lib/resource-release-control-confirmation";
 import {
@@ -9,6 +10,10 @@ import {
   resourceReleaseControlError,
 } from "../lib/resource-release-control-i18n";
 import { useNexusLocale } from "./locale-context";
+
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 export function ResourceModerationControls({
   product,
 }: {
@@ -66,8 +71,10 @@ export function ResourceModerationControls({
         {copy.moderationNote}
       </p>
       <fieldset disabled={busy || saved} className="space-y-4">
-        <label htmlFor={`${field}-reason`} className="block space-y-2">
-          <span className="text-sm">{copy.reason}</span>
+        <div className="space-y-1.5">
+          <label htmlFor={`${field}-reason`} className={nativeLabelClass}>
+            {copy.reason}
+          </label>
           <textarea
             id={`${field}-reason`}
             value={reason}
@@ -76,9 +83,9 @@ export function ResourceModerationControls({
             maxLength={2000}
             rows={3}
             required
-            className="nexus-input w-full"
+            className={textareaClass}
           />
-        </label>
+        </div>
         <label htmlFor={`${field}-confirm`} className="flex items-start gap-3 text-sm">
           <input
             id={`${field}-confirm`}
@@ -101,9 +108,9 @@ export function ResourceModerationControls({
           {copy.saved}
         </p>
       ) : null}
-      <button type="submit" disabled={busy || saved || !confirmed} className="btn-primary">
+      <Button type="submit" isLoading={busy} disabled={saved || !confirmed} className="min-h-11">
         {busy ? copy.saving : release ? copy.release : copy.suspend}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import type { ResourceCopyCommand, ResourceCopyPreview } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
 import { resourceCopyCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,7 +71,7 @@ export function ResourceCopyForm({
     }
   }
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form onSubmit={submit} aria-busy={busy} className="space-y-5">
       <p role="note" className="text-sm text-secondary">
         {c.notice}
       </p>
@@ -80,31 +81,25 @@ export function ResourceCopyForm({
       </p>
       <ResourceCopyMetadataView metadata={preview.metadata} locale={locale} />
       <fieldset disabled={busy || frozen} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
-        <label htmlFor={`${field}-title`}>
-          <span className="block">{c.name}</span>
-          <input
-            id={`${field}-title`}
-            required
-            minLength={3}
-            maxLength={120}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded border border-base bg-surface p-2"
-          />
-        </label>
-        <label htmlFor={`${field}-slug`}>
-          <span className="block">{c.slug}</span>
-          <input
-            id={`${field}-slug`}
-            required
-            minLength={3}
-            maxLength={120}
-            pattern="[a-z0-9]+(-[a-z0-9]+)*"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            className="w-full rounded border border-base bg-surface p-2"
-          />
-        </label>
+        <Input
+          id={`${field}-title`}
+          label={c.name}
+          required
+          minLength={3}
+          maxLength={120}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <Input
+          id={`${field}-slug`}
+          label={c.slug}
+          required
+          minLength={3}
+          maxLength={120}
+          pattern="[a-z0-9]+(-[a-z0-9]+)*"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+        />
       </fieldset>
       {frozen && (
         <p role="note" className="text-sm text-secondary">
@@ -117,13 +112,9 @@ export function ResourceCopyForm({
         </p>
       )}
       <div className="flex flex-wrap gap-4">
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded bg-accent px-4 py-2 text-background disabled:opacity-50"
-        >
+        <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? c.busy : c.create}
-        </button>
+        </Button>
         <Link
           href={`/workspace/resources/${encodeURIComponent(preview.source.id)}/copies`}
           className="text-accent underline"

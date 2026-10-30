@@ -4,6 +4,7 @@ import {
   RESOURCE_MEDIA_INPUT_BYTES,
   RESOURCE_MEDIA_LIMIT,
 } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
@@ -93,9 +94,8 @@ export function ResourceMediaEditor({
     body.set("expectedUpdatedAt", current.product.updatedAt);
     void execute("POST", body, form);
   }
-  const button = "rounded-lg border border-base px-3 py-2 text-sm text-accent disabled:opacity-50";
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" aria-busy={busy}>
       {readonly && (
         <p role="note" className="text-warning">
           {copy.readonly}
@@ -116,9 +116,9 @@ export function ResourceMediaEditor({
           {copy.busy}
         </p>
       )}
-      <button type="button" className={button} disabled={busy} onClick={() => void execute("GET")}>
+      <Button type="button" variant="outline" disabled={busy} onClick={() => void execute("GET")}>
         {copy.reload}
-      </button>
+      </Button>
       {!items.length && <p className="text-muted">{copy.empty}</p>}
       <ol className="grid gap-5 sm:grid-cols-2">
         {items.map((item, index) => (
@@ -134,63 +134,63 @@ export function ResourceMediaEditor({
               {item.width} × {item.height}
               {index === 0 ? ` · ${copy.currentCover}` : ""}
             </p>
-            <label className="block text-sm text-secondary">
-              {copy.caption}
-              <input
-                value={item.caption}
-                maxLength={160}
-                disabled={busy || readonly}
-                className="nexus-input mt-1 w-full"
-                onChange={(event) =>
-                  setItems(
-                    items.map((v) =>
-                      v.id === item.id ? { ...v, caption: event.target.value } : v,
-                    ),
-                  )
-                }
-              />
-            </label>
+            <Input
+              id={`media-caption-${item.id}`}
+              label={copy.caption}
+              value={item.caption}
+              maxLength={160}
+              disabled={busy || readonly}
+              onChange={(event) =>
+                setItems(
+                  items.map((v) => (v.id === item.id ? { ...v, caption: event.target.value } : v)),
+                )
+              }
+            />
             {!readonly && (
               <div className="flex flex-wrap gap-2">
-                <button
+                <Button
                   type="button"
-                  className={button}
+                  variant="outline"
+                  size="sm"
                   disabled={busy || index === 0}
                   onClick={() => move(index, 0)}
                 >
                   {copy.cover}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={button}
+                  variant="outline"
+                  size="sm"
                   disabled={busy || index === 0}
                   onClick={() => move(index, index - 1)}
                 >
                   {copy.up}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={button}
+                  variant="outline"
+                  size="sm"
                   disabled={busy || index === items.length - 1}
                   onClick={() => move(index, index + 1)}
                 >
                   {copy.down}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={button}
+                  variant="outline"
+                  size="sm"
                   disabled={busy || dirty}
                   onClick={() => setRemoving(item.id)}
                 >
                   {copy.remove}
-                </button>
+                </Button>
               </div>
             )}
             {removing === item.id && (
-              <div className="space-x-2">
-                <button
+              <div className="flex flex-wrap gap-2">
+                <Button
                   type="button"
-                  className={button}
+                  size="sm"
                   disabled={busy || dirty || readonly}
                   onClick={() =>
                     void execute(
@@ -204,15 +204,16 @@ export function ResourceMediaEditor({
                   }
                 >
                   {copy.confirm}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={button}
+                  variant="outline"
+                  size="sm"
                   disabled={busy}
                   onClick={() => setRemoving(null)}
                 >
                   {copy.cancel}
-                </button>
+                </Button>
               </div>
             )}
           </li>
@@ -225,9 +226,8 @@ export function ResourceMediaEditor({
               {copy.dirty}
             </p>
           )}
-          <button
+          <Button
             type="button"
-            className={button}
             disabled={busy || !dirty}
             onClick={() =>
               void execute(
@@ -239,38 +239,43 @@ export function ResourceMediaEditor({
                 }),
               )
             }
+            className="min-h-11"
           >
             {copy.save}
-          </button>
+          </Button>
           <form onSubmit={upload} className="nexus-panel space-y-4 p-5">
-            <label className="block text-sm text-secondary">
-              {copy.file}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="media-upload-file"
+                className="block font-label uppercase text-secondary"
+              >
+                {copy.file}
+              </label>
               <input
+                id="media-upload-file"
                 type="file"
                 name="file"
                 accept="image/png,image/jpeg,image/webp"
                 required
                 disabled={busy || dirty || items.length >= RESOURCE_MEDIA_LIMIT}
-                className="mt-2 block w-full"
+                className="block w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
               />
-            </label>
-            <label className="block text-sm text-secondary">
-              {copy.caption}
-              <input
-                name="caption"
-                maxLength={160}
-                defaultValue=""
-                disabled={busy || dirty}
-                className="nexus-input mt-1 w-full"
-              />
-            </label>
-            <button
+            </div>
+            <Input
+              id="media-upload-caption"
+              name="caption"
+              label={copy.caption}
+              maxLength={160}
+              defaultValue=""
+              disabled={busy || dirty}
+            />
+            <Button
               type="submit"
-              className={button}
               disabled={busy || dirty || items.length >= RESOURCE_MEDIA_LIMIT}
+              className="min-h-11"
             >
               {copy.upload}
-            </button>
+            </Button>
           </form>
         </>
       )}

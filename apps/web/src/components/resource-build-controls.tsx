@@ -1,11 +1,17 @@
 "use client";
-import { useId, useRef, useState, type FormEvent } from "react";
+import type { ResourceBuildCommand, ResourceBuildView } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
-import type { ResourceBuildView, ResourceBuildCommand } from "@nexus/domain";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { privateRequest } from "../lib/private-request";
-import { confirmedBuildCommand } from "../lib/resource-build-workspace-response";
 import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
+import { confirmedBuildCommand } from "../lib/resource-build-workspace-response";
 import { useNexusLocale } from "./locale-context";
+
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
+
 type EditorBuild = Pick<
   ResourceBuildView,
   "id" | "productId" | "version" | "status" | "revision" | "releaseNotes" | "mtaVersionTarget"
@@ -83,8 +89,6 @@ export function ResourceBuildControls({
     event.preventDefault();
     void command("save");
   }
-  const inputClass = "w-full rounded-lg border border-base bg-inset p-3 text-primary";
-  const buttonClass = "rounded-lg border border-base px-4 py-2 text-primary disabled:opacity-40";
   const blocked = pending || uncertain;
   return (
     <section className="space-y-4" aria-busy={pending}>
@@ -96,90 +100,93 @@ export function ResourceBuildControls({
       {current.status === "pending_review" && <p className="text-secondary">{copy.pending}</p>}
       {editable && !withdrawn && (
         <form onSubmit={save} className="space-y-3">
-          <label htmlFor={`${prefix}-notes`} className="block">
-            {copy.notes}
-          </label>
-          <textarea
-            id={`${prefix}-notes`}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            maxLength={10000}
-            rows={6}
-            disabled={blocked}
-            className={inputClass}
-          />
-          <label htmlFor={`${prefix}-target`} className="block">
-            {copy.target}
-          </label>
-          <input
+          <div className="space-y-1.5">
+            <label htmlFor={`${prefix}-notes`} className={nativeLabelClass}>
+              {copy.notes}
+            </label>
+            <textarea
+              id={`${prefix}-notes`}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              maxLength={10000}
+              rows={6}
+              disabled={blocked}
+              className={textareaClass}
+            />
+          </div>
+          <Input
             id={`${prefix}-target`}
+            label={copy.target}
             value={target}
             onChange={(e) => setTarget(e.target.value)}
             maxLength={64}
             disabled={blocked}
-            className={inputClass}
           />
-          <button type="submit" disabled={blocked} className={buttonClass}>
+          <Button type="submit" isLoading={pending} disabled={uncertain} className="min-h-11">
             {pending ? copy.working : copy.save}
-          </button>
+          </Button>
         </form>
       )}
       {current.status !== "retired" && current.status !== "quarantined" && (
         <div className="space-y-3">
-          <label htmlFor={`${prefix}-reason`} className="block">
-            {copy.reason}
-          </label>
-          <textarea
-            id={`${prefix}-reason`}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            minLength={3}
-            maxLength={2000}
-            disabled={blocked}
-            className={inputClass}
-          />
+          <div className="space-y-1.5">
+            <label htmlFor={`${prefix}-reason`} className={nativeLabelClass}>
+              {copy.reason}
+            </label>
+            <textarea
+              id={`${prefix}-reason`}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              minLength={3}
+              maxLength={2000}
+              disabled={blocked}
+              className={textareaClass}
+            />
+          </div>
           {editable && !withdrawn && (
             <>
               <p className="text-sm text-secondary">{copy.clean}</p>
-              <button
+              <Button
                 type="button"
                 disabled={blocked || !trustedScan || dirty || reason.trim().length < 3}
                 onClick={() => void command("submit")}
-                className={buttonClass}
+                className="min-h-11"
               >
                 {copy.submit}
-              </button>
+              </Button>
             </>
           )}
           {current.status === "pending_review" && (
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={blocked || reason.trim().length < 3}
               onClick={() => void command("withdraw")}
-              className={buttonClass}
+              className="min-h-11"
             >
               {copy.withdraw}
-            </button>
+            </Button>
           )}
           <details>
             <summary className="cursor-pointer text-danger">{copy.retire}</summary>
             <p className="py-3 text-sm text-secondary">{copy.retirement}</p>
-            <button
+            <Button
               type="button"
+              variant="danger"
               disabled={blocked || reason.trim().length < 3}
               onClick={() => void command("retire")}
-              className={buttonClass}
+              className="min-h-11"
             >
               {copy.retire}
-            </button>
+            </Button>
           </details>
         </div>
       )}
       {message && <p role={uncertain ? "alert" : "status"}>{message}</p>}
       {uncertain && (
-        <button type="button" onClick={() => window.location.reload()} className={buttonClass}>
+        <Button type="button" variant="outline" onClick={() => window.location.reload()}>
           {copy.reload}
-        </button>
+        </Button>
       )}
     </section>
   );

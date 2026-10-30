@@ -1,19 +1,23 @@
 "use client";
+import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Button } from "@nexus/ui";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
+import { platformRequest } from "../lib/user-platform-client";
 import {
-  editableDeveloperSchema,
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
+  editableDeveloperSchema,
 } from "../lib/verification-workspace-contract";
 import {
   verificationCopy,
   verificationError,
   verificationMutationError,
 } from "../lib/verification-workspace-copy";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 export function DeveloperProfileEditor({
   initial,
   locale,
@@ -124,38 +128,37 @@ export function DeveloperProfileEditor({
         <p className="text-sm font-semibold text-success">{copy.experience}</p>
       )}
       <form className="space-y-4" onSubmit={submit}>
-        <label className="block space-y-1 text-sm text-secondary">
-          <span>{copy.specialties}</span>
+        <div className="space-y-1.5">
+          <label htmlFor="developer-specialties" className={nativeLabelClass}>
+            {copy.specialties}
+          </label>
           <textarea
-            className={platformFieldClass}
+            id="developer-specialties"
             rows={5}
             value={specialties}
             maxLength={700}
             disabled={pending || !profile}
             onChange={(event) => setSpecialties(event.target.value)}
+            className={textareaClass}
           />
-        </label>
-        <label className="block space-y-1 text-sm text-secondary">
-          <span>{copy.github}</span>
-          <input
-            className={platformFieldClass}
-            type="url"
-            value={github}
-            maxLength={2048}
-            disabled={pending || !profile}
-            onChange={(event) => setGithub(event.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-sm text-secondary">
-          <span>{copy.discord}</span>
-          <input
-            className={platformFieldClass}
-            value={discord}
-            maxLength={80}
-            disabled={pending || !profile}
-            onChange={(event) => setDiscord(event.target.value)}
-          />
-        </label>
+        </div>
+        <Input
+          id="developer-github"
+          type="url"
+          label={copy.github}
+          value={github}
+          maxLength={2048}
+          disabled={pending || !profile}
+          onChange={(event) => setGithub(event.target.value)}
+        />
+        <Input
+          id="developer-discord"
+          label={copy.discord}
+          value={discord}
+          maxLength={80}
+          disabled={pending || !profile}
+          onChange={(event) => setDiscord(event.target.value)}
+        />
         <div className="flex flex-wrap gap-3">
           <Button type="submit" isLoading={pending} disabled={!profile || pending}>
             {copy.save}

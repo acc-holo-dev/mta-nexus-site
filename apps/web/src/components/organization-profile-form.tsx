@@ -1,18 +1,21 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
+import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@nexus/ui";
+import { type FormEvent, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
+import { organizationRequest as platformRequest } from "../lib/organization-workspace-client";
 import {
+  type EditableOrganization,
+  editableOrganizationSchema,
   organizationCreateSchema,
   organizationUpdateSchema,
-  editableOrganizationSchema,
-  type EditableOrganization,
 } from "../lib/organization-workspace-contract";
-import { organizationRequest as platformRequest } from "../lib/organization-workspace-client";
-import { platformFieldClass } from "../lib/user-platform-client";
+import { getOrganizationCopy } from "../lib/organization-workspace-copy";
+
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function OrganizationProfileForm({
   locale,
@@ -105,21 +108,19 @@ export function OrganizationProfileForm({
       <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
       <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
       <fieldset disabled={busy || disabled} className="space-y-4">
-        <label className="block space-y-1 text-sm text-secondary">
-          <span>{copy.name}</span>
-          <input
-            className={platformFieldClass}
-            required
-            minLength={2}
-            maxLength={100}
-            value={fields.name}
-            onChange={(e) => change("name", e.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-sm text-secondary">
-          <span>{copy.slug}</span>
-          <input
-            className={platformFieldClass}
+        <Input
+          id="organization-name"
+          label={copy.name}
+          required
+          minLength={2}
+          maxLength={100}
+          value={fields.name}
+          onChange={(e) => change("name", e.target.value)}
+        />
+        <div className="space-y-1.5">
+          <Input
+            id="organization-slug"
+            label={copy.slug}
             required
             minLength={3}
             maxLength={80}
@@ -127,34 +128,39 @@ export function OrganizationProfileForm({
             readOnly={!!initial}
             value={fields.slug}
             onChange={(e) => change("slug", e.target.value)}
+            aria-describedby="organization-slug-help"
           />
-          <span className="block text-xs text-muted">{copy.slugHelp}</span>
-        </label>
-        <label className="block space-y-1 text-sm text-secondary">
-          <span>{copy.descriptionLabel}</span>
+          <span id="organization-slug-help" className="block text-xs text-muted">
+            {copy.slugHelp}
+          </span>
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="organization-description" className={nativeLabelClass}>
+            {copy.descriptionLabel}
+          </label>
           <textarea
-            className={platformFieldClass}
+            id="organization-description"
             maxLength={4000}
             rows={5}
             value={fields.description}
             onChange={(e) => change("description", e.target.value)}
+            className={textareaClass}
           />
-        </label>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {(["logoUrl", "websiteUrl"] as const).map((key) => (
-            <label key={key} className="block space-y-1 text-sm text-secondary">
-              <span>{key === "logoUrl" ? copy.logo : copy.website}</span>
-              <input
-                type="url"
-                maxLength={2048}
-                className={platformFieldClass}
-                value={fields[key]}
-                onChange={(e) => change(key, e.target.value)}
-              />
-            </label>
+            <Input
+              key={key}
+              id={`organization-${key}`}
+              type="url"
+              label={key === "logoUrl" ? copy.logo : copy.website}
+              maxLength={2048}
+              value={fields[key]}
+              onChange={(e) => change(key, e.target.value)}
+            />
           ))}
         </div>
-        <Button type="submit" isLoading={busy}>
+        <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? copy.saving : initial ? copy.save : copy.create}
         </Button>
       </fieldset>

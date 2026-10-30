@@ -1,16 +1,16 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Avatar, Button, Input } from "@nexus/ui";
 import Link from "next/link";
-import { Button, Avatar } from "@nexus/ui";
-import { useNexusLocale } from "./locale-context";
-import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import {
-  parseEditableProfile,
-  platformRequest,
-  platformFieldClass,
-} from "../lib/user-platform-client";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { parseEditableProfile, platformRequest } from "../lib/user-platform-client";
 import type { EditableProfile } from "../lib/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
+import { useNexusLocale } from "./locale-context";
+
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function PublicProfileForm() {
   const { locale } = useNexusLocale();
@@ -122,53 +122,52 @@ export function PublicProfileForm() {
             </Link>
           </div>
           <fieldset disabled={busy || loading} className="space-y-4">
-            <label className="block space-y-1 text-sm text-secondary">
-              <span>{copy.displayName}</span>
-              <input
-                name="displayName"
-                autoComplete="nickname"
-                required
-                minLength={2}
-                maxLength={80}
-                defaultValue={profile.displayName}
-                className={platformFieldClass}
-              />
-            </label>
-            <label className="block space-y-1 text-sm text-secondary">
-              <span>{copy.bio}</span>
+            <Input
+              id="profile-display-name"
+              name="displayName"
+              label={copy.displayName}
+              autoComplete="nickname"
+              required
+              minLength={2}
+              maxLength={80}
+              defaultValue={profile.displayName}
+            />
+            <div className="space-y-1.5">
+              <label htmlFor="profile-bio" className={nativeLabelClass}>
+                {copy.bio}
+              </label>
               <textarea
+                id="profile-bio"
                 name="bio"
                 maxLength={2000}
                 rows={5}
                 defaultValue={profile.bio}
-                className={platformFieldClass}
+                className={textareaClass}
               />
-            </label>
-            <label className="block space-y-1 text-sm text-secondary">
-              <span>{copy.avatar}</span>
-              <input
-                name="avatarUrl"
-                type="url"
-                maxLength={2048}
-                defaultValue={profile.avatarUrl}
-                className={platformFieldClass}
-              />
-            </label>
-            <Button type="submit" isLoading={busy}>
+            </div>
+            <Input
+              id="profile-avatar-url"
+              name="avatarUrl"
+              type="url"
+              label={copy.avatar}
+              maxLength={2048}
+              defaultValue={profile.avatarUrl}
+            />
+            <Button type="submit" isLoading={busy} className="min-h-11">
               {copy.save}
             </Button>
           </fieldset>
         </form>
       )}
       {(notice?.error || (!profile && !loading)) && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           disabled={busy || loading}
           onClick={() => setRevision((value) => value + 1)}
-          className="text-sm text-accent underline"
         >
           {copy.retry}
-        </button>
+        </Button>
       )}
     </section>
   );
