@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import type { ResourceReleaseWatch, ResourceReleaseWatchCommand } from "@nexus/domain";
+import { Button } from "@nexus/ui";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { useNexusLocale } from "./locale-context";
@@ -107,15 +108,16 @@ export function ResourceReleaseWatchControl({
   return (
     <div className="space-y-2">
       {!pending && (
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={save}
           disabled={busy || saved || (!available && !watch.enabled)}
           aria-busy={busy}
-          className="rounded-md border border-base px-4 py-2 text-sm text-accent disabled:opacity-60"
+          className="text-accent"
         >
           {busy ? copy.busy : watch.enabled ? copy.unwatch : copy.watch}
-        </button>
+        </Button>
       )}
       {pending && !saved && (
         <div className="space-y-2">
@@ -123,24 +125,26 @@ export function ResourceReleaseWatchControl({
             {copy.pendingNote}
           </p>
           {!blocked && (
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={save}
               disabled={busy}
               aria-busy={busy}
-              className="rounded-md border border-base px-4 py-2 text-sm text-accent disabled:opacity-60"
+              className="text-accent"
             >
               {busy ? copy.busy : copy.retrySame}
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={() => window.location.reload()}
             disabled={busy}
-            className="rounded-md border border-base px-4 py-2 text-sm text-accent disabled:opacity-60"
+            className="text-accent"
           >
             {copy.reloadState}
-          </button>
+          </Button>
         </div>
       )}
       {error ? (

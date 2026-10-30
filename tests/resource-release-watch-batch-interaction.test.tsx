@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -31,13 +32,19 @@ vi.mock("react", async (original) => ({
   },
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
+
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {
   if (Array.isArray(n)) return n.flatMap(nodes);
   if (!n || typeof n !== "object" || !("props" in n)) return [];
   const e = n as Element;
+  const type = e.type as { displayName?: string } | string;
+  if (typeof type === "object" && type?.displayName === "Button") {
+    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
+  }
   return [e, ...nodes(e.props.children as ReactNode)];
 }
 const items = [

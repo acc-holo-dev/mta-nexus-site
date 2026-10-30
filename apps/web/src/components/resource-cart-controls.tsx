@@ -1,23 +1,25 @@
 "use client";
 
+import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
-import { useNexusLocale } from "./locale-context";
 import { privateApiRequest } from "../lib/private-api-request";
-import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+import { resourceCartReceiptsCopy } from "../lib/resource-cart-receipts-i18n";
+import { resourceCartReceiptUrl } from "../lib/resource-cart-receipts-query";
+import { confirmedResourceCartReview } from "../lib/resource-cart-review-confirmation";
 import {
   confirmedCartAcquisition,
   confirmedResourceCart,
 } from "../lib/resource-commerce-confirmation";
-
-import { confirmedResourceCartReview } from "../lib/resource-cart-review-confirmation";
-import { resourceCartReceiptsCopy } from "../lib/resource-cart-receipts-i18n";
-import { resourceCartReceiptUrl } from "../lib/resource-cart-receipts-query";
+import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+import { useNexusLocale } from "./locale-context";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =
   "rounded-lg border border-base px-4 py-2 text-sm font-semibold text-primary hover:bg-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]";
+const outlineButtonClass =
+  "rounded-lg border-base font-semibold text-primary hover:bg-hover disabled:opacity-50";
 
 export function AddResourceToCart({
   productId,
@@ -68,14 +70,15 @@ export function AddResourceToCart({
           {copy.added} · {copy.openCart}
         </Link>
       ) : (
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => void add()}
           disabled={busy}
-          className={`${buttonClass} w-full`}
+          className={`${outlineButtonClass} w-full`}
         >
           {busy ? copy.working : copy.add}
-        </button>
+        </Button>
       )}
       {error && (
         <p role="alert" className="text-sm text-danger">
@@ -273,15 +276,16 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                       <p className="text-sm text-success">{copy.owned}</p>
                     ) : null}
                   </div>
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     disabled={busy || uncertain}
                     aria-label={`${copy.remove}: ${item.title ?? copy.unavailable}`}
                     onClick={() => void run((signal) => remove(item.productId, signal))}
-                    className={buttonClass}
+                    className={outlineButtonClass}
                   >
                     {copy.remove}
-                  </button>
+                  </Button>
                 </div>
                 {evidence?.available ? (
                   <ResourceCartReviewEvidence item={evidence} locale={locale} />
@@ -298,41 +302,39 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
       ) : null}
       <div className="flex flex-wrap gap-3">
         {uncertain ? (
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={busy}
             onClick={() => void run(acquire)}
-            className={buttonClass}
+            className={outlineButtonClass}
           >
             {receiptCopy.retry}
-          </button>
+          </Button>
         ) : review?.reviewDigest ? (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void run(acquire)}
-            className={`${buttonClass} bg-accent text-white`}
-          >
+          <Button type="button" disabled={busy} onClick={() => void run(acquire)}>
             {busy ? copy.working : receiptCopy.confirm}
-          </button>
+          </Button>
         ) : cart.items.length > 0 ? (
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={busy || unavailable}
             onClick={() => void run(inspect)}
-            className={buttonClass}
+            className={outlineButtonClass}
           >
             {busy ? copy.working : receiptCopy.review}
-          </button>
+          </Button>
         ) : null}
-        <button
+        <Button
           type="button"
+          variant="outline"
           disabled={busy}
           onClick={() => void run(refresh)}
-          className={buttonClass}
+          className={outlineButtonClass}
         >
           {copy.refresh}
-        </button>
+        </Button>
         <Link href="/market" className={buttonClass}>
           {copy.browse}
         </Link>

@@ -11,6 +11,8 @@ it.each(["en", "ru"] as const)("renders an accessible download button in %s", (l
   );
   expect(html).toContain('type="button"');
   expect(html).toContain('aria-busy="false"');
+  expect(html).toContain("rounded-lg");
+  expect(html).toContain("bg-success-solid");
   expect(html).toContain(locale === "ru" ? "Скачать сборку" : "Download Build");
   expect(html).toContain("v1.2.3");
   expect(html).not.toContain("/api/products/");
