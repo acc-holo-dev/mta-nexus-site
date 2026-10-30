@@ -1,9 +1,10 @@
 "use client";
 import type {
   LibraryCollectionCommand,
-  LibraryCollectionSnapshot,
   LibraryCollectionCopyPreview,
+  LibraryCollectionSnapshot,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -177,11 +178,7 @@ export function LibraryCollectionCommandForm({
           {action === "duplicate" ? c.copyConfirm : c.archiveConfirm}
         </label>
       )}
-      <button
-        type="submit"
-        disabled={busy || saved || blocked}
-        className="rounded border border-base px-3 py-2 text-sm text-accent disabled:opacity-60"
-      >
+      <Button type="submit" disabled={busy || saved || blocked} variant="outline">
         {busy
           ? c.busy
           : saved
@@ -191,7 +188,7 @@ export function LibraryCollectionCommandForm({
               : frozen && error
                 ? c.retryAction
                 : c[action]}
-      </button>
+      </Button>
       {frozen && !saved && (
         <p role="note" className="text-xs text-muted">
           {c.frozen}

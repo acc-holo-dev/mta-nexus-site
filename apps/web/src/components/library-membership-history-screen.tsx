@@ -3,14 +3,15 @@ import {
   LIBRARY_COLLECTION_HISTORY_DAYS,
   LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../lib/i18n-server";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
-import { libraryCollectionsCopy, libraryCollectionError } from "../lib/library-collections-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,
@@ -127,9 +128,9 @@ export async function LibraryMembershipHistoryScreen({
               className="rounded border border-base bg-surface p-2"
             />
           </label>
-          <button type="submit" className="rounded border border-base px-3 py-2">
+          <Button type="submit" variant="outline">
             {h.filter}
-          </button>
+          </Button>
           <Link href={membershipHistoryHref()} className="text-accent underline">
             {h.clear}
           </Link>

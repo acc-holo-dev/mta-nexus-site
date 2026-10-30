@@ -4,17 +4,18 @@ import {
   type LibraryCollectionCommand,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { collectionHref } from "../lib/library-collections-query";
-import { privateApiRequest } from "../lib/private-api-request";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
 } from "../lib/library-collection-receipts-i18n";
+import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { collectionHref } from "../lib/library-collections-query";
+import { privateApiRequest } from "../lib/private-api-request";
 
 export function LibraryCollectionBatchForm({
   locale,
@@ -249,7 +250,7 @@ export function LibraryCollectionBatchForm({
           {c.batchConfirm}
         </label>
       </fieldset>
-      <button
+      <Button
         type="submit"
         disabled={
           busy ||
@@ -262,7 +263,7 @@ export function LibraryCollectionBatchForm({
               collection.status !== "active" ||
               collection.revision >= 2147483647))
         }
-        className="rounded border border-base px-3 py-2 text-sm text-accent disabled:opacity-60"
+        variant="outline"
       >
         {busy
           ? c.busy
@@ -273,7 +274,7 @@ export function LibraryCollectionBatchForm({
               : frozen
                 ? c.retryAction
                 : c[shownAction]}
-      </button>
+      </Button>
       {frozen && !saved && (
         <p role="note" className="text-xs text-muted">
           {c.frozen}

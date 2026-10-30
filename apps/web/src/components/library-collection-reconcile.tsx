@@ -1,17 +1,19 @@
 "use client";
-import type { LibraryCollectionCommand, LibraryCollectionChangesPreview } from "@nexus/domain";
+import type { LibraryCollectionChangesPreview, LibraryCollectionCommand } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { libraryCollectionsCopy, libraryCollectionError } from "../lib/library-collections-i18n";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
-import { collectionHref } from "../lib/library-collections-query";
-import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
-import { privateApiRequest } from "../lib/private-api-request";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
 } from "../lib/library-collection-receipts-i18n";
+import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { collectionHref } from "../lib/library-collections-query";
+import { privateApiRequest } from "../lib/private-api-request";
+
 type Command = Extract<LibraryCollectionCommand, { action: "reconcile-items" }>;
 export function LibraryCollectionReconcileForm({
   preview,
@@ -218,7 +220,7 @@ export function LibraryCollectionReconcileForm({
           {m.reconcileConfirm}
         </label>
       </fieldset>
-      <button
+      <Button
         type="submit"
         disabled={
           busy ||
@@ -226,7 +228,7 @@ export function LibraryCollectionReconcileForm({
           blocked ||
           (!pending.current && (!acknowledged || !selected.length || !capacity || !writable))
         }
-        className="rounded border border-base px-3 py-2"
+        variant="outline"
       >
         {busy
           ? c.busy
@@ -237,7 +239,7 @@ export function LibraryCollectionReconcileForm({
               : frozen
                 ? c.retryAction
                 : c["reconcile-items"]}
-      </button>
+      </Button>
       {frozen && !saved && <p role="note">{c.frozen}</p>}
       {error && <p role="alert">{error}</p>}
       {(error || saved) && (

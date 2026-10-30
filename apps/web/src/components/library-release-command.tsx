@@ -1,15 +1,16 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import type { LibraryReleaseCommand } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { LibraryReleaseCommand } from "@nexus/domain";
-import { privateApiRequest } from "../lib/private-api-request";
-import { confirmedLibraryRelease } from "../lib/resource-release-control-confirmation";
+import { useEffect, useRef, useState } from "react";
 import {
+  type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
   matchesLibraryReleaseRequest,
-  type FrozenLibraryReleaseRequest,
 } from "../lib/library-release-request";
+import { privateApiRequest } from "../lib/private-api-request";
+import { confirmedLibraryRelease } from "../lib/resource-release-control-confirmation";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
@@ -145,23 +146,23 @@ export function LibraryReleaseCommandStatus({
         <div className="space-y-3">
           <p className="text-sm text-muted">{copy.pendingNote}</p>
           {!blocked ? (
-            <button
+            <Button
               type="button"
               disabled={busy}
               onClick={() => void send(pending)}
-              className="rounded-md border border-base px-4 py-2 text-sm"
+              variant="outline"
             >
               {copy.retrySame}
-            </button>
+            </Button>
           ) : null}
-          <button
+          <Button
             type="button"
             disabled={busy}
             onClick={() => window.location.reload()}
-            className="rounded-md border border-base px-4 py-2 text-sm"
+            variant="outline"
           >
             {copy.reloadState}
-          </button>
+          </Button>
         </div>
       ) : null}
       {error ? (
@@ -174,13 +175,14 @@ export function LibraryReleaseCommandStatus({
           <p role="status" className="text-sm text-success">
             {copy.selectSaved}
           </p>
-          <button
+          <Button
             type="button"
             onClick={() => window.location.reload()}
-            className="text-sm text-accent underline"
+            className="h-auto px-0 text-accent underline"
+            variant="ghost"
           >
             {copy.reloadState}
-          </button>
+          </Button>
         </div>
       ) : null}
     </>

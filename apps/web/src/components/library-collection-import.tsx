@@ -1,18 +1,19 @@
 "use client";
 import {
   LIBRARY_COLLECTION_MANIFEST_BYTES,
-  type LibraryCollectionSnapshot,
   type LibraryCollectionImportPreview,
   type LibraryCollectionReconcilePreview,
+  type LibraryCollectionSnapshot,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import {
-  libraryCollectionManifestSchema,
   libraryCollectionImportPreviewSchema,
+  libraryCollectionManifestSchema,
   libraryCollectionReconcilePreviewSchema,
 } from "@nexus/validation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
-import { libraryCollectionsCopy, libraryCollectionError } from "../lib/library-collections-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
@@ -170,13 +171,9 @@ export function LibraryCollectionImport({
             />
           </label>
         </fieldset>
-        <button
-          type="submit"
-          disabled={busy || frozen || !source}
-          className="rounded border border-base px-3 py-2"
-        >
+        <Button type="submit" disabled={busy || frozen || !source} variant="outline">
           {busy ? m.busy : m.preview}
-        </button>
+        </Button>
         {error && <p role="alert">{error}</p>}
       </form>
       {frozen && <p role="note">{m.frozen}</p>}

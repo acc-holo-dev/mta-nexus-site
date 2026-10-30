@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { useRef, useState } from "react";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
@@ -74,14 +75,9 @@ export function LibraryReleaseComparisonSelection({
             />
             <span>{copy.confirmChoice}</span>
           </label>
-          <button
-            type="button"
-            disabled={disabled || !confirmed}
-            onClick={apply}
-            className="rounded-md border border-base px-4 py-2 text-sm"
-          >
+          <Button type="button" disabled={disabled || !confirmed} onClick={apply} variant="outline">
             {state.busy ? control.saving : copy.chooseCompared}
-          </button>
+          </Button>
         </>
       )}
       <LibraryReleaseCommandStatus state={state} locale={locale} />

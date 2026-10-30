@@ -1,7 +1,8 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
-import { useLibraryReleaseCommand, LibraryReleaseCommandStatus } from "./library-release-command";
+import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 import { useNexusLocale } from "./locale-context";
 export function LibraryReleaseSelectionControls({
   productId,
@@ -25,14 +26,14 @@ export function LibraryReleaseSelectionControls({
       <p className="text-xs text-muted">
         {copy.revision}: {revision}
       </p>
-      <button
+      <Button
         type="button"
         disabled={busy || saved || pending !== null || mode === "latest"}
         onClick={() => void send({ mode: "latest", expectedRevision: revision })}
-        className="rounded-md border border-base px-4 py-2 text-sm"
+        variant="outline"
       >
         {busy ? copy.saving : copy.useLatest}
-      </button>
+      </Button>
       <ul className="flex flex-wrap gap-3">
         {versions.map((version) => {
           const command = {
@@ -47,7 +48,7 @@ export function LibraryReleaseSelectionControls({
           const valid = libraryReleaseCommandSchema.safeParse(command).success;
           return (
             <li key={version.id}>
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   if (valid) void send(command);
@@ -59,10 +60,10 @@ export function LibraryReleaseSelectionControls({
                   !valid ||
                   (mode === "fixed" && selectedBuildId === version.id)
                 }
-                className="rounded-md border border-base px-4 py-2 text-sm"
+                variant="outline"
               >
                 {copy.choose}: {version.version}
-              </button>
+              </Button>
             </li>
           );
         })}

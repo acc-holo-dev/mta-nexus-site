@@ -113,6 +113,7 @@ it("preserves filters/search in navigation and export while clear resets the sea
   expect(html).toContain("/releases/export?page=1&amp;filter=all&amp;q=core+%26+maps");
   expect(html).toContain("/lcol_a/versions?q=core+%26+maps");
   expect(html).toContain('dateTime="2026-10-12T00:00:00.000Z"');
+  expect(html).toContain("border border-base bg-surface text-secondary");
 });
 it("keeps archived collections inspectable without batch mutation navigation", async () => {
   const result = report();

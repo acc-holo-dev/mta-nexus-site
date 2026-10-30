@@ -1,23 +1,20 @@
-import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
-import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
-import {
-  collectionReceiptHref,
-  libraryCollectionReceiptsCopy,
-} from "../lib/library-collection-receipts-i18n";
-import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../lib/library-membership-history-query";
-import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
-import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
-import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
-import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
+import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
+import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
+import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
+import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../lib/library-collection-receipts-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import {
   collectionHref,
@@ -25,11 +22,15 @@ import {
   collectionPageParams,
   collectionsQuery,
 } from "../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../lib/library-membership-history-query";
+import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
+import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
-import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
+import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
 import { ResourceDownloadButton } from "./resource-download-button";
 
 type Query = Record<string, string | string[] | undefined>;
@@ -186,9 +187,9 @@ export async function LibraryCollectionsScreen({
                 className="rounded border border-base bg-inset px-3 py-2"
               />
             </label>
-            <button type="submit" className="rounded border border-base px-4 py-2">
+            <Button type="submit" variant="outline">
               {c.apply}
-            </button>
+            </Button>
           </form>
           <LibraryCollectionItemCopyForm
             key={JSON.stringify([
@@ -496,9 +497,9 @@ export async function LibraryCollectionsScreen({
               className="rounded border border-base bg-surface p-2"
             />
           </label>
-          <button type="submit" className="rounded border border-base px-3 py-2 text-sm">
+          <Button type="submit" variant="outline">
             {c.apply}
-          </button>
+          </Button>
           {result.q && (
             <Link
               href={collectionHref(id, adding ? "add" : "")}

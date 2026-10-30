@@ -46,6 +46,10 @@ function nodes(n: ReactNode): Element[] {
   if (Array.isArray(n)) return n.flatMap(nodes);
   if (!n || typeof n !== "object" || !("props" in n)) return [];
   const e = n as Element;
+  const type = e.type as { displayName?: string } | string | ((p: unknown) => ReactNode);
+  if (typeof type === "object" && type && "displayName" in type && type.displayName === "Button") {
+    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
+  }
   if (typeof e.type === "function")
     return [e, ...nodes((e.type as (p: unknown) => ReactNode)(e.props))];
   return [e, ...nodes(e.props.children as ReactNode)];

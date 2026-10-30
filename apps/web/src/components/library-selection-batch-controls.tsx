@@ -1,5 +1,6 @@
 "use client";
 import type { LibrarySelectionBatchCommand, LibrarySelectionBatchPreview } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import {
@@ -158,9 +159,14 @@ export function LibrarySelectionBatchControls({
             </li>
           ))}
         </ul>
-        <button type="button" onClick={() => void review()} disabled={!ids.length}>
+        <Button
+          type="button"
+          onClick={() => void review()}
+          disabled={!ids.length}
+          variant="outline"
+        >
           {busy ? c.busy : c.preview}
-        </button>
+        </Button>
       </fieldset>
       {preview && (
         <section className="nexus-panel space-y-4 p-4">
@@ -196,13 +202,14 @@ export function LibrarySelectionBatchControls({
             />
             {c.confirm}
           </label>
-          <button
+          <Button
             type="button"
             disabled={busy || saved || !confirmed || !preview.changedCount}
             onClick={() => void apply()}
+            variant="outline"
           >
             {busy ? c.busy : saved ? c.saved : frozen ? c.retry : c.apply}
-          </button>
+          </Button>
         </section>
       )}
       {frozen && !saved && <p role="note">{c.frozen}</p>}

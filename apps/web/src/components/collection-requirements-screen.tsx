@@ -1,9 +1,10 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRequestLocale } from "../lib/i18n-server";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
+import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
@@ -69,7 +70,9 @@ export async function CollectionRequirementsScreen({
             required
           />
         </label>
-        <button type="submit">{copy.check}</button>
+        <Button type="submit" variant="outline">
+          {copy.check}
+        </Button>
       </form>
       <p role="status" className="font-semibold">
         {result.state === "empty" ? c.empty : copy.states[result.state]}

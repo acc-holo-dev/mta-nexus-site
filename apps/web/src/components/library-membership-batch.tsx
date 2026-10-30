@@ -1,19 +1,20 @@
 "use client";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import {
   LIBRARY_COLLECTION_BATCH_LIMIT,
-  type LibraryResourceCollections,
-  type LibraryMembershipBatchCommand,
   type LibraryCollectionSnapshot,
+  type LibraryMembershipBatchCommand,
+  type LibraryResourceCollections,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { libraryMembershipBatchCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { collectionHref } from "../lib/library-collections-query";
 import { confirmedMembershipBatch } from "../lib/library-membership-batch-confirmation";
 import { libraryMembershipBatchesCopy } from "../lib/library-membership-batches-i18n";
-import { libraryCollectionsCopy, libraryCollectionError } from "../lib/library-collections-i18n";
-import { collectionHref } from "../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import { privateApiRequest } from "../lib/private-api-request";
 export function LibraryMembershipBatchForm({
   report,
@@ -252,7 +253,7 @@ export function LibraryMembershipBatchForm({
           {h.confirm}
         </label>
       </fieldset>
-      <button
+      <Button
         type="submit"
         disabled={
           busy ||
@@ -261,10 +262,10 @@ export function LibraryMembershipBatchForm({
           (!pending.current &&
             (!checked || !changed.length || changed.length > LIBRARY_COLLECTION_BATCH_LIMIT))
         }
-        className="rounded border border-base px-4 py-2 text-accent disabled:opacity-60"
+        variant="outline"
       >
         {busy ? c.busy : saved ? c.saved : blocked ? c.reload : frozen ? c.retryAction : h.apply}
-      </button>
+      </Button>
       {frozen && !saved && (
         <p role="note" className="text-sm text-muted">
           {c.frozen}
