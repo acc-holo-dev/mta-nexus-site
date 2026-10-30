@@ -261,20 +261,21 @@ echo "PASS: J5 browser claimed one entitlement, incremented library additions on
 created_product=$(sql "SELECT id FROM products WHERE author_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL');")
 [[ "$created_product" =~ ^prd_[a-zA-Z0-9_-]+$ ]]
 [[ $(sql "SELECT status FROM products WHERE id = '$created_product';") == draft ]]
-[[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product';") == 2 ]]
+[[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product';") == 3 ]]
 # Retrying a committed upload must not leave duplicate assets or temporary files.
 created_author_id=$(sql "SELECT author_id FROM products WHERE id = '$created_product';")
 [[ "$created_author_id" =~ ^usr_[a-zA-Z0-9_-]+$ ]]
 author_assets=$("${pc[@]}" exec -T app sh -c 'find "/data/uploads/assets/$1" -type f | wc -l' sh "$created_author_id" | tr -d '[:space:]')
-[[ "$author_assets" == 2 ]]
-[[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND scan_status = 'clean' AND scanner IS NOT NULL AND scanned_at IS NOT NULL;") == 2 ]]
+[[ "$author_assets" == 3 ]]
+[[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND scan_status = 'clean' AND scanner IS NOT NULL AND scanned_at IS NOT NULL;") == 3 ]]
 [[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND status = 'retired';") == 1 ]]
 [[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND status = 'rejected';") == 1 ]]
+[[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND status = 'pending_review';") == 1 ]]
 # External client update and confirmed draft save each audit once; stale 409 must add none.
 [[ $(sql "SELECT count(*) FROM audit_events WHERE target_id = '$created_product' AND action = 'product.details_updated';") == 2 ]]
 for decision in submitted_for_review approved rejected retired; do
   expected_count=1
-  [[ "$decision" != submitted_for_review ]] || expected_count=2
+  [[ "$decision" != submitted_for_review ]] || expected_count=3
   [[ $(sql "SELECT count(*) FROM audit_events WHERE action = 'build.$decision' AND target_id IN (SELECT id FROM builds WHERE product_id = '$created_product');") == "$expected_count" ]]
 done
 [[ $(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$created_product' AND permission = 'product.download';") == 1 ]]

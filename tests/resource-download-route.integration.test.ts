@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-import { NextRequest } from "next/server";
 import {
   buildRepository,
   entitlementRepository,
@@ -8,10 +6,14 @@ import {
   userRepository,
 } from "@nexus/db";
 import { storageService } from "@nexus/storage";
+import { NextRequest } from "next/server";
+import { describe, expect, it } from "vitest";
 import { GET } from "../apps/web/src/app/api/products/[id]/download/route";
 
-function downloadRequest(token: string, productId: string) {
-  return new NextRequest(`http://nexus.test/api/products/${productId}/download`, {
+function downloadRequest(token: string, productId: string, buildId?: string) {
+  const url = new URL(`http://nexus.test/api/products/${productId}/download`);
+  if (buildId) url.searchParams.set("buildId", buildId);
+  return new NextRequest(url, {
     method: "GET",
     headers: {
       cookie: `nexus_session=${token}`,
@@ -137,6 +139,36 @@ describe("resource download route integration", () => {
       expect(await denied.json()).toEqual({
         error: "Add this resource to your library before downloading it",
       });
+
+      const pendingBuildId = `bld_dl_pending_${suffix}`;
+      await buildRepository.create({
+        id: pendingBuildId,
+        productId,
+        version: "1.1.0-private",
+        releaseNotes: "still private",
+        storageKey: asset.key,
+        sha256Hash: asset.sha256Hash,
+        fileSizeBytes: asset.sizeBytes,
+        fileName: "download-integration.zip",
+        mimeType: "application/zip",
+        status: "pending_review",
+        scanStatus: "clean",
+        scanner: "integration-test",
+        scannedAt: new Date(),
+        isSigned: false,
+      });
+      const privatePin = await GET(downloadRequest(entitledToken, productId, pendingBuildId), {
+        params: Promise.resolve({ id: productId }),
+      });
+      expect(privatePin.status).toBe(404);
+      expect(await privatePin.json()).toEqual({
+        error: "No published build is available",
+      });
+      const stillLatest = await GET(downloadRequest(entitledToken, productId), {
+        params: Promise.resolve({ id: productId }),
+      });
+      expect(stillLatest.status).toBe(200);
+      expect(Buffer.from(await stillLatest.arrayBuffer())).toEqual(bytes);
 
       await productRepository.update(productId, { status: "draft" });
       const unpublished = await GET(downloadRequest(entitledToken, productId), {

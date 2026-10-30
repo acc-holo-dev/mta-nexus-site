@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
-import { randomBytes, createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { notificationInboxCopy } from "../../apps/web/src/lib/notification-inbox-copy.ts";
+
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
@@ -620,6 +621,32 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   evidence.push(
     "After metadata edits, the withdrawn first build was resubmitted for review at its live revision.",
   );
+  // Recipient path must stay fail-closed while the only build is still private.
+  const privateMarket = await outsider.goto(`${process.env.NEXUS_BROWSER_BASE_URL}/market/${slug}`);
+  assert([200, 404].includes(privateMarket.status()));
+  await expect(
+    outsider.getByRole("heading", { name: "Page not found", exact: true }),
+  ).toBeVisible();
+  await expect(outsider.getByRole("heading", { name: updated, exact: true })).toHaveCount(0);
+  const privateApi = await outsider.evaluate(
+    async ({ productId, buildId }) => {
+      const product = await fetch(`/api/products/${productId}`);
+      const download = await fetch(
+        `/api/products/${productId}/download?buildId=${encodeURIComponent(buildId)}`,
+      );
+      return {
+        product: product.status,
+        download: download.status,
+        downloadBody: await download.json().catch(() => null),
+      };
+    },
+    { productId: product.id, buildId: pendingFirst.id },
+  );
+  assert.equal(privateApi.product, 404);
+  assert.equal(privateApi.download, 404);
+  evidence.push(
+    "Before approval the public market and recipient download stayed closed for the pending private build.",
+  );
   await moderate(
     outsider,
     pendingFirst.id,
@@ -670,6 +697,11 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await page.getByRole("link", { name: "Open resource preview", exact: true }).click();
   await expect(page.getByRole("heading", { name: updated, exact: true })).toBeVisible();
   await outsider.goto(`/market/${slug}`);
+  const expectedSha = createHash("sha256").update(file).digest("hex");
+  await expect(outsider.getByText(`SHA-256: ${expectedSha.slice(0, 16)}…`)).toBeVisible();
+  await expect(
+    outsider.getByText(new RegExp(`\\b${file.length.toLocaleString("en-US")} B\\b|\\b1 KB\\b`)),
+  ).toBeVisible();
   await outsider.getByRole("link", { name: "Add to library", exact: true }).click();
   await outsider.getByRole("button", { name: "Add to library", exact: true }).click();
   await expect(
@@ -681,10 +713,13 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const download = await downloadPromise;
   assert.equal(await download.failure(), null);
   const downloadedPath = await download.path();
-  assert.deepEqual(await readFile(downloadedPath), file);
+  const downloadedBytes = await readFile(downloadedPath);
+  assert.deepEqual(downloadedBytes, file);
+  assert.equal(downloadedBytes.length, file.length);
+  assert.equal(createHash("sha256").update(downloadedBytes).digest("hex"), expectedSha);
   await rm(downloadedPath);
   evidence.push(
-    "The newly published author resource was claimed and downloaded with exact uploaded bytes.",
+    "The newly published author resource exposed matching SHA/size, was claimed and downloaded with exact uploaded bytes.",
   );
   evidence.push(
     "Moderator approval notes appeared in the author workspace and the public resource opened.",
@@ -835,6 +870,52 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   evidence.push(
     "Second version rejection preserved the previous public version and exposed notes in RU.",
   );
+  const rejectedPin = await outsider.evaluate(
+    async ({ productId, buildId }) => {
+      const response = await fetch(
+        `/api/products/${productId}/download?buildId=${encodeURIComponent(buildId)}`,
+      );
+      return { status: response.status, body: await response.json().catch(() => null) };
+    },
+    { productId: product.id, buildId: second.id },
+  );
+  assert.equal(rejectedPin.status, 404);
+  assert.equal(rejectedPin.body?.error, "No published build is available");
+  evidence.push("Rejected private builds stayed undownloadable even for an entitled recipient.");
+
+  // Retry after rejection: author submits a corrected follow-up without losing the live public build.
+  const retryForm = page.getByRole("form", { name: "Отправить новую версию", exact: true });
+  await retryForm.getByLabel("Версия", { exact: true }).fill("1.2.0");
+  await retryForm.getByLabel("Примечания к версии", { exact: true }).fill("Retry after rejection.");
+  await retryForm
+    .locator('[name="file"]')
+    .setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  const retryResponse = page.waitForResponse(
+    (response) =>
+      response.url().endsWith(`/api/products/${product.id}/builds`) &&
+      response.request().method() === "POST",
+  );
+  await retryForm.getByRole("button", { name: "Отправить новую версию", exact: true }).click();
+  const retried = await retryResponse;
+  assert.equal(retried.status(), 201);
+  const third = (await retried.json()).build;
+  assert.equal(third.scanStatus, "clean");
+  assert.equal(third.status, "pending_review");
+  await expect(
+    page.getByText("Версия отправлена на проверку файла и модерацию.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Опубликован · 1.0.0", { exact: true })).toBeVisible();
+  const retryPin = await outsider.evaluate(
+    async ({ productId, buildId }) =>
+      (await fetch(`/api/products/${productId}/download?buildId=${encodeURIComponent(buildId)}`))
+        .status,
+    { productId: product.id, buildId: third.id },
+  );
+  assert.equal(retryPin, 404);
+  evidence.push(
+    "Post-rejection retry scanned clean, kept the published recipient build, and left the new private build undownloadable.",
+  );
+
   await page.setViewportSize({ width: 390, height: 844 });
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   const publishedRow = page
@@ -851,13 +932,19 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     publishedRow.getByText("Снята с публикации", { exact: false }).first(),
   ).toBeVisible();
   await expect(page.getByText("Retire acceptance publication.", { exact: true })).toBeVisible();
-  const publicProduct = await outsider.evaluate(
-    async (id) => (await fetch(`/api/products/${id}`)).status,
-    product.id,
-  );
-  assert.equal(publicProduct, 404);
+  const afterRetirement = await outsider.evaluate(async (id) => {
+    const productStatus = (await fetch(`/api/products/${id}`)).status;
+    const download = await fetch(`/api/products/${id}/download`);
+    return {
+      product: productStatus,
+      download: download.status,
+      downloadBody: await download.json().catch(() => null),
+    };
+  }, product.id);
+  assert.equal(afterRetirement.product, 404);
+  assert.equal(afterRetirement.download, 404);
   evidence.push(
-    "Mobile layout fits at 390px; retirement removed the final public build from public API.",
+    "Mobile layout fits at 390px; retirement removed the final public build from public API and recipient download.",
   );
   await outsiderContext.close();
   assert.deepEqual(errors, []);
