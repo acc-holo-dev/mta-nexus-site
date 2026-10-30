@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "@nexus/ui";
 import type { Locale } from "../lib/i18n";
 import {
   resourceReviewCopy,
@@ -125,9 +126,9 @@ export function ResourceReviewEditor({
               className="mt-2 block min-h-36 w-full rounded border border-base bg-surface p-3"
             />
           </label>
-          <button type="submit" className="btn-primary" disabled={busy || confirmed}>
+          <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
             {busy ? copy.busy : copy.save}
-          </button>
+          </Button>
         </form>
       ) : (
         review && <p className="whitespace-pre-wrap break-words text-sm">{review.text}</p>
@@ -218,9 +219,9 @@ export function ResourceReviewReportForm({
           disabled={busy || !!id}
           className="block min-h-24 w-full rounded border border-base bg-surface p-3"
         />
-        <button type="submit" className="btn-primary" disabled={busy || !!id}>
+        <Button type="submit" disabled={busy || !!id} isLoading={busy}>
           {busy ? copy.busy : copy.send}
-        </button>
+        </Button>
       </form>
       <p role="status">{message}</p>
       {id ? (
@@ -320,9 +321,9 @@ export function ResourceReviewDecisionForm({
           className="mt-2 block min-h-24 w-full rounded border border-base bg-surface p-3"
         />
       </label>
-      <button type="submit" className="btn-primary" disabled={busy || confirmed}>
+      <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
         {busy ? copy.busy : copy.decide}
-      </button>
+      </Button>
       <p role="status">{message}</p>
       <Recovery locale={locale} />
     </form>

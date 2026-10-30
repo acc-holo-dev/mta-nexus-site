@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { authService } from "../../../lib/services/auth-service";
 import { resourceModerationService } from "../../../lib/services/resource-release-control-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -75,9 +76,7 @@ export default async function ResourceModerationPage({
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-primary">
-          {copy.search}
-        </button>
+        <Button type="submit">{copy.search}</Button>
       </form>
       {result.resources.length ? (
         <ul className="space-y-3">

@@ -2,6 +2,7 @@
 import { type FormEvent, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { COMMERCIAL_CURRENCIES, type CommercialCurrency } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { privateApiRequest } from "../lib/private-api-request";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../lib/commercial-confirmation";
@@ -122,9 +123,9 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
             </select>
           </label>
         </fieldset>
-        <button type="submit" disabled={busy} className="btn-primary">
+        <Button type="submit" isLoading={busy}>
           {busy ? copy.calculating : copy.calculate}
-        </button>
+        </Button>
       </form>
       {error ? (
         <p role="alert" className="text-sm text-danger">

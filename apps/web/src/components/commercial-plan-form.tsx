@@ -7,6 +7,7 @@ import {
   type CommercialPlan,
   type CommercialPlanCommand,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { commercialPlanCommandSchema } from "@nexus/validation";
 import { privateApiRequest } from "../lib/private-api-request";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
@@ -240,13 +241,13 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
         </p>
       ) : null}
       <div className="flex flex-wrap gap-3">
-        <button
+        <Button
           type="submit"
           disabled={disabled || plan?.status === "archived" || (!!plan && !dirty)}
-          className="btn-primary"
+          isLoading={busy}
         >
           {busy ? copy.saving : plan ? copy.save : copy.create}
-        </button>
+        </Button>
         {plan
           ? (plan.status === "archived"
               ? (["restore"] as const)
@@ -254,15 +255,15 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
                 ? (["publish", "archive"] as const)
                 : (["archive"] as const)
             ).map((action) => (
-              <button
+              <Button
                 key={action}
                 type="button"
+                variant="outline"
                 onClick={() => void send(action)}
                 disabled={disabled || dirty}
-                className="rounded-md border border-base px-4 py-2 text-sm"
               >
                 {copy[action]}
-              </button>
+              </Button>
             ))
           : null}
       </div>

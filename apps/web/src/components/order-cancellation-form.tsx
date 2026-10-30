@@ -2,6 +2,7 @@
 import { type FormEvent, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { OrderCancellationCommand } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { orderCancellationCommandSchema } from "@nexus/validation";
 import { privateApiRequest } from "../lib/private-api-request";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
@@ -117,9 +118,9 @@ export function OrderCancellationForm({
           {copy.cancelled}
         </p>
       ) : null}
-      <button type="submit" disabled={busy || saved || !confirmed} className="btn-primary">
+      <Button type="submit" disabled={busy || saved || !confirmed} isLoading={busy}>
         {busy ? copy.cancelling : retry ? copy.retry : copy.cancel}
-      </button>
+      </Button>
     </form>
   );
 }
