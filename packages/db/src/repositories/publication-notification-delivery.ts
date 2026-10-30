@@ -10,14 +10,14 @@ import {
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { notificationRepository } from "./notifications";
 
-export type PublicationNotificationDeliveryResult = Readonly<{
+type PublicationNotificationDeliveryResult = Readonly<{
   state: "idle" | "progress" | "completed" | "retry" | "failed";
   recipients: number;
   stored: number;
   pushDeferred: number;
 }>;
 
-export type PublicationNotificationDeliveryStats = Readonly<{
+type PublicationNotificationDeliveryStats = Readonly<{
   pending: number;
   failed: number;
   oldestAgeSeconds: number;
@@ -25,7 +25,7 @@ export type PublicationNotificationDeliveryStats = Readonly<{
 
 const MAX_SERVER_FOLLOWERS_PER_PUBLICATION = 100;
 
-export class PublicationNotificationDeliveryRepository {
+class PublicationNotificationDeliveryRepository {
   async processNext(limit = 20): Promise<PublicationNotificationDeliveryResult> {
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
       throw new RangeError("Invalid publication notification batch size");

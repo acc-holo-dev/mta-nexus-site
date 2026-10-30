@@ -1,9 +1,9 @@
 "use client";
 
+import { Button, Input } from "@nexus/ui";
+import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
-import { KeyRound } from "lucide-react";
-import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../components/locale-context";
 import { recoveryJsonRequest } from "../../../lib/account-recovery-browser";
 
@@ -59,25 +59,22 @@ export default function ForgotPasswordPage() {
         <p className="text-sm leading-relaxed text-muted">{copy.forgotDescription}</p>
 
         <form onSubmit={submit} aria-busy={pending} className="space-y-4">
-          <label className="block space-y-1.5" htmlFor="reset-email">
-            <span className="text-sm font-semibold text-primary">{copy.email}</span>
-            <input
-              id="reset-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              autoCapitalize="none"
-              spellCheck={false}
-              required
-              maxLength={320}
-              disabled={pending}
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-lg border border-base bg-inset px-3 py-2.5 text-sm text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
-            />
-          </label>
+          <Input
+            id="reset-email"
+            name="email"
+            type="email"
+            label={copy.email}
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            required
+            maxLength={320}
+            disabled={pending}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
 
-          <Button type="submit" isLoading={pending} className="w-full">
+          <Button type="submit" size="lg" isLoading={pending} className="w-full min-h-11">
             {pending ? copy.submitting : copy.sendReset}
           </Button>
         </form>

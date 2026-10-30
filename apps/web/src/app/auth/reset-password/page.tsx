@@ -1,14 +1,14 @@
 "use client";
 
+import { Button, Input } from "@nexus/ui";
+import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
-import { ShieldCheck } from "lucide-react";
-import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../components/locale-context";
 import {
+  type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
-  type AccountRecoveryProof,
 } from "../../../lib/account-recovery-browser";
 
 type Proof = AccountRecoveryProof;
@@ -134,44 +134,43 @@ export default function ResetPasswordPage() {
               </p>
             )}
 
-            <label className="block space-y-1.5" htmlFor="reset-new-password">
-              <span className="text-sm font-semibold text-primary">{copy.newPassword}</span>
-              <input
-                id="reset-new-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={8}
-                maxLength={128}
-                disabled={state.kind === "submitting"}
-                value={passwords.next}
-                onChange={(event) => setPasswords({ ...passwords, next: event.target.value })}
-                className="w-full rounded-lg border border-base bg-inset px-3 py-2.5 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
-              />
-            </label>
+            <Input
+              id="reset-new-password"
+              type="password"
+              label={copy.newPassword}
+              autoComplete="new-password"
+              required
+              minLength={8}
+              maxLength={128}
+              disabled={state.kind === "submitting"}
+              value={passwords.next}
+              onChange={(event) => setPasswords({ ...passwords, next: event.target.value })}
+            />
 
-            <label className="block space-y-1.5" htmlFor="reset-confirm-password">
-              <span className="text-sm font-semibold text-primary">{copy.confirmPassword}</span>
-              <input
-                id="reset-confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={8}
-                maxLength={128}
-                disabled={state.kind === "submitting"}
-                value={passwords.confirm}
-                onChange={(event) =>
-                  setPasswords({
-                    ...passwords,
-                    confirm: event.target.value,
-                  })
-                }
-                className="w-full rounded-lg border border-base bg-inset px-3 py-2.5 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
-              />
-            </label>
+            <Input
+              id="reset-confirm-password"
+              type="password"
+              label={copy.confirmPassword}
+              autoComplete="new-password"
+              required
+              minLength={8}
+              maxLength={128}
+              disabled={state.kind === "submitting"}
+              value={passwords.confirm}
+              onChange={(event) =>
+                setPasswords({
+                  ...passwords,
+                  confirm: event.target.value,
+                })
+              }
+            />
 
-            <Button type="submit" isLoading={state.kind === "submitting"} className="w-full">
+            <Button
+              type="submit"
+              size="lg"
+              isLoading={state.kind === "submitting"}
+              className="w-full min-h-11"
+            >
               {state.kind === "submitting" ? copy.resetting : copy.reset}
             </Button>
           </form>
