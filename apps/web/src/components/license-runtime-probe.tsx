@@ -1,12 +1,13 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import type { LicenseReleaseConfirmation, LicenseReleaseCheck } from "@nexus/domain";
+import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/domain";
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
+import { Button } from "@nexus/ui";
+import { useEffect, useRef, useState } from "react";
 import { getLicenseControlCopy } from "../lib/license-control-i18n";
 import {
-  parseLicenseRuntimeContext,
   confirmLicenseRelease,
   type LicenseRuntimeContext,
+  parseLicenseRuntimeContext,
 } from "../lib/license-runtime-response";
 import { privateApiRequest } from "../lib/private-api-request";
 
@@ -151,33 +152,40 @@ export function LicenseRuntimeProbe({
               ))}
             </select>
           </label>
-          <button
+          <Button
             type="button"
-            className="text-sm text-accent underline"
+            variant="ghost"
+            className="h-auto px-0 text-sm text-accent underline"
             disabled={busy}
             onClick={() => void check()}
           >
             {busy ? copy.pending : copy.probe}
-          </button>
+          </Button>
           {context.totalPages > 1 && (
             <div className="flex gap-4 text-sm">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
+                className="h-auto px-0 text-sm text-accent"
                 disabled={busy || context.page <= 1}
                 onClick={() => setPage(context.page - 1)}
               >
                 {copy.previous}
-              </button>
+              </Button>
               <span>
                 {context.page} / {context.totalPages}
               </span>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
+                className="h-auto px-0 text-sm text-accent"
                 disabled={busy || context.page >= context.totalPages}
                 onClick={() => setPage(context.page + 1)}
               >
                 {copy.next}
-              </button>
+              </Button>
             </div>
           )}
         </>
