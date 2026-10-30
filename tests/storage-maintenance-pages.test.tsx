@@ -54,6 +54,9 @@ it.each(["en", "ru"])("renders discovery, private journal and inspection in %s",
   expect(html).toContain(locale === "ru" ? "Обслуживание хранилища" : "Storage maintenance");
   expect(html).toContain("/admin/storage/objects/smo_a");
   expect(html).toContain('type="number"');
+  expect(html).toContain(locale === "ru" ? "Показать каталоги" : "List directories");
+  expect(html).toContain(locale === "ru" ? "Сканировать окно" : "Scan window");
+  expect(html).toContain("bg-accent text-white");
   expect(html).toContain("view=all&amp;page=2");
 });
 it("does not load journal data for moderators or signed-out visitors", async () => {
@@ -68,6 +71,7 @@ it("requires an initially unchecked confirmation before cleanup", () => {
   expect(html).toContain('type="checkbox"');
   expect(html).not.toContain("checked=");
   expect(html).toContain('disabled=""');
+  expect(html).toContain("bg-danger-solid");
   expect(html).toContain("Deletion is irreversible");
 });
 it("omits cleanup for referenced objects", async () => {
