@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -161,31 +162,33 @@ function FollowControl({
       if (alive.current) setPending(false);
     }
   }
-  const style =
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-60";
+  const linkStyle =
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-accent";
   return (
     <div className="space-y-2">
       {state === "anonymous" ? (
-        <Link href="/auth/login" className={style}>
+        <Link href="/auth/login" className={linkStyle}>
           {copy.signIn}
         </Link>
       ) : state === "self" ? (
         <p className="text-sm text-muted">{copy.self}</p>
       ) : state === "error" ? (
-        <button
+        <Button
           type="button"
-          className={style}
+          variant="outline"
+          className="min-h-11"
           onClick={() => {
             setMessage("");
             setAttempt((value) => value + 1);
           }}
         >
           {copy.retry}
-        </button>
+        </Button>
       ) : (
-        <button
+        <Button
           type="button"
-          className={`${style} ${state === "following" ? "text-accent" : ""}`}
+          variant="outline"
+          className={`min-h-11 ${state === "following" ? "text-accent" : ""}`}
           disabled={pending || state === "checking"}
           onClick={toggle}
           aria-pressed={state === "checking" ? undefined : state === "following"}
@@ -205,7 +208,7 @@ function FollowControl({
               : state === "following"
                 ? copy.following
                 : copy.follow}
-        </button>
+        </Button>
       )}
       {message && (
         <p
