@@ -3,6 +3,7 @@ export const FRESH_AUTH_ACTIONS = [
   "withdrawal",
   "account_recovery",
   "security_change",
+  "organization_ownership",
 ] as const;
 
 export type FreshAuthAction = (typeof FRESH_AUTH_ACTIONS)[number];
@@ -23,6 +24,7 @@ const REQUIREMENTS: Record<FreshAuthAction, FreshAuthRequirement> = {
   withdrawal: requirement("withdrawal", ["current_password"]),
   account_recovery: requirement("account_recovery", ["current_password", "recovery_challenge"]),
   security_change: requirement("security_change", ["current_password"]),
+  organization_ownership: requirement("organization_ownership", ["current_password"]),
 };
 
 function requirement(

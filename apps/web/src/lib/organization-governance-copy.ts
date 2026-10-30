@@ -13,13 +13,16 @@ const en = {
   formerRole: "Your role after transfer",
   confirmation: "Type the organization's public address to confirm",
   confirmHelp: "Enter exactly",
+  currentPassword: "Current password",
+  currentPasswordHelp: "Confirm with your account password. A live session alone is not enough.",
   submit: "Confirm ownership transfer",
   confirm: "Transfer full organization ownership to this selected member?",
   transferred: "Ownership transferred. Your team role has been updated.",
   noSelection:
     "Choose a member from the team list below. Search and pagination can find other current members.",
   cancel: "Cancel selection",
-  invalid: "Check the selected member, public address and profile version.",
+  invalid: "Check the selected member, public address, password and profile version.",
+  reauthRequired: "Current password is incorrect. Re-enter it and try again.",
   targetInvalid: "The selected account is no longer an eligible team member. Reload the team.",
   ownerRequired: "Only the current organization owner can perform this action.",
   unavailable: "Unable to load organization activity. Try again.",
@@ -67,13 +70,16 @@ const ru: typeof en = {
   formerRole: "Ваша роль после передачи",
   confirmation: "Введите публичный адрес организации для подтверждения",
   confirmHelp: "Введите точно",
+  currentPassword: "Текущий пароль",
+  currentPasswordHelp: "Подтвердите паролем аккаунта. Одной активной сессии недостаточно.",
   submit: "Подтвердить передачу владения",
   confirm: "Передать полное владение организацией выбранному участнику?",
   transferred: "Владение передано. Ваша роль в команде обновлена.",
   noSelection:
     "Выберите участника в списке команды ниже. Используйте поиск и страницы для остальных участников.",
   cancel: "Отменить выбор",
-  invalid: "Проверьте выбранного участника, публичный адрес и версию профиля.",
+  invalid: "Проверьте выбранного участника, публичный адрес, пароль и версию профиля.",
+  reauthRequired: "Неверный текущий пароль. Введите его снова и повторите попытку.",
   targetInvalid: "Выбранный аккаунт больше не подходит для передачи. Загрузите актуальную команду.",
   ownerRequired: "Это действие доступно только текущему владельцу организации.",
   unavailable: "Не удалось загрузить историю организации. Попробуйте ещё раз.",
@@ -115,6 +121,7 @@ export function organizationGovernanceError(locale: Locale, code: unknown) {
   const copy = organizationGovernanceCopy(locale);
   if (code === "OWNERSHIP_OWNER_REQUIRED") return copy.ownerRequired;
   if (code === "OWNERSHIP_TARGET_INVALID") return copy.targetInvalid;
+  if (code === "FRESH_AUTH_REQUIRED") return copy.reauthRequired;
   if (code === "ORGANIZATION_HISTORY_EXPIRED") return copy.expired;
   if (["CHANGE_HISTORY_FILTER_INVALID", "INVALID_CURSOR"].includes(String(code)))
     return privateChangeHistoryError(locale, code);

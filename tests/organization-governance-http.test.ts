@@ -8,6 +8,8 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
   transfer: vi.fn(),
   history: vi.fn(),
+  findByEmail: vi.fn(),
+  verifyPassword: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
@@ -15,22 +17,26 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("@nexus/db", () => ({
   organizationGovernanceRepository: mocks,
   organizationWorkspaceRepository: {},
+  userRepository: { findByEmail: mocks.findByEmail },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: mocks.rate,
   generateId: (prefix: string) => `${prefix}_new`,
+  verifyPassword: mocks.verifyPassword,
+  freshAuthProofAccepted: () => true,
 }));
 
 import { GET } from "../apps/web/src/app/api/workspace/organizations/[id]/activity/route";
 import { POST } from "../apps/web/src/app/api/workspace/organizations/[id]/ownership/route";
 
 const time = "2026-10-11T00:00:00.000Z",
-  actor = { id: "owner", role: "user" },
+  actor = { id: "owner", role: "user", email: "owner@nexus.test" },
   context = { params: Promise.resolve({ id: "org" }) };
 const transfer = {
   targetId: "target",
   targetUsername: " target ",
   confirmationSlug: "team",
+  currentPassword: "Current-password-123!",
   formerOwnerRole: "member",
   expectedUpdatedAt: time,
 };
@@ -66,6 +72,12 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
+  mocks.findByEmail.mockResolvedValue({
+    id: "owner",
+    email: "owner@nexus.test",
+    passwordHash: "owner-password-hash",
+  });
+  mocks.verifyPassword.mockResolvedValue(true);
   mocks.transfer.mockResolvedValue({
     organization,
     role: "member",
@@ -96,9 +108,13 @@ it("binds transfer and private history to the actual session with versioned inpu
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
   expect(JSON.stringify(await response.json())).not.toContain("PRIVATE");
+  expect(mocks.verifyPassword).toHaveBeenCalledWith("Current-password-123!", "owner-password-hash");
   expect(mocks.transfer).toHaveBeenCalledWith({
-    ...transfer,
+    targetId: "target",
     targetUsername: "target",
+    confirmationSlug: "team",
+    formerOwnerRole: "member",
+    expectedPasswordHash: "owner-password-hash",
     expectedUpdatedAt: new Date(time),
     actorId: "owner",
     currentToken: "test",
@@ -106,6 +122,7 @@ it("binds transfer and private history to the actual session with versioned inpu
     memberId: "mem_new",
     auditId: "aud_new",
   });
+  expect(JSON.stringify(mocks.transfer.mock.calls)).not.toContain("Current-password-123!");
   const history = await GET(request("GET", undefined, "?before=audit_1"), context);
   expect(history.status).toBe(200);
   expect(mocks.history).toHaveBeenCalledWith(

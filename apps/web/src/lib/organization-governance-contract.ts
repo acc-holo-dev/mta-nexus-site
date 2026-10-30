@@ -15,6 +15,8 @@ export const ownershipTransferSchema = z
       .max(80)
       .regex(/^[a-zA-Z0-9_-]+$/u),
     confirmationSlug: z.string().min(3).max(80),
+    // ORG-003: current password is a fresh-auth proof; never stored after the request.
+    currentPassword: z.string().min(1).max(128),
     formerOwnerRole: z.enum(["member", "admin"]),
     expectedUpdatedAt: z.iso.datetime(),
   })

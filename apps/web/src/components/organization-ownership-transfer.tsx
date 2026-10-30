@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../lib/i18n";
@@ -39,6 +39,7 @@ export function OrganizationOwnershipTransfer({
   const copy = organizationGovernanceCopy(locale),
     teamCopy = getOrganizationCopy(locale);
   const [slug, setSlug] = useState(""),
+    [currentPassword, setCurrentPassword] = useState(""),
     [formerRole, setFormerRole] = useState<"member" | "admin">("member"),
     [error, setError] = useState("");
   const guard = useRef(false),
@@ -52,6 +53,7 @@ export function OrganizationOwnershipTransfer({
       targetId: target.id,
       targetUsername: target.username,
       confirmationSlug: slug,
+      currentPassword,
       formerOwnerRole: formerRole,
       expectedUpdatedAt: data.organization.updatedAt,
     });
@@ -79,8 +81,10 @@ export function OrganizationOwnershipTransfer({
         parsed.data,
       );
       if (!result) throw new Error(copy.mutationUnavailable);
+      setCurrentPassword("");
       onSaved(result);
     } catch (caught) {
+      setCurrentPassword("");
       setError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
     } finally {
       guard.current = false;
@@ -130,11 +134,29 @@ export function OrganizationOwnershipTransfer({
               {copy.confirmHelp}: {data.organization.slug}
             </span>
           </label>
+          <div className="space-y-1.5">
+            <Input
+              id="organization-ownership-password"
+              name="currentPassword"
+              type="password"
+              label={copy.currentPassword}
+              autoComplete="current-password"
+              required
+              maxLength={128}
+              value={currentPassword}
+              disabled={busy}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              aria-describedby="organization-ownership-password-hint"
+            />
+            <p id="organization-ownership-password-hint" className="text-xs text-muted">
+              {copy.currentPasswordHelp}
+            </p>
+          </div>
           <div className="flex flex-wrap gap-3">
             <Button
               type="submit"
               variant="danger"
-              disabled={busy || slug !== data.organization.slug}
+              disabled={busy || slug !== data.organization.slug || !currentPassword}
               isLoading={busy}
             >
               {copy.submit}

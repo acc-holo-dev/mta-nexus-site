@@ -15,11 +15,13 @@ import { expect, it } from "vitest";
 
 async function identity() {
   const key = randomUUID().replaceAll("-", "");
+  const passwordHash = `hash_${key}`;
   const user = await userRepository.create({
     id: `usr_org_session_${key}`,
     username: key,
     email: `${key}@nexus.test`,
     displayName: "Organization session fixture",
+    passwordHash,
   });
   const currentToken = `org-transfer-token-${key}`;
   const sessionId = `ses_org_${key}`;
@@ -29,7 +31,7 @@ async function identity() {
     token: currentToken,
     expiresAt: new Date(Date.now() + 3_600_000),
   });
-  return { user, currentToken, sessionId };
+  return { user, currentToken, sessionId, passwordHash };
 }
 
 async function fixture() {
@@ -71,6 +73,7 @@ async function fixture() {
       targetId: target.user.id,
       targetUsername: target.user.username,
       confirmationSlug: organization.slug,
+      expectedPasswordHash: owner.passwordHash,
       expectedUpdatedAt: organization.updatedAt,
       formerOwnerRole: "admin" as const,
       memberId: `mem_new_${key}`,

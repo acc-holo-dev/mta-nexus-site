@@ -1,4 +1,4 @@
-import { organizationGovernanceRepository } from "@nexus/db";
+import { organizationGovernanceRepository, userRepository } from "@nexus/db";
 import {
   AppError,
   type ChangeHistoryFilters,
@@ -6,7 +6,7 @@ import {
   UnauthorizedError,
   type User,
 } from "@nexus/domain";
-import { generateId } from "@nexus/security";
+import { freshAuthProofAccepted, generateId, verifyPassword } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import {
   organizationChangeHistorySchema,
@@ -20,8 +20,20 @@ class OrganizationGovernanceService {
     if (!currentToken) throw new UnauthorizedError();
     const parsed = ownershipTransferSchema.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid transfer", 400, "VALIDATION_ERROR");
+    if (!freshAuthProofAccepted("organization_ownership", "current_password")) {
+      throw new AppError("Current password is required", 401, "FRESH_AUTH_REQUIRED");
+    }
+    const stored = await userRepository.findByEmail(actor.email);
+    if (
+      !stored?.passwordHash ||
+      !(await verifyPassword(parsed.data.currentPassword, stored.passwordHash))
+    ) {
+      throw new AppError("Current password is incorrect", 401, "FRESH_AUTH_REQUIRED");
+    }
+    const { currentPassword: _currentPassword, ...transferInput } = parsed.data;
     const result = await organizationGovernanceRepository.transfer({
-      ...parsed.data,
+      ...transferInput,
+      expectedPasswordHash: stored.passwordHash,
       expectedUpdatedAt: new Date(parsed.data.expectedUpdatedAt),
       id,
       actorId: actor.id,
