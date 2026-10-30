@@ -1,7 +1,7 @@
 import { followWorkspaceRepository, socialRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { after, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { followCommandSchema } from "../../../lib/follow-workspace-contract";
 import { followError } from "../../../lib/follow-workspace-copy";
@@ -12,7 +12,6 @@ import {
   logRequestEvent,
 } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
-import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 import { userPlatformApi } from "../../../lib/user-platform-api";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 
@@ -79,6 +78,7 @@ function mutation(request: NextRequest, following: boolean) {
       const parsed = followCommandSchema.safeParse(await readBoundedJson(request, 32 * 1024));
       if (!parsed.success) throw new AppError("Invalid follow command", 400, "VALIDATION_ERROR");
       const { targetType, targetId } = parsed.data;
+      // Follower inbox notice commits in the same follow transaction; no after().
       const result = await followWorkspaceRepository.setFollowing(
         actor.id,
         targetType,
@@ -86,31 +86,6 @@ function mutation(request: NextRequest, following: boolean) {
         following,
         generateId("fol"),
       );
-      if (result.created && targetType === "user") {
-        const context = createRequestLogContext(request);
-        after(async () => {
-          try {
-            await dispatchNotificationsBestEffort([
-              {
-                recipientId: targetId,
-                title: "New Follower",
-                message: `@${actor.username} started following your activity.`,
-                type: "system",
-                category: "follow",
-                link: `/users/${encodeURIComponent(actor.username)}`,
-              },
-            ]);
-          } catch (error) {
-            logRequestEvent({
-              level: "warn",
-              event: "follow.notification_delivery_failed",
-              context,
-              status: 200,
-              error,
-            });
-          }
-        });
-      }
       return { success: true, targetType, targetId, following: result.following };
     },
     200,

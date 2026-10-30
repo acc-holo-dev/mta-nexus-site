@@ -10,7 +10,7 @@
 
 | № | Цель и граница работы | Зависит от | Критерий готовности |
 |---|---|---|---|
-| 05 | ~~Verification/discussion continuous fanout~~ (done on mainline path). Remaining: confirm addressed-replay boundaries stay operator-only for pre-0083 comments. | — | Live verification and discussion comment create commit delivery sources; workers recheck eligibility; HTTP has no `after()` for these paths. Replay CLI remains for historical windows. External push is not exactly-once. |
+| 05 | ~~Notification continuous fanout without `after()`~~ (done on mainline path). Remaining: addressed-replay stays operator-only for pre-0083 comments / pre-0084 publications. | — | Verification, discussion, server-publication, and user-follow inbox paths commit durable sources; HTTP has no notification `after()`. Replay CLI remains for historical windows. External push is not exactly-once. |
 | 06 | ~~Проверить повтор и восстановление доставки~~ (fanout jobs). | 05 | Report/support/verification/discussion: page rollback, SKIP LOCKED restart, five-attempt exhaustion, operator reset, idempotent notice IDs. External push lease/retry remains separate and not exactly-once. |
 | 07 | ~~Сделать запуск и остановку среды воспроизводимыми~~ (local stack). | — | `pnpm dev` / compose keep app + workers under `init`; push-worker has 30s SIGTERM grace; health probes separate heartbeat vs progress; workers remove health files on stop; SIGTERM lifecycle covered by focused tests. Crashed app/push-worker stay `restart: "no"` so failures remain visible. |
 | 08 | Сократить измеренное время тестов БД. | — | Есть сравнимые замеры до/после; повторная подготовка фикстур и ненужное ожидание убраны там, где это даёт выигрыш. Проверки конкуренции, отката и отдельная БД сохранены. |

@@ -6,57 +6,19 @@ import {
 } from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   user: { id: "usr_1", username: "tester" } as { id: string; username: string } | null,
   follow: { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" } as Record<
     string,
     string
   > | null,
   following: true,
-  notificationFails: false,
 }));
 
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
-const dispatchNotifications = vi.hoisted(() =>
-  vi.fn(async () => {
-    if (state.notificationFails) {
-      throw new Error("delivery unavailable");
-    }
-    return {
-      requested: 1,
-      stored: 1,
-      storageFailed: 0,
-      push: {
-        notifications: 1,
-        attempted: 0,
-        delivered: 0,
-        failed: 0,
-        stale: 0,
-        deliveryErrors: 0,
-      },
-    };
-  }),
-);
 const markSingle = vi.hoisted(() => vi.fn(async () => false));
 const markAll = vi.hoisted(() => vi.fn(async () => undefined));
 
-vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>("next/server");
-  return {
-    ...actual,
-    after: afterMock,
-  };
-});
-
 vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
-}));
-vi.mock("../../../lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: dispatchNotifications,
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -118,11 +80,9 @@ describe("social and notification HTTP state contract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     stubBrowserMutationOrigin();
-    state.afterCallbacks.length = 0;
     state.user = { id: "usr_1", username: "tester" };
     state.follow = { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" };
     state.following = true;
-    state.notificationFails = false;
   });
 
   afterEach(() => {
@@ -166,49 +126,18 @@ describe("social and notification HTTP state contract", () => {
     expectPrivate(response);
   });
 
-  it("confirms a committed follow before best-effort notification delivery", async () => {
-    state.notificationFails = true;
-    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
-    try {
-      const response = await follow(
-        makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
-      );
-      expect(response.status).toBe(200);
-      expectPrivate(response);
-      expect(await response.json()).toMatchObject({
-        success: true,
-        targetType: "user",
-        targetId: "usr_2",
-        following: true,
-      });
-      expect(afterMock).toHaveBeenCalledOnce();
-      expect(dispatchNotifications).not.toHaveBeenCalled();
-
-      await state.afterCallbacks[0]?.();
-
-      expect(dispatchNotifications).toHaveBeenCalledTimes(1);
-      expect(log).toHaveBeenCalledOnce();
-    } finally {
-      log.mockRestore();
-    }
-  });
-
-  it("pushes only the successfully stored follower notification after response", async () => {
+  it("confirms a committed follow without Next.js after() notification dispatch", async () => {
     const response = await follow(
       makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
     );
-
     expect(response.status).toBe(200);
-    expect(dispatchNotifications).not.toHaveBeenCalled();
-
-    await state.afterCallbacks[0]?.();
-
-    expect(dispatchNotifications).toHaveBeenCalledWith([
-      expect.objectContaining({
-        recipientId: "usr_2",
-        category: "follow",
-      }),
-    ]);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({
+      success: true,
+      targetType: "user",
+      targetId: "usr_2",
+      following: true,
+    });
   });
 
   it("checks the exact follow key before confirming a conflict", async () => {

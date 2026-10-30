@@ -19,7 +19,14 @@ import { serverContentAccess } from "./server-content";
 import { publicationNotice } from "./publication-notice";
 import { lockInitiatingSession } from "./initiating-session";
 import { resourceReviewsRepository } from "./resource-reviews";
-import { auditEvents, content, comments, discussionNotificationDeliveries, users } from "../schema";
+import {
+  auditEvents,
+  content,
+  comments,
+  discussionNotificationDeliveries,
+  publicationNotificationDeliveries,
+  users,
+} from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
@@ -358,6 +365,18 @@ export class ContentRepository {
         status === "published" ? "published" : "archived",
         audit.id,
       );
+      if (status === "published" && updated.serverId) {
+        // Durable server-follower fanout; HTTP must not use after() for this path.
+        await tx
+          .delete(publicationNotificationDeliveries)
+          .where(eq(publicationNotificationDeliveries.contentId, updated.id));
+        await tx.insert(publicationNotificationDeliveries).values({
+          contentId: updated.id,
+          serverId: updated.serverId,
+          authorId: updated.authorId,
+          createdAt: sql`clock_timestamp()`,
+        });
+      }
       return updated as unknown as Content;
     });
   }

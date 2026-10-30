@@ -413,9 +413,11 @@ Never synthesize intents for historical or already accepted notifications. After
 an admission succeeds, sender cleanup of outbox rows must not cause another
 admission. Discussion replies use their existing typed receipt and explicit
 `--repair-push` replay below. Admission recovery cannot create an inbox that was
-lost before it was stored. Report, support, verification and new discussion comment
-fanout use transactional delivery sources. Historical discussion comments from
-before migration 0083 still rely on addressed replay below. External push delivery
+lost before it was stored. Report, support, verification, discussion, and
+server-publication fanout use transactional delivery sources; new user-follow
+notices commit inbox rows in the follow transaction. HTTP notification paths do
+not use Next.js `after()`. Historical discussion comments from before migration
+0083 and publications from before 0084 are not backfilled. External push delivery
 retains the existing lease, retry and provider guarantees and is not exactly-once.
 
 ### Recovering discussion moderator-style delivery jobs
@@ -429,8 +431,10 @@ the support/report pattern.
 
 The queue probe reports `discussionPending`, `discussionFailed`,
 `discussionOldestAgeSeconds`, and alerts `discussion_delivery_failed` or
-`discussion_delivery_backlog`. After resolving the cause, reset one verified
-failed comment on the intended database:
+`discussion_delivery_backlog`. Server-linked publishes likewise enqueue
+`publication_notification_deliveries` (newest followers first, capped at 100) with
+`publicationPending` / `publicationFailed` probe fields. After resolving the cause,
+reset one verified failed comment on the intended database:
 
 ```sql
 SELECT comment_id, attempts, available_at

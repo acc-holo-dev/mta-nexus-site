@@ -1,11 +1,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import {
+  contentRepository,
+  db,
   notificationRepository,
+  publicationNotificationDeliveries,
+  publicationNotificationDeliveryRepository,
   serverRepository,
   socialRepository,
   userRepository,
 } from "@nexus/db";
-import { notifyServerFollowersOfPublishedContent } from "../apps/web/src/lib/services/server-follow-notification-service";
+import { drainPublicationNotificationDelivery } from "../apps/web/src/lib/services/server-follow-notification-service";
 
 describe("server follower publication notification integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -13,6 +17,7 @@ describe("server follower publication notification integration", () => {
   const enabledId = `usr_srv_notify_on_${suffix}`;
   const disabledId = `usr_srv_notify_off_${suffix}`;
   const serverId = `srv_notify_${suffix}`;
+  const contentId = `cnt_notify_${suffix}`;
   const serverPort = 20_000 + ((Date.now() + process.pid) % 40_000);
 
   beforeAll(async () => {
@@ -74,27 +79,37 @@ describe("server follower publication notification integration", () => {
     await notificationRepository.updatePreferences(disabledId, {
       serverEnabled: false,
     });
-  });
 
-  it("delivers only to eligible followers with server notifications enabled", async () => {
-    const result = await notifyServerFollowersOfPublishedContent({
+    await contentRepository.create({
+      id: contentId,
       authorId,
       serverId,
       slug: `server-update-${suffix}`,
-      status: "published",
       title: "Integration update",
+      body: "Body",
+      type: "update",
+      status: "published",
+      publishedAt: new Date(),
+      viewCount: 0,
+      likeCount: 0,
+      commentCount: 0,
+      tags: [],
     });
 
-    expect(result).toMatchObject({
-      eligibleFollowers: 2,
-      attempted: 2,
-      delivered: 1,
-      suppressedByPreference: 1,
-      failed: 0,
-      pushQueued: 0,
-      followerLimitReached: false,
-      skipped: false,
+    await db.insert(publicationNotificationDeliveries).values({
+      contentId,
+      serverId,
+      authorId,
+      createdAt: new Date(),
     });
+  });
+
+  it("delivers only to eligible followers with server notifications enabled", async () => {
+    const pages = await drainPublicationNotificationDelivery();
+    expect(pages.some((page) => page.state === "completed")).toBe(true);
+    expect(
+      pages.reduce((sum, page) => sum + page.stored, 0),
+    ).toBeGreaterThanOrEqual(1);
 
     const enabledNotifications = await notificationRepository.listByUser(enabledId, 10);
     const disabledNotifications = await notificationRepository.listByUser(disabledId, 10);
@@ -110,5 +125,8 @@ describe("server follower publication notification integration", () => {
     });
     expect(disabledNotifications).toHaveLength(0);
     expect(authorNotifications).toHaveLength(0);
+
+    const idle = await publicationNotificationDeliveryRepository.processNext();
+    expect(idle.state).toBe("idle");
   });
 });

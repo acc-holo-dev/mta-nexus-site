@@ -4,6 +4,7 @@ export * from "./repositories/index";
 export { supportNotificationDeliveryRepository } from "./repositories/support-notification-delivery";
 export { verificationNotificationDeliveryRepository } from "./repositories/verification-notification-delivery";
 export { discussionNotificationDeliveryRepository } from "./repositories/discussion-notification-delivery";
+export { publicationNotificationDeliveryRepository } from "./repositories/publication-notification-delivery";
 export {
   WebPushAdmissionRecoveryRepository,
   type WebPushAdmissionRecoveryResult,

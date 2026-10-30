@@ -5,6 +5,7 @@ import {
   closeDatabaseConnection,
   createWebPushHttpSender,
   discussionNotificationDeliveryRepository,
+  publicationNotificationDeliveryRepository,
   reportNotificationDeliveryRepository,
   supportNotificationDeliveryRepository,
   verificationNotificationDeliveryRepository,
@@ -68,6 +69,8 @@ type QueueAlertReason =
   | "verification_delivery_backlog"
   | "discussion_delivery_failed"
   | "discussion_delivery_backlog"
+  | "publication_delivery_failed"
+  | "publication_delivery_backlog"
   | "admission_recovery_failed"
   | "admission_recovery_backlog";
 
@@ -98,6 +101,9 @@ let verificationOldestAgeSeconds = 0;
 let discussionPending = 0;
 let discussionFailed = 0;
 let discussionOldestAgeSeconds = 0;
+let publicationPending = 0;
+let publicationFailed = 0;
+let publicationOldestAgeSeconds = 0;
 let admissionPending = 0;
 let admissionFailed = 0;
 let admissionOldestAgeSeconds = 0;
@@ -168,6 +174,12 @@ function updateQueueAlertState() {
     (discussionPending > 0 && discussionOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
   )
     reasons.push("discussion_delivery_backlog");
+  if (publicationFailed > 0) reasons.push("publication_delivery_failed");
+  if (
+    publicationPending >= QUEUE_ALERT_DUE_JOBS ||
+    (publicationPending > 0 && publicationOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("publication_delivery_backlog");
   if (admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     admissionPending >= QUEUE_ALERT_DUE_JOBS ||
@@ -200,6 +212,9 @@ function updateQueueAlertState() {
     discussionPending,
     discussionFailed,
     discussionOldestAgeSeconds,
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -247,6 +262,9 @@ async function writeHealthSnapshot() {
     discussionPending,
     discussionFailed,
     discussionOldestAgeSeconds,
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -294,6 +312,10 @@ async function refreshQueueStats() {
   discussionPending = discussion.pending;
   discussionFailed = discussion.failed;
   discussionOldestAgeSeconds = discussion.oldestAgeSeconds;
+  const publication = await publicationNotificationDeliveryRepository.stats();
+  publicationPending = publication.pending;
+  publicationFailed = publication.failed;
+  publicationOldestAgeSeconds = publication.oldestAgeSeconds;
   const admissions = await webPushAdmissionRecoveryRepository.stats();
   admissionPending = admissions.pending;
   admissionFailed = admissions.failed;
@@ -388,6 +410,14 @@ try {
     if (discussion.state !== "idle") {
       activity += 1;
       emit({ status: "discussion-delivery", batch: healthBatch, ...discussion });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const publication = await publicationNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (publication.state !== "idle") {
+      activity += 1;
+      emit({ status: "publication-delivery", batch: healthBatch, ...publication });
     }
     markProgress();
     if (controller.signal.aborted) break;

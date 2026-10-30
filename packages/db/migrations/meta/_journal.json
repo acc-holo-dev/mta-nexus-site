@@ -589,6 +589,13 @@
       "when": 1793530800000,
       "tag": "0083_discussion_notification_delivery",
       "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1793617200000,
+      "tag": "0084_publication_notification_delivery",
+      "breakpoints": true
     }
   ]
 }

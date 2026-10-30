@@ -1719,6 +1719,46 @@ export const discussionNotificationDeliveries = pgTable(
   ],
 );
 
+// Durable server-follower fanout for newly published server-linked content.
+export const publicationNotificationDeliveries = pgTable(
+  "publication_notification_deliveries",
+  {
+    contentId: text("content_id")
+      .primaryKey()
+      .references(() => content.id, { onDelete: "cascade" }),
+    serverId: text("server_id")
+      .notNull()
+      .references(() => servers.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    lastFollowerCreatedAt: timestamp("last_follower_created_at", { withTimezone: true }),
+    lastFollowerId: text("last_follower_id"),
+    notifiedCount: integer("notified_count").notNull().default(0),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("publication_notification_deliveries_due_idx")
+      .on(table.availableAt, table.contentId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check(
+      "publication_notification_deliveries_attempts_bounds",
+      sql`${table.attempts} BETWEEN 0 AND 5`,
+    ),
+    check(
+      "publication_notification_deliveries_notified_bounds",
+      sql`${table.notifiedCount} BETWEEN 0 AND 100`,
+    ),
+    check(
+      "publication_notification_deliveries_follower_cursor_pair",
+      sql`(${table.lastFollowerCreatedAt} IS NULL AND ${table.lastFollowerId} IS NULL) OR (${table.lastFollowerCreatedAt} IS NOT NULL AND ${table.lastFollowerId} IS NOT NULL)`,
+    ),
+  ],
+);
+
 export const serverClaimChallenges = pgTable(
   "server_claim_challenges",
   {

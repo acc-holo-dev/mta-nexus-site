@@ -52,6 +52,8 @@ test("migration, database tooling, workflow and explicit release changes run ful
       "report-notification-delivery",
       "verification-notification-delivery",
       "discussion-notification-delivery",
+      "publication-notification-delivery",
+      "user-follow-notice",
       "resource-release-worker",
       "support-requester-notice",
       "verification",

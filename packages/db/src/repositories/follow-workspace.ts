@@ -15,6 +15,7 @@ import {
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
 import { containsPattern } from "./search-pattern";
+import { userFollowNotice } from "./user-follow-notice";
 
 type TargetType = Follow["targetType"];
 type Cursor = { createdAt: string; id: string };
@@ -511,6 +512,13 @@ class FollowWorkspaceRepository {
       if (!created) {
         const [existing] = await tx.select({ id: follows.id }).from(follows).where(key).limit(1);
         if (!existing) throw new AppError("Follow could not be confirmed", 503, "UNCONFIRMED");
+      } else if (targetType === "user") {
+        const [follower] = await tx
+          .select({ username: users.username })
+          .from(users)
+          .where(eq(users.id, actorId))
+          .limit(1);
+        if (follower) await userFollowNotice(tx, created.id, targetId, follower.username);
       }
       return { following: true, created: !!created };
     });
