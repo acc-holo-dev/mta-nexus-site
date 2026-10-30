@@ -58,8 +58,8 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import SecurityPage from "../apps/web/src/app/security/page";
-import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
 import { SECURITY_ACTIVITY_ACTIONS } from "../apps/web/src/lib/security-activity";
+import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
 
 describe("Security Center behavior", () => {
   beforeEach(() => {
@@ -142,6 +142,14 @@ describe("Security Center behavior", () => {
         createdAt: new Date("2026-10-08T00:00:00.000Z"),
       },
       {
+        id: "aud_license",
+        actorId: "usr_security",
+        action: "license.bound",
+        targetType: "license",
+        details: { reason: "bind", secret: "license-detail" },
+        createdAt: new Date("2026-10-08T00:00:00.500Z"),
+      },
+      {
         id: "aud_other",
         actorId: "usr_security",
         action: "product.updated",
@@ -160,8 +168,14 @@ describe("Security Center behavior", () => {
         id: "aud_allowed",
         action: "user.logged_in",
       }),
+      expect.objectContaining({
+        id: "aud_license",
+        action: "license.bound",
+        targetType: "license",
+      }),
     ]);
     expect(JSON.stringify(result)).not.toContain("secret");
     expect(JSON.stringify(result)).not.toContain("must-not-leak");
+    expect(JSON.stringify(result)).not.toContain("license-detail");
   });
 });
