@@ -10,8 +10,8 @@
 
 | № | Цель и граница работы | Зависит от | Критерий готовности |
 |---|---|---|---|
-| 19 | Повторить обновление БД и парное восстановление данных/файлов. | — | Контракт mount-топологии `compose.production.yaml` закреплён тестом; CI-green (#126) и library/history `@nexus/ui` (#127) на tip. Residual: зелёный full_acceptance + `backup-restore-evidence.json` на текущем tip SHA для кандидата 20. Рабочие/production-данные не изменены. |
-| 20 | Подготовить проверяемый кандидат открытой бесплатной беты. | 06–09, 13–19 | Harness `pnpm beta:candidate` готов: exact-SHA приёмка (CI full_acceptance + jobResults, TLS/runtime, mail, storage/scanner, browsers, DB upgrade, backup/restore) с именованными блокерами; `openBetaLive`/`productionAuthorized` никогда не true. Checkable только после PASS-артефактов на текущем tip; blocked-by 19 CI evidence на tip + owner deploy/observability/legal. Marketplace/DRM вне scope. Развёртывание требует отдельного разрешения. |
+| 19 | Повторить обновление БД и парное восстановление данных/файлов. | — | Контракт mount-топологии `compose.production.yaml` закреплён тестом; disposable backup-restore PASS на tip `21f1531a` (run 40998031353) вместе с upgrade rehearsal; full_acceptance ещё красный из‑за Sequential database tests (~30 fails). Рабочие/production-данные не изменены. |
+| 20 | Подготовить проверяемый кандидат открытой бесплатной беты. | 06–09, 13–19 | Harness `pnpm beta:candidate` готов; `openBetaLive`/`productionAuthorized` никогда не true. На tip `21f1531a` candidate не PASS: full_acceptance FAIL (verify/DB behavior); backup evidence есть, но нет зелёного ci-evidence. Далее зелёный verify + owner deploy/observability/legal. Marketplace/DRM вне scope. Развёртывание требует отдельного разрешения. |
 
 У каждой параллельной задачи один владелец и непересекающиеся файлы. Изменения общих helpers, CI и документации собирает основной агент; PostgreSQL-тесты исполнителей используют разные одноразовые БД. Полные проверки и тяжёлая сборка выполняются один раз после интеграции. Завершённые задачи удаляются из очереди после включения в `main`, номера оставшихся сохраняются; доказательства и история остаются в PR и Git.
 
