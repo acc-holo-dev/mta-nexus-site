@@ -77,6 +77,8 @@ export function toSecurityActivityItem(event: {
   ipAddress?: string;
   userAgent?: string;
   createdAt: Date;
+  /** Accepted so full audit rows can be mapped; never copied into the user-facing item. */
+  details?: unknown;
 }): SecurityActivityItem | null {
   if (!isSecurityActivityAction(event.action)) return null;
   return {
