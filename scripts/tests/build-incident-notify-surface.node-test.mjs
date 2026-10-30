@@ -7,7 +7,11 @@ import { RELEASE_UPGRADE_TARGET_TAG } from "../../packages/db/scripts/release-up
 const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 test("SEC-002 build-incident delivery lands with explicit quarantine opt-in", () => {
-  assert.equal(RELEASE_UPGRADE_TARGET_TAG, "0085_build_incident_notification_delivery");
+  const journal = JSON.parse(read("packages/db/migrations/meta/_journal.json"));
+  assert.ok(
+    journal.entries.some((entry) => entry.tag === "0085_build_incident_notification_delivery"),
+  );
+  assert.equal(journal.entries.at(-1)?.tag, RELEASE_UPGRADE_TARGET_TAG);
   assert.match(
     read("packages/db/migrations/0085_build_incident_notification_delivery.sql"),
     /build_incident_notification_deliveries/u,
