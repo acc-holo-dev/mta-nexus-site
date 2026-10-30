@@ -1,15 +1,16 @@
 "use client";
+import { Button } from "@nexus/ui";
 
 import { Archive, LoaderCircle, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
-import { useNexusLocale } from "./locale-context";
 import {
   confirmsModerationCommand,
   moderationDetailHref,
 } from "../lib/community-moderation-contract";
 import { moderationCopy, moderationError } from "../lib/community-moderation-copy";
+import { useNexusLocale } from "./locale-context";
 
 export function ContentModerationControls({
   contentId,
@@ -133,11 +134,12 @@ export function ContentModerationControls({
       </label>
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
           onClick={() => void moderate("publish")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-success)]/25 bg-success-soft px-3 py-2 text-[11px] font-semibold text-success transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 bg-success-soft text-success text-[11px]"
+          variant="outline"
         >
           {pending === "publish" ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -145,13 +147,14 @@ export function ContentModerationControls({
             <Send className="h-3.5 w-3.5" aria-hidden="true" />
           )}
           {copy.publish}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "archived"}
           onClick={() => void moderate("archive")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-base bg-surface px-3 py-2 text-[11px] font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 text-[11px]"
+          variant="outline"
         >
           {pending === "archive" ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -159,7 +162,7 @@ export function ContentModerationControls({
             <Archive className="h-3.5 w-3.5" aria-hidden="true" />
           )}
           {copy.archive}
-        </button>
+        </Button>
       </div>
 
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
@@ -181,14 +184,15 @@ export function ContentModerationControls({
           <p role="alert" className="text-[11px] text-danger">
             {error}
           </p>
-          <button
+          <Button
             type="button"
             disabled={pending !== null}
             onClick={() => window.location.reload()}
-            className="text-xs text-accent underline"
+            className="h-auto min-h-11 px-0 text-sm text-accent underline"
+            variant="ghost"
           >
             {locale === "ru" ? "Загрузить сохранённую версию" : "Reload saved version"}
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@nexus/ui";
 import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -76,15 +77,16 @@ export function BuildQuarantineControls({
           className="w-full resize-y rounded-md border border-base bg-inset px-2.5 py-2 text-xs text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
         />
       </label>
-      <button
+      <Button
         type="button"
+        variant="outline"
         disabled={!hasReason || pending !== null}
         onClick={() => void act(action)}
-        className={`inline-flex min-h-9 items-center gap-1.5 rounded-md border px-3 py-2 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+        className={
           action === "quarantine"
-            ? "border-[color:var(--nexus-danger)]/25 bg-danger-soft text-danger"
-            : "border-[color:var(--nexus-success)]/25 bg-success-soft text-success"
-        }`}
+            ? "min-h-9 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
+            : "min-h-9 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
+        }
       >
         {pending ? (
           <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -94,7 +96,7 @@ export function BuildQuarantineControls({
           <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
         )}
         {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
-      </button>
+      </Button>
       {error && (
         <p role="alert" className="text-[11px] text-danger">
           {error}

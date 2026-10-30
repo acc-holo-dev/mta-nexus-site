@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -66,11 +67,12 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
         />
       </label>
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           disabled={!ready || pending !== null}
           onClick={() => void decide("resolve")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-base bg-success-soft px-3 py-2 text-xs font-semibold text-success disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 bg-success-soft text-success text-xs"
+          variant="outline"
         >
           {pending === "resolve" ? (
             <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -78,12 +80,13 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
           )}
           {copy.resolveReport}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           disabled={!ready || pending !== null}
           onClick={() => void decide("dismiss")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-base bg-danger-soft px-3 py-2 text-xs font-semibold text-danger disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 bg-danger-soft text-danger text-xs"
+          variant="outline"
         >
           {pending === "dismiss" ? (
             <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -91,7 +94,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
             <XCircle className="h-4 w-4" aria-hidden="true" />
           )}
           {copy.dismissReport}
-        </button>
+        </Button>
       </div>
       {!ready && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
       {error && (

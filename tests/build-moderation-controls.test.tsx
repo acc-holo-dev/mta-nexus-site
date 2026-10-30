@@ -81,6 +81,8 @@ describe("build moderation control behavior", () => {
     );
     expect(trusted).toContain('href="/api/admin/builds/bld_clean/download"');
     expect(trusted).toContain(copy.reviewArtifact);
+    expect(trusted).toContain("bg-success-soft");
+    expect(trusted).toContain("rounded-lg");
     expect(trusted).not.toContain(copy.artifactRequiresCleanScan);
 
     const untrusted = renderToStaticMarkup(

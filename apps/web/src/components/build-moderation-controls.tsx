@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 
 import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -121,11 +122,12 @@ export function BuildModerationControls({
           </span>
         )}
 
-        <button
+        <Button
           type="button"
           disabled={uncertain || !expectedRevision || confirmedWrite || !canApprove}
           onClick={() => void moderate("approve")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-success)]/25 bg-success-soft px-3 py-2 text-[11px] font-semibold text-success transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 bg-success-soft text-success text-[11px]"
+          variant="outline"
         >
           {pending === "approve" ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -133,13 +135,14 @@ export function BuildModerationControls({
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           )}
           {copy.approve}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
           disabled={uncertain || !expectedRevision || confirmedWrite || !canReject}
           onClick={() => void moderate("reject")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-danger)]/25 bg-danger-soft px-3 py-2 text-[11px] font-semibold text-danger transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 bg-danger-soft text-danger text-[11px]"
+          variant="outline"
         >
           {pending === "reject" ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -147,7 +150,7 @@ export function BuildModerationControls({
             <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
           )}
           {copy.reject}
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -156,13 +159,14 @@ export function BuildModerationControls({
         </p>
       )}
       {uncertain && (
-        <button
+        <Button
           type="button"
           onClick={() => window.location.reload()}
-          className="text-accent underline"
+          className="h-auto px-0 text-accent underline"
+          variant="ghost"
         >
           {versionCopy.reload}
-        </button>
+        </Button>
       )}
       {!hasNotes && (
         <p className="text-[10px] text-faint" aria-live="polite">
