@@ -166,7 +166,7 @@ overrides:
   '@esbuild-kit/core-utils>esbuild': 0.28.2
   vite: 7.3.7
 
-packageExtensionsChecksum: sha256-tgPVZfsu8TzY1uNWyseiFDjgEY6NuXa5tYKYm6UbwOM=
+packageExtensionsChecksum: sha256-cOljtaeUxRajqYuTy/xi9hkWzGt1fFYfhEuPJA+7E7s=
 
 importers:
 
@@ -188,8 +188,8 @@ importers:
         specifier: 19.3.0
         version: 19.3.0(@types/react@19.3.0)
       dependency-cruiser:
-        specifier: 18.5.0
-        version: 18.5.0
+        specifier: 18.7.0
+        version: 18.7.0
       drizzle-orm:
         specifier: ^0.45.3
         version: 0.45.3(postgres@3.4.9)
@@ -1776,6 +1776,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  acorn@8.19.0:
+    resolution: {integrity: sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
@@ -1824,8 +1829,8 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  dependency-cruiser@18.5.0:
-    resolution: {integrity: sha512-LFvJOvufjQ7XTucSI40NHqse0gcQBevDGkZabLAKcGwO+VWOywTqZ5EyFRYWSokNxvLOO7v6EXyNi+9I72oWUA==}
+  dependency-cruiser@18.7.0:
+    resolution: {integrity: sha512-WexT4OswA6Gy86ms2J7SJ4FJscN43dyS+i5skpbtXlPTFQW4yWbontjFip1TOBAVnc+U+9zdH0a56YTRZX/IGw==}
     engines: {node: ^22||^24||>=26}
     hasBin: true
 
@@ -2011,8 +2016,8 @@ packages:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
 
-  ignore@7.0.11:
-    resolution: {integrity: sha512-YChdK5txDjwGUvgR7oCJcLGkwi3LDh8Zx8tS7ndYciLEg/oOCL26VUBSUEtgS7EjiybcBqFxh5j0rAdDX7/bbg==}
+  ignore@7.0.12:
+    resolution: {integrity: sha512-/8UvqAPU9DGTI9k4mxtf49U37Isfwr8Uts96+SBHIkFxPJnHS0Ew4f00sM4Scd8V8EjM0jUNtVDdv1kPdt35lg==}
     engines: {node: '>= 4'}
 
   ini@4.1.1:
@@ -3364,9 +3369,9 @@ snapshots:
 
   acorn-jsx-walk@2.0.0: {}
 
-  acorn-jsx@5.3.2(acorn@8.18.0):
+  acorn-jsx@5.3.2(acorn@8.19.0):
     dependencies:
-      acorn: 8.18.0
+      acorn: 8.19.0
 
   acorn-loose@8.5.2:
     dependencies:
@@ -3377,6 +3382,8 @@ snapshots:
       acorn: 8.18.0
 
   acorn@8.18.0: {}
+
+  acorn@8.19.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -3411,16 +3418,16 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  dependency-cruiser@18.5.0:
+  dependency-cruiser@18.7.0:
     dependencies:
-      acorn: 8.18.0
-      acorn-jsx: 5.3.2(acorn@8.18.0)
+      acorn: 8.19.0
+      acorn-jsx: 5.3.2(acorn@8.19.0)
       acorn-jsx-walk: 2.0.0
       acorn-loose: 8.5.2
       acorn-walk: 8.3.5
       commander: 15.0.0
       enhanced-resolve: 5.26.0
-      ignore: 7.0.11
+      ignore: 7.0.12
       interpret: 3.1.1
       is-installed-globally: 1.0.1
       json5: 2.2.3
@@ -3562,7 +3569,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  ignore@7.0.11: {}
+  ignore@7.0.12: {}
 
   ini@4.1.1: {}
 
@@ -3963,7 +3970,7 @@ snapshots:
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
       chalk: 4.1.2
-      enhanced-resolve: 5.25.1
+      enhanced-resolve: 5.26.0
       tapable: 2.3.3
       tsconfig-paths: 4.2.0
 

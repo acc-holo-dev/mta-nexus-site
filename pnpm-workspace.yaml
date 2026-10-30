@@ -9,11 +9,14 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
 packageExtensions:
-  # Dependency-cruiser cannot yet use the TypeScript 7 compiler API.
-  "dependency-cruiser@18.5.0":
+  # Stable dependency-cruiser still needs the TS 6 compiler API for tsPreCompilationDeps.
+  # Native TypeScript 7 support lands in dependency-cruiser ≥18.8 with typescript ≥7.1;
+  # keep this extension until that pair is installed and verified.
+  "dependency-cruiser@18.7.0":
     dependencies:
       typescript: "6.0.3"
 overrides:
+  # drizzle-kit 0.31.11 still pulls @esbuild-kit/*; pin its nested esbuild for security.
   "@esbuild-kit/core-utils>esbuild": "0.28.2"
-  # Vitest accepts Vite 7 and 8; keep the existing major while applying security fixes.
+  # Vitest 5 accepts Vite 7 and 8; stay on the latest Vite 7 until a dedicated Vite 8 slice.
   "vite": "7.3.7"
