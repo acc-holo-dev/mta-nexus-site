@@ -53,6 +53,9 @@ it.each(["ru", "en"] as const)(
       getDictionary(locale).support.close,
     );
     expect(renderToStaticMarkup(<SupportCaseActions {...props} busy />)).toContain('disabled=""');
+    const staff = renderToStaticMarkup(<SupportCaseActions {...props} staff />);
+    expect(staff).toContain("border border-base bg-surface");
+    expect(staff).toContain("min-h-10 text-accent");
   },
 );
 it("renders URL-based escaped search inputs and role-specific create forms", () => {
@@ -74,6 +77,9 @@ it("renders URL-based escaped search inputs and role-specific create forms", () 
   expect(html).not.toContain("<script>");
   expect(html).toContain('value="resolved" selected=""');
   expect(html).toContain(supportWorkspaceCopy("en").apply);
+  expect(html).toContain("border border-base bg-surface");
+  expect(html).toContain("bg-accent text-white");
+  expect(html).toContain("font-label");
   const staff = renderToStaticMarkup(
     <LocaleProvider locale="en">
       <SupportCenter staffMode />

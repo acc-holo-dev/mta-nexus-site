@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { supportActivitySchema } from "../lib/support-workspace-contract";
@@ -63,13 +64,14 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               <p role="alert" className="text-sm text-danger">
                 {error}
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={() => setRetry((value) => value + 1)}
-                className="min-h-9 text-sm text-accent underline"
+                className="h-auto min-h-9 px-0 text-accent underline"
+                variant="ghost"
               >
                 {copy.reload}
-              </button>
+              </Button>
             </>
           ) : !data ? (
             <p className="text-sm text-muted">{dictionary.support.loading}</p>
@@ -97,22 +99,24 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
           )}
           <nav className="flex flex-wrap gap-4" aria-label={copy.history}>
             {before && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setBefore(undefined)}
-                className="min-h-9 text-sm text-accent underline"
+                className="h-auto min-h-9 px-0 text-accent underline"
+                variant="ghost"
               >
                 {copy.latest}
-              </button>
+              </Button>
             )}
             {data?.nextCursor && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setBefore(data.nextCursor ?? undefined)}
-                className="min-h-9 text-sm text-accent underline"
+                className="h-auto min-h-9 px-0 text-accent underline"
+                variant="ghost"
               >
                 {copy.older}
-              </button>
+              </Button>
             )}
           </nav>
         </div>
