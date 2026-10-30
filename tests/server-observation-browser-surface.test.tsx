@@ -1,7 +1,8 @@
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { observationBrowserFixture } from "./helpers/server-observation-browser-fixture";
+
 const state = vi.hoisted(() => ({ locale: "ru" as "ru" | "en", session: vi.fn(), read: vi.fn() }));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
@@ -23,12 +24,14 @@ vi.mock("../apps/web/src/lib/services/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+
 import {
+  ServerObservationBrowserLoading,
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
-  ServerObservationBrowserLoading,
 } from "../apps/web/src/components/server-observation-browser-page";
 import { ServerObservationPeriodControls } from "../apps/web/src/components/server-observation-period-controls";
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.useFakeTimers();
@@ -68,6 +71,8 @@ it.each(["ru", "en"] as const)(
     expect(html).toContain('name="password"');
     expect(html).toContain('name="responding"');
     expect(html).toContain('action="/servers/server/observations"');
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("bg-accent");
     expect(html).toContain("Server &lt;private&gt;");
     expect(html).toContain(">0</td>");
     expect(html).not.toContain("Server <private>");
@@ -94,6 +99,8 @@ it("keeps duration tabs and adjacent periods anchored to the selected UTC end wh
   expect(html).toContain("end=2026-09-24T12%3A34%3A56.123Z");
   expect(html).toContain("end=2026-10-08T12%3A34%3A56.123Z");
   expect(html).toContain('href="/observations?window=7d&amp;q=Lua&amp;players=zero"');
+  expect(html).toContain("rounded-lg");
+  expect(html).toContain("bg-accent");
   expect(html).not.toContain("cursor=");
   expect(html).not.toContain("before=");
 });

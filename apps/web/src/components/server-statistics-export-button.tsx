@@ -1,8 +1,9 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
-import { fetchServerStatisticsCsv } from "../lib/server-statistics-download";
 import { serverStatisticsCopy, serverStatisticsError } from "../lib/server-statistics-copy";
+import { fetchServerStatisticsCsv } from "../lib/server-statistics-download";
 
 export function ServerStatisticsExportButton({
   url,
@@ -52,15 +53,16 @@ export function ServerStatisticsExportButton({
   }
   return (
     <div className="space-y-2">
-      <button
+      <Button
         type="button"
+        variant="secondary"
         onClick={download}
         disabled={disabled || busy}
-        aria-busy={busy}
-        className="min-h-11 rounded-lg border border-base bg-inset px-3 py-2 text-sm font-semibold text-accent disabled:opacity-50"
+        isLoading={busy}
+        className="min-h-11 font-semibold text-accent"
       >
         {busy ? serverStatisticsCopy(locale).downloading : label}
-      </button>
+      </Button>
       {error && (
         <p role="alert" className="max-w-md text-sm text-danger">
           {error}
