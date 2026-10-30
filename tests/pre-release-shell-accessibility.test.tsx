@@ -88,6 +88,7 @@ describe("pre-release shell accessibility behavior", () => {
     expect(html).toMatch(
       new RegExp(`<button[^>]*aria-expanded="false"[^>]*>.*?${dictionary.nav.more}`, "su"),
     );
+    expect(html).toContain('aria-haspopup="dialog"');
     expect(html).not.toContain('aria-controls="mobile-more-menu"');
     expect(html).not.toContain('id="mobile-more-menu"');
   });
@@ -108,5 +109,6 @@ describe("pre-release shell accessibility behavior", () => {
     expect(html).toMatch(
       new RegExp(`<a[^>]*href="/admin"[^>]*aria-label="${dictionary.nav.admin}"`, "u"),
     );
+    expect(html).toMatch(new RegExp(`<button[^>]*aria-label="${dictionary.nav.expand}"`, "u"));
   });
 });

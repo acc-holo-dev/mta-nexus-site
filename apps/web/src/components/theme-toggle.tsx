@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@nexus/ui";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -63,13 +64,15 @@ export function ThemeToggle() {
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="icon"
       onClick={toggle}
       disabled={!hydrated}
       data-theme-toggle=""
       data-hydrated={hydrated ? "true" : "false"}
-      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base bg-elevated p-0 text-muted transition-colors hover:bg-hover hover:text-primary disabled:cursor-wait disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      className="h-8 w-8 shrink-0 rounded-lg border-base bg-elevated p-0 text-muted disabled:cursor-wait disabled:opacity-60"
       aria-label={label}
       title={label}
     >
@@ -80,6 +83,6 @@ export function ThemeToggle() {
       ) : (
         <Monitor className="h-4 w-4" aria-hidden="true" />
       )}
-    </button>
+    </Button>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Button } from "@nexus/ui";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
 
 type ContextOption = {
@@ -128,14 +129,16 @@ export function ContextSwitcher() {
           <p role="alert" className="text-xs text-danger">
             {error}
           </p>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setReload((value) => value + 1)}
             disabled={loading || saving}
-            className="rounded-md border border-base px-3 py-1.5 text-xs font-medium text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)] disabled:opacity-60"
+            className="rounded-md"
           >
             {copy.retry}
-          </button>
+          </Button>
         </div>
       )}
 

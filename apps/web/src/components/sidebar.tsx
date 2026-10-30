@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Button } from "@nexus/ui";
 import {
   Bell,
   Bookmark,
@@ -18,15 +17,17 @@ import {
   Settings,
   ShieldAlert,
   ShieldCheck,
-  Wrench,
   Users,
+  Wrench,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { communityReportCopy } from "../lib/community-report-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
-import { communityReportCopy } from "../lib/community-report-copy";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
 
 export function Sidebar({
@@ -142,15 +143,17 @@ export function Sidebar({
                 </span>
               </div>
             </Link>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={onToggle}
-              className="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="h-8 w-8 shrink-0 rounded-md p-1 text-muted"
               aria-label={dictionary.nav.collapse}
               title={dictionary.nav.collapse}
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -197,15 +200,17 @@ export function Sidebar({
 
       {isCollapsed && (
         <div className="border-t border-base p-2">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onToggle}
-            className="flex w-full justify-center rounded-md p-1.5 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="h-8 w-full justify-center rounded-md p-1.5 text-muted"
             aria-label={dictionary.nav.expand}
             title={dictionary.nav.expand}
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+          </Button>
         </div>
       )}
     </aside>

@@ -1,9 +1,11 @@
 "use client";
 
+import { Button } from "@nexus/ui";
 import {
-  Bookmark,
   Bell,
+  Bookmark,
   BookOpen,
+  Code2,
   Compass,
   Home,
   LayoutDashboard,
@@ -13,22 +15,21 @@ import {
   MessageSquare,
   Server,
   Settings,
-  ShieldCheck,
   ShieldAlert,
-  Code2,
-  X,
+  ShieldCheck,
   Users,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { publicationCopy } from "../lib/publication-feed-copy";
+import { communityReportCopy } from "../lib/community-report-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
-import { communityReportCopy } from "../lib/community-report-copy";
+import { getDictionary, type Locale } from "../lib/i18n";
+import { getOrganizationCopy } from "../lib/organization-workspace-copy";
+import { publicationCopy } from "../lib/publication-feed-copy";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
@@ -113,20 +114,21 @@ export function MobileNav({ locale }: { locale: Locale }) {
         );
       })}
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => setIsMoreOpen(true)}
         aria-current={moreActive ? "page" : undefined}
         aria-expanded={isMoreOpen}
         aria-haspopup="dialog"
         aria-controls={isMoreOpen ? "mobile-more-menu" : undefined}
-        className={`flex min-h-12 min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
-          moreActive ? "bg-accent-soft text-accent" : "text-muted hover:bg-hover hover:text-primary"
+        className={`h-auto min-h-12 min-w-0 flex-col gap-1 rounded-md px-1 py-2 text-[10px] font-semibold focus-visible:ring-offset-0 ${
+          moreActive ? "bg-accent-soft text-accent" : "text-muted hover:text-primary"
         }`}
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
         <span className="max-w-full truncate">{dictionary.nav.more}</span>
-      </button>
+      </Button>
 
       {isMoreOpen && (
         <dialog
@@ -151,14 +153,16 @@ export function MobileNav({ locale }: { locale: Locale }) {
         >
           <div className="flex items-center justify-between gap-3 border-b border-base px-4 py-3">
             <h2 className="font-heading text-sm text-primary">{dictionary.nav.more}</h2>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               aria-label={dictionary.nav.closeMore}
               onClick={() => setIsMoreOpen(false)}
-              className="rounded-md p-1.5 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="h-8 w-8 rounded-md p-1.5 text-muted"
             >
               <X className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </Button>
           </div>
 
           <div className="grid grid-cols-2 gap-2 p-3">
