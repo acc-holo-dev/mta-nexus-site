@@ -1,5 +1,6 @@
 import type { SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
 import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { formatFinancialMinor } from "../lib/financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../lib/seller-sales-i18n";
@@ -137,9 +138,7 @@ export function SellerSalesReportView({
           />
         </label>
         <div className="flex items-end gap-4">
-          <button type="submit" className="rounded bg-accent px-4 py-2 text-sm text-white">
-            {c.apply}
-          </button>
+          <Button type="submit">{c.apply}</Button>
           <Link
             href={sellerSalesUrl({
               page: 1,
