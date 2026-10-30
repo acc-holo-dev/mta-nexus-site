@@ -245,6 +245,26 @@ function evaluateExternal(category) {
 }
 
 /**
+ * Local dated env backups must not block candidate evaluation.
+ * Other untracked/modified paths still count as a dirty working tree.
+ */
+export function isDirtyWorkingTreeBeyondEnvBackups(porcelain) {
+  if (typeof porcelain !== "string") return true;
+  const lines = porcelain
+    .split(/\r?\n/u)
+    .map((line) => line.trimEnd())
+    .filter(Boolean);
+  if (!lines.length) return false;
+  return lines.some((line) => {
+    const path = line.replace(/^[ MADRCU?!]{1,2}\s+/u, "").replace(/^"(.*)"$/u, "$1");
+    const file = path.includes(" -> ") ? path.slice(path.lastIndexOf(" -> ") + 4) : path;
+    return (
+      !/(?:^|\/)\.env\.backup-[^/]+$/u.test(file) && !/(?:^|\/)[^/]+\.env\.backup[^/]*$/u.test(file)
+    );
+  });
+}
+
+/**
  * Evaluate a free open-beta candidate package for one exact SHA.
  * Never authorizes production deployment or claims open beta is live.
  */
