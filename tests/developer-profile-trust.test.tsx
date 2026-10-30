@@ -43,6 +43,11 @@ vi.mock("@nexus/ui", () => ({
       {fallback}
     </span>
   ),
+  Button: ({ children, ...props }: { children?: React.ReactNode }) => (
+    <button type="button" {...props}>
+      {children}
+    </button>
+  ),
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
 }));
 

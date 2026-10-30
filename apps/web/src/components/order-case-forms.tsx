@@ -1,7 +1,4 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ORDER_CASE_KINDS,
   type OrderCaseKind,
@@ -11,6 +8,9 @@ import {
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { orderCaseCreateSchema } from "@nexus/validation";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useRef, useState } from "react";
 import { orderCaseActionLabel, orderCaseCopy, orderCaseKindLabel } from "../lib/order-case-i18n";
 import {
   confirmOrderCaseCreated,
@@ -198,14 +198,15 @@ export function OrderCaseCreateForm({
           </Link>
         </p>
       )}
-      <button
+      <Button
         type="button"
+        variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="text-sm text-accent underline"
+        className="h-auto min-h-11 px-0 text-sm text-accent underline"
       >
         {copy.reload}
-      </button>
+      </Button>
     </form>
   );
 }
@@ -345,14 +346,15 @@ export function OrderCaseReviewForm({
           {message}
         </p>
       )}
-      <button
+      <Button
         type="button"
+        variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="text-sm text-accent underline"
+        className="h-auto min-h-11 px-0 text-sm text-accent underline"
       >
         {copy.reload}
-      </button>
+      </Button>
     </section>
   );
 }

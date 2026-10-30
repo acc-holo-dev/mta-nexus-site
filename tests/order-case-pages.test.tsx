@@ -1,6 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -25,12 +26,14 @@ vi.mock("../apps/web/src/components/support-case-thread", () => ({
     <div data-case={caseId}>Existing conversation</div>
   ),
 }));
+
 import {
   OrderCaseCreatePage,
   OrderCaseDetailPage,
   OrderCaseListPage,
   orderCaseMetadata,
 } from "../apps/web/src/components/order-case-page";
+
 const date = new Date("2026-10-11T00:00:00.000Z");
 const evidence = {
   orderId: "ord_a",
@@ -127,6 +130,13 @@ it("continues an existing order case instead of displaying a second intake form"
   const html = renderToStaticMarkup(await OrderCaseCreatePage({ orderId: "ord_a" }));
   expect(html).toContain('href="/workspace/order-cases/sup_a"');
   expect(html).not.toContain("Submit case");
+});
+it("renders intake and reload controls with shared Button chrome", async () => {
+  const html = renderToStaticMarkup(await OrderCaseCreatePage({ orderId: "ord_a" }));
+  expect(html).toContain("Reload saved state");
+  expect(html).toContain("rounded-lg");
+  expect(html).toContain("text-accent");
+  expect(html).toContain("underline");
 });
 it("preserves filters in archive pagination", async () => {
   const html = renderToStaticMarkup(

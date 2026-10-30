@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { Button } from "@nexus/ui";
 import { LogOut, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
 
 type Account = { username: string };
@@ -99,8 +100,10 @@ export function AccountControls() {
     }
   }
 
-  const control =
+  const linkControl =
     "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-base bg-elevated px-2 text-xs font-semibold text-primary transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] sm:px-2.5";
+  const buttonControl =
+    "h-8 shrink-0 gap-1.5 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5";
 
   return (
     // biome-ignore lint/a11y/useSemanticElements: Mixed links and a button form a named group, not a form fieldset.
@@ -118,31 +121,40 @@ export function AccountControls() {
           <Link
             href="/workspace"
             aria-label={`${copy.workspaceFor} ${account.username}`}
-            className={control}
+            className={linkControl}
           >
             <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden max-w-24 truncate sm:block">@{account.username}</span>
           </Link>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => void signOut()}
             disabled={signingOut}
+            isLoading={signingOut}
             aria-label={signingOut ? copy.signingOut : copy.signOut}
             title={signingOut ? copy.signingOut : copy.signOut}
-            className={`${control} disabled:opacity-50`}
+            className={buttonControl}
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
-          </button>
+          </Button>
         </>
       ) : error ? (
-        <button type="button" onClick={() => setAttempt((value) => value + 1)} className={control}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setAttempt((value) => value + 1)}
+          className={buttonControl}
+        >
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>
           <span className="sr-only sm:hidden">{copy.retry}</span>
-        </button>
+        </Button>
       ) : (
-        <Link href="/auth/login" className={control}>
+        <Link href="/auth/login" className={linkControl}>
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.signIn}</span>
           <span className="sr-only sm:hidden">{copy.signIn}</span>

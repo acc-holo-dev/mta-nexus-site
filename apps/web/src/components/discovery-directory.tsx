@@ -1,24 +1,24 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { followWorkspaceRepository } from "@nexus/db";
-import { Avatar, EmptyState } from "@nexus/ui";
-import { ShieldCheck } from "lucide-react";
-import { ProductCard } from "./product-card";
-import { ServerCard } from "./server-card";
-import { ArticleCard } from "./article-card";
-import { FollowButton } from "./follow-button";
-import { DISCOVER_CONTENT_TYPES, discoverHref, type DiscoverQuery } from "../lib/discover-query";
-import { discoveryCopy } from "../lib/discovery-copy";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { discoveryService } from "../lib/services/discovery-service";
-import { authService } from "../lib/services/auth-service";
-import { discoveryStreamCopy, discoveryStreamError } from "../lib/discovery-stream-copy";
 import { AppError } from "@nexus/domain";
-import { discoveryStreamHref, type DiscoveryStreamQuery } from "../lib/discovery-stream-contract";
+import { Avatar, Button, EmptyState } from "@nexus/ui";
+import { ShieldCheck } from "lucide-react";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../lib/discover-query";
+import { discoveryCopy } from "../lib/discovery-copy";
+import { type DiscoveryStreamQuery, discoveryStreamHref } from "../lib/discovery-stream-contract";
+import { discoveryStreamCopy, discoveryStreamError } from "../lib/discovery-stream-copy";
+import { getDictionary, type Locale } from "../lib/i18n";
+import { authService } from "../lib/services/auth-service";
+import { discoveryService } from "../lib/services/discovery-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../lib/services/mta-master-directory-service";
+import { ArticleCard } from "./article-card";
+import { FollowButton } from "./follow-button";
+import { ProductCard } from "./product-card";
+import { ServerCard } from "./server-card";
 
 export function DirectoryFilters({
   state,
@@ -80,12 +80,9 @@ export function DirectoryFilters({
               </select>
             </label>
           )}
-          <button
-            className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-            type="submit"
-          >
+          <Button type="submit" className="min-h-11 font-semibold">
             {dictionary.searchButton}
-          </button>
+          </Button>
           <Link
             href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
             className="min-h-11 content-center text-sm text-accent underline"
