@@ -3,15 +3,21 @@ import {
   LIBRARY_RELEASE_HISTORY_DAYS,
   RESOURCE_RELEASE_WATCH_HISTORY_SOURCES,
 } from "@nexus/domain";
+import { Button, EmptyState, Input } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../lib/library-collections-query";
-import { resourceReleaseWatchHistoryQuery } from "../../../../../lib/resource-release-watch-history-query";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../lib/resource-release-watch-history-i18n";
+import { resourceReleaseWatchHistoryQuery } from "../../../../../lib/resource-release-watch-history-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
+
+const selectClass =
+  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const labelClass = "block font-label uppercase text-secondary";
+
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function Page({
@@ -50,10 +56,10 @@ export default async function Page({
       </Link>
       <h1 className="font-display">{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
-      <form className="flex flex-wrap items-end gap-3">
-        <label className="grid gap-1">
-          {c.days}
-          <select name="days" defaultValue={result.days}>
+      <form method="get" className="nexus-panel flex flex-wrap items-end gap-4 p-4">
+        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+          <span className={labelClass}>{c.days}</span>
+          <select name="days" className={selectClass} defaultValue={result.days}>
             {LIBRARY_RELEASE_HISTORY_DAYS.map((days) => (
               <option key={days} value={days}>
                 {days}
@@ -61,9 +67,9 @@ export default async function Page({
             ))}
           </select>
         </label>
-        <label className="grid gap-1">
-          {c.source}
-          <select name="source" defaultValue={result.source}>
+        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+          <span className={labelClass}>{c.source}</span>
+          <select name="source" className={selectClass} defaultValue={result.source}>
             {RESOURCE_RELEASE_WATCH_HISTORY_SOURCES.map((source) => (
               <option key={source} value={source}>
                 {c[source]}
@@ -71,16 +77,18 @@ export default async function Page({
             ))}
           </select>
         </label>
-        <label className="grid gap-1">
-          {c.productId}
-          <input
+        <div className="min-w-0 flex-1">
+          <Input
             name="productId"
             defaultValue={result.productId ?? ""}
             maxLength={160}
             pattern="[A-Za-z0-9_-]+"
+            label={c.productId}
           />
-        </label>
-        <button type="submit">{c.filter}</button>
+        </div>
+        <Button type="submit" variant="secondary">
+          {c.filter}
+        </Button>
       </form>
       <a
         href={`/api/library/watches/history/export?${suffix(result.page)}`}
@@ -88,7 +96,7 @@ export default async function Page({
       >
         {c.export}
       </a>
-      {!result.items.length && <p>{c.empty}</p>}
+      {!result.items.length && <EmptyState title={c.empty} description={c.note} />}
       <ol className="space-y-4">
         {result.items.map((item) => (
           <li key={item.id} className="nexus-panel space-y-3 p-5">

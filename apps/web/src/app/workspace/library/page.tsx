@@ -1,28 +1,29 @@
-import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
-import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
+import { type UserLibraryFilter, userLibraryRepository } from "@nexus/db";
+import { EmptyState, StatusBadge } from "@nexus/ui";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
 import { cookies } from "next/headers";
-import { userLibraryRepository, type UserLibraryFilter } from "@nexus/db";
+import Link from "next/link";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
-import { authService } from "../../../lib/services/auth-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
-import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import {
   getLibraryCopy,
   libraryHref,
   parseLibraryFilter,
   parseLibraryPage,
 } from "../../../lib/library-view";
+import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
+import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
+import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
+import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
+import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
+import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
+import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
+import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { authService } from "../../../lib/services/auth-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -129,7 +130,7 @@ export default async function ResourceLibraryPage({
             key={value}
             href={libraryHref(value, 1)}
             aria-current={filter === value ? "page" : undefined}
-            className="rounded-md border border-base px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary aria-[current=page]:bg-accent aria-[current=page]:text-white"
+            className="inline-flex h-10 items-center rounded-lg border border-base bg-surface px-4 text-sm text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] aria-[current=page]:border-transparent aria-[current=page]:bg-accent aria-[current=page]:text-white"
           >
             {copy[value]} ({result.counts[value]})
           </Link>
@@ -141,14 +142,15 @@ export default async function ResourceLibraryPage({
       </p>
 
       {result.items.length === 0 ? (
-        <div className="nexus-panel space-y-4 p-8 text-center">
-          <p className="text-sm text-secondary">
-            {result.counts.all === 0 ? copy.empty : copy.emptyFilter}
-          </p>
-          <Link href="/market?maxPrice=0" className="text-sm text-accent underline">
-            {copy.browse}
-          </Link>
-        </div>
+        <EmptyState
+          title={result.counts.all === 0 ? copy.empty : copy.emptyFilter}
+          description={copy.subtitle}
+          action={
+            <Link href="/market?maxPrice=0" className="text-sm font-medium text-accent underline">
+              {copy.browse}
+            </Link>
+          }
+        />
       ) : (
         <ol className="grid gap-4 md:grid-cols-2">
           {result.items.map((item) => (
@@ -157,9 +159,10 @@ export default async function ResourceLibraryPage({
                 <h2 className="min-w-0 break-words text-base font-semibold text-primary">
                   {item.downloadable ? item.title : copy.unavailableResource}
                 </h2>
-                <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">
-                  {item.downloadable ? copy.ready : copy.unavailable}
-                </span>
+                <StatusBadge
+                  status={item.downloadable ? copy.ready : copy.unavailable}
+                  tone={item.downloadable ? "success" : "neutral"}
+                />
               </div>
 
               <p className="text-xs text-muted">

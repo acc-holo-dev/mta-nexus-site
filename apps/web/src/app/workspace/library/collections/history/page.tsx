@@ -1,14 +1,9 @@
 import {
-  collectionReceiptHref,
-  libraryCollectionReceiptsCopy,
-} from "../../../../../lib/library-collection-receipts-i18n";
-import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
-import {
   AppError,
   LIBRARY_COLLECTION_HISTORY_ACTIONS,
   LIBRARY_COLLECTION_HISTORY_DAYS,
 } from "@nexus/domain";
+import { Button, EmptyState, Input } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -20,12 +15,23 @@ import {
   libraryCollectionHistorySuffix,
 } from "../../../../../lib/library-collection-history-query";
 import {
-  libraryCollectionsCopy,
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../../../../../lib/library-collection-receipts-i18n";
+import {
   libraryCollectionError,
+  libraryCollectionsCopy,
 } from "../../../../../lib/library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../../../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
+
+const selectClass =
+  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const labelClass = "block font-label uppercase text-secondary";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -73,15 +79,11 @@ export default async function Page({
         <form
           method="get"
           action="/workspace/library/collections/history"
-          className="flex flex-wrap items-end gap-3"
+          className="nexus-panel flex flex-wrap items-end gap-4 p-4"
         >
-          <label className="grid gap-1">
-            {h.days}
-            <select
-              name="days"
-              defaultValue={result.days}
-              className="rounded border border-base bg-surface p-2"
-            >
+          <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+            <span className={labelClass}>{h.days}</span>
+            <select name="days" defaultValue={result.days} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
                 <option key={days} value={days}>
                   {days}
@@ -89,13 +91,9 @@ export default async function Page({
               ))}
             </select>
           </label>
-          <label className="grid gap-1">
-            {h.action}
-            <select
-              name="action"
-              defaultValue={result.action}
-              className="rounded border border-base bg-surface p-2"
-            >
+          <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+            <span className={labelClass}>{h.action}</span>
+            <select name="action" defaultValue={result.action} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_ACTIONS.map((action) => (
                 <option key={action} value={action}>
                   {c[action]}
@@ -103,30 +101,31 @@ export default async function Page({
               ))}
             </select>
           </label>
-          <label className="grid gap-1">
-            {h.collectionId}
-            <input
+          <div className="min-w-0 flex-1">
+            <Input
               name="collectionId"
               defaultValue={result.collectionId ?? ""}
               maxLength={160}
               pattern="[A-Za-z0-9_-]+"
-              className="rounded border border-base bg-surface p-2"
+              label={h.collectionId}
             />
-          </label>
-          <label className="grid gap-1">
-            {h.productId}
-            <input
+          </div>
+          <div className="min-w-0 flex-1">
+            <Input
               name="productId"
               defaultValue={result.productId ?? ""}
               maxLength={160}
               pattern="[A-Za-z0-9_-]+"
-              className="rounded border border-base bg-surface p-2"
+              label={h.productId}
             />
-          </label>
-          <button type="submit" className="rounded border border-base px-3 py-2">
+          </div>
+          <Button type="submit" variant="secondary">
             {h.filter}
-          </button>
-          <Link href="/workspace/library/collections/history" className="text-accent underline">
+          </Button>
+          <Link
+            href="/workspace/library/collections/history"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
             {h.clear}
           </Link>
         </form>
@@ -140,7 +139,7 @@ export default async function Page({
         >
           {h.export}
         </a>
-        {!result.items.length && <p>{h.empty}</p>}
+        {!result.items.length && <EmptyState title={h.empty} description={h.note} />}
         <ol className="space-y-4">
           {result.items.map((item) => {
             const receipt = item.receipt,
