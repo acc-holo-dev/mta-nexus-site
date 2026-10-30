@@ -1,4 +1,5 @@
 import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { REPORT_TYPES } from "../lib/community-report-contract";
 import { communityReportCopy } from "../lib/community-report-copy";
@@ -86,12 +87,9 @@ export function CommunityReportGroups({
           </select>
         </label>
         <div className="flex items-end gap-4">
-          <button
-            type="submit"
-            className="min-h-11 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-primary focus-visible:outline-2 focus-visible:outline-accent"
-          >
+          <Button type="submit" className="min-h-11" variant="outline">
             {copy.apply}
-          </button>
+          </Button>
           <Link
             href={path}
             className="inline-flex min-h-11 items-center text-sm text-accent underline"

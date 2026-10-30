@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportRateLimit } from "../lib/community-report-api";
@@ -112,12 +113,9 @@ export async function PublicationReportsPage({
               ))}
             </select>
           </label>
-          <button
-            type="submit"
-            className="min-h-11 rounded-lg border border-base px-4 py-2 text-sm font-semibold text-primary"
-          >
+          <Button type="submit" className="min-h-11" variant="outline">
             {copy.apply}
-          </button>
+          </Button>
         </form>
         <DiscussionReportBatch
           key={`${actor.id}:${id}:${JSON.stringify(filters)}:${data.items.map((item) => `${item.id}:${item.status}`).join("|")}`}

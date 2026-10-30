@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -312,12 +313,9 @@ export async function CommunityModerationScreen({
                 ))}
               </select>
             </label>
-            <button
-              className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-              type="submit"
-            >
+            <Button className="min-h-11" type="submit" variant="primary">
               {copy.apply}
-            </button>
+            </Button>
             <Link
               className="inline-flex min-h-11 items-center text-sm text-accent underline"
               href="/admin/community"

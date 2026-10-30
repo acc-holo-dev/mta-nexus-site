@@ -120,6 +120,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(reportGroupsCopy(locale).title);
     expect(html).toContain('method="get"');
     expect(html).toContain('name="period"');
+    expect(html).toContain("border border-base bg-surface text-secondary");
     expect(html).toMatch(/maxlength="80"/iu);
     expect(html).toContain("/admin/community/post/reports?view=pending");
     expect(html).toContain("/admin/community/post/discussion/comment/reports?view=pending");
@@ -160,6 +161,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(reportGroupsCopy(locale).publicationTitle);
     expect(html).toContain(reportBatchCopy(locale).publicationHelp);
     expect(html).toContain(reportBatchCopy(locale).preview);
+    expect(html).toContain("border border-base bg-surface text-secondary");
     expect(html).toContain("&lt;script&gt;");
     expect(html).not.toContain("<script>");
     expect(html).toContain("page=2");
