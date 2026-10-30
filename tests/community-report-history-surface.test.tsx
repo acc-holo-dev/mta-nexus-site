@@ -68,6 +68,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('method="get"');
     expect(html).toContain('name="period"');
     expect(html).toContain('name="group"');
+    expect(html).toContain("border border-base bg-surface text-secondary");
     expect(html).toContain(stamp);
     expect(html).toContain("/workspace/reports/report/history");
     expect(html).toContain("/api/workspace/reports/report/history/export?until=");

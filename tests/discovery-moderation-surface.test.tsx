@@ -173,6 +173,7 @@ it.each(["ru", "en"] as const)(
     );
     expect(queue).toContain(moderationCopy(locale).title);
     expect(queue).toContain('name="author"');
+    expect(queue).toContain("bg-accent text-white");
     expect(queue).toContain('href="/admin/community/item"');
     expect(queue).toContain("type=post&amp;author=writer&amp;cursor=older");
     const detail = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));

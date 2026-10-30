@@ -1,9 +1,10 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
 import type { DiscussionPage } from "../lib/content-discussion-contract";
-import { getDiscussionCopy, discussionMutationError } from "../lib/content-discussion-copy";
+import { discussionMutationError, getDiscussionCopy } from "../lib/content-discussion-copy";
 import { confirmsDiscussionMutation } from "../lib/discussion-mutation-confirmation";
+import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 export function DiscussionCommentActions({
   comment,
@@ -105,16 +106,14 @@ export function DiscussionCommentActions({
       if (alive.current) setPending(false);
     }
   }
-  const button =
-    "min-h-9 rounded border border-base px-3 text-xs text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   return (
     <div className="space-y-3" aria-busy={pending}>
       {!mode ? (
         <div className="flex flex-wrap gap-3">
           {own && editable && (
-            <button
+            <Button
               type="button"
-              className={button}
+              className="min-h-9 text-xs"
               disabled={disabled || blocked}
               onClick={() => {
                 setText(comment.text);
@@ -122,22 +121,24 @@ export function DiscussionCommentActions({
                 setError("");
                 setMode("edit");
               }}
+              variant="outline"
             >
               {copy.edit}
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
-            className={button}
+            className="min-h-9 text-xs"
             disabled={disabled || blocked}
             onClick={() => {
               setRevision(comment.revision);
               setError("");
               setMode("remove");
             }}
+            variant="outline"
           >
             {copy.remove}
-          </button>
+          </Button>
         </div>
       ) : (
         <form
@@ -181,21 +182,23 @@ export function DiscussionCommentActions({
             </>
           )}
           <div className="flex flex-wrap gap-3">
-            <button
+            <Button
               type="submit"
-              className={button}
+              className="min-h-9 text-xs"
               disabled={pending || disabled || stale || blocked}
+              variant="outline"
             >
               {mode === "edit" ? copy.saveEdit : copy.confirmRemove}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className={button}
+              className="min-h-9 text-xs"
               disabled={pending}
               onClick={() => setMode(null)}
+              variant="outline"
             >
               {copy.cancelEdit}
-            </button>
+            </Button>
           </div>
         </form>
       )}

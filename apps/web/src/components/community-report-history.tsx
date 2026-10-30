@@ -4,6 +4,7 @@ import {
   REPORT_HISTORY_GROUPS,
   type ReportHistoryGroup,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { communityReportCopy } from "../lib/community-report-copy";
 import type { ReportHistoryPage } from "../lib/community-report-history-contract";
@@ -63,12 +64,9 @@ export function CommunityReportHistory({
             ))}
           </select>
         </label>
-        <button
-          type="submit"
-          className="inline-flex min-h-11 items-center rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-primary focus-visible:outline-2 focus-visible:outline-accent"
-        >
+        <Button type="submit" className="min-h-11" variant="outline">
           {copy.apply}
-        </button>
+        </Button>
         <Link
           href={path}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
