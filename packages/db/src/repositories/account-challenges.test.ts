@@ -577,7 +577,7 @@ describe("D1 account proof primitives", () => {
     const c = await repo.issue(verification(a));
     await db
       .update(sessions)
-      .set({ expiresAt: sql`clock_timestamp() + interval '1 second'` })
+      .set({ expiresAt: sql`clock_timestamp() + interval '100 milliseconds'` })
       .where(eq(sessions.token, digestSessionToken(a.currentToken)));
     await afterWait(
       (tx) => tx.select().from(authChallenges).where(eq(authChallenges.id, c.id)).for("update"),
@@ -585,7 +585,7 @@ describe("D1 account proof primitives", () => {
       // The lock wait is already observed. This deliberate time advance tests
       // expiry, not guessed request ordering; no application clock mocking.
       async () => {
-        await delay(1200);
+        await delay(150);
       },
     );
     expect((await challenge(c.id)).consumedAt).toBeNull();

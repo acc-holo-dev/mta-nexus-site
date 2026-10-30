@@ -479,7 +479,7 @@ describe("D2a atomic encrypted mail enqueue on disposable PostgreSQL", () => {
         // its session lock while that producer holds the user/session locks.
         await db
           .update(sessions)
-          .set({ expiresAt: sql`clock_timestamp() + interval '2 seconds'` })
+          .set({ expiresAt: sql`clock_timestamp() + interval '100 milliseconds'` })
           .where(eq(sessions.token, digestSessionToken(a.currentToken)));
         const [backend] = await tx.execute(sql`select pg_backend_pid() as pid`);
         operation = settled(queue.enqueue(verification(a), cipher)).then((v) => {

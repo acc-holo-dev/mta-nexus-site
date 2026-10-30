@@ -45,7 +45,9 @@ export default defineConfig({
           include: testFiles.database,
           // Queue capacity, leases and exact counts share one disposable DB.
           fileParallelism: false,
-          isolate: true,
+          // Sequential files can reuse the transformed module graph and one
+          // postgres.js pool. Isolation stays on for unit tests that mock heavily.
+          isolate: false,
         },
       },
     ],
