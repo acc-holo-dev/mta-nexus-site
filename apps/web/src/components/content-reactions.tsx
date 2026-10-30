@@ -1,14 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { CONTENT_REACTION_EMOJI, CONTENT_REACTIONS, type ContentReaction } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
-import { CONTENT_REACTIONS, CONTENT_REACTION_EMOJI, type ContentReaction } from "@nexus/domain";
-import type { Locale } from "../lib/i18n";
-import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
+import { useEffect, useRef, useState } from "react";
 import {
   confirmedReactionMutation,
-  reactionStateSchema,
   type ReactionState,
+  reactionStateSchema,
 } from "../lib/content-reaction-contract";
+import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
+import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 export function ContentReactions({
   slug,
@@ -85,38 +86,44 @@ export function ContentReactions({
       if (alive.current) setPending(false);
     }
   }
-  const style =
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base px-3 text-sm font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-50";
   return (
     <section className="space-y-3" aria-label={copy.title} aria-busy={pending}>
       <p className="text-sm text-secondary">{state?.self ? copy.own : copy.choose}</p>
       <div className="flex flex-wrap gap-2">
         {CONTENT_REACTIONS.map((reaction) => (
-          <button
+          <Button
             key={reaction}
             type="button"
-            className={`${style} ${state?.reaction === reaction ? "bg-accent-soft text-accent" : "bg-inset"}`}
+            variant="outline"
+            className={`min-h-11 gap-2 ${state?.reaction === reaction ? "bg-accent-soft text-accent" : "bg-inset"}`}
             aria-pressed={state?.reaction === reaction}
             disabled={pending || blocked || !state?.authenticated || state.self}
             onClick={() => void send(state?.reaction === reaction ? null : reaction)}
           >
             <span aria-hidden="true">{CONTENT_REACTION_EMOJI[reaction]}</span>
             {copy[reaction]} <span className="font-numeric">{state?.counts[reaction] ?? "—"}</span>
-          </button>
+          </Button>
         ))}
         {state?.reaction && (
-          <button
+          <Button
             type="button"
-            className={style}
+            variant="outline"
+            className="min-h-11"
             disabled={pending || blocked}
             onClick={() => void send(null)}
           >
             {copy.remove}
-          </button>
+          </Button>
         )}
-        <button type="button" className={style} disabled={pending} onClick={() => void send()}>
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11"
+          disabled={pending}
+          onClick={() => void send()}
+        >
           {pending ? copy.saving : copy.reload}
-        </button>
+        </Button>
       </div>
       {state && !state.authenticated && (
         <Link

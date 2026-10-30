@@ -1,11 +1,11 @@
 "use client";
-import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { z } from "zod";
 import { Button } from "@nexus/ui";
-import type { Locale } from "../lib/i18n";
-import { REPORT_TYPES, communityReportCreateSchema } from "../lib/community-report-contract";
+import Link from "next/link";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { z } from "zod";
+import { communityReportCreateSchema, REPORT_TYPES } from "../lib/community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../lib/community-report-copy";
+import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 export function CommunityReportForm({
   targetType,
@@ -80,13 +80,14 @@ export function CommunityReportForm({
   }
   if (!open)
     return (
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => setOpen(true)}
-        className="min-h-9 text-xs text-muted underline"
+        className="h-auto min-h-9 px-0 text-xs text-muted underline"
       >
         {copy.report}
-      </button>
+      </Button>
     );
   return (
     <section
@@ -95,14 +96,15 @@ export function CommunityReportForm({
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-primary">{copy.reportTitle}</h3>
-        <button
+        <Button
           type="button"
-          className="min-h-9 text-xs text-accent underline"
+          variant="ghost"
+          className="h-auto min-h-9 px-0 text-xs text-accent underline"
           disabled={pending}
           onClick={() => setOpen(false)}
         >
           {copy.cancel}
-        </button>
+        </Button>
       </div>
       {!authenticated ? (
         <Link className="text-sm text-accent underline" href="/auth/login">

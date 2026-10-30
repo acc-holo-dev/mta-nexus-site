@@ -1,11 +1,13 @@
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import {
   contentPageHref,
   type parseContentPage,
   type writerTypes,
 } from "../lib/user-platform-contract";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
+
 const fieldClass =
   "rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
 type Filters = ReturnType<typeof parseContentPage>;
@@ -60,12 +62,7 @@ export function ContentCatalogControls({
             </select>
           </label>
         )}
-        <button
-          type="submit"
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
-        >
-          {copy.apply}
-        </button>
+        <Button type="submit">{copy.apply}</Button>
         {(filters.query || filters.type || filters.status) && (
           <Link href={path} className="py-2 text-sm text-accent underline">
             {copy.reset}
