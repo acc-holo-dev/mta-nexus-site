@@ -7,7 +7,7 @@
 Регулярно проверять `pnpm audit` и обновлять зависимости небольшими группами с тестами и сборкой. Обоснованные ограничения (проверяются `scripts/tests/toolchain-pins.node-test.mjs`):
 
 - `@esbuild-kit/*` ещё тянет `drizzle-kit@0.31.11`; безопасной замены нет, пока upstream не уберёт loader. Nested `esbuild` уже зафиксирован override на `0.28.2`.
-- Vite остаётся на `7.3.7` (последний 7.x) при Vitest 5; переход на Vite 8 — отдельный срез.
+- Vite закреплён на `8.3.5` (Vitest 5 peer: `^6.4 || ^7 || ^8`); дальнейшие минорные обновления — небольшими группами с `pnpm test:unit` / tooling pins.
 - `dependency-cruiser@18.7.0` для `tsPreCompilationDeps` использует вложенный TypeScript `6.0.3` через `packageExtensions`. Стабильная поддержка TypeScript 7 ожидается в dependency-cruiser ≥18.8 с typescript ≥7.1; тогда расширение можно снять.
 
 ## Приёмка релиза
