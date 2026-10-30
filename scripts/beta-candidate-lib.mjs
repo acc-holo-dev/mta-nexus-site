@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "./backup-restore-contract.mjs";
 import { requiredJobs } from "./ci-policy.mjs";
 import { evaluateWebPushEvidenceResidual } from "./web-push-evidence-lib.mjs";
 
@@ -222,15 +224,23 @@ function evaluateBackupArtifact(path, candidateSha) {
       reason: `backup-restore status is ${body.status ?? "unknown"}, not PASS.`,
     };
   }
-  const cleanupOk = body.cleanupComplete === true || body.cleanupCompleted === true;
-  const incompleteFlags = [];
-  if (body.sourceDestroyedBeforeRestore !== true)
-    incompleteFlags.push("sourceDestroyedBeforeRestore");
-  if (!cleanupOk) incompleteFlags.push("cleanupComplete");
+  if (!sha) {
+    return {
+      status: "blocked",
+      reason: "backup-restore evidence is missing the candidate SHA.",
+    };
+  }
+  const incompleteFlags = BACKUP_RESTORE_EVIDENCE_FLAGS.filter((flag) => body[flag] !== true);
+  if (incompleteFlags.length) {
+    return {
+      status: "blocked",
+      reason: `backup-restore evidence incomplete: ${incompleteFlags.join(", ")}.`,
+      incompleteFlags,
+    };
+  }
   return {
     status: "passed",
     reason: null,
-    ...(incompleteFlags.length ? { incompleteFlags } : {}),
   };
 }
 
@@ -326,14 +336,11 @@ export function evaluateBetaCandidate({
         result = evaluateCiJobs(category, ciEvidence, candidateSha);
         break;
       case "artifact": {
-        const path = `${artifactRoot}/${category.artifact}`.replace(/\\/gu, "/");
-        // Prefer relative path from cwd when artifactRoot is cwd.
-        const relative = category.artifact;
+        const artifactPath = join(artifactRoot, category.artifact);
         result =
           category.id === "database_upgrade"
-            ? evaluateUpgradeArtifact(relative, candidateSha)
-            : evaluateBackupArtifact(relative, candidateSha);
-        void path;
+            ? evaluateUpgradeArtifact(artifactPath, candidateSha)
+            : evaluateBackupArtifact(artifactPath, candidateSha);
         break;
       }
       case "external":

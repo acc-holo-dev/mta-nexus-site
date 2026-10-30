@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { chdir, cwd } from "node:process";
 import test from "node:test";
 import {
   BETA_CANDIDATE_CATEGORIES,
@@ -14,6 +13,7 @@ const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 test("root exposes beta:candidate without runtime dependencies", () => {
   const pkg = JSON.parse(read("package.json"));
+  assert.equal(pkg.scripts["beta:fetch"], "node scripts/fetch-beta-candidate-evidence.mjs");
   assert.equal(pkg.scripts["beta:candidate"], "node scripts/beta-candidate-evidence.mjs");
   assert.match(pkg.scripts["test:tooling"] ?? "", /./u);
 });
@@ -43,7 +43,6 @@ test("full acceptance still requires backup-restore for ROADMAP 19 residual evid
 test("synthetic PASS artifacts yield checkable candidate awaiting owner deploy", () => {
   const sha = "b".repeat(40);
   const root = mkdtempSync(join(tmpdir(), "nexus-beta-candidate-"));
-  const previous = cwd();
   try {
     mkdirSync(join(root, "artifacts"), { recursive: true });
     writeFileSync(
@@ -56,14 +55,19 @@ test("synthetic PASS artifacts yield checkable candidate awaiting owner deploy",
         status: "PASS",
         sha,
         sourceDestroyedBeforeRestore: true,
-        cleanupCompleted: true,
-        verificationPassed: true,
+        backupChecksumsVerified: true,
+        databaseRowsRestored: true,
+        applicationSchemaRestored: true,
+        applicationRowsRestored: true,
+        migrationLedgerRestored: true,
+        uploadFilesRestored: true,
+        cleanupComplete: true,
       }),
     );
-    chdir(root);
     const report = evaluateBetaCandidate({
       candidateSha: sha,
       dirtyWorkingTree: false,
+      artifactRoot: root,
       ciEvidence: {
         sha,
         scope: "full_acceptance",
@@ -78,7 +82,6 @@ test("synthetic PASS artifacts yield checkable candidate awaiting owner deploy",
     assert.deepEqual(report.technicalBlockers, []);
     assert.ok(report.blockers.some((item) => item.startsWith("deployment_authorization:")));
   } finally {
-    chdir(previous);
     rmSync(root, { recursive: true, force: true });
   }
 });

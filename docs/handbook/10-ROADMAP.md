@@ -10,7 +10,7 @@
 
 | № | Цель и граница работы | Зависит от | Критерий готовности |
 |---|---|---|---|
-| 19 | Повторить обновление БД и парное восстановление данных/файлов. | — | Контракт mount-топологии и disposable backup-restore/upgrade rehearsal PASS на tip `acc1ef93` (full_acceptance run 41002320537). Рабочие/production-данные не изменены. |
+| 19 | Повторить обновление БД и парное восстановление данных/файлов. | — | Контракт mount-топологии и disposable backup-restore/upgrade rehearsal PASS на tip `acc1ef93` (full_acceptance run 41002320537). Для кандидата: `pnpm beta:fetch` подтягивает retained CI JSON на exact SHA (14d); `beta:candidate` принимает только PASS + matching SHA + все disposable flags—без изобретения PASS. Рабочие/production-данные не изменены. |
 | 20 | Подготовить проверяемый кандидат открытой бесплатной беты. | 06–09, 13–19 | Harness `pnpm beta:candidate` готов; на tip `acc1ef93` — `checkableCandidate=true`, `status=awaiting_owner_deploy_decision`; `openBetaLive`/`productionAuthorized` никогда не true. Остаются owner deploy/observability/legal и optional Web Push evidence. Marketplace/DRM вне scope. |
 
 У каждой параллельной задачи один владелец и непересекающиеся файлы. Изменения общих helpers, CI и документации собирает основной агент; PostgreSQL-тесты исполнителей используют разные одноразовые БД. Полные проверки и тяжёлая сборка выполняются один раз после интеграции. Завершённые задачи удаляются из очереди после включения в `main`, номера оставшихся сохраняются; доказательства и история остаются в PR и Git.
