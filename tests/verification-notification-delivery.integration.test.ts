@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { db, verificationRepository } from "@nexus/db";
-import { asc, eq, inArray, sql } from "drizzle-orm";
+import { asc, eq, inArray, ne, sql } from "drizzle-orm";
 import { afterEach, expect, it, vi } from "vitest";
 import {
   verificationNotificationDeliveryRepository as delivery,
@@ -33,6 +33,7 @@ afterEach(async () => {
     await db.execute(sql.raw(`drop function if exists ${name}()`));
   }
   if (requests.length) {
+    await db.delete(jobs).where(inArray(jobs.verificationRequestId, requests));
     await db.delete(auditEvents).where(inArray(auditEvents.targetId, requests));
     await db.delete(verificationRequests).where(inArray(verificationRequests.id, requests));
   }
@@ -204,7 +205,14 @@ it("atomically creates the request with its delivery source", async () => {
   expect(await db.select().from(auditEvents).where(eq(auditEvents.actorId, requesterId))).toEqual(
     [],
   );
-  expect(await db.select().from(jobs)).toEqual([]);
+  // Scope to this requester: the shared disposable DB may hold unrelated delivery rows.
+  expect(
+    await db
+      .select({ id: jobs.verificationRequestId })
+      .from(jobs)
+      .innerJoin(verificationRequests, eq(jobs.verificationRequestId, verificationRequests.id))
+      .where(eq(verificationRequests.requesterId, requesterId)),
+  ).toEqual([]);
   await db.execute(sql.raw(`drop trigger ${name} on verification_notification_deliveries`));
   await db.execute(sql.raw(`drop function ${name}()`));
   triggers.splice(
@@ -311,7 +319,12 @@ it("rolls back a failed page, bounds retries and resumes after an operator reset
     expect(await notices(request.id)).toEqual([]);
   }
   expect((await delivery.stats()).failed).toBeGreaterThanOrEqual(1);
-  // Exhausted jobs stay unclaimed until an operator reset.
+  // Exhausted jobs stay unclaimed until an operator reset. Defer unrelated ready
+  // rows so this assertion measures that property on a shared disposable DB.
+  await db
+    .update(jobs)
+    .set({ availableAt: new Date("2099-01-01T00:00:00.000Z") })
+    .where(ne(jobs.verificationRequestId, request.id));
   expect(await delivery.processNext(2)).toEqual({
     state: "idle",
     recipients: 0,
