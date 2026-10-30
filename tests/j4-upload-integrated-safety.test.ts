@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
+
+function readBuildsRepositoryModules(): string {
+  return ["builds.ts", "builds-queries.ts", "builds-moderation.ts", "builds-lifecycle.ts"]
+    .map((name) => read(`packages/db/src/repositories/${name}`))
+    .join("\n");
+}
 
 describe("integrated J4 build upload safety contract", () => {
   it("orders cheap authorization and input guards before body parsing and scanner/storage work", () => {
@@ -82,7 +88,7 @@ describe("integrated J4 build upload safety contract", () => {
   });
 
   it("keeps moderation on the deterministic serialized publication path", () => {
-    const repository = read("packages/db/src/repositories/builds.ts");
+    const repository = readBuildsRepositoryModules();
     const service = read("apps/web/src/lib/services/product-service.ts");
 
     const dollar = "$";
@@ -112,7 +118,7 @@ describe("integrated J4 build upload safety contract", () => {
 
   it("requires build review context and writes the decision audit only in the transactional moderation path", () => {
     const route = read("apps/web/src/app/api/admin/actions/route.ts");
-    const repository = read("packages/db/src/repositories/builds.ts");
+    const repository = readBuildsRepositoryModules();
 
     expect(route).toContain('targetType: z.literal("build")');
     expect(route).toContain("notes: z.string().trim().min(3).max(2000)");
