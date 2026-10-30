@@ -2,6 +2,8 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
+const documentationPath = /^(?:README\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md)$/;
+
 // Changes to deployment, dependencies and trust boundaries require full acceptance.
 const fullAcceptancePaths = [
   /^\.github\/workflows\//,
@@ -26,20 +28,51 @@ const fullAcceptancePaths = [
   /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];
 
+// Narrow unit profile: only shared UI and web components (and their colocated tests).
+// Anything else — including unknown paths — stays on fast_ci or full_acceptance.
+const unitOnlyPaths = [
+  /^packages\/ui\//,
+  /^apps\/web\/src\/components\//,
+  /^apps\/web\/src\/components\/.+\.(?:test|spec)\.[cm]?[jt]sx?$/,
+];
+
+function isDocumentation(file) {
+  return documentationPath.test(file);
+}
+
+function isUnitOnlyPath(file) {
+  return unitOnlyPaths.some((pattern) => pattern.test(file));
+}
+
 export function classifyChanges(files, { explicitFull = false, release = false } = {}) {
-  const code = files.some((file) => !/^(?:README\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md)$/.test(file));
+  const code = files.some((file) => !isDocumentation(file));
   const infrastructure = files.some((file) =>
     fullAcceptancePaths.some((pattern) => pattern.test(file)),
   );
-  return { code: code || explicitFull || release, full: explicitFull || release || infrastructure };
+  const full = explicitFull || release || infrastructure;
+  const codeFiles = files.filter((file) => !isDocumentation(file));
+  // Empty or unknown-heavy sets must not claim unit_only; default wider, never narrower.
+  const unitOnly =
+    !full &&
+    codeFiles.length > 0 &&
+    codeFiles.every((file) => isUnitOnlyPath(file));
+  return {
+    code: code || explicitFull || release || unitOnly,
+    unitOnly,
+    full,
+  };
 }
 
-export function requiredJobs({ code, full }) {
-  // Full acceptance may not degrade into a documentation-only pass.
+export function requiredJobs({ code, unitOnly, full }) {
+  // Full acceptance may not degrade into a documentation-only or unit-only pass.
   if (!code && !full) return ["plan"];
-  const jobs = ["plan", "unit", "verify", "image", "smoke"];
-  if (full)
-    jobs.push(
+  if (full) {
+    return [
+      "plan",
+      "unit",
+      "verify",
+      "image",
+      "smoke",
       "postgres-persistence",
       "local-compose",
       "backup-restore",
@@ -48,8 +81,10 @@ export function requiredJobs({ code, full }) {
       "directory-browser",
       "resource-browser",
       "mail-worker",
-    );
-  return jobs;
+    ];
+  }
+  if (unitOnly) return ["plan", "unit"];
+  return ["plan", "unit", "verify", "image", "smoke"];
 }
 
 export function summarizeJobs(policy, needs) {
@@ -58,7 +93,13 @@ export function summarizeJobs(policy, needs) {
     ...policy,
     status: missing.length ? "FAIL" : "PASS",
     failedOrMissing: missing,
-    scope: policy.full ? "full_acceptance" : policy.code ? "fast_ci" : "documentation",
+    scope: policy.full
+      ? "full_acceptance"
+      : policy.unitOnly
+        ? "unit_ci"
+        : policy.code
+          ? "fast_ci"
+          : "documentation",
   };
 }
 
@@ -80,7 +121,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     explicitFull: event.inputs?.full === true || event.inputs?.full === "true",
     release: (process.env.GITHUB_REF ?? "").startsWith("refs/tags/v"),
   });
-  if (process.env.GITHUB_EVENT_NAME === "workflow_dispatch") policy.code = true;
-  appendFileSync(process.env.GITHUB_OUTPUT, `code=${policy.code}\nfull=${policy.full}\n`);
+  if (process.env.GITHUB_EVENT_NAME === "workflow_dispatch") {
+    // Manual runs default to fast_ci unless full acceptance is requested.
+    policy.code = true;
+    policy.unitOnly = false;
+  }
+  appendFileSync(
+    process.env.GITHUB_OUTPUT,
+    `code=${policy.code}\nunit_only=${policy.unitOnly}\nfull=${policy.full}\n`,
+  );
   console.log(JSON.stringify({ ...policy, changedFiles: files.length }));
 }

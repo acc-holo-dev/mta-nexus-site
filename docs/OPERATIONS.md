@@ -128,6 +128,21 @@ pnpm build
 - `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
 - `pnpm test`: both Vitest projects; `pnpm check` and `pnpm release:verify` retain the full local release path.
 
+CI chooses a scope from the changed-file set (`scripts/ci-policy.mjs`). Unknown or
+mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
+`full_acceptance`. Local commands stay aligned with those scopes:
+
+| Scope | When | CI jobs | Local analogue |
+| --- | --- | --- | --- |
+| `documentation` | Markdown-only (`README.md`, `docs/**/*.md`) | `plan` (doc links) | `node scripts/check-doc-links.mjs` |
+| `unit_ci` | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown) | `plan`, `unit` | `pnpm check:code` |
+| `fast_ci` | Other application code that is not infrastructure | `plan`, `unit`, `verify`, `image`, `smoke` | `pnpm check:code` then disposable `pnpm test:database` |
+| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` / full isolated acceptance |
+
+Release tags (`v*`) and explicit full workflow dispatch always run `full_acceptance`.
+Sibling branch `codex/db-test-time` (ROADMAP 08) shortens measured database suite
+time; it is not required to land this profile wiring.
+
 The CI unit job and host development use the same `check:code` command. It uses
 the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
 with an anchored selector for exactly seven scripts. `--sequential` bounds memory;
