@@ -84,7 +84,6 @@ services:
       retries: 12
       start_period: 60s
 
-
   push-worker:
     build:
       context: .
@@ -94,14 +93,7 @@ services:
     restart: "no"
     stop_grace_period: 30s
     working_dir: /app/packages/db
-    command:
-      [
-        "node",
-        "--import",
-        "tsx",
-        "scripts/run-web-push-dispatcher.ts",
-        "--ready"
-      ]
+    command: ["node", "--import", "tsx", "scripts/run-web-push-dispatcher.ts", "--ready"]
     environment:
       NODE_ENV: development
       DATABASE_URL: postgres://nexus:nexus_secret@postgres:5432/mta_nexus
@@ -126,12 +118,7 @@ services:
       app:
         condition: service_healthy
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "/app/scripts/check-web-push-worker-health.mjs"
-        ]
+      test: ["CMD", "node", "/app/scripts/check-web-push-worker-health.mjs"]
       interval: 15s
       timeout: 10s
       retries: 8

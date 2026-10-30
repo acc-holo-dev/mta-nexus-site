@@ -41,23 +41,29 @@ A subscription never buys verification, moderation victory, dispute priority, se
 ## 3. Server plans
 
 ### Free
+
 Core claim/management, truthful directory presence, base page/community and essential server information.
 
 ### Pro
+
 Richer page builder/media, deeper history/analytics, recruitment/events, promotion tooling and higher quotas.
 
 ### Business
+
 Highest standard team/media/history/management quotas, advanced workflows/automation and integration/export capabilities when those platform contracts are available.
 
 ## 4. Organization plans
 
 ### Free
+
 Organization identity, core members/permissions and collaborative ownership.
 
 ### Pro
+
 Larger team/assets, analytics, billing/operations tooling and higher quotas.
 
 ### Business
+
 Highest standard organization quotas, finance/audit/workflow/automation capabilities for serious teams.
 
 Organization pricing is per organization, not per-seat by default.
