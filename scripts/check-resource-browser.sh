@@ -260,7 +260,10 @@ echo "PASS: J5 browser claimed one entitlement, incremented library additions on
 
 created_product=$(sql "SELECT id FROM products WHERE author_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL');")
 [[ "$created_product" =~ ^prd_[a-zA-Z0-9_-]+$ ]]
-[[ $(sql "SELECT status FROM products WHERE id = '$created_product';") == draft ]]
+# Author journey retires the last public build while a retry stays pending_review;
+# workspace retirement keeps the product in review scope rather than plain draft.
+created_status=$(sql "SELECT status FROM products WHERE id = '$created_product';")
+[[ "$created_status" == pending_review ]]
 [[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product';") == 3 ]]
 # Retrying a committed upload must not leave duplicate assets or temporary files.
 created_author_id=$(sql "SELECT author_id FROM products WHERE id = '$created_product';")

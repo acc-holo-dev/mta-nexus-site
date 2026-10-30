@@ -420,8 +420,10 @@ check("P11 agent-browser checks anonymous sign-in after security changes", async
   try {
     await execute(agent, [...args, "open", `${baseURL}/auth/login`], { timeout: 30_000 });
     const snapshot = await execute(agent, [...args, "snapshot", "-i"], { timeout: 30_000 });
-    assert(snapshot.stdout.includes("Email address") && snapshot.stdout.includes("Sign In"));
+    // Input labels use CSS uppercase; agent-browser may expose "EMAIL ADDRESS".
     await writeFile(join(output, "password-agent-snapshot.txt"), snapshot.stdout);
+    assert.match(snapshot.stdout, /email address/i, "login snapshot should expose the email field");
+    assert.match(snapshot.stdout, /sign in/i, "login snapshot should expose the sign-in control");
     await execute(agent, [...args, "screenshot", join(output, "password-anonymous-login.png")], {
       timeout: 30_000,
     });
