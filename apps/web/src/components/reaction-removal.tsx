@@ -1,8 +1,9 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
-import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
 import { confirmedReactionRemoval } from "../lib/content-reaction-contract";
+import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
+import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 export function ReactionRemoval({
   contentId,
@@ -65,14 +66,16 @@ export function ReactionRemoval({
   return (
     <div className="space-y-2" aria-busy={phase === "saving"}>
       {phase !== "removed" && (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          className="min-h-11"
+          isLoading={phase === "saving"}
           disabled={phase !== "idle"}
           onClick={() => void remove()}
-          className="min-h-11 rounded-lg border border-base px-3 text-sm text-secondary focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-50"
         >
           {phase === "saving" ? copy.saving : copy.remove}
-        </button>
+        </Button>
       )}
       {message && (
         <p

@@ -248,14 +248,15 @@ export function ContentDiscussion({
             <span>
               {copy.replying} {reply.name}
             </span>
-            <button
-              className="text-accent underline"
+            <Button
+              className="h-auto px-0 text-accent underline"
+              variant="ghost"
               type="button"
               disabled={submitting}
               onClick={() => setReply(null)}
             >
               {copy.cancel}
-            </button>
+            </Button>
           </div>
         )}
         <label className="block space-y-1 text-sm text-secondary">
@@ -364,8 +365,9 @@ export function ContentDiscussion({
                 authenticated={!!viewer}
               />
             )}
-            <button
-              className="text-xs text-accent underline"
+            <Button
+              className="h-auto px-0 text-xs text-accent underline"
+              variant="ghost"
               type="button"
               disabled={submitting || !!managingId}
               onClick={() => {
@@ -379,7 +381,7 @@ export function ContentDiscussion({
               }}
             >
               {copy.reply}
-            </button>
+            </Button>
             {viewer &&
               comment.revision &&
               (viewer.id === comment.author?.id || viewer.canModerate) && (
@@ -453,14 +455,15 @@ export function ContentDiscussion({
             {loading ? copy.loading : copy.older}
           </Button>
         )}
-        <button
+        <Button
           type="button"
+          variant="ghost"
           disabled={loading || submitting || !!managingId}
-          className="text-sm text-accent underline"
+          className="h-auto px-0 text-sm text-accent underline"
           onClick={() => void load(false, "")}
         >
           {!page || readError ? copy.retry : copy.latest}
-        </button>
+        </Button>
       </div>
     </section>
   );

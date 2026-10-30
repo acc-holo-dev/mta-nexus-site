@@ -1,10 +1,11 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
 import { ContentReactions } from "../apps/web/src/components/content-reactions";
 import { PublicUserTrustPanel } from "../apps/web/src/components/public-user-trust";
 import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
 import { trustCopy } from "../apps/web/src/lib/public-user-trust-copy";
+
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   session: vi.fn(),
@@ -27,10 +28,12 @@ vi.mock("../apps/web/src/lib/services/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-import ReactionsPage, { generateMetadata } from "../apps/web/src/app/workspace/reactions/page";
+
 import TrustPage, {
   generateMetadata as trustMetadata,
 } from "../apps/web/src/app/users/[username]/trust/page";
+import ReactionsPage, { generateMetadata } from "../apps/web/src/app/workspace/reactions/page";
+
 const saved = {
   contentId: "content",
   slug: "guide",
@@ -82,6 +85,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(reactionCopy(locale).thanks);
     expect(html).toContain(reactionCopy(locale).remove);
     expect(html).toContain(reactionCopy(locale).reload);
+    expect(html).toContain("bg-accent-soft");
+    expect(html).toContain("rounded-lg");
     expect(html).toContain('href="/workspace/reactions"');
   },
 );
