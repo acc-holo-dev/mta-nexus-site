@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -177,4 +178,62 @@ test("workflow keeps backup restore as a separate disposable job", () => {
     /backup-restore:[\s\S]*?uses: actions\/checkout@v7[\s\S]*?persist-credentials: false/u,
   );
   assert.match(workflow, /node scripts\/check-backup-restore\.mjs/u);
+});
+
+test("backup restore rehearsal script still requires disposable runner and full evidence", () => {
+  const script = readFileSync(resolve(process.cwd(), "scripts/check-backup-restore.mjs"), "utf8");
+  assert.match(script, /assertDisposableRunnerPolicy\(/u);
+  assert.match(script, /assertBackupRestoreEvidence\(/u);
+  assert.match(script, /pg_dump/u);
+  assert.match(script, /pg_restore/u);
+  for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) {
+    assert.match(script, new RegExp(flag, "u"));
+  }
+  assert.match(script, /sourceDestroyedBeforeRestore\s*=\s*true/u);
+  assert.doesNotMatch(script, /NEXUS_SKIP_DISPOSABLE|force.?production/iu);
+});
+
+test("rendered compose.production.yaml still matches the backup restore mount contract", () => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-backup-compose-"));
+  const emptyEnv = join(directory, "empty.env");
+  try {
+    writeFileSync(emptyEnv, "", { mode: PRIVATE_BACKUP_FILE_MODE });
+    const env = createBackupRestoreEnvironment({
+      PATH: process.env.PATH,
+      HOME: process.env.HOME,
+      TMPDIR: process.env.TMPDIR,
+    });
+    const rendered = JSON.parse(
+      execFileSync(
+        "docker",
+        [
+          "compose",
+          "--env-file",
+          emptyEnv,
+          "--project-name",
+          "nexus-backup-contract-surface",
+          "--file",
+          resolve(process.cwd(), "compose.production.yaml"),
+          "config",
+          "--format",
+          "json",
+        ],
+        {
+          cwd: process.cwd(),
+          env,
+          encoding: "utf8",
+          timeout: 60_000,
+          maxBuffer: 16 * 1024 * 1024,
+        },
+      ),
+    );
+
+    assert.deepEqual(extractBackupRestoreSpec(rendered), {
+      postgresImage: "postgres:18-alpine",
+      postgresTarget: "/var/lib/postgresql",
+      uploadsTarget: "/data/uploads",
+    });
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
