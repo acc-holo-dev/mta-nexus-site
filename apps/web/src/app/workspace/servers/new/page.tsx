@@ -1,21 +1,22 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
-import { Button } from "@nexus/ui";
 import { normalizeMtaAddress } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
+import { type FormEvent, useEffect, useState } from "react";
 import { useNexusLocale } from "../../../../components/locale-context";
+import { privateApiRequest } from "../../../../lib/private-api-request";
 import { confirmedCreatedServer } from "../../../../lib/server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../../../../lib/server-mutation-errors";
-import { privateApiRequest } from "../../../../lib/private-api-request";
 import {
   parseServerOrganizations,
   type ServerOrganizationOption,
 } from "../../../../lib/server-organization-options";
 
-const fieldClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
-const labelClass = "space-y-1.5";
-const labelTextClass = "font-label text-secondary";
+const controlClass =
+  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export default function RegisterServerPage() {
   const { locale, dictionary } = useNexusLocale();
@@ -128,7 +129,7 @@ export default function RegisterServerPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
+    <div className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:px-0">
       <div className="space-y-1.5">
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
@@ -148,13 +149,16 @@ export default function RegisterServerPage() {
         aria-busy={loading}
         className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
       >
-        <label className={`${labelClass} sm:col-span-2`}>
-          <span className={labelTextClass}>{copy.ownerScope}</span>
+        <div className="space-y-1.5 sm:col-span-2">
+          <label htmlFor="server-organization" className={nativeLabelClass}>
+            {copy.ownerScope}
+          </label>
           <select
+            id="server-organization"
             name="organizationId"
             defaultValue=""
-            disabled={organizationsLoading || organizationsFailed}
-            className={fieldClass}
+            disabled={loading || organizationsLoading || organizationsFailed}
+            className={controlClass}
           >
             <option value="">{copy.personalScope}</option>
             {organizations.map((organization) => (
@@ -171,161 +175,194 @@ export default function RegisterServerPage() {
               {copy.organizationsUnavailable}
             </span>
           )}
-        </label>
+        </div>
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.name}</span>
-          <input name="name" required minLength={3} maxLength={100} className={fieldClass} />
-        </label>
+        <Input
+          id="server-name"
+          name="name"
+          label={copy.name}
+          required
+          minLength={3}
+          maxLength={100}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.slug}</span>
-          <input
-            name="slug"
-            required
-            minLength={3}
-            maxLength={100}
-            pattern="[a-z0-9-]+"
-            autoCapitalize="none"
-            spellCheck={false}
-            className={fieldClass}
+        <Input
+          id="server-slug"
+          name="slug"
+          label={copy.slug}
+          required
+          minLength={3}
+          maxLength={100}
+          pattern="[a-z0-9-]+"
+          autoCapitalize="none"
+          spellCheck={false}
+          disabled={loading}
+        />
+
+        <div className="space-y-1.5 sm:col-span-2">
+          <label htmlFor="server-description" className={nativeLabelClass}>
+            {copy.descriptionLabel}
+          </label>
+          <textarea
+            id="server-description"
+            name="description"
+            rows={4}
+            maxLength={5000}
+            disabled={loading}
+            className={textareaClass}
           />
-        </label>
+        </div>
 
-        <label className={`${labelClass} sm:col-span-2`}>
-          <span className={labelTextClass}>{copy.descriptionLabel}</span>
-          <textarea name="description" rows={4} maxLength={5000} className={fieldClass} />
-        </label>
+        <Input
+          id="server-website-url"
+          name="websiteUrl"
+          type="url"
+          label={copy.websiteUrl}
+          placeholder="https://..."
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.websiteUrl}</span>
-          <input name="websiteUrl" type="url" placeholder="https://..." className={fieldClass} />
-        </label>
+        <Input
+          id="server-discord-url"
+          name="discordUrl"
+          type="url"
+          label={copy.discordUrl}
+          placeholder="https://discord.gg/..."
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.discordUrl}</span>
-          <input
-            name="discordUrl"
-            type="url"
-            placeholder="https://discord.gg/..."
-            className={fieldClass}
-          />
-        </label>
+        <Input
+          id="server-rules-url"
+          name="rulesUrl"
+          type="url"
+          label={copy.rulesUrl}
+          placeholder="https://..."
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.rulesUrl}</span>
-          <input name="rulesUrl" type="url" placeholder="https://..." className={fieldClass} />
-        </label>
+        <Input
+          id="server-language"
+          name="language"
+          label={copy.language}
+          maxLength={64}
+          defaultValue={locale === "ru" ? "Русский" : "English"}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.language}</span>
-          <input
-            name="language"
-            maxLength={64}
-            defaultValue={locale === "ru" ? "Русский" : "English"}
-            className={fieldClass}
-          />
-        </label>
+        <Input
+          id="server-region"
+          name="region"
+          label={copy.region}
+          maxLength={64}
+          placeholder={locale === "ru" ? "Европа" : "Europe"}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.region}</span>
-          <input
-            name="region"
-            maxLength={64}
-            placeholder={locale === "ru" ? "Европа" : "Europe"}
-            className={fieldClass}
-          />
-        </label>
-
-        <label className={`${labelClass} sm:col-span-2`}>
-          <span className={labelTextClass}>{copy.gameplayTags}</span>
-          <input
+        <div className="sm:col-span-2">
+          <Input
+            id="server-gameplay-tags"
             name="gameplayTags"
+            label={copy.gameplayTags}
             maxLength={500}
             placeholder="roleplay, economy, freeroam"
-            className={fieldClass}
+            disabled={loading}
           />
-        </label>
+        </div>
 
-        <label className={`${labelClass} sm:col-span-2`}>
-          <span className={labelTextClass}>{copy.mediaUrls}</span>
+        <div className="space-y-1.5 sm:col-span-2">
+          <label htmlFor="server-media-urls" className={nativeLabelClass}>
+            {copy.mediaUrls}
+          </label>
           <textarea
+            id="server-media-urls"
             name="mediaUrls"
             rows={3}
             maxLength={3000}
             placeholder="https://..."
-            className={fieldClass}
+            disabled={loading}
+            className={textareaClass}
           />
-        </label>
+        </div>
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.ipAddress}</span>
-          <input
-            name="ipAddress"
-            required
-            maxLength={255}
-            autoCapitalize="none"
-            spellCheck={false}
-            className={fieldClass}
-          />
-        </label>
+        <Input
+          id="server-ip-address"
+          name="ipAddress"
+          label={copy.ipAddress}
+          required
+          maxLength={255}
+          autoCapitalize="none"
+          spellCheck={false}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.gameMode}</span>
-          <input name="gameMode" maxLength={64} className={fieldClass} />
-        </label>
+        <Input
+          id="server-game-mode"
+          name="gameMode"
+          label={copy.gameMode}
+          maxLength={64}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.mapName}</span>
-          <input name="mapName" maxLength={64} className={fieldClass} />
-        </label>
+        <Input
+          id="server-map-name"
+          name="mapName"
+          label={copy.mapName}
+          maxLength={64}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.gamePort}</span>
-          <input
-            name="port"
-            type="number"
-            min={1}
-            max={65535}
-            defaultValue={22003}
-            className={fieldClass}
-          />
-        </label>
+        <Input
+          id="server-port"
+          name="port"
+          type="number"
+          label={copy.gamePort}
+          min={1}
+          max={65535}
+          defaultValue={22003}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.httpPort}</span>
-          <input
-            name="httpPort"
-            type="number"
-            min={1}
-            max={65535}
-            defaultValue={22005}
-            className={fieldClass}
-          />
-        </label>
+        <Input
+          id="server-http-port"
+          name="httpPort"
+          type="number"
+          label={copy.httpPort}
+          min={1}
+          max={65535}
+          defaultValue={22005}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.maxPlayers}</span>
-          <input
-            name="maxPlayers"
-            type="number"
-            min={1}
-            max={4096}
-            defaultValue={128}
-            className={fieldClass}
-          />
-        </label>
+        <Input
+          id="server-max-players"
+          name="maxPlayers"
+          type="number"
+          label={copy.maxPlayers}
+          min={1}
+          max={4096}
+          defaultValue={128}
+          disabled={loading}
+        />
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>{copy.visibility}</span>
-          <select name="visibility" defaultValue="public" className={fieldClass}>
+        <div className="space-y-1.5">
+          <label htmlFor="server-visibility" className={nativeLabelClass}>
+            {copy.visibility}
+          </label>
+          <select
+            id="server-visibility"
+            name="visibility"
+            defaultValue="public"
+            disabled={loading}
+            className={controlClass}
+          >
             <option value="public">{copy.public}</option>
             <option value="unlisted">{copy.unlisted}</option>
             <option value="private">{copy.private}</option>
           </select>
-        </label>
+        </div>
 
-        <Button type="submit" isLoading={loading} className="sm:col-span-2">
+        <Button type="submit" isLoading={loading} className="min-h-11 sm:col-span-2">
           {loading ? copy.creating : copy.create}
         </Button>
       </form>

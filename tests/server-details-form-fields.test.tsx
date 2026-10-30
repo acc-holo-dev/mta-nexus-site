@@ -14,13 +14,39 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
 vi.mock("@nexus/ui", async () => {
   const { createElement } = await import("react");
   return {
-    Button: ({ children, type }: { children: ReactNode; type?: "button" | "submit" }) =>
-      createElement("button", { type }, children),
+    Button: ({
+      children,
+      type,
+      isLoading,
+    }: {
+      children: ReactNode;
+      type?: "button" | "submit";
+      isLoading?: boolean;
+    }) => createElement("button", { type, "aria-busy": isLoading || undefined }, children),
+    Input: ({
+      label,
+      id,
+      error: _error,
+      ...props
+    }: {
+      label?: string;
+      id?: string;
+      error?: string;
+      name?: string;
+      defaultValue?: string | number;
+      [key: string]: unknown;
+    }) =>
+      createElement(
+        "div",
+        null,
+        label ? createElement("label", { htmlFor: id }, label) : null,
+        createElement("input", { id, ...props }),
+      ),
   };
 });
 
-import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
 import RegisterServerPage from "../apps/web/src/app/workspace/servers/new/page";
+import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
 
 describe("server forms use the same editable MTA metadata", () => {
   it("renders persisted HTTP port and map in the owner editor", () => {
@@ -42,6 +68,8 @@ describe("server forms use the same editable MTA metadata", () => {
     expect(html).toMatch(/name="mapName"[^>]*value="Los Santos"/u);
     expect(html).toContain("HTTP port");
     expect(html).toContain("Map name");
+    expect(html).toContain('for="manage-server-http-port"');
+    expect(html).toContain('for="manage-server-map-name"');
   });
 
   it("defaults a legacy unfilled HTTP port without hiding map editing", () => {
@@ -67,5 +95,7 @@ describe("server forms use the same editable MTA metadata", () => {
     expect(html).toContain('name="httpPort"');
     expect(html).toContain('name="organizationId"');
     expect(html).toContain("My personal account");
+    expect(html).toContain('for="server-map-name"');
+    expect(html).toContain('for="server-organization"');
   });
 });
