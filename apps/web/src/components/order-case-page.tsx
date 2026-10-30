@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError, ORDER_CASE_REVIEW_STATUSES, type OrderCaseEvidence } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -231,9 +232,9 @@ export async function OrderCaseListPage({
             ))}
           </select>
         </label>
-        <button type="submit" className="rounded-lg border border-base p-2 text-sm text-accent">
+        <Button type="submit" variant="outline" size="sm">
           {copy.apply}
-        </button>
+        </Button>
         <Link href={base} className="p-2 text-sm text-accent underline">
           {copy.clear}
         </Link>

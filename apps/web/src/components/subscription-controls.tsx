@@ -1,5 +1,6 @@
 "use client";
 import type { CommercialPlanTerms, SubscriptionCommand } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { subscriptionCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -152,13 +153,9 @@ export function SubscriptionControls(props: Props) {
           {error}
         </p>
       )}
-      <button
-        disabled={busy}
-        type="submit"
-        className="rounded bg-accent px-4 py-2 text-background disabled:opacity-50"
-      >
+      <Button type="submit" disabled={busy} isLoading={busy}>
         {busy ? c.busy : props.action === "activate" ? c.activate : c.cancel}
-      </button>
+      </Button>
       <Link
         href={`${subscriptionAccountHref(props.action === "cancel" ? props.organizationId : props.scope === "organization" ? organizationId || undefined : undefined).replace("/workspace/subscriptions", "/workspace/subscriptions/history")}`}
         className="ml-4 text-accent underline"

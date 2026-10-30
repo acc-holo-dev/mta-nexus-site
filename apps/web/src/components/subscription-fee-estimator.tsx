@@ -1,5 +1,6 @@
 "use client";
 import type { commercialFeeEstimate } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { formatHistoryAmount } from "../lib/commerce-history-format";
 import { parseCommercialAmount } from "../lib/commercial-confirmation";
@@ -108,9 +109,9 @@ export function SubscriptionFeeEstimator({
           </select>
         </label>
       </fieldset>
-      <button type="submit" disabled={busy} className="text-accent underline">
+      <Button type="submit" variant="outline" isLoading={busy}>
         {busy ? c.busy : c.calculate}
-      </button>
+      </Button>
       {error && <p role="alert">{error}</p>}
       {result && (
         <output className="block space-y-2">

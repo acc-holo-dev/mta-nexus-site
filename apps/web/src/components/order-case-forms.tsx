@@ -9,6 +9,7 @@ import {
   type OrderCaseReviewStatus,
   type SupportCaseStatus,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { orderCaseCreateSchema } from "@nexus/validation";
 import { orderCaseActionLabel, orderCaseCopy, orderCaseKindLabel } from "../lib/order-case-i18n";
 import {
@@ -23,8 +24,6 @@ import {
 } from "../lib/support-retry";
 
 const fieldClass = "w-full rounded-lg border border-base bg-surface p-3 text-sm text-primary";
-const buttonClass =
-  "rounded-lg border border-base px-4 py-2 text-sm text-accent disabled:opacity-50";
 
 export function OrderCaseCreateForm({
   orderId,
@@ -179,9 +178,9 @@ export function OrderCaseCreateForm({
             <span className="block text-sm text-secondary">{copy.amountHelp}</span>
           </label>
         )}
-        <button type="submit" className={buttonClass}>
+        <Button type="submit" variant="outline" isLoading={busy}>
           {busy ? copy.busy : copy.send}
-        </button>
+        </Button>
       </fieldset>
       {error && (
         <p role="alert" className="text-sm text-danger">
@@ -319,9 +318,10 @@ export function OrderCaseReviewForm({
       </label>
       <div className="flex flex-wrap gap-3">
         {actions.map((action) => (
-          <button
+          <Button
             type="button"
             key={action}
+            variant="outline"
             disabled={
               busy ||
               sealed ||
@@ -329,10 +329,9 @@ export function OrderCaseReviewForm({
               (action === "recommend_refund" && !recommendationEligible)
             }
             onClick={() => void review(action)}
-            className={buttonClass}
           >
             {orderCaseActionLabel(locale, action)}
-          </button>
+          </Button>
         ))}
       </div>
       {canRecommendRefund && monetary && !recommendationEligible && (

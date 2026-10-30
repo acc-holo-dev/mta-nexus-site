@@ -1,5 +1,6 @@
 "use client";
 import { type CommercialPlan, commercialFeeEstimate, type PlanReviewCommand } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { planReviewCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -161,13 +162,13 @@ export function PlanReviewForm({
           {error}
         </p>
       ) : null}
-      <button
+      <Button
         type="submit"
         disabled={busy || (plan.scope === "organization" && !organizationId)}
-        className="rounded bg-accent px-4 py-2 text-white disabled:opacity-50"
+        isLoading={busy}
       >
         {busy ? c.saving : c.save}
-      </button>
+      </Button>
     </form>
   );
 }
