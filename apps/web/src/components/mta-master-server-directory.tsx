@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Button } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Search, Users } from "lucide-react";
-import type { MtaMasterServer } from "../lib/services/mta-master-directory-service";
+import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
+import type { MtaMasterServer } from "../lib/services/mta-master-directory-service";
 
 const PAGE_SIZE = 50;
 const REQUEST_TIMEOUT_MS = 12_000;
@@ -91,16 +92,18 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
           >
             {copy.connect}
           </a>
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             aria-label={`${copy.copyAddress}: ${name}`}
             disabled={copying}
             onClick={copyAddress}
-            className={`${controlClass} inline-flex items-center gap-1.5 disabled:opacity-50`}
+            className="gap-1.5"
           >
             <Copy className="h-4 w-4" aria-hidden="true" />
             {copying ? copy.copying : copy.copyAddress}
-          </button>
+          </Button>
         </div>
       </div>
       <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
@@ -275,13 +278,14 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
       {error && (
         <div role="alert" className="nexus-panel space-y-3 p-6 text-sm text-secondary">
           <p>{error}</p>
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => setAttempt((current) => current + 1)}
-            className={controlClass}
           >
             {copy.tryAgain}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -294,17 +298,18 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
             <div className="nexus-panel space-y-3 p-6 text-center text-sm text-secondary">
               <p>{hasFilters ? copy.noMatch : copy.none}</p>
               {hasFilters ? (
-                <button type="button" onClick={resetFilters} className={controlClass}>
+                <Button type="button" variant="secondary" size="sm" onClick={resetFilters}>
                   {copy.resetFilters}
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setAttempt((current) => current + 1)}
-                  className={controlClass}
                 >
                   {copy.tryAgain}
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -316,27 +321,31 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
           className="flex flex-wrap items-center justify-between gap-3"
           aria-label={copy.directory}
         >
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => setPage((current) => Math.max(0, current - 1))}
             disabled={page === 0}
-            className={`${controlClass} inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50`}
+            className="gap-1"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             {copy.previous}
-          </button>
+          </Button>
           <span className="text-xs text-secondary">
             {copy.page} {page + 1} {copy.of} {totalPages}
           </span>
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}
             disabled={page >= totalPages - 1}
-            className={`${controlClass} inline-flex items-center gap-1 disabled:cursor-not-allowed disabled:opacity-50`}
+            className="gap-1"
           >
             {copy.next}
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+          </Button>
         </nav>
       )}
     </section>
