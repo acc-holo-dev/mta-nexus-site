@@ -59,6 +59,12 @@ export async function retireAndRefreshProduct(
       .where(and(safePublishedBuildCondition(retired.productId), ne(builds.id, retired.id)))
       .orderBy(desc(builds.createdAt), desc(builds.id))
       .limit(1);
+    const pending = await tx
+      .select({ version: builds.version })
+      .from(builds)
+      .where(and(eq(builds.productId, retired.productId), eq(builds.status, "pending_review")))
+      .orderBy(desc(builds.createdAt), desc(builds.id))
+      .limit(1);
     await tx
       .update(products)
       .set(
@@ -66,7 +72,13 @@ export async function retireAndRefreshProduct(
           ? { updatedAt: new Date() }
           : fallback[0] && !parent.metadataReviewRequired
             ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
-            : { status: "draft", updatedAt: new Date() },
+            : pending[0]
+              ? {
+                  currentVersion: pending[0].version,
+                  status: "pending_review",
+                  updatedAt: new Date(),
+                }
+              : { status: "draft", updatedAt: new Date() },
       )
       .where(eq(products.id, retired.productId));
 

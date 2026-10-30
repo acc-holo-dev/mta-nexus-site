@@ -132,4 +132,40 @@ describe("build retirement persistence", () => {
       currentVersion: "1.0.0",
     });
   });
+
+  it("keeps a newer pending version in product review scope after retirement", async () => {
+    const f = await fixture("pending", ["1.0.0"]);
+    const publishedId = f.buildIds[0];
+    assert.ok(publishedId);
+    const pendingId = `bld_retire_pending_${f.productId.slice(-10)}`;
+    await buildRepository.create({
+      id: pendingId,
+      productId: f.productId,
+      version: "1.1.0",
+      releaseNotes: "Pending follow-up",
+      status: "pending_review",
+      storageKey: `test/${pendingId}.zip`,
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 12,
+      fileName: "1.1.0.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "integration",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
+
+    await expect(
+      buildRepository.retireAndRefreshProduct(
+        publishedId,
+        "published",
+        audit(`aud_${publishedId}_pending`, f.userId, publishedId),
+      ),
+    ).resolves.toMatchObject({ id: publishedId, status: "retired" });
+
+    await expect(productRepository.findById(f.productId)).resolves.toMatchObject({
+      status: "pending_review",
+      currentVersion: "1.1.0",
+    });
+  });
 });
