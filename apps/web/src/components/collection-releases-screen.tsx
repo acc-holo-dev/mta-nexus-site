@@ -1,17 +1,18 @@
-import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { AppError, LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRequestLocale } from "../lib/i18n-server";
-import { collectionPageParams, collectionHref } from "../lib/library-collections-query";
-import { collectionReleasesQuery } from "../lib/collection-releases-query";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
-import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
-import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
+import { collectionReleasesQuery } from "../lib/collection-releases-query";
+import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
+import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../lib/library-collections-query";
+import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
+import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
+import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { ResourceDownloadButton } from "./resource-download-button";
@@ -98,7 +99,9 @@ export async function CollectionReleasesScreen({
             className="border border-base bg-surface p-2"
           />
         </label>
-        <button type="submit">{cc.apply}</button>
+        <Button type="submit" variant="outline">
+          {cc.apply}
+        </Button>
         {result.q && (
           <Link
             href={collectionHref(path.id, "releases", { filter: result.filter })}

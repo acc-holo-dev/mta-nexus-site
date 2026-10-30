@@ -1,12 +1,14 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus/domain";
 import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
+
 type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };
 export function LibraryCollectionItemCopyForm({
@@ -248,16 +250,16 @@ export function LibraryCollectionItemCopyForm({
         </label>
       </fieldset>
       {!blocked && !saved && (
-        <button
+        <Button
           type="submit"
           disabled={
             busy || (!frozen && (!confirmed || !ids.length || !destination || overCapacity))
           }
           aria-busy={busy}
-          className="rounded border border-base px-4 py-2 text-sm text-accent disabled:opacity-60"
+          variant="outline"
         >
           {busy ? c.busy : frozen ? c.retryAction : c[action]}
-        </button>
+        </Button>
       )}
       {frozen && !saved && (
         <div className="space-y-2">
@@ -268,14 +270,15 @@ export function LibraryCollectionItemCopyForm({
           <p role="note" className="text-sm text-muted">
             {c.frozen}
           </p>
-          <button
+          <Button
             type="button"
             disabled={busy}
             onClick={() => window.location.reload()}
-            className="text-accent underline"
+            className="h-auto px-0 text-accent underline"
+            variant="ghost"
           >
             {c.reload}
-          </button>
+          </Button>
         </div>
       )}
       {error && (

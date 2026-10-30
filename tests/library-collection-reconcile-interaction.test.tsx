@@ -38,6 +38,10 @@ function nodes(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const e = node as Element;
+  const type = e.type as { displayName?: string } | string;
+  if (typeof type === "object" && type?.displayName === "Button") {
+    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
+  }
   return [e, ...nodes(e.props.children as ReactNode)];
 }
 const date = "2026-10-13T00:00:00.000Z",
