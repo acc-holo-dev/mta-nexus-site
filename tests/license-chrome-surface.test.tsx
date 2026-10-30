@@ -22,27 +22,30 @@ import { LicenseArchiveFilters } from "../apps/web/src/components/license-archiv
 import { LicenseControlPanel } from "../apps/web/src/components/license-control-panel";
 
 describe("license chrome surface", () => {
-  it.each(["en", "ru"] as const)("applies archive filters with shared Button chrome in %s", (locale) => {
-    const copy = getLicenseMaintenanceCopy(locale);
-    const html = renderToStaticMarkup(
-      createElement(LicenseArchiveFilters, {
-        locale,
-        page: 1,
-        query: {
+  it.each(["en", "ru"] as const)(
+    "applies archive filters with shared Button chrome in %s",
+    (locale) => {
+      const copy = getLicenseMaintenanceCopy(locale);
+      const html = renderToStaticMarkup(
+        createElement(LicenseArchiveFilters, {
+          locale,
           page: 1,
-          q: "",
-          status: "all",
-          binding: "all",
-          term: "all",
-          sort: "newest",
-        },
-      }),
-    );
-    expect(html).toContain(copy.apply);
-    expect(html).toContain("rounded-lg");
-    expect(html).toContain("text-accent");
-    expect(html).toContain('type="submit"');
-  });
+          query: {
+            page: 1,
+            q: "",
+            status: "all",
+            binding: "all",
+            term: "all",
+            sort: "newest",
+          },
+        }),
+      );
+      expect(html).toContain(copy.apply);
+      expect(html).toContain("rounded-lg");
+      expect(html).toContain("text-accent");
+      expect(html).toContain('type="submit"');
+    },
+  );
 
   it("renders license control actions with shared Button chrome", () => {
     const copy = getLicenseControlCopy("en");

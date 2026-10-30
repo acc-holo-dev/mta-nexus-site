@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import {
   canModerateLicense,
-  type LicenseOwnerAction,
   type LicenseModerationAction,
+  type LicenseOwnerAction,
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
-import { licenseOwnerCommandSchema, licenseModerationCommandSchema } from "@nexus/validation";
-import { useNexusLocale } from "./locale-context";
-import { privateApiRequest } from "../lib/private-api-request";
-import { getLicenseControlCopy, licenseControlError } from "../lib/license-control-i18n";
+import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexus/validation";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { confirmedLicenseControl } from "../lib/license-control-confirmation";
+import { getLicenseControlCopy, licenseControlError } from "../lib/license-control-i18n";
+import { privateApiRequest } from "../lib/private-api-request";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
+import { useNexusLocale } from "./locale-context";
 
 type ServerPage = { servers: { id: string; name: string }[]; page: number; totalPages: number };
 export type LicensePanelData = {

@@ -1,8 +1,8 @@
 import type { LicenseArchiveFilter } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import Link from "next/link";
-import { getLicenseMaintenanceCopy } from "../lib/license-maintenance-i18n";
 import { licenseArchiveUrl } from "../lib/license-archive-query";
+import { getLicenseMaintenanceCopy } from "../lib/license-maintenance-i18n";
 export function LicenseArchiveFilters({
   query,
   page,

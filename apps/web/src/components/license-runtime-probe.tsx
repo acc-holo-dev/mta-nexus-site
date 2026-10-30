@@ -1,13 +1,13 @@
 "use client";
-import type { LicenseReleaseConfirmation, LicenseReleaseCheck } from "@nexus/domain";
+import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/domain";
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { getLicenseControlCopy } from "../lib/license-control-i18n";
 import {
-  parseLicenseRuntimeContext,
   confirmLicenseRelease,
   type LicenseRuntimeContext,
+  parseLicenseRuntimeContext,
 } from "../lib/license-runtime-response";
 import { privateApiRequest } from "../lib/private-api-request";
 
