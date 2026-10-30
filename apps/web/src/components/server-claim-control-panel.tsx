@@ -1,16 +1,17 @@
 "use client";
 
+import { Button } from "@nexus/ui";
+import { KeyRound, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { KeyRound, LoaderCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { privateApiRequest } from "../lib/private-api-request";
 import {
   confirmsServerClaimVerification,
-  parseIssuedServerClaimChallenge,
   type IssuedServerClaimChallenge,
+  parseIssuedServerClaimChallenge,
 } from "../lib/server-claim-confirmation";
 import { serverClaimErrorMessage } from "../lib/server-claim-status-view";
-import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 export function ServerClaimControlPanel({
@@ -130,17 +131,15 @@ export function ServerClaimControlPanel({
       </div>
 
       {!challenge ? (
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          isLoading={state === "issuing"}
           onClick={() => void issue()}
-          disabled={state === "issuing"}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[color:var(--nexus-accent)]/30 bg-accent-soft px-4 py-2 text-xs font-bold text-accent transition-colors hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] disabled:opacity-50"
+          className="min-h-10"
         >
-          {state === "issuing" && (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
-          )}
           {state === "issuing" ? copy.creating : copy.create}
-        </button>
+        </Button>
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3">
@@ -165,29 +164,27 @@ export function ServerClaimControlPanel({
           </p>
 
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
               type="button"
+              isLoading={state === "verifying"}
               onClick={() => void verify()}
-              disabled={state === "verifying"}
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-success-solid px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-success)] disabled:opacity-50"
+              className="min-h-10"
             >
-              {state === "verifying" && (
-                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
-              )}
               {state === "verifying" ? copy.checking : copy.verify}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              disabled={state === "verifying"}
               onClick={() => {
                 setChallenge(null);
                 setState("idle");
                 setError(null);
               }}
-              disabled={state === "verifying"}
-              className="min-h-10 rounded-lg border border-base bg-surface px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] disabled:opacity-50"
+              className="min-h-10"
             >
               {copy.startOver}
-            </button>
+            </Button>
           </div>
         </div>
       )}
