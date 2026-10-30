@@ -1,9 +1,15 @@
-import { PRODUCT_TYPES, RESOURCE_READINESS, type PublisherResourceQuery } from "@nexus/domain";
+import { PRODUCT_TYPES, type PublisherResourceQuery, RESOURCE_READINESS } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
+import { getDictionary } from "../lib/i18n";
+import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 import { resourcePublisherUrl } from "../lib/resource-publisher-query";
-import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
-import { getDictionary } from "../lib/i18n";
+
+const controlClass =
+  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
+
 export function ResourcePublisherFilters({
   query,
   statusCounts,
@@ -16,7 +22,6 @@ export function ResourcePublisherFilters({
   const copy = getResourcePublisherCopy(locale),
     dictionary = getDictionary(locale),
     labels = dictionary.authorResources;
-  const input = "w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-primary";
   return (
     <section className="space-y-4" aria-label={copy.filters}>
       <form
@@ -25,13 +30,23 @@ export function ResourcePublisherFilters({
         className="nexus-panel grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3"
       >
         <input type="hidden" name="status" value={query.status} />
-        <label className="space-y-1 text-sm text-secondary">
-          {copy.search}
-          <input name="q" defaultValue={query.q} maxLength={120} className={input} />
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          {copy.type}
-          <select name="type" defaultValue={query.type} className={input}>
+        <Input
+          id="publisher-search"
+          name="q"
+          label={copy.search}
+          defaultValue={query.q}
+          maxLength={120}
+        />
+        <div className="space-y-1.5">
+          <label htmlFor="publisher-type" className={nativeLabelClass}>
+            {copy.type}
+          </label>
+          <select
+            id="publisher-type"
+            name="type"
+            defaultValue={query.type}
+            className={controlClass}
+          >
             <option value="all">{copy.all}</option>
             {PRODUCT_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -39,20 +54,34 @@ export function ResourcePublisherFilters({
               </option>
             ))}
           </select>
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          {copy.scope}
-          <select name="scope" defaultValue={query.scope} className={input}>
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="publisher-scope" className={nativeLabelClass}>
+            {copy.scope}
+          </label>
+          <select
+            id="publisher-scope"
+            name="scope"
+            defaultValue={query.scope}
+            className={controlClass}
+          >
             {["all", "personal", "organization"].map((scope) => (
               <option key={scope} value={scope}>
                 {copy[scope as "all" | "personal" | "organization"]}
               </option>
             ))}
           </select>
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          {copy.readinessLabel}
-          <select name="readiness" defaultValue={query.readiness} className={input}>
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="publisher-readiness" className={nativeLabelClass}>
+            {copy.readinessLabel}
+          </label>
+          <select
+            id="publisher-readiness"
+            name="readiness"
+            defaultValue={query.readiness}
+            className={controlClass}
+          >
             <option value="all">{copy.all}</option>
             {RESOURCE_READINESS.map((value) => (
               <option key={value} value={value}>
@@ -60,21 +89,28 @@ export function ResourcePublisherFilters({
               </option>
             ))}
           </select>
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          {copy.sort}
-          <select name="sort" defaultValue={query.sort} className={input}>
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="publisher-sort" className={nativeLabelClass}>
+            {copy.sort}
+          </label>
+          <select
+            id="publisher-sort"
+            name="sort"
+            defaultValue={query.sort}
+            className={controlClass}
+          >
             {["updated", "created", "title"].map((sort) => (
               <option key={sort} value={sort}>
                 {copy[sort as "updated" | "created" | "title"]}
               </option>
             ))}
           </select>
-        </label>
+        </div>
         <div className="flex items-end gap-4">
-          <button className="rounded-md bg-accent px-4 py-2 text-sm text-white" type="submit">
+          <Button type="submit" className="min-h-11">
             {copy.apply}
-          </button>
+          </Button>
           <Link className="text-sm text-accent underline" href="/workspace/resources">
             {copy.reset}
           </Link>

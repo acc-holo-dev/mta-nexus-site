@@ -1,13 +1,14 @@
 "use client";
 
 import { PRODUCT_TYPES } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useState } from "react";
 import { confirmedAuthorBuild } from "../lib/author-resource-response";
 import {
   MAX_BUILD_FILE_SIZE_BYTES,
   validateBuildFileSelection,
 } from "../lib/build-file-validation";
+import { buildPackageCopy } from "../lib/build-package-i18n";
 import { confirmedCreatedResource } from "../lib/new-resource-response";
 import {
   createPendingResourceDraft,
@@ -17,15 +18,17 @@ import {
 } from "../lib/pending-resource-draft";
 import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
-import { buildPackageCopy } from "../lib/build-package-i18n";
 import { useNexusLocale } from "./locale-context";
-import { ResourceSubmissionSuccess } from "./resource-submission-success";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
+import { ResourceSubmissionSuccess } from "./resource-submission-success";
 
-const fieldClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
-const labelClass = "space-y-1.5";
-const labelTextClass = "font-label text-secondary";
+const controlClass =
+  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
+const fileClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
 
 export function NewResourceForm({ actorId }: { actorId: string }) {
   const storageKey = pendingResourceDraftKey(actorId);
@@ -284,135 +287,146 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
       >
         <fieldset disabled={loading} className="contents">
-          <label className={labelClass}>
-            <span className={labelTextClass}>{copy.title}</span>
-            <input
-              name="title"
-              required
-              minLength={3}
-              maxLength={120}
-              className={fieldClass}
-              disabled={Boolean(createdProduct)}
-            />
-          </label>
+          <Input
+            id="resource-title"
+            name="title"
+            label={copy.title}
+            required
+            minLength={3}
+            maxLength={120}
+            disabled={Boolean(createdProduct)}
+          />
 
-          <label className={labelClass}>
-            <span className={labelTextClass}>{copy.slug}</span>
-            <input
-              name="slug"
-              required
-              minLength={3}
-              maxLength={120}
-              pattern="[a-z0-9-]+"
-              autoCapitalize="none"
-              spellCheck={false}
-              className={fieldClass}
-              disabled={Boolean(createdProduct)}
-            />
-          </label>
+          <Input
+            id="resource-slug"
+            name="slug"
+            label={copy.slug}
+            required
+            minLength={3}
+            maxLength={120}
+            pattern="[a-z0-9-]+"
+            autoCapitalize="none"
+            spellCheck={false}
+            disabled={Boolean(createdProduct)}
+          />
 
-          <label className={`${labelClass} sm:col-span-2`}>
-            <span className={labelTextClass}>{copy.shortDescription}</span>
-            <input
+          <div className="sm:col-span-2">
+            <Input
+              id="resource-short-description"
               name="shortDescription"
+              label={copy.shortDescription}
               maxLength={240}
-              className={fieldClass}
               disabled={Boolean(createdProduct)}
             />
-          </label>
+          </div>
 
-          <label className={`${labelClass} sm:col-span-2`}>
-            <span className={labelTextClass}>{copy.description}</span>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="resource-description" className={nativeLabelClass}>
+              {copy.description}
+            </label>
             <textarea
+              id="resource-description"
               name="description"
               required
               minLength={10}
               maxLength={10_000}
               rows={6}
-              className={fieldClass}
               disabled={Boolean(createdProduct)}
+              className={textareaClass}
             />
-          </label>
+          </div>
 
-          <label className={labelClass}>
-            <span className={labelTextClass}>{copy.type}</span>
-            <select name="type" className={fieldClass} disabled={Boolean(createdProduct)}>
+          <div className="space-y-1.5">
+            <label htmlFor="resource-type" className={nativeLabelClass}>
+              {copy.type}
+            </label>
+            <select
+              id="resource-type"
+              name="type"
+              className={controlClass}
+              disabled={Boolean(createdProduct)}
+            >
               {PRODUCT_TYPES.map((type) => (
                 <option key={type} value={type}>
                   {copy[PRODUCT_PUBLISHING_KEYS[type]]}
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <label className={labelClass}>
-            <span className={labelTextClass}>{copy.tags}</span>
-            <input
-              name="tags"
-              maxLength={500}
-              className={fieldClass}
-              disabled={Boolean(createdProduct)}
-            />
-          </label>
+          <Input
+            id="resource-tags"
+            name="tags"
+            label={copy.tags}
+            maxLength={500}
+            disabled={Boolean(createdProduct)}
+          />
 
-          <label className={labelClass}>
-            <span className={labelTextClass}>{copy.version}</span>
-            <input
-              name="version"
-              defaultValue="1.0.0"
-              required
-              maxLength={64}
-              pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
-              className={fieldClass}
-            />
-          </label>
+          <Input
+            id="resource-version"
+            name="version"
+            label={copy.version}
+            defaultValue="1.0.0"
+            required
+            maxLength={64}
+            pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
+          />
 
-          <label className={labelClass}>
-            <span className={labelTextClass}>{copy.minMtaVersion}</span>
-            <input
-              name="mtaMinVersion"
-              value={mtaVersionTarget}
-              onChange={(event) => setMtaVersionTarget(event.target.value)}
-              pattern="1\.[0-9]+(\.[0-9]+)?"
-              maxLength={64}
-              className={fieldClass}
-              disabled={Boolean(createdProduct)}
-            />
-          </label>
+          <Input
+            id="resource-min-mta"
+            name="mtaMinVersion"
+            label={copy.minMtaVersion}
+            value={mtaVersionTarget}
+            onChange={(event) => setMtaVersionTarget(event.target.value)}
+            pattern="1\.[0-9]+(\.[0-9]+)?"
+            maxLength={64}
+            disabled={Boolean(createdProduct)}
+          />
 
-          <label className={`${labelClass} sm:col-span-2`}>
-            <span className={labelTextClass}>{copy.dependencies}</span>
-            <input
+          <div className="sm:col-span-2">
+            <Input
+              id="resource-dependencies"
               name="dependencies"
+              label={copy.dependencies}
               maxLength={1000}
               placeholder="core-ui, vehicle-pack"
-              className={fieldClass}
               disabled={Boolean(createdProduct)}
             />
-          </label>
+          </div>
 
-          <label className={`${labelClass} sm:col-span-2`}>
-            <span className={labelTextClass}>{copy.buildArchive}</span>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="resource-build-file" className={nativeLabelClass}>
+              {copy.buildArchive}
+            </label>
             <input
+              id="resource-build-file"
               name="file"
               type="file"
               accept=".zip,.rar,.7z,.lua"
               required
-              className="w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
+              className={fileClass}
             />
             <span className="text-xs text-muted">{buildFileRequirements}</span>
-          </label>
+          </div>
 
-          <label className={`${labelClass} sm:col-span-2`}>
-            <span className={labelTextClass}>{copy.releaseNotes}</span>
-            <textarea name="releaseNotes" rows={3} maxLength={5000} className={fieldClass} />
-          </label>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="resource-release-notes" className={nativeLabelClass}>
+              {copy.releaseNotes}
+            </label>
+            <textarea
+              id="resource-release-notes"
+              name="releaseNotes"
+              rows={3}
+              maxLength={5000}
+              className={textareaClass}
+            />
+          </div>
 
           <Button
             type="submit"
             isLoading={loading}
             disabled={!draftReady}
-            className="sm:col-span-2"
+            className="min-h-11 sm:col-span-2"
           >
             {!draftReady
               ? copy.checkingDraft

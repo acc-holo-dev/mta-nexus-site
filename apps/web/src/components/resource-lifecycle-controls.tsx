@@ -1,16 +1,23 @@
 "use client";
 
-import { useId, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import {
   canTransitionResource,
   type ProductStatus,
   type ResourceLifecycleAction,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { resourceLifecycleSchema } from "@nexus/validation";
-import { useNexusLocale } from "./locale-context";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+import { useNexusLocale } from "./locale-context";
+
+const controlClass =
+  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function ResourceLifecycleControls({
   product,
@@ -85,43 +92,47 @@ export function ResourceLifecycleControls({
       {actions.length === 0 ? (
         <p className="text-sm text-warning">{copy.blocked}</p>
       ) : (
-        <form onSubmit={submit} className="space-y-4">
-          <label htmlFor={`${fieldId}-action`} className="block text-sm text-secondary">
-            {copy.lifecycle}
-          </label>
-          <select
-            id={`${fieldId}-action`}
-            value={action}
-            disabled={busy || saved}
-            onChange={(event) => {
-              setAction(event.target.value as ResourceLifecycleAction);
-              setConfirmed(false);
-            }}
-            className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
-          >
-            {actions.map((value) => (
-              <option key={value} value={value}>
-                {labels[value]}
-              </option>
-            ))}
-          </select>
+        <form onSubmit={submit} aria-busy={busy} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor={`${fieldId}-action`} className={nativeLabelClass}>
+              {copy.lifecycle}
+            </label>
+            <select
+              id={`${fieldId}-action`}
+              value={action}
+              disabled={busy || saved}
+              onChange={(event) => {
+                setAction(event.target.value as ResourceLifecycleAction);
+                setConfirmed(false);
+              }}
+              className={controlClass}
+            >
+              {actions.map((value) => (
+                <option key={value} value={value}>
+                  {labels[value]}
+                </option>
+              ))}
+            </select>
+          </div>
           <p id={`${fieldId}-note`} className="text-sm text-secondary">
             {notes[action]}
           </p>
-          <label htmlFor={`${fieldId}-reason`} className="block text-sm text-secondary">
-            {copy.reason}
-          </label>
-          <textarea
-            id={`${fieldId}-reason`}
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-            required
-            minLength={5}
-            maxLength={1000}
-            rows={3}
-            disabled={busy || saved}
-            className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
-          />
+          <div className="space-y-1.5">
+            <label htmlFor={`${fieldId}-reason`} className={nativeLabelClass}>
+              {copy.reason}
+            </label>
+            <textarea
+              id={`${fieldId}-reason`}
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              required
+              minLength={5}
+              maxLength={1000}
+              rows={3}
+              disabled={busy || saved}
+              className={textareaClass}
+            />
+          </div>
           <label className="flex items-start gap-3 text-sm text-secondary">
             <input
               type="checkbox"
@@ -133,13 +144,14 @@ export function ResourceLifecycleControls({
             />
             <span>{copy.confirm}</span>
           </label>
-          <button
+          <Button
             type="submit"
-            disabled={busy || saved || !confirmed}
-            className="rounded-lg bg-accent px-4 py-2 font-semibold text-white disabled:opacity-50"
+            isLoading={busy}
+            disabled={saved || !confirmed}
+            className="min-h-11"
           >
             {busy ? copy.working : labels[action]}
-          </button>
+          </Button>
         </form>
       )}
       {error && (

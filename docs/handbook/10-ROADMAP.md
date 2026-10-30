@@ -10,7 +10,7 @@
 
 | № | Цель и граница работы | Зависит от | Критерий готовности |
 |---|---|---|---|
-| 18 | Закрыть ошибки интерфейса основных путей беты. | 15–17 | RU/EN, мобильная ширина, клавиатура, focus, labels и loading/empty/error/success проверены на целевых экранах; используются общие компоненты и токены. Auth login/register/recovery и server registration/management/claim уже на `@nexus/ui`; остаются workspace/resource целевые экраны. |
+| 18 | Закрыть ошибки интерфейса основных путей беты. | 15–17 | Готово для основных путей беты: auth, server registration/management/claim, resource create/edit/filters/copy/compatibility/lifecycle/builds/media и workspace profile/org/developer forms на `@nexus/ui` с RU/EN labels/focus/loading. Вторичные library/history filter chrome могут ещё использовать native controls. |
 | 19 | Повторить обновление БД и парное восстановление данных/файлов. | — | На отдельных пустых томах восстановлены backup и uploads, сверены миграции и хеши; проверены существующие данные после forward-only upgrade. Рабочие/production-данные не изменены. Контракт mount-топологии `compose.production.yaml` уже закреплён тестом; полный disposable-volume прогон остаётся в CI. |
 | 20 | Подготовить проверяемый кандидат открытой бесплатной беты. | 06–09, 13–19 | На точном SHA пройдены CI и целевая приёмка: TLS, почта/push, хранилище, scanner, наблюдаемость, браузеры и backup/restore. Невыполненные условия названы блокерами. Развёртывание требует отдельного разрешения. |
 

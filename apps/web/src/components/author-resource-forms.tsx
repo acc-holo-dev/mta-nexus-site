@@ -1,43 +1,44 @@
 "use client";
 
-import { useEffect, useId, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Button, Input } from "@nexus/ui";
 import { editProductDetailsSchema } from "@nexus/validation";
-import { useNexusLocale } from "./locale-context";
-import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useEffect, useId, useState } from "react";
 import {
-  exceedsBuildFileSizeLimit,
-  getSupportedBuildExtension,
-} from "../lib/build-file-validation";
-import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
-import { buildPackageCopy } from "../lib/build-package-i18n";
-import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+  type AuthorDetailsDraft,
+  type AuthorResourceDraft,
+  authorResourceDraftKey,
+  emptyAuthorVersion,
+  hasAuthorVersionDraft,
+  parseAuthorResourceDraft,
+  reconcileAuthorDetails,
+  sameAuthorDetails,
+} from "../lib/author-resource-draft";
 import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
 } from "../lib/author-resource-requests";
-
 import {
-  authorResourceDraftKey,
-  parseAuthorResourceDraft,
-  sameAuthorDetails,
-  reconcileAuthorDetails,
-  emptyAuthorVersion,
-  hasAuthorVersionDraft,
-  type AuthorDetailsDraft,
-  type AuthorResourceDraft,
-} from "../lib/author-resource-draft";
-import {
-  confirmedAuthorDetails,
   confirmedAuthorBuild,
+  confirmedAuthorDetails,
   confirmedRetiredBuild,
 } from "../lib/author-resource-response";
+import {
+  exceedsBuildFileSizeLimit,
+  getSupportedBuildExtension,
+} from "../lib/build-file-validation";
+import { buildPackageCopy } from "../lib/build-package-i18n";
+import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
+import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
+import { useNexusLocale } from "./locale-context";
 
-const inputClass =
-  "w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
-const buttonClass =
-  "rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
+const textareaClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+const nativeLabelClass = "block font-label uppercase text-secondary";
+const fileClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
 
 export function AuthorResourceForms({
   product,
@@ -373,21 +374,21 @@ export function AuthorResourceForms({
           <div role="alert" className="space-y-3 rounded-lg border border-base bg-surface p-4">
             <p>{copy.draftConflict}</p>
             <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={recoverDraft} className={buttonClass}>
+              <Button type="button" onClick={recoverDraft}>
                 {copy.restoreDraft}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => {
                   setDetails(baseline);
                   setConflict(null);
                   setRecovered(false);
                   setSaved(false);
                 }}
-                className="rounded-md border border-base px-4 py-2"
               >
                 {copy.discardDraft}
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -425,30 +426,28 @@ export function AuthorResourceForms({
           disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
           className="space-y-4"
         >
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.title}</span>
-            <input
-              name="title"
-              required
-              minLength={3}
-              maxLength={120}
-              value={details.title}
-              onChange={(event) => changeDetails("title", event.target.value)}
-              className={inputClass}
-            />
-          </label>
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.shortDescription}</span>
-            <input
-              name="shortDescription"
-              maxLength={250}
-              value={details.shortDescription}
-              onChange={(event) => changeDetails("shortDescription", event.target.value)}
-              className={inputClass}
-            />
-          </label>
-          <div className="block space-y-1 text-sm text-secondary">
-            <label htmlFor={`${fieldId}-description`}>{publishing.description}</label>
+          <Input
+            id={`${fieldId}-title`}
+            name="title"
+            label={publishing.title}
+            required
+            minLength={3}
+            maxLength={120}
+            value={details.title}
+            onChange={(event) => changeDetails("title", event.target.value)}
+          />
+          <Input
+            id={`${fieldId}-short-description`}
+            name="shortDescription"
+            label={publishing.shortDescription}
+            maxLength={250}
+            value={details.shortDescription}
+            onChange={(event) => changeDetails("shortDescription", event.target.value)}
+          />
+          <div className="space-y-1.5">
+            <label htmlFor={`${fieldId}-description`} className={nativeLabelClass}>
+              {publishing.description}
+            </label>
             <textarea
               id={`${fieldId}-description`}
               name="description"
@@ -458,19 +457,17 @@ export function AuthorResourceForms({
               rows={6}
               value={details.description}
               onChange={(event) => changeDetails("description", event.target.value)}
-              className={inputClass}
+              className={textareaClass}
             />
           </div>
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.tags}</span>
-            <input
-              name="tags"
-              value={details.tagsText}
-              maxLength={4096}
-              onChange={(event) => changeDetails("tagsText", event.target.value)}
-              className={inputClass}
-            />
-          </label>
+          <Input
+            id={`${fieldId}-tags`}
+            name="tags"
+            label={publishing.tags}
+            value={details.tagsText}
+            maxLength={4096}
+            onChange={(event) => changeDetails("tagsText", event.target.value)}
+          />
         </fieldset>
         {error && (
           <p role="alert" className="text-sm text-error">
@@ -482,13 +479,14 @@ export function AuthorResourceForms({
             {copy.saved}
           </p>
         )}
-        <button
+        <Button
           type="submit"
-          disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
-          className={buttonClass}
+          isLoading={saving}
+          disabled={uploadBlocked || !ready || Boolean(conflict) || refreshPending}
+          className="min-h-11"
         >
           {saving ? copy.saving : copy.save}
-        </button>
+        </Button>
       </form>
       <form
         onSubmit={upload}
@@ -505,38 +503,36 @@ export function AuthorResourceForms({
           disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending}
           className="space-y-4"
         >
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.version}</span>
-            <input
-              name="version"
-              value={versionDraft.version}
-              onChange={(event) => {
-                setVersionDraft((draft) => ({ ...draft, version: event.target.value }));
-                setSubmitted(false);
-              }}
-              required
-              maxLength={64}
-              placeholder="1.1.0"
-              pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
-              className={inputClass}
-            />
-          </label>
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.minMtaVersion}</span>
-            <input
-              name="mtaVersionTarget"
-              value={versionDraft.mtaVersionTarget}
-              onChange={(event) => {
-                setVersionDraft((draft) => ({ ...draft, mtaVersionTarget: event.target.value }));
-                setSubmitted(false);
-              }}
-              maxLength={64}
-              placeholder="1.6.0"
-              className={inputClass}
-            />
-          </label>
-          <div className="block space-y-1 text-sm text-secondary">
-            <label htmlFor={`${fieldId}-release-notes`}>{publishing.releaseNotes}</label>
+          <Input
+            id={`${fieldId}-version`}
+            name="version"
+            label={publishing.version}
+            value={versionDraft.version}
+            onChange={(event) => {
+              setVersionDraft((draft) => ({ ...draft, version: event.target.value }));
+              setSubmitted(false);
+            }}
+            required
+            maxLength={64}
+            placeholder="1.1.0"
+            pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
+          />
+          <Input
+            id={`${fieldId}-mta-version`}
+            name="mtaVersionTarget"
+            label={publishing.minMtaVersion}
+            value={versionDraft.mtaVersionTarget}
+            onChange={(event) => {
+              setVersionDraft((draft) => ({ ...draft, mtaVersionTarget: event.target.value }));
+              setSubmitted(false);
+            }}
+            maxLength={64}
+            placeholder="1.6.0"
+          />
+          <div className="space-y-1.5">
+            <label htmlFor={`${fieldId}-release-notes`} className={nativeLabelClass}>
+              {publishing.releaseNotes}
+            </label>
             <textarea
               id={`${fieldId}-release-notes`}
               name="releaseNotes"
@@ -547,12 +543,15 @@ export function AuthorResourceForms({
               }}
               maxLength={5000}
               rows={4}
-              className={inputClass}
+              className={textareaClass}
             />
           </div>
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.buildArchive}</span>
+          <div className="space-y-1.5">
+            <label htmlFor={`${fieldId}-build-file`} className={nativeLabelClass}>
+              {publishing.buildArchive}
+            </label>
             <input
+              id={`${fieldId}-build-file`}
               name="file"
               type="file"
               onChange={(event) => {
@@ -561,12 +560,12 @@ export function AuthorResourceForms({
               }}
               required
               accept=".zip,.rar,.7z,.lua"
-              className={inputClass}
+              className={fileClass}
             />
             <span className="block text-xs text-muted">
               {publishing.buildFileRequirements.replace("{maxFileSize}", "64")}
             </span>
-          </label>
+          </div>
         </fieldset>
         {uploadError && (
           <p role="alert" className="text-sm text-error">
@@ -578,13 +577,14 @@ export function AuthorResourceForms({
             {copy.versionSubmitted}
           </p>
         )}
-        <button
+        <Button
           type="submit"
-          disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending}
-          className={buttonClass}
+          isLoading={uploading}
+          disabled={uploadBlocked || !ready || Boolean(conflict) || refreshPending}
+          className="min-h-11"
         >
           {uploading ? publishing.submitting : copy.newVersion}
-        </button>
+        </Button>
       </form>
     </div>
   );
@@ -637,8 +637,10 @@ export function RetireBuildForm({
       </summary>
       <form onSubmit={retire} className="mt-3 space-y-3">
         <p>{copy.retireHint}</p>
-        <div className="block space-y-1">
-          <label htmlFor={reasonId}>{copy.retireReason}</label>
+        <div className="space-y-1.5">
+          <label htmlFor={reasonId} className={nativeLabelClass}>
+            {copy.retireReason}
+          </label>
           <textarea
             id={reasonId}
             name="reason"
@@ -646,13 +648,13 @@ export function RetireBuildForm({
             minLength={3}
             maxLength={2000}
             disabled={pending}
-            className={inputClass}
+            className={textareaClass}
           />
         </div>
         {error && <p role="alert">{error}</p>}
-        <button type="submit" disabled={pending} className={buttonClass}>
+        <Button type="submit" isLoading={pending} className="min-h-11">
           {pending ? copy.retiring : copy.retire}
-        </button>
+        </Button>
       </form>
     </details>
   );
