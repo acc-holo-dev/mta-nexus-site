@@ -55,6 +55,8 @@ it.each(["en", "ru"] as const)(
     expect(filters).toContain('name="language"');
     expect(filters).toContain('name="verified"');
     expect(filters).toContain(discoveryCopy(locale).filter);
+    expect(filters).toContain("rounded-lg");
+    expect(filters).toContain("bg-accent");
     mocks.page.mockResolvedValue({ type: "servers", items: [], page: 2, hasMore: true });
     const results = renderToStaticMarkup(await DirectoryResults({ state, locale }));
     expect(results).toContain("page=3");
