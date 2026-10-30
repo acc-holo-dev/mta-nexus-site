@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -116,14 +117,15 @@ export function AuthorPublicationRestore({
   return (
     <div className="nexus-panel space-y-3 p-4" aria-busy={busy}>
       <p className="text-sm text-muted">{copy.restoreHelp}</p>
-      <button
+      <Button
         type="button"
+        variant="outline"
         disabled={busy || blocked || saved}
         onClick={() => void restore()}
-        className="min-h-11 rounded-lg border border-base px-4 text-sm font-semibold text-accent disabled:opacity-50"
+        className="min-h-11 font-semibold text-accent"
       >
         {copy.restore}
-      </button>
+      </Button>
       {notice && (
         <p
           role={saved ? "status" : "alert"}
@@ -147,13 +149,14 @@ export function AuthorPublicationRestore({
           {copy.restored}
         </Link>
       ) : blocked && !busy ? (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => window.location.reload()}
-          className="min-h-11 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline"
         >
           {copy.reload}
-        </button>
+        </Button>
       ) : null}
     </div>
   );

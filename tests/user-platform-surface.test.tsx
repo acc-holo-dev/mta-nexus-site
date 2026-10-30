@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { Locale } from "../apps/web/src/lib/i18n";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   items: [] as Record<string, unknown>[],
@@ -13,10 +14,12 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () =
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: { pageArticles: mocks.articles, pageCommunity: mocks.community },
 }));
+
 import ArticlesPage from "../apps/web/src/app/articles/page";
 import CommunityPage from "../apps/web/src/app/community/page";
 import { AuthorContentForm } from "../apps/web/src/components/author-content-form";
 import { ContentPageNavigation } from "../apps/web/src/components/content-catalog-controls";
+
 beforeEach(() => {
   vi.clearAllMocks();
   state.items = [];
@@ -34,6 +37,8 @@ it.each(["ru", "en"] as Locale[])("renders new and archived publication forms in
   expect(create).toContain('name="body"');
   expect(create).not.toContain('name="status"');
   expect(create).toContain(copy.reviewNote);
+  expect(create).toContain("rounded-lg");
+  expect(create).toContain(copy.preview);
   const archived = renderToStaticMarkup(
     <AuthorContentForm
       locale={locale}

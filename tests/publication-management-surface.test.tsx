@@ -1,13 +1,14 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { PublicationFeed } from "../apps/web/src/components/publication-feed";
+import { beforeEach, expect, it, vi } from "vitest";
 import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
-import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+import { PublicationFeed } from "../apps/web/src/components/publication-feed";
 import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
 import {
-  publicationPageQuery,
   type PublicationPage,
+  publicationPageQuery,
 } from "../apps/web/src/lib/publication-feed-contract";
+import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
+
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
   session: vi.fn(),
@@ -33,9 +34,11 @@ vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.discussion },
 }));
-import FollowingPage from "../apps/web/src/app/workspace/feed/page";
-import UserActivity from "../apps/web/src/app/users/[username]/activity/page";
+
 import ArticlePage from "../apps/web/src/app/articles/[slug]/page";
+import UserActivity from "../apps/web/src/app/users/[username]/activity/page";
+import FollowingPage from "../apps/web/src/app/workspace/feed/page";
+
 vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
@@ -102,6 +105,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(publicationCopy(locale).source);
     expect(html).toContain('name="type"');
     expect(html).toMatch(/maxlength="100"/iu);
+    expect(html).toContain(publicationCopy(locale).search);
+    expect(html).toContain("rounded-lg");
     expect(html).toContain("/users/writer");
     expect(html).toContain("/organizations/team");
     expect(html).toContain("/articles/article#discussion");

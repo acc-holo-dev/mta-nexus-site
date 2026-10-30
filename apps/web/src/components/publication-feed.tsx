@@ -1,4 +1,4 @@
-import { Avatar } from "@nexus/ui";
+import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -33,7 +33,7 @@ export function PublicationFeed({
     types = getUserPlatformCopy(locale);
   const page = initial,
     error = initial ? "" : errorCode ? publicationError(locale, errorCode) : copy.error;
-  const button =
+  const linkControl =
     "min-h-11 rounded-lg border border-base px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) =>
     type === "review" ? (locale === "ru" ? "Обзор" : "Review") : types[type];
@@ -117,9 +117,9 @@ export function PublicationFeed({
             defaultValue={filters.tag ?? ""}
           />
         </label>
-        <button type="submit" className={button}>
+        <Button type="submit" variant="outline" className="min-h-11 font-semibold text-accent">
           {copy.search}
-        </button>
+        </Button>
         <Link href={path} className="min-h-11 content-center text-sm text-accent underline">
           {copy.reset}
         </Link>
@@ -235,13 +235,16 @@ export function PublicationFeed({
         {page?.previousCursor && (
           <Link
             href={publicationHref(path, filters, page.previousCursor)}
-            className={`${button} inline-flex items-center`}
+            className={`${linkControl} inline-flex items-center`}
             prefetch={false}
           >
             {copy.previous}
           </Link>
         )}
-        <a href={publicationHref(path, filters)} className={`${button} inline-flex items-center`}>
+        <a
+          href={publicationHref(path, filters)}
+          className={`${linkControl} inline-flex items-center`}
+        >
           {copy.latest}
         </a>
         {error && (
@@ -251,7 +254,7 @@ export function PublicationFeed({
               filters,
               filters.cursor ? JSON.stringify(filters.cursor) : null,
             )}
-            className={`${button} inline-flex items-center`}
+            className={`${linkControl} inline-flex items-center`}
           >
             {copy.retry}
           </a>
@@ -259,7 +262,7 @@ export function PublicationFeed({
         {page?.hasMore && (
           <Link
             href={publicationHref(path, filters, page.nextCursor)}
-            className={`${button} inline-flex items-center`}
+            className={`${linkControl} inline-flex items-center`}
             prefetch={false}
           >
             {copy.next}
