@@ -58,6 +58,13 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
+  const type = element.type as { displayName?: string } | string;
+  if (typeof type === "object" && type?.displayName === "Button") {
+    return [
+      { ...element, type: "button" } as Element,
+      ...descendants(element.props.children as ReactNode),
+    ];
+  }
   return [element, ...descendants(element.props.children as ReactNode)];
 }
 function render(workspace = true) {

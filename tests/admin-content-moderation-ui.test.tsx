@@ -49,6 +49,8 @@ describe("admin content moderation controls", () => {
       expect(html).toContain(copy.reviewNoteHint);
       expect(html).toContain(`>${copy.publish}<`);
       expect(html).toContain(`>${copy.archive}<`);
+      expect(html).toContain("bg-success-soft");
+      expect(html).toContain("rounded-lg");
       expect((html.match(/disabled=""/gu) ?? []).length).toBe(2);
       expect(html).toContain('aria-busy="false"');
     },

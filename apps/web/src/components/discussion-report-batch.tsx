@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -189,26 +190,28 @@ export function DiscussionReportBatch({
               {copy.selected}: {selected.length}
             </legend>
             <div className="flex flex-wrap gap-3">
-              <button
+              <Button
                 type="button"
-                className="min-h-11 text-sm text-accent underline"
+                className="h-auto min-h-11 px-0 text-sm text-accent underline"
                 onClick={() => {
                   resetReview();
                   setSelected(available.map((item) => item.id));
                 }}
+                variant="ghost"
               >
                 {copy.selectAll}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="min-h-11 text-sm text-accent underline"
+                className="h-auto min-h-11 px-0 text-sm text-accent underline"
                 onClick={() => {
                   resetReview();
                   setSelected([]);
                 }}
+                variant="ghost"
               >
                 {copy.clear}
-              </button>
+              </Button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1 text-sm text-primary">
@@ -250,14 +253,15 @@ export function DiscussionReportBatch({
                 />
               </label>
             </div>
-            <button
+            <Button
               type="button"
               disabled={!selected.length || notes.trim().length < 3}
-              className="min-h-11 rounded-lg border border-base px-4 text-sm font-semibold text-accent disabled:opacity-50"
+              className="min-h-11"
               onClick={() => void review()}
+              variant="outline"
             >
               {copy.preview}
-            </button>
+            </Button>
           </fieldset>
         </div>
       )}
@@ -277,13 +281,14 @@ export function DiscussionReportBatch({
         </p>
       )}
       {blocked && !busy && (
-        <button
+        <Button
           type="button"
-          className="min-h-11 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline"
           onClick={() => window.location.reload()}
+          variant="ghost"
         >
           {copy.reload}
-        </button>
+        </Button>
       )}
       {preview && (
         <div className="nexus-panel space-y-4 p-5">
@@ -325,22 +330,24 @@ export function DiscussionReportBatch({
             ))}
           </ol>
           <div className="flex flex-wrap gap-3">
-            <button
+            <Button
               type="button"
               disabled={busy || blocked}
-              className="min-h-11 rounded-lg border border-base px-4 text-sm font-semibold text-accent disabled:opacity-50"
+              className="min-h-11"
               onClick={() => void commit()}
+              variant="outline"
             >
               {copy.confirm}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               disabled={busy || blocked}
-              className="min-h-11 text-sm text-accent underline"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline"
               onClick={() => setPreview(null)}
+              variant="ghost"
             >
               {copy.cancel}
-            </button>
+            </Button>
           </div>
         </div>
       )}
