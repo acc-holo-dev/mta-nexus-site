@@ -180,6 +180,19 @@ test("workflow keeps backup restore as a separate disposable job", () => {
   assert.match(workflow, /node scripts\/check-backup-restore\.mjs/u);
 });
 
+test("backup restore rehearsal script still requires disposable runner and full evidence", () => {
+  const script = readFileSync(resolve(process.cwd(), "scripts/check-backup-restore.mjs"), "utf8");
+  assert.match(script, /assertDisposableRunnerPolicy\(/u);
+  assert.match(script, /assertBackupRestoreEvidence\(/u);
+  assert.match(script, /pg_dump/u);
+  assert.match(script, /pg_restore/u);
+  for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) {
+    assert.match(script, new RegExp(flag, "u"));
+  }
+  assert.match(script, /sourceDestroyedBeforeRestore\s*=\s*true/u);
+  assert.doesNotMatch(script, /NEXUS_SKIP_DISPOSABLE|force.?production/iu);
+});
+
 test("rendered compose.production.yaml still matches the backup restore mount contract", () => {
   const directory = mkdtempSync(join(tmpdir(), "nexus-backup-compose-"));
   const emptyEnv = join(directory, "empty.env");
