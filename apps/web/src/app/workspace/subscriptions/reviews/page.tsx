@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -91,9 +92,7 @@ export default async function PlanReviewsPage({
             </select>
           </label>
           <input type="hidden" name="scopePage" value={scopes.page} />
-          <button className="rounded bg-accent px-4 py-2 text-white" type="submit">
-            {c.apply}
-          </button>
+          <Button type="submit">{c.apply}</Button>
         </form>
         {scopes.totalPages > 1 ? (
           <nav aria-label={c.scopeNext} className="flex gap-4 text-sm">

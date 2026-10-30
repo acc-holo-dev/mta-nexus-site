@@ -3,25 +3,26 @@ import {
   LIBRARY_COLLECTION_INVENTORY_FILTERS,
   LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../../../lib/library-collection-inventory-i18n";
 import {
+  collectionInventoryHref,
   libraryCollectionInventoryQuery,
   libraryCollectionInventorySuffix,
-  collectionInventoryHref,
 } from "../../../../../lib/library-collection-inventory-query";
-import { collectionHref, collectionPageParams } from "../../../../../lib/library-collections-query";
 import {
-  libraryCollectionsCopy,
   libraryCollectionError,
+  libraryCollectionsCopy,
 } from "../../../../../lib/library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../../../../../lib/library-collections-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -134,9 +135,9 @@ export default async function Page({
               ))}
             </select>
           </label>
-          <button type="submit" className="rounded border border-base px-3 py-2">
+          <Button type="submit" variant="outline" className="px-3">
             {v.apply}
-          </button>
+          </Button>
           <Link href={collectionInventoryHref()} className="text-accent underline">
             {v.clear}
           </Link>

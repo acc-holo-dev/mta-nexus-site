@@ -121,6 +121,8 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain('action="/workspace/content"');
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("bg-accent");
     expect(html).toContain("&lt;Private title&gt;");
     expect(html).toContain("&lt;script&gt;");
     expect(html).not.toContain("<script>");

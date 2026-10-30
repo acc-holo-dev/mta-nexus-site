@@ -1,20 +1,21 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { OrganizationTeamDirectory } from "../../../../../components/organization-team-directory";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { authService } from "../../../../../lib/services/auth-service";
-import { organizationTeamService } from "../../../../../lib/services/organization-team-service";
-import {
-  organizationTeamCopy,
-  organizationTeamError,
-} from "../../../../../lib/organization-team-copy";
-import { getOrganizationCopy } from "../../../../../lib/organization-workspace-copy";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
 } from "../../../../../lib/organization-team-contract";
-import { OrganizationTeamDirectory } from "../../../../../components/organization-team-directory";
+import {
+  organizationTeamCopy,
+  organizationTeamError,
+} from "../../../../../lib/organization-team-copy";
+import { getOrganizationCopy } from "../../../../../lib/organization-workspace-copy";
+import { authService } from "../../../../../lib/services/auth-service";
+import { organizationTeamService } from "../../../../../lib/services/organization-team-service";
 import { platformFieldClass } from "../../../../../lib/user-platform-client";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
@@ -145,12 +146,9 @@ export default async function TeamPage({
                 <option value="no">{copy.no}</option>
               </select>
             </label>
-            <button
-              type="submit"
-              className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-            >
+            <Button type="submit" className="min-h-11 font-semibold">
               {team.filter}
-            </button>
+            </Button>
             <Link
               href={organizationTeamHref(id, { query: "" })}
               className="inline-flex min-h-11 items-center text-sm text-accent underline"

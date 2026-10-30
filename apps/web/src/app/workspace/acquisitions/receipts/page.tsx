@@ -1,17 +1,18 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../../lib/services/auth-service";
-import { resourceCartReceiptsService } from "../../../../lib/services/resource-cart-receipts-service";
+import { Button } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../lib/resource-cart-receipts-i18n";
 import {
   resourceCartReceiptQuery,
-  resourceCartReceiptUrl,
   resourceCartReceiptsUrl,
+  resourceCartReceiptUrl,
 } from "../../../../lib/resource-cart-receipts-query";
-import { formatHistoryDate } from "../../../../lib/commerce-history-format";
+import { authService } from "../../../../lib/services/auth-service";
+import { resourceCartReceiptsService } from "../../../../lib/services/resource-cart-receipts-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -107,9 +108,9 @@ export default async function ResourceCartReceiptsPage({
             ))}
           </select>
         </label>
-        <button type="submit" className="rounded-md border border-base px-4 py-2 text-sm">
+        <Button type="submit" variant="outline" className="text-sm">
           {copy.apply}
-        </button>
+        </Button>
       </form>
       {!result.items.length ? (
         <p className="nexus-panel p-6 text-secondary">{copy.empty}</p>

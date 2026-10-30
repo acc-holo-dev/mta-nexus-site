@@ -1,9 +1,8 @@
 import { PRODUCT_TYPES } from "@nexus/domain";
-import { PRODUCT_CATEGORY_KEYS } from "../../lib/product-type-labels";
-import Link from "next/link";
-import { productService } from "../../lib/services/product-service";
-import { ProductCard } from "../../components/product-card";
+import { Button } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { ProductCard } from "../../components/product-card";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import {
@@ -12,6 +11,8 @@ import {
   marketHref,
   parseMarketQuery,
 } from "../../lib/market-query";
+import { PRODUCT_CATEGORY_KEYS } from "../../lib/product-type-labels";
+import { productService } from "../../lib/services/product-service";
 
 export const dynamic = "force-dynamic";
 
@@ -80,13 +81,10 @@ export default async function MarketPage({
             placeholder={dictionary.market.searchPlaceholder}
             className="min-h-11 min-w-0 flex-1 rounded-lg border border-base bg-surface px-3 text-sm text-primary placeholder:text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           />
-          <button
-            type="submit"
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
+          <Button type="submit" className="min-h-11 gap-2 font-semibold">
             <Search className="h-4 w-4" aria-hidden="true" />
             {dictionary.market.searchButton}
-          </button>
+          </Button>
         </form>
       </search>
 

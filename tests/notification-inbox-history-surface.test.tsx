@@ -65,6 +65,8 @@ it.each(["en", "ru"] as const)(
     });
     const html = await render({ period: "7", at: until });
     expect(html).toContain(locale === "ru" ? "Закреплённый период (UTC)" : "Fixed period (UTC)");
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("bg-accent");
     expect(html).toContain(`dateTime="${from}"`);
     expect(html).toContain('download="nexus-notification-page.json"');
     expect(html).toContain(

@@ -1,4 +1,5 @@
 import { serverRepository } from "@nexus/db";
+import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -159,12 +160,9 @@ export default async function ManagedServersPage({
               ))}
             </select>
           </label>
-          <button
-            type="submit"
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
-          >
+          <Button type="submit" className="font-semibold">
             {copy.apply}
-          </button>
+          </Button>
           {filtered && (
             <Link href="/workspace/servers" className="py-2 text-sm text-accent underline">
               {copy.reset}

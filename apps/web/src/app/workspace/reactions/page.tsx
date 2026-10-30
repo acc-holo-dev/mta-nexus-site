@@ -1,12 +1,13 @@
-import Link from "next/link";
+import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
-import { AppError, CONTENT_REACTIONS, CONTENT_REACTION_EMOJI } from "@nexus/domain";
+import Link from "next/link";
 import { ReactionRemoval } from "../../../components/reaction-removal";
-import { authService } from "../../../lib/services/auth-service";
-import { contentReactionService } from "../../../lib/services/content-reaction-service";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { contentReactionService } from "../../../lib/services/content-reaction-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const copy = reactionCopy(await getRequestLocale());
@@ -89,12 +90,9 @@ export default async function ReactionsPage({
             ))}
           </select>
         </label>
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-        >
+        <Button type="submit" className="min-h-11 font-semibold">
           {copy.search}
-        </button>
+        </Button>
         <Link
           href="/workspace/reactions"
           className="inline-flex min-h-11 items-center text-sm text-accent underline"

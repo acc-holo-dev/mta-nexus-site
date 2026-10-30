@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError, RESOURCE_DELIVERY_STATUSES } from "@nexus/domain";
-import { authService } from "../../../../lib/services/auth-service";
-import { resourceDeliveriesService } from "../../../../lib/services/resource-deliveries-service";
+import { Button } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { ResourceDeliveryEvidence } from "../../../../components/resource-delivery-evidence";
+import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceDeliveriesCopy } from "../../../../lib/resource-deliveries-i18n";
 import {
@@ -11,8 +12,8 @@ import {
   resourceDeliveriesQuery,
   resourceDeliveriesUrl,
 } from "../../../../lib/resource-deliveries-query";
-import { ResourceDownloadButton } from "../../../../components/resource-download-button";
-import { ResourceDeliveryEvidence } from "../../../../components/resource-delivery-evidence";
+import { authService } from "../../../../lib/services/auth-service";
+import { resourceDeliveriesService } from "../../../../lib/services/resource-deliveries-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -90,9 +91,9 @@ export default async function ResourceDownloadsPage({
             ))}
           </select>
         </label>
-        <button type="submit" className="rounded-md border border-base px-4 py-2 text-sm">
+        <Button type="submit" variant="outline" className="text-sm">
           {copy.apply}
-        </button>
+        </Button>
         {query.resourceId ? (
           <Link
             href={resourceDeliveriesUrl({ ...query, resourceId: null, page: 1 })}

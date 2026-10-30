@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -82,9 +83,9 @@ export default async function SubscriptionAccountPage({
               ))}
             </select>
           </label>
-          <button type="submit" className="text-accent underline">
+          <Button type="submit" variant="ghost" className="h-auto px-0 text-accent underline">
             {c.open}
-          </button>
+          </Button>
         </form>
         {scopes.page > 1 && (
           <Link

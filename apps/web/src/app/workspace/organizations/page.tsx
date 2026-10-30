@@ -1,11 +1,12 @@
-import Link from "next/link";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
+import Link from "next/link";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { organizationWorkspaceService } from "../../../lib/services/organization-workspace-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
-import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
@@ -58,12 +59,9 @@ export default async function OrganizationsPage({
             defaultValue={filters.query}
           />
         </label>
-        <button
-          className="rounded-lg border border-base px-4 py-2 text-sm text-secondary"
-          type="submit"
-        >
+        <Button type="submit" variant="outline" className="text-sm text-secondary">
           {copy.filter}
-        </button>
+        </Button>
       </form>
       {!result ? (
         <p role="alert" className="nexus-panel p-5 text-danger">

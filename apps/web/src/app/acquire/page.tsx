@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useId, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { CheckCircle2, Library, ShieldCheck } from "lucide-react";
 import { Button } from "@nexus/ui";
+import { CheckCircle2, Library, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useId, useState } from "react";
 import { useNexusLocale } from "../../components/locale-context";
-import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";
 import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
+import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";
 
 interface ProductInfo {
   id: string;
@@ -191,13 +191,15 @@ function AcquireContent() {
           {copy.browse}
         </Link>
         {productId && productError && productError !== copy.productNotFound && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setLoadRevision((value) => value + 1)}
-            className="ml-3 rounded-lg border border-base px-4 py-2 text-xs font-semibold text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+            className="ml-3 font-semibold"
           >
             {copy.retry}
-          </button>
+          </Button>
         )}
       </div>
     );
