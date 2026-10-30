@@ -1,7 +1,7 @@
 "use client";
 
-import { nextTabIndex } from "@nexus/ui";
-import { useId, useState, type ReactNode } from "react";
+import { Button, nextTabIndex } from "@nexus/ui";
+import { type ReactNode, useId, useState } from "react";
 import { useNexusLocale } from "./locale-context";
 
 export function NotificationCenterTabs({ children }: { children: ReactNode }) {
@@ -19,11 +19,13 @@ export function NotificationCenterTabs({ children }: { children: ReactNode }) {
           const active = filter === item;
           const tabId = `${tabIdPrefix}-${item}`;
           return (
-            <button
+            <Button
               key={item}
               id={tabId}
               type="button"
               role="tab"
+              variant={active ? "primary" : "outline"}
+              size="sm"
               aria-selected={active}
               aria-controls={panelId}
               tabIndex={active ? 0 : -1}
@@ -39,14 +41,12 @@ export function NotificationCenterTabs({ children }: { children: ReactNode }) {
                   ?.querySelectorAll<HTMLElement>('[role="tab"]')
                   [nextIndex]?.focus();
               }}
-              className={`min-h-11 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
-                active
-                  ? "border-[color:var(--nexus-accent)] bg-accent text-white"
-                  : "border-base bg-surface text-muted hover:bg-hover hover:text-primary"
+              className={`min-h-11 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                active ? "" : "text-muted"
               }`}
             >
               {item === "all" ? copy.all : copy.unread}
-            </button>
+            </Button>
           );
         })}
       </div>

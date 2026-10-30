@@ -80,7 +80,9 @@ it("shows sign-in when the session is absent without reading another inbox", asy
   expect(html).toContain('role="tablist"');
   expect(html).toContain('aria-label="Notification center"');
   expect(html).toContain('role="tab"');
+  expect(html).toContain('aria-selected="true"');
   expect(html).toContain('role="tabpanel"');
+  expect(html).toContain("rounded-lg");
   expect(html).toContain("/auth/login");
   expect(html).not.toContain("No notifications yet");
   expect(state.page).not.toHaveBeenCalled();

@@ -77,6 +77,8 @@ describe("global shell controls behavior", () => {
 
       expect(html).toContain(`aria-label="${dictionary.notificationBell.title}"`);
       expect(html).toContain('aria-expanded="false"');
+      expect(html).toContain('aria-haspopup="dialog"');
+      expect(html).toContain("rounded-");
       expect(html).not.toContain('aria-controls="notification-popover"');
       expect(html).not.toContain('id="notification-popover"');
     },
