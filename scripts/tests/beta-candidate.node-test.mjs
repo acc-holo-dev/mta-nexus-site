@@ -5,6 +5,7 @@ import {
   BETA_CANDIDATE_OUT_OF_SCOPE,
   evaluateBetaCandidate,
   FULL_ACCEPTANCE_JOBS,
+  isDirtyWorkingTreeBeyondEnvBackups,
 } from "../beta-candidate-lib.mjs";
 
 const sha = "a".repeat(40);
@@ -83,4 +84,15 @@ test("dirty trees cannot become checkable candidates", () => {
   });
   assert.equal(report.checkableCandidate, false);
   assert.ok(report.technicalBlockers.some((item) => item.startsWith("working_tree:")));
+});
+
+test("dated env backup porcelain alone is not a dirty working tree", () => {
+  assert.equal(isDirtyWorkingTreeBeyondEnvBackups(""), false);
+  assert.equal(isDirtyWorkingTreeBeyondEnvBackups("?? .env.backup-20251011\n"), false);
+  assert.equal(isDirtyWorkingTreeBeyondEnvBackups("?? nested/.env.backup-old\n"), false);
+  assert.equal(
+    isDirtyWorkingTreeBeyondEnvBackups("?? .env.backup-20251011\n?? scripts/scratch.mjs\n"),
+    true,
+  );
+  assert.equal(isDirtyWorkingTreeBeyondEnvBackups(" M apps/web/src/lib/i18n.ts\n"), true);
 });

@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildBetaCandidateChecksum,
   evaluateBetaCandidate,
+  isDirtyWorkingTreeBeyondEnvBackups,
   readCiEvidence,
 } from "./beta-candidate-lib.mjs";
 import { writeReleaseEvidence } from "./release-evidence-lib.mjs";
@@ -31,7 +32,9 @@ function runCaptured(command, args) {
 const gitShaResult = runCaptured("git", ["rev-parse", "HEAD"]);
 const gitStatusResult = runCaptured("git", ["status", "--porcelain"]);
 const candidateSha = process.env.NEXUS_BETA_CANDIDATE_SHA || gitShaResult.output || null;
-const dirtyWorkingTree = gitStatusResult.ok ? Boolean(gitStatusResult.output) : true;
+const dirtyWorkingTree = gitStatusResult.ok
+  ? isDirtyWorkingTreeBeyondEnvBackups(gitStatusResult.output)
+  : true;
 const ciEvidence = readCiEvidence(join(root, "artifacts", "ci-evidence.json"));
 
 const evaluation = evaluateBetaCandidate({
