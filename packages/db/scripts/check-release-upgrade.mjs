@@ -844,9 +844,8 @@ try {
   );
   evidence.publicationNotificationDeliverySchemaPresent = true;
   assert.equal(
-    (
-      await client`SELECT count(*)::integer AS total FROM build_incident_notification_deliveries`
-    )[0].total,
+    (await client`SELECT count(*)::integer AS total FROM build_incident_notification_deliveries`)[0]
+      .total,
     0,
     "Upgrade must not invent downloader-incident notices for historical quarantines",
   );
