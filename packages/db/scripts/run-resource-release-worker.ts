@@ -66,9 +66,9 @@ async function main() {
     process.removeListener("SIGINT", stop);
     process.removeListener("SIGTERM", stop);
     status = "stopping";
-    if (options.loop) await health();
     await closeDatabaseConnection();
     await rm(temporary, { force: true });
+    await rm(healthFile, { force: true });
   }
   if (failure) throw failure;
 }

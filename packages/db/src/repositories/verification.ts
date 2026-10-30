@@ -16,6 +16,7 @@ import {
   serverClaimChallenges,
   servers,
   users,
+  verificationNotificationDeliveries,
   verificationRequests,
 } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
@@ -113,6 +114,13 @@ export class VerificationRepository {
           createdAt: values.createdAt,
         });
       }
+
+      const createdAt = sql`(select ${verificationRequests.createdAt} from ${verificationRequests} where ${verificationRequests.id} = ${request.id})`;
+      await tx.insert(verificationNotificationDeliveries).values({
+        verificationRequestId: request.id,
+        event: "application",
+        createdAt,
+      });
 
       return request;
     });

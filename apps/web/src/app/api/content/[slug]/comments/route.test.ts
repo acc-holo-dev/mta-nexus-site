@@ -1,33 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
-  articleAuthorId: "usr_author",
-}));
-
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
-const notifyDiscussionReplies = vi.hoisted(() =>
-  vi.fn(async () => ({
-    attempted: 1,
-    stored: 1,
-    suppressed: 0,
-    duplicate: 0,
-    skipped: 0,
-    failed: 0,
-    pushQueued: 0,
-    pushDegraded: 0,
-  })),
-);
 const getArticle = vi.hoisted(() =>
   vi.fn(async () => ({
     id: "cnt_1",
     slug: "article-one",
     title: "Article One",
-    authorId: state.articleAuthorId,
+    authorId: "usr_author",
   })),
 );
 const addComment = vi.hoisted(() =>
@@ -38,14 +16,6 @@ const addComment = vi.hoisted(() =>
     text: "Useful comment",
   })),
 );
-
-vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>("next/server");
-  return {
-    ...actual,
-    after: afterMock,
-  };
-});
 
 vi.mock("../../../../../lib/services/auth-service", () => ({
   authService: {
@@ -65,10 +35,6 @@ vi.mock("../../../../../lib/services/content-service", () => ({
 
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
-}));
-
-vi.mock("../../../../../lib/services/discussion-follow-notification-service", () => ({
-  notifyDiscussionReplies,
 }));
 
 import { NextRequest } from "next/server";
@@ -96,19 +62,17 @@ function request() {
   });
 }
 
-describe("article comment notification side effects", () => {
+describe("article comment HTTP behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     stubBrowserMutationOrigin();
-    state.afterCallbacks.length = 0;
-    state.articleAuthorId = "usr_author";
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
-  it("returns the committed comment before author inbox and push delivery", async () => {
+  it("commits the comment without a post-commit notification callback", async () => {
     const response = await POST(request(), {
       params: Promise.resolve({ slug: "article-one" }),
     });
@@ -116,24 +80,8 @@ describe("article comment notification side effects", () => {
     expect(response.status).toBe(201);
     expectPrivate(response);
     expect(addComment).toHaveBeenCalledOnce();
-    expect(afterMock).toHaveBeenCalledOnce();
-    expect(notifyDiscussionReplies).not.toHaveBeenCalled();
-
-    await state.afterCallbacks[0]?.();
-    expect(notifyDiscussionReplies).toHaveBeenCalledWith("cnt_1", "cmt_1");
-  });
-
-  it("still schedules after() for self-comments; audience suppression is in notify", async () => {
-    state.articleAuthorId = "usr_commenter";
-    const response = await POST(request(), {
-      params: Promise.resolve({ slug: "article-one" }),
+    expect(await response.json()).toMatchObject({
+      comment: { id: "cmt_1", contentId: "cnt_1" },
     });
-
-    expect(response.status).toBe(201);
-    expectPrivate(response);
-    expect(afterMock).toHaveBeenCalledOnce();
-    expect(notifyDiscussionReplies).not.toHaveBeenCalled();
-    await state.afterCallbacks[0]?.();
-    expect(notifyDiscussionReplies).toHaveBeenCalledWith("cnt_1", "cmt_1");
   });
 });

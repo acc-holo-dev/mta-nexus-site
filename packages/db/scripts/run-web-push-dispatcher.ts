@@ -4,8 +4,11 @@ import {
   checkDatabaseConnection,
   closeDatabaseConnection,
   createWebPushHttpSender,
+  discussionNotificationDeliveryRepository,
+  publicationNotificationDeliveryRepository,
   reportNotificationDeliveryRepository,
   supportNotificationDeliveryRepository,
+  verificationNotificationDeliveryRepository,
   WebPushDispatcher,
   webPushAdmissionRecoveryRepository,
   webPushOutboxRepository,
@@ -62,6 +65,12 @@ type QueueAlertReason =
   | "report_delivery_backlog"
   | "support_delivery_failed"
   | "support_delivery_backlog"
+  | "verification_delivery_failed"
+  | "verification_delivery_backlog"
+  | "discussion_delivery_failed"
+  | "discussion_delivery_backlog"
+  | "publication_delivery_failed"
+  | "publication_delivery_backlog"
   | "admission_recovery_failed"
   | "admission_recovery_backlog";
 
@@ -86,6 +95,15 @@ let reportOldestAgeSeconds = 0;
 let supportPending = 0;
 let supportFailed = 0;
 let supportOldestAgeSeconds = 0;
+let verificationPending = 0;
+let verificationFailed = 0;
+let verificationOldestAgeSeconds = 0;
+let discussionPending = 0;
+let discussionFailed = 0;
+let discussionOldestAgeSeconds = 0;
+let publicationPending = 0;
+let publicationFailed = 0;
+let publicationOldestAgeSeconds = 0;
 let admissionPending = 0;
 let admissionFailed = 0;
 let admissionOldestAgeSeconds = 0;
@@ -144,6 +162,24 @@ function updateQueueAlertState() {
     (supportPending > 0 && supportOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
   )
     reasons.push("support_delivery_backlog");
+  if (verificationFailed > 0) reasons.push("verification_delivery_failed");
+  if (
+    verificationPending >= QUEUE_ALERT_DUE_JOBS ||
+    (verificationPending > 0 && verificationOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("verification_delivery_backlog");
+  if (discussionFailed > 0) reasons.push("discussion_delivery_failed");
+  if (
+    discussionPending >= QUEUE_ALERT_DUE_JOBS ||
+    (discussionPending > 0 && discussionOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("discussion_delivery_backlog");
+  if (publicationFailed > 0) reasons.push("publication_delivery_failed");
+  if (
+    publicationPending >= QUEUE_ALERT_DUE_JOBS ||
+    (publicationPending > 0 && publicationOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("publication_delivery_backlog");
   if (admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     admissionPending >= QUEUE_ALERT_DUE_JOBS ||
@@ -170,6 +206,15 @@ function updateQueueAlertState() {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
+    discussionPending,
+    discussionFailed,
+    discussionOldestAgeSeconds,
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -211,6 +256,15 @@ async function writeHealthSnapshot() {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
+    discussionPending,
+    discussionFailed,
+    discussionOldestAgeSeconds,
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -250,6 +304,18 @@ async function refreshQueueStats() {
   supportPending = support.pending;
   supportFailed = support.failed;
   supportOldestAgeSeconds = support.oldestAgeSeconds;
+  const verification = await verificationNotificationDeliveryRepository.stats();
+  verificationPending = verification.pending;
+  verificationFailed = verification.failed;
+  verificationOldestAgeSeconds = verification.oldestAgeSeconds;
+  const discussion = await discussionNotificationDeliveryRepository.stats();
+  discussionPending = discussion.pending;
+  discussionFailed = discussion.failed;
+  discussionOldestAgeSeconds = discussion.oldestAgeSeconds;
+  const publication = await publicationNotificationDeliveryRepository.stats();
+  publicationPending = publication.pending;
+  publicationFailed = publication.failed;
+  publicationOldestAgeSeconds = publication.oldestAgeSeconds;
   const admissions = await webPushAdmissionRecoveryRepository.stats();
   admissionPending = admissions.pending;
   admissionFailed = admissions.failed;
@@ -328,6 +394,30 @@ try {
     if (support.state !== "idle") {
       activity += 1;
       emit({ status: "support-delivery", batch: healthBatch, ...support });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const verification = await verificationNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (verification.state !== "idle") {
+      activity += 1;
+      emit({ status: "verification-delivery", batch: healthBatch, ...verification });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const discussion = await discussionNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (discussion.state !== "idle") {
+      activity += 1;
+      emit({ status: "discussion-delivery", batch: healthBatch, ...discussion });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const publication = await publicationNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (publication.state !== "idle") {
+      activity += 1;
+      emit({ status: "publication-delivery", batch: healthBatch, ...publication });
     }
     markProgress();
     if (controller.signal.aborted) break;

@@ -19,7 +19,14 @@ import { serverContentAccess } from "./server-content";
 import { publicationNotice } from "./publication-notice";
 import { lockInitiatingSession } from "./initiating-session";
 import { resourceReviewsRepository } from "./resource-reviews";
-import { auditEvents, content, comments, users } from "../schema";
+import {
+  auditEvents,
+  content,
+  comments,
+  discussionNotificationDeliveries,
+  publicationNotificationDeliveries,
+  users,
+} from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
@@ -358,6 +365,18 @@ export class ContentRepository {
         status === "published" ? "published" : "archived",
         audit.id,
       );
+      if (status === "published" && updated.serverId) {
+        // Durable server-follower fanout; HTTP must not use after() for this path.
+        await tx
+          .delete(publicationNotificationDeliveries)
+          .where(eq(publicationNotificationDeliveries.contentId, updated.id));
+        await tx.insert(publicationNotificationDeliveries).values({
+          contentId: updated.id,
+          serverId: updated.serverId,
+          authorId: updated.authorId,
+          createdAt: sql`clock_timestamp()`,
+        });
+      }
       return updated as unknown as Content;
     });
   }
@@ -497,6 +516,8 @@ export class ContentRepository {
         }
       }
       const rows = await tx.insert(comments).values(values).returning();
+      const comment = rows[0];
+      if (!comment) throw new Error("Comment insert did not return a row");
       if (data.contentId) {
         await tx
           .update(content)
@@ -504,6 +525,12 @@ export class ContentRepository {
             commentCount: sql`${content.commentCount} + 1`,
           })
           .where(eq(content.id, data.contentId));
+        const createdAt = sql`(select ${comments.createdAt} from ${comments} where ${comments.id} = ${comment.id})`;
+        await tx.insert(discussionNotificationDeliveries).values({
+          commentId: comment.id,
+          contentId: data.contentId,
+          createdAt,
+        });
       }
       if (audit) {
         await tx.insert(auditEvents).values({
@@ -512,7 +539,7 @@ export class ContentRepository {
         });
       }
 
-      return rows[0] as unknown as Comment;
+      return comment as unknown as Comment;
     });
   }
 

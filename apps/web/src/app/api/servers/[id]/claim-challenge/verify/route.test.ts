@@ -5,18 +5,12 @@ import {
 } from "../../../../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   failVerification: false,
   authenticated: true,
   rateLimited: false,
   verificationError: null as unknown,
 }));
 
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
 const verifyChallenge = vi.hoisted(() =>
   vi.fn(async () => {
     if (state.verificationError) throw state.verificationError;
@@ -25,9 +19,6 @@ const verifyChallenge = vi.hoisted(() =>
     }
     return {
       success: true,
-      moderatorNotification: {
-        serverName: "Nexus Racing",
-      },
       verificationRequest: {
         id: "ver_1",
         status: "pending",
@@ -41,15 +32,6 @@ const verifyChallenge = vi.hoisted(() =>
     };
   }),
 );
-const notifyModerators = vi.hoisted(() => vi.fn(async () => undefined));
-
-vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>("next/server");
-  return {
-    ...actual,
-    after: afterMock,
-  };
-});
 
 vi.mock("../../../../../../lib/services/auth-service", () => ({
   authService: {
@@ -68,7 +50,6 @@ vi.mock("../../../../../../lib/services/server-claim-service", () => ({
   serverClaimService: {
     verifyChallenge,
   },
-  notifyModeratorsOfServerClaim: notifyModerators,
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -96,11 +77,10 @@ function request(overrides: { headers?: Record<string, string>; body?: string } 
   });
 }
 
-describe("server claim moderator notification side effects", () => {
+describe("server claim verification HTTP", () => {
   beforeEach(() => {
     stubBrowserMutationOrigin();
     vi.clearAllMocks();
-    state.afterCallbacks.length = 0;
     state.failVerification = false;
     state.authenticated = true;
     state.rateLimited = false;
@@ -111,7 +91,7 @@ describe("server claim moderator notification side effects", () => {
     vi.unstubAllEnvs();
   });
 
-  it("returns durable proof before scheduling moderator inbox/push delivery", async () => {
+  it("returns durable proof without a post-commit moderator callback", async () => {
     const response = await POST(request(), {
       params: Promise.resolve({ id: "srv_1" }),
     });
@@ -124,15 +104,10 @@ describe("server claim moderator notification side effects", () => {
       verificationRequest: { id: "ver_1" },
     });
     expect(data).not.toHaveProperty("moderatorNotification");
-    expect(afterMock).toHaveBeenCalledOnce();
-    expect(notifyModerators).not.toHaveBeenCalled();
-
-    await state.afterCallbacks[0]?.();
-
-    expect(notifyModerators).toHaveBeenCalledWith("Nexus Racing");
+    expect(verifyChallenge).toHaveBeenCalledOnce();
   });
 
-  it("does not schedule moderator work if proof verification fails", async () => {
+  it("does not call verification service if proof verification fails", async () => {
     state.failVerification = true;
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
@@ -141,8 +116,7 @@ describe("server claim moderator notification side effects", () => {
       });
       expect(response.status).toBe(500);
       expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
-      expect(afterMock).not.toHaveBeenCalled();
-      expect(notifyModerators).not.toHaveBeenCalled();
+      expect(verifyChallenge).toHaveBeenCalledOnce();
     } finally {
       error.mockRestore();
     }
@@ -178,11 +152,10 @@ describe("server claim moderator notification side effects", () => {
       expect(response.status).toBe(status);
       if (code) expect(await response.json()).toHaveProperty("code", code);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-      expect(response.headers.get("Vary")).toBe("Cookie");
       expect(verifyChallenge).not.toHaveBeenCalled();
-      expect(afterMock).not.toHaveBeenCalled();
     },
   );
+
   it.each(["auth", "rate"])("enforces %s before parsing proof", async (boundary) => {
     state.authenticated = boundary !== "auth";
     state.rateLimited = boundary === "rate";
@@ -193,6 +166,7 @@ describe("server claim moderator notification side effects", () => {
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(verifyChallenge).not.toHaveBeenCalled();
   });
+
   it.each(["SERVER_CLAIM_SCOPE_CHANGED", "SERVER_CLAIM_AUTHORITY_CHANGED"])(
     "preserves a stable claim conflict code: %s",
     async (code) => {
@@ -200,7 +174,6 @@ describe("server claim moderator notification side effects", () => {
       const response = await POST(request(), { params: Promise.resolve({ id: "srv_1" }) });
       expect(response.status).toBe(409);
       expect(await response.json()).toHaveProperty("code", code);
-      expect(afterMock).not.toHaveBeenCalled();
     },
   );
 });

@@ -10,30 +10,9 @@ const state = vi.hoisted(() => ({
     title: "Update 1",
     authorId: "usr_author",
   } as Record<string, unknown>,
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
 }));
 
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
 const moderateContent = vi.hoisted(() => vi.fn(async () => state.moderated));
-const notifyFollowers = vi.hoisted(() =>
-  vi.fn(async () => ({
-    attempted: 1,
-    delivered: 1,
-    failed: 0,
-  })),
-);
-
-vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>("next/server");
-  return {
-    ...actual,
-    after: afterMock,
-  };
-});
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -57,10 +36,6 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: {
     moderateContent,
   },
-}));
-
-vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
-  notifyServerFollowersOfPublishedContent: notifyFollowers,
 }));
 
 vi.mock("@nexus/db", () => ({
@@ -118,7 +93,6 @@ describe("content publication side effects", () => {
   beforeEach(() => {
     stubBrowserMutationOrigin();
     vi.clearAllMocks();
-    state.afterCallbacks.length = 0;
     state.moderated = {
       id: "cnt_1",
       serverId: "srv_1",
@@ -132,7 +106,7 @@ describe("content publication side effects", () => {
     vi.unstubAllEnvs();
   });
 
-  it("schedules server follower fanout after a successful publish response", async () => {
+  it("publishes through moderation without Next.js after() fanout", async () => {
     const response = await POST(request("publish"));
 
     expect(response.status).toBe(200);
@@ -142,35 +116,13 @@ describe("content publication side effects", () => {
       targetId: "cnt_1",
     });
     expect(moderateContent).toHaveBeenCalledTimes(1);
-    expect(afterMock).toHaveBeenCalledTimes(1);
-    expect(notifyFollowers).not.toHaveBeenCalled();
-    expect(state.afterCallbacks).toHaveLength(1);
-
-    await state.afterCallbacks[0]?.();
-
-    expect(notifyFollowers).toHaveBeenCalledTimes(1);
-    expect(notifyFollowers).toHaveBeenCalledWith(state.moderated);
   });
 
-  it("does not schedule follower fanout for archive", async () => {
+  it("archives without scheduling follower fanout callbacks", async () => {
     const response = await POST(request("archive"));
 
     expect(response.status).toBe(200);
-    expect(afterMock).not.toHaveBeenCalled();
-    expect(notifyFollowers).not.toHaveBeenCalled();
-  });
-
-  it("does not schedule fanout when published content is not server-linked", async () => {
-    state.moderated = {
-      ...state.moderated,
-      serverId: null,
-    };
-
-    const response = await POST(request("publish"));
-
-    expect(response.status).toBe(200);
-    expect(afterMock).not.toHaveBeenCalled();
-    expect(notifyFollowers).not.toHaveBeenCalled();
+    expect(moderateContent).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -185,6 +137,5 @@ it.each([
     const response = await POST(request("publish", extra));
     expect(response.status).toBe(400);
     expect(moderateContent).not.toHaveBeenCalled();
-    expect(notifyFollowers).not.toHaveBeenCalled();
   },
 );

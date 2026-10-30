@@ -1,4 +1,5 @@
-import { after, type NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { AppError } from "@nexus/domain";
@@ -9,7 +10,6 @@ import { resourceModerationService } from "../../../../lib/services/resource-rel
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { contentService } from "../../../../lib/services/content-service";
-import { notifyServerFollowersOfPublishedContent } from "../../../../lib/services/server-follow-notification-service";
 import { productRepository, reportRepository, verificationRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 
@@ -215,7 +215,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       }
     } else if (targetType === "content") {
       if (!token) return json({ error: "Authentication required" }, 401);
-      const moderated = await contentService.moderateContent(
+      // Server-follower fanout enqueues in the moderation transaction; no after().
+      await contentService.moderateContent(
         targetId,
         action,
         user,
@@ -223,11 +224,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         notes,
         new Date(parsed.data.expectedUpdatedAt),
       );
-      if (action === "publish" && moderated.serverId) {
-        after(async () => {
-          await notifyServerFollowersOfPublishedContent(moderated).catch(() => undefined);
-        });
-      }
     }
 
     return json({ success: true, action, targetId });

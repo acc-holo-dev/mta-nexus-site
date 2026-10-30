@@ -11,6 +11,12 @@ const ALERT_REASONS = [
   "report_delivery_backlog",
   "support_delivery_failed",
   "support_delivery_backlog",
+  "verification_delivery_failed",
+  "verification_delivery_backlog",
+  "discussion_delivery_failed",
+  "discussion_delivery_backlog",
+  "publication_delivery_failed",
+  "publication_delivery_backlog",
   "admission_recovery_failed",
   "admission_recovery_backlog",
 ];
@@ -45,6 +51,27 @@ function expectedAlertReasons(input) {
       input.supportOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
   )
     reasons.push("support_delivery_backlog");
+  if (input.verificationFailed > 0) reasons.push("verification_delivery_failed");
+  if (
+    input.verificationPending >= input.queueAlertThresholds.dueJobs ||
+    (input.verificationPending > 0 &&
+      input.verificationOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("verification_delivery_backlog");
+  if (input.discussionFailed > 0) reasons.push("discussion_delivery_failed");
+  if (
+    input.discussionPending >= input.queueAlertThresholds.dueJobs ||
+    (input.discussionPending > 0 &&
+      input.discussionOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("discussion_delivery_backlog");
+  if (input.publicationFailed > 0) reasons.push("publication_delivery_failed");
+  if (
+    input.publicationPending >= input.queueAlertThresholds.dueJobs ||
+    (input.publicationPending > 0 &&
+      input.publicationOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("publication_delivery_backlog");
   if (input.admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     input.admissionPending >= input.queueAlertThresholds.dueJobs ||
@@ -79,6 +106,15 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const supportPending = data?.supportPending;
   const supportFailed = data?.supportFailed;
   const supportOldestAgeSeconds = data?.supportOldestAgeSeconds;
+  const verificationPending = data?.verificationPending;
+  const verificationFailed = data?.verificationFailed;
+  const verificationOldestAgeSeconds = data?.verificationOldestAgeSeconds;
+  const discussionPending = data?.discussionPending;
+  const discussionFailed = data?.discussionFailed;
+  const discussionOldestAgeSeconds = data?.discussionOldestAgeSeconds;
+  const publicationPending = data?.publicationPending;
+  const publicationFailed = data?.publicationFailed;
+  const publicationOldestAgeSeconds = data?.publicationOldestAgeSeconds;
   const admissionPending = data?.admissionPending;
   const admissionFailed = data?.admissionFailed;
   const admissionOldestAgeSeconds = data?.admissionOldestAgeSeconds;
@@ -103,6 +139,21 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const supportStateValid = [supportPending, supportFailed, supportOldestAgeSeconds].every(
     (value) => Number.isSafeInteger(value) && value >= 0,
   );
+  const verificationStateValid = [
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
+  ].every((value) => Number.isSafeInteger(value) && value >= 0);
+  const discussionStateValid = [
+    discussionPending,
+    discussionFailed,
+    discussionOldestAgeSeconds,
+  ].every((value) => Number.isSafeInteger(value) && value >= 0);
+  const publicationStateValid = [
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
+  ].every((value) => Number.isSafeInteger(value) && value >= 0);
   const admissionStateValid = [admissionPending, admissionFailed, admissionOldestAgeSeconds].every(
     (value) => Number.isSafeInteger(value) && value >= 0,
   );
@@ -127,6 +178,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     !queueStateValid ||
     !reportStateValid ||
     !supportStateValid ||
+    !verificationStateValid ||
+    !discussionStateValid ||
+    !publicationStateValid ||
     !admissionStateValid ||
     !thresholdsValid ||
     now - heartbeatAt > staleAfterMs ||
@@ -147,6 +201,15 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
+    discussionPending,
+    discussionFailed,
+    discussionOldestAgeSeconds,
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -187,6 +250,15 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     supportPending,
     supportFailed,
     supportOldestAgeSeconds,
+    verificationPending,
+    verificationFailed,
+    verificationOldestAgeSeconds,
+    discussionPending,
+    discussionFailed,
+    discussionOldestAgeSeconds,
+    publicationPending,
+    publicationFailed,
+    publicationOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,

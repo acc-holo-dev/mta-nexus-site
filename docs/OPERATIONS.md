@@ -47,6 +47,14 @@ the worker half validates heartbeat/progress and queue counters. With no VAPID t
 healthy-idle and performs queue maintenance; with all three VAPID values set it
 dispatches durable Web Push jobs.
 
+`pnpm dev:docker:down` (or `docker compose … stop`) sends SIGTERM. App and workers use
+`init: true` so the signal reaches the Node process; the push worker gets a 30-second
+grace window to finish the current page, emit `stopped`, and remove its health file.
+License and resource-release workers do the same cleanup. A fresh heartbeat alone is not
+liveness: probes also require recent dispatcher progress (see [Worker liveness vs progress](#worker-liveness-vs-progress)).
+App and push-worker keep `restart: "no"` so a crash stays visible; start the stack again
+after fixing the cause rather than relying on silent restarts.
+
 ### Optional local mail capture
 
 `compose.mailpit.yaml` extends only the development `compose.yaml`. It adds
@@ -323,6 +331,36 @@ RETURNING message_id;
 Do not reset all jobs or delete inbox records. Inbox delivery does not guarantee
 external push delivery; optional push admission has its own recovery below.
 
+### Recovering verification moderator inbox delivery
+
+New verification applications and server-claim proofs commit a
+`verification_notification_deliveries` row with the request and audit.
+Migration 0082 does not backfill historical requests. The push worker pages at
+most twenty current moderators/admins, including without VAPID. Accounts must
+predate the event; current role is rechecked on each page. Notices use generic
+copy and link to the pending verification queue without target IDs, notes or
+server names. Retry and operator reset match the support/report pattern.
+
+The queue probe reports `verificationPending`, `verificationFailed`,
+`verificationOldestAgeSeconds`, and alerts `verification_delivery_failed` or
+`verification_delivery_backlog`. After resolving the cause, reset one verified
+failed request on the intended database:
+
+```sql
+SELECT verification_request_id, attempts, available_at
+FROM verification_notification_deliveries
+WHERE completed_at IS NULL AND attempts = 5
+ORDER BY available_at, verification_request_id LIMIT 20;
+
+UPDATE verification_notification_deliveries
+SET attempts = 0, available_at = clock_timestamp()
+WHERE verification_request_id = 'REPLACE_WITH_VERIFIED_REQUEST_ID'
+  AND attempts = 5 AND completed_at IS NULL
+RETURNING verification_request_id;
+```
+
+Do not reset all jobs or delete inbox records.
+
 ### Recovering optional push admission
 
 Migration 0080 adds `web_push_admission_recovery` without backfilling old inbox
@@ -375,13 +413,49 @@ Never synthesize intents for historical or already accepted notifications. After
 an admission succeeds, sender cleanup of outbox rows must not cause another
 admission. Discussion replies use their existing typed receipt and explicit
 `--repair-push` replay below. Admission recovery cannot create an inbox that was
-lost before it was stored; support/verification moderator callbacks still need
-a transactional fanout source. External push delivery retains the existing lease,
-retry and provider guarantees and is not exactly-once.
+lost before it was stored. Report, support, verification, discussion, and
+server-publication fanout use transactional delivery sources; new user-follow
+notices commit inbox rows in the follow transaction. HTTP notification paths do
+not use Next.js `after()`. Historical discussion comments from before migration
+0083 and publications from before 0084 are not backfilled. External push delivery
+retains the existing lease, retry and provider guarantees and is not exactly-once.
+
+### Recovering discussion moderator-style delivery jobs
+
+New article comments commit a `discussion_notification_deliveries` row with the
+comment and audit. Migration 0083 does not backfill historical comments. The push
+worker first delivers direct participants, then pages followers who predate the
+comment, rechecking publication, follow and preference eligibility on each write.
+Notices stay generic and never include comment text. Retry and operator reset match
+the support/report pattern.
+
+The queue probe reports `discussionPending`, `discussionFailed`,
+`discussionOldestAgeSeconds`, and alerts `discussion_delivery_failed` or
+`discussion_delivery_backlog`. Server-linked publishes likewise enqueue
+`publication_notification_deliveries` (newest followers first, capped at 100) with
+`publicationPending` / `publicationFailed` probe fields. After resolving the cause,
+reset one verified failed comment on the intended database:
+
+```sql
+SELECT comment_id, attempts, available_at
+FROM discussion_notification_deliveries
+WHERE completed_at IS NULL AND attempts = 5
+ORDER BY available_at, comment_id LIMIT 20;
+
+UPDATE discussion_notification_deliveries
+SET attempts = 0, available_at = clock_timestamp()
+WHERE comment_id = 'REPLACE_WITH_VERIFIED_COMMENT_ID'
+  AND attempts = 5 AND completed_at IS NULL
+RETURNING comment_id;
+```
+
+Do not reset all jobs or delete inbox records.
 
 ### Recovering discussion inbox delivery
 
-Run from the repository with the target database environment loaded:
+For comments created before migration 0083, or windows where delivery jobs were
+never enqueued, use the addressed replay CLI. Run from the repository with the
+target database environment loaded:
 
 ```sh
 pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100

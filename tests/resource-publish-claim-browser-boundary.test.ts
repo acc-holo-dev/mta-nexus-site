@@ -16,7 +16,6 @@ vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
 }));
 vi.mock("../apps/web/src/lib/services/server-claim-service", () => ({
   serverClaimService: { issueChallenge: vi.fn(), verifyChallenge: vi.fn() },
-  notifyModeratorsOfServerClaim: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService: { transitionResource: vi.fn() },

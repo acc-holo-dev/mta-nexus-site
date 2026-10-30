@@ -15,8 +15,6 @@ const mocks = vi.hoisted(() => ({
   issue: vi.fn(),
   assertLive: vi.fn(),
   consume: vi.fn(),
-  moderators: vi.fn(),
-  dispatch: vi.fn(),
   matchesEndpoint: vi.fn(),
 }));
 
@@ -28,9 +26,6 @@ vi.mock("@nexus/db", () => ({
     issue: mocks.issue,
     assertLive: mocks.assertLive,
     consumeVerifiedProof: mocks.consume,
-  },
-  userRepository: {
-    listModeratorIds: mocks.moderators,
   },
 }));
 
@@ -51,14 +46,7 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: mocks.dispatch,
-}));
-
-import {
-  notifyModeratorsOfServerClaim,
-  serverClaimService,
-} from "../apps/web/src/lib/services/server-claim-service";
+import { serverClaimService } from "../apps/web/src/lib/services/server-claim-service";
 
 const requester = {
   id: "usr_claimant",
@@ -118,20 +106,6 @@ describe("server claim service behavior", () => {
       },
       challengeId: "scc_1",
       verifiedAt: new Date("2026-10-08T00:00:01.000Z"),
-    });
-    mocks.moderators.mockResolvedValue(["mod_1", "mod_2"]);
-    mocks.dispatch.mockResolvedValue({
-      requested: 2,
-      stored: 2,
-      storageFailed: 0,
-      push: {
-        notifications: 2,
-        attempted: 0,
-        delivered: 0,
-        failed: 0,
-        stale: 0,
-        deliveryErrors: 0,
-      },
     });
   });
 
@@ -320,25 +294,6 @@ describe("server claim service behavior", () => {
       verificationRequestId: "ver_test",
       auditId: "aud_test",
     });
-  });
-
-  it("keeps moderator notification delivery secondary to durable proof", async () => {
-    await notifyModeratorsOfServerClaim("Nexus Racing");
-    expect(mocks.dispatch).toHaveBeenCalledWith([
-      expect.objectContaining({
-        recipientId: "mod_1",
-        type: "security",
-        category: "security",
-      }),
-      expect.objectContaining({
-        recipientId: "mod_2",
-        type: "security",
-        category: "security",
-      }),
-    ]);
-
-    mocks.dispatch.mockRejectedValueOnce(new Error("notification queue unavailable"));
-    await expect(notifyModeratorsOfServerClaim("Nexus Racing")).resolves.toBeUndefined();
   });
 
   it("uses organization management authority even when a legacy personal owner is still recorded", async () => {

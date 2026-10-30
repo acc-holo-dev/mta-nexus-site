@@ -1,5 +1,5 @@
-import { after, type NextRequest } from "next/server";
-import { organizationRepository, userRepository, verificationRepository } from "@nexus/db";
+import type { NextRequest } from "next/server";
+import { organizationRepository, verificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { z } from "zod";
@@ -12,7 +12,6 @@ import {
 } from "../../../lib/observability";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { authService } from "../../../lib/services/auth-service";
-import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -185,6 +184,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    // Moderator inbox fanout is committed with the request as
+    // verification_notification_deliveries; the push worker pages recipients.
     const verificationRequest = await verificationRepository.createRequest(
       {
         requesterId: user.id,
@@ -204,41 +205,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         },
       },
     );
-
-    after(async () => {
-      try {
-        const moderatorIds = await userRepository.listModeratorIds();
-        const dispatch = await dispatchNotificationsBestEffort(
-          moderatorIds.map((moderatorId) => ({
-            recipientId: moderatorId,
-            title: "New verification request",
-            message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
-            link: "/admin?verificationView=pending&verificationPage=1",
-            type: "security" as const,
-          })),
-        );
-
-        if (dispatch.storageFailed) {
-          logRequestEvent({
-            level: "warn",
-            event: "verification.moderator_notification_partial_failure",
-            context,
-            status: 201,
-            fields: {
-              storageFailed: dispatch.storageFailed,
-            },
-          });
-        }
-      } catch (error) {
-        logRequestEvent({
-          level: "warn",
-          event: "verification.moderator_notification_failed",
-          context,
-          status: 201,
-          error,
-        });
-      }
-    });
 
     return json(
       context,

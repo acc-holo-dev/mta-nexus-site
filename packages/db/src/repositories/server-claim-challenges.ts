@@ -7,7 +7,13 @@ import {
   serverClaimMatchesOwnershipScope,
 } from "@nexus/domain";
 import { db } from "../client";
-import { auditEvents, serverClaimChallenges, servers, verificationRequests } from "../schema";
+import {
+  auditEvents,
+  serverClaimChallenges,
+  servers,
+  verificationNotificationDeliveries,
+  verificationRequests,
+} from "../schema";
 
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 
@@ -333,6 +339,13 @@ export class ServerClaimChallengeRepository {
         targetId: input.serverId,
         targetType: "server",
         createdAt: consumedAt,
+      });
+
+      const createdAt = sql`(select ${verificationRequests.createdAt} from ${verificationRequests} where ${verificationRequests.id} = ${input.verificationRequestId})`;
+      await tx.insert(verificationNotificationDeliveries).values({
+        verificationRequestId: input.verificationRequestId,
+        event: "server_claim",
+        createdAt,
       });
 
       return Object.freeze({
