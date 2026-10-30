@@ -26,11 +26,8 @@ Dependency-cruiser 18.7 ещё не использует API TypeScript 7 для
 
 ## Production-сборка
 
-Turbopack предупреждает о широком tracing для динамических путей storage и mail-secret. Тесты, документация и служебные файлы исключены из standalone-пакета; проверить более точную границу tracing без ослабления безопасного доступа к файлам.
+Динамические пути local storage и absolute mail-secret files остаются runtime mounts: Turbopack может предупреждать о broad tracing. NFT-выход standalone ограничен `outputFileTracingExcludes` (tests/docs/scripts/migrations/deploy/git/env/uploads), runtime-образ стартует как `USER node` и пишет только в `/data/uploads`; migrations/workers уходят отдельным `/runtime/db`. Не ослаблять исключения и non-root runtime ради «тихого» build log.
 
 ## Размер модулей
 
-Репозиторий `community-reports.ts` объединяет много операций и затрудняет локальное изменение. Разделять по ответственностям вместе с соответствующей задачей, сохраняя транзакции, авторизацию и поведенческие тесты. Сам по себе размер файла не доказывает ошибку. Операции `builds` уже разделены на query/moderation/lifecycle модули с тонким facade.
-
-
-Репозиторий `builds.ts` объединяет много операций и затрудняет локальное изменение. Разделять по ответственностям вместе с соответствующей задачей, сохраняя транзакции, авторизацию и поведенческие тесты. Сам по себе размер файла не доказывает ошибку. Операции `community-reports` уже разделены на query/submit/decision модули с тонким facade.
+Операции `builds` и `community-reports` разделены по сценариям (query/moderation/lifecycle и query/submit/decision) с тонкими facade. Новые связанные изменения держать в тех же границах; сам по себе размер файла не доказывает ошибку.

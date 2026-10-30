@@ -140,9 +140,6 @@ mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
 | `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` / full isolated acceptance |
 
 Release tags (`v*`) and explicit full workflow dispatch always run `full_acceptance`.
-Sibling branch `codex/db-test-time` (ROADMAP 08) shortens measured database suite
-time; it is not required to land this profile wiring.
-
 The CI unit job and host development use the same `check:code` command. It uses
 the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
 with an anchored selector for exactly seven scripts. `--sequential` bounds memory;
