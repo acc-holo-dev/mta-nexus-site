@@ -16,7 +16,7 @@
 
 ## Доставка уведомлений
 
-Исторически потерянные уведомления автоматически не восстанавливаются. Verification, reports, support, discussion, server-publication fanout и user-follow notices коммитят транзакционный источник (job или inbox) без Next.js `after()`; worker перепроверяет eligibility. Миграции 0083/0084 не заполняют доставку для старых комментариев/публикаций. Исчерпание повторов fanout (attempts = 5) требует устранения причины и адресного operator reset по [инструкции эксплуатации](OPERATIONS.md#recovering-report-inbox-delivery); внешняя push-доставка по-прежнему не exactly-once.
+Исторически потерянные уведомления автоматически не восстанавливаются. Verification, reports, support, discussion, server-publication fanout и user-follow notices коммитят транзакционный источник (job или inbox) без Next.js `after()`; worker перепроверяет eligibility. Миграции 0083/0084 не заполняют доставку для старых комментариев/публикаций. Исчерпание повторов fanout/admission (attempts = 5) требует устранения причины и адресного reset одного id: `pnpm notifications:delivery list|reset` (`NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES`, без bulk) — см. [эксплуатацию](OPERATIONS.md#recovering-report-inbox-delivery); внешняя push-доставка по-прежнему не exactly-once.
 
 ## Проверки и сопровождение
 

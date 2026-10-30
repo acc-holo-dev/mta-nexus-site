@@ -18,7 +18,8 @@
     "scenario:cleanup": "tsx scripts/run-scenario-lab.ts cleanup",
     "push:dispatch": "tsx scripts/run-web-push-dispatcher.ts",
     "push:soak": "tsx scripts/run-web-push-soak.ts",
-    "push:provider:probe": "tsx scripts/run-web-push-provider-probe.ts"
+    "push:provider:probe": "tsx scripts/run-web-push-provider-probe.ts",
+    "notifications:delivery": "tsx scripts/run-notification-delivery-operator.ts"
   },
   "dependencies": {
     "@nexus/config": "workspace:*",
