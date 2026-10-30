@@ -1,6 +1,6 @@
 # Guest, Home and Discover — Screen Specification
 
-Status: **OWNER-CONFIRMED / TARGET**  
+Status: **OWNER-CONFIRMED / TARGET**
 
 ## 1. Purpose
 

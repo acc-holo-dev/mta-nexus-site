@@ -175,7 +175,7 @@ actual `X-Resource-Build-Id`; the client refuses to save a pinned download
 if this does not exactly match the requested build.
 
 The library and resource-detail pages link to the release archive. Buttons
-are convenience controls for currently entitled users and managers, *not*
+are convenience controls for currently entitled users and managers, _not_
 authoritative grants. A version may disappear or be blocked between
 render and click. Current download authorization takes precedence over
 the page's stale state. Legacy paid checkout stays disabled.

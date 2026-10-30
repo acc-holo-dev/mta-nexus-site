@@ -147,7 +147,8 @@ test("expensive production startup waits for core verification", () => {
   assert.ok(start >= 0 && end > start);
   const section = workflow.slice(start, end);
   for (const gate of ["plan", "unit", "verify", "image"]) {
-    assert.match(section, new RegExp(`^    - ${gate}$`, "m"));
+    // Biome YAML may indent sequence entries under `needs:` (6 spaces) vs flat 4.
+    assert.match(section, new RegExp(`^\\s+- ${gate}$`, "m"));
   }
   assert.match(section, /needs\.plan\.outputs\.full == 'true'/u);
 });

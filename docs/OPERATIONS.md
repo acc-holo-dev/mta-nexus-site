@@ -132,12 +132,12 @@ CI chooses a scope from the changed-file set (`scripts/ci-policy.mjs`). Unknown 
 mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
 `full_acceptance`. Local commands stay aligned with those scopes:
 
-| Scope | When | CI jobs | Local analogue |
-| --- | --- | --- | --- |
-| `documentation` | Markdown-only (`README.md`, `docs/**/*.md`) | `plan` (doc links) | `node scripts/check-doc-links.mjs` |
-| `unit_ci` | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown) | `plan`, `unit` | `pnpm check:code` |
-| `fast_ci` | Other application code that is not infrastructure | `plan`, `unit`, `verify`, `image`, `smoke` | `pnpm check:code` then disposable `pnpm test:database` |
-| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` / full isolated acceptance |
+| Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                     |
+| `unit_ci`         | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown)                                                                                     | `plan`, `unit`                                        | `pnpm check:code`                                      |
+| `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` |
+| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` / full isolated acceptance       |
 
 Release tags (`v*`) and explicit full workflow dispatch always run `full_acceptance`.
 The CI unit job and host development use the same `check:code` command. It uses
@@ -169,11 +169,11 @@ All five browser-tool installations in the workflows use
 `scripts/browser-toolchain.mjs`. This is the single place to update their
 pinned package versions:
 
-| Profile | Tools | Used by |
-| --- | --- | --- |
-| `basic` | Playwright | DEV origin/hydration verification |
-| `a11y` | Playwright, axe Playwright integration and axe-core | Production smoke and Resource browser |
-| `agent` | Playwright and agent-browser | Account and Directory browser |
+| Profile | Tools                                               | Used by                               |
+| ------- | --------------------------------------------------- | ------------------------------------- |
+| `basic` | Playwright                                          | DEV origin/hydration verification     |
+| `a11y`  | Playwright, axe Playwright integration and axe-core | Production smoke and Resource browser |
+| `agent` | Playwright and agent-browser                        | Account and Directory browser         |
 
 The installer receives an absolute tool directory, invokes npm directly, and
 preserves a failed installation's exit status. Each job still uses its own
@@ -185,10 +185,10 @@ The Chromium acceptance uses `@axe-core/playwright` 4.13.0 and
 `axe-core` 4.13.0. Both are pinned in the isolated browser-tools installations for
 the smoke and resource-browser jobs; they are not application dependencies.
 
-| Contour | Scanned states |
-| --- | --- |
-| Production browser smoke | Login, registration and password recovery in RU/EN, light desktop and dark mobile themes; authenticated workspace after registration. |
-| Resource browser | Open notification and mobile More dialogs in RU/EN; login error, recovery success and authenticated Settings, Security, Support, resource publishing and server claim at 320px and 1280px. |
+| Contour                  | Scanned states                                                                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Production browser smoke | Login, registration and password recovery in RU/EN, light desktop and dark mobile themes; authenticated workspace after registration.                                                      |
+| Resource browser         | Open notification and mobile More dialogs in RU/EN; login error, recovery success and authenticated Settings, Security, Support, resource publishing and server claim at 320px and 1280px. |
 
 `scripts/axe-accessibility.mjs` scans the full rendered state after each test's
 readiness assertions. It selects WCAG 2 A/AA, 2.1 A/AA and 2.2 AA rule tags and
@@ -885,13 +885,13 @@ beta, authorize production deployment, or activate paid marketplace/DRM.
 
 The report writes `artifacts/beta-candidate-evidence.json`. Interpret it as:
 
-| Field | Meaning |
-| --- | --- |
-| `checkableCandidate: true` | Required technical proofs for that SHA passed; only owner deploy authorization remains |
-| `status: awaiting_owner_deploy_decision` | Same as checkable; still not live and not authorized |
-| `openBetaLive` / `productionAuthorized` | Always `false` in this harness |
-| `technicalBlockers` | Named gaps (often missing backup-restore CI evidence for ROADMAP 19) |
-| `residuals` | Owner content/observability and optional Web Push soak/provider proofs (both `artifacts/web-push-soak-evidence.json` and `artifacts/web-push-provider-evidence.json` must validate via their checkers; file presence alone never clears `web_push`) |
+| Field                                    | Meaning                                                                                                                                                                                                                                             |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `checkableCandidate: true`               | Required technical proofs for that SHA passed; only owner deploy authorization remains                                                                                                                                                              |
+| `status: awaiting_owner_deploy_decision` | Same as checkable; still not live and not authorized                                                                                                                                                                                                |
+| `openBetaLive` / `productionAuthorized`  | Always `false` in this harness                                                                                                                                                                                                                      |
+| `technicalBlockers`                      | Named gaps (often missing backup-restore CI evidence for ROADMAP 19)                                                                                                                                                                                |
+| `residuals`                              | Owner content/observability and optional Web Push soak/provider proofs (both `artifacts/web-push-soak-evidence.json` and `artifacts/web-push-provider-evidence.json` must validate via their checkers; file presence alone never clears `web_push`) |
 
 `ci-evidence.json` from the CI summary job now includes `requiredJobs` and
 `jobResults` so browser/mail/runtime categories can be checked per job.
@@ -902,11 +902,11 @@ Select one exact `main` commit and wait for **CI**, **Resource browser**,
 **Account browser**, and **Directory browser** to succeed on that commit.
 Keep these CI artifacts outside the runner before their 14-day retention expires:
 
-| Evidence | What it proves |
-| --- | --- |
-| `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Drizzle upgrade from the configured baseline to the current migration target; failed DDL and ledger rollback; retry, idempotency and preservation checks |
-| `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
+| Evidence                                | What it proves                                                                                                                                                         |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build                                                                                          |
+| `release-upgrade-<sha>-<attempt>`       | Drizzle upgrade from the configured baseline to the current migration target; failed DDL and ledger rollback; retry, idempotency and preservation checks               |
+| `backup-restore-<sha>-<attempt>`        | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
 to be true in the upgrade and restore reports. A downloaded report alone is not

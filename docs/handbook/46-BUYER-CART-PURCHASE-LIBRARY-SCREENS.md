@@ -69,6 +69,7 @@ Owner-approved tab layout:
 `Overview / Downloads / License / Updates / Support / Invoice / Dispute`
 
 ### Overview
+
 - order/purchase identity;
 - seller/product/SKU;
 - purchase date and amount;
@@ -77,6 +78,7 @@ Owner-approved tab layout:
 - key alerts.
 
 ### Downloads
+
 - eligible build/version;
 - SHA-256;
 - scan state/provenance;
@@ -84,6 +86,7 @@ Owner-approved tab layout:
 - 30-day post-delist access rules where applicable.
 
 ### License
+
 - server binding;
 - activation state;
 - contractual term;
@@ -91,18 +94,22 @@ Owner-approved tab layout:
 - transfer policy.
 
 ### Updates
+
 - version history/changelog;
 - free future updates under current owner decision;
 - compatibility/dependency changes.
 
 ### Support
+
 - unified support thread/tickets;
 - safe attachments.
 
 ### Invoice
+
 - receipt/invoice/provider references where supported.
 
 ### Dispute
+
 - eligibility/state/evidence/timeline and decision.
 
 ## 7. Trials

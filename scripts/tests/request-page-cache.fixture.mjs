@@ -208,6 +208,8 @@ async function render(route, key, request) {
   const { default: Page, generateMetadata } = await import(
     pathToFileURL(resolve(sourceRoot, "app", name, "page.tsx"))
   );
+  // Fixture closes over ALS request context; not a production component factory.
+  // biome-ignore lint/correctness/noComponentHookFactories: request-scoped RSC fixture
   async function Tree() {
     // Root metadata/layout also consume the locale in a normal app render.
     const input = { params: Promise.resolve({ [parameter]: key }) };
