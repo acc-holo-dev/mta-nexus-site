@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -269,14 +270,15 @@ export function NotificationInbox({
       )}
       <div className="nexus-panel flex flex-wrap items-center gap-3 p-4">
         {page.unreadCount > 0 && (
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={disabled}
             onClick={() => void mark(true, [], true)}
-            className="min-h-11 rounded-lg border border-base px-3 text-sm text-accent disabled:opacity-50"
+            className="min-h-11 text-accent"
           >
             {copy.markAllRead}
-          </button>
+          </Button>
         )}
         <label className="inline-flex min-h-11 items-center gap-2 text-sm text-secondary">
           <input
@@ -292,30 +294,33 @@ export function NotificationInbox({
         <span className="text-xs text-muted">
           {copy.selected}: {selected.length}
         </span>
-        <button
+        <Button
           type="button"
+          variant="outline"
           disabled={disabled || !selected.length}
           onClick={() => void mark(true)}
-          className="min-h-11 rounded-lg border border-base px-3 text-sm text-accent disabled:opacity-50"
+          className="min-h-11 text-accent"
         >
           {copy.markRead}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="outline"
           disabled={disabled || !selected.length}
           onClick={() => void mark(false)}
-          className="min-h-11 rounded-lg border border-base px-3 text-sm text-accent disabled:opacity-50"
+          className="min-h-11 text-accent"
         >
           {copy.markUnread}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
           disabled={busy}
           onClick={() => void refresh()}
-          className="min-h-11 px-2 text-sm text-accent underline disabled:opacity-50"
+          className="h-auto min-h-11 px-2 text-accent underline"
         >
           {copy.retry}
-        </button>
+        </Button>
       </div>
       {!page.items.length && (
         <p className="nexus-panel p-6 text-sm text-muted">
@@ -381,14 +386,15 @@ export function NotificationInbox({
                         {copy.view}
                       </Link>
                     )}
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
                       disabled={disabled}
                       onClick={() => void mark(!item.isRead, [item.id])}
-                      className="min-h-11 text-sm text-accent underline"
+                      className="h-auto min-h-11 px-0 text-sm text-accent underline"
                     >
                       {item.isRead ? copy.markOneUnread : copy.markOneRead}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

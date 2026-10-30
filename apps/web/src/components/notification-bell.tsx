@@ -1,6 +1,7 @@
 "use client";
 
 import type { Notification } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { AlertTriangle, Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -103,13 +104,15 @@ export function NotificationBell() {
 
   return (
     <div className="relative">
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon"
         onClick={() => {
           if (!isOpen) setAttempt((value) => value + 1);
           setIsOpen((open) => !open);
         }}
-        className="relative inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-base bg-elevated p-0 text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className="relative h-8 w-8 shrink-0 rounded-md border-base bg-elevated p-0 text-secondary"
         aria-label={bellLabel}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
@@ -127,7 +130,7 @@ export function NotificationBell() {
             aria-hidden="true"
           />
         )}
-      </button>
+      </Button>
 
       {announcement && (
         <span role="status" aria-live="polite" className="sr-only">
@@ -158,24 +161,28 @@ export function NotificationBell() {
         >
           <div className="flex items-center justify-between gap-3 border-b border-base px-3 py-2.5">
             <span className="font-heading text-xs text-primary">{copy.title}</span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               aria-label={copy.close}
               onClick={() => setIsOpen(false)}
-              className="min-h-6 min-w-6 rounded-md p-1 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="h-6 w-6 min-h-6 min-w-6 rounded-md p-1 text-muted"
             >
               <X className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </Button>
             {unreadCount > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 disabled={marking}
                 onClick={() => void markAllRead()}
-                className="flex min-h-6 items-center gap-1 px-1 text-[11px] font-semibold text-accent hover:underline disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="h-auto min-h-6 gap-1 px-1 text-[11px] font-semibold text-accent hover:underline"
               >
                 <CheckCheck className="h-3 w-3" aria-hidden="true" />
                 <span>{copy.markAllRead}</span>
-              </button>
+              </Button>
             )}
           </div>
 
@@ -188,13 +195,15 @@ export function NotificationBell() {
                 <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
                 {error}
               </span>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setAttempt((value) => value + 1)}
-                className="min-h-6 px-1 font-semibold underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="h-auto min-h-6 px-1 font-semibold underline"
               >
                 {copy.retry}
-              </button>
+              </Button>
             </div>
           )}
 
