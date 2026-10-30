@@ -153,6 +153,8 @@ it.each(["en", "ru"] as const)(
     expect(state.history).toHaveBeenCalledWith("article", { id: "actor" }, { cursor: undefined });
     expect(html).toContain(authorPublicationDeskCopy(locale).actorModeration);
     expect(html).toContain(authorPublicationDeskCopy(locale).restore);
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("text-accent");
     expect(html).toContain(`dateTime="${revision}"`);
     expect(html).toContain('href="/workspace/content/article"');
     expect(html).toContain("cursor=");

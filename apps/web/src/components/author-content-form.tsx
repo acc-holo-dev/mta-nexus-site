@@ -234,14 +234,15 @@ export function AuthorContentForm({
             {notice.text}
           </p>
           {notice.error && saved && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
               disabled={busy}
               onClick={() => window.location.reload()}
-              className="text-sm text-accent underline"
+              className="h-auto px-0 text-sm text-accent underline"
             >
               {copy.retry}
-            </button>
+            </Button>
           )}
           {notice.error && (organization || server) && !saved && (
             <Link
@@ -344,9 +345,10 @@ export function AuthorContentForm({
             <Button type="submit" isLoading={busy}>
               {saved ? copy.save : copy.submit}
             </Button>
-            <button
+            <Button
               type="button"
-              className="text-sm text-accent underline"
+              variant="ghost"
+              className="h-auto px-0 text-sm text-accent underline"
               onClick={() =>
                 setPreview(
                   preview === null
@@ -358,7 +360,7 @@ export function AuthorContentForm({
               }
             >
               {preview === null ? copy.preview : copy.editText}
-            </button>
+            </Button>
           </div>
         </fieldset>
       </form>
@@ -371,14 +373,15 @@ export function AuthorContentForm({
         </section>
       )}
       {saved && !archived && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           disabled={busy}
           onClick={() => void archive()}
-          className="text-sm font-semibold text-danger disabled:opacity-50"
+          className="h-auto px-0 text-sm font-semibold text-danger"
         >
           {copy.archive}
-        </button>
+        </Button>
       )}
     </div>
   );
