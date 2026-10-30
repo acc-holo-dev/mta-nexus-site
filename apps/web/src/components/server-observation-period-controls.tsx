@@ -1,8 +1,9 @@
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
-import { serverHistoryWindows, type ServerHistoryWindow } from "../lib/server-history-window";
-import { serverStatisticsCopy } from "../lib/server-statistics-copy";
+import { type ServerHistoryWindow, serverHistoryWindows } from "../lib/server-history-window";
 import { serverStatisticsHref } from "../lib/server-statistics-contract";
+import { serverStatisticsCopy } from "../lib/server-statistics-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
 export function ServerObservationPeriodControls({
   path,
@@ -76,12 +77,9 @@ export function ServerObservationPeriodControls({
             className={`${platformFieldClass} min-h-11`}
           />
         </label>
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-        >
+        <Button type="submit" className="min-h-11 font-semibold">
           {copy.choosePeriod}
-        </button>
+        </Button>
         <p className="w-full text-xs text-muted">{copy.periodScope}</p>
       </form>
       <nav aria-label={copy.adjacent} className="flex flex-wrap gap-4">

@@ -1,7 +1,8 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { statisticsFixture } from "./helpers/server-statistics-fixture";
+
 const state = vi.hoisted(() => ({ locale: "ru" as "ru" | "en", session: vi.fn(), read: vi.fn() }));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
@@ -23,12 +24,14 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/server-statistics-service", () => ({
   serverStatisticsService: { read: state.read },
 }));
-import { ServerStatisticsPanel } from "../apps/web/src/components/server-statistics-panel";
+
 import {
+  ServerStatisticsLoading,
   ServerStatisticsPage,
   serverStatisticsMetadata,
-  ServerStatisticsLoading,
 } from "../apps/web/src/components/server-statistics-page";
+import { ServerStatisticsPanel } from "../apps/web/src/components/server-statistics-panel";
+
 beforeEach(() => {
   state.locale = "ru";
   state.session.mockReset().mockResolvedValue({ id: "manager", role: "admin" });
@@ -54,6 +57,8 @@ it.each(["ru", "en"] as const)(
     expect(html).toContain("end=2026-10-11T00%3A00%3A00.000Z");
     expect(html).toContain(locale === "ru" ? "Среднее число игроков" : "Average players");
     expect(html).toContain(locale === "ru" ? "Скачать CSV интервалов" : "Download interval CSV");
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("text-accent");
     expect(html).not.toContain("/api/workspace");
     expect(html).toContain(
       '<section aria-labelledby="server-statistics-observations" tabindex="0"',

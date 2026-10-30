@@ -1,29 +1,30 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { AppError, type User } from "@nexus/domain";
 import type { ServerStatisticsTarget } from "@nexus/db";
-import { authService } from "../lib/services/auth-service";
-import {
-  serverStatisticsService,
-  type ServerObservationBrowserResult,
-} from "../lib/services/server-statistics-service";
+import { AppError, type User } from "@nexus/domain";
+import { Button } from "@nexus/ui";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import type { Locale } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
+import {
+  parseServerObservationBrowserQuery,
+  type ServerObservationBrowserQuery,
+  serverObservationBrowserHref,
+} from "../lib/server-observation-browser-contract";
 import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
 } from "../lib/server-observation-browser-copy";
-import {
-  parseServerObservationBrowserQuery,
-  serverObservationBrowserHref,
-  type ServerObservationBrowserQuery,
-} from "../lib/server-observation-browser-contract";
-import { serverStatisticsCopy } from "../lib/server-statistics-copy";
 import { serverStatisticsHref } from "../lib/server-statistics-contract";
+import { serverStatisticsCopy } from "../lib/server-statistics-copy";
+import { authService } from "../lib/services/auth-service";
+import {
+  type ServerObservationBrowserResult,
+  serverStatisticsService,
+} from "../lib/services/server-statistics-service";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { ServerObservationPeriodControls } from "./server-observation-period-controls";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
-import type { Locale } from "../lib/i18n";
 export async function serverObservationBrowserMetadata() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return {
@@ -221,12 +222,9 @@ function ServerObservationBrowserPanel({
             </select>
           </label>
         ))}
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-        >
+        <Button type="submit" className="min-h-11 font-semibold">
           {copy.apply}
-        </button>
+        </Button>
         <Link
           href={serverObservationBrowserHref(path, {
             ...state,

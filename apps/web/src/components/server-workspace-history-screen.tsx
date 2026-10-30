@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -114,12 +115,9 @@ export async function ServerWorkspaceHistoryScreen({
             )}
           </select>
         </label>
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg border border-base px-4 text-sm text-accent"
-        >
+        <Button type="submit" variant="outline" className="min-h-11 text-accent">
           {copy.apply}
-        </button>
+        </Button>
         <Link
           href={base}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
