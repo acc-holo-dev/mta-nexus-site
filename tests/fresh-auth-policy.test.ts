@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
 import {
+  FRESH_AUTH_ACTIONS,
   freshAuthProofAccepted,
   freshAuthRequirement,
-  FRESH_AUTH_ACTIONS,
   ordinaryRecoveryEligible,
 } from "@nexus/security";
+import { describe, expect, it } from "vitest";
 
 const account = {
   role: "user",
@@ -20,6 +20,7 @@ describe("fresh-auth requirements", () => {
       "withdrawal",
       "account_recovery",
       "security_change",
+      "organization_ownership",
     ]);
     for (const action of FRESH_AUTH_ACTIONS) {
       const requirement = freshAuthRequirement(action);
@@ -35,6 +36,7 @@ describe("fresh-auth requirements", () => {
     expect(freshAuthProofAccepted("staff_action", "recovery_challenge")).toBe(false);
     expect(freshAuthProofAccepted("withdrawal", "recovery_challenge")).toBe(false);
     expect(freshAuthProofAccepted("security_change", "recovery_challenge")).toBe(false);
+    expect(freshAuthProofAccepted("organization_ownership", "recovery_challenge")).toBe(false);
   });
 
   it("keeps ordinary recovery off staff, moderator, 2FA, and passwordless accounts", () => {

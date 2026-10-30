@@ -55,6 +55,7 @@ async function lockTransferActors(
   actorId: string,
   targetId: string,
   targetUsername: string,
+  expectedPasswordHash: string,
 ) {
   const actors = await tx
     .select({
@@ -62,13 +63,19 @@ async function lockTransferActors(
       username: users.username,
       displayName: users.displayName,
       avatarUrl: users.avatarUrl,
+      passwordHash: users.passwordHash,
     })
     .from(users)
     .where(inArray(users.id, [actorId, targetId]))
     .orderBy(asc(users.id))
     .for("share");
-  if (!actors.some((actor) => actor.id === actorId)) throw new UnauthorizedError();
-  const target = actors.find((actor) => actor.id === targetId && actor.username === targetUsername);
+  const actor = actors.find((row) => row.id === actorId);
+  if (!actor) throw new UnauthorizedError();
+  // Fresh-auth recheck: a concurrent password change must invalidate the transfer.
+  if (!actor.passwordHash || actor.passwordHash !== expectedPasswordHash) {
+    throw new AppError("Current password is incorrect", 401, "FRESH_AUTH_REQUIRED");
+  }
+  const target = actors.find((row) => row.id === targetId && row.username === targetUsername);
   if (!target) throw new AppError("Selected member changed", 409, "OWNERSHIP_TARGET_INVALID");
   return target;
 }
@@ -80,6 +87,7 @@ class OrganizationGovernanceRepository {
     targetId: string;
     targetUsername: string;
     confirmationSlug: string;
+    expectedPasswordHash: string;
     formerOwnerRole: "admin" | "member";
     expectedUpdatedAt: Date;
     memberId: string;
@@ -130,6 +138,7 @@ class OrganizationGovernanceRepository {
         input.actorId,
         input.targetId,
         input.targetUsername,
+        input.expectedPasswordHash,
       );
       await lockInitiatingSession(tx, input.actorId, input.currentToken);
       await tx

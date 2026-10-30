@@ -86,6 +86,8 @@ async function fixture(role: "member" | "admin" = "member") {
     target = await actor(),
     id = `org_ogov_${randomUUID()}`;
   const currentToken = `org-owner-${randomUUID()}`;
+  const expectedPasswordHash = `hash_${owner.id}`;
+  await db.update(users).set({ passwordHash: expectedPasswordHash }).where(eq(users.id, owner.id));
   await sessionRepository.create({
     id: `ses_${randomUUID()}`,
     userId: owner.id,
@@ -110,10 +112,10 @@ async function fixture(role: "member" | "admin" = "member") {
     `mem_${randomUUID()}`,
     audit(owner, id, "organization.member_added"),
   );
-  return { owner, target, currentToken, org: added.organization };
+  return { owner, target, currentToken, expectedPasswordHash, org: added.organization };
 }
 const transfer = (
-  { org, owner, target, currentToken }: Awaited<ReturnType<typeof fixture>>,
+  { org, owner, target, currentToken, expectedPasswordHash }: Awaited<ReturnType<typeof fixture>>,
   extra = {},
 ) =>
   governance.transfer({
@@ -123,6 +125,7 @@ const transfer = (
     targetId: target.id,
     targetUsername: target.username,
     confirmationSlug: org.slug,
+    expectedPasswordHash,
     expectedUpdatedAt: org.updatedAt,
     formerOwnerRole: "member",
     memberId: `mem_${randomUUID()}`,

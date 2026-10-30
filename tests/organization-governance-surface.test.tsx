@@ -177,6 +177,7 @@ it("requires exact recipient/organization/role/newer revision before accepting s
     targetId: "target",
     targetUsername: "target",
     confirmationSlug: "team",
+    currentPassword: "Current-password-123!",
     formerOwnerRole: "member",
     expectedUpdatedAt: time,
   });

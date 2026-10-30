@@ -69,6 +69,7 @@ const input = {
   targetId: "target",
   targetUsername: "target",
   confirmationSlug: "team",
+  expectedPasswordHash: "owner-password-hash",
   formerOwnerRole: "member" as const,
   expectedUpdatedAt: new Date(time),
   memberId: "new-membership",
@@ -89,8 +90,8 @@ function transferRows(
     [org()],
     members,
     [
-      ["owner", "owner", "Owner", null],
-      ["target", "target", "Target", null],
+      ["owner", "owner", "Owner", null, "owner-password-hash"],
+      ["target", "target", "Target", null, "target-password-hash"],
     ],
     [["session", new Date(Date.now() + 3_600_000).toISOString()]],
     [org({ ownerId: "target", updatedAt: later })],
@@ -185,13 +186,23 @@ it("rejects a changed username before transfer rather than resolving another acc
     [org()],
     [["membership", "target", "member"]],
     [
-      ["owner", "owner", "Owner", null],
-      ["target", "changed", "Target", null],
+      ["owner", "owner", "Owner", null, "owner-password-hash"],
+      ["target", "changed", "Target", null, "target-password-hash"],
     ],
   ];
   await expect(repository.transfer(input)).rejects.toMatchObject({
     code: "OWNERSHIP_TARGET_INVALID",
   });
+  expect(writes("audit_events")).toHaveLength(0);
+});
+it("rejects a stale password hash before session lock or ownership writes", async () => {
+  transferRows();
+  await expect(
+    repository.transfer({ ...input, expectedPasswordHash: "rotated-hash" }),
+  ).rejects.toMatchObject({ code: "FRESH_AUTH_REQUIRED" });
+  expect(state.queries).toHaveLength(3);
+  expect(writes("organization_members")).toHaveLength(0);
+  expect(writes("organizations")).toHaveLength(0);
   expect(writes("audit_events")).toHaveLength(0);
 });
 it("rejects a missing token before querying or an absent current session before any write", async () => {

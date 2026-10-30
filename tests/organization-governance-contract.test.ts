@@ -15,16 +15,18 @@ const transfer = {
   targetId: "target",
   targetUsername: " target ",
   confirmationSlug: "team",
+  currentPassword: "Current-password-123!",
   formerOwnerRole: "member",
   expectedUpdatedAt: "2026-10-11T00:00:00.000Z",
 };
-it("requires explicit recipient identity, retained role, confirmation and shared revision", () => {
+it("requires explicit recipient identity, retained role, confirmation, password and shared revision", () => {
   expect(ownershipTransferSchema.parse(transfer).targetUsername).toBe("target");
   for (const extra of [
     { targetId: "a/b" },
     { formerOwnerRole: "owner" },
     { expectedUpdatedAt: "yesterday" },
     { confirmationSlug: "" },
+    { currentPassword: "" },
     { actorId: "owner" },
     { permissions: ["manage_products"] },
     { isVerified: true },
