@@ -32,13 +32,18 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "apps/web/src/lib/license-bearer-route-adapter.ts",
     "tests/browser-api-route-inventory.test.ts",
   ]) {
-    assert.deepEqual(classifyChanges([file]), { code: true, full: true }, file);
+    assert.deepEqual(classifyChanges([file]), { code: true, unitOnly: false, full: true }, file);
   }
   assert.deepEqual(classifyChanges(["apps/web/src/components/server-card.tsx"]), {
     code: true,
+    unitOnly: true,
     full: false,
   });
-  assert.deepEqual(classifyChanges(["docs/handbook/notes.md"]), { code: false, full: false });
+  assert.deepEqual(classifyChanges(["docs/handbook/notes.md"]), {
+    code: false,
+    unitOnly: false,
+    full: false,
+  });
 });
 
 test("inconsistent full acceptance cannot pass with only plan", () => {
