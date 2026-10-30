@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
@@ -128,12 +129,9 @@ export function VerificationApplicationAmend({
             className={`${platformFieldClass} min-h-11`}
           />
         </label>
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-        >
+        <Button type="submit" isLoading={busy} disabled={busy}>
           {busy ? labels.loading : copy.amend}
-        </button>
+        </Button>
       </fieldset>
       {notice && (
         <p
@@ -144,13 +142,14 @@ export function VerificationApplicationAmend({
         </p>
       )}
       {blocked && !busy && (
-        <button
+        <Button
           type="button"
           onClick={() => window.location.reload()}
-          className="min-h-11 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline"
+          variant="ghost"
         >
           {labels.reload}
-        </button>
+        </Button>
       )}
     </form>
   );

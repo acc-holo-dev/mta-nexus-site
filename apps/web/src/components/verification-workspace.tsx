@@ -406,14 +406,15 @@ export function VerificationWorkspace({
               )}
             </form>
           )}
-          <button
+          <Button
             type="button"
-            className="min-h-9 text-sm text-accent underline"
+            className="h-auto min-h-9 px-0 text-sm text-accent underline"
+            variant="ghost"
             disabled={pending}
             onClick={() => setTarget(null)}
           >
             {copy.cancel}
-          </button>
+          </Button>
         </section>
       )}
       <section className="nexus-panel space-y-3 p-5">
