@@ -1,7 +1,8 @@
 "use client";
 
+import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
 
 type AuthMode = "login" | "register";
@@ -63,11 +64,8 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
     }
   }
 
-  const input =
-    "w-full rounded-lg border border-base bg-inset px-3 py-2.5 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-  const label = "block text-sm font-semibold text-primary";
   return (
-    <div className="mx-auto max-w-md space-y-6 py-10">
+    <div className="mx-auto max-w-md space-y-6 px-4 py-10 sm:px-0">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-primary">
           {registering ? copy.registerTitle : copy.loginTitle}
@@ -91,30 +89,24 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
             {error}
           </p>
         )}
-        <div className="space-y-1.5">
-          <label htmlFor="auth-email" className={label}>
-            {copy.email}
-          </label>
-          <input
-            id="auth-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            autoCapitalize="none"
-            spellCheck={false}
-            required
-            className={input}
-          />
-        </div>
+        <Input
+          id="auth-email"
+          name="email"
+          type="email"
+          label={copy.email}
+          autoComplete="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          required
+          disabled={loading}
+        />
         {registering && (
           <>
             <div className="space-y-1.5">
-              <label htmlFor="auth-username" className={label}>
-                {copy.username}
-              </label>
-              <input
+              <Input
                 id="auth-username"
                 name="username"
+                label={copy.username}
                 autoComplete="username"
                 autoCapitalize="none"
                 spellCheck={false}
@@ -123,24 +115,22 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
                 maxLength={32}
                 pattern="[a-zA-Z0-9_\-]+"
                 aria-describedby="username-hint"
-                className={input}
+                disabled={loading}
               />
               <p id="username-hint" className="text-xs text-muted">
                 {copy.usernameHint}
               </p>
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="auth-display-name" className={label}>
-                {copy.displayName}
-              </label>
-              <input
+              <Input
                 id="auth-display-name"
                 name="displayName"
+                label={copy.displayName}
                 autoComplete="nickname"
                 minLength={2}
                 maxLength={50}
                 aria-describedby="display-name-hint"
-                className={input}
+                disabled={loading}
               />
               <p id="display-name-hint" className="text-xs text-muted">
                 {copy.displayNameHint}
@@ -149,19 +139,17 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
           </>
         )}
         <div className="space-y-1.5">
-          <label htmlFor="auth-password" className={label}>
-            {copy.password}
-          </label>
-          <input
+          <Input
             id="auth-password"
             name="password"
             type="password"
+            label={copy.password}
             required
             minLength={registering ? 8 : 1}
             maxLength={128}
             autoComplete={registering ? "new-password" : "current-password"}
             aria-describedby={registering ? "password-hint" : undefined}
-            className={input}
+            disabled={loading}
           />
           {registering && (
             <p id="password-hint" className="text-xs text-muted">
@@ -169,11 +157,7 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
             </p>
           )}
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] disabled:opacity-50"
-        >
+        <Button type="submit" size="lg" isLoading={loading} className="w-full min-h-11">
           {loading
             ? registering
               ? copy.creating
@@ -181,7 +165,7 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
             : registering
               ? copy.create
               : copy.signIn}
-        </button>
+        </Button>
       </form>
       <div className="space-y-2 text-sm text-muted">
         {!registering && (
