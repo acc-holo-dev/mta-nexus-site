@@ -1,18 +1,19 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@nexus/ui";
+import Link from "next/link";
+import { useState } from "react";
 import type { Locale } from "../lib/i18n";
-import {
-  resourceReviewCopy,
-  resourceReviewError,
-  resourceReviewState,
-} from "../lib/resource-review-i18n";
 import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
 } from "../lib/resource-review-confirmation";
+import {
+  resourceReviewCopy,
+  resourceReviewError,
+  resourceReviewState,
+} from "../lib/resource-review-i18n";
+
 type Review = {
   text: string;
   rating: number | null;
@@ -22,13 +23,14 @@ type Review = {
 };
 function Recovery({ locale }: { locale: Locale }) {
   return (
-    <button
+    <Button
       type="button"
-      className="text-sm text-accent underline"
+      variant="ghost"
+      className="h-auto px-0 text-sm text-accent underline"
       onClick={() => window.location.reload()}
     >
       {resourceReviewCopy(locale).reload}
-    </button>
+    </Button>
   );
 }
 async function post(url: string, body: unknown) {
@@ -134,14 +136,15 @@ export function ResourceReviewEditor({
         review && <p className="whitespace-pre-wrap break-words text-sm">{review.text}</p>
       )}
       {review?.status === "published" && (
-        <button
+        <Button
           type="button"
-          className="text-sm text-danger underline"
+          variant="ghost"
+          className="h-auto px-0 text-sm text-danger underline"
           disabled={busy || confirmed}
           onClick={() => void submit("withdraw")}
         >
           {copy.withdraw}
-        </button>
+        </Button>
       )}
       <p role="status" className="text-sm">
         {message}

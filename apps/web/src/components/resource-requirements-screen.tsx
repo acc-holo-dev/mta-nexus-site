@@ -1,4 +1,5 @@
 import { AppError, type ResourceRequirementsScope } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -86,7 +87,7 @@ export async function ResourceRequirementsScreen({
         )}
         {query.returnFrom && <input type="hidden" name="returnFrom" value={query.returnFrom} />}
         {query.returnPage && <input type="hidden" name="returnPage" value={query.returnPage} />}
-        <button type="submit">{copy.check}</button>
+        <Button type="submit">{copy.check}</Button>
       </form>
       <ResourceRequirementsReportBody
         report={report}

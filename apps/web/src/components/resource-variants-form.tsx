@@ -1,5 +1,6 @@
 "use client";
 import { type ManagedResourceVariants, RESOURCE_VARIANT_LIMIT } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -190,35 +191,41 @@ export function ResourceVariantsForm({
                 className="my-2 w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
               />
               <div className="flex flex-wrap gap-4 text-xs text-accent">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={disabled || index === 0}
                   aria-label={`${copy.up}: ${row.title}`}
                   onClick={() => move(index, -1)}
-                  className="disabled:opacity-40"
+                  className="h-auto px-0 text-xs text-accent disabled:opacity-40"
                 >
                   {copy.up}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={disabled || index === selected.length - 1}
                   aria-label={`${copy.down}: ${row.title}`}
                   onClick={() => move(index, 1)}
-                  className="disabled:opacity-40"
+                  className="h-auto px-0 text-xs text-accent disabled:opacity-40"
                 >
                   {copy.down}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={disabled || row.productId === product.id}
                   aria-label={`${copy.remove}: ${row.title}`}
                   onClick={() =>
                     setSelected((rows) => rows.filter((value) => value.productId !== row.productId))
                   }
-                  className="disabled:opacity-40"
+                  className="h-auto px-0 text-xs text-accent disabled:opacity-40"
                 >
                   {copy.remove}
-                </button>
+                </Button>
               </div>
             </li>
           ))}
@@ -237,13 +244,9 @@ export function ResourceVariantsForm({
           onChange={(event) => setReason(event.target.value)}
           className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
         />
-        <button
-          type="submit"
-          disabled={disabled}
-          className="rounded-lg bg-accent px-4 py-2 font-semibold text-white disabled:opacity-50"
-        >
+        <Button type="submit" disabled={disabled}>
           {busy ? copy.working : copy.save}
-        </button>
+        </Button>
       </form>
       <section className="nexus-panel space-y-3 p-5" aria-labelledby={`${field}-candidates`}>
         <h2 id={`${field}-candidates`} className="font-semibold text-primary">
@@ -259,8 +262,9 @@ export function ResourceVariantsForm({
                 {row.title}
                 <span className="block text-xs text-muted">{row.slug}</span>
               </span>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 disabled={
                   disabled ||
                   selected.length >= RESOURCE_VARIANT_LIMIT ||
@@ -273,10 +277,10 @@ export function ResourceVariantsForm({
                     { productId: row.productId, title: row.title, label: "" },
                   ])
                 }
-                className="text-sm text-accent disabled:opacity-40"
+                className="h-auto px-0 text-sm text-accent disabled:opacity-40"
               >
                 {copy.add}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -284,25 +288,27 @@ export function ResourceVariantsForm({
           <p className="text-sm text-muted">{copy.noCandidates}</p>
         )}
         <nav aria-label={copy.candidates} className="flex items-center gap-4 text-sm text-accent">
-          <button
+          <Button
             type="button"
+            variant="ghost"
             disabled={disabled || loading || candidates.page <= 1}
             onClick={() => changePage(candidates.page - 1)}
-            className="disabled:opacity-40"
+            className="h-auto px-0 text-sm text-accent disabled:opacity-40"
           >
             {copy.previous}
-          </button>
+          </Button>
           <span className="text-secondary">
             {copy.page} {candidates.page}
           </span>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             disabled={disabled || loading || !candidates.hasMore || candidates.page >= 1000}
             onClick={() => changePage(candidates.page + 1)}
-            className="disabled:opacity-40"
+            className="h-auto px-0 text-sm text-accent disabled:opacity-40"
           >
             {copy.next}
-          </button>
+          </Button>
         </nav>
       </section>
       {managed.group && (
@@ -334,13 +340,14 @@ export function ResourceVariantsForm({
             />
             {copy.confirm}
           </label>
-          <button
+          <Button
             type="submit"
+            variant="outline"
             disabled={disabled || !confirmed}
-            className="rounded-lg border border-danger px-4 py-2 text-danger disabled:opacity-40"
+            className="border-danger text-danger disabled:opacity-40"
           >
             {copy.dissolve}
-          </button>
+          </Button>
         </form>
       )}
       {error && (

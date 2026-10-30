@@ -1,16 +1,17 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   RESOURCE_RELEASE_WATCH_BATCH_LIMIT,
+  RESOURCE_RELEASE_WATCH_LIMIT,
   type ResourceReleaseWatchDisableCommand,
   type ResourceReleaseWatchEnableCommand,
-  RESOURCE_RELEASE_WATCH_LIMIT,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
-import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { confirmedResourceReleaseWatchBatch } from "../lib/resource-release-watch-batch-confirmation";
+import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 export function ResourceReleaseWatchBatchControls({
   items,
   locale,
@@ -188,36 +189,31 @@ export function ResourceReleaseWatchBatchControls({
         </label>
       </fieldset>
       {!pending && (
-        <button
+        <Button
           type="button"
+          variant="outline"
           disabled={busy || saved || !confirmed || !selected.length || selected.length > capacity}
           onClick={() => void send()}
-          className="rounded-md border border-base px-4 py-2 text-sm"
         >
           {apply}
-        </button>
+        </Button>
       )}
       {pending && !saved && (
         <div className="space-y-3">
           <p className="text-sm text-muted">{copy.pendingNote}</p>
           {!blocked && (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => void send()}
-              className="rounded-md border border-base px-4 py-2 text-sm"
-            >
+            <Button type="button" variant="outline" disabled={busy} onClick={() => void send()}>
               {copy.retrySame}
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={busy}
             onClick={() => window.location.reload()}
-            className="rounded-md border border-base px-4 py-2 text-sm"
           >
             {copy.reloadState}
-          </button>
+          </Button>
         </div>
       )}
       {error && (

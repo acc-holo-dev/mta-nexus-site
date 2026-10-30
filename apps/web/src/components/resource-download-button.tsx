@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { Button } from "@nexus/ui";
 import { Download } from "lucide-react";
-import { useNexusLocale } from "./locale-context";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { resourceDeliveriesCopy } from "../lib/resource-deliveries-i18n";
 import {
+  type DownloadFailure,
   fetchResourceDownload,
   ResourceDownloadError,
-  type DownloadFailure,
 } from "../lib/resource-download-client";
+import { useNexusLocale } from "./locale-context";
 
 export function ResourceDownloadButton({
   productId,
@@ -101,16 +102,16 @@ export function ResourceDownloadButton({
 
   return (
     <div className="space-y-2">
-      <button
+      <Button
         type="button"
         onClick={download}
         disabled={busy}
         aria-busy={busy}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-success-solid py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="h-auto w-full gap-2 bg-success-solid py-3 text-sm font-bold shadow-nexus hover:opacity-90"
       >
         <Download className="h-4 w-4" aria-hidden="true" />
         {busy ? copy.downloadPreparing : `${copy.downloadBuild} v${version}`}
-      </button>
+      </Button>
       {busy && (
         <div className="space-y-2">
           <progress
@@ -119,13 +120,14 @@ export function ResourceDownloadButton({
             value={progress ?? undefined}
             aria-label={copy.downloadProgress}
           />
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => active.current?.abort()}
-            className="text-sm text-secondary underline"
+            className="h-auto px-0 text-sm text-secondary underline"
           >
             {copy.downloadCancel}
-          </button>
+          </Button>
         </div>
       )}
       {failure && (
