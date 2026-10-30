@@ -1,4 +1,5 @@
 import { AppError, LIBRARY_COLLECTION_COMPARISON_FILTERS } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -11,8 +12,8 @@ import {
   libraryCollectionComparisonSuffix,
 } from "../../../../../../lib/library-collection-comparison-query";
 import {
-  libraryCollectionsCopy,
   libraryCollectionError,
+  libraryCollectionsCopy,
 } from "../../../../../../lib/library-collections-i18n";
 import {
   collectionHref,
@@ -140,13 +141,14 @@ export default async function Page({
               <option value="move">{c["move-items"]}</option>
             </select>
           </label>
-          <button
+          <Button
             type="submit"
-            className="rounded border border-base px-3 py-2"
+            variant="outline"
+            className="px-3"
             disabled={!report.targets.length}
           >
             {h.compare}
-          </button>
+          </Button>
         </form>
         {!comparison ? (
           <p>{report.targets.length ? h.choose : c.noDestination}</p>

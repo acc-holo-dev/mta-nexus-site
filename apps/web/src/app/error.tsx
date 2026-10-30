@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { Button } from "@nexus/ui";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { useNexusLocale } from "../components/locale-context";
 
 export default function GlobalError({
@@ -24,14 +25,15 @@ export default function GlobalError({
         </p>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <button
+        <Button
           type="button"
+          size="sm"
           onClick={reset}
-          className="flex cursor-pointer items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="gap-1.5 rounded-md px-4 font-semibold"
         >
           <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{dictionary.errors.retry}</span>
-        </button>
+        </Button>
         <Link
           href="/"
           className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

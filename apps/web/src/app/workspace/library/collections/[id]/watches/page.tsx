@@ -1,11 +1,12 @@
-import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
 import { AppError, RESOURCE_RELEASE_WATCH_LIMIT } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../../lib/library-collections-query";
+import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
 import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
 import { authService } from "../../../../../../lib/services/auth-service";
@@ -80,7 +81,9 @@ export default async function Page({
             className="border border-base bg-inset px-3 py-2"
           />
         </label>
-        <button type="submit">{copy.search}</button>
+        <Button type="submit" variant="outline">
+          {copy.search}
+        </Button>
       </form>
       <nav className="flex flex-wrap gap-4" aria-label={copy.collectionTitle}>
         {(["all", "enabled", "disabled", "unavailable"] as const).map((filter) => (

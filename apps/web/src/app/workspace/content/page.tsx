@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
@@ -145,12 +146,9 @@ export default async function AuthorContentPage({
                 className={`${platformFieldClass} block min-h-11`}
               />
             </label>
-            <button
-              type="submit"
-              className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-            >
+            <Button type="submit" className="min-h-11 font-semibold">
               {copy.search}
-            </button>
+            </Button>
             <Link
               href="/workspace/content"
               className="inline-flex min-h-11 items-center text-sm text-accent underline"

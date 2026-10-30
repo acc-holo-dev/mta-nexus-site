@@ -1,13 +1,14 @@
+import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { publicVerificationHistoryService } from "../../../../../lib/services/public-verification-history-service";
-import { approvalCopy, approvalError } from "../../../../../lib/public-verification-history-copy";
 import {
   approvalPageHref,
   parseApprovalQuery,
 } from "../../../../../lib/public-verification-history-contract";
+import { approvalCopy, approvalError } from "../../../../../lib/public-verification-history-copy";
+import { publicVerificationHistoryService } from "../../../../../lib/services/public-verification-history-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const copy = approvalCopy(await getRequestLocale()),
@@ -104,12 +105,9 @@ export default async function ApprovalHistoryPage({
             <option value="developer">{copy.developer}</option>
           </select>
         </label>
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-        >
+        <Button type="submit" className="min-h-11 font-semibold">
           {copy.filter}
-        </button>
+        </Button>
         <Link
           href={approvalPageHref(username)}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"

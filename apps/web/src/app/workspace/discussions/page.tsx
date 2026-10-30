@@ -1,14 +1,15 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../lib/services/auth-service";
-import { discussionWorkspaceService } from "../../../lib/services/discussion-workspace-service";
+import { Button } from "@nexus/ui";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import {
-  parseOwnDiscussionQuery,
   ownDiscussionHref,
+  parseOwnDiscussionQuery,
 } from "../../../lib/discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../../../lib/discussion-workspace-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { discussionWorkspaceService } from "../../../lib/services/discussion-workspace-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const copy = ownDiscussionCopy(await getRequestLocale());
@@ -113,12 +114,9 @@ export default async function OwnDiscussionsPage({
             <option value="unavailable">{copy.unavailable}</option>
           </select>
         </label>
-        <button
-          type="submit"
-          className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-        >
+        <Button type="submit" className="min-h-11 font-semibold">
           {copy.search}
-        </button>
+        </Button>
         <Link
           href="/workspace/discussions"
           className="inline-flex min-h-11 items-center text-sm text-accent underline"

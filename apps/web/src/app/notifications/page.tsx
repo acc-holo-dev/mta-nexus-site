@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { NotificationCenterTabs } from "../../components/notification-center-tabs";
@@ -133,12 +134,9 @@ export default async function NotificationCenterPage({
                 ))}
               </select>
             </label>
-            <button
-              type="submit"
-              className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-            >
+            <Button type="submit" className="min-h-11 font-semibold">
               {copy.search}
-            </button>
+            </Button>
             <Link
               href="/notifications"
               className="inline-flex min-h-11 items-center text-sm text-accent underline"

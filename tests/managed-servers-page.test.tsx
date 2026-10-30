@@ -78,6 +78,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain("<search");
     expect(html).toContain('name="visibility"');
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("bg-accent");
     expect(html).toContain(locale === "ru" ? "Управляемые серверы" : "Managed servers");
     expect(html).toContain(locale === "ru" ? "Обслуживание" : "Maintenance");
     expect(html).toContain(locale === "ru" ? "Онлайн" : "Online");

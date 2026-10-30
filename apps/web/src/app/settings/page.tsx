@@ -1,20 +1,20 @@
 "use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 import { Button } from "@nexus/ui";
+import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { ContextSwitcher } from "../../components/context-switcher";
-import { WebPushSettings } from "../../components/web-push-settings";
+import { useNexusLocale } from "../../components/locale-context";
 import { ProfileChangeHistoryLink } from "../../components/private-change-history-controls";
 import { PublicProfileForm } from "../../components/public-profile-form";
-import { profilePrivacyCopy } from "../../lib/profile-privacy-copy";
-import { useNexusLocale } from "../../components/locale-context";
+import { WebPushSettings } from "../../components/web-push-settings";
 import {
   confirmedNotificationPreferences,
-  parseNotificationPreferences,
   type NotificationPreferences,
+  parseNotificationPreferences,
 } from "../../lib/notification-preferences-confirmation";
+import { profilePrivacyCopy } from "../../lib/profile-privacy-copy";
 
 type Session = {
   id: string;
@@ -646,27 +646,31 @@ export default function SettingsPage() {
               {copy.activeSessions}
             </h2>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             disabled={pending}
             onClick={() => setRevision((current) => current + 1)}
-            className="text-xs font-semibold text-accent disabled:opacity-50"
+            className="h-auto px-0 font-semibold text-accent"
           >
             {copy.reloadSettings}
-          </button>
+          </Button>
         </div>
 
         <p className="text-sm text-muted">{copy.sessionsDescription}</p>
 
         {sessions && sessions.length > 1 && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             disabled={pending}
             onClick={revokeOthers}
-            className="text-xs font-semibold text-danger disabled:opacity-50"
+            className="h-auto px-0 font-semibold text-danger"
           >
             {copy.endOtherSessions}
-          </button>
+          </Button>
         )}
 
         <div className="space-y-2">
@@ -689,14 +693,16 @@ export default function SettingsPage() {
               {session.isCurrent ? (
                 <span className="text-xs font-semibold text-accent">{copy.thisBrowser}</span>
               ) : (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={pending}
                   onClick={() => revokeSession(session.id)}
-                  className="text-xs font-semibold text-danger disabled:opacity-50"
+                  className="h-auto px-0 font-semibold text-danger"
                 >
                   {copy.endSession}
-                </button>
+                </Button>
               )}
             </div>
           ))}
