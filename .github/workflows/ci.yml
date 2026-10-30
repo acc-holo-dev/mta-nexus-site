@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.scope.outputs.code }}
+      unit_only: ${{ steps.scope.outputs.unit_only }}
       full: ${{ steps.scope.outputs.full }}
     steps:
     - name: Checkout
@@ -78,6 +79,8 @@ jobs:
     name: Sequential database tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: plan
+    if: ${{ needs.plan.outputs.code == 'true' && needs.plan.outputs.unit_only != 'true' }}
     services:
       postgres:
         image: postgres:18-alpine
@@ -258,12 +261,10 @@ jobs:
         path: artifacts/database-tests.json
         if-no-files-found: warn
         retention-days: 7
-    needs: plan
-    if: ${{ needs.plan.outputs.code == 'true' }}
   image:
     name: Build production image once
     needs: plan
-    if: ${{ needs.plan.outputs.code == 'true' }}
+    if: ${{ needs.plan.outputs.code == 'true' && needs.plan.outputs.unit_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -296,7 +297,7 @@ jobs:
     - unit
     - verify
     - image
-    if: ${{ needs.plan.outputs.code == 'true' }}
+    if: ${{ needs.plan.outputs.code == 'true' && needs.plan.outputs.unit_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env: &id001
@@ -642,6 +643,7 @@ jobs:
     - name: Require every gate for the selected scope
       env:
         CI_CODE: ${{ needs.plan.outputs.code }}
+        CI_UNIT_ONLY: ${{ needs.plan.outputs.unit_only }}
         CI_FULL: ${{ needs.plan.outputs.full }}
         CI_JOB_RESULTS: ${{ toJSON(needs) }}
       run: node scripts/ci-summary.mjs

@@ -7,24 +7,59 @@ import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
 test("documentation does not trigger builds; executable docs/configuration do", () => {
   assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md"]), {
     code: false,
+    unitOnly: false,
     full: false,
   });
   assert.deepEqual(
     classifyChanges(["docs/handbook/13-DECISION-REGISTER.md", "docs/handbook/deep/note.md"]),
-    { code: false, full: false },
+    { code: false, unitOnly: false, full: false },
   );
   assert.deepEqual(classifyChanges(["docs/handbook/schema.sql", "docs/handbook/.config.yml"]), {
     code: true,
+    unitOnly: false,
     full: false,
   });
-  assert.deepEqual(classifyChanges(["docs/migration.sql"]), { code: true, full: false });
-  assert.deepEqual(classifyChanges(["compose.production.yaml"]), { code: true, full: true });
+  assert.deepEqual(classifyChanges(["docs/migration.sql"]), {
+    code: true,
+    unitOnly: false,
+    full: false,
+  });
+  assert.deepEqual(classifyChanges(["compose.production.yaml"]), {
+    code: true,
+    unitOnly: false,
+    full: true,
+  });
 });
+
+test("shared UI and web component changes use the unit CI profile", () => {
+  const policy = classifyChanges([
+    "packages/ui/src/button.tsx",
+    "apps/web/src/components/resource-download-button.tsx",
+    "apps/web/src/components/resource-download-button.test.tsx",
+    "docs/OPERATIONS.md",
+  ]);
+  assert.deepEqual(policy, { code: true, unitOnly: true, full: false });
+  assert.deepEqual(requiredJobs(policy), ["plan", "unit"]);
+  assert.equal(summarizeJobs(policy, { plan: { result: "success" }, unit: { result: "success" } }).scope, "unit_ci");
+});
+
+test("unknown or mixed application paths never claim unit_only", () => {
+  assert.equal(
+    classifyChanges(["apps/web/src/components/button.tsx", "apps/web/src/app/api/health/route.ts"])
+      .unitOnly,
+    false,
+  );
+  assert.equal(classifyChanges(["apps/web/src/lib/services/auth-service.ts"]).unitOnly, false);
+  assert.equal(classifyChanges(["mystery/new-tool.sh"]).unitOnly, false);
+  assert.equal(classifyChanges(["packages/domain/src/entities.ts"]).unitOnly, false);
+});
+
 test("application changes retain all mandatory fast gates", () => {
-  const policy = classifyChanges(["apps/web/src/components/resource-download-button.tsx"]);
-  assert.deepEqual(policy, { code: true, full: false });
+  const policy = classifyChanges(["apps/web/src/components/resource-download-button.tsx", "apps/web/src/lib/i18n.ts"]);
+  assert.deepEqual(policy, { code: true, unitOnly: false, full: false });
   assert.deepEqual(requiredJobs(policy), ["plan", "unit", "verify", "image", "smoke"]);
 });
+
 test("migration, database tooling, workflow and explicit release changes run full acceptance", () => {
   for (const files of [
     ["packages/db/migrations/0027.sql"],
@@ -68,17 +103,21 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ["Dockerfile"],
     ["tests/mainline-repository-policy.test.ts"],
   ]) {
-    assert.equal(classifyChanges(files).full, true);
+    const policy = classifyChanges(files);
+    assert.equal(policy.full, true);
+    assert.equal(policy.unitOnly, false);
   }
   for (const option of [{ explicitFull: true }, { release: true }]) {
     const policy = classifyChanges([], option);
     assert.equal(policy.code, true);
     assert.equal(policy.full, true);
+    assert.equal(policy.unitOnly, false);
     assert(requiredJobs(policy).includes("resource-browser"));
   }
 });
+
 test("skipped or missing required gates never report successful acceptance", () => {
-  const policy = { code: true, full: true };
+  const policy = { code: true, unitOnly: false, full: true };
   const needs = Object.fromEntries(
     requiredJobs(policy).map((name) => [name, { result: "success" }]),
   );
@@ -87,6 +126,12 @@ test("skipped or missing required gates never report successful acceptance", () 
     const invalid = { ...needs, "resource-browser": { result } };
     assert.deepEqual(summarizeJobs(policy, invalid).failedOrMissing, ["resource-browser"]);
   }
+  const unitPolicy = { code: true, unitOnly: true, full: false };
+  assert.deepEqual(
+    summarizeJobs(unitPolicy, { plan: { result: "success" }, unit: { result: "skipped" } })
+      .failedOrMissing,
+    ["unit"],
+  );
 });
 
 test("expensive production startup waits for core verification", () => {
@@ -99,4 +144,16 @@ test("expensive production startup waits for core verification", () => {
     assert.match(section, new RegExp(`^    - ${gate}$`, "m"));
   }
   assert.match(section, /needs\.plan\.outputs\.full == 'true'/u);
+});
+
+test("unit_only skips database image and smoke without skipping plan or unit", () => {
+  const workflow = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
+  assert.match(workflow, /unit_only: \$\{\{ steps\.scope\.outputs\.unit_only \}\}/u);
+  assert.match(
+    workflow,
+    /needs\.plan\.outputs\.code == 'true' && needs\.plan\.outputs\.unit_only != 'true'/u,
+  );
+  const unitJob = workflow.slice(workflow.indexOf("  unit:"), workflow.indexOf("  verify:"));
+  assert.match(unitJob, /needs\.plan\.outputs\.code == 'true'/u);
+  assert.doesNotMatch(unitJob, /unit_only/u);
 });

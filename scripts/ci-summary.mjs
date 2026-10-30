@@ -5,6 +5,7 @@ const report = {
   ...summarizeJobs(
     {
       code: process.env.CI_CODE === "true",
+      unitOnly: process.env.CI_UNIT_ONLY === "true",
       full: process.env.CI_FULL === "true",
     },
     JSON.parse(process.env.CI_JOB_RESULTS),
