@@ -165,6 +165,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain("disabled");
     expect(html).toContain(followCopy(locale).checking);
+    expect(html).toContain("rounded-lg");
     expect(html).not.toContain('aria-pressed="false"');
   },
 );
@@ -301,5 +302,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('aria-pressed="true"');
     expect(html).toContain(followCopy(locale).following);
     expect(html).toContain(`${followCopy(locale).unfollow}: Article`);
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("text-accent");
   },
 );

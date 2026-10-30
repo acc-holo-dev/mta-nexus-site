@@ -1,5 +1,5 @@
 "use client";
-import { Avatar } from "@nexus/ui";
+import { Avatar, Button } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -134,8 +134,6 @@ export function FollowWorkspace({
       if (alive.current) setPending("");
     }
   }
-  const button =
-    "min-h-11 rounded-lg border border-base bg-surface px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   return (
     <div className="space-y-5">
       <nav aria-label={copy.title} className="flex gap-2 overflow-x-auto">
@@ -162,23 +160,24 @@ export function FollowWorkspace({
             className="min-h-11 w-full rounded-lg border border-base bg-inset px-3 text-sm text-primary"
           />
         </label>
-        <button type="submit" className={button}>
+        <Button type="submit" variant="outline" className="min-h-11 text-accent">
           {copy.submit}
-        </button>
+        </Button>
         <Link
           href={href(type, "")}
           className="min-h-11 content-center text-sm text-accent underline"
         >
           {copy.clear}
         </Link>
-        <button
+        <Button
           type="button"
+          variant="outline"
           disabled={!!pending}
           onClick={() => void load("latest")}
-          className={button}
+          className="min-h-11 text-accent"
         >
           {pending === "latest" ? copy.refreshing : copy.latest}
-        </button>
+        </Button>
       </form>
       {error && (
         <p role="alert" className="rounded-lg border border-base p-3 text-sm text-danger">
@@ -266,40 +265,43 @@ export function FollowWorkspace({
                   timeZone: "UTC",
                 })}
               </time>
-              <button
+              <Button
                 type="button"
-                className={button}
+                variant="outline"
+                className="min-h-11 text-accent"
                 disabled={!!pending}
                 onClick={() => void remove(item)}
                 aria-label={`${copy.remove}: ${item.title ?? copy.unavailableTarget}`}
               >
                 {pending === item.id ? copy.removing : copy.remove}
-              </button>
+              </Button>
             </div>
           </article>
         ))}
       </div>
       {page && (
         <nav aria-label={copy.page} className="flex items-center justify-between gap-3">
-          <button
+          <Button
             type="button"
-            className={button}
+            variant="outline"
+            className="min-h-11 text-accent"
             disabled={!!pending || !history.length}
             onClick={() => void load("previous")}
           >
             {copy.previous}
-          </button>
+          </Button>
           <span className="text-sm text-muted">
             {copy.page} {history.length + 1}
           </span>
-          <button
+          <Button
             type="button"
-            className={button}
+            variant="outline"
+            className="min-h-11 text-accent"
             disabled={!!pending || !page.hasMore}
             onClick={() => void load("next")}
           >
             {pending === "next" ? copy.loading : copy.older}
-          </button>
+          </Button>
         </nav>
       )}
     </div>
