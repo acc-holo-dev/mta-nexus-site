@@ -1,4 +1,5 @@
 "use client";
+import { Button, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { storageMaintenanceCopy } from "../lib/storage-maintenance-i18n";
@@ -58,26 +59,33 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
     <section className="nexus-panel space-y-4 p-4">
       <h2>{copy.discovery}</h2>
       <div className="flex flex-wrap gap-3">
-        <button type="button" disabled={pending} onClick={() => void run("namespaces")}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={pending}
+          onClick={() => void run("namespaces")}
+        >
           {copy.namespaces}
-        </button>
+        </Button>
         {nextNamespaces !== null && (
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={pending}
             onClick={() => void run("namespaces", nextNamespaces)}
           >
             {copy.nextWindow}
-          </button>
+          </Button>
         )}
       </div>
       {owners.length > 0 && (
         <ul className="flex flex-wrap gap-3">
           {owners.map((owner) => (
             <li key={owner}>
-              <button
+              <Button
                 type="button"
-                className="text-accent underline"
+                variant="ghost"
+                className="h-auto px-0 text-accent underline"
                 disabled={pending}
                 onClick={() => {
                   setOwner(owner);
@@ -86,7 +94,7 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
                 }}
               >
                 {owner}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -98,9 +106,9 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
           void run("discover");
         }}
       >
-        <label className="grid gap-1">
-          {copy.owner}
-          <input
+        <div className="min-w-48 flex-1">
+          <Input
+            label={copy.owner}
             required
             pattern="[A-Za-z0-9_-]{1,128}"
             value={ownerId}
@@ -111,12 +119,11 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
               setOffset(0);
               setNextObjects(null);
             }}
-            className="border border-base bg-inset p-2"
           />
-        </label>
-        <label className="grid gap-1">
-          {copy.offset}
-          <input
+        </div>
+        <div className="w-28">
+          <Input
+            label={copy.offset}
             required
             type="number"
             min={0}
@@ -128,20 +135,20 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
               setOffset(Number(event.target.value));
               setNextObjects(null);
             }}
-            className="w-28 border border-base bg-inset p-2"
           />
-        </label>
-        <button type="submit" disabled={pending}>
+        </div>
+        <Button type="submit" disabled={pending} isLoading={pending}>
           {pending ? copy.busy : copy.discover}
-        </button>
+        </Button>
         {nextObjects !== null && (
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={pending}
             onClick={() => void run("discover", nextObjects)}
           >
             {copy.nextWindow}
-          </button>
+          </Button>
         )}
       </form>
       <p role="status">{message}</p>
@@ -196,17 +203,19 @@ export function StorageCleanupControls({
         />
         {copy.confirm}
       </label>
-      <div className="flex gap-4">
-        <button
+      <div className="flex flex-wrap gap-3">
+        <Button
           type="button"
+          variant="danger"
           disabled={!confirmed || pending}
-          className="text-danger disabled:opacity-50"
+          isLoading={pending}
           onClick={() => void cleanup()}
         >
           {pending ? copy.busy : copy.cleanup}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="outline"
           disabled={pending}
           onClick={() => {
             setConfirmed(false);
@@ -214,7 +223,7 @@ export function StorageCleanupControls({
           }}
         >
           {copy.refresh}
-        </button>
+        </Button>
       </div>
       {error && (
         <p role="alert" className="text-danger">
