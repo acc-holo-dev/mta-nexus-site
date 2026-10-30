@@ -246,30 +246,39 @@ export function LicenseControlPanel({
                   <p className="text-sm text-muted">{copy.noServers}</p>
                 )}
                 <div className="flex gap-4 text-sm">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-0 text-sm text-accent"
                     disabled={loadingServers || servers.page <= 1}
                     onClick={() => void loadServers(servers.page - 1)}
                   >
                     {copy.previous}
-                  </button>
+                  </Button>
                   <span>
                     {servers.page} / {servers.totalPages}
                   </span>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-0 text-sm text-accent"
                     disabled={loadingServers || servers.page >= servers.totalPages}
                     onClick={() => void loadServers(servers.page + 1)}
                   >
                     {copy.next}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-0 text-sm text-accent"
                     disabled={loadingServers}
                     onClick={() => void loadServers(servers.page)}
                   >
                     {copy.refresh}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -316,14 +325,15 @@ export function LicenseControlPanel({
           {copy.success}
         </p>
       )}
-      <button
+      <Button
         type="button"
+        variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="text-sm text-accent underline"
+        className="h-auto px-0 text-sm text-accent underline"
       >
         {copy.refresh}
-      </button>
+      </Button>
       {secret && (
         <div className="space-y-3 rounded-md border border-base p-4">
           <p className="text-sm text-primary">{copy.tokenOnce}</p>
@@ -347,8 +357,11 @@ export function LicenseControlPanel({
             </time>
           </p>
           <div className="flex gap-4 text-sm">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
+              className="h-auto px-0 text-sm text-accent"
               onClick={() => {
                 void navigator.clipboard
                   .writeText(secret.value)
@@ -357,10 +370,16 @@ export function LicenseControlPanel({
               }}
             >
               {copied ? copy.copied : copy.copy}
-            </button>
-            <button type="button" onClick={() => setSecret(null)}>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-auto px-0 text-sm text-accent"
+              onClick={() => setSecret(null)}
+            >
               {copy.hide}
-            </button>
+            </Button>
           </div>
           <p className="break-words text-xs text-muted">{copy.checkEndpoint}</p>
           <LicenseRuntimeProbe licenseId={license.id} token={secret.value} locale={locale} />

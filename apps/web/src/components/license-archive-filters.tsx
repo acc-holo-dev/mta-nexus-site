@@ -1,5 +1,6 @@
-import Link from "next/link";
 import type { LicenseArchiveFilter } from "@nexus/domain";
+import { Button } from "@nexus/ui";
+import Link from "next/link";
 import { getLicenseMaintenanceCopy } from "../lib/license-maintenance-i18n";
 import { licenseArchiveUrl } from "../lib/license-archive-query";
 export function LicenseArchiveFilters({
@@ -64,9 +65,13 @@ export function LicenseArchiveFilters({
           </select>
         </label>
         <div className="flex items-end gap-4 text-sm">
-          <button type="submit" className="text-accent underline">
+          <Button
+            type="submit"
+            variant="ghost"
+            className="h-auto px-0 text-sm text-accent underline"
+          >
             {copy.apply}
-          </button>
+          </Button>
           <Link href="/workspace/licenses" className="text-accent underline">
             {copy.clear}
           </Link>
