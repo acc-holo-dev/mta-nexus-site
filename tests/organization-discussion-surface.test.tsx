@@ -1,11 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
 import { OrganizationProfileForm } from "../apps/web/src/components/organization-profile-form";
 import { OrganizationWorkspacePanel } from "../apps/web/src/components/organization-workspace";
-import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
-import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
 import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
 import type { OrganizationWorkspace } from "../apps/web/src/lib/organization-workspace-contract";
+import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
+
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
 const organization = {
   id: "org",
@@ -54,6 +55,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.team);
     expect(html).toContain(copy.add);
     expect(html).toContain(copy.remove);
+    expect(html).toContain("rounded-lg");
     expect(html).toContain('value="admin"');
     expect(html).toContain("/workspace/organizations/org?q=lua&amp;page=3");
     expect(html).toMatch(/readonly=""/iu);
@@ -83,6 +85,8 @@ it("renders a genuinely read-only member workspace", () => {
   );
   expect(html).toContain(getOrganizationCopy("en").readOnly);
   expect(html).not.toContain(getOrganizationCopy("en").add);
+  expect(html).toContain(getOrganizationCopy("en").leave);
+  expect(html).toContain("rounded-lg");
   expect(html).toContain('disabled=""');
 });
 it.each(["en", "ru"] as const)(

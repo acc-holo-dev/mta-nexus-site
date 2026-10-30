@@ -1,4 +1,3 @@
-import { Button } from "@nexus/ui";
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -50,6 +49,13 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
+  const type = element.type as { displayName?: string } | string;
+  if (typeof type === "object" && type?.displayName === "Button") {
+    return [
+      { ...element, type: "button" } as Element,
+      ...descendants(element.props.children as ReactNode),
+    ];
+  }
   return [element, ...descendants(element.props.children as ReactNode)];
 }
 const time = "2026-10-11T00:00:00.000Z",
@@ -135,9 +141,7 @@ function render(kind: "team" | "comment") {
   );
 }
 function button(nodes: Element[], label: string) {
-  const node = nodes.find(
-    (node) => (node.type === "button" || node.type === Button) && node.props.children === label,
-  );
+  const node = nodes.find((node) => node.type === "button" && node.props.children === label);
   if (!node) throw Error(`Missing ${label}`);
   return node;
 }

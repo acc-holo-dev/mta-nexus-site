@@ -1,13 +1,13 @@
 "use client";
-import { organizationTeamCopy } from "../lib/organization-team-copy";
-import { useState } from "react";
-import Link from "next/link";
+import { type OrganizationTeamRole, organizationTeamRoles } from "@nexus/domain";
 import { Avatar, Button } from "@nexus/ui";
-import { organizationTeamRoles, type OrganizationTeamRole } from "@nexus/domain";
+import Link from "next/link";
+import { useState } from "react";
 import type { Locale } from "../lib/i18n";
+import { organizationGovernanceCopy } from "../lib/organization-governance-copy";
+import { organizationTeamCopy } from "../lib/organization-team-copy";
 import type { OrganizationWorkspace } from "../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { organizationGovernanceCopy } from "../lib/organization-governance-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
 export function OrganizationMemberEditor({
   member,
@@ -90,20 +90,26 @@ export function OrganizationMemberEditor({
           <Button type="submit" size="sm">
             {copy.updateMember}
           </Button>
-          <button className="text-sm text-danger underline" type="button" onClick={onRemove}>
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-auto px-0 text-sm text-danger underline"
+            onClick={onRemove}
+          >
             {copy.remove}
-          </button>
+          </Button>
         </fieldset>
       )}
       {onSelectOwner && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           disabled={busy}
           onClick={onSelectOwner}
-          className="min-h-9 text-sm text-accent underline"
+          className="h-auto min-h-9 px-0 text-sm text-accent underline"
         >
           {organizationGovernanceCopy(locale).choose}
-        </button>
+        </Button>
       )}
     </form>
   );
