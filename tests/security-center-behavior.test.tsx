@@ -53,7 +53,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 
 vi.mock("@nexus/db", () => ({
   auditRepository: {
-    listByActor: auditList,
+    listAccountActivity: auditList,
   },
 }));
 
@@ -114,6 +114,16 @@ describe("Security Center behavior", () => {
         userAgent: "Test Browser",
         createdAt: new Date("2026-10-08T00:00:00.000Z"),
       },
+      {
+        id: "aud_removed",
+        actorId: "usr_admin",
+        action: "organization.member_removed",
+        targetType: "organization",
+        ipAddress: "198.51.100.8",
+        userAgent: "Staff Browser",
+        details: { userId: "usr_security", note: "private-note" },
+        createdAt: new Date("2026-10-08T00:00:01.000Z"),
+      },
     ]);
 
     const html = renderToStaticMarkup(await SecurityPage());
@@ -128,6 +138,11 @@ describe("Security Center behavior", () => {
     expect(html).toContain("recovery@example.test");
     expect(html).toContain("Test Browser");
     expect(html).toContain("203.0.113.10");
+    expect(html).toContain("You were removed from an organization");
+    expect(html).not.toContain("usr_admin");
+    expect(html).not.toContain("private-note");
+    expect(html).not.toContain("198.51.100.8");
+    expect(html).not.toContain("Staff Browser");
     expect(html).toContain('href="/settings"');
   });
 
@@ -157,6 +172,14 @@ describe("Security Center behavior", () => {
         details: { secret: "also-hidden" },
         createdAt: new Date("2026-10-08T00:00:01.000Z"),
       },
+      {
+        id: "aud_foreign_login",
+        actorId: "usr_other",
+        action: "user.logged_in",
+        targetType: "user",
+        ipAddress: "198.51.100.9",
+        createdAt: new Date("2026-10-08T00:00:02.000Z"),
+      },
     ]);
 
     const service = new SecurityCenterService();
@@ -177,5 +200,7 @@ describe("Security Center behavior", () => {
     expect(JSON.stringify(result)).not.toContain("secret");
     expect(JSON.stringify(result)).not.toContain("must-not-leak");
     expect(JSON.stringify(result)).not.toContain("license-detail");
+    expect(JSON.stringify(result)).not.toContain("aud_foreign_login");
+    expect(result.map((item) => item.perspective)).toEqual(["actor", "actor"]);
   });
 });

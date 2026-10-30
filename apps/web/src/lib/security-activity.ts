@@ -1,3 +1,5 @@
+import { SECURITY_SUBJECT_ACTIONS, type SecuritySubjectAction } from "@nexus/domain";
+
 export const SECURITY_ACTIVITY_ACTIONS = [
   "user.registered",
   "user.logged_in",
@@ -55,6 +57,13 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "product.download_finished": "productDownloadFinished",
 } as const satisfies Record<SecurityActivityAction, string>;
 
+export const SECURITY_SUBJECT_LABEL_KEYS = {
+  "organization.ownership_transferred": "organizationOwnershipReceived",
+  "organization.member_added": "organizationMembershipGranted",
+  "organization.member_updated": "organizationMembershipChanged",
+  "organization.member_removed": "organizationMembershipEnded",
+} as const satisfies Record<SecuritySubjectAction, string>;
+
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);
 
 export function isSecurityActivityAction(action: string): action is SecurityActivityAction {
@@ -65,28 +74,49 @@ export interface SecurityActivityItem {
   id: string;
   action: SecurityActivityAction;
   targetType: string;
+  perspective: "actor" | "subject";
   ipAddress?: string;
   userAgent?: string;
   createdAt: Date;
 }
 
-export function toSecurityActivityItem(event: {
-  id: string;
-  action: string;
-  targetType: string;
-  ipAddress?: string;
-  userAgent?: string;
-  createdAt: Date;
-  /** Accepted so full audit rows can be mapped; never copied into the user-facing item. */
-  details?: unknown;
-}): SecurityActivityItem | null {
+export function securityActivityLabelKey(item: SecurityActivityItem) {
+  if (item.perspective === "subject" && item.action in SECURITY_SUBJECT_LABEL_KEYS) {
+    return SECURITY_SUBJECT_LABEL_KEYS[item.action as SecuritySubjectAction];
+  }
+  return SECURITY_ACTIVITY_LABEL_KEYS[item.action];
+}
+
+export function toSecurityActivityItem(
+  event: {
+    id: string;
+    action: string;
+    actorId?: string;
+    targetType: string;
+    ipAddress?: string;
+    userAgent?: string;
+    createdAt: Date;
+    /** Accepted so full audit rows can be mapped; never copied into the user-facing item. */
+    details?: unknown;
+  },
+  viewerId?: string,
+): SecurityActivityItem | null {
   if (!isSecurityActivityAction(event.action)) return null;
+  const subject =
+    viewerId !== undefined && event.actorId !== undefined && event.actorId !== viewerId;
+  if (subject && !(SECURITY_SUBJECT_ACTIONS as readonly string[]).includes(event.action))
+    return null;
   return {
     id: event.id,
     action: event.action,
     targetType: event.targetType,
-    ipAddress: event.ipAddress,
-    userAgent: event.userAgent,
+    perspective: subject ? "subject" : "actor",
+    ...(subject
+      ? {}
+      : {
+          ipAddress: event.ipAddress,
+          userAgent: event.userAgent,
+        }),
     createdAt: event.createdAt,
   };
 }
