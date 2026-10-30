@@ -1,6 +1,9 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig } from "vitest/config";
 import { classifyTests } from "./scripts/test-projects.mjs";
+
+const rootDir = import.meta.dirname ?? path.dirname(fileURLToPath(import.meta.url));
 
 // The focused runner passes explicit files so a small change does not require
 // classifying every test and its import graph. Normal runs still discover all tests.
@@ -16,11 +19,11 @@ if (
 ) {
   throw new Error("Focused test selection must match the explicit Vitest file arguments");
 }
-const testFiles = classifyTests(__dirname, focusedFiles as string[] | undefined);
+const testFiles = classifyTests(rootDir, focusedFiles as string[] | undefined);
 
 export default defineConfig({
-  // Match Next.js: JSX uses the automatic React runtime, including shared packages.
-  esbuild: { jsx: "automatic" },
+  // Vite 8 transforms via Oxc; keep the automatic React JSX runtime used by Next.js.
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
     globals: true,
     // Standalone builds copy source tests; never execute those generated copies.
@@ -57,13 +60,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@nexus/config": path.resolve(__dirname, "./packages/config/src"),
-      "@nexus/domain": path.resolve(__dirname, "./packages/domain/src"),
-      "@nexus/validation": path.resolve(__dirname, "./packages/validation/src"),
-      "@nexus/security": path.resolve(__dirname, "./packages/security/src"),
-      "@nexus/storage": path.resolve(__dirname, "./packages/storage/src"),
-      "@nexus/db": path.resolve(__dirname, "./packages/db/src"),
-      "@nexus/ui": path.resolve(__dirname, "./packages/ui/src"),
+      "@nexus/config": path.resolve(rootDir, "./packages/config/src"),
+      "@nexus/domain": path.resolve(rootDir, "./packages/domain/src"),
+      "@nexus/validation": path.resolve(rootDir, "./packages/validation/src"),
+      "@nexus/security": path.resolve(rootDir, "./packages/security/src"),
+      "@nexus/storage": path.resolve(rootDir, "./packages/storage/src"),
+      "@nexus/db": path.resolve(rootDir, "./packages/db/src"),
+      "@nexus/ui": path.resolve(rootDir, "./packages/ui/src"),
     },
   },
 });

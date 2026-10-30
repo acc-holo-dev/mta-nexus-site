@@ -20,9 +20,9 @@ function readPkg(...parts) {
   return JSON.parse(readFileSync(join(...parts), "utf8"));
 }
 
-test("Vite stays on the justified 7.3.7 override until a dedicated Vite 8 slice", () => {
-  assert.match(workspace, /^[ \t]*"vite":\s*"7\.3\.7"\s*$/mu);
-  assert.equal(readPkg(pnpmPackageDir("vite@7.3.7"), "vite/package.json").version, "7.3.7");
+test("Vite stays on the justified 8.3.5 override for the Vitest 5 unit toolchain", () => {
+  assert.match(workspace, /^[ \t]*"vite":\s*"8\.3\.5"\s*$/mu);
+  assert.equal(readPkg(pnpmPackageDir("vite@8.3.5"), "vite/package.json").version, "8.3.5");
 });
 
 test("dependency-cruiser keeps a TypeScript 6 package extension until stable TS 7 support", () => {

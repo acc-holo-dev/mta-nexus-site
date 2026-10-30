@@ -18,5 +18,5 @@ packageExtensions:
 overrides:
   # drizzle-kit 0.31.11 still pulls @esbuild-kit/*; pin its nested esbuild for security.
   "@esbuild-kit/core-utils>esbuild": "0.28.2"
-  # Vitest 5 accepts Vite 7 and 8; stay on the latest Vite 7 until a dedicated Vite 8 slice.
-  "vite": "7.3.7"
+  # Vitest 5 accepts Vite ^6.4 || ^7 || ^8; pin the current Vite 8 release for the unit toolchain.
+  "vite": "8.3.5"
