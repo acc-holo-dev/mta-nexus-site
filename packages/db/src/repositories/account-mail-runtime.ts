@@ -62,7 +62,12 @@ function secretSource(
     // Open once: validating a path and reading it later can observe different
     // files if a secret is rotated or the path is replaced between operations.
     // O_NONBLOCK also keeps a replaced FIFO from hanging startup.
-    const fd = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    // Absolute secret paths are mounts outside the checkout; ignore them for NFT.
+    const secretPath = file;
+    const fd = openSync(
+      /* turbopackIgnore: true */ secretPath,
+      constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
+    );
     try {
       const stat = fstatSync(fd);
       if (!stat.isFile() || (stat.mode & 0o002) !== 0 || stat.size < 1 || stat.size > maxBytes) {

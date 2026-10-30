@@ -18,7 +18,9 @@ export class LocalStorageProvider implements StorageProvider {
   private readonly baseDir: string;
 
   constructor(baseDir = "./uploads") {
-    this.baseDir = path.resolve(baseDir);
+    // Runtime storage root comes from env/mounts, not the checkout. Ignore the
+    // dynamic resolve so Turbopack does not treat the whole repository as NFT input.
+    this.baseDir = path.resolve(/* turbopackIgnore: true */ baseDir);
   }
 
   private resolvePath(key: string): string {

@@ -12,18 +12,30 @@ const nextConfig = {
   allowedDevOrigins: ["app", "nexus-local-app-1"],
   output: "standalone",
   outputFileTracingRoot: repositoryRoot,
-  // Dynamic storage/secret paths make tracing conservative. These repository
-  // files are never runtime inputs; migrations/workers are deployed separately.
+  // Local storage and absolute mail-secret file paths are runtime mounts, so
+  // Turbopack cannot prove a static tree and may warn about whole-project
+  // tracing. These excludes keep non-runtime checkout trees out of the
+  // standalone NFT output; migrations/workers still deploy via /runtime/db.
+  // Remaining warnings are bounded by that exclude set plus the non-root
+  // runtime image (USER node, writable only under /data/uploads).
   outputFileTracingExcludes: {
     "/*": [
       "../../apps/web/src/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
       "../../packages/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
+      "../../packages/db/migrations/**/*",
+      "../../packages/db/scripts/**/*",
       "../../tests/**/*",
-      "../../scripts/tests/**/*",
+      "../../scripts/**/*",
       "../../docs/**/*",
+      "../../deploy/**/*",
+      "../../.github/**/*",
       "../../artifacts/**/*",
+      "../../uploads/**/*",
       "../../.git/**/*",
       "../../.env*",
+      "../../compose*.yaml",
+      "../../vitest.config.*",
+      "../../playwright*.mjs",
       "./.env*",
     ],
   },
