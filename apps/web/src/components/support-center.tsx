@@ -1,26 +1,27 @@
 "use client";
+import { Button, Input } from "@nexus/ui";
 
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { supportHref, type SupportQuery } from "../lib/support-workspace-contract";
+import {
+  confirmSupportCaseCreated,
+  parseSupportCasePage,
+  type SupportCaseStatus,
+  type SupportCaseSummary,
+} from "../lib/support-response";
+import {
+  clearSupportRetry,
+  reserveSupportCaseRetry,
+  resolveSupportRetryActorScope,
+} from "../lib/support-retry";
+import { type SupportQuery, supportHref } from "../lib/support-workspace-contract";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
-import {
-  clearSupportRetry,
-  reserveSupportCaseRetry,
-  resolveSupportRetryActorScope,
-} from "../lib/support-retry";
-import {
-  confirmSupportCaseCreated,
-  parseSupportCasePage,
-  type SupportCaseSummary,
-  type SupportCaseStatus,
-} from "../lib/support-response";
 
 export function SupportCenter({
   staffMode = false,
@@ -238,19 +239,16 @@ export function SupportCenter({
                 </select>
               </label>
 
-              <label className="block space-y-1.5">
-                <span className="font-label text-secondary">{copy.subject}</span>
-                <input
-                  value={subject}
-                  disabled={creating}
-                  onChange={(event) => setSubject(event.target.value)}
-                  minLength={5}
-                  maxLength={120}
-                  required
-                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  placeholder={copy.subjectPlaceholder}
-                />
-              </label>
+              <Input
+                label={copy.subject}
+                value={subject}
+                disabled={creating}
+                onChange={(event) => setSubject(event.target.value)}
+                minLength={5}
+                maxLength={120}
+                required
+                placeholder={copy.subjectPlaceholder}
+              />
 
               <label className="block space-y-1.5">
                 <span className="font-label text-secondary">{copy.message}</span>
@@ -267,14 +265,10 @@ export function SupportCenter({
                 />
               </label>
 
-              <button
-                type="submit"
-                disabled={creating}
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Button type="submit" disabled={creating} isLoading={creating} variant="primary">
                 <MessageSquareText className="h-4 w-4" aria-hidden="true" />
                 {creating ? copy.creating : copy.create}
-              </button>
+              </Button>
             </form>
           )}
 
@@ -348,12 +342,9 @@ export function SupportCenter({
                 </select>
               </label>
               <div className="flex flex-wrap gap-4 sm:col-span-2">
-                <button
-                  type="submit"
-                  className="min-h-10 rounded-lg border border-base px-4 text-sm font-semibold text-accent"
-                >
+                <Button type="submit" className="min-h-10" variant="outline">
                   {workspaceCopy.apply}
-                </button>
+                </Button>
                 <Link href={basePath} className="min-h-10 py-2 text-sm text-accent underline">
                   {workspaceCopy.reset}
                 </Link>
@@ -369,13 +360,14 @@ export function SupportCenter({
             {loading ? (
               <p className="text-sm text-muted">{copy.loading}</p>
             ) : error ? (
-              <button
+              <Button
                 type="button"
                 onClick={() => void loadCases()}
-                className="min-h-10 text-sm text-accent underline"
+                className="h-auto min-h-10 px-0 text-sm text-accent underline"
+                variant="ghost"
               >
                 {workspaceCopy.reload}
-              </button>
+              </Button>
             ) : cases.length === 0 ? (
               <div className="nexus-panel p-5 text-sm text-muted">
                 {initialFilters.q || initialFilters.category || initialFilters.status

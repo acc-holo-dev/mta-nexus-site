@@ -1,4 +1,5 @@
 import type { SupportMessageFilters } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -65,12 +66,9 @@ export function SupportMessageBrowser({
             <option value="staff">{copy.staff}</option>
           </select>
         </label>
-        <button
-          type="submit"
-          className="min-h-10 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Button type="submit" className="min-h-10" variant="primary">
           {copy.apply}
-        </button>
+        </Button>
         <Link href={path} className="text-sm text-accent underline">
           {copy.reset}
         </Link>

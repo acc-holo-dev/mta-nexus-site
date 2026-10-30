@@ -1,22 +1,10 @@
 "use client";
+import { Button } from "@nexus/ui";
 
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { SupportCaseActions } from "./support-case-actions";
-import { SupportStatusHistory } from "./support-status-history";
-import {
-  SupportClientFailure,
-  supportWorkspaceCopy,
-  supportWorkspaceError,
-} from "../lib/support-workspace-copy";
-import { useNexusLocale } from "./locale-context";
 import { supportMessageCopy } from "../lib/support-message-discovery-copy";
-import {
-  clearSupportRetry,
-  reserveSupportReplyRetry,
-  resolveSupportRetryActorScope,
-} from "../lib/support-retry";
 import {
   confirmSupportReply,
   confirmSupportStatusChanged,
@@ -24,6 +12,19 @@ import {
   type SupportCaseData,
   type SupportMessageData,
 } from "../lib/support-response";
+import {
+  clearSupportRetry,
+  reserveSupportReplyRetry,
+  resolveSupportRetryActorScope,
+} from "../lib/support-retry";
+import {
+  SupportClientFailure,
+  supportWorkspaceCopy,
+  supportWorkspaceError,
+} from "../lib/support-workspace-copy";
+import { useNexusLocale } from "./locale-context";
+import { SupportCaseActions } from "./support-case-actions";
+import { SupportStatusHistory } from "./support-status-history";
 
 export function SupportCaseThread({
   caseId,
@@ -274,13 +275,14 @@ export function SupportCaseThread({
             {success}
           </p>
         )}
-        <button
+        <Button
           type="button"
           onClick={() => void load()}
-          className="min-h-9 text-sm text-accent underline"
+          className="h-auto min-h-9 px-0 text-accent underline"
+          variant="ghost"
         >
           {workspaceCopy.reload}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -339,14 +341,15 @@ export function SupportCaseThread({
           className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
         >
           {error}
-          <button
+          <Button
             type="button"
             disabled={sending || updatingStatus}
             onClick={() => void load()}
-            className="ml-3 min-h-9 text-accent underline"
+            className="h-auto min-h-9 px-0 text-accent underline"
+            variant="ghost"
           >
             {workspaceCopy.reload}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -394,25 +397,27 @@ export function SupportCaseThread({
           aria-label={dictionary.market.paginationLabel}
           className="flex items-center justify-between gap-3"
         >
-          <button
+          <Button
             type="button"
             disabled={messagePage <= 1 || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.max(1, value - 1))}
-            className="text-sm text-accent underline disabled:opacity-40"
+            className="h-auto px-0 text-sm text-accent underline"
+            variant="ghost"
           >
             {dictionary.market.previousPage}
-          </button>
+          </Button>
           <span className="text-sm text-secondary">
             {dictionary.market.pageLabel} {messagePage} / {messageTotalPages}
           </span>
-          <button
+          <Button
             type="button"
             disabled={messagePage >= messageTotalPages || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.min(messageTotalPages, value + 1))}
-            className="text-sm text-accent underline disabled:opacity-40"
+            className="h-auto px-0 text-sm text-accent underline"
+            variant="ghost"
           >
             {dictionary.market.nextPage}
-          </button>
+          </Button>
         </nav>
       )}
 
@@ -435,14 +440,15 @@ export function SupportCaseThread({
               className="w-full resize-y rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             />
           </label>
-          <button
+          <Button
             type="submit"
             disabled={sending || updatingStatus || !supportCase.updatedAt}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            isLoading={sending}
+            variant="primary"
           >
             <Send className="h-4 w-4" aria-hidden="true" />
             {sending ? copy.sending : copy.sendReply}
-          </button>
+          </Button>
         </form>
       ) : (
         <p className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">

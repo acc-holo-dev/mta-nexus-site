@@ -1,3 +1,4 @@
+import { Button } from "@nexus/ui";
 import { getDictionary, type Locale } from "../lib/i18n";
 import type { SupportCaseData, SupportCaseStatus } from "../lib/support-response";
 import { supportWorkspaceCopy } from "../lib/support-workspace-copy";
@@ -40,15 +41,20 @@ export function SupportCaseActions({
       {!staff && <p className="text-sm text-muted">{workspace.ownHelp}</p>}
       <div className="flex flex-wrap gap-2">
         {actions.map((action) => (
-          <button
+          <Button
             key={action.status}
             type="button"
+            variant="outline"
             disabled={busy}
             onClick={() => onChangeStatus(action.status)}
-            className={`min-h-10 rounded-md border px-3 text-sm font-semibold disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 ${action.status === "closed" ? "border-danger/30 text-danger" : "border-base text-accent"}`}
+            className={
+              action.status === "closed"
+                ? "min-h-10 border-danger/30 text-danger"
+                : "min-h-10 text-accent"
+            }
           >
             {action.label}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

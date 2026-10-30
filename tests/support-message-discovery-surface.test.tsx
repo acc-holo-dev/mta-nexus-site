@@ -74,6 +74,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.focused);
     expect(html).toContain(copy.truncated);
     expect(html).toContain('method="get"');
+    expect(html).toContain("bg-accent text-white");
     expect(html).toContain('maxLength="80"');
     expect(html).toContain('htmlFor="support-message-query"'.replace("htmlFor", "for"));
     expect(html).toContain(`id="message-${messageId}"`);
