@@ -2,8 +2,8 @@ import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../lib/i18n";
-import { LocaleProvider } from "./locale-context";
 import { AccountControls } from "./account-controls";
+import { LocaleProvider } from "./locale-context";
 import { Navbar } from "./navbar";
 import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
@@ -93,6 +93,8 @@ describe("global shell controls behavior", () => {
       expect(html).toContain('type="button"');
       expect(html).toContain(`aria-label="${getDictionary(locale).theme.switchToLight}"`);
       expect(html).toContain('aria-hidden="true"');
+      expect(html).toContain("rounded-lg");
+      expect(html).toContain('data-theme-toggle=""');
     },
   );
 
