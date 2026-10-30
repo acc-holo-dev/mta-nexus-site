@@ -53,6 +53,13 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
+  const type = element.type as { displayName?: string } | string;
+  if (typeof type === "object" && type?.displayName === "Button") {
+    return [
+      { ...element, type: "button" } as Element,
+      ...descendants(element.props.children as ReactNode),
+    ];
+  }
   return [element, ...descendants(element.props.children as ReactNode)];
 }
 function render(locale: "en" | "ru" = "en") {
@@ -212,6 +219,18 @@ it("sends the observed evidence revision when deciding and blocks reusing that m
   harness.fetch.mockResolvedValue(response({ id: "request", status: "approved" }));
   reviewNotes();
   const nodes = moderation();
+  expect(
+    nodes.some(
+      (node) =>
+        node.type === "button" && String(node.props.className ?? "").includes("bg-success-soft"),
+    ),
+  ).toBe(true);
+  expect(
+    nodes.some(
+      (node) =>
+        node.type === "button" && String(node.props.className ?? "").includes("bg-danger-soft"),
+    ),
+  ).toBe(true);
   decide(nodes);
   decide(nodes);
   expect(harness.fetch).toHaveBeenCalledTimes(1);

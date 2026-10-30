@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@nexus/ui";
 import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -103,11 +104,12 @@ export function VerificationModerationControls({
       </label>
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked}
           onClick={() => void decide("approve")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-success)]/25 bg-success-soft px-3 py-2 text-[11px] font-semibold text-success transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
+          variant="outline"
         >
           {pending === "approve" ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -115,13 +117,14 @@ export function VerificationModerationControls({
             <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
           )}
           {copy.approve}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked}
           onClick={() => void decide("reject")}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-danger)]/25 bg-danger-soft px-3 py-2 text-[11px] font-semibold text-danger transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-9 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
+          variant="outline"
         >
           {pending === "reject" ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -129,7 +132,7 @@ export function VerificationModerationControls({
             <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
           )}
           {copy.reject}
-        </button>
+        </Button>
       </div>
 
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
@@ -139,13 +142,14 @@ export function VerificationModerationControls({
         </p>
       )}
       {blocked && pending === null && (
-        <button
+        <Button
           type="button"
           onClick={() => window.location.reload()}
-          className="min-h-11 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline"
+          variant="ghost"
         >
           {verificationCopy(locale).reload}
-        </button>
+        </Button>
       )}
     </div>
   );

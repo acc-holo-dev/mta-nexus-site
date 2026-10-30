@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -120,12 +121,7 @@ export default async function VerificationHistoryPage({
                 ))}
               </select>
             </label>
-            <button
-              type="submit"
-              className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
-            >
-              {copy.search}
-            </button>
+            <Button type="submit">{copy.search}</Button>
           </form>
           <p className="text-xs text-muted">{copy.live}</p>
           <Link
