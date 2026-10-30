@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { requiredJobs } from "./ci-policy.mjs";
+import { evaluateWebPushEvidenceResidual } from "./web-push-evidence-lib.mjs";
 
 /** ROADMAP 20 automated evidence categories for a checkable free open-beta candidate. */
 export const BETA_CANDIDATE_CATEGORIES = Object.freeze([
@@ -73,7 +74,7 @@ export const BETA_CANDIDATE_CATEGORIES = Object.freeze([
       "artifacts/web-push-provider-evidence.json",
     ]),
     description:
-      "Optional retained soak/provider JSON; absence is a named residual, not a free-beta marketplace claim.",
+      "Optional retained soak/provider JSON must both validate via checkers; presence alone never clears the residual, and absence remains a named residual—not a free-beta marketplace claim.",
   }),
   Object.freeze({
     id: "observability",
@@ -233,15 +234,32 @@ function evaluateBackupArtifact(path, candidateSha) {
   };
 }
 
-function evaluateExternal(category) {
-  const present = (category.artifacts ?? []).filter((path) => existsSync(path));
+function evaluateExternal(category, artifactRoot = process.cwd()) {
+  if (category.id === "web_push") {
+    return evaluateWebPushEvidenceResidual({
+      artifactRoot,
+      soakRelativePath: category.artifacts?.[0] ?? "artifacts/web-push-soak-evidence.json",
+      providerRelativePath: category.artifacts?.[1] ?? "artifacts/web-push-provider-evidence.json",
+    });
+  }
+  const present = (category.artifacts ?? []).filter((path) =>
+    existsSync(resolveUnder(artifactRoot, path)),
+  );
   if (!present.length) {
     return {
       status: "residual",
-      reason: `Optional Web Push evidence absent (${(category.artifacts ?? []).join(", ")}).`,
+      reason: `Optional external evidence absent (${(category.artifacts ?? []).join(", ")}).`,
     };
   }
-  return { status: "passed", reason: null, present };
+  return {
+    status: "residual",
+    reason: `Optional external evidence present but no validator is wired for ${category.id}.`,
+    present,
+  };
+}
+
+function resolveUnder(root, relativePath) {
+  return `${root.replace(/\\/gu, "/").replace(/\/$/u, "")}/${relativePath.replace(/^\/+/u, "")}`;
 }
 
 /**
@@ -319,7 +337,7 @@ export function evaluateBetaCandidate({
         break;
       }
       case "external":
-        result = evaluateExternal(category);
+        result = evaluateExternal(category, artifactRoot);
         break;
       case "owner":
         result = {

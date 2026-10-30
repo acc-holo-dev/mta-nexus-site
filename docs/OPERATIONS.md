@@ -882,7 +882,7 @@ The report writes `artifacts/beta-candidate-evidence.json`. Interpret it as:
 | `status: awaiting_owner_deploy_decision` | Same as checkable; still not live and not authorized |
 | `openBetaLive` / `productionAuthorized` | Always `false` in this harness |
 | `technicalBlockers` | Named gaps (often missing backup-restore CI evidence for ROADMAP 19) |
-| `residuals` | Owner content/observability and optional Web Push soak/provider proofs |
+| `residuals` | Owner content/observability and optional Web Push soak/provider proofs (both `artifacts/web-push-soak-evidence.json` and `artifacts/web-push-provider-evidence.json` must validate via their checkers; file presence alone never clears `web_push`) |
 
 `ci-evidence.json` from the CI summary job now includes `requiredJobs` and
 `jobResults` so browser/mail/runtime categories can be checked per job.

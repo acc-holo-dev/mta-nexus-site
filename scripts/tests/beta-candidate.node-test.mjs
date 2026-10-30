@@ -96,3 +96,17 @@ test("dated env backup porcelain alone is not a dirty working tree", () => {
   );
   assert.equal(isDirtyWorkingTreeBeyondEnvBackups(" M apps/web/src/lib/i18n.ts\n"), true);
 });
+
+test("web_push residual stays residual without inventing PASS for mere file presence", () => {
+  const report = evaluateBetaCandidate({
+    candidateSha: sha,
+    dirtyWorkingTree: false,
+    ciEvidence: passingCiEvidence(),
+  });
+  const webPush = report.categories.find((item) => item.id === "web_push");
+  assert.equal(webPush?.status, "residual");
+  assert.match(webPush?.reason ?? "", /incomplete or invalid|absent/u);
+  assert.ok(report.residuals.some((item) => item.startsWith("web_push:")));
+  assert.equal(report.openBetaLive, false);
+  assert.equal(report.productionAuthorized, false);
+});
