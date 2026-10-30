@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Build, User } from "@nexus/domain";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   findBuild: vi.fn(),
@@ -111,6 +111,43 @@ describe("build quarantine service behavior", () => {
       statusCode: 409,
       code: "BUILD_STATE_CHANGED",
     });
+  });
+
+  it("passes SEC-002 downloader notify opt-in into the quarantine transaction", async () => {
+    await service.quarantineBuild(
+      { buildId: "bld_1", reason: "Confirmed malware", notifyAffectedDownloaders: true },
+      moderator,
+      "staff-session",
+    );
+    expect(mocks.quarantine).toHaveBeenCalledWith(
+      "bld_1",
+      "usr_mod",
+      "Confirmed malware",
+      expect.objectContaining({
+        action: "build.quarantined",
+        details: expect.objectContaining({ notifyAffectedDownloaders: true }),
+      }),
+      "staff-session",
+      { notifyAffectedDownloaders: true },
+    );
+  });
+
+  it("does not invent SEC-002 fanout when notify opt-in is omitted", async () => {
+    await service.quarantineBuild(
+      { buildId: "bld_1", reason: "Investigation" },
+      moderator,
+      "staff-session",
+    );
+    expect(mocks.quarantine).toHaveBeenCalledWith(
+      "bld_1",
+      "usr_mod",
+      "Investigation",
+      expect.objectContaining({
+        details: expect.objectContaining({ notifyAffectedDownloaders: false }),
+      }),
+      "staff-session",
+      { notifyAffectedDownloaders: false },
+    );
   });
 
   it("requires quarantined state before restore", async () => {

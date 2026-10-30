@@ -58,6 +58,9 @@ function healthy(overrides = {}) {
     publicationPending: 0,
     publicationFailed: 0,
     publicationOldestAgeSeconds: 0,
+    buildIncidentPending: 0,
+    buildIncidentFailed: 0,
+    buildIncidentOldestAgeSeconds: 0,
     admissionPending: 0,
     admissionFailed: 0,
     admissionOldestAgeSeconds: 0,
@@ -243,6 +246,44 @@ test("validates discussion fanout counters and alerts without VAPID", () => {
       discussionFailed: 1,
       queueAlert: "alert",
       queueAlertReasons: ["discussion_delivery_failed", "discussion_delivery_failed"],
+    },
+  ]) {
+    assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));
+  }
+});
+
+test("validates build-incident fanout counters and alerts without VAPID", () => {
+  assert.equal(
+    run(
+      healthy({
+        configured: false,
+        queuePending: 0,
+        queueDue: 0,
+        queueLeased: 0,
+        buildIncidentPending: 2,
+        buildIncidentFailed: 1,
+        buildIncidentOldestAgeSeconds: 900,
+        queueAlert: "alert",
+        queueAlertReasons: ["build_incident_delivery_failed", "build_incident_delivery_backlog"],
+      }),
+    ),
+    0,
+  );
+  for (const overrides of [
+    { buildIncidentPending: undefined },
+    { buildIncidentFailed: null },
+    { buildIncidentOldestAgeSeconds: "0" },
+    { buildIncidentPending: -1 },
+    { buildIncidentFailed: 0.5 },
+    { buildIncidentOldestAgeSeconds: Number.MAX_SAFE_INTEGER + 1 },
+    { buildIncidentFailed: 1 },
+    { buildIncidentPending: 100 },
+    { buildIncidentPending: 1, buildIncidentOldestAgeSeconds: 900 },
+    { queueAlert: "alert", queueAlertReasons: ["build_incident_delivery_failed"] },
+    {
+      buildIncidentFailed: 1,
+      queueAlert: "alert",
+      queueAlertReasons: ["build_incident_delivery_failed", "build_incident_delivery_failed"],
     },
   ]) {
     assert.equal(run(healthy(overrides)), 1, JSON.stringify(overrides));

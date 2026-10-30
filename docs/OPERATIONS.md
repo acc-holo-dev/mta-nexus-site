@@ -450,6 +450,22 @@ NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
 
 Do not reset all jobs or delete inbox records.
 
+### Recovering build-incident downloader notices (SEC-002)
+
+Quarantine alone stops new downloads. Moderators may also opt in to notify users
+who already have a **served** `resource_delivery_receipts` row for that build.
+The durable source is `build_incident_notification_deliveries` (migration 0085);
+historical quarantines are not backfilled. Notices are generic security inbox
+items linking to `/security` and never invent malware details.
+
+```sh
+pnpm notifications:delivery list --channel build_incident
+NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES pnpm notifications:delivery reset \
+  --channel build_incident --id REPLACE_WITH_VERIFIED_BUILD_ID
+```
+
+Do not reset all jobs or delete inbox records.
+
 ### Recovering discussion inbox delivery
 
 For comments created before migration 0083, or windows where delivery jobs were

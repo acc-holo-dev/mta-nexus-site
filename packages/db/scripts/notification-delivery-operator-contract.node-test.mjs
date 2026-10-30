@@ -14,7 +14,15 @@ import {
 test("channels cover fanout sources plus admission recovery", () => {
   assert.deepEqual(
     listNotificationDeliveryChannels().map((item) => item.id),
-    ["report", "support", "verification", "discussion", "publication", "admission"],
+    [
+      "report",
+      "support",
+      "verification",
+      "discussion",
+      "publication",
+      "admission",
+      "build_incident",
+    ],
   );
   assert.equal(NOTIFICATION_DELIVERY_CHANNELS.publication.idColumn, "content_id");
   assert.equal(NOTIFICATION_DELIVERY_CHANNELS.admission.kind, "admission");

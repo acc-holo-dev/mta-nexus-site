@@ -513,7 +513,7 @@ export class ProductService {
   }
 
   async quarantineBuild(
-    input: { buildId: string; reason: string },
+    input: { buildId: string; reason: string; notifyAffectedDownloaders?: boolean },
     actor: User,
     currentToken: string,
   ): Promise<Build> {
@@ -531,6 +531,7 @@ export class ProductService {
       );
     }
 
+    const notifyAffectedDownloaders = input.notifyAffectedDownloaders === true;
     const quarantined = await buildRepository.quarantinePublishedAndRefreshProduct(
       build.id,
       actor.id,
@@ -547,9 +548,11 @@ export class ProductService {
           version: build.version,
           reason: input.reason,
           previousStatus: build.status,
+          notifyAffectedDownloaders,
         },
       },
       currentToken,
+      { notifyAffectedDownloaders },
     );
     if (!quarantined) {
       throw new AppError(

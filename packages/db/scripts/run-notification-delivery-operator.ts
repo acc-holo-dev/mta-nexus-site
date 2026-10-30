@@ -42,6 +42,7 @@ async function main(): Promise<void> {
         | "verification"
         | "discussion"
         | "publication"
+        | "build_incident"
         | "admission",
       parsed.id,
     );

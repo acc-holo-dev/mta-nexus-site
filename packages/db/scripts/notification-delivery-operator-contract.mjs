@@ -48,6 +48,13 @@ export const NOTIFICATION_DELIVERY_CHANNELS = Object.freeze({
     kind: "admission",
     description: "Optional Web Push admission recovery",
   }),
+  build_incident: Object.freeze({
+    id: "build_incident",
+    table: "build_incident_notification_deliveries",
+    idColumn: "build_id",
+    kind: "fanout",
+    description: "SEC-002 quarantined-build downloader notices",
+  }),
 });
 
 export function listNotificationDeliveryChannels() {

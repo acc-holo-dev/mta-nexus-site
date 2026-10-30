@@ -48,6 +48,8 @@ const evidence = {
   supportNotificationDeliverySchemaPresent: false,
   verificationNotificationDeliverySchemaPresent: false,
   discussionNotificationDeliverySchemaPresent: false,
+  publicationNotificationDeliverySchemaPresent: false,
+  buildIncidentNotificationDeliverySchemaPresent: false,
   webPushAdmissionRecoverySchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
@@ -841,6 +843,37 @@ try {
     (error) => error.code === "23503",
   );
   evidence.publicationNotificationDeliverySchemaPresent = true;
+  assert.equal(
+    (await client`SELECT count(*)::integer AS total FROM build_incident_notification_deliveries`)[0]
+      .total,
+    0,
+    "Upgrade must not invent downloader-incident notices for historical quarantines",
+  );
+  assert.equal(
+    (
+      await client`SELECT indexname FROM pg_indexes WHERE schemaname='public'
+      AND indexname='build_incident_notification_deliveries_due_idx'`
+    ).length,
+    1,
+  );
+  assert.equal(
+    (
+      await client`SELECT indexname FROM pg_indexes WHERE schemaname='public'
+      AND indexname='resource_delivery_build_served_user_idx'`
+    ).length,
+    1,
+  );
+  await assert.rejects(
+    client`INSERT INTO build_incident_notification_deliveries (build_id, product_id, version, created_at, attempts)
+      VALUES ('missing-build', 'missing-product', '1.0.0', clock_timestamp(), 6)`,
+    (error) => error.code === "23514",
+  );
+  await assert.rejects(
+    client`INSERT INTO build_incident_notification_deliveries (build_id, product_id, version, created_at)
+      VALUES ('missing-build', 'missing-product', '1.0.0', clock_timestamp())`,
+    (error) => error.code === "23503",
+  );
+  evidence.buildIncidentNotificationDeliverySchemaPresent = true;
   const receiptColumns =
     await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);

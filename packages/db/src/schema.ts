@@ -1,53 +1,55 @@
-import {
-  PRODUCT_TYPES,
-  SUPPORT_CASE_CATEGORIES,
-  SUPPORT_CASE_STATUSES,
-  SUPPORT_RELATED_TYPES,
-  type ProductType,
-  type StorageObjectIdentity,
-  type StorageMaintenanceState,
-  type BuildPackageEvidence,
-  type BuildReviewNotificationData,
-  type LicenseTermNotificationData,
-  type ResourceDeliveryStatus,
-  type ResourceDeliveryError,
-  type ResourceReleaseNoticeData,
-  type SupportCaseCategory,
-  type SupportCaseStatus,
-  type SupportMessageAuthorRole,
-  type SupportRelatedType,
-  type ResourceCartAcquisition,
-  type ResourceCartReceiptItem,
-  type CommercialPlanTerms,
-  type CommercialPlanStatus,
-  type OrderCaseKind,
-  type OrderCaseReviewStatus,
-  type OrderCaseEvidence,
-} from "@nexus/domain";
-import type { LibrarySelectionBatchCommand, LibrarySelectionBatchSnapshot } from "@nexus/domain";
-import { sql } from "drizzle-orm";
 import type {
   LibraryCollectionCommand,
   LibraryCollectionSnapshot,
   LibraryCollectionStatus,
   LibraryMembershipBatchCommand,
+  LibrarySelectionBatchCommand,
+  LibrarySelectionBatchSnapshot,
 } from "@nexus/domain";
 import {
-  pgTable,
-  text,
-  integer,
+  type BuildIncidentNotificationData,
+  type BuildPackageEvidence,
+  type BuildReviewNotificationData,
+  type CommercialPlanStatus,
+  type CommercialPlanTerms,
+  type LicenseTermNotificationData,
+  type OrderCaseEvidence,
+  type OrderCaseKind,
+  type OrderCaseReviewStatus,
+  PRODUCT_TYPES,
+  type ProductType,
+  type ResourceCartAcquisition,
+  type ResourceCartReceiptItem,
+  type ResourceDeliveryError,
+  type ResourceDeliveryStatus,
+  type ResourceReleaseNoticeData,
+  type StorageMaintenanceState,
+  type StorageObjectIdentity,
+  SUPPORT_CASE_CATEGORIES,
+  SUPPORT_CASE_STATUSES,
+  SUPPORT_RELATED_TYPES,
+  type SupportCaseCategory,
+  type SupportCaseStatus,
+  type SupportMessageAuthorRole,
+  type SupportRelatedType,
+} from "@nexus/domain";
+import { sql } from "drizzle-orm";
+import {
   bigint,
   bigserial,
   boolean,
-  timestamp,
-  jsonb,
-  index,
-  uniqueIndex,
-  unique,
-  primaryKey,
-  foreignKey,
-  uuid,
   check,
+  foreignKey,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  unique,
+  uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 // 1. Users
@@ -1232,6 +1234,7 @@ export const notifications = pgTable(
   {
     data: jsonb("data").$type<
       | BuildReviewNotificationData
+      | BuildIncidentNotificationData
       | LicenseTermNotificationData
       | ResourceReleaseNoticeData
       | import("@nexus/domain").DiscussionPushNotificationData
@@ -1467,6 +1470,34 @@ export const reportNotificationDeliveries = pgTable(
       .on(table.availableAt, table.reportId)
       .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
     check("report_notification_deliveries_attempts_bounds", sql`${table.attempts} BETWEEN 0 AND 5`),
+  ],
+);
+
+// SEC-002: durable notice fanout for served downloaders of a quarantined build.
+export const buildIncidentNotificationDeliveries = pgTable(
+  "build_incident_notification_deliveries",
+  {
+    buildId: text("build_id")
+      .primaryKey()
+      .references(() => builds.id, { onDelete: "cascade" }),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    version: text("version").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    lastRecipientId: text("last_recipient_id"),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("build_incident_notification_deliveries_due_idx")
+      .on(table.availableAt, table.buildId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check(
+      "build_incident_notification_deliveries_attempts_bounds",
+      sql`${table.attempts} BETWEEN 0 AND 5`,
+    ),
   ],
 );
 

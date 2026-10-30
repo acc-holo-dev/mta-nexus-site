@@ -18,6 +18,7 @@ export type { ContentSummary } from "./content-summary";
 export { developerProfileRepository } from "./developer-profile";
 export { discussionManagementRepository, discussionRevision } from "./discussion-management";
 export * from "./discussion-notification-delivery";
+export * from "./build-incident-notification-delivery";
 export { discussionWorkspaceRepository } from "./discussion-workspace";
 export * from "./entitlements";
 export * from "./financial-statements";

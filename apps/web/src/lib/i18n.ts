@@ -1075,6 +1075,10 @@ const en = {
     restoreReason: "Restore reason",
     quarantineReasonHint: "Record at least 3 characters of evidence or operational context.",
     quarantineBuildConfirm: "Quarantine this published build and stop its public delivery?",
+    quarantineNotifyDownloaders:
+      "Also notify users who already completed a download of this build (malware / security incident).",
+    quarantineBuildNotifyConfirm:
+      "Quarantine this build, stop public delivery, and notify users with a completed download receipt?",
     restoreBuildConfirm:
       "Restore this quarantined build to publication if its trusted clean scan is still valid?",
     quarantineBuildFailed: "Build quarantine action failed.",
@@ -2447,6 +2451,10 @@ const ru: typeof en = {
     quarantineReasonHint: "Укажите минимум 3 символа контекста или доказательства.",
     quarantineBuildConfirm:
       "Поместить эту опубликованную сборку в карантин и прекратить её публичную выдачу?",
+    quarantineNotifyDownloaders:
+      "Также уведомить пользователей, которые уже завершили скачивание этой сборки (malware / security incident).",
+    quarantineBuildNotifyConfirm:
+      "Поместить сборку в карантин, остановить публичную выдачу и уведомить пользователей с завершённым скачиванием?",
     restoreBuildConfirm:
       "Вернуть эту сборку в публикацию, если trusted clean scan всё ещё действителен?",
     quarantineBuildFailed: "Не удалось изменить карантин сборки.",

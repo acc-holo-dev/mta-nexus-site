@@ -1,7 +1,7 @@
 import type { AuditEvent, Build } from "@nexus/domain";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, builds, products } from "../schema";
+import { auditEvents, buildIncidentNotificationDeliveries, builds, products } from "../schema";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { lockInitiatingSession } from "./initiating-session";
 import {
@@ -93,6 +93,7 @@ export async function quarantinePublishedAndRefreshProduct(
   reason: string,
   audit: Omit<AuditEvent, "createdAt">,
   currentToken: string,
+  options: { notifyAffectedDownloaders?: boolean } = {},
 ): Promise<Build | null> {
   return db.transaction(async (tx) => {
     const [target] = await tx
@@ -169,7 +170,23 @@ export async function quarantinePublishedAndRefreshProduct(
         .where(eq(products.id, quarantined.productId));
     }
 
-    await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+    await tx.insert(auditEvents).values({
+      ...audit,
+      createdAt: now,
+      details: {
+        ...((audit.details as Record<string, unknown> | undefined) ?? {}),
+        notifyAffectedDownloaders: options.notifyAffectedDownloaders === true,
+      },
+    });
+    if (options.notifyAffectedDownloaders === true) {
+      // SEC-002: enqueue durable fanout only when moderators explicitly request it.
+      await tx.insert(buildIncidentNotificationDeliveries).values({
+        buildId: quarantined.id,
+        productId: quarantined.productId,
+        version: quarantined.version,
+        createdAt: now,
+      });
+    }
     return quarantined as unknown as Build;
   });
 }

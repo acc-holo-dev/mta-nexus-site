@@ -1,6 +1,7 @@
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
+  buildIncidentNotificationDeliveries,
   discussionNotificationDeliveries,
   publicationNotificationDeliveries,
   reportNotificationDeliveries,
@@ -25,6 +26,7 @@ export type NotificationDeliveryOperatorChannelId =
   | "verification"
   | "discussion"
   | "publication"
+  | "build_incident"
   | "admission";
 
 export type NotificationDeliveryExhaustedItem = Readonly<{
@@ -81,6 +83,14 @@ const FANOUT = {
     availableAt: publicationNotificationDeliveries.availableAt,
     attempts: publicationNotificationDeliveries.attempts,
     completedAt: publicationNotificationDeliveries.completedAt,
+  },
+  build_incident: {
+    table: buildIncidentNotificationDeliveries,
+    id: buildIncidentNotificationDeliveries.buildId,
+    createdAt: buildIncidentNotificationDeliveries.createdAt,
+    availableAt: buildIncidentNotificationDeliveries.availableAt,
+    attempts: buildIncidentNotificationDeliveries.attempts,
+    completedAt: buildIncidentNotificationDeliveries.completedAt,
   },
 } as const;
 
@@ -161,7 +171,15 @@ export async function listExhaustedNotificationDeliveries(options: {
 }): Promise<readonly NotificationDeliveryExhaustedSummary[]> {
   const channels: NotificationDeliveryOperatorChannelId[] = options.channel
     ? [options.channel]
-    : ["report", "support", "verification", "discussion", "publication", "admission"];
+    : [
+        "report",
+        "support",
+        "verification",
+        "discussion",
+        "publication",
+        "build_incident",
+        "admission",
+      ];
   const summaries: NotificationDeliveryExhaustedSummary[] = [];
   for (const channel of channels) {
     summaries.push(

@@ -1,5 +1,5 @@
-import type { ProductType } from "./product-types";
 import type { BuildPackageEvidence } from "./build-package-evidence";
+import type { ProductType } from "./product-types";
 
 // Domain State Enums & Types
 
@@ -440,9 +440,18 @@ export interface DiscussionPushNotificationData {
   kind: "discussion_push";
   discussionPush: { version: 1; state: "pending" | "queued" | "unavailable" };
 }
+
+export interface BuildIncidentNotificationData {
+  kind: "build_incident";
+  buildId: string;
+  productId: string;
+  version: string;
+}
+
 export interface Notification {
   data?:
     | BuildReviewNotificationData
+    | BuildIncidentNotificationData
     | import("./license-maintenance").LicenseTermNotificationData
     | import("./resource-release-watches").ResourceReleaseNoticeData
     | DiscussionPushNotificationData

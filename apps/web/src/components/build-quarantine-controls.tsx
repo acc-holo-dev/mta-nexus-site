@@ -18,6 +18,7 @@ export function BuildQuarantineControls({
   const { dictionary } = useNexusLocale();
   const copy = dictionary.admin;
   const [reason, setReason] = useState("");
+  const [notifyAffectedDownloaders, setNotifyAffectedDownloaders] = useState(false);
   const [pending, setPending] = useState<"quarantine" | "restore" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasReason = reason.trim().length >= 3;
@@ -25,7 +26,11 @@ export function BuildQuarantineControls({
   async function act(action: "quarantine" | "restore") {
     if (pending || !hasReason) return;
     const confirmed = window.confirm(
-      action === "quarantine" ? copy.quarantineBuildConfirm : copy.restoreBuildConfirm,
+      action === "quarantine"
+        ? notifyAffectedDownloaders
+          ? copy.quarantineBuildNotifyConfirm
+          : copy.quarantineBuildConfirm
+        : copy.restoreBuildConfirm,
     );
     if (!confirmed) return;
 
@@ -42,6 +47,7 @@ export function BuildQuarantineControls({
           targetId: buildId,
           action,
           notes: reason.trim(),
+          ...(action === "quarantine" ? { notifyAffectedDownloaders } : {}),
         }),
         signal: AbortSignal.timeout(10_000),
       });
@@ -77,6 +83,18 @@ export function BuildQuarantineControls({
           className="w-full resize-y rounded-md border border-base bg-inset px-2.5 py-2 text-xs text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
         />
       </label>
+      {status === "published" ? (
+        <label className="flex items-start gap-2 text-[11px] text-secondary">
+          <input
+            type="checkbox"
+            className="mt-0.5"
+            checked={notifyAffectedDownloaders}
+            onChange={(event) => setNotifyAffectedDownloaders(event.target.checked)}
+            disabled={pending !== null}
+          />
+          <span>{copy.quarantineNotifyDownloaders}</span>
+        </label>
+      ) : null}
       <Button
         type="button"
         variant="outline"
