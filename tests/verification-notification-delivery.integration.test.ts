@@ -10,9 +10,9 @@ import {
 } from "../packages/db/src/repositories/verification-notification-delivery";
 import {
   auditEvents,
+  verificationNotificationDeliveries as jobs,
   notifications,
   users,
-  verificationNotificationDeliveries as jobs,
   verificationRequests,
 } from "../packages/db/src/schema";
 
@@ -117,7 +117,10 @@ async function drain(requestId: string, limit = 20) {
   throw Error("Fixture delivery did not complete");
 }
 
-async function failInsert(table: "verification_notification_deliveries" | "notifications", value: string) {
+async function failInsert(
+  table: "verification_notification_deliveries" | "notifications",
+  value: string,
+) {
   const column =
     table === "verification_notification_deliveries" ? "verification_request_id" : "recipient_id";
   const name = `verification_delivery_failure_${randomUUID().replaceAll("-", "")}`;
@@ -193,11 +196,14 @@ it("atomically creates the request with its delivery source", async () => {
   );
   await expect(apply(requesterId)).rejects.toThrow();
   expect(
-    await db.select().from(verificationRequests).where(eq(verificationRequests.requesterId, requesterId)),
+    await db
+      .select()
+      .from(verificationRequests)
+      .where(eq(verificationRequests.requesterId, requesterId)),
   ).toEqual([]);
-  expect(
-    await db.select().from(auditEvents).where(eq(auditEvents.actorId, requesterId)),
-  ).toEqual([]);
+  expect(await db.select().from(auditEvents).where(eq(auditEvents.actorId, requesterId))).toEqual(
+    [],
+  );
   expect(await db.select().from(jobs)).toEqual([]);
   await db.execute(sql.raw(`drop trigger ${name} on verification_notification_deliveries`));
   await db.execute(sql.raw(`drop function ${name}()`));

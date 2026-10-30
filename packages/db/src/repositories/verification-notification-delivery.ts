@@ -146,10 +146,7 @@ export class VerificationNotificationDeliveryRepository {
             availableAt: sql`clock_timestamp() + ${delaySeconds} * interval '1 second'`,
           })
           .where(
-            eq(
-              verificationNotificationDeliveries.verificationRequestId,
-              job.verificationRequestId,
-            ),
+            eq(verificationNotificationDeliveries.verificationRequestId, job.verificationRequestId),
           );
         return {
           state: attempts === 5 ? "failed" : "retry",

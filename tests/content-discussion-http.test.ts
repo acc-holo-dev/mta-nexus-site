@@ -103,7 +103,7 @@ it("does not read discussions for drafts or missing content", async () => {
   expect((await GET(request("GET"), context)).status).toBe(404);
   expect(mocks.page).not.toHaveBeenCalled();
 });
-it("persists a reply before dispatching the stored event to its fresh audience", async () => {
+it("persists a reply with transactional fanout instead of after() dispatch", async () => {
   const response = await POST(
     request("POST", { text: " A useful reply ", parentId: "parent" }),
     context,
@@ -114,8 +114,7 @@ it("persists a reply before dispatching the stored event to its fresh audience",
     state.actor,
   );
   expect(mocks.notify).not.toHaveBeenCalled();
-  await state.after[0]();
-  expect(mocks.notify).toHaveBeenCalledExactlyOnceWith("content", "comment");
+  expect(state.after).toHaveLength(0);
 });
 it("passes normalized text search and focused comment selectors without recording views", async () => {
   expect((await GET(request("GET", undefined, "?q=%20Lua%20"), context)).status).toBe(200);
@@ -145,32 +144,22 @@ it("rate-limits public discussion lookup before loading its article", async () =
   expect((await GET(request("GET", undefined, "?q=Lua"), context)).status).toBe(429);
   expect(mocks.article).not.toHaveBeenCalled();
 });
-it("delegates recipient selection to storage instead of stale request authors", async () => {
+it("does not resolve parent authors or schedule after() fanout on write", async () => {
   mocks.article.mockResolvedValue({ id: "content", authorId: "stale-author", slug: "article" });
   await POST(request("POST", { text: "Reply", parentId: "parent" }), context);
-  await state.after[0]();
-  expect(mocks.notify).toHaveBeenCalledExactlyOnceWith("content", "comment");
+  expect(mocks.notify).not.toHaveBeenCalled();
   expect(mocks.parent).not.toHaveBeenCalled();
+  expect(state.after).toHaveLength(0);
 });
-it.each(["registration", "delivery"])(
-  "keeps a saved reply successful after %s failure",
-  async (stage) => {
-    state.registrationFails = stage === "registration";
-    mocks.notify.mockRejectedValue(Error("private-delivery"));
-    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
-    try {
-      const response = await POST(request("POST", { text: "Saved reply" }), context);
-      expect(response.status).toBe(201);
-      expect(response.headers.get("cache-control")).toBe("private, no-store");
-      expect(await response.json()).toMatchObject({ comment: { id: "comment" } });
-      if (stage === "delivery") await expect(state.after[0]()).resolves.toBeUndefined();
-      expect(mocks.add).toHaveBeenCalledOnce();
-      expect(log).toHaveBeenCalled();
-    } finally {
-      log.mockRestore();
-    }
-  },
-);
+it("keeps a saved reply successful without after() registration", async () => {
+  const response = await POST(request("POST", { text: "Saved reply" }), context);
+  expect(response.status).toBe(201);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(await response.json()).toMatchObject({ comment: { id: "comment" } });
+  expect(mocks.add).toHaveBeenCalledOnce();
+  expect(state.after).toHaveLength(0);
+  expect(mocks.notify).not.toHaveBeenCalled();
+});
 it.each([1, 5001])("rejects comment length %s", async (length) => {
   expect((await POST(request("POST", { text: "x".repeat(length) }), context)).status).toBe(400);
   expect(mocks.add).not.toHaveBeenCalled();

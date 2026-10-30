@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
+import { describe, expect, it, vi } from "vitest";
 
 const captured = vi.hoisted(() => ({
   filter: null as SQL | null,
@@ -48,9 +48,10 @@ vi.mock("../packages/db/src/client", () => ({
 import { VerificationRepository } from "../packages/db/src/repositories/verification";
 import {
   auditEvents,
-  verificationRequests,
-  organizations,
   organizationMembers,
+  organizations,
+  verificationNotificationDeliveries,
+  verificationRequests,
 } from "../packages/db/src/schema";
 
 describe("verification application serialization", () => {
@@ -95,6 +96,10 @@ describe("verification application serialization", () => {
       },
     );
     expect(request.id).toBe("ver_new");
-    expect(captured.inserts).toEqual([verificationRequests, auditEvents]);
+    expect(captured.inserts).toEqual([
+      verificationRequests,
+      auditEvents,
+      verificationNotificationDeliveries,
+    ]);
   });
 });

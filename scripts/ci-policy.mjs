@@ -52,10 +52,7 @@ export function classifyChanges(files, { explicitFull = false, release = false }
   const full = explicitFull || release || infrastructure;
   const codeFiles = files.filter((file) => !isDocumentation(file));
   // Empty or unknown-heavy sets must not claim unit_only; default wider, never narrower.
-  const unitOnly =
-    !full &&
-    codeFiles.length > 0 &&
-    codeFiles.every((file) => isUnitOnlyPath(file));
+  const unitOnly = !full && codeFiles.length > 0 && codeFiles.every((file) => isUnitOnlyPath(file));
   return {
     code: code || explicitFull || release || unitOnly,
     unitOnly,

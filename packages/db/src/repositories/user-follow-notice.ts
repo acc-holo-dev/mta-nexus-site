@@ -21,7 +21,9 @@ export async function userFollowNotice(
     .where(eq(notificationPreferences.userId, recipientId))
     .limit(1);
   if (preference?.enabled === false) return;
-  const id = `ntf_follow_${createHash("sha256").update(JSON.stringify([followId])).digest("hex")}`;
+  const id = `ntf_follow_${createHash("sha256")
+    .update(JSON.stringify([followId]))
+    .digest("hex")}`;
   const [inserted] = await tx
     .insert(notifications)
     .values({

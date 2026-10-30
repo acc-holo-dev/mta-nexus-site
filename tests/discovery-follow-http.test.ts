@@ -219,20 +219,14 @@ it("confirms repeated follows without duplicating the follower notification", as
   });
   expect(state.callbacks).toHaveLength(0);
 });
-it("keeps a committed follow confirmed when notification delivery fails", async () => {
+it("keeps a committed follow confirmed without after() notification dispatch", async () => {
   mocks.notifications.mockRejectedValue(new Error("delivery failed"));
   const response = await POST(
     request("/api/follow", "POST", { targetType: "user", targetId: "target" }),
   );
   expect(await response.json()).toMatchObject({ success: true, following: true });
   expect(mocks.notifications).not.toHaveBeenCalled();
-  const log = vi.spyOn(console, "warn").mockImplementation(() => {});
-  try {
-    await state.callbacks[0]();
-    expect(mocks.notifications).toHaveBeenCalledOnce();
-  } finally {
-    log.mockRestore();
-  }
+  expect(state.callbacks).toHaveLength(0);
 });
 it("allows removing an unavailable target and translates fresh availability denials", async () => {
   const body = { targetType: "server", targetId: "missing" };

@@ -40,7 +40,10 @@ test("shared UI and web component changes use the unit CI profile", () => {
   ]);
   assert.deepEqual(policy, { code: true, unitOnly: true, full: false });
   assert.deepEqual(requiredJobs(policy), ["plan", "unit"]);
-  assert.equal(summarizeJobs(policy, { plan: { result: "success" }, unit: { result: "success" } }).scope, "unit_ci");
+  assert.equal(
+    summarizeJobs(policy, { plan: { result: "success" }, unit: { result: "success" } }).scope,
+    "unit_ci",
+  );
 });
 
 test("unknown or mixed application paths never claim unit_only", () => {
@@ -55,7 +58,10 @@ test("unknown or mixed application paths never claim unit_only", () => {
 });
 
 test("application changes retain all mandatory fast gates", () => {
-  const policy = classifyChanges(["apps/web/src/components/resource-download-button.tsx", "apps/web/src/lib/i18n.ts"]);
+  const policy = classifyChanges([
+    "apps/web/src/components/resource-download-button.tsx",
+    "apps/web/src/lib/i18n.ts",
+  ]);
   assert.deepEqual(policy, { code: true, unitOnly: false, full: false });
   assert.deepEqual(requiredJobs(policy), ["plan", "unit", "verify", "image", "smoke"]);
 });
