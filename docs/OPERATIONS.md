@@ -866,13 +866,19 @@ volumes and can make an intact installation appear empty.
 ROADMAP 20 prepares a **checkable** free open-beta candidate. It does not open
 beta, authorize production deployment, or activate paid marketplace/DRM.
 
-1. Select one exact `main` SHA and wait for `full_acceptance` CI to succeed.
-2. Download and keep `ci-evidence-<sha>`, `release-upgrade-<sha>-<attempt>`, and
-   `backup-restore-<sha>-<attempt>` before 14-day retention expires.
-3. Place the JSON files under local `artifacts/` as
-   `ci-evidence.json`, `release-upgrade.json`, and
-   `backup-restore-evidence.json`.
-4. On a clean checkout of that SHA run `pnpm beta:candidate`.
+1. Select one exact `main` SHA and wait for `full_acceptance` CI to succeed
+   (backup-restore and release-upgrade artifacts are published only when
+   `plan.outputs.full=true`; retention is 14 days).
+2. On a clean checkout of that SHA run `pnpm beta:fetch` (or
+   `pnpm beta:fetch <sha>`). It uses `gh` to download retained
+   `ci-evidence-<sha>`, `release-upgrade-<sha>-<attempt>`, and
+   `backup-restore-<sha>-<attempt>` into local `artifacts/ci-evidence.json`,
+   `artifacts/release-upgrade.json`, and `artifacts/backup-restore-evidence.json`.
+   The fetch never invents PASS JSON; missing/expired artifacts fail honestly.
+3. Run `pnpm beta:candidate`. ROADMAP 19 backup-restore evidence must report
+   `status: "PASS"`, matching SHA, and every disposable-rehearsal flag true
+   (`sourceDestroyedBeforeRestore`, checksum/row/schema/ledger/upload restores,
+   `cleanupComplete`). Incomplete flags block the candidate—they do not pass.
 
 The report writes `artifacts/beta-candidate-evidence.json`. Interpret it as:
 
