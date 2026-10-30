@@ -13,13 +13,13 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
   }),
 }));
 
-import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
 import {
   MtaMetaInspectorPanel,
   metaInspectorClientPolicy,
   metaInspectorPreview,
   requestMtaMetaInspection,
 } from "../apps/web/src/components/mta-meta-inspector-panel";
+import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
 
 describe("author-facing MTA meta inspector", () => {
   it.each(["en", "ru"] as const)(
@@ -46,6 +46,8 @@ describe("author-facing MTA meta inspector", () => {
 
     expect(html).toContain(`type="button"`);
     expect(html).toContain(copy.inspect);
+    expect(html).toContain("rounded-lg");
+    expect(html).toContain("bg-accent");
     expect(html).toContain(copy.fileLabel);
     expect(html).not.toContain("<form");
   });

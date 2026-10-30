@@ -1,11 +1,11 @@
 "use client";
 
-import { withOccurrenceKeys } from "@nexus/ui";
-import { FileSearch, LoaderCircle } from "lucide-react";
+import { Button, withOccurrenceKeys } from "@nexus/ui";
+import { FileSearch } from "lucide-react";
 import { useState } from "react";
-import { useNexusLocale } from "./locale-context";
-import { getMtaVersionTargetSuggestion } from "../lib/mta-version-target";
 import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
+import { getMtaVersionTargetSuggestion } from "../lib/mta-version-target";
+import { useNexusLocale } from "./locale-context";
 
 export type InspectionResponse = {
   inspection?: {
@@ -154,15 +154,16 @@ export function MtaMetaInspectorPanel({
           />
         </label>
 
-        <button
+        <Button
           type="button"
+          size="sm"
           disabled={!file || loading}
+          isLoading={loading}
           onClick={() => void inspect()}
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] disabled:opacity-50"
+          className="min-h-10 text-xs font-bold"
         >
-          {loading && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />}
           {loading ? copy.inspecting : copy.inspect}
-        </button>
+        </Button>
       </div>
 
       {result?.error && (
@@ -252,14 +253,16 @@ export function MtaMetaInspectorPanel({
                   <dt className="text-faint">{copy.formTarget}</dt>
                   <dd className="flex flex-wrap items-center gap-2 text-secondary">
                     <code>{versionSuggestion}</code>
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
                       disabled={minimumVersionLocked}
                       onClick={() => onApplyMinimumVersion(versionSuggestion)}
-                      className="min-h-8 rounded-md border border-base px-2.5 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="h-auto min-h-8 px-2.5 py-1 text-[11px] font-semibold text-accent"
                     >
                       {copy.applyMinimumVersion}
-                    </button>
+                    </Button>
                   </dd>
                 </>
               )}

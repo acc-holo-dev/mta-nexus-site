@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -169,20 +170,22 @@ export function ManagedServerVisibilityBatch({
             {copy.selected}: {selected.length}
           </legend>
           <div className="flex flex-wrap gap-3">
-            <button
+            <Button
               type="button"
-              className="min-h-11 text-sm text-accent underline"
+              variant="ghost"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline"
               onClick={() => changeSelection(items.map((item) => item.id))}
             >
               {copy.selectAll}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="min-h-11 text-sm text-accent underline"
+              variant="ghost"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline"
               onClick={() => changeSelection([])}
             >
               {copy.clear}
-            </button>
+            </Button>
           </div>
           <label className="flex max-w-sm flex-col gap-2 text-sm text-primary">
             <span>{labels.visibility}</span>
@@ -204,14 +207,15 @@ export function ManagedServerVisibilityBatch({
             </select>
           </label>
           <p className="text-sm text-muted">{copy[`${visibility}Help`]}</p>
-          <button
+          <Button
             type="button"
-            className="min-h-11 rounded-lg border border-base px-4 text-sm font-semibold text-accent disabled:opacity-50"
+            variant="outline"
+            className="min-h-11 font-semibold text-accent"
             disabled={!selected.length}
             onClick={() => void review()}
           >
             {copy.preview}
-          </button>
+          </Button>
         </fieldset>
       </div>
       {busy && (
@@ -230,13 +234,14 @@ export function ManagedServerVisibilityBatch({
         </p>
       )}
       {blocked && !busy && (
-        <button
+        <Button
           type="button"
-          className="min-h-11 text-sm text-accent underline"
+          variant="ghost"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline"
           onClick={() => window.location.reload()}
         >
           {copy.reload}
-        </button>
+        </Button>
       )}
       {preview && (
         <div className="nexus-panel space-y-4 p-5">
@@ -274,22 +279,24 @@ export function ManagedServerVisibilityBatch({
             </p>
           )}
           <div className="flex flex-wrap gap-3">
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={busy || blocked || !preview.items.some((item) => item.changed)}
-              className="min-h-11 rounded-lg border border-base px-4 text-sm font-semibold text-accent disabled:opacity-50"
+              className="min-h-11 font-semibold text-accent"
               onClick={() => void commit()}
             >
               {copy.confirm}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
               disabled={busy || blocked}
-              className="min-h-11 text-sm text-accent underline"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline"
               onClick={() => setPreview(null)}
             >
               {copy.cancel}
-            </button>
+            </Button>
           </div>
         </div>
       )}
