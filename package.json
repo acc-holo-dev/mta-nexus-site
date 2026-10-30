@@ -38,6 +38,7 @@
     "server:observations:capture": "pnpm --filter @nexus/web server:observations:capture",
     "server:observations:guard:test": "node --test scripts/tests/server-observation-capture.node-test.mjs",
     "release:verify": "node scripts/release-evidence.mjs",
+    "beta:candidate": "node scripts/beta-candidate-evidence.mjs",
     "dev:docker": "pnpm dev:preflight && docker compose -p nexus-local -f compose.yaml up --build",
     "dev:docker:up": "pnpm dev:preflight && docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600",
     "dev:docker:down": "docker compose -p nexus-local -f compose.yaml down",

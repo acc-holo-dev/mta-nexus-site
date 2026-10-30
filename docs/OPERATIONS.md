@@ -861,6 +861,32 @@ Use the existing production Compose project name and its protected environment
 file throughout. Changing the project name during a normal update creates different
 volumes and can make an intact installation appear empty.
 
+### Open free beta candidate evidence
+
+ROADMAP 20 prepares a **checkable** free open-beta candidate. It does not open
+beta, authorize production deployment, or activate paid marketplace/DRM.
+
+1. Select one exact `main` SHA and wait for `full_acceptance` CI to succeed.
+2. Download and keep `ci-evidence-<sha>`, `release-upgrade-<sha>-<attempt>`, and
+   `backup-restore-<sha>-<attempt>` before 14-day retention expires.
+3. Place the JSON files under local `artifacts/` as
+   `ci-evidence.json`, `release-upgrade.json`, and
+   `backup-restore-evidence.json`.
+4. On a clean checkout of that SHA run `pnpm beta:candidate`.
+
+The report writes `artifacts/beta-candidate-evidence.json`. Interpret it as:
+
+| Field | Meaning |
+| --- | --- |
+| `checkableCandidate: true` | Required technical proofs for that SHA passed; only owner deploy authorization remains |
+| `status: awaiting_owner_deploy_decision` | Same as checkable; still not live and not authorized |
+| `openBetaLive` / `productionAuthorized` | Always `false` in this harness |
+| `technicalBlockers` | Named gaps (often missing backup-restore CI evidence for ROADMAP 19) |
+| `residuals` | Owner content/observability and optional Web Push soak/provider proofs |
+
+`ci-evidence.json` from the CI summary job now includes `requiredJobs` and
+`jobResults` so browser/mail/runtime categories can be checked per job.
+
 ### Acceptance evidence
 
 Select one exact `main` commit and wait for **CI**, **Resource browser**,

@@ -1,15 +1,18 @@
-import { mkdirSync, writeFileSync, appendFileSync } from "node:fs";
-import { summarizeJobs } from "./ci-policy.mjs";
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { requiredJobs, summarizeJobs } from "./ci-policy.mjs";
+
+const policy = {
+  code: process.env.CI_CODE === "true",
+  unitOnly: process.env.CI_UNIT_ONLY === "true",
+  full: process.env.CI_FULL === "true",
+};
+const needs = JSON.parse(process.env.CI_JOB_RESULTS);
+const required = requiredJobs(policy);
 const report = {
   sha: process.env.GITHUB_SHA,
-  ...summarizeJobs(
-    {
-      code: process.env.CI_CODE === "true",
-      unitOnly: process.env.CI_UNIT_ONLY === "true",
-      full: process.env.CI_FULL === "true",
-    },
-    JSON.parse(process.env.CI_JOB_RESULTS),
-  ),
+  ...summarizeJobs(policy, needs),
+  requiredJobs: required,
+  jobResults: Object.fromEntries(required.map((name) => [name, needs[name]?.result ?? "missing"])),
 };
 mkdirSync("artifacts", { recursive: true });
 writeFileSync("artifacts/ci-evidence.json", JSON.stringify(report, null, 2));
