@@ -7,6 +7,7 @@ import {
   type LicenseOwnerAction,
   type LicenseModerationAction,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import { licenseOwnerCommandSchema, licenseModerationCommandSchema } from "@nexus/validation";
 import { useNexusLocale } from "./locale-context";
 import { privateApiRequest } from "../lib/private-api-request";
@@ -299,9 +300,9 @@ export function LicenseControlPanel({
               />
               {copy.confirm}
             </label>
-            <button type="submit" disabled={!confirmed || loadingServers} className="btn-primary">
+            <Button type="submit" disabled={!confirmed || loadingServers} isLoading={busy}>
               {busy ? copy.pending : copy.submit}
-            </button>
+            </Button>
           </fieldset>
         </form>
       )}

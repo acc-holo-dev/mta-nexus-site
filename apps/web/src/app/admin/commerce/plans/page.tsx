@@ -40,7 +40,10 @@ export default async function CommercialPlansAdmin({
       </Link>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-primary">{copy.admin}</h1>
-        <Link href="/admin/commerce/plans/new" className="btn-primary">
+        <Link
+          href="/admin/commerce/plans/new"
+          className="inline-flex h-10 items-center justify-center rounded-lg bg-accent px-4 text-sm font-medium text-white shadow-nexus-sm transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
+        >
           {copy.newPlan}
         </Link>
       </header>

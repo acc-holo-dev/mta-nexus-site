@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { can } from "@nexus/security";
+import { Button } from "@nexus/ui";
 import { authService } from "../../../lib/services/auth-service";
 import { licenseControlService } from "../../../lib/services/license-control-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -78,9 +79,7 @@ export default async function LicensesModerationPage({
             </option>
           ))}
         </select>
-        <button className="btn-primary" type="submit">
-          {copy.searchButton}
-        </button>
+        <Button type="submit">{copy.searchButton}</Button>
       </form>
       {result.licenses.length === 0 ? (
         <p className="text-sm text-muted">{copy.empty}</p>
