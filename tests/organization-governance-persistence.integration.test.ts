@@ -155,6 +155,10 @@ it("persists one authoritative owner, both chosen roles, unchanged permissions a
   await expect(governance.history(f.org.id, f.owner.id)).rejects.toMatchObject({
     code: "FORBIDDEN",
   });
+  await expect(transfer(f)).rejects.toMatchObject({
+    code: "OWNERSHIP_OWNER_REQUIRED",
+  });
+  expect((await teams.getWorkspace(f.org.id, f.owner.id)).organization.ownerId).toBe(f.target.id);
   expect((await governance.history(f.org.id, f.target.id)).items[0].action).toBe(
     "organization.ownership_transferred",
   );
