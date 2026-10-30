@@ -172,14 +172,15 @@ export function OrganizationOwnershipTransfer({
           <p role="alert" className="text-sm text-danger">
             {error}
           </p>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             disabled={busy}
             onClick={onReload}
-            className="min-h-9 text-sm text-accent underline"
+            className="h-auto min-h-9 px-0 text-sm text-accent underline"
           >
             {copy.reload}
-          </button>
+          </Button>
         </div>
       )}
     </section>

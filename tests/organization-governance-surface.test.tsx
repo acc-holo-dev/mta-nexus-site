@@ -106,11 +106,14 @@ it.each(["ru", "en"] as const)(
     expect(html).toContain("&lt;script&gt;");
     expect(html).toMatch(/autocomplete="off"/iu);
     expect(html).toContain("disabled");
+    expect(html).toContain("rounded-lg");
     expect(html).not.toContain('value="owner"');
     const panel = renderToStaticMarkup(
       <OrganizationWorkspacePanel initial={workspace} locale={locale} actorId="owner" query="" />,
     );
     expect(panel).toContain(copy.choose);
+    expect(panel).toContain("rounded-lg");
+    expect(panel).toContain("text-accent");
     expect(panel).toContain('href="/workspace/organizations/org/activity"');
     const admin = renderToStaticMarkup(
       <OrganizationWorkspacePanel

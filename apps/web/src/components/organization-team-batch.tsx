@@ -130,20 +130,22 @@ export function OrganizationTeamBatch({
           {copy.selected}: {selected.length} / 20
         </legend>
         <div className="flex flex-wrap gap-3">
-          <button
+          <Button
             type="button"
-            className="min-h-11 text-sm text-accent underline"
+            variant="ghost"
+            className="h-auto min-h-11 px-0 text-sm text-accent underline"
             onClick={() => setSelected(eligible.map((member) => member.id))}
           >
             {copy.all}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="min-h-11 text-sm text-accent underline"
+            variant="ghost"
+            className="h-auto min-h-11 px-0 text-sm text-accent underline"
             onClick={() => setSelected([])}
           >
             {copy.clear}
-          </button>
+          </Button>
         </div>
         <ul className="grid gap-2 sm:grid-cols-2">
           {eligible.map((member) => (
@@ -258,14 +260,15 @@ export function OrganizationTeamBatch({
             >
               {stage === "saving" ? copy.saving : copy.confirm}
             </Button>
-            <button
+            <Button
               type="button"
-              className="min-h-11 text-sm text-accent underline"
+              variant="ghost"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline"
               disabled={disabled}
               onClick={() => setPreview(null)}
             >
               {copy.cancel}
-            </button>
+            </Button>
           </div>
         </div>
       )}

@@ -1,8 +1,4 @@
 "use client";
-import { OrganizationMemberEditor } from "./organization-member-editor";
-import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
-import { organizationTeamCopy } from "../lib/organization-team-copy";
-import { organizationContentCopy } from "../lib/organization-content-copy";
 import type { OrganizationTeamRole } from "@nexus/domain";
 import {
   canChangeOrganizationMember,
@@ -14,7 +10,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
+import { organizationContentCopy } from "../lib/organization-content-copy";
 import { organizationGovernanceCopy } from "../lib/organization-governance-copy";
+import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
+import { organizationTeamCopy } from "../lib/organization-team-copy";
 import { organizationRequest as platformRequest } from "../lib/organization-workspace-client";
 import {
   editableOrganizationSchema,
@@ -24,6 +23,7 @@ import {
 } from "../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";
 
@@ -403,23 +403,25 @@ export function OrganizationWorkspacePanel({
           </p>
         )}
         {data.role !== "owner" && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             disabled={busy}
-            className="text-sm text-danger underline"
+            className="h-auto px-0 text-sm text-danger underline"
             onClick={() => void leave()}
           >
             {copy.leave}
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           type="button"
+          variant="ghost"
           disabled={busy}
-          className="text-sm text-accent underline"
+          className="h-auto px-0 text-sm text-accent underline"
           onClick={() => router.refresh()}
         >
           {copy.reload}
-        </button>
+        </Button>
       </section>
     </div>
   );
