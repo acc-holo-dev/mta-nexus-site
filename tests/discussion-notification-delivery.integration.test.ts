@@ -5,15 +5,15 @@ import { contentRepository, db } from "@nexus/db";
 import { asc, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it, vi } from "vitest";
 import {
-  discussionNotificationDeliveryRepository as delivery,
   DiscussionNotificationDeliveryRepository,
+  discussionNotificationDeliveryRepository as delivery,
 } from "../packages/db/src/repositories/discussion-notification-delivery";
 import {
   auditEvents,
   comments,
   content,
-  discussionNotificationDeliveries as jobs,
   follows,
+  discussionNotificationDeliveries as jobs,
   notifications,
   users,
 } from "../packages/db/src/schema";
@@ -225,9 +225,10 @@ it("delivers direct and follower notices with generic copy and current eligibili
   expect(stored.map((row) => row.recipientId).sort()).toEqual([followerId, ownerId].sort());
   for (const row of stored) {
     expect(row.title).toBe("New discussion reply");
-    expect(["A publication you follow has a new reply.", "A discussion you participate in has a new reply."]).toContain(
-      row.message,
-    );
+    expect([
+      "A publication you follow has a new reply.",
+      "A discussion you participate in has a new reply.",
+    ]).toContain(row.message);
     expect(JSON.stringify(row)).not.toContain("PRIVATE_");
     expect(JSON.stringify(row)).not.toContain(commenterId);
   }

@@ -1,7 +1,7 @@
-import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { auditEvents, comments, content } from "../schema";
+import { auditEvents, comments, content, discussionNotificationDeliveries } from "../schema";
 
 const captured = vi.hoisted(() => ({
   transactionCalls: 0,
@@ -106,7 +106,7 @@ describe("article comment persistence", () => {
       isVerifiedPurchase: false,
     });
     expect(captured.transactionCalls).toBe(1);
-    expect(captured.inserts).toEqual([comments, auditEvents]);
+    expect(captured.inserts).toEqual([comments, discussionNotificationDeliveries, auditEvents]);
     expect(captured.updateTable).toBe(content);
     expect(captured.updateValues).not.toHaveProperty("updatedAt");
     const increment = captured.updateValues?.commentCount;

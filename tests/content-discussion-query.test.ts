@@ -1,6 +1,7 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
 import { comments } from "../packages/db/src/schema";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -22,8 +23,10 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-import { contentDiscussionRepository } from "../packages/db/src/repositories/content-discussion";
+
 import { contentRepository } from "../packages/db/src/repositories/content";
+import { contentDiscussionRepository } from "../packages/db/src/repositories/content-discussion";
+
 const data = {
   id: "cmt",
   contentId: "content",
@@ -139,12 +142,13 @@ it("inserts a reply, changes only the count and audits under the publication loc
   const row = Object.keys(getTableColumns(comments)).map(
     (key) => stored[key as keyof typeof stored] ?? null,
   );
-  state.rows = [[["published"]], [["parent"]], [row], [], []];
+  state.rows = [[["published"]], [["parent"]], [row], [], [], []];
   const result = await contentRepository.addComment(data, audit);
   expect(result.id).toBe("cmt");
   expect(state.queries[0].sql).toContain("for update");
   const update = state.queries[3].sql;
   expect(update).toContain('"comment_count" = "content"."comment_count" + 1');
   expect(update).not.toContain('"updated_at"');
-  expect(state.queries[4].sql).toContain('insert into "audit_events"');
+  expect(state.queries[4].sql).toContain('insert into "discussion_notification_deliveries"');
+  expect(state.queries[5].sql).toContain('insert into "audit_events"');
 });

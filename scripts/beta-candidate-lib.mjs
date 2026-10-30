@@ -221,18 +221,15 @@ function evaluateBackupArtifact(path, candidateSha) {
       reason: `backup-restore status is ${body.status ?? "unknown"}, not PASS.`,
     };
   }
-  const flags = ["sourceDestroyedBeforeRestore", "cleanupCompleted", "verificationPassed"];
-  const missingFlags = flags.filter(
-    (name) => body[name] !== true && body.evidence?.[name] !== true,
-  );
-  if (missingFlags.length) {
-    // Soft: older evidence shapes may nest differently; require PASS + sha match primarily.
-    // Still record incomplete flags as residual detail without inventing PASS.
-  }
+  const cleanupOk = body.cleanupComplete === true || body.cleanupCompleted === true;
+  const incompleteFlags = [];
+  if (body.sourceDestroyedBeforeRestore !== true)
+    incompleteFlags.push("sourceDestroyedBeforeRestore");
+  if (!cleanupOk) incompleteFlags.push("cleanupComplete");
   return {
     status: "passed",
     reason: null,
-    incompleteFlags: missingFlags,
+    ...(incompleteFlags.length ? { incompleteFlags } : {}),
   };
 }
 

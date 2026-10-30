@@ -55,14 +55,18 @@ it("SIGTERM stops the ready loop, emits stopped, and removes the health file", a
 
   try {
     await waitFor(() => stdout.includes('"status":"ready"'), 20_000, "worker did not become ready");
-    await waitFor(async () => {
-      try {
-        await access(healthFile);
-        return true;
-      } catch {
-        return false;
-      }
-    }, 5_000, "health file was not written");
+    await waitFor(
+      async () => {
+        try {
+          await access(healthFile);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      5_000,
+      "health file was not written",
+    );
 
     expect(child.kill("SIGTERM")).toBe(true);
     const result = await Promise.race([

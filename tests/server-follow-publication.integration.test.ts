@@ -1,4 +1,3 @@
-import { beforeAll, describe, expect, it } from "vitest";
 import {
   contentRepository,
   db,
@@ -9,6 +8,7 @@ import {
   socialRepository,
   userRepository,
 } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 import { drainPublicationNotificationDelivery } from "../apps/web/src/lib/services/server-follow-notification-service";
 
 describe("server follower publication notification integration", () => {
@@ -107,9 +107,7 @@ describe("server follower publication notification integration", () => {
   it("delivers only to eligible followers with server notifications enabled", async () => {
     const pages = await drainPublicationNotificationDelivery();
     expect(pages.some((page) => page.state === "completed")).toBe(true);
-    expect(
-      pages.reduce((sum, page) => sum + page.stored, 0),
-    ).toBeGreaterThanOrEqual(1);
+    expect(pages.reduce((sum, page) => sum + page.stored, 0)).toBeGreaterThanOrEqual(1);
 
     const enabledNotifications = await notificationRepository.listByUser(enabledId, 10);
     const disabledNotifications = await notificationRepository.listByUser(disabledId, 10);

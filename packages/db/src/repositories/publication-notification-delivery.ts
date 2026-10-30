@@ -1,12 +1,7 @@
 import { createHash } from "node:crypto";
 import { and, asc, desc, eq, isNull, lte, ne, sql } from "drizzle-orm";
 import { db } from "../client";
-import {
-  content,
-  follows,
-  publicationNotificationDeliveries,
-  servers,
-} from "../schema";
+import { content, follows, publicationNotificationDeliveries, servers } from "../schema";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { notificationRepository } from "./notifications";
 
@@ -76,8 +71,7 @@ class PublicationNotificationDeliveryRepository {
             .for("share")
             .limit(1);
           if (
-            !publication ||
-            publication.status !== "published" ||
+            publication?.status !== "published" ||
             publication.serverId !== job.serverId ||
             publication.authorId !== job.authorId
           ) {
