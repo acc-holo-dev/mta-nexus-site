@@ -12,7 +12,7 @@
 
 ## Приёмка релиза
 
-Локальная сборка и тесты не подтверждают готовность целевой инфраструктуры. Для кандидата используйте `pnpm beta:candidate` на чистом exact SHA после `full_acceptance`: отчёт требует `artifacts/ci-evidence.json` (с `jobResults`), `release-upgrade.json` и `backup-restore-evidence.json` со `status: "PASS"`. Отчёт никогда не ставит open beta live и не разрешает production deploy. Полный backup/restore rehearsal (`scripts/check-backup-restore.mjs`) по-прежнему только на disposable GitHub-hosted runner (ROADMAP 19); локально подтверждается контракт топологии `compose.production.yaml`. Owner-остатки: observability/alerts среды, публикация Terms/Privacy/Community rules, optional Web Push soak/provider evidence.
+Локальная сборка и тесты не подтверждают готовность целевой инфраструктуры. Для кандидата используйте `pnpm beta:candidate` на чистом exact SHA после `full_acceptance`: отчёт требует `artifacts/ci-evidence.json` (с `jobResults`), `release-upgrade.json` и `backup-restore-evidence.json` со `status: "PASS"`. Отчёт никогда не ставит open beta live и не разрешает production deploy. Полный backup/restore rehearsal (`scripts/check-backup-restore.mjs`) по-прежнему только на disposable GitHub-hosted runner (ROADMAP 19); локально подтверждается контракт топологии `compose.production.yaml`. Owner-остатки: observability/alerts среды, публикация Terms/Privacy/Community rules, optional Web Push soak/provider evidence (`pnpm push:soak` / `pnpm push:provider:probe` + verify; `beta:candidate` clears the residual only when both JSON artifacts validate—presence alone never invents PASS).
 
 ## Доставка уведомлений
 
