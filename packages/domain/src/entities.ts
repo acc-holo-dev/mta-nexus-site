@@ -1,5 +1,5 @@
-import type { ProductType } from "./product-types";
 import type { BuildPackageEvidence } from "./build-package-evidence";
+import type { ProductType } from "./product-types";
 
 // Domain State Enums & Types
 
