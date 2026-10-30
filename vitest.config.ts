@@ -1,5 +1,5 @@
-import { configDefaults, defineConfig } from "vitest/config";
 import path from "node:path";
+import { configDefaults, defineConfig } from "vitest/config";
 import { classifyTests } from "./scripts/test-projects.mjs";
 
 // The focused runner passes explicit files so a small change does not require
@@ -45,9 +45,12 @@ export default defineConfig({
           include: testFiles.database,
           // Queue capacity, leases and exact counts share one disposable DB.
           fileParallelism: false,
-          // Sequential files can reuse the transformed module graph and one
-          // postgres.js pool. Isolation stays on for unit tests that mock heavily.
-          isolate: false,
+          // Temp-table suites mock `packages/db/src/client` with a per-file Proxy.
+          // Sharing the module graph across files leaves repositories bound to
+          // another file's Proxy/`active.db`, so inserts hit public tables and
+          // reads return empty. Isolate each file so its client mock applies.
+          isolate: true,
+          maxWorkers: 1,
         },
       },
     ],
