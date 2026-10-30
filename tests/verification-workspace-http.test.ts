@@ -124,7 +124,7 @@ it("normalizes saved fields and submits proof without accepting trust/role/scope
   expect(mocks.updateProfile).toHaveBeenCalledWith(actor, { ...profile, discordTag: "dev" });
   expect((await POST(request("POST", application))).status).toBe(201);
   expect(mocks.apply).toHaveBeenCalledWith(actor, { ...application, notes: "Project evidence" });
-  expect(mocks.after).toHaveBeenCalledTimes(1);
+  expect(mocks.after).not.toHaveBeenCalled();
   for (const body of [
     { ...profile, verifiedDeveloper: true },
     { ...profile, reputationScore: 900 },
