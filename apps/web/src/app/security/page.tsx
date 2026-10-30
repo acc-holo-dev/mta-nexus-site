@@ -1,11 +1,11 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
-import { authService } from "../../lib/services/auth-service";
-import { securityCenterService } from "../../lib/services/security-center-service";
-import { SECURITY_ACTIVITY_LABEL_KEYS } from "../../lib/security-activity";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { securityActivityLabelKey } from "../../lib/security-activity";
+import { authService } from "../../lib/services/auth-service";
+import { securityCenterService } from "../../lib/services/security-center-service";
 
 export const dynamic = "force-dynamic";
 
@@ -137,7 +137,7 @@ export default async function SecurityPage() {
               <li key={event.id} className="flex flex-wrap justify-between gap-3 py-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-primary">
-                    {copy.activityLabels[SECURITY_ACTIVITY_LABEL_KEYS[event.action]]}
+                    {copy.activityLabels[securityActivityLabelKey(event)]}
                   </p>
                   <p className="mt-0.5 text-xs text-muted">
                     {event.userAgent || event.targetType}

@@ -1,9 +1,11 @@
+import { SECURITY_SUBJECT_ACTIONS } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 import {
   isSecurityActivityAction,
   SECURITY_ACTIVITY_ACTIONS,
   SECURITY_ACTIVITY_LABEL_KEYS,
+  SECURITY_SUBJECT_LABEL_KEYS,
   toSecurityActivityItem,
 } from "../apps/web/src/lib/security-activity";
 
@@ -39,6 +41,10 @@ describe("security activity contract", () => {
       expect(SECURITY_ACTIVITY_ACTIONS).toContain(action);
       expect(isSecurityActivityAction(action)).toBe(true);
     }
+    for (const action of SECURITY_SUBJECT_ACTIONS) {
+      expect(SECURITY_ACTIVITY_ACTIONS).toContain(action);
+      expect(SECURITY_SUBJECT_LABEL_KEYS[action]).toBeTruthy();
+    }
   });
 
   it("keeps RU/EN Security Center labels for every allowlisted action", () => {
@@ -46,6 +52,9 @@ describe("security activity contract", () => {
       const labels = getDictionary(locale).securityCenter.activityLabels;
       for (const action of SECURITY_ACTIVITY_ACTIONS) {
         const key = SECURITY_ACTIVITY_LABEL_KEYS[action];
+        expect(labels[key as keyof typeof labels]).toBeTruthy();
+      }
+      for (const key of Object.values(SECURITY_SUBJECT_LABEL_KEYS)) {
         expect(labels[key as keyof typeof labels]).toBeTruthy();
       }
     }
@@ -66,6 +75,7 @@ describe("security activity contract", () => {
       id: "aud_test",
       action: "user.password_changed",
       targetType: "user",
+      perspective: "actor",
       ipAddress: "127.0.0.1",
       userAgent: "Browser",
       createdAt: new Date("2026-10-07T00:00:00.000Z"),
@@ -85,6 +95,7 @@ describe("security activity contract", () => {
       id: "aud_license",
       action: "license.bound",
       targetType: "license",
+      perspective: "actor",
       createdAt: new Date("2026-10-07T00:00:00.000Z"),
     });
     expect(JSON.stringify(license)).not.toContain("previousStatus");
@@ -97,6 +108,44 @@ describe("security activity contract", () => {
         createdAt: new Date("2026-10-07T00:00:00.000Z"),
       })?.action,
     ).toBe("organization.ownership_transferred");
+  });
+
+  it("shows organization changes that name this account without the actor network or details", () => {
+    const item = toSecurityActivityItem(
+      {
+        id: "aud_removed",
+        actorId: "usr_admin",
+        action: "organization.member_removed",
+        targetType: "organization",
+        ipAddress: "198.51.100.8",
+        userAgent: "Staff Browser",
+        details: { userId: "usr_member", note: "private-note" },
+        createdAt: new Date("2026-10-07T00:00:00.000Z"),
+      },
+      "usr_member",
+    );
+    expect(item).toEqual({
+      id: "aud_removed",
+      action: "organization.member_removed",
+      targetType: "organization",
+      perspective: "subject",
+      createdAt: new Date("2026-10-07T00:00:00.000Z"),
+    });
+    expect(JSON.stringify(item)).not.toContain("usr_admin");
+    expect(JSON.stringify(item)).not.toContain("private-note");
+    expect(JSON.stringify(item)).not.toContain("198.51.100.8");
+    expect(
+      toSecurityActivityItem(
+        {
+          id: "aud_foreign",
+          actorId: "usr_admin",
+          action: "user.logged_in",
+          targetType: "user",
+          createdAt: new Date("2026-10-07T00:00:00.000Z"),
+        },
+        "usr_member",
+      ),
+    ).toBeNull();
   });
 
   it("rejects non-security audit events", () => {

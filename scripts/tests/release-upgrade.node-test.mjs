@@ -236,7 +236,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract keeps staff queue indexes and covers notification delivery", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0085_build_incident_notification_delivery");
+  assert.equal(plan.targetTag, "0086_security_activity_subject_indexes");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

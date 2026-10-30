@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   type AuditEvent,
+  SECURITY_SUBJECT_ACTIONS,
+  SECURITY_SUBJECT_DETAIL_KEYS,
   SERVER_ACTIVITY_ACTIONS,
   SERVER_ACTIVITY_FIELDS,
   type ServerActivityAction,
@@ -9,7 +11,7 @@ import {
   serverActivityCursor,
   type User,
 } from "@nexus/domain";
-import { and, desc, eq, exists, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, exists, inArray, ne, or, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
 import { auditEvents, servers, users } from "../schema";
@@ -316,6 +318,55 @@ export class AuditRepository {
       .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
       .limit(boundedLimit);
     return rows as unknown as AuditEvent[];
+  }
+
+  async listAccountActivity(
+    userId: string,
+    actorActions: readonly string[],
+    limit = 50,
+  ): Promise<AuditEvent[]> {
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(userId)) {
+      throw new AppError(
+        "Invalid security activity account",
+        400,
+        "SECURITY_ACTIVITY_ACCOUNT_INVALID",
+      );
+    }
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 50;
+    const actorScope =
+      actorActions.length > 0
+        ? and(eq(auditEvents.actorId, userId), inArray(auditEvents.action, [...actorActions]))
+        : undefined;
+    const subjectScope = and(
+      ne(auditEvents.actorId, userId),
+      or(
+        ...SECURITY_SUBJECT_ACTIONS.map((action) =>
+          and(
+            eq(auditEvents.action, action),
+            sql`${auditEvents.details}->>${SECURITY_SUBJECT_DETAIL_KEYS[action]} = ${userId}`,
+          ),
+        ),
+      ),
+    );
+    const rows = await db
+      .select({
+        id: auditEvents.id,
+        actorId: auditEvents.actorId,
+        actorType: auditEvents.actorType,
+        action: auditEvents.action,
+        targetId: auditEvents.targetId,
+        targetType: auditEvents.targetType,
+        ipAddress: auditEvents.ipAddress,
+        userAgent: auditEvents.userAgent,
+        createdAt: auditEvents.createdAt,
+      })
+      .from(auditEvents)
+      .where(actorScope ? or(actorScope, subjectScope) : subjectScope)
+      .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
+      .limit(boundedLimit);
+    return rows as AuditEvent[];
   }
 }
 

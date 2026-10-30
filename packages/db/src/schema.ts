@@ -1413,6 +1413,19 @@ export const auditEvents = pgTable(
     index("audit_events_download_activity_idx")
       .on(table.targetId, table.createdAt.desc(), table.id.desc())
       .where(sql`${table.targetType} = 'product' AND ${table.action} = 'product.download_started'`),
+    index("audit_events_actor_created_id_idx").on(
+      table.actorId,
+      table.createdAt.desc(),
+      table.id.desc(),
+    ),
+    index("audit_events_security_new_owner_idx")
+      .on(sql`(${table.details}->>'newOwnerId')`, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.action} = 'organization.ownership_transferred'`),
+    index("audit_events_security_member_subject_idx")
+      .on(sql`(${table.details}->>'userId')`, table.createdAt.desc(), table.id.desc())
+      .where(
+        sql`${table.action} IN ('organization.member_added','organization.member_updated','organization.member_removed')`,
+      ),
   ],
 );
 
