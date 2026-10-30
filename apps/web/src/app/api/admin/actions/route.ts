@@ -1,17 +1,17 @@
+import { productRepository, reportRepository, verificationRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
+import { resourceModerationCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { AppError } from "@nexus/domain";
-import { z } from "zod";
-import { resourceModerationCommandSchema } from "@nexus/validation";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { resourceModerationService } from "../../../../lib/services/resource-release-control-service";
 import { authService } from "../../../../lib/services/auth-service";
-import { productService } from "../../../../lib/services/product-service";
 import { contentService } from "../../../../lib/services/content-service";
-import { productRepository, reportRepository, verificationRepository } from "@nexus/db";
-import { can, consumeRateLimit, generateId } from "@nexus/security";
+import { productService } from "../../../../lib/services/product-service";
+import { resourceModerationService } from "../../../../lib/services/resource-release-control-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -51,6 +51,8 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
     action: z.enum(["approve", "reject", "quarantine", "restore"]),
     notes: z.string().trim().min(3).max(2000),
     expectedRevision: z.number().int().min(1).max(2147483646).optional(),
+    /** SEC-002: enqueue durable notices for users with a served download receipt. */
+    notifyAffectedDownloaders: z.boolean().optional(),
   }),
   z
     .object({
@@ -199,6 +201,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           {
             buildId: targetId,
             reason: notes,
+            notifyAffectedDownloaders: parsed.data.notifyAffectedDownloaders === true,
           },
           user,
           token,

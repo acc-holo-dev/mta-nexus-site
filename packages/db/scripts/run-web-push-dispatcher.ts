@@ -1,6 +1,7 @@
 import { rename, rm, writeFile } from "node:fs/promises";
 import { readWebPushVapidConfig } from "@nexus/config";
 import {
+  buildIncidentNotificationDeliveryRepository,
   checkDatabaseConnection,
   closeDatabaseConnection,
   createWebPushHttpSender,
@@ -71,6 +72,8 @@ type QueueAlertReason =
   | "discussion_delivery_backlog"
   | "publication_delivery_failed"
   | "publication_delivery_backlog"
+  | "build_incident_delivery_failed"
+  | "build_incident_delivery_backlog"
   | "admission_recovery_failed"
   | "admission_recovery_backlog";
 
@@ -104,6 +107,9 @@ let discussionOldestAgeSeconds = 0;
 let publicationPending = 0;
 let publicationFailed = 0;
 let publicationOldestAgeSeconds = 0;
+let buildIncidentPending = 0;
+let buildIncidentFailed = 0;
+let buildIncidentOldestAgeSeconds = 0;
 let admissionPending = 0;
 let admissionFailed = 0;
 let admissionOldestAgeSeconds = 0;
@@ -180,6 +186,12 @@ function updateQueueAlertState() {
     (publicationPending > 0 && publicationOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
   )
     reasons.push("publication_delivery_backlog");
+  if (buildIncidentFailed > 0) reasons.push("build_incident_delivery_failed");
+  if (
+    buildIncidentPending >= QUEUE_ALERT_DUE_JOBS ||
+    (buildIncidentPending > 0 && buildIncidentOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("build_incident_delivery_backlog");
   if (admissionFailed > 0) reasons.push("admission_recovery_failed");
   if (
     admissionPending >= QUEUE_ALERT_DUE_JOBS ||
@@ -215,6 +227,9 @@ function updateQueueAlertState() {
     publicationPending,
     publicationFailed,
     publicationOldestAgeSeconds,
+    buildIncidentPending,
+    buildIncidentFailed,
+    buildIncidentOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -265,6 +280,9 @@ async function writeHealthSnapshot() {
     publicationPending,
     publicationFailed,
     publicationOldestAgeSeconds,
+    buildIncidentPending,
+    buildIncidentFailed,
+    buildIncidentOldestAgeSeconds,
     admissionPending,
     admissionFailed,
     admissionOldestAgeSeconds,
@@ -316,6 +334,10 @@ async function refreshQueueStats() {
   publicationPending = publication.pending;
   publicationFailed = publication.failed;
   publicationOldestAgeSeconds = publication.oldestAgeSeconds;
+  const incidents = await buildIncidentNotificationDeliveryRepository.stats();
+  buildIncidentPending = incidents.pending;
+  buildIncidentFailed = incidents.failed;
+  buildIncidentOldestAgeSeconds = incidents.oldestAgeSeconds;
   const admissions = await webPushAdmissionRecoveryRepository.stats();
   admissionPending = admissions.pending;
   admissionFailed = admissions.failed;
@@ -418,6 +440,14 @@ try {
     if (publication.state !== "idle") {
       activity += 1;
       emit({ status: "publication-delivery", batch: healthBatch, ...publication });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
+    const incidents = await buildIncidentNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (incidents.state !== "idle") {
+      activity += 1;
+      emit({ status: "build-incident-delivery", batch: healthBatch, ...incidents });
     }
     markProgress();
     if (controller.signal.aborted) break;

@@ -111,6 +111,7 @@ export class BuildRepository {
     reason: string,
     audit: Omit<AuditEvent, "createdAt">,
     currentToken: string,
+    options: { notifyAffectedDownloaders?: boolean } = {},
   ): Promise<Build | null> {
     return buildLifecycle.quarantinePublishedAndRefreshProduct(
       id,
@@ -118,6 +119,7 @@ export class BuildRepository {
       reason,
       audit,
       currentToken,
+      options,
     );
   }
 

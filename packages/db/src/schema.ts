@@ -7,6 +7,7 @@ import {
   type StorageObjectIdentity,
   type StorageMaintenanceState,
   type BuildPackageEvidence,
+  type BuildIncidentNotificationData,
   type BuildReviewNotificationData,
   type LicenseTermNotificationData,
   type ResourceDeliveryStatus,
@@ -1232,6 +1233,7 @@ export const notifications = pgTable(
   {
     data: jsonb("data").$type<
       | BuildReviewNotificationData
+      | BuildIncidentNotificationData
       | LicenseTermNotificationData
       | ResourceReleaseNoticeData
       | import("@nexus/domain").DiscussionPushNotificationData
@@ -1467,6 +1469,34 @@ export const reportNotificationDeliveries = pgTable(
       .on(table.availableAt, table.reportId)
       .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
     check("report_notification_deliveries_attempts_bounds", sql`${table.attempts} BETWEEN 0 AND 5`),
+  ],
+);
+
+// SEC-002: durable notice fanout for served downloaders of a quarantined build.
+export const buildIncidentNotificationDeliveries = pgTable(
+  "build_incident_notification_deliveries",
+  {
+    buildId: text("build_id")
+      .primaryKey()
+      .references(() => builds.id, { onDelete: "cascade" }),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    version: text("version").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    lastRecipientId: text("last_recipient_id"),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("build_incident_notification_deliveries_due_idx")
+      .on(table.availableAt, table.buildId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check(
+      "build_incident_notification_deliveries_attempts_bounds",
+      sql`${table.attempts} BETWEEN 0 AND 5`,
+    ),
   ],
 );
 
