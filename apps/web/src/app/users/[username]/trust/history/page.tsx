@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -98,7 +98,7 @@ export default async function ApprovalHistoryPage({
           <select
             name="type"
             defaultValue={filters?.type ?? ""}
-            className="nexus-input block min-h-11"
+            className={`${fieldClass} block min-h-11`}
           >
             <option value="">{copy.all}</option>
             <option value="user">{copy.user}</option>

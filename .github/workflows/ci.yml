@@ -53,6 +53,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+      # pnpm must be on PATH before setup-node resolves `cache: pnpm` (store path).
       - name: Install pnpm
         uses: pnpm/action-setup@v6.1.0
         with:

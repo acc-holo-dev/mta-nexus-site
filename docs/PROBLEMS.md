@@ -8,7 +8,7 @@
 
 - `@esbuild-kit/*` ещё тянет `drizzle-kit@0.31.11`; безопасной замены нет, пока upstream не уберёт loader. Nested `esbuild` уже зафиксирован override на `0.28.2`.
 - Vite закреплён на `8.3.5` (Vitest 5 peer: `^6.4 || ^7 || ^8`); дальнейшие минорные обновления — небольшими группами с `pnpm test:unit` / tooling pins.
-- `dependency-cruiser@18.7.0` для `tsPreCompilationDeps` использует вложенный TypeScript `6.0.3` через `packageExtensions`. Стабильная поддержка TypeScript 7 ожидается в dependency-cruiser ≥18.8 с typescript ≥7.1; тогда расширение можно снять.
+- `dependency-cruiser@18.7.0` для `tsPreCompilationDeps` использует вложенный TypeScript `6.0.3` через `packageExtensions`. **Не снимать pin на beta:** на 2026-10-31 npm даёт только `18.8.0-beta-1` (TS ≥7.1 native API); стабильного 18.8 ещё нет. Корневой `typescript` сейчас резолвится в `7.0.2` (`^7.0.2`) — для снятия расширения нужны **оба**: stable dependency-cruiser ≥18.8 **и** typescript ≥7.1, затем `pnpm analyze:architecture` + `pnpm test:tooling`.
 
 ## Приёмка релиза
 
@@ -20,7 +20,9 @@
 
 ## Проверки и сопровождение
 
-Тесты PostgreSQL внутри одного запуска используют общую БД и выполняются последовательно (`fileParallelism: false`, `maxWorkers: 1`). Файлы database-проекта изолируются (`isolate: true`), потому что temp-table suites подменяют `packages/db/src/client` per-file Proxy. Полный набор не запускать одновременно с тяжёлой сборкой на ограниченном хосте. Для локальных изменений выбирать связанные проверки; дальнейшие ускорения — только по новым замерам без ослабления конкуренции и отката.
+Тесты PostgreSQL внутри одного запуска используют общую БД и выполняются последовательно (`fileParallelism: false`, `maxWorkers: 1`). Файлы database-проекта изолируются (`isolate: true`), потому что temp-table suites подменяют `packages/db/src/client` per-file Proxy. Полный набор не запускать одновременно с тяжёлой сборкой на ограниченном хосте. Для локальных изменений выбирать связанные проверки; дальнейшие ускорения — только по новым замерам без ослабления конкуренции и отката. **Не** ставить `isolate: false` и **не** поднимать database `maxWorkers` без нового измеримого плана и зелёного прогона.
+
+Замер unit (host Node 26.11.1 / pnpm 12.4.2, 2026-10-31, tip with Phase-0 docs): `pnpm test:unit` wall **≈62.5s**, 634 files / 6815 tests (1 failure was the temporary PROJECT-MAP allowlist gap, now fixed). Sum of per-file durations ≈29.3s under `maxWorkers: 4`. Top slow files (from `artifacts/unit-tests.json` via `node scripts/summarize-unit-timings.mjs`): interaction/UI suites `discussion-report-batch-interaction` (~2.0s), `managed-server-visibility-interaction` (~1.3s), `notification-inbox-history-interaction` (~1.2s), then `storage-atomic-upload` (~1.2s) and `request-ip-properties` (~1.0s). Дальнейшая оптимизация unit — точечно по этим файлам; database policy unchanged.
 
 Dependency-cruiser 18.7 ещё не использует API TypeScript 7 для pre-compilation deps: см. ограничение в разделе «Зависимости». После стабильного 18.8+/TS 7.1 снять `packageExtensions` и перепроверить `analyze:architecture`.
 

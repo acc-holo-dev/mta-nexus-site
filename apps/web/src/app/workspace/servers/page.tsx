@@ -1,5 +1,5 @@
 import { serverRepository } from "@nexus/db";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -25,8 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
-const fieldClass =
-  "rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
 
 export default async function ManagedServersPage({
   searchParams,

@@ -1,5 +1,5 @@
 import { AppError, RESOURCE_DELIVERY_STATUSES } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -73,7 +73,7 @@ export default async function ResourceDownloadsPage({
         ) : null}
         <label className="grid gap-1 text-sm">
           {copy.days}
-          <select name="days" defaultValue={query.days} className="nexus-input">
+          <select name="days" defaultValue={query.days} className={fieldClass}>
             {["all", "7", "30", "90", "365"].map((days) => (
               <option key={days} value={days}>
                 {days === "all" ? copy.periodAll : `${days} ${copy.dayCount}`}
@@ -83,7 +83,7 @@ export default async function ResourceDownloadsPage({
         </label>
         <label className="grid gap-1 text-sm">
           {copy.title}
-          <select name="status" defaultValue={query.status} className="nexus-input">
+          <select name="status" defaultValue={query.status} className={fieldClass}>
             {["all", ...RESOURCE_DELIVERY_STATUSES].map((status) => (
               <option key={status} value={status}>
                 {copy[status as "all" | (typeof RESOURCE_DELIVERY_STATUSES)[number]]}

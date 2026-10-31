@@ -3,6 +3,20 @@
 This document covers development startup, verification and production boundaries.  
 Документ описывает запуск разработки, проверки и эксплуатационные ограничения.
 
+Компактная карта репозитория: [PROJECT-MAP.md](PROJECT-MAP.md).
+
+### Contents / Содержание
+
+1. [Supported DEV startup](#1-supported-dev-startup)
+2. [Verification](#2-verification)
+3. [Production boundary](#3-production-boundary)
+4. [Backup and recovery](#4-backup-and-recovery)
+5. [Resource safety operations](#5-resource-safety-operations)
+6. [Branch and release operations](#6-branch-and-release-operations)
+- [Resource integrity rollout and seed recovery](#resource-integrity-rollout-and-seed-recovery)
+- [Production compilation in restricted build environments](#production-compilation-in-restricted-build-environments)
+- [Existing-installation release and recovery](#existing-installation-release-and-recovery)
+
 ## 1. Supported DEV startup
 
 Use the root `compose.yaml` directly when you want a Docker-only startup:
@@ -130,7 +144,19 @@ pnpm build
 
 CI chooses a scope from the changed-file set (`scripts/ci-policy.mjs`). Unknown or
 mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
-`full_acceptance`. Local commands stay aligned with those scopes:
+`full_acceptance`. Local commands stay aligned with those scopes.
+
+Workspace install jobs (`unit`, `verify`, `mail-worker`) must keep
+`pnpm/action-setup` **before** `actions/setup-node` with `cache: pnpm`, then
+`pnpm install --frozen-lockfile`. Jobs without a workspace install must not set
+`cache: pnpm`. This order is asserted by `scripts/tests/ci-hardening.node-test.mjs`.
+Do not widen path scopes to “make CI green.” After `pnpm test:unit`, optional
+`node scripts/summarize-unit-timings.mjs` ranks slow files from
+`artifacts/unit-tests.json` (gitignored). Measured host timings live in
+[PROBLEMS](PROBLEMS.md#проверки-и-сопровождение); cache contract summary:
+[PROJECT-MAP](PROJECT-MAP.md#ci-install-cache-проверено).
+
+Local commands stay aligned with those scopes:
 
 | Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                         |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |

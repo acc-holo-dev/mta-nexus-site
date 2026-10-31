@@ -67,3 +67,29 @@ test("workflow Node versions use the same repository pin", () => {
     assert.doesNotMatch(content, /^[ \t]+node-version:/mu, file);
   }
 });
+
+test("pnpm install jobs enable setup-node cache only after pnpm/action-setup", () => {
+  const content = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
+  // Split on top-level jobs (two-space indent). Keep jobs that run workspace installs.
+  const jobs = content.split(/\n  [a-z0-9-]+:\n/u).slice(1);
+  const installJobs = jobs.filter((job) => /pnpm install --frozen-lockfile/u.test(job));
+  assert.equal(installJobs.length, 3, "unit, verify, and mail-worker install the workspace");
+  for (const job of installJobs) {
+    const pnpmSetup = job.search(/uses: pnpm\/action-setup@/u);
+    const nodeSetup = job.search(/uses: actions\/setup-node@/u);
+    const cachePnpm = job.search(/^[ \t]+cache: pnpm$/mu);
+    assert.ok(pnpmSetup >= 0, "install job must install pnpm before caching");
+    assert.ok(nodeSetup > pnpmSetup, "setup-node must follow pnpm/action-setup");
+    assert.ok(cachePnpm > nodeSetup, "cache: pnpm must be under that setup-node step");
+  }
+  // Jobs that only run Node scripts must not invent a pnpm store cache without an install.
+  for (const jobName of ["plan:", "summary:", "smoke:", "postgres-persistence:"]) {
+    const marker = `\n  ${jobName}\n`;
+    const start = content.indexOf(marker);
+    assert.ok(start >= 0, jobName);
+    const rest = content.slice(start + 1);
+    const next = rest.search(/\n  [a-z0-9-]+:\n/u);
+    const job = next >= 0 ? rest.slice(0, next) : rest;
+    assert.doesNotMatch(job, /^[ \t]+cache: pnpm$/mu, `${jobName} must not cache pnpm without install`);
+  }
+});

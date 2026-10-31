@@ -1,5 +1,5 @@
 import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { ReactionRemoval } from "../../../components/reaction-removal";
@@ -72,7 +72,7 @@ export default async function ReactionsPage({
             name="q"
             maxLength={100}
             defaultValue={filters?.query ?? ""}
-            className="nexus-input block min-h-11 w-full"
+            className={`${fieldClass} block min-h-11 w-full`}
           />
         </label>
         <label className="space-y-1 text-xs text-muted">
@@ -80,7 +80,7 @@ export default async function ReactionsPage({
           <select
             name="reaction"
             defaultValue={filters?.reaction ?? ""}
-            className="nexus-input block min-h-11"
+            className={`${fieldClass} block min-h-11`}
           >
             <option value="">{copy.all}</option>
             {CONTENT_REACTIONS.map((reaction) => (

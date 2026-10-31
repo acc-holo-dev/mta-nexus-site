@@ -49,7 +49,13 @@ describe("mainline repository policy", () => {
       .sort();
 
     // PROBLEMS.md is the single maintained problem registry (owner-requested).
-    expect(documents).toEqual(["ARCHITECTURE.md", "OPERATIONS.md", "PROBLEMS.md"]);
+    // PROJECT-MAP.md is the compact repository navigation index (Phase 0 foundation).
+    expect(documents).toEqual([
+      "ARCHITECTURE.md",
+      "OPERATIONS.md",
+      "PROBLEMS.md",
+      "PROJECT-MAP.md",
+    ]);
 
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
     expect(handbook.length).toBeGreaterThanOrEqual(4);

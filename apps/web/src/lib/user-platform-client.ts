@@ -1,10 +1,12 @@
+import { fieldClassBlock } from "@nexus/ui";
 import { z } from "zod";
 import type { Locale } from "./i18n";
 import { privateApiRequest } from "./private-api-request";
 import { contentFieldsSchema, profileUpdateSchema } from "./user-platform-contract";
 import { userPlatformError } from "./user-platform-copy";
-export const platformFieldClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
+
+/** Alias kept for existing platform screens; new code should import from `@nexus/ui`. */
+export const platformFieldClass = fieldClassBlock;
 
 const editableContentSchema = contentFieldsSchema
   .extend({

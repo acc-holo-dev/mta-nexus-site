@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { NotificationCenterTabs } from "../../components/notification-center-tabs";
@@ -88,7 +88,7 @@ export default async function NotificationCenterPage({
                 name="q"
                 maxLength={100}
                 defaultValue={filters?.query ?? ""}
-                className="nexus-input block min-h-11 w-full"
+                className={`${fieldClass} block min-h-11 w-full`}
               />
             </label>
             <label className="space-y-1 text-xs text-muted">
@@ -96,7 +96,7 @@ export default async function NotificationCenterPage({
               <select
                 name="state"
                 defaultValue={filters?.state ?? "all"}
-                className="nexus-input block min-h-11"
+                className={`${fieldClass} block min-h-11`}
               >
                 {(["all", "unread", "read"] as const).map((state) => (
                   <option key={state} value={state}>
@@ -110,7 +110,7 @@ export default async function NotificationCenterPage({
               <select
                 name="category"
                 defaultValue={filters?.category ?? "all"}
-                className="nexus-input block min-h-11"
+                className={`${fieldClass} block min-h-11`}
               >
                 <option value="all">{copy.all}</option>
                 {INBOX_CATEGORIES.map((category) => (
@@ -125,7 +125,7 @@ export default async function NotificationCenterPage({
               <select
                 name="period"
                 defaultValue={filters?.period ?? "all"}
-                className="nexus-input block min-h-11"
+                className={`${fieldClass} block min-h-11`}
               >
                 {INBOX_PERIODS.map((period) => (
                   <option key={period} value={period}>

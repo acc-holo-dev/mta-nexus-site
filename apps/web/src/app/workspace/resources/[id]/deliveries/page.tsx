@@ -1,5 +1,5 @@
 import { AppError, RESOURCE_DELIVERY_STATUSES } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -83,7 +83,7 @@ export default async function PublisherDeliveriesPage({
       <form method="get" className="flex flex-wrap items-end gap-3">
         <label className="grid gap-1 text-sm">
           {copy.days}
-          <select name="days" defaultValue={query.days} className="nexus-input">
+          <select name="days" defaultValue={query.days} className={fieldClass}>
             {["all", "7", "30", "90", "365"].map((days) => (
               <option key={days} value={days}>
                 {days === "all" ? copy.periodAll : `${days} ${copy.dayCount}`}

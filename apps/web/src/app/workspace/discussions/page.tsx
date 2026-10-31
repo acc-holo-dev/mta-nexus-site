@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
@@ -99,7 +99,7 @@ export default async function OwnDiscussionsPage({
             name="q"
             maxLength={120}
             defaultValue={filters?.query ?? ""}
-            className="nexus-input block min-h-11 w-full"
+            className={`${fieldClass} block min-h-11 w-full`}
           />
         </label>
         <label className="space-y-1 text-xs text-muted">
@@ -107,7 +107,7 @@ export default async function OwnDiscussionsPage({
           <select
             name="availability"
             defaultValue={filters?.availability ?? ""}
-            className="nexus-input block min-h-11"
+            className={`${fieldClass} block min-h-11`}
           >
             <option value="">{copy.all}</option>
             <option value="available">{copy.available}</option>

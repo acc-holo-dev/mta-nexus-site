@@ -1,6 +1,7 @@
 export * from "./utils";
 export * from "./button";
 export * from "./input";
+export * from "./field-classes";
 export * from "./card";
 export * from "./badge";
 export * from "./avatar";

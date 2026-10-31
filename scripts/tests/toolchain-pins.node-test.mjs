@@ -26,11 +26,23 @@ test("Vite stays on the justified 8.3.5 override for the Vitest 5 unit toolchain
 });
 
 test("dependency-cruiser keeps a TypeScript 6 package extension until stable TS 7 support", () => {
+  // Removal gate (do not apply until ALL are true on tip):
+  // 1) dependency-cruiser stable ≥18.8 published (18.8.0-beta-1 only as of 2026-10-31)
+  // 2) root typescript resolved to ≥7.1 (public compiler API; 7.0.x is insufficient)
+  // 3) drop packageExtensions entry for dependency-cruiser
+  // 4) update this pin test + pnpm-workspace.yaml
+  // 5) pnpm install --frozen-lockfile && pnpm analyze:architecture && pnpm test:tooling
   assert.equal(rootPackage.devDependencies["dependency-cruiser"], "18.7.0");
   assert.match(workspace, /"dependency-cruiser@18\.7\.0":[\s\S]*?typescript:\s*"6\.0\.3"/u);
   const cruiserDir = pnpmPackageDir("dependency-cruiser@18.7.0");
   assert.equal(readPkg(cruiserDir, "dependency-cruiser/package.json").version, "18.7.0");
   assert.equal(readPkg(cruiserDir, "typescript/package.json").version, "6.0.3");
+  assert.match(rootPackage.devDependencies.typescript, /^\^7\./u);
+  assert.doesNotMatch(
+    rootPackage.devDependencies["dependency-cruiser"],
+    /beta/iu,
+    "do not pin dependency-cruiser betas on main",
+  );
 });
 
 test("drizzle-kit still owns the @esbuild-kit path with a pinned nested esbuild", () => {
