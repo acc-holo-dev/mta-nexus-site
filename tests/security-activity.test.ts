@@ -24,9 +24,13 @@ describe("security activity contract", () => {
       "order.terms_recorded",
       "order.unpaid_cancelled",
       "commerce.subscription_expired",
+      "commerce.subscription_activated_free",
+      "commerce.subscription_cancelled",
       "commerce.order_case.created",
       "commerce.order_case.reviewed",
       "commerce.plan_review_saved",
+      "support.case.created",
+      "support.case.status_changed",
       "verification.requested",
       "verification.approved",
       "verification.rejected",
@@ -409,6 +413,62 @@ describe("security activity contract", () => {
     expect(JSON.stringify(approved)).not.toContain("usr_staff");
     expect(JSON.stringify(approved)).not.toContain("staff-private");
     expect(JSON.stringify(approved)).not.toContain("203.0.113.70");
+  });
+
+  it("maps subscription activate and cancel without leaking plan details", () => {
+    const activated = toSecurityActivityItem({
+      id: "aud_sub_free",
+      actorId: "usr_buyer",
+      action: "commerce.subscription_activated_free",
+      targetType: "subscription",
+      details: { planId: "plan_private", receiptId: "srec_private", price: 0 },
+      createdAt: new Date("2026-10-13T01:00:00.000Z"),
+    });
+    expect(activated).toMatchObject({
+      action: "commerce.subscription_activated_free",
+      perspective: "actor",
+    });
+    expect(JSON.stringify(activated)).not.toContain("plan_private");
+    expect(
+      toSecurityActivityItem({
+        id: "aud_sub_cancel",
+        actorId: "usr_buyer",
+        action: "commerce.subscription_cancelled",
+        targetType: "subscription",
+        details: { planId: "plan_private" },
+        createdAt: new Date("2026-10-13T02:00:00.000Z"),
+      })?.action,
+    ).toBe("commerce.subscription_cancelled");
+  });
+
+  it("shows staff support status changes to the requester without from/to details or staff network", () => {
+    const changed = toSecurityActivityItem(
+      {
+        id: "aud_support_status",
+        actorId: "usr_staff",
+        action: "support.case.status_changed",
+        targetType: "support_case",
+        ipAddress: "203.0.113.80",
+        userAgent: "Staff Console",
+        details: { from: "open", to: "resolved", notes: "staff-private" },
+        createdAt: new Date("2026-10-16T00:00:00.000Z"),
+      },
+      "usr_requester",
+    );
+    expect(changed).toEqual({
+      id: "aud_support_status",
+      action: "support.case.status_changed",
+      targetType: "support_case",
+      perspective: "subject",
+      createdAt: new Date("2026-10-16T00:00:00.000Z"),
+    });
+    expect(SECURITY_SUBJECT_LABEL_KEYS["support.case.status_changed"]).toBe(
+      "supportCaseStatusChangedNotice",
+    );
+    expect(JSON.stringify(changed)).not.toContain("usr_staff");
+    expect(JSON.stringify(changed)).not.toContain("staff-private");
+    expect(JSON.stringify(changed)).not.toContain("203.0.113.80");
+    expect(JSON.stringify(changed)).not.toContain("resolved");
   });
 
   it("rejects non-security audit events", () => {

@@ -25,6 +25,17 @@ export const SECURITY_COMMERCE_SUBJECT_ACTIONS = ["commerce.order_case.reviewed"
 
 export type SecurityCommerceSubjectAction = (typeof SECURITY_COMMERCE_SUBJECT_ACTIONS)[number];
 
+// Staff (or other non-requester) support status changes target the case; the account is the requester.
+export const SECURITY_SUPPORT_SUBJECT_ACTIONS = ["support.case.status_changed"] as const;
+
+export type SecuritySupportSubjectAction = (typeof SECURITY_SUPPORT_SUBJECT_ACTIONS)[number];
+
+// Support-case rows projected to the requester (order-case review + status changes).
+export const SECURITY_SUPPORT_CASE_SUBJECT_ACTIONS = [
+  ...SECURITY_COMMERCE_SUBJECT_ACTIONS,
+  ...SECURITY_SUPPORT_SUBJECT_ACTIONS,
+] as const;
+
 // Staff verification decisions target a verification request; the account is the requester.
 export const SECURITY_VERIFICATION_SUBJECT_ACTIONS = [
   "verification.approved",
@@ -48,6 +59,7 @@ export type SecuritySubjectAction =
   | SecuritySubjectDetailAction
   | SecurityLicenseSubjectAction
   | SecurityCommerceSubjectAction
+  | SecuritySupportSubjectAction
   | SecurityVerificationSubjectAction
   | SecurityServerVerificationSubjectAction;
 
@@ -55,6 +67,7 @@ export const SECURITY_SUBJECT_ACTIONS = [
   ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
   ...SECURITY_LICENSE_SUBJECT_ACTIONS,
   ...SECURITY_COMMERCE_SUBJECT_ACTIONS,
+  ...SECURITY_SUPPORT_SUBJECT_ACTIONS,
   ...SECURITY_VERIFICATION_SUBJECT_ACTIONS,
   ...SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
 ] as const satisfies readonly SecuritySubjectAction[];
