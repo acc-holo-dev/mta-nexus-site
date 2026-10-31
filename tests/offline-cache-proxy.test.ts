@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
+import { describe, expect, it } from "vitest";
 import { config, proxy } from "../apps/web/src/proxy";
 
 function request(pathname: string, options: { cookie?: string; method?: string } = {}) {
@@ -43,6 +43,7 @@ describe("public offline cache proxy contract", () => {
     expect(config.matcher).toEqual([
       "/api/:path*",
       "/articles/:path*",
+      "/community-rules",
       "/copyright",
       "/privacy",
       "/terms",

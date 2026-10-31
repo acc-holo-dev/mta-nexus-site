@@ -13,6 +13,7 @@ describe("public offline cache policy", () => {
       "/privacy",
       "/terms",
       "/copyright",
+      "/community-rules",
     ]) {
       expect(isOfflineCacheablePublicPath(path)).toBe(true);
     }
