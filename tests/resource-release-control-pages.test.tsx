@@ -114,14 +114,36 @@ beforeEach(() => {
     product: { id: "prd_a", title: "<Resource>" },
     selection: { revision: 3, mode: "fixed", buildId: "withdrawn" },
     selected: null,
-    latest: { id: "bld_latest", version: "2.0.0" },
+    latest: {
+      id: "bld_latest",
+      version: "2.0.0",
+      status: "published",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 100,
+      fileName: "latest.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "clamav",
+      scannedAt: now,
+      mtaVersionTarget: "1.6.0",
+      isSigned: false,
+      createdAt: now,
+    },
     versions: [
       {
         id: "bld_latest",
         version: "2.0.0",
         releaseNotes: "<script>unsafe text</script>",
+        status: "published",
         sha256Hash: "a".repeat(64),
         fileSizeBytes: 100,
+        fileName: "latest.zip",
+        mimeType: "application/zip",
+        scanStatus: "clean",
+        scanner: "clamav",
+        scannedAt: now,
+        mtaVersionTarget: "1.6.0",
+        isSigned: false,
         createdAt: now,
         storageKey: "PRIVATE-FILE",
       },
@@ -199,7 +221,24 @@ it.each(["en", "ru"] as const)(
 );
 it("downloads only the explicitly selected cleared release", async () => {
   const result = await state.versions();
-  state.versions.mockResolvedValue({ ...result, selected: { id: "bld_fixed", version: "1.0.0" } });
+  state.versions.mockResolvedValue({
+    ...result,
+    selected: {
+      id: "bld_fixed",
+      version: "1.0.0",
+      status: "published",
+      sha256Hash: "b".repeat(64),
+      fileSizeBytes: 50,
+      fileName: "fixed.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "clamav",
+      scannedAt: now,
+      mtaVersionTarget: "1.6.0",
+      isSigned: false,
+      createdAt: now,
+    },
+  });
   const html = renderToStaticMarkup(await Versions(input));
   expect(html).toContain('data-download="bld_fixed"');
   expect(html).not.toContain('data-download="bld_latest"');
@@ -207,6 +246,8 @@ it("downloads only the explicitly selected cleared release", async () => {
   expect(html).toContain('data-revision="3"');
   expect(html).toContain("a".repeat(64));
   expect(html).toContain("fileSizeBytes&quot;:100");
+  expect(html).toContain('data-testid="build-provenance"');
+  expect(html).toContain('data-build-id="bld_fixed"');
   expect(html).not.toContain("PRIVATE-FILE");
 });
 it("masks unavailable resource metadata even if an upstream DTO includes it", async () => {

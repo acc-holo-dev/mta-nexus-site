@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { buildRepository } from "@nexus/db";
+import { BuildProvenanceDetails } from "../../../../components/build-provenance-details";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { BuildPackageSummaryPanel } from "../../../../components/build-package-evidence";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
@@ -152,6 +153,24 @@ export default async function PublicResourceVersionsPage({
               </div>
 
               <BuildPackageSummaryPanel summary={release.packageSummary} locale={locale} />
+
+              <BuildProvenanceDetails
+                build={{
+                  id: release.id,
+                  version: release.version,
+                  status: "published",
+                  sha256Hash: release.sha256Hash,
+                  fileName: release.fileName,
+                  fileSizeBytes: release.fileSizeBytes,
+                  mimeType: release.mimeType,
+                  scanStatus: release.scanStatus,
+                  scanner: release.scanner,
+                  scannedAt: release.scannedAt,
+                  mtaVersionTarget: release.mtaVersionTarget,
+                  isSigned: release.isSigned,
+                }}
+                locale={locale}
+              />
 
               {canDownload && (
                 <ResourceDownloadButton

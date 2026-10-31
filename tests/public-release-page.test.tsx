@@ -146,7 +146,9 @@ describe("public safely published version archive", () => {
     expect(html).toContain("a".repeat(64));
     expect(html).toContain("New commands");
     expect(html).not.toContain("PRIVATE_STORAGE_PATH");
-    expect(html).not.toContain("private-server-file.zip");
+    expect(html).toContain("private-server-file.zip");
+    expect(html).toContain('data-testid="build-provenance"');
+    expect(html).toContain('data-build-id="bld_clean_1"');
     expect(html).not.toContain('data-build="bld_clean_1"');
     expect(html).toContain(locale === "ru" ? "История версий" : "Release history");
     expect(state.checkRight).not.toHaveBeenCalled();

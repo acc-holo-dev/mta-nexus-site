@@ -380,6 +380,9 @@ describe("resource detail acquisition behavior", () => {
     expect(html).toContain('data-version="2.0.0"');
     expect(html).toContain('href="/workspace"');
     expect(html).not.toContain("/acquire?productId=prd_detail");
+    // History list (2) + download aside for published current version (1).
+    expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(3);
+    expect(html).toContain('data-build-id="bld_latest"');
   });
 
   it("lets a current manager inspect builds and download without entitlement", async () => {

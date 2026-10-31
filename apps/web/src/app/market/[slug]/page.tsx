@@ -167,6 +167,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         ),
   ]);
   const hasAccess = isPublished && (canManageProduct || isLicensed || isAdmin);
+  // Download aside only shows provenance for the published current version; never invent clean.
+  const downloadBuild = hasAccess
+    ? (builds.find(
+        (build) => build.status === "published" && build.version === product.currentVersion,
+      ) ?? null)
+    : null;
 
   const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
@@ -394,6 +400,26 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                   </div>
 
                   <ResourceDownloadButton productId={product.id} version={product.currentVersion} />
+
+                  {downloadBuild ? (
+                    <BuildProvenanceDetails
+                      build={{
+                        id: downloadBuild.id,
+                        version: downloadBuild.version,
+                        status: downloadBuild.status,
+                        sha256Hash: downloadBuild.sha256Hash,
+                        fileName: downloadBuild.fileName,
+                        fileSizeBytes: downloadBuild.fileSizeBytes,
+                        mimeType: downloadBuild.mimeType,
+                        scanStatus: downloadBuild.scanStatus,
+                        scanner: downloadBuild.scanner,
+                        scannedAt: downloadBuild.scannedAt,
+                        mtaVersionTarget: downloadBuild.mtaVersionTarget,
+                        isSigned: downloadBuild.isSigned,
+                      }}
+                      locale={locale}
+                    />
+                  ) : null}
 
                   <Link
                     href="/workspace"

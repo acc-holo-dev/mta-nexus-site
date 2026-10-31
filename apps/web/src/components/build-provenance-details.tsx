@@ -52,7 +52,11 @@ export function BuildProvenanceDetails({
         : copy.noCleanVerdict;
 
   return (
-    <details className="rounded-lg border border-base bg-surface">
+    <details
+      data-testid="build-provenance"
+      data-build-id={build.id}
+      className="rounded-lg border border-base bg-surface"
+    >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-[11px] font-semibold text-secondary">
         <span className="flex items-center gap-2">
           <Fingerprint className="h-3.5 w-3.5 text-accent" aria-hidden="true" />

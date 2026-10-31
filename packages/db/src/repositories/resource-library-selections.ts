@@ -28,6 +28,7 @@ import { digestSessionToken } from "./sessions";
 
 const fail = (code: string) =>
   new AppError("Library selection changed or is unavailable", 409, code);
+/** Entitled library surface: publication + scan provenance only; never storage keys. */
 const publicBuild = {
   id: builds.id,
   version: builds.version,
@@ -35,6 +36,14 @@ const publicBuild = {
   createdAt: builds.createdAt,
   sha256Hash: builds.sha256Hash,
   fileSizeBytes: builds.fileSizeBytes,
+  status: builds.status,
+  fileName: builds.fileName,
+  mimeType: builds.mimeType,
+  scanStatus: builds.scanStatus,
+  scanner: builds.scanner,
+  scannedAt: builds.scannedAt,
+  mtaVersionTarget: builds.mtaVersionTarget,
+  isSigned: builds.isSigned,
 };
 const selectionFields = {
   revision: selections.revision,

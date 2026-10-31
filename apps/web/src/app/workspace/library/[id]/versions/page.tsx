@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
+import { BuildProvenanceDetails } from "../../../../../components/build-provenance-details";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
 import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
@@ -83,12 +84,31 @@ export default async function LibraryVersionsPage({
         {current?.version ?? copy.unavailable}
       </p>
       {current ? (
-        <ResourceDownloadButton
-          key={`${id}:${current.id}:${current.version}`}
-          productId={id}
-          version={current.version}
-          buildId={current.id}
-        />
+        <div className="space-y-3">
+          <ResourceDownloadButton
+            key={`${id}:${current.id}:${current.version}`}
+            productId={id}
+            version={current.version}
+            buildId={current.id}
+          />
+          <BuildProvenanceDetails
+            build={{
+              id: current.id,
+              version: current.version,
+              status: current.status,
+              sha256Hash: current.sha256Hash,
+              fileName: current.fileName,
+              fileSizeBytes: current.fileSizeBytes,
+              mimeType: current.mimeType,
+              scanStatus: current.scanStatus,
+              scanner: current.scanner,
+              scannedAt: current.scannedAt,
+              mtaVersionTarget: current.mtaVersionTarget,
+              isSigned: current.isSigned,
+            }}
+            locale={locale}
+          />
+        </div>
       ) : null}
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/requirements`}
@@ -155,6 +175,23 @@ export default async function LibraryVersionsPage({
                   {version.releaseNotes}
                 </p>
               ) : null}
+              <BuildProvenanceDetails
+                build={{
+                  id: version.id,
+                  version: version.version,
+                  status: version.status,
+                  sha256Hash: version.sha256Hash,
+                  fileName: version.fileName,
+                  fileSizeBytes: version.fileSizeBytes,
+                  mimeType: version.mimeType,
+                  scanStatus: version.scanStatus,
+                  scanner: version.scanner,
+                  scannedAt: version.scannedAt,
+                  mtaVersionTarget: version.mtaVersionTarget,
+                  isSigned: version.isSigned,
+                }}
+                locale={locale}
+              />
             </li>
           ))}
         </ol>

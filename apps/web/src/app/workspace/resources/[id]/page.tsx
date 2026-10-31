@@ -1,12 +1,5 @@
-import { resourceCopyCopy } from "../../../../lib/resource-copy-i18n";
-import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
-import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
-import { getResourceManagementCopy } from "../../../../lib/resource-management-i18n";
-import { getResourceActivityCopy } from "../../../../lib/resource-activity-i18n";
-import { resourceDeliveriesCopy } from "../../../../lib/resource-deliveries-i18n";
-import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -54,7 +47,6 @@ export default async function ManageResourcePage({
   ]);
   const commerceCopy = getResourceCommerceCopy(locale);
   const buildCopy = getResourceBuildWorkspaceCopy(locale);
-  const managementCopy = getResourceManagementCopy(locale);
   const publisherCopy = getResourcePublisherCopy(locale);
   return (
     <div className="space-y-8">
@@ -73,44 +65,6 @@ export default async function ManageResourcePage({
       {product.metadataReviewRequired && (
         <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
       )}
-      <nav
-        className="flex flex-wrap gap-4 text-sm text-accent"
-        aria-label={managementCopy.variants}
-      >
-        <Link href={`/workspace/resources/${product.id}/copy`} className="underline">
-          {resourceCopyCopy(locale).title}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/copies`} className="underline">
-          {resourceCopyCopy(locale).history}
-        </Link>
-        <Link
-          href={`/workspace/sales/report?${new URLSearchParams({ productId: product.id, ...(product.organizationId ? { organizationId: product.organizationId } : {}) })}`}
-          className="underline"
-        >
-          {sellerSalesCopy(locale).title}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/media`} className="underline">
-          {resourceMediaCopy(locale).title}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/variants`} className="underline">
-          {managementCopy.variants}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/compatibility`} className="underline">
-          {managementCopy.compatibility}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/activity`} className="underline">
-          {getResourceActivityCopy(locale).analytics}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/moderation`} className="underline">
-          {getResourceReleaseControlCopy(locale).moderationHistory}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/history`} className="underline">
-          {publisherCopy.history}
-        </Link>
-        <Link href={`/workspace/resources/${product.id}/deliveries`} className="underline">
-          {resourceDeliveriesCopy(locale).publisherTitle}
-        </Link>
-      </nav>
       <ResourceLifecycleControls
         key={`lifecycle:${product.id}:${product.status}:${new Date(product.updatedAt).toISOString()}`}
         product={{

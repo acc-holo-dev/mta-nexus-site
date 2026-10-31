@@ -11,9 +11,6 @@ import { readManagedServerClaimStatus } from "@nexus/db";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";
-import { getServerActivityCopy, serverActivityHref } from "../../../../lib/server-activity-view";
-import { serverStatisticsCopy } from "../../../../lib/server-statistics-copy";
-import { serverContentCopy } from "../../../../lib/server-content-copy";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -30,7 +27,6 @@ export default async function ServerManagementPage({
   const locale = await getRequestLocale();
   const copy = getDictionary(locale).serverManagement;
   const serverCopy = getManagedServerCopy(locale);
-  const activityCopy = getServerActivityCopy(locale);
   const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
@@ -59,12 +55,6 @@ export default async function ServerManagementPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <div>
         <Link
-          href={`/workspace/servers/${encodeURIComponent(server.id)}/content`}
-          className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline"
-        >
-          {serverContentCopy(locale).title}
-        </Link>
-        <Link
           href="/workspace/servers"
           className="text-xs font-semibold text-accent hover:underline"
         >
@@ -74,18 +64,6 @@ export default async function ServerManagementPage({
         <p className="mt-1 font-mono text-sm text-muted">
           {server.ipAddress}:{server.port}
         </p>
-        <Link
-          href={serverActivityHref(server.id)}
-          className="mt-3 inline-block text-sm font-semibold text-accent hover:underline"
-        >
-          {activityCopy.open}
-        </Link>
-        <Link
-          href={`/workspace/servers/${encodeURIComponent(server.id)}/statistics`}
-          className="ml-4 mt-3 inline-block text-sm font-semibold text-accent hover:underline"
-        >
-          {serverStatisticsCopy(locale).open}
-        </Link>
       </div>
 
       <div className="nexus-panel flex items-start gap-3 p-4">

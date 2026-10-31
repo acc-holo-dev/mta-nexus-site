@@ -32,6 +32,7 @@ vi.mock("next/navigation", () => ({
     state.notFoundCalls += 1;
     throw new Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/servers/srv_managed",
 }));
 
 vi.mock("next/link", async () => {
@@ -73,7 +74,19 @@ vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
   };
 });
 
+import ServerWorkspaceLayout from "../apps/web/src/app/workspace/servers/[id]/layout";
 import ServerManagementPage from "../apps/web/src/app/workspace/servers/[id]/page";
+import { getServerWorkspaceNavCopy } from "../apps/web/src/lib/server-workspace-nav-i18n";
+
+async function renderManagedServer(id = "srv_managed") {
+  const params = Promise.resolve({ id });
+  return renderToStaticMarkup(
+    await ServerWorkspaceLayout({
+      params,
+      children: await ServerManagementPage({ params }),
+    }),
+  );
+}
 
 describe("server management page behavior", () => {
   const dictionary = getDictionary("en").serverManagement;
@@ -140,18 +153,20 @@ describe("server management page behavior", () => {
   });
 
   it("renders listing management and claim controls for an authorized unverified server", async () => {
-    const html = renderToStaticMarkup(
-      await ServerManagementPage({
-        params: Promise.resolve({ id: "srv_managed" }),
-      }),
-    );
+    const html = await renderManagedServer();
+    const nav = getServerWorkspaceNavCopy("en");
 
     expect(serverService.canManageServer).toHaveBeenCalledWith(server, state.user);
     expect(html).toContain(dictionary.ownerManaged);
     expect(html).toContain(dictionary.ownerManagedDescription);
     expect(html).toContain(dictionary.listingDetails);
     expect(html).toContain('href="/workspace/servers/srv_managed/activity"');
-    expect(html).toContain("View activity");
+    expect(html).toContain('href="/workspace/servers/srv_managed/content"');
+    expect(html).toContain('href="/workspace/servers/srv_managed/statistics"');
+    expect(html).toContain('href="/workspace/servers/srv_managed/observations"');
+    expect(html).toContain(nav.activity);
+    expect(html).toContain(nav.observations);
+    expect(html).toContain('aria-label="Server workspace sections"');
     expect(html).toContain('data-testid="server-details-form"');
     expect(html).toContain('data-testid="server-claim-control-panel"');
     expect(html).not.toMatch(/installation key|heartbeat/iu);
