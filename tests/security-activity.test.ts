@@ -26,6 +26,10 @@ describe("security activity contract", () => {
       "commerce.subscription_expired",
       "commerce.order_case.created",
       "commerce.order_case.reviewed",
+      "verification.requested",
+      "verification.approved",
+      "verification.rejected",
+      "server.control_proof_recorded",
       "license.bound",
       "license.binding_refreshed",
       "license.token_rotated",
@@ -277,6 +281,75 @@ describe("security activity contract", () => {
     expect(JSON.stringify(reviewed)).not.toContain("staff-private-notes");
     expect(JSON.stringify(reviewed)).not.toContain("ord_private");
     expect(JSON.stringify(reviewed)).not.toContain("203.0.113.40");
+  });
+
+  it("shows staff verification decisions to the requester without notes or staff network", () => {
+    const approved = toSecurityActivityItem(
+      {
+        id: "aud_ver_approved",
+        actorId: "usr_staff",
+        action: "verification.approved",
+        targetType: "verification",
+        ipAddress: "203.0.113.55",
+        userAgent: "Moderator Console",
+        details: { notes: "staff-private-review" },
+        createdAt: new Date("2026-10-12T00:00:00.000Z"),
+      },
+      "usr_requester",
+    );
+    expect(approved).toEqual({
+      id: "aud_ver_approved",
+      action: "verification.approved",
+      targetType: "verification",
+      perspective: "subject",
+      createdAt: new Date("2026-10-12T00:00:00.000Z"),
+    });
+    expect(SECURITY_SUBJECT_LABEL_KEYS["verification.approved"]).toBe("verificationApprovedNotice");
+    expect(SECURITY_SUBJECT_LABEL_KEYS["verification.rejected"]).toBe("verificationRejectedNotice");
+    expect(JSON.stringify(approved)).not.toContain("usr_staff");
+    expect(JSON.stringify(approved)).not.toContain("staff-private-review");
+    expect(JSON.stringify(approved)).not.toContain("203.0.113.55");
+    expect(
+      toSecurityActivityItem(
+        {
+          id: "aud_ver_rejected",
+          actorId: "usr_staff",
+          action: "verification.rejected",
+          targetType: "verification",
+          details: { notes: "needs-more-proof" },
+          createdAt: new Date("2026-10-12T01:00:00.000Z"),
+        },
+        "usr_requester",
+      ),
+    ).toMatchObject({ perspective: "subject", action: "verification.rejected" });
+  });
+
+  it("maps requester verification and control-proof actions without leaking details", () => {
+    const requested = toSecurityActivityItem({
+      id: "aud_ver_requested",
+      actorId: "usr_requester",
+      action: "verification.requested",
+      targetType: "verification",
+      details: { proofMethod: "mta_master_name_challenge", challengeId: "ch_private" },
+      createdAt: new Date("2026-10-12T02:00:00.000Z"),
+    });
+    expect(requested).toEqual({
+      id: "aud_ver_requested",
+      action: "verification.requested",
+      targetType: "verification",
+      perspective: "actor",
+      createdAt: new Date("2026-10-12T02:00:00.000Z"),
+    });
+    expect(JSON.stringify(requested)).not.toContain("ch_private");
+    expect(
+      toSecurityActivityItem({
+        id: "aud_proof",
+        actorId: "usr_requester",
+        action: "server.control_proof_recorded",
+        targetType: "server",
+        createdAt: new Date("2026-10-12T03:00:00.000Z"),
+      })?.action,
+    ).toBe("server.control_proof_recorded");
   });
 
   it("rejects non-security audit events", () => {
