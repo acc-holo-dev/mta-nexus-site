@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+import "../register-ts-directory-resolve.mjs";
 import { getDictionary } from "../../apps/web/src/lib/i18n.ts";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");

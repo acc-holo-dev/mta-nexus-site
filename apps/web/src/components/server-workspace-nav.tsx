@@ -38,10 +38,7 @@ export function ServerWorkspaceNav({
   const copy = getServerWorkspaceNavCopy(locale);
 
   return (
-    <nav
-      aria-label={copy.navigation}
-      className="rounded-lg border border-base bg-surface p-4"
-    >
+    <nav aria-label={copy.navigation} className="rounded-lg border border-base bg-surface p-4">
       <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
         {items(serverId).map((item) => {
           const current = isCurrent(pathname, item);

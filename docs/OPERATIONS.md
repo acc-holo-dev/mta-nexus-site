@@ -13,6 +13,7 @@ This document covers development startup, verification and production boundaries
 4. [Backup and recovery](#4-backup-and-recovery)
 5. [Resource safety operations](#5-resource-safety-operations)
 6. [Branch and release operations](#6-branch-and-release-operations)
+
 - [Resource integrity rollout and seed recovery](#resource-integrity-rollout-and-seed-recovery)
 - [Production compilation in restricted build environments](#production-compilation-in-restricted-build-environments)
 - [Existing-installation release and recovery](#existing-installation-release-and-recovery)
@@ -159,12 +160,12 @@ Do not widen path scopes to “make CI green.” After `pnpm test:unit`, optiona
 
 Local commands stay aligned with those scopes:
 
-| Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                     |
-| `unit_ci`         | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown)                                                                                     | `plan`, `unit`                                        | `pnpm check:code`                                      |
+| Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                                                                                      |
+| `unit_ci`         | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown)                                                                                     | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
 | `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
-| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance |
+| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
 
 Release tags (`v*`) and explicit full workflow dispatch always run `full_acceptance`.
 The CI unit job and host development use the same `check:code` command. It uses

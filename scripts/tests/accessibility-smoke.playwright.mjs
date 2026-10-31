@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+import "../register-ts-directory-resolve.mjs";
 import { getDictionary } from "../../apps/web/src/lib/i18n.ts";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 

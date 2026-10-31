@@ -82,7 +82,10 @@ export function ResourcePublisherWorkspaceNav({
   const sections = groups(resourceId, organizationId);
 
   return (
-    <nav aria-label={copy.navigation} className="space-y-4 rounded-lg border border-base bg-surface p-4">
+    <nav
+      aria-label={copy.navigation}
+      className="space-y-4 rounded-lg border border-base bg-surface p-4"
+    >
       {sections.map((section) => (
         <div key={section.labelKey} className="space-y-2">
           <p className="font-label text-[10px] uppercase tracking-wide text-faint">

@@ -4,15 +4,15 @@
 
 ## Стек (факт кода)
 
-| Слой | Версия / выбор |
-| ---- | -------------- |
-| Runtime | Node.js 26.10.0 (`.nvmrc`), pnpm 12.4.2 |
-| App | Next.js 16.4 + React 19.3 в `apps/web` (Turbopack default; `build:webpack` запасной) |
-| UI | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN |
-| Data | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations |
-| Quality | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser |
-| Dev stack | Docker Compose (`compose.yaml`): app, PostgreSQL, ClamAV, push-worker |
-| CI | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo |
+| Слой      | Версия / выбор                                                                        |
+| --------- | ------------------------------------------------------------------------------------- |
+| Runtime   | Node.js 26.10.0 (`.nvmrc`), pnpm 12.4.2                                               |
+| App       | Next.js 16.4 + React 19.3 в `apps/web` (Turbopack default; `build:webpack` запасной)  |
+| UI        | Tailwind CSS 4, `@nexus/ui`, токены `globals.css`, RU/EN                              |
+| Data      | PostgreSQL 18, Drizzle ORM, forward-only SQL migrations                               |
+| Quality   | Biome, TypeScript 7, Vitest 5 (проекты `unit` / `database`), Knip, dependency-cruiser |
+| Dev stack | Docker Compose (`compose.yaml`): app, PostgreSQL, ClamAV, push-worker                 |
+| CI        | GitHub Actions path-scoped gates + browser/axe smoke; не Turbo monorepo               |
 
 Модульный монолит на одной инстанции. Redis, внешние очереди и микросервисы не входят в текущую форму без измеренной необходимости.
 
@@ -35,31 +35,31 @@ scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 
 ## Основные продуктовые поверхности
 
-| Область | Где смотреть |
-| ------- | ------------ |
-| Auth / Security Center | `auth-service`, `packages/security`, workspace settings |
-| Servers / directory | `mta-master-directory-service`, `server-*`, `/servers` |
+| Область                   | Где смотреть                                                         |
+| ------------------------- | -------------------------------------------------------------------- |
+| Auth / Security Center    | `auth-service`, `packages/security`, workspace settings              |
+| Servers / directory       | `mta-master-directory-service`, `server-*`, `/servers`               |
 | Resources / builds / scan | `product-service`, `build-*`, ClamAV, `/market`, workspace resources |
-| Library / collections | `library-*`, `/workspace/library` |
-| Community / content | `content-service`, discussions, `/community`, articles |
-| Orgs / teams | `organization-*`, `/workspace/organizations` |
-| Moderation / trust | reports, verification, admin queues |
-| Notifications / PWA | inbox services, push worker, mail worker (optional Mailpit) |
-| Commerce shell | cart/checkout/orders **без** реальных платежей (closed beta) |
+| Library / collections     | `library-*`, `/workspace/library`                                    |
+| Community / content       | `content-service`, discussions, `/community`, articles               |
+| Orgs / teams              | `organization-*`, `/workspace/organizations`                         |
+| Moderation / trust        | reports, verification, admin queues                                  |
+| Notifications / PWA       | inbox services, push worker, mail worker (optional Mailpit)          |
+| Commerce shell            | cart/checkout/orders **без** реальных платежей (closed beta)         |
 
 ## Запуск и проверки (кратко)
 
-| Цель | Команда |
-| ---- | ------- |
-| Full local stack | `pnpm dev` / `pnpm dev:docker:up` → `pnpm dev:docker:check` |
-| Host Next only | `pnpm dev:host` (внешние Postgres/storage/scanner) |
-| Mail capture | `pnpm dev:mail` |
-| Code gate (no Docker) | `pnpm check:code` |
-| Focused tests | `pnpm test:focus path/to/file.test.ts` |
-| Disposable DB suite | `pnpm test:isolated` (нужен Docker stack; unit без APP_URL, database с APP_URL) |
+| Цель                    | Команда                                                                                                                         |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Full local stack        | `pnpm dev` / `pnpm dev:docker:up` → `pnpm dev:docker:check`                                                                     |
+| Host Next only          | `pnpm dev:host` (внешние Postgres/storage/scanner)                                                                              |
+| Mail capture            | `pnpm dev:mail`                                                                                                                 |
+| Code gate (no Docker)   | `pnpm check:code`                                                                                                               |
+| Focused tests           | `pnpm test:focus path/to/file.test.ts`                                                                                          |
+| Disposable DB suite     | `pnpm test:isolated` (нужен Docker stack; unit без APP_URL, database с APP_URL)                                                 |
 | Local disposable verify | `NEXUS_LOCAL_VERIFY=true` + `scripts/check-local-verification.sh` → `compose.verify.yaml` (зеркало CI: unit / database / build) |
-| Docs links | `pnpm docs:check` |
-| Release evidence | `pnpm release:verify` (не deploy; Vitest через `run-ci-aligned-vitest.mjs`) |
+| Docs links              | `pnpm docs:check`                                                                                                               |
+| Release evidence        | `pnpm release:verify` (не deploy; Vitest через `run-ci-aligned-vitest.mjs`)                                                     |
 
 Preflight: `pnpm nexus:doctor` (также `dev:preflight`).
 
@@ -87,12 +87,12 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 
 ## Документы по роли
 
-| Нужно | Открыть |
-| ----- | ------- |
-| Правила агента | [AGENTS.md](../AGENTS.md) |
-| Слои и безопасность | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Команды и ops | [OPERATIONS.md](OPERATIONS.md) |
-| Открытые ограничения | [PROBLEMS.md](PROBLEMS.md) |
-| Решения владельца | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md) |
-| Очередь beta | [10-ROADMAP.md](handbook/10-ROADMAP.md) |
-| Предметная глава | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md) |
+| Нужно                | Открыть                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| Правила агента       | [AGENTS.md](../AGENTS.md)                                   |
+| Слои и безопасность  | [ARCHITECTURE.md](ARCHITECTURE.md)                          |
+| Команды и ops        | [OPERATIONS.md](OPERATIONS.md)                              |
+| Открытые ограничения | [PROBLEMS.md](PROBLEMS.md)                                  |
+| Решения владельца    | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md) |
+| Очередь beta         | [10-ROADMAP.md](handbook/10-ROADMAP.md)                     |
+| Предметная глава     | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)   |

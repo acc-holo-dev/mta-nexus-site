@@ -47,7 +47,7 @@ files.sort((left, right) => right.durationMs - left.durationMs);
 const totalMs = files.reduce((sum, file) => sum + file.durationMs, 0);
 const latestEnd = Math.max(
   0,
-  ...((report.testResults ?? []).map((suite) => Number(suite.endTime)).filter(Number.isFinite)),
+  ...(report.testResults ?? []).map((suite) => Number(suite.endTime)).filter(Number.isFinite),
 );
 const startTime = Number(report.startTime);
 const wallMs =
@@ -65,7 +65,9 @@ console.log(
     ? `Sum of per-file durations: ${(totalMs / 1000).toFixed(1)}s`
     : `Sum of per-file durations: ${(totalMs / 1000).toFixed(1)}s (parallel wall ≈ ${(wallMs / 1000).toFixed(1)}s)`,
 );
-console.log(`Top ${top} share of summed file time: ${((100 * slowShare) / Math.max(totalMs, 1)).toFixed(1)}%`);
+console.log(
+  `Top ${top} share of summed file time: ${((100 * slowShare) / Math.max(totalMs, 1)).toFixed(1)}%`,
+);
 console.log("");
 console.log("| # | s | assertions | file |");
 console.log("| - | - | ---------- | ---- |");

@@ -17,27 +17,27 @@ docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-
 
 При установленных Node.js 26.10.0 и pnpm 12.4.2:
 
-| Команда | Назначение |
-| ------- | ---------- |
-| `pnpm nexus:doctor` | Preflight: Node/pnpm/Docker/порт/`compose.yaml` |
-| `pnpm dev` | Полный Compose-стек (тот же, что выше) |
-| `pnpm dev:docker:check` | Readiness app + push-worker |
-| `pnpm dev:host` | Только Next.js (Postgres/storage/scanner уже снаружи) |
-| `pnpm dev:mail` | Стек + Mailpit для локального захвата писем |
-| `pnpm db:migrate` / `pnpm db:seed` | Миграции и демо-данные |
+| Команда                            | Назначение                                            |
+| ---------------------------------- | ----------------------------------------------------- |
+| `pnpm nexus:doctor`                | Preflight: Node/pnpm/Docker/порт/`compose.yaml`       |
+| `pnpm dev`                         | Полный Compose-стек (тот же, что выше)                |
+| `pnpm dev:docker:check`            | Readiness app + push-worker                           |
+| `pnpm dev:host`                    | Только Next.js (Postgres/storage/scanner уже снаружи) |
+| `pnpm dev:mail`                    | Стек + Mailpit для локального захвата писем           |
+| `pnpm db:migrate` / `pnpm db:seed` | Миграции и демо-данные                                |
 
 ## Проверки
 
-| Команда | Когда |
-| ------- | ----- |
-| `pnpm check:code` | Формат, lint, типы, boundaries, unused, unit + tooling (без Docker) |
-| `pnpm test:unit` | Изолированные unit/mock |
-| `pnpm test:database` | Последовательные DB-тесты на **отдельной** disposable БД |
-| `pnpm test:focus path/to/file.test.ts` | Узкий Vitest / `.node-test.mjs` прогон |
-| `pnpm docs:check` | Локальные Markdown-ссылки и якоря |
-| `pnpm build` | Production-сборка (env — Dockerfile) |
-| `pnpm test:isolated` | Полный Vitest в одноразовой БД внутри Docker-стека |
-| `pnpm release:verify` | Релизные свидетельства; **не** deploy |
+| Команда                                | Когда                                                               |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| `pnpm check:code`                      | Формат, lint, типы, boundaries, unused, unit + tooling (без Docker) |
+| `pnpm test:unit`                       | Изолированные unit/mock                                             |
+| `pnpm test:database`                   | Последовательные DB-тесты на **отдельной** disposable БД            |
+| `pnpm test:focus path/to/file.test.ts` | Узкий Vitest / `.node-test.mjs` прогон                              |
+| `pnpm docs:check`                      | Локальные Markdown-ссылки и якоря                                   |
+| `pnpm build`                           | Production-сборка (env — Dockerfile)                                |
+| `pnpm test:isolated`                   | Полный Vitest в одноразовой БД внутри Docker-стека                  |
+| `pnpm release:verify`                  | Релизные свидетельства; **не** deploy                               |
 
 Для тестов БД через `test:focus`: `DATABASE_URL` на одноразовую базу, миграции, `NEXUS_DISPOSABLE_DATABASE=1`. Сначала связанные тесты модуля, затем проверки по риску. Подробнее: [эксплуатация](docs/OPERATIONS.md).
 

@@ -1,9 +1,9 @@
 // Isolated RSC process: actual page/locale source, synthetic repositories and UI.
 import assert from "node:assert/strict";
 import { AsyncLocalStorage } from "node:async_hooks";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
-import { dirname, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseSync, transformSync } from "@swc/core";
 import React from "react";
@@ -18,6 +18,15 @@ const routes = [
   ["organizations/[slug]", "slug", "organization"],
   ["servers/[slug]", "slug", "server"],
 ];
+function collectTsFiles(directory) {
+  const files = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const absolute = join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...collectTsFiles(absolute));
+    else if (entry.isFile() && absolute.endsWith(".ts")) files.push(absolute);
+  }
+  return files;
+}
 const sourceFiles = new Set([
   ...routes.map(([route]) => resolve(sourceRoot, "app", route, "page.tsx")),
   ...[
@@ -30,6 +39,7 @@ const sourceFiles = new Set([
     "verification-workspace-copy.ts",
     "server-statistics-copy.ts",
   ].map((file) => resolve(sourceRoot, "lib", file)),
+  ...collectTsFiles(resolve(sourceRoot, "lib/i18n")),
 ]);
 const emptyPage = async () => ({
   products: [],
@@ -98,6 +108,17 @@ const mocks = {
     },
   },
   "server-service": { serverService: { getServerBySlug: (key) => read("server", key) } },
+  "server-review-service": {
+    serverReviewService: {
+      publicPage: async () => ({
+        reviews: [],
+        total: 0,
+        page: 1,
+        pageSize: 20,
+        totalPages: 1,
+      }),
+    },
+  },
   "mta-master-directory-service": {
     mtaMasterDirectoryService: { getDirectory: async () => null },
     indexMtaObservations: () => nothing,
@@ -173,7 +194,14 @@ registerHooks({
     if (sourceFiles.has(parent) && !specifier.startsWith("react")) {
       const target = specifier.startsWith(".") ? resolve(dirname(parent), specifier) : null;
       const source =
-        target && [target, `${target}.ts`, `${target}.tsx`].find((file) => sourceFiles.has(file));
+        target &&
+        [
+          target,
+          `${target}.ts`,
+          `${target}.tsx`,
+          join(target, "index.ts"),
+          join(target, "index.tsx"),
+        ].find((file) => sourceFiles.has(file));
       if (source) return { url: pathToFileURL(source).href, shortCircuit: true };
       return {
         url: mockModule(specifier, importsByFile.get(parent).get(specifier) ?? []),

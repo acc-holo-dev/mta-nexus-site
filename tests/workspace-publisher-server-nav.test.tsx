@@ -52,17 +52,18 @@ describe("workspace publisher and server navigation", () => {
     expect(html).toContain(`>${copy.media}</a>`);
   });
 
-  it.each(["en", "ru"] as const)("marks server overview current and links observations in %s", (locale) => {
-    nav.pathname = "/workspace/servers/srv_a";
-    const copy = getServerWorkspaceNavCopy(locale);
-    const html = renderToStaticMarkup(
-      <ServerWorkspaceNav serverId="srv_a" locale={locale} />,
-    );
+  it.each(["en", "ru"] as const)(
+    "marks server overview current and links observations in %s",
+    (locale) => {
+      nav.pathname = "/workspace/servers/srv_a";
+      const copy = getServerWorkspaceNavCopy(locale);
+      const html = renderToStaticMarkup(<ServerWorkspaceNav serverId="srv_a" locale={locale} />);
 
-    expect(html).toContain(`aria-label="${copy.navigation}"`);
-    expect(html).toContain('href="/workspace/servers/srv_a/observations"');
-    expect(html).toContain('href="/workspace/servers/srv_a/content"');
-    expect(html).toContain(copy.observations);
-    expect(html).toContain('aria-current="page"');
-  });
+      expect(html).toContain(`aria-label="${copy.navigation}"`);
+      expect(html).toContain('href="/workspace/servers/srv_a/observations"');
+      expect(html).toContain('href="/workspace/servers/srv_a/content"');
+      expect(html).toContain(copy.observations);
+      expect(html).toContain('aria-current="page"');
+    },
+  );
 });

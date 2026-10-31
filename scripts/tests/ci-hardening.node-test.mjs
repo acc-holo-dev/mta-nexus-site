@@ -90,6 +90,10 @@ test("pnpm install jobs enable setup-node cache only after pnpm/action-setup", (
     const rest = content.slice(start + 1);
     const next = rest.search(/\n {2}[a-z0-9-]+:\n/u);
     const job = next >= 0 ? rest.slice(0, next) : rest;
-    assert.doesNotMatch(job, /^[ \t]+cache: pnpm$/mu, `${jobName} must not cache pnpm without install`);
+    assert.doesNotMatch(
+      job,
+      /^[ \t]+cache: pnpm$/mu,
+      `${jobName} must not cache pnpm without install`,
+    );
   }
 });

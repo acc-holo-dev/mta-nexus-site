@@ -22,5 +22,3 @@ const copy = {
 export function getServerWorkspaceNavCopy(locale: Locale) {
   return copy[locale];
 }
-
-export type ServerWorkspaceNavCopy = ReturnType<typeof getServerWorkspaceNavCopy>;

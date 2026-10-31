@@ -24,7 +24,10 @@ export const LEGAL_SURFACE_ROUTES = Object.freeze([
 ]);
 
 const FOOTER_RELATIVE = "apps/web/src/components/footer.tsx";
-const I18N_RELATIVE = "apps/web/src/lib/i18n.ts";
+const I18N_LOCALE_LEGAL = Object.freeze([
+  Object.freeze({ locale: "en", relative: "apps/web/src/lib/i18n/en/legal.ts" }),
+  Object.freeze({ locale: "ru", relative: "apps/web/src/lib/i18n/ru/legal.ts" }),
+]);
 const MIN_SECTION_BODY = 40;
 
 function readText(root, relativePath) {
@@ -77,10 +80,15 @@ export function evaluateLegalSurfaces(repoRoot = process.cwd()) {
   const problems = [];
   const present = [];
   const footer = readText(repoRoot, FOOTER_RELATIVE);
-  const i18n = readText(repoRoot, I18N_RELATIVE);
+  const localeLegal = I18N_LOCALE_LEGAL.map((entry) => ({
+    ...entry,
+    source: readText(repoRoot, entry.relative),
+  }));
 
   if (!footer) problems.push(`${FOOTER_RELATIVE}: absent`);
-  if (!i18n) problems.push(`${I18N_RELATIVE}: absent`);
+  for (const entry of localeLegal) {
+    if (!entry.source) problems.push(`${entry.relative}: absent`);
+  }
 
   for (const surface of LEGAL_SURFACE_ROUTES) {
     const page = readText(repoRoot, surface.pageRelative);
@@ -95,30 +103,18 @@ export function evaluateLegalSurfaces(repoRoot = process.cwd()) {
     if (footer && !footer.includes(`href="${surface.path}"`)) {
       problems.push(`footer: missing link to ${surface.path}`);
     }
-    if (i18n) {
-      // EN dictionary is the first `legal:` block; RU follows. Check both occurrences of the key.
-      const occurrences = [];
-      let searchFrom = 0;
-      while (searchFrom < i18n.length) {
-        const block = extractLegalDocumentBlock(i18n.slice(searchFrom), surface.dictionaryKey);
-        if (!block) break;
-        const absoluteIndex = i18n.indexOf(block, searchFrom);
-        occurrences.push(block);
-        searchFrom = absoluteIndex + block.length;
-        if (occurrences.length >= 2) break;
-      }
-      if (occurrences.length < 2) {
-        problems.push(`i18n: ${surface.dictionaryKey} missing EN/RU document blocks`);
+    for (const entry of localeLegal) {
+      if (!entry.source) continue;
+      const block = extractLegalDocumentBlock(entry.source, surface.dictionaryKey);
+      if (!block) {
+        problems.push(`i18n.${entry.locale}.${surface.dictionaryKey}: missing document block`);
         continue;
       }
-      for (const [index, block] of occurrences.entries()) {
-        const locale = index === 0 ? "en" : "ru";
-        if (countSections(block) < 3) {
-          problems.push(`i18n.${locale}.${surface.dictionaryKey}: need >=3 sections`);
-        }
-        if (!hasSubstantialBodies(block)) {
-          problems.push(`i18n.${locale}.${surface.dictionaryKey}: section bodies too short`);
-        }
+      if (countSections(block) < 3) {
+        problems.push(`i18n.${entry.locale}.${surface.dictionaryKey}: need >=3 sections`);
+      }
+      if (!hasSubstantialBodies(block)) {
+        problems.push(`i18n.${entry.locale}.${surface.dictionaryKey}: section bodies too short`);
       }
     }
   }
