@@ -37,7 +37,10 @@ export function generateWebPushVapidEnvLines(subject = DEFAULT_WEB_PUSH_VAPID_SU
 }
 
 const scriptPath = fileURLToPath(import.meta.url);
-if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === pathToFileURL(scriptPath).href) {
+if (
+  process.argv[1] &&
+  pathToFileURL(resolve(process.argv[1])).href === pathToFileURL(scriptPath).href
+) {
   const subject = process.argv[2]?.trim() || DEFAULT_WEB_PUSH_VAPID_SUBJECT;
   for (const line of generateWebPushVapidEnvLines(subject)) {
     console.log(line);
