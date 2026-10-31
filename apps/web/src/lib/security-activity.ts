@@ -48,6 +48,11 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "verification.rejected",
   "product.download_started",
   "product.download_finished",
+  // SEC-005 community report outcomes (actor for staff; subject for reporter)
+  "report.review",
+  "report.resolve",
+  "report.dismiss",
+  "report.remove_comment",
 ] as const;
 
 export type SecurityActivityAction = (typeof SECURITY_ACTIVITY_ACTIONS)[number];
@@ -99,6 +104,10 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "verification.rejected": "verificationRejected",
   "product.download_started": "productDownloadStarted",
   "product.download_finished": "productDownloadFinished",
+  "report.review": "reportReviewed",
+  "report.resolve": "reportResolved",
+  "report.dismiss": "reportDismissed",
+  "report.remove_comment": "reportCommentRemoved",
 } as const satisfies Record<SecurityActivityAction, string>;
 
 export const SECURITY_SUBJECT_LABEL_KEYS = {
@@ -118,6 +127,10 @@ export const SECURITY_SUBJECT_LABEL_KEYS = {
   "verification.rejected": "verificationRejectedNotice",
   "server.verification_approved": "serverVerificationApprovedNotice",
   "server.verification_rejected": "serverVerificationRejectedNotice",
+  "report.review": "reportReviewedNotice",
+  "report.resolve": "reportResolvedNotice",
+  "report.dismiss": "reportDismissedNotice",
+  "report.remove_comment": "reportCommentRemovedNotice",
 } as const satisfies Record<SecuritySubjectAction, string>;
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);

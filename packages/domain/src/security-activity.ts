@@ -58,13 +58,24 @@ export const SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS = [
 export type SecurityServerVerificationSubjectAction =
   (typeof SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS)[number];
 
+// Staff community-report outcomes target a report row; the account is the reporter.
+export const SECURITY_REPORT_SUBJECT_ACTIONS = [
+  "report.review",
+  "report.resolve",
+  "report.dismiss",
+  "report.remove_comment",
+] as const;
+
+export type SecurityReportSubjectAction = (typeof SECURITY_REPORT_SUBJECT_ACTIONS)[number];
+
 export type SecuritySubjectAction =
   | SecuritySubjectDetailAction
   | SecurityLicenseSubjectAction
   | SecurityCommerceSubjectAction
   | SecuritySupportSubjectAction
   | SecurityVerificationSubjectAction
-  | SecurityServerVerificationSubjectAction;
+  | SecurityServerVerificationSubjectAction
+  | SecurityReportSubjectAction;
 
 export const SECURITY_SUBJECT_ACTIONS = [
   ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
@@ -73,4 +84,5 @@ export const SECURITY_SUBJECT_ACTIONS = [
   ...SECURITY_SUPPORT_SUBJECT_ACTIONS,
   ...SECURITY_VERIFICATION_SUBJECT_ACTIONS,
   ...SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
+  ...SECURITY_REPORT_SUBJECT_ACTIONS,
 ] as const satisfies readonly SecuritySubjectAction[];

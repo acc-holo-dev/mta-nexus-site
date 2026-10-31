@@ -504,6 +504,40 @@ describe("security activity contract", () => {
     expect(JSON.stringify(reply)).not.toContain("203.0.113.81");
   });
 
+  it("shows staff community-report decisions to the reporter without notes or staff network", () => {
+    for (const [action, label] of [
+      ["report.review", "reportReviewedNotice"],
+      ["report.resolve", "reportResolvedNotice"],
+      ["report.dismiss", "reportDismissedNotice"],
+      ["report.remove_comment", "reportCommentRemovedNotice"],
+    ] as const) {
+      const item = toSecurityActivityItem(
+        {
+          id: `aud_${action}`,
+          actorId: "usr_moderator",
+          action,
+          targetType: "report",
+          ipAddress: "203.0.113.90",
+          userAgent: "Moderator Console",
+          details: { notes: "PRIVATE_MOD_NOTES", previousStatus: "open", status: "resolved" },
+          createdAt: new Date("2026-10-18T00:00:00.000Z"),
+        },
+        "usr_reporter",
+      );
+      expect(item).toEqual({
+        id: `aud_${action}`,
+        action,
+        targetType: "report",
+        perspective: "subject",
+        createdAt: new Date("2026-10-18T00:00:00.000Z"),
+      });
+      expect(SECURITY_SUBJECT_LABEL_KEYS[action]).toBe(label);
+      expect(JSON.stringify(item)).not.toContain("PRIVATE_MOD_NOTES");
+      expect(JSON.stringify(item)).not.toContain("usr_moderator");
+      expect(JSON.stringify(item)).not.toContain("203.0.113.90");
+    }
+  });
+
   it("maps cart acquisition, verification application updates and privacy changes without details", () => {
     expect(
       toSecurityActivityItem({
