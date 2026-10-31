@@ -27,6 +27,8 @@ const auditIds = [
   "aud_secsub_ver_approved",
   "aud_secsub_ver_rejected",
   "aud_secsub_ver_other",
+  "aud_server_verification_ver_secsub_srv",
+  "aud_server_verification_ver_secsub_srv_other",
 ];
 
 const fixture = {
@@ -40,13 +42,24 @@ const fixture = {
   otherCaseId: "case_secsub_other",
   verificationId: "ver_secsub_owned",
   otherVerificationId: "ver_secsub_other",
+  serverVerificationId: "ver_secsub_srv",
+  otherServerVerificationId: "ver_secsub_srv_other",
+  serverId: "srv_secsub_owned",
+  otherServerId: "srv_secsub_other",
 };
 
 async function clearFixtures() {
   await db.delete(auditEvents).where(inArray(auditEvents.id, auditIds));
   await db
     .delete(verificationRequests)
-    .where(inArray(verificationRequests.id, [fixture.verificationId, fixture.otherVerificationId]));
+    .where(
+      inArray(verificationRequests.id, [
+        fixture.verificationId,
+        fixture.otherVerificationId,
+        fixture.serverVerificationId,
+        fixture.otherServerVerificationId,
+      ]),
+    );
   await db
     .delete(supportCases)
     .where(inArray(supportCases.id, [fixture.caseId, fixture.otherCaseId]));
@@ -421,6 +434,76 @@ describe("security activity subject lookup", () => {
     expect(serialized).not.toContain("203.0.113.55");
     expect(serialized).not.toContain("Moderator Console");
     expect(serialized).not.toContain(fixture.otherVerificationId);
+  });
+
+  it("returns staff server-claim outcomes for the requester via verification request id", async () => {
+    await clearFixtures();
+    await userRepository.create({
+      id: fixture.userId,
+      email: `${fixture.userId}@example.invalid`,
+      username: fixture.userId,
+      displayName: "Subject member",
+      role: "user",
+    });
+    await userRepository.create({
+      id: fixture.otherUserId,
+      email: `${fixture.otherUserId}@example.invalid`,
+      username: fixture.otherUserId,
+      displayName: "Other owner",
+      role: "user",
+    });
+    await db.insert(verificationRequests).values([
+      {
+        id: fixture.serverVerificationId,
+        requesterId: fixture.userId,
+        targetType: "server",
+        targetId: fixture.serverId,
+        status: "approved",
+      },
+      {
+        id: fixture.otherServerVerificationId,
+        requesterId: fixture.otherUserId,
+        targetType: "server",
+        targetId: fixture.otherServerId,
+        status: "rejected",
+      },
+    ]);
+    await db.insert(auditEvents).values([
+      {
+        id: `aud_server_verification_${fixture.serverVerificationId}`,
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "server.verification_approved",
+        targetId: fixture.serverId,
+        targetType: "server",
+        ipAddress: "203.0.113.70",
+        userAgent: "Moderator Console",
+        createdAt: new Date("2026-10-14T00:00:00.000Z"),
+      },
+      {
+        id: `aud_server_verification_${fixture.otherServerVerificationId}`,
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "server.verification_rejected",
+        targetId: fixture.otherServerId,
+        targetType: "server",
+        createdAt: new Date("2026-10-15T00:00:00.000Z"),
+      },
+    ]);
+
+    const result = await new SecurityCenterService().listActivity(fixture.userId, 20);
+    expect(result.map((item) => [item.id, item.perspective, item.action])).toEqual([
+      [
+        `aud_server_verification_${fixture.serverVerificationId}`,
+        "subject",
+        "server.verification_approved",
+      ],
+    ]);
+    const serialized = JSON.stringify(result);
+    expect(serialized).not.toContain("usr_secsub_admin");
+    expect(serialized).not.toContain("203.0.113.70");
+    expect(serialized).not.toContain("Moderator Console");
+    expect(serialized).not.toContain(fixture.otherServerId);
   });
 
   it("rejects an invalid account id before reading audit rows", async () => {

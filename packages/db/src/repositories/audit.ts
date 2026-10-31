@@ -4,6 +4,7 @@ import {
   type AuditEvent,
   SECURITY_COMMERCE_SUBJECT_ACTIONS,
   SECURITY_LICENSE_SUBJECT_ACTIONS,
+  SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
   SECURITY_SUBJECT_DETAIL_KEYS,
   SECURITY_VERIFICATION_SUBJECT_ACTIONS,
   SERVER_ACTIVITY_ACTIONS,
@@ -390,6 +391,23 @@ export class AuditRepository {
           ),
       ),
     );
+    const serverVerificationSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS]),
+      eq(auditEvents.targetType, "server"),
+      exists(
+        db
+          .select({ id: verificationRequests.id })
+          .from(verificationRequests)
+          .where(
+            and(
+              eq(verificationRequests.requesterId, userId),
+              eq(verificationRequests.targetType, "server"),
+              eq(verificationRequests.targetId, auditEvents.targetId),
+              sql`${auditEvents.id} = concat('aud_server_verification_', ${verificationRequests.id})`,
+            ),
+          ),
+      ),
+    );
     const subjectScope = and(
       ne(auditEvents.actorId, userId),
       or(
@@ -397,6 +415,7 @@ export class AuditRepository {
         licenseSubjectScope,
         commerceSubjectScope,
         verificationSubjectScope,
+        serverVerificationSubjectScope,
       ),
     );
     const rows = await db
