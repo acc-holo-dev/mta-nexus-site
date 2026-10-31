@@ -4,7 +4,7 @@ import { AppError } from "@nexus/domain";
 import { inArray } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
-import { licenses, products, users } from "../packages/db/src/schema";
+import { licenses, products, supportCases, users } from "../packages/db/src/schema";
 
 const auditIds = [
   "aud_secsub_login",
@@ -16,6 +16,8 @@ const auditIds = [
   "aud_secsub_lic_suspend",
   "aud_secsub_lic_expired",
   "aud_secsub_lic_other",
+  "aud_secsub_case_reviewed",
+  "aud_secsub_case_other",
 ];
 
 const fixture = {
@@ -25,10 +27,15 @@ const fixture = {
   otherProductId: "prd_secsub_lic_other",
   licenseId: "lic_secsub_owned",
   otherLicenseId: "lic_secsub_other",
+  caseId: "case_secsub_owned",
+  otherCaseId: "case_secsub_other",
 };
 
 async function clearFixtures() {
   await db.delete(auditEvents).where(inArray(auditEvents.id, auditIds));
+  await db
+    .delete(supportCases)
+    .where(inArray(supportCases.id, [fixture.caseId, fixture.otherCaseId]));
   await db
     .delete(licenses)
     .where(inArray(licenses.id, [fixture.licenseId, fixture.otherLicenseId]));
@@ -239,6 +246,84 @@ describe("security activity subject lookup", () => {
     expect(serialized).not.toContain("203.0.113.9");
     expect(serialized).not.toContain("Moderator");
     expect(serialized).not.toContain(fixture.otherLicenseId);
+  });
+
+  it("returns staff order-case reviews for the requester via support case ownership", async () => {
+    await clearFixtures();
+    await userRepository.create({
+      id: fixture.userId,
+      email: `${fixture.userId}@example.invalid`,
+      username: fixture.userId,
+      displayName: "Subject member",
+      role: "user",
+    });
+    await userRepository.create({
+      id: fixture.otherUserId,
+      email: `${fixture.otherUserId}@example.invalid`,
+      username: fixture.otherUserId,
+      displayName: "Other owner",
+      role: "user",
+    });
+    await db.insert(supportCases).values([
+      {
+        id: fixture.caseId,
+        requesterId: fixture.userId,
+        category: "purchase",
+        subject: "Owned order case",
+        status: "open",
+        relatedType: "purchase",
+        relatedId: "ord_secsub_owned",
+      },
+      {
+        id: fixture.otherCaseId,
+        requesterId: fixture.otherUserId,
+        category: "purchase",
+        subject: "Other order case",
+        status: "open",
+        relatedType: "purchase",
+        relatedId: "ord_secsub_other",
+      },
+    ]);
+    await db.insert(auditEvents).values([
+      {
+        id: "aud_secsub_case_reviewed",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "commerce.order_case.reviewed",
+        targetId: fixture.caseId,
+        targetType: "support_case",
+        ipAddress: "203.0.113.40",
+        userAgent: "Staff Console",
+        details: {
+          orderId: "ord_secsub_owned",
+          action: "resolve",
+          notes: "staff-private-notes",
+          evidence: { refundedRecordCount: 0 },
+        },
+        createdAt: new Date("2026-10-10T00:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_case_other",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "commerce.order_case.reviewed",
+        targetId: fixture.otherCaseId,
+        targetType: "support_case",
+        details: { orderId: "ord_secsub_other", notes: "other-buyer" },
+        createdAt: new Date("2026-10-11T00:00:00.000Z"),
+      },
+    ]);
+
+    const result = await new SecurityCenterService().listActivity(fixture.userId, 20);
+    expect(result.map((item) => [item.id, item.perspective, item.action])).toEqual([
+      ["aud_secsub_case_reviewed", "subject", "commerce.order_case.reviewed"],
+    ]);
+    const serialized = JSON.stringify(result);
+    expect(serialized).not.toContain("staff-private-notes");
+    expect(serialized).not.toContain("usr_secsub_admin");
+    expect(serialized).not.toContain("203.0.113.40");
+    expect(serialized).not.toContain("Staff Console");
+    expect(serialized).not.toContain(fixture.otherCaseId);
   });
 
   it("rejects an invalid account id before reading audit rows", async () => {

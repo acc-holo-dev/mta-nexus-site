@@ -20,9 +20,18 @@ export const SECURITY_LICENSE_SUBJECT_ACTIONS = [
 
 export type SecurityLicenseSubjectAction = (typeof SECURITY_LICENSE_SUBJECT_ACTIONS)[number];
 
-export type SecuritySubjectAction = SecuritySubjectDetailAction | SecurityLicenseSubjectAction;
+// Staff review of an order case targets the support case; the account is the requester.
+export const SECURITY_COMMERCE_SUBJECT_ACTIONS = ["commerce.order_case.reviewed"] as const;
+
+export type SecurityCommerceSubjectAction = (typeof SECURITY_COMMERCE_SUBJECT_ACTIONS)[number];
+
+export type SecuritySubjectAction =
+  | SecuritySubjectDetailAction
+  | SecurityLicenseSubjectAction
+  | SecurityCommerceSubjectAction;
 
 export const SECURITY_SUBJECT_ACTIONS = [
   ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
   ...SECURITY_LICENSE_SUBJECT_ACTIONS,
+  ...SECURITY_COMMERCE_SUBJECT_ACTIONS,
 ] as const satisfies readonly SecuritySubjectAction[];
