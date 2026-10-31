@@ -4,7 +4,13 @@ import { AppError } from "@nexus/domain";
 import { inArray } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
-import { licenses, products, supportCases, users } from "../packages/db/src/schema";
+import {
+  licenses,
+  products,
+  supportCases,
+  users,
+  verificationRequests,
+} from "../packages/db/src/schema";
 
 const auditIds = [
   "aud_secsub_login",
@@ -18,6 +24,9 @@ const auditIds = [
   "aud_secsub_lic_other",
   "aud_secsub_case_reviewed",
   "aud_secsub_case_other",
+  "aud_secsub_ver_approved",
+  "aud_secsub_ver_rejected",
+  "aud_secsub_ver_other",
 ];
 
 const fixture = {
@@ -29,10 +38,15 @@ const fixture = {
   otherLicenseId: "lic_secsub_other",
   caseId: "case_secsub_owned",
   otherCaseId: "case_secsub_other",
+  verificationId: "ver_secsub_owned",
+  otherVerificationId: "ver_secsub_other",
 };
 
 async function clearFixtures() {
   await db.delete(auditEvents).where(inArray(auditEvents.id, auditIds));
+  await db
+    .delete(verificationRequests)
+    .where(inArray(verificationRequests.id, [fixture.verificationId, fixture.otherVerificationId]));
   await db
     .delete(supportCases)
     .where(inArray(supportCases.id, [fixture.caseId, fixture.otherCaseId]));
@@ -324,6 +338,89 @@ describe("security activity subject lookup", () => {
     expect(serialized).not.toContain("203.0.113.40");
     expect(serialized).not.toContain("Staff Console");
     expect(serialized).not.toContain(fixture.otherCaseId);
+  });
+
+  it("returns staff verification decisions for the requester via request ownership", async () => {
+    await clearFixtures();
+    await userRepository.create({
+      id: fixture.userId,
+      email: `${fixture.userId}@example.invalid`,
+      username: fixture.userId,
+      displayName: "Subject member",
+      role: "user",
+    });
+    await userRepository.create({
+      id: fixture.otherUserId,
+      email: `${fixture.otherUserId}@example.invalid`,
+      username: fixture.otherUserId,
+      displayName: "Other owner",
+      role: "user",
+    });
+    await db.insert(verificationRequests).values([
+      {
+        id: fixture.verificationId,
+        requesterId: fixture.userId,
+        targetType: "developer",
+        targetId: fixture.userId,
+        status: "approved",
+        reviewNotes: "staff-private-review",
+      },
+      {
+        id: fixture.otherVerificationId,
+        requesterId: fixture.otherUserId,
+        targetType: "developer",
+        targetId: fixture.otherUserId,
+        status: "rejected",
+        reviewNotes: "other-requester",
+      },
+    ]);
+    await db.insert(auditEvents).values([
+      {
+        id: "aud_secsub_ver_approved",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "verification.approved",
+        targetId: fixture.verificationId,
+        targetType: "verification",
+        ipAddress: "203.0.113.55",
+        userAgent: "Moderator Console",
+        details: { notes: "staff-private-review" },
+        createdAt: new Date("2026-10-12T00:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_ver_rejected",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "verification.rejected",
+        targetId: fixture.verificationId,
+        targetType: "verification",
+        details: { notes: "earlier-private" },
+        createdAt: new Date("2026-10-11T00:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_ver_other",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "verification.approved",
+        targetId: fixture.otherVerificationId,
+        targetType: "verification",
+        details: { notes: "other-requester" },
+        createdAt: new Date("2026-10-13T00:00:00.000Z"),
+      },
+    ]);
+
+    const result = await new SecurityCenterService().listActivity(fixture.userId, 20);
+    expect(result.map((item) => [item.id, item.perspective, item.action])).toEqual([
+      ["aud_secsub_ver_approved", "subject", "verification.approved"],
+      ["aud_secsub_ver_rejected", "subject", "verification.rejected"],
+    ]);
+    const serialized = JSON.stringify(result);
+    expect(serialized).not.toContain("staff-private-review");
+    expect(serialized).not.toContain("earlier-private");
+    expect(serialized).not.toContain("usr_secsub_admin");
+    expect(serialized).not.toContain("203.0.113.55");
+    expect(serialized).not.toContain("Moderator Console");
+    expect(serialized).not.toContain(fixture.otherVerificationId);
   });
 
   it("rejects an invalid account id before reading audit rows", async () => {

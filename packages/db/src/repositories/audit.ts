@@ -5,6 +5,7 @@ import {
   SECURITY_COMMERCE_SUBJECT_ACTIONS,
   SECURITY_LICENSE_SUBJECT_ACTIONS,
   SECURITY_SUBJECT_DETAIL_KEYS,
+  SECURITY_VERIFICATION_SUBJECT_ACTIONS,
   SERVER_ACTIVITY_ACTIONS,
   SERVER_ACTIVITY_FIELDS,
   type ServerActivityAction,
@@ -15,7 +16,14 @@ import {
 import { and, desc, eq, exists, inArray, ne, or, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
-import { auditEvents, licenses, servers, supportCases, users } from "../schema";
+import {
+  auditEvents,
+  licenses,
+  servers,
+  supportCases,
+  users,
+  verificationRequests,
+} from "../schema";
 import { serverContentContext } from "./server-content";
 import { managedServerScope } from "./server-management-scope";
 
@@ -367,9 +375,29 @@ export class AuditRepository {
           ),
       ),
     );
+    const verificationSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_VERIFICATION_SUBJECT_ACTIONS]),
+      eq(auditEvents.targetType, "verification"),
+      exists(
+        db
+          .select({ id: verificationRequests.id })
+          .from(verificationRequests)
+          .where(
+            and(
+              eq(verificationRequests.id, auditEvents.targetId),
+              eq(verificationRequests.requesterId, userId),
+            ),
+          ),
+      ),
+    );
     const subjectScope = and(
       ne(auditEvents.actorId, userId),
-      or(organizationSubjectScope, licenseSubjectScope, commerceSubjectScope),
+      or(
+        organizationSubjectScope,
+        licenseSubjectScope,
+        commerceSubjectScope,
+        verificationSubjectScope,
+      ),
     );
     const rows = await db
       .select({

@@ -31,6 +31,10 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "organization.member_removed",
   "organization.member_left",
   "server.claim_challenge_issued",
+  "server.control_proof_recorded",
+  "verification.requested",
+  "verification.approved",
+  "verification.rejected",
   "product.download_started",
   "product.download_finished",
 ] as const;
@@ -67,6 +71,10 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "organization.member_removed": "organizationMemberRemoved",
   "organization.member_left": "organizationMemberLeft",
   "server.claim_challenge_issued": "serverClaimChallengeIssued",
+  "server.control_proof_recorded": "serverControlProofRecorded",
+  "verification.requested": "verificationRequested",
+  "verification.approved": "verificationApproved",
+  "verification.rejected": "verificationRejected",
   "product.download_started": "productDownloadStarted",
   "product.download_finished": "productDownloadFinished",
 } as const satisfies Record<SecurityActivityAction, string>;
@@ -82,6 +90,8 @@ export const SECURITY_SUBJECT_LABEL_KEYS = {
   "license.expired": "licenseExpiredNotice",
   "license.expiring": "licenseExpiringNotice",
   "commerce.order_case.reviewed": "orderCaseReviewedNotice",
+  "verification.approved": "verificationApprovedNotice",
+  "verification.rejected": "verificationRejectedNotice",
 } as const satisfies Record<SecuritySubjectAction, string>;
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);

@@ -25,13 +25,24 @@ export const SECURITY_COMMERCE_SUBJECT_ACTIONS = ["commerce.order_case.reviewed"
 
 export type SecurityCommerceSubjectAction = (typeof SECURITY_COMMERCE_SUBJECT_ACTIONS)[number];
 
+// Staff verification decisions target a verification request; the account is the requester.
+export const SECURITY_VERIFICATION_SUBJECT_ACTIONS = [
+  "verification.approved",
+  "verification.rejected",
+] as const;
+
+export type SecurityVerificationSubjectAction =
+  (typeof SECURITY_VERIFICATION_SUBJECT_ACTIONS)[number];
+
 export type SecuritySubjectAction =
   | SecuritySubjectDetailAction
   | SecurityLicenseSubjectAction
-  | SecurityCommerceSubjectAction;
+  | SecurityCommerceSubjectAction
+  | SecurityVerificationSubjectAction;
 
 export const SECURITY_SUBJECT_ACTIONS = [
   ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
   ...SECURITY_LICENSE_SUBJECT_ACTIONS,
   ...SECURITY_COMMERCE_SUBJECT_ACTIONS,
+  ...SECURITY_VERIFICATION_SUBJECT_ACTIONS,
 ] as const satisfies readonly SecuritySubjectAction[];
