@@ -160,6 +160,7 @@ export class LicenseMaintenanceRepository {
           targetType: "license",
           targetId: license.id,
           details: {
+            userId: license.userId,
             previousStatus: license.status,
             status: event === "expired" ? "expired" : license.status,
             expiresAt: license.expiresAt.toISOString(),

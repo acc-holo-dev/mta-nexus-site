@@ -28,6 +28,10 @@ describe("security activity contract", () => {
       "license.token_rotated",
       "license.token_revoked",
       "license.revoked",
+      "license.suspended",
+      "license.restored",
+      "license.expired",
+      "license.expiring",
       "organization.ownership_transferred",
       "organization.member_added",
       "organization.member_updated",
@@ -146,6 +150,45 @@ describe("security activity contract", () => {
         "usr_member",
       ),
     ).toBeNull();
+  });
+
+  it("shows admin or system license actions for the owner without staff network or details", () => {
+    const suspended = toSecurityActivityItem(
+      {
+        id: "aud_lic_suspend",
+        actorId: "usr_staff",
+        action: "license.suspended",
+        targetType: "license",
+        ipAddress: "203.0.113.9",
+        userAgent: "Moderator",
+        details: { userId: "usr_owner", reason: "staff-private", previousStatus: "active" },
+        createdAt: new Date("2026-10-08T00:00:00.000Z"),
+      },
+      "usr_owner",
+    );
+    expect(suspended).toEqual({
+      id: "aud_lic_suspend",
+      action: "license.suspended",
+      targetType: "license",
+      perspective: "subject",
+      createdAt: new Date("2026-10-08T00:00:00.000Z"),
+    });
+    expect(JSON.stringify(suspended)).not.toContain("usr_staff");
+    expect(JSON.stringify(suspended)).not.toContain("staff-private");
+    expect(JSON.stringify(suspended)).not.toContain("203.0.113.9");
+    expect(
+      toSecurityActivityItem(
+        {
+          id: "aud_lic_expired",
+          actorId: "system:license-maintenance",
+          action: "license.expired",
+          targetType: "license",
+          details: { userId: "usr_owner", notified: true },
+          createdAt: new Date("2026-10-08T01:00:00.000Z"),
+        },
+        "usr_owner",
+      ),
+    ).toMatchObject({ perspective: "subject", action: "license.expired" });
   });
 
   it("rejects non-security audit events", () => {

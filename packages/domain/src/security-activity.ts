@@ -7,8 +7,22 @@ export const SECURITY_SUBJECT_DETAIL_KEYS = {
   "organization.member_removed": "userId",
 } as const;
 
-export type SecuritySubjectAction = keyof typeof SECURITY_SUBJECT_DETAIL_KEYS;
+export type SecuritySubjectDetailAction = keyof typeof SECURITY_SUBJECT_DETAIL_KEYS;
 
-export const SECURITY_SUBJECT_ACTIONS = Object.keys(
-  SECURITY_SUBJECT_DETAIL_KEYS,
-) as SecuritySubjectAction[];
+// License moderation/maintenance targets a license row; the account is the owner.
+export const SECURITY_LICENSE_SUBJECT_ACTIONS = [
+  "license.revoked",
+  "license.suspended",
+  "license.restored",
+  "license.expired",
+  "license.expiring",
+] as const;
+
+export type SecurityLicenseSubjectAction = (typeof SECURITY_LICENSE_SUBJECT_ACTIONS)[number];
+
+export type SecuritySubjectAction = SecuritySubjectDetailAction | SecurityLicenseSubjectAction;
+
+export const SECURITY_SUBJECT_ACTIONS = [
+  ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
+  ...SECURITY_LICENSE_SUBJECT_ACTIONS,
+] as const satisfies readonly SecuritySubjectAction[];
