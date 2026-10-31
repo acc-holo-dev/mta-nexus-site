@@ -1,7 +1,7 @@
 "use client";
 import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/domain";
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { getLicenseControlCopy } from "../lib/license-control-i18n";
 import {
@@ -136,7 +136,7 @@ export function LicenseRuntimeProbe({
           <label className="block text-sm">
             <span>{copy.release}</span>
             <select
-              className="nexus-input mt-1 w-full"
+              className={`${fieldClassBlock} mt-1`}
               value={selected}
               disabled={busy}
               onChange={(event) => {
@@ -196,7 +196,7 @@ export function LicenseRuntimeProbe({
         <label className="block space-y-1 text-sm">
           <span>{copy.requestBody}</span>
           <textarea
-            className="nexus-input w-full font-mono text-xs"
+            className={`${fieldClassBlock} font-mono text-xs`}
             readOnly
             rows={8}
             value={JSON.stringify(command, null, 2)}

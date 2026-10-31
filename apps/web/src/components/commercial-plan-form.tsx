@@ -1,17 +1,17 @@
 "use client";
-import { type FormEvent, useId, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   COMMERCIAL_CURRENCIES,
   COMMERCIAL_PLAN_DURATIONS,
   type CommercialPlan,
   type CommercialPlanCommand,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { commercialPlanCommandSchema } from "@nexus/validation";
-import { privateApiRequest } from "../lib/private-api-request";
-import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmedCommercialPlan, parseCommercialAmount } from "../lib/commercial-confirmation";
+import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
+import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "updatedAt"> }) {
@@ -114,7 +114,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
                 onChange={(event) => setSlug(event.target.value)}
                 maxLength={80}
                 required
-                className="nexus-input w-full"
+                className={fieldClassBlock}
               />
             </label>
             <label htmlFor={`${field}-scope`} className="space-y-2">
@@ -125,7 +125,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
                 onChange={(event) =>
                   setScope(event.target.value === "organization" ? "organization" : "user")
                 }
-                className="nexus-input w-full"
+                className={fieldClassBlock}
               >
                 <option value="user">{copy.user}</option>
                 <option value="organization">{copy.organization}</option>
@@ -145,7 +145,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
                 maxLength={2000}
                 rows={5}
                 required
-                className="nexus-input w-full"
+                className={fieldClassBlock}
               />
             ) : (
               <input
@@ -155,7 +155,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
                 minLength={3}
                 maxLength={100}
                 required
-                className="nexus-input w-full"
+                className={fieldClassBlock}
               />
             )}
           </label>
@@ -168,7 +168,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
             value={values.price}
             onChange={(event) => patch("price", event.target.value)}
             required
-            className="nexus-input w-full"
+            className={fieldClassBlock}
           />
         </label>
         <label htmlFor={`${field}-currency`} className="space-y-2">
@@ -177,7 +177,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
             id={`${field}-currency`}
             value={values.currency}
             onChange={(event) => patch("currency", event.target.value)}
-            className="nexus-input w-full"
+            className={fieldClassBlock}
           >
             {COMMERCIAL_CURRENCIES.map((currency) => (
               <option key={currency}>{currency}</option>
@@ -190,7 +190,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
             id={`${field}-duration`}
             value={values.durationDays}
             onChange={(event) => patch("durationDays", event.target.value)}
-            className="nexus-input w-full"
+            className={fieldClassBlock}
           >
             {COMMERCIAL_PLAN_DURATIONS.map((days) => (
               <option key={days} value={days}>
@@ -207,7 +207,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
             value={values.commission}
             onChange={(event) => patch("commission", event.target.value)}
             required
-            className="nexus-input w-full"
+            className={fieldClassBlock}
           />
         </label>
       </fieldset>
@@ -222,7 +222,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
           rows={2}
           required
           disabled={disabled}
-          className="nexus-input w-full"
+          className={fieldClassBlock}
         />
       </label>
       {plan && dirty ? (

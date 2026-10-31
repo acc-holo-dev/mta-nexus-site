@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { can } from "@nexus/security";
-import { Button } from "@nexus/ui";
-import { authService } from "../../../lib/services/auth-service";
-import { licenseControlService } from "../../../lib/services/license-control-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
-import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
-import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
+import { Button, fieldClass } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
   licenseStatusLabel,
   parseHistoryPage,
 } from "../../../lib/commerce-history-format";
+import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
+import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
+import { authService } from "../../../lib/services/auth-service";
+import { licenseControlService } from "../../../lib/services/license-control-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -64,13 +64,13 @@ export default async function LicensesModerationPage({
           maxLength={120}
           aria-label={copy.search}
           placeholder={copy.search}
-          className="nexus-input"
+          className={fieldClass}
         />
         <select
           name="status"
           defaultValue={status}
           aria-label={history.status}
-          className="nexus-input"
+          className={fieldClass}
         >
           <option value="">{copy.all}</option>
           {Object.entries(history.licenseStatuses).map(([value, label]) => (

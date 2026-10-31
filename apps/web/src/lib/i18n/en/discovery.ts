@@ -1,9 +1,10 @@
 export const discovery = {
   home: {
-    liveEcosystem: "Live MTA ecosystem",
-    title: "What is happening in MTA right now?",
+    brand: "MTA NEXUS",
+    liveEcosystem: "Closed beta",
+    title: "Live servers, community, and free resources",
     description:
-      "Find public MTA servers from the official directory, follow community updates, and add useful resources without a fake checkout flow.",
+      "Provisional home copy while the brand line stays open: browse the official MTA directory, community updates, and free resources.",
     exploreServers: "Explore MTA servers",
     browseResources: "Browse free resources",
     playersOnline: "Players online",

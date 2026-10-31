@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -538,7 +538,7 @@ export default function SettingsPage() {
                     value={recoveryPassword}
                     onChange={(event) => setRecoveryPassword(event.target.value)}
                     aria-describedby="recovery-email-policy"
-                    className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
+                    className={`${fieldClassBlock} h-10`}
                   />
                 </div>
 
@@ -592,7 +592,7 @@ export default function SettingsPage() {
                   currentPassword: event.target.value,
                 })
               }
-              className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
+              className={`${fieldClassBlock} h-10`}
             />
           </div>
 
@@ -617,7 +617,7 @@ export default function SettingsPage() {
                 })
               }
               aria-describedby="password-length"
-              className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
+              className={`${fieldClassBlock} h-10`}
             />
             <p id="password-length" className="text-xs text-muted">
               {copy.passwordHint}

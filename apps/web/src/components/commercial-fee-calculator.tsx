@@ -1,12 +1,12 @@
 "use client";
-import { type FormEvent, useId, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { COMMERCIAL_CURRENCIES, type CommercialCurrency } from "@nexus/domain";
-import { Button } from "@nexus/ui";
-import { privateApiRequest } from "../lib/private-api-request";
-import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
-import { confirmedCommercialEstimate, parseCommercialAmount } from "../lib/commercial-confirmation";
+import { Button, fieldClassBlock } from "@nexus/ui";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { formatHistoryAmount } from "../lib/commerce-history-format";
+import { confirmedCommercialEstimate, parseCommercialAmount } from "../lib/commercial-confirmation";
+import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
+import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 type Plan = { id: string; title: string; revision: number; commissionBps: number };
@@ -88,7 +88,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
               inputMode="decimal"
               onChange={(event) => change(() => setAmount(event.target.value))}
               required
-              className="nexus-input w-full"
+              className={fieldClassBlock}
             />
           </label>
           <label htmlFor={`${field}-currency`} className="space-y-2">
@@ -99,7 +99,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
               onChange={(event) =>
                 change(() => setCurrency(event.target.value as CommercialCurrency))
               }
-              className="nexus-input w-full"
+              className={fieldClassBlock}
             >
               {COMMERCIAL_CURRENCIES.map((value) => (
                 <option key={value}>{value}</option>
@@ -112,7 +112,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
               id={`${field}-plan`}
               value={planId}
               onChange={(event) => change(() => setPlanId(event.target.value))}
-              className="nexus-input w-full"
+              className={fieldClassBlock}
             >
               <option value="">{copy.base}</option>
               {plans.map((plan) => (

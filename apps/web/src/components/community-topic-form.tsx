@@ -1,17 +1,14 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { useRouter } from "next/navigation";
-import { Button } from "@nexus/ui";
-import { useNexusLocale } from "./locale-context";
+import { type FormEvent, useState } from "react";
 import {
   buildCommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
 } from "../lib/community-topic-submission";
-
-const fieldClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
+import { useNexusLocale } from "./locale-context";
 
 export function CommunityTopicForm() {
   const router = useRouter();
@@ -64,7 +61,7 @@ export function CommunityTopicForm() {
     >
       <label className="space-y-1.5">
         <span className="font-label text-secondary">{copy.type}</span>
-        <select name="type" className={fieldClass}>
+        <select name="type" className={fieldClassBlock}>
           <option value="question">{copy.question}</option>
           <option value="post">{copy.discussion}</option>
         </select>
@@ -72,7 +69,7 @@ export function CommunityTopicForm() {
 
       <label className="space-y-1.5">
         <span className="font-label text-secondary">{copy.topicTitle}</span>
-        <input name="title" minLength={3} maxLength={200} required className={fieldClass} />
+        <input name="title" minLength={3} maxLength={200} required className={fieldClassBlock} />
       </label>
 
       <label className="space-y-1.5">
@@ -83,13 +80,13 @@ export function CommunityTopicForm() {
           maxLength={20_000}
           rows={10}
           required
-          className={fieldClass}
+          className={fieldClassBlock}
         />
       </label>
 
       <label className="space-y-1.5">
         <span className="font-label text-secondary">{copy.tags}</span>
-        <input name="tags" maxLength={500} className={fieldClass} />
+        <input name="tags" maxLength={500} className={fieldClassBlock} />
       </label>
 
       {error && (

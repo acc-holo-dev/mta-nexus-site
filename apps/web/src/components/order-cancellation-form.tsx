@@ -1,12 +1,12 @@
 "use client";
-import { type FormEvent, useId, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import type { OrderCancellationCommand } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { orderCancellationCommandSchema } from "@nexus/validation";
-import { privateApiRequest } from "../lib/private-api-request";
-import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmedOrderCancellation } from "../lib/commercial-confirmation";
+import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
+import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 export function OrderCancellationForm({
@@ -93,7 +93,7 @@ export function OrderCancellationForm({
             maxLength={1000}
             rows={2}
             required
-            className="nexus-input w-full"
+            className={fieldClassBlock}
           />
         </label>
         <label htmlFor={`${field}-confirm`} className="flex items-start gap-3 text-sm">

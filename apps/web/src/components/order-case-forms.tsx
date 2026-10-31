@@ -6,7 +6,7 @@ import {
   type OrderCaseReviewStatus,
   type SupportCaseStatus,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,8 +22,6 @@ import {
   reserveSupportCaseRetry,
   resolveSupportRetryActorScope,
 } from "../lib/support-retry";
-
-const fieldClass = "w-full rounded-lg border border-base bg-surface p-3 text-sm text-primary";
 
 export function OrderCaseCreateForm({
   orderId,
@@ -125,7 +123,7 @@ export function OrderCaseCreateForm({
           <select
             value={kind}
             onChange={(e) => setKind(e.target.value as OrderCaseKind)}
-            className={fieldClass}
+            className={fieldClassBlock}
           >
             {ORDER_CASE_KINDS.map((value) => (
               <option
@@ -146,7 +144,7 @@ export function OrderCaseCreateForm({
             required
             minLength={5}
             maxLength={120}
-            className={fieldClass}
+            className={fieldClassBlock}
           />
         </label>
         <label className="block space-y-2">
@@ -158,7 +156,7 @@ export function OrderCaseCreateForm({
             minLength={10}
             maxLength={4000}
             rows={6}
-            className={fieldClass}
+            className={fieldClassBlock}
           />
         </label>
         {monetary && (
@@ -173,7 +171,7 @@ export function OrderCaseCreateForm({
               required={kind === "refund_request"}
               disabled={!supported || total < 1}
               maxLength={13}
-              className={fieldClass}
+              className={fieldClassBlock}
             />
             <span className="block text-sm text-secondary">{copy.amountHelp}</span>
           </label>
@@ -313,7 +311,7 @@ export function OrderCaseReviewForm({
           minLength={3}
           maxLength={2000}
           rows={4}
-          className={fieldClass}
+          className={fieldClassBlock}
         />
         <span className="block text-sm text-secondary">{copy.notesHelp}</span>
       </label>

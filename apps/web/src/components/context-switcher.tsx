@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
@@ -113,7 +113,7 @@ export function ContextSwitcher() {
             value={activeContextId}
             onChange={(event) => void switchContext(event.target.value)}
             disabled={saving}
-            className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] disabled:opacity-60"
+            className={`${fieldClassBlock} h-10 disabled:opacity-60`}
           >
             {contexts.map((context) => (
               <option key={context.id} value={context.id}>

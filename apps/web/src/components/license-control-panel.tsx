@@ -5,7 +5,7 @@ import {
   type LicenseModerationAction,
   type LicenseOwnerAction,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -213,7 +213,7 @@ export function LicenseControlPanel({
                   setAction(event.target.value as LicenseOwnerAction | LicenseModerationAction);
                   setConfirmed(false);
                 }}
-                className="nexus-input mt-1 w-full"
+                className={`${fieldClassBlock} mt-1`}
               >
                 {actions.map((item) => (
                   <option key={item} value={item}>
@@ -232,7 +232,7 @@ export function LicenseControlPanel({
                     onChange={(event) => setServerId(event.target.value)}
                     required
                     disabled={loadingServers}
-                    className="nexus-input mt-1 w-full"
+                    className={`${fieldClassBlock} mt-1`}
                   >
                     <option value="">{copy.choose}</option>
                     {servers.servers.map((server) => (
@@ -298,7 +298,7 @@ export function LicenseControlPanel({
                 maxLength={1000}
                 required
                 rows={3}
-                className="nexus-input mt-1 w-full"
+                className={`${fieldClassBlock} mt-1`}
               />
             </label>
             <label className="flex items-start gap-2 text-sm text-secondary">
@@ -345,7 +345,7 @@ export function LicenseControlPanel({
             value={secret.value}
             autoComplete="off"
             spellCheck={false}
-            className="nexus-input w-full font-mono"
+            className={`${fieldClassBlock} font-mono`}
             onFocus={(event) => event.target.select()}
           />
           <p className="text-sm text-secondary">

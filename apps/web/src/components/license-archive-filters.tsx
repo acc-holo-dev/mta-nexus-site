@@ -1,5 +1,5 @@
 import type { LicenseArchiveFilter } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
 import { licenseArchiveUrl } from "../lib/license-archive-query";
 import { getLicenseMaintenanceCopy } from "../lib/license-maintenance-i18n";
@@ -23,11 +23,11 @@ export function LicenseArchiveFilters({
       >
         <label className="space-y-1 text-sm">
           <span>{copy.search}</span>
-          <input name="q" className="nexus-input w-full" maxLength={120} defaultValue={query.q} />
+          <input name="q" className={fieldClassBlock} maxLength={120} defaultValue={query.q} />
         </label>
         <label className="space-y-1 text-sm">
           <span>{copy.status}</span>
-          <select name="status" defaultValue={query.status} className="nexus-input w-full">
+          <select name="status" defaultValue={query.status} className={fieldClassBlock}>
             {(["all", "active", "expiring", "expired", "suspended", "revoked"] as const).map(
               (key) => (
                 <option key={key} value={key}>
@@ -39,7 +39,7 @@ export function LicenseArchiveFilters({
         </label>
         <label className="space-y-1 text-sm">
           <span>{copy.binding}</span>
-          <select name="binding" defaultValue={query.binding} className="nexus-input w-full">
+          <select name="binding" defaultValue={query.binding} className={fieldClassBlock}>
             {(["all", "bound", "unbound"] as const).map((key) => (
               <option key={key} value={key}>
                 {copy[key]}
@@ -49,7 +49,7 @@ export function LicenseArchiveFilters({
         </label>
         <label className="space-y-1 text-sm">
           <span>{copy.term}</span>
-          <select name="term" defaultValue={query.term} className="nexus-input w-full">
+          <select name="term" defaultValue={query.term} className={fieldClassBlock}>
             {(["all", "finite", "unknown"] as const).map((key) => (
               <option key={key} value={key}>
                 {copy[key]}
@@ -59,7 +59,7 @@ export function LicenseArchiveFilters({
         </label>
         <label className="space-y-1 text-sm">
           <span>{copy.sort}</span>
-          <select name="sort" defaultValue={query.sort} className="nexus-input w-full">
+          <select name="sort" defaultValue={query.sort} className={fieldClassBlock}>
             <option value="newest">{copy.newest}</option>
             <option value="expires_soon">{copy.expiresSoon}</option>
           </select>

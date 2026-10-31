@@ -23,11 +23,6 @@ vi.mock("@nexus/ui", () => ({
       {action}
     </header>
   ),
-  StatCard: ({ label, value }: { label: string; value: string | number }) => (
-    <p>
-      {label}: {value}
-    </p>
-  ),
 }));
 
 vi.mock("../apps/web/src/components/article-card", () => ({
