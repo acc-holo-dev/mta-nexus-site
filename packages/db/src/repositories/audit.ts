@@ -3,6 +3,7 @@ import {
   AppError,
   type AuditEvent,
   SECURITY_LICENSE_SUBJECT_ACTIONS,
+  SECURITY_REPORT_SUBJECT_ACTIONS,
   SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
   SECURITY_SUBJECT_DETAIL_KEYS,
   SECURITY_SUPPORT_CASE_SUBJECT_ACTIONS,
@@ -20,6 +21,7 @@ import { db } from "../client";
 import {
   auditEvents,
   licenses,
+  reports,
   servers,
   supportCases,
   users,
@@ -408,6 +410,16 @@ export class AuditRepository {
           ),
       ),
     );
+    const reportSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_REPORT_SUBJECT_ACTIONS]),
+      eq(auditEvents.targetType, "report"),
+      exists(
+        db
+          .select({ id: reports.id })
+          .from(reports)
+          .where(and(eq(reports.id, auditEvents.targetId), eq(reports.reporterId, userId))),
+      ),
+    );
     const subjectScope = and(
       ne(auditEvents.actorId, userId),
       or(
@@ -416,6 +428,7 @@ export class AuditRepository {
         supportCaseSubjectScope,
         verificationSubjectScope,
         serverVerificationSubjectScope,
+        reportSubjectScope,
       ),
     );
     const rows = await db
