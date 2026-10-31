@@ -538,6 +538,50 @@ describe("security activity contract", () => {
     }
   });
 
+  it("shows notified build quarantines to downloaders without reason or staff network", () => {
+    const item = toSecurityActivityItem(
+      {
+        id: "aud_build_quarantine",
+        actorId: "usr_moderator",
+        action: "build.quarantined",
+        targetType: "build",
+        ipAddress: "203.0.113.91",
+        userAgent: "Moderator Console",
+        details: {
+          reason: "PRIVATE_MALWARE_REASON",
+          notifyAffectedDownloaders: true,
+          version: "1.2.3",
+        },
+        createdAt: new Date("2026-10-19T00:00:00.000Z"),
+      },
+      "usr_downloader",
+    );
+    expect(item).toEqual({
+      id: "aud_build_quarantine",
+      action: "build.quarantined",
+      targetType: "build",
+      perspective: "subject",
+      createdAt: new Date("2026-10-19T00:00:00.000Z"),
+    });
+    expect(SECURITY_SUBJECT_LABEL_KEYS["build.quarantined"]).toBe("buildQuarantinedNotice");
+    expect(JSON.stringify(item)).not.toContain("PRIVATE_MALWARE_REASON");
+    expect(JSON.stringify(item)).not.toContain("usr_moderator");
+    expect(JSON.stringify(item)).not.toContain("203.0.113.91");
+    expect(JSON.stringify(item)).not.toContain("1.2.3");
+    expect(
+      toSecurityActivityItem(
+        {
+          id: "aud_build_restore",
+          actorId: "usr_moderator",
+          action: "build.quarantine_restored",
+          targetType: "build",
+          createdAt: new Date("2026-10-19T01:00:00.000Z"),
+        },
+        "usr_downloader",
+      ),
+    ).toBeNull();
+  });
+
   it("maps cart acquisition, verification application updates and privacy changes without details", () => {
     expect(
       toSecurityActivityItem({

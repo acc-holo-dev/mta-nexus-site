@@ -1,10 +1,20 @@
 import { randomUUID } from "node:crypto";
-import { auditEvents, auditRepository, db, userRepository } from "@nexus/db";
+import {
+  auditEvents,
+  auditRepository,
+  resourceDownloadAuthorizationRepository as authorization,
+  buildRepository,
+  db,
+  productRepository,
+  resourceDeliveriesRepository as receipts,
+  userRepository,
+} from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { inArray } from "drizzle-orm";
+import { inArray, or } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 import { SecurityCenterService } from "../apps/web/src/lib/services/security-center-service";
 import {
+  entitlements,
   licenses,
   products,
   reports,
@@ -36,6 +46,11 @@ const auditIds = [
   "aud_secsub_report_dismiss",
   "aud_secsub_report_other",
   "aud_secsub_report_self",
+  "aud_secsub_build_notify",
+  "aud_secsub_build_silent",
+  "aud_secsub_build_other",
+  "aud_secsub_build_restore",
+  "aud_secsub_build_started_only",
 ];
 
 const fixture = {
@@ -43,6 +58,10 @@ const fixture = {
   otherUserId: "usr_secsub_other_owner",
   productId: "prd_secsub_lic",
   otherProductId: "prd_secsub_lic_other",
+  quarantineProductId: "prd_secsub_qi",
+  otherQuarantineProductId: "prd_secsub_qi_other",
+  quarantineBuildId: "bld_secsub_qi",
+  otherQuarantineBuildId: "bld_secsub_qi_other",
   licenseId: "lic_secsub_owned",
   otherLicenseId: "lic_secsub_other",
   caseId: "case_secsub_owned",
@@ -55,10 +74,25 @@ const fixture = {
   otherServerId: "srv_secsub_other",
   reportId: "rpt_secsub_owned",
   otherReportId: "rpt_secsub_other",
+  quarantineEntitlementId: "ent_secsub_qi",
+  otherQuarantineEntitlementId: "ent_secsub_qi_other",
 };
 
 async function clearFixtures() {
-  await db.delete(auditEvents).where(inArray(auditEvents.id, auditIds));
+  await db
+    .delete(auditEvents)
+    .where(
+      or(
+        inArray(auditEvents.id, auditIds),
+        inArray(auditEvents.actorId, [fixture.userId, fixture.otherUserId]),
+        inArray(auditEvents.targetId, [
+          fixture.quarantineBuildId,
+          fixture.otherQuarantineBuildId,
+          fixture.quarantineProductId,
+          fixture.otherQuarantineProductId,
+        ]),
+      ),
+    );
   await db
     .delete(verificationRequests)
     .where(
@@ -74,12 +108,124 @@ async function clearFixtures() {
     .where(inArray(supportCases.id, [fixture.caseId, fixture.otherCaseId]));
   await db.delete(reports).where(inArray(reports.id, [fixture.reportId, fixture.otherReportId]));
   await db
+    .delete(entitlements)
+    .where(
+      inArray(entitlements.id, [
+        fixture.quarantineEntitlementId,
+        fixture.otherQuarantineEntitlementId,
+      ]),
+    );
+  await db
     .delete(licenses)
     .where(inArray(licenses.id, [fixture.licenseId, fixture.otherLicenseId]));
   await db
     .delete(products)
-    .where(inArray(products.id, [fixture.productId, fixture.otherProductId]));
+    .where(
+      inArray(products.id, [
+        fixture.productId,
+        fixture.otherProductId,
+        fixture.quarantineProductId,
+        fixture.otherQuarantineProductId,
+      ]),
+    );
   await db.delete(users).where(inArray(users.id, [fixture.userId, fixture.otherUserId]));
+}
+
+async function servedReceipt(
+  userId: string,
+  productId: string,
+  buildId: string,
+  entitlementId: string,
+) {
+  await db.insert(entitlements).values({
+    id: entitlementId,
+    subjectType: "user",
+    subjectId: userId,
+    permission: "product.download",
+    resourceId: productId,
+  });
+  const expected = await buildRepository.findById(buildId);
+  if (!expected) throw new Error("Missing quarantine fixture build");
+  const receiptId = `dlv_secsub_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+  await authorization.authorize({
+    actorId: userId,
+    expected,
+    pinned: true,
+    receiptId,
+    auditId: `aud_dlv_start_${receiptId}`,
+  });
+  await receipts.finish({
+    userId,
+    receiptId,
+    auditId: `aud_dlv_finish_${receiptId}`,
+    result: { status: "served", bytesSent: expected.fileSizeBytes, errorCode: null },
+  });
+  return receiptId;
+}
+
+async function startedReceipt(
+  userId: string,
+  productId: string,
+  buildId: string,
+  entitlementId: string,
+) {
+  await db.insert(entitlements).values({
+    id: entitlementId,
+    subjectType: "user",
+    subjectId: userId,
+    permission: "product.download",
+    resourceId: productId,
+  });
+  const expected = await buildRepository.findById(buildId);
+  if (!expected) throw new Error("Missing quarantine fixture build");
+  const receiptId = `dlv_secsub_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+  await authorization.authorize({
+    actorId: userId,
+    expected,
+    pinned: true,
+    receiptId,
+    auditId: `aud_dlv_start_${receiptId}`,
+  });
+  return receiptId;
+}
+
+async function quarantineProduct(productId: string, buildId: string, authorId: string) {
+  await productRepository.create({
+    id: productId,
+    title: "Quarantine subject fixture",
+    slug: productId,
+    description: "SEC-005 quarantine subject fixture",
+    type: "script",
+    status: "published",
+    authorId,
+    price: 0,
+    currency: "USD",
+    licenseModel: "unlimited",
+    tags: [],
+    currentVersion: "1.0.0",
+    ratingAverage: 0,
+    ratingCount: 0,
+    salesCount: 0,
+    isFeatured: false,
+    screenshots: [],
+    compatibility: { dependencies: [] },
+  });
+  await buildRepository.create({
+    id: buildId,
+    productId,
+    version: "1.0.0",
+    releaseNotes: "fixture",
+    status: "published",
+    storageKey: `fixtures/${buildId}.zip`,
+    sha256Hash: "a".repeat(64),
+    fileSizeBytes: 7,
+    fileName: "1.0.0.zip",
+    mimeType: "application/zip",
+    scanStatus: "clean",
+    scanner: "test-scanner",
+    scannedAt: new Date(),
+    isSigned: false,
+  });
 }
 
 describe("security activity subject lookup", () => {
@@ -704,6 +850,123 @@ describe("security activity subject lookup", () => {
     expect(serialized).not.toContain("203.0.113.90");
     expect(serialized).not.toContain("Moderator Console");
     expect(serialized).not.toContain(fixture.otherReportId);
+  });
+
+  it("returns notified build quarantines only for served downloaders", async () => {
+    await clearFixtures();
+    await userRepository.create({
+      id: fixture.userId,
+      email: `${fixture.userId}@example.invalid`,
+      username: fixture.userId,
+      displayName: "Subject member",
+      role: "user",
+    });
+    await userRepository.create({
+      id: fixture.otherUserId,
+      email: `${fixture.otherUserId}@example.invalid`,
+      username: fixture.otherUserId,
+      displayName: "Other owner",
+      role: "developer",
+    });
+    await quarantineProduct(
+      fixture.quarantineProductId,
+      fixture.quarantineBuildId,
+      fixture.otherUserId,
+    );
+    await quarantineProduct(
+      fixture.otherQuarantineProductId,
+      fixture.otherQuarantineBuildId,
+      fixture.otherUserId,
+    );
+    await servedReceipt(
+      fixture.userId,
+      fixture.quarantineProductId,
+      fixture.quarantineBuildId,
+      fixture.quarantineEntitlementId,
+    );
+    await startedReceipt(
+      fixture.otherUserId,
+      fixture.otherQuarantineProductId,
+      fixture.otherQuarantineBuildId,
+      fixture.otherQuarantineEntitlementId,
+    );
+
+    await db.insert(auditEvents).values([
+      {
+        id: "aud_secsub_build_notify",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "build.quarantined",
+        targetId: fixture.quarantineBuildId,
+        targetType: "build",
+        ipAddress: "203.0.113.91",
+        userAgent: "Moderator Console",
+        details: {
+          reason: "PRIVATE_MALWARE_REASON",
+          notifyAffectedDownloaders: true,
+          version: "1.0.0",
+        },
+        createdAt: new Date("2026-10-19T00:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_build_silent",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "build.quarantined",
+        targetId: fixture.quarantineBuildId,
+        targetType: "build",
+        details: {
+          reason: "PRIVATE_SILENT_REASON",
+          notifyAffectedDownloaders: false,
+        },
+        createdAt: new Date("2026-10-19T01:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_build_other",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "build.quarantined",
+        targetId: fixture.otherQuarantineBuildId,
+        targetType: "build",
+        details: { notifyAffectedDownloaders: true, reason: "OTHER_BUILD" },
+        createdAt: new Date("2026-10-19T02:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_build_started_only",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "build.quarantined",
+        targetId: fixture.otherQuarantineBuildId,
+        targetType: "build",
+        details: { notifyAffectedDownloaders: true, reason: "STARTED_ONLY" },
+        createdAt: new Date("2026-10-19T03:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_build_restore",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "build.quarantine_restored",
+        targetId: fixture.quarantineBuildId,
+        targetType: "build",
+        details: { reason: "PRIVATE_RESTORE_REASON" },
+        createdAt: new Date("2026-10-19T04:00:00.000Z"),
+      },
+    ]);
+
+    const result = await new SecurityCenterService().listActivity(fixture.userId, 20);
+    const quarantines = result.filter((item) => item.action.startsWith("build.quarantine"));
+    expect(quarantines.map((item) => [item.id, item.perspective, item.action])).toEqual([
+      ["aud_secsub_build_notify", "subject", "build.quarantined"],
+    ]);
+    const serialized = JSON.stringify(quarantines);
+    expect(serialized).not.toContain("PRIVATE_MALWARE_REASON");
+    expect(serialized).not.toContain("PRIVATE_SILENT_REASON");
+    expect(serialized).not.toContain("PRIVATE_RESTORE_REASON");
+    expect(serialized).not.toContain("usr_secsub_admin");
+    expect(serialized).not.toContain("203.0.113.91");
+    expect(serialized).not.toContain("Moderator Console");
+    expect(serialized).not.toContain(fixture.otherQuarantineBuildId);
+    expect(serialized).not.toContain("build.quarantine_restored");
   });
 
   it("rejects an invalid account id before reading audit rows", async () => {

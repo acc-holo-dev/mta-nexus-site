@@ -1254,6 +1254,8 @@ const en = {
       reportResolvedNotice: "Your community report was resolved",
       reportDismissedNotice: "Your community report was dismissed",
       reportCommentRemovedNotice: "Your community report was resolved and the comment was removed",
+      buildQuarantined: "Build quarantined after security review",
+      buildQuarantinedNotice: "A build you downloaded was quarantined after a security review",
     },
   },
   settings: {
@@ -2719,6 +2721,9 @@ const ru: typeof en = {
       reportResolvedNotice: "Ваша жалоба сообщества разрешена",
       reportDismissedNotice: "Ваша жалоба сообщества отклонена",
       reportCommentRemovedNotice: "Ваша жалоба сообщества разрешена, комментарий удалён",
+      buildQuarantined: "Сборка помещена в карантин после проверки безопасности",
+      buildQuarantinedNotice:
+        "Сборка, которую вы скачивали, помещена в карантин после проверки безопасности",
     },
   },
   settings: {
