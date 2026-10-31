@@ -18,6 +18,10 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "license.token_rotated",
   "license.token_revoked",
   "license.revoked",
+  "license.suspended",
+  "license.restored",
+  "license.expired",
+  "license.expiring",
   "organization.ownership_transferred",
   "organization.member_added",
   "organization.member_updated",
@@ -47,6 +51,10 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "license.token_rotated": "licenseTokenRotated",
   "license.token_revoked": "licenseTokenRevoked",
   "license.revoked": "licenseRevoked",
+  "license.suspended": "licenseSuspended",
+  "license.restored": "licenseRestored",
+  "license.expired": "licenseExpired",
+  "license.expiring": "licenseExpiring",
   "organization.ownership_transferred": "organizationOwnershipTransferred",
   "organization.member_added": "organizationMemberAdded",
   "organization.member_updated": "organizationMemberUpdated",
@@ -62,6 +70,11 @@ export const SECURITY_SUBJECT_LABEL_KEYS = {
   "organization.member_added": "organizationMembershipGranted",
   "organization.member_updated": "organizationMembershipChanged",
   "organization.member_removed": "organizationMembershipEnded",
+  "license.revoked": "licenseRevokedByStaff",
+  "license.suspended": "licenseSuspendedByStaff",
+  "license.restored": "licenseRestoredByStaff",
+  "license.expired": "licenseExpiredNotice",
+  "license.expiring": "licenseExpiringNotice",
 } as const satisfies Record<SecuritySubjectAction, string>;
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);

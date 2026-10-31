@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   type AuditEvent,
-  SECURITY_SUBJECT_ACTIONS,
+  SECURITY_LICENSE_SUBJECT_ACTIONS,
   SECURITY_SUBJECT_DETAIL_KEYS,
   SERVER_ACTIVITY_ACTIONS,
   SERVER_ACTIVITY_FIELDS,
@@ -14,7 +14,7 @@ import {
 import { and, desc, eq, exists, inArray, ne, or, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
-import { auditEvents, servers, users } from "../schema";
+import { auditEvents, licenses, servers, users } from "../schema";
 import { serverContentContext } from "./server-content";
 import { managedServerScope } from "./server-management-scope";
 
@@ -339,16 +339,24 @@ export class AuditRepository {
       actorActions.length > 0
         ? and(eq(auditEvents.actorId, userId), inArray(auditEvents.action, [...actorActions]))
         : undefined;
+    const organizationSubjectScope = or(
+      ...Object.entries(SECURITY_SUBJECT_DETAIL_KEYS).map(([action, detailKey]) =>
+        and(eq(auditEvents.action, action), sql`${auditEvents.details}->>${detailKey} = ${userId}`),
+      ),
+    );
+    const licenseSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_LICENSE_SUBJECT_ACTIONS]),
+      eq(auditEvents.targetType, "license"),
+      exists(
+        db
+          .select({ id: licenses.id })
+          .from(licenses)
+          .where(and(eq(licenses.id, auditEvents.targetId), eq(licenses.userId, userId))),
+      ),
+    );
     const subjectScope = and(
       ne(auditEvents.actorId, userId),
-      or(
-        ...SECURITY_SUBJECT_ACTIONS.map((action) =>
-          and(
-            eq(auditEvents.action, action),
-            sql`${auditEvents.details}->>${SECURITY_SUBJECT_DETAIL_KEYS[action]} = ${userId}`,
-          ),
-        ),
-      ),
+      or(organizationSubjectScope, licenseSubjectScope),
     );
     const rows = await db
       .select({
