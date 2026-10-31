@@ -1194,6 +1194,47 @@ export const comments = pgTable(
   ],
 );
 
+// 18b. Verified-interaction server reviews (SV-009)
+export const serverReviews = pgTable(
+  "server_reviews",
+  {
+    id: text("id").primaryKey(),
+    serverId: text("server_id")
+      .notNull()
+      .references(() => servers.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    text: text("text").notNull(),
+    rating: integer("rating").notNull(),
+    status: text("status").notNull().default("published"),
+    revision: integer("revision").notNull().default(1),
+    interactionSource: text("interaction_source").notNull(),
+    moderationReason: text("moderation_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("server_reviews_server_author_idx").on(table.serverId, table.authorId),
+    check("server_reviews_rating_check", sql`${table.rating} BETWEEN 1 AND 5`),
+    check(
+      "server_reviews_status_check",
+      sql`${table.status} IN ('published', 'withdrawn', 'removed')`,
+    ),
+    check("server_reviews_revision_check", sql`${table.revision} > 0`),
+    check("server_reviews_source_check", sql`${table.interactionSource} IN ('follow')`),
+    check("server_reviews_text_check", sql`char_length(btrim(${table.text})) BETWEEN 3 AND 4000`),
+    index("server_reviews_public_time_id_idx")
+      .on(table.serverId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.status} = 'published'`),
+    index("server_reviews_author_time_id_idx").on(
+      table.authorId,
+      table.createdAt.desc(),
+      table.id.desc(),
+    ),
+  ],
+);
+
 // 19. Reactions
 export const reactions = pgTable("reactions", {
   id: text("id").primaryKey(),

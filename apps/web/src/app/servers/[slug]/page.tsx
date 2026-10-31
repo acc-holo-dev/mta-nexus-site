@@ -1,27 +1,29 @@
-import { safeExternalWebUrl } from "@nexus/validation";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import type { Metadata } from "next";
-import { Cpu, Users } from "lucide-react";
 import { TrustBadge } from "@nexus/ui";
-import { serverService } from "../../../lib/services/server-service";
+import { safeExternalWebUrl } from "@nexus/validation";
+import { Cpu, Users } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
+import { ServerFollowButton } from "../../../components/server-follow-button";
+import { ServerHistoryPanel } from "../../../components/server-history-panel";
+import { ServerReviewPanel } from "../../../components/server-review-panel";
+import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
+import { parseServerHistoryWindow } from "../../../lib/server-history-window";
+import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
+import { contentService } from "../../../lib/services/content-service";
 import {
   matchesMtaEndpoint,
   mtaLiveStatus,
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
-import { ServerFollowButton } from "../../../components/server-follow-button";
 import { serverHistoryService } from "../../../lib/services/server-history-service";
-import { parseServerHistoryWindow } from "../../../lib/server-history-window";
-import { ServerHistoryPanel } from "../../../components/server-history-panel";
-import { contentService } from "../../../lib/services/content-service";
-import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
-import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
-import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
-import { cache } from "react";
+import { serverReviewService } from "../../../lib/services/server-review-service";
+import { serverService } from "../../../lib/services/server-service";
 
 export const dynamic = "force-dynamic";
 
@@ -85,10 +87,19 @@ export default async function ServerDetailPage({
     .map(safeExternalWebUrl)
     .filter((url): url is string => url !== undefined);
 
-  const [directory, history, serverUpdates] = await Promise.all([
+  const [directory, history, serverUpdates, reviewPage] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
     serverHistoryService.getHistoryForServer(server, historyWindow).catch(() => null),
     contentService.listServerUpdates(server.id, 6).catch(() => null),
+    server.visibility === "public" && server.status === "active"
+      ? serverReviewService.publicPage(server.id).catch(() => ({
+          reviews: [],
+          total: 0,
+          page: 1,
+          pageSize: 20,
+          totalPages: 1,
+        }))
+      : Promise.resolve(null),
   ]);
 
   const observedServer = directory?.servers.find((item) => matchesMtaEndpoint(server, item));
@@ -279,6 +290,8 @@ export default async function ServerDetailPage({
       <ServerHistoryPanel history={history} locale={locale} />
 
       <ServerUpdatesPanel updates={serverUpdates} locale={locale} serverSlug={server.slug} />
+
+      {reviewPage && <ServerReviewPanel serverId={server.id} initialPage={reviewPage} />}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="nexus-panel space-y-4 p-6">

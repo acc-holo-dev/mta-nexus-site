@@ -24,6 +24,7 @@ export * from "./resource-release-watches";
 export * from "./resource-cart-receipts";
 export * from "./financial-journal";
 export * from "./resource-reviews";
+export * from "./server-reviews";
 export * from "./resource-build-workspace";
 export * from "./order-cases";
 export * from "./content-reactions";

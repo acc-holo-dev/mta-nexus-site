@@ -1,9 +1,9 @@
-import type { NextRequest } from "next/server";
-import { AppError, UnauthorizedError, RateLimitExceededError, type User } from "@nexus/domain";
+import { AppError, RateLimitExceededError, UnauthorizedError, type User } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { authService } from "./services/auth-service";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
+import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "./bounded-json";
+import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
+import { authService } from "./services/auth-service";
 
 export async function resourceCommerceRequest(
   request: NextRequest,
@@ -31,7 +31,8 @@ export async function resourceCommerceRequest(
           : request.nextUrl.pathname.startsWith("/api/admin/resources/") ||
               request.nextUrl.pathname.startsWith("/api/admin/commerce/") ||
               request.nextUrl.pathname.startsWith("/api/admin/licenses/") ||
-              request.nextUrl.pathname.startsWith("/api/admin/storage/")
+              request.nextUrl.pathname.startsWith("/api/admin/storage/") ||
+              request.nextUrl.pathname.startsWith("/api/admin/servers/")
             ? "moderationAction"
             : /^\/api\/subscriptions\/account(?:\/|$)/u.test(request.nextUrl.pathname)
               ? "contentCreation"
