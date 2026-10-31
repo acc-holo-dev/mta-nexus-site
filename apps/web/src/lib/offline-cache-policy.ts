@@ -3,7 +3,13 @@ export const PUBLIC_OFFLINE_CACHE_MARKER = "public-readonly-v1";
 
 const ARTICLE_SLUG_PATH = /^\/articles\/[a-z0-9][a-z0-9-]{2,199}$/u;
 
-const EXACT_PUBLIC_READONLY_PATHS = new Set(["/articles", "/copyright", "/privacy", "/terms"]);
+const EXACT_PUBLIC_READONLY_PATHS = new Set([
+  "/articles",
+  "/community-rules",
+  "/copyright",
+  "/privacy",
+  "/terms",
+]);
 
 export function isOfflineCacheablePublicPath(pathname: string): boolean {
   return EXACT_PUBLIC_READONLY_PATHS.has(pathname) || ARTICLE_SLUG_PATH.test(pathname);

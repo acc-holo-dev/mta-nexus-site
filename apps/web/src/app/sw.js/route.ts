@@ -91,6 +91,7 @@ function notificationTarget(value) {
 function isPublicDocumentPath(pathname) {
   return (
     pathname === "/articles" ||
+    pathname === "/community-rules" ||
     pathname === "/copyright" ||
     pathname === "/privacy" ||
     pathname === "/terms" ||

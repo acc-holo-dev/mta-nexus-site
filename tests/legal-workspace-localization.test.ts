@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
 import { ManagedServerCard } from "../apps/web/src/components/managed-server-card";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { getManagedServerCopy } from "../apps/web/src/lib/managed-server-view";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
@@ -14,6 +14,7 @@ describe("localized legal and workspace shell", () => {
       ["apps/web/src/app/terms/page.tsx", "terms"],
       ["apps/web/src/app/privacy/page.tsx", "privacy"],
       ["apps/web/src/app/copyright/page.tsx", "copyright"],
+      ["apps/web/src/app/community-rules/page.tsx", "communityRules"],
     ] as const) {
       const page = read(path);
       expect(page).toContain("getRequestLocale");
@@ -26,6 +27,7 @@ describe("localized legal and workspace shell", () => {
     expect(en.terms.title).not.toBe(ru.terms.title);
     expect(en.privacy.title).not.toBe(ru.privacy.title);
     expect(en.copyright.title).not.toBe(ru.copyright.title);
+    expect(en.communityRules.title).not.toBe(ru.communityRules.title);
   });
 
   it("uses the shared locale provider for route errors and loading", () => {

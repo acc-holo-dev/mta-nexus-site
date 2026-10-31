@@ -35,5 +35,12 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/articles/:path*", "/copyright", "/privacy", "/terms"],
+  matcher: [
+    "/api/:path*",
+    "/articles/:path*",
+    "/community-rules",
+    "/copyright",
+    "/privacy",
+    "/terms",
+  ],
 };
