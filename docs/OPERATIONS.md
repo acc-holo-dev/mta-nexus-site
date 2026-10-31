@@ -908,25 +908,23 @@ pnpm observability:verify
 ```
 
 Optional Web Push residual (both artifacts required; never invent PASS). Soak uses
-a fixture sender against a migrated database reachable from the runner (compose
-`app`/`push-worker` network is typical when host `localhost:5432` is unpublished).
-Provider probe needs a real HTTPS push subscription endpoint + VAPID triplet:
+a fixture sender against a migrated database. Local Compose does **not** publish
+Postgres to the host, so prefer the compose-network soak entrypoint (stops
+`push-worker` for the run so it cannot race the soak dispatcher):
 
 ```bash
-# Generate a local/dev VAPID triplet (store only in private env; do not commit):
-node --input-type=module -e 'import { generateKeyPairSync } from "node:crypto";
-const { privateKey, publicKey } = generateKeyPairSync("ec", { namedCurve: "P-256" });
-const pub = publicKey.export({ format: "jwk" });
-const priv = privateKey.export({ format: "jwk" });
-const b64u = (buf) => Buffer.from(buf).toString("base64url");
-const x=Buffer.from(pub.x,"base64url"), y=Buffer.from(pub.y,"base64url");
-console.log("WEB_PUSH_VAPID_PUBLIC_KEY="+b64u(Buffer.concat([Buffer.from([0x04]),x,y])));
-console.log("WEB_PUSH_VAPID_PRIVATE_KEY="+priv.d);
-console.log("WEB_PUSH_VAPID_SUBJECT=mailto:ops@example.invalid");'
+# Dev VAPID into the protected env file only (never commit private keys):
+node scripts/generate-web-push-vapid.mjs 'mailto:push-dev@example.invalid'
 
-NEXUS_WEB_PUSH_SOAK_ACK=YES NEXUS_WEB_PUSH_SOAK_DURATION_MS=60000 pnpm push:soak
-pnpm push:soak:verify
+# Soak via Compose network → artifacts/web-push-soak-evidence.json
+NEXUS_WEB_PUSH_SOAK_ACK=YES NEXUS_WEB_PUSH_SOAK_DURATION_MS=60000 pnpm push:soak:compose
+# equivalent host-only path when DATABASE_URL already reaches a migrated DB:
+# NEXUS_WEB_PUSH_SOAK_ACK=YES NEXUS_WEB_PUSH_SOAK_DURATION_MS=60000 pnpm push:soak && pnpm push:soak:verify
 
+# Provider probe needs a real browser Push subscription (HTTPS FCM/Mozilla/… endpoint).
+# Enable Web Push while signed in on the local app, then copy endpoint/p256dh/auth
+# from that session — do not invent endpoints. Automation browsers without
+# Notification/PushManager permission cannot clear this half of the residual.
 NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK=YES \
   NEXUS_WEB_PUSH_PROBE_ENDPOINT='https://…' \
   NEXUS_WEB_PUSH_PROBE_P256DH='…' \
