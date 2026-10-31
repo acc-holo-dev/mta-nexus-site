@@ -35,6 +35,8 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
 vi.mock("@nexus/ui", async () => {
   const { createElement } = await import("react");
   return {
+    fieldClass: "mock-field",
+    fieldClassBlock: "mock-field-block",
     Avatar: () => createElement("div", { "data-ui": "avatar" }),
     Button: ({
       children,

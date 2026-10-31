@@ -1,4 +1,3 @@
-import type { Build } from "@nexus/domain";
 import { Fingerprint, ShieldCheck } from "lucide-react";
 import { getBuildProvenance } from "../lib/build-provenance";
 import { getDictionary, type Locale } from "../lib/i18n";
@@ -10,18 +9,21 @@ const toneClass = {
   danger: "border-[color:var(--nexus-danger)]/20 bg-danger-soft text-danger",
 } as const;
 
-export type BuildProvenanceDetailsBuild = Pick<
-  Build,
-  | "status"
-  | "sha256Hash"
-  | "fileName"
-  | "scanStatus"
-  | "scanner"
-  | "scannedAt"
-  | "mtaVersionTarget"
-  | "isSigned"
-> &
-  Partial<Pick<Build, "id" | "version" | "mimeType" | "fileSizeBytes">>;
+/** Accepts domain Builds and public/library projections (nullables from SQL). */
+export type BuildProvenanceDetailsBuild = {
+  status: string;
+  sha256Hash: string;
+  fileName: string;
+  scanStatus: string;
+  scanner?: string | null;
+  scannedAt?: Date | null;
+  mtaVersionTarget?: string | null;
+  isSigned: boolean;
+  id?: string;
+  version?: string;
+  mimeType?: string | null;
+  fileSizeBytes?: number;
+};
 
 export function BuildProvenanceDetails({
   build,
@@ -33,6 +35,7 @@ export function BuildProvenanceDetails({
   const copy = getDictionary(locale).provenance;
   const provenance = getBuildProvenance(build);
   const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
+  const publicationState = build.status.replace(/_/g, " ");
 
   const scanLabel =
     provenance.scanStatus === "clean"
@@ -135,7 +138,7 @@ export function BuildProvenanceDetails({
           </dd>
 
           <dt className="text-faint">{copy.publicationState}</dt>
-          <dd className="text-secondary">{build.status.replace(/_/g, " ")}</dd>
+          <dd className="text-secondary">{publicationState}</dd>
         </dl>
 
         <p className="text-[10px] leading-relaxed text-faint">{copy.explanation}</p>

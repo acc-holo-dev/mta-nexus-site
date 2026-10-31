@@ -19,25 +19,28 @@ export function formatProvenanceTimestamp(value?: Date | null): string | null {
     .replace(/\.\d{3}Z$/u, " UTC");
 }
 
-export function getBuildProvenance(
-  build: Pick<Build, "scanStatus" | "scanner" | "scannedAt">,
-): BuildProvenance {
+export function getBuildProvenance(build: {
+  scanStatus: Build["scanStatus"] | (string & {});
+  scanner?: string | null;
+  scannedAt?: Date | null;
+}): BuildProvenance {
+  const scanStatus = build.scanStatus as Build["scanStatus"];
   const scanner = build.scanner?.trim() || null;
   const scannedAtLabel = formatProvenanceTimestamp(build.scannedAt);
   const scanTone =
-    build.scanStatus === "clean"
+    scanStatus === "clean"
       ? "positive"
-      : build.scanStatus === "malicious"
+      : scanStatus === "malicious"
         ? "danger"
-        : build.scanStatus === "error"
+        : scanStatus === "error"
           ? "warning"
           : "neutral";
 
   return Object.freeze({
-    scanStatus: build.scanStatus,
+    scanStatus,
     scanTone,
     scanner,
     scannedAtLabel,
-    trustedCleanScan: build.scanStatus === "clean" && Boolean(scanner && scannedAtLabel),
+    trustedCleanScan: scanStatus === "clean" && Boolean(scanner && scannedAtLabel),
   });
 }

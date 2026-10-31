@@ -155,6 +155,29 @@ vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
   };
 });
 
+vi.mock("../apps/web/src/components/server-review-panel", async () => {
+  const React = await import("react");
+  return {
+    ServerReviewPanel: ({ serverId }: { serverId: string }) =>
+      React.createElement("div", {
+        "data-testid": "server-reviews",
+        "data-server-id": serverId,
+      }),
+  };
+});
+
+vi.mock("../apps/web/src/lib/services/server-review-service", () => ({
+  serverReviewService: {
+    publicPage: vi.fn(async () => ({
+      reviews: [],
+      total: 0,
+      page: 1,
+      pageSize: 20,
+      totalPages: 1,
+    })),
+  },
+}));
+
 import ServerDetailPage from "../apps/web/src/app/servers/[slug]/page";
 
 describe("server detail behavior", () => {

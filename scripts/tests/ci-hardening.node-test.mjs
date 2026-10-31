@@ -71,7 +71,7 @@ test("workflow Node versions use the same repository pin", () => {
 test("pnpm install jobs enable setup-node cache only after pnpm/action-setup", () => {
   const content = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
   // Split on top-level jobs (two-space indent). Keep jobs that run workspace installs.
-  const jobs = content.split(/\n  [a-z0-9-]+:\n/u).slice(1);
+  const jobs = content.split(/\n {2}[a-z0-9-]+:\n/u).slice(1);
   const installJobs = jobs.filter((job) => /pnpm install --frozen-lockfile/u.test(job));
   assert.equal(installJobs.length, 3, "unit, verify, and mail-worker install the workspace");
   for (const job of installJobs) {
@@ -88,7 +88,7 @@ test("pnpm install jobs enable setup-node cache only after pnpm/action-setup", (
     const start = content.indexOf(marker);
     assert.ok(start >= 0, jobName);
     const rest = content.slice(start + 1);
-    const next = rest.search(/\n  [a-z0-9-]+:\n/u);
+    const next = rest.search(/\n {2}[a-z0-9-]+:\n/u);
     const job = next >= 0 ? rest.slice(0, next) : rest;
     assert.doesNotMatch(job, /^[ \t]+cache: pnpm$/mu, `${jobName} must not cache pnpm without install`);
   }
