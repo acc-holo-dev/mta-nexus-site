@@ -116,49 +116,6 @@ describe("security activity contract", () => {
     ).toBe("organization.ownership_transferred");
   });
 
-  it("maps buyer commerce audits without leaking staff notes or case details", () => {
-    const expired = toSecurityActivityItem({
-      id: "aud_sub_expired",
-      actorId: "usr_buyer",
-      action: "commerce.subscription_expired",
-      targetType: "subscription",
-      details: { expiresAt: "2026-10-01T00:00:00.000Z", note: "staff-private" },
-      createdAt: new Date("2026-10-07T00:00:00.000Z"),
-    });
-    expect(expired).toEqual({
-      id: "aud_sub_expired",
-      action: "commerce.subscription_expired",
-      targetType: "subscription",
-      perspective: "actor",
-      createdAt: new Date("2026-10-07T00:00:00.000Z"),
-    });
-    expect(JSON.stringify(expired)).not.toContain("staff-private");
-    expect(JSON.stringify(expired)).not.toContain("expiresAt");
-
-    const orderCase = toSecurityActivityItem({
-      id: "aud_order_case",
-      actorId: "usr_buyer",
-      action: "commerce.order_case.created",
-      targetType: "support_case",
-      ipAddress: "203.0.113.10",
-      userAgent: "Buyer Browser",
-      details: { orderId: "ord_secret", kind: "refund", toReview: "intake", notes: "private" },
-      createdAt: new Date("2026-10-07T01:00:00.000Z"),
-    });
-    expect(orderCase).toEqual({
-      id: "aud_order_case",
-      action: "commerce.order_case.created",
-      targetType: "support_case",
-      perspective: "actor",
-      ipAddress: "203.0.113.10",
-      userAgent: "Buyer Browser",
-      createdAt: new Date("2026-10-07T01:00:00.000Z"),
-    });
-    expect(JSON.stringify(orderCase)).not.toContain("ord_secret");
-    expect(JSON.stringify(orderCase)).not.toContain("private");
-    expect(JSON.stringify(orderCase)).not.toContain("toReview");
-  });
-
   it("maps buyer commerce audits without leaking order or subscription details", () => {
     const expired = toSecurityActivityItem({
       id: "aud_sub_expired",
