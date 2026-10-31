@@ -699,8 +699,12 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await outsider.goto(`/market/${slug}`);
   const expectedSha = createHash("sha256").update(file).digest("hex");
   await expect(outsider.getByText(`SHA-256: ${expectedSha.slice(0, 16)}…`)).toBeVisible();
+  // Build row rounds small packages to "1 KB"; provenance lists exact byte size.
+  await expect(outsider.getByText(/Size:\s*1 KB/u)).toBeVisible();
   await expect(
-    outsider.getByText(new RegExp(`\\b${file.length.toLocaleString("en-US")} B\\b|\\b1 KB\\b`)),
+    outsider
+      .getByTestId("build-provenance")
+      .getByText(`${file.length.toLocaleString("en-US")} B`, { exact: true }),
   ).toBeVisible();
   await outsider.getByRole("link", { name: "Add to library", exact: true }).click();
   await outsider.getByRole("button", { name: "Add to library", exact: true }).click();

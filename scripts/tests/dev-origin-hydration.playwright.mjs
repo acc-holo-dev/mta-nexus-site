@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+// Register before any i18n import: static ESM links resolve before hooks run.
 import "../register-ts-directory-resolve.mjs";
-import { getDictionary } from "../../apps/web/src/lib/i18n.ts";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
@@ -10,6 +10,7 @@ assert(process.env.NEXUS_BROWSER_TOOLS);
 
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { chromium } = require("@playwright/test");
+const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
 
 const dictionary = getDictionary("en");
 const origins = [
