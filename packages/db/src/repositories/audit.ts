@@ -2,10 +2,10 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   type AuditEvent,
-  SECURITY_COMMERCE_SUBJECT_ACTIONS,
   SECURITY_LICENSE_SUBJECT_ACTIONS,
   SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
   SECURITY_SUBJECT_DETAIL_KEYS,
+  SECURITY_SUPPORT_CASE_SUBJECT_ACTIONS,
   SECURITY_VERIFICATION_SUBJECT_ACTIONS,
   SERVER_ACTIVITY_ACTIONS,
   SERVER_ACTIVITY_FIELDS,
@@ -364,8 +364,8 @@ export class AuditRepository {
           .where(and(eq(licenses.id, auditEvents.targetId), eq(licenses.userId, userId))),
       ),
     );
-    const commerceSubjectScope = and(
-      inArray(auditEvents.action, [...SECURITY_COMMERCE_SUBJECT_ACTIONS]),
+    const supportCaseSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_SUPPORT_CASE_SUBJECT_ACTIONS]),
       eq(auditEvents.targetType, "support_case"),
       exists(
         db
@@ -413,7 +413,7 @@ export class AuditRepository {
       or(
         organizationSubjectScope,
         licenseSubjectScope,
-        commerceSubjectScope,
+        supportCaseSubjectScope,
         verificationSubjectScope,
         serverVerificationSubjectScope,
       ),

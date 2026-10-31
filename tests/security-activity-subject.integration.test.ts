@@ -29,6 +29,8 @@ const auditIds = [
   "aud_secsub_ver_other",
   "aud_server_verification_ver_secsub_srv",
   "aud_server_verification_ver_secsub_srv_other",
+  "aud_secsub_support_status",
+  "aud_secsub_support_other",
 ];
 
 const fixture = {
@@ -504,6 +506,75 @@ describe("security activity subject lookup", () => {
     expect(serialized).not.toContain("203.0.113.70");
     expect(serialized).not.toContain("Moderator Console");
     expect(serialized).not.toContain(fixture.otherServerId);
+  });
+
+  it("returns staff support status changes for the requester via support case ownership", async () => {
+    await clearFixtures();
+    await userRepository.create({
+      id: fixture.userId,
+      email: `${fixture.userId}@example.invalid`,
+      username: fixture.userId,
+      displayName: "Subject member",
+      role: "user",
+    });
+    await userRepository.create({
+      id: fixture.otherUserId,
+      email: `${fixture.otherUserId}@example.invalid`,
+      username: fixture.otherUserId,
+      displayName: "Other owner",
+      role: "user",
+    });
+    await db.insert(supportCases).values([
+      {
+        id: fixture.caseId,
+        requesterId: fixture.userId,
+        category: "account",
+        subject: "Owned support case",
+        status: "resolved",
+      },
+      {
+        id: fixture.otherCaseId,
+        requesterId: fixture.otherUserId,
+        category: "account",
+        subject: "Other support case",
+        status: "open",
+      },
+    ]);
+    await db.insert(auditEvents).values([
+      {
+        id: "aud_secsub_support_status",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "support.case.status_changed",
+        targetId: fixture.caseId,
+        targetType: "support_case",
+        ipAddress: "203.0.113.80",
+        userAgent: "Staff Console",
+        details: { from: "open", to: "resolved", notes: "staff-private" },
+        createdAt: new Date("2026-10-16T00:00:00.000Z"),
+      },
+      {
+        id: "aud_secsub_support_other",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "support.case.status_changed",
+        targetId: fixture.otherCaseId,
+        targetType: "support_case",
+        details: { from: "open", to: "closed" },
+        createdAt: new Date("2026-10-17T00:00:00.000Z"),
+      },
+    ]);
+
+    const result = await new SecurityCenterService().listActivity(fixture.userId, 20);
+    expect(result.map((item) => [item.id, item.perspective, item.action])).toEqual([
+      ["aud_secsub_support_status", "subject", "support.case.status_changed"],
+    ]);
+    const serialized = JSON.stringify(result);
+    expect(serialized).not.toContain("staff-private");
+    expect(serialized).not.toContain("usr_secsub_admin");
+    expect(serialized).not.toContain("203.0.113.80");
+    expect(serialized).not.toContain("Staff Console");
+    expect(serialized).not.toContain(fixture.otherCaseId);
   });
 
   it("rejects an invalid account id before reading audit rows", async () => {
