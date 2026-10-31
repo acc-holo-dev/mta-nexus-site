@@ -891,10 +891,49 @@ The report writes `artifacts/beta-candidate-evidence.json`. Interpret it as:
 | `status: awaiting_owner_deploy_decision` | Same as checkable; still not live and not authorized                                                                                                                                                                                                |
 | `openBetaLive` / `productionAuthorized`  | Always `false` in this harness                                                                                                                                                                                                                      |
 | `technicalBlockers`                      | Named gaps (often missing backup-restore CI evidence for ROADMAP 19)                                                                                                                                                                                |
-| `residuals`                              | Owner content/observability and optional Web Push soak/provider proofs (both `artifacts/web-push-soak-evidence.json` and `artifacts/web-push-provider-evidence.json` must validate via their checkers; file presence alone never clears `web_push`) |
+| `residuals`                              | Optional proofs only: `legal_surfaces` passes from in-repo Terms/Privacy/Community rules (counsel review stays human); `observability` clears only when `artifacts/observability-readiness-evidence.json` validates via `pnpm observability:verify` after `NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready`; `web_push` still needs both soak + live provider JSON (presence alone never clears) |
 
 `ci-evidence.json` from the CI summary job now includes `requiredJobs` and
 `jobResults` so browser/mail/runtime categories can be checked per job.
+
+Legal product surfaces: `pnpm legal:check` (Terms `/terms`, Privacy `/privacy`,
+Community rules `/community-rules`, footer links, RU/EN substance). This is not
+counsel approval.
+
+Operator observability readiness (alert thresholds + in-repo probes/runbooks):
+
+```bash
+NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready
+pnpm observability:verify
+```
+
+Optional Web Push residual (both artifacts required; never invent PASS). Soak uses
+a fixture sender against a migrated database reachable from the runner (compose
+`app`/`push-worker` network is typical when host `localhost:5432` is unpublished).
+Provider probe needs a real HTTPS push subscription endpoint + VAPID triplet:
+
+```bash
+# Generate a local/dev VAPID triplet (store only in private env; do not commit):
+node --input-type=module -e 'import { generateKeyPairSync } from "node:crypto";
+const { privateKey, publicKey } = generateKeyPairSync("ec", { namedCurve: "P-256" });
+const pub = publicKey.export({ format: "jwk" });
+const priv = privateKey.export({ format: "jwk" });
+const b64u = (buf) => Buffer.from(buf).toString("base64url");
+const x=Buffer.from(pub.x,"base64url"), y=Buffer.from(pub.y,"base64url");
+console.log("WEB_PUSH_VAPID_PUBLIC_KEY="+b64u(Buffer.concat([Buffer.from([0x04]),x,y])));
+console.log("WEB_PUSH_VAPID_PRIVATE_KEY="+priv.d);
+console.log("WEB_PUSH_VAPID_SUBJECT=mailto:ops@example.invalid");'
+
+NEXUS_WEB_PUSH_SOAK_ACK=YES NEXUS_WEB_PUSH_SOAK_DURATION_MS=60000 pnpm push:soak
+pnpm push:soak:verify
+
+NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK=YES \
+  NEXUS_WEB_PUSH_PROBE_ENDPOINT='https://…' \
+  NEXUS_WEB_PUSH_PROBE_P256DH='…' \
+  NEXUS_WEB_PUSH_PROBE_AUTH='…' \
+  pnpm push:provider:probe
+pnpm push:provider:verify
+```
 
 ### Acceptance evidence
 
