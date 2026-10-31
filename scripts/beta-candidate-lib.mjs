@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "./backup-restore-contract.mjs";
 import { requiredJobs } from "./ci-policy.mjs";
+import { evaluateLegalSurfaces } from "./legal-surfaces-lib.mjs";
+import { evaluateObservabilityEvidenceResidual } from "./observability-evidence-lib.mjs";
 import { evaluateWebPushEvidenceResidual } from "./web-push-evidence-lib.mjs";
 
 /** ROADMAP 20 automated evidence categories for a checkable free open-beta candidate. */
@@ -82,16 +84,18 @@ export const BETA_CANDIDATE_CATEGORIES = Object.freeze([
     id: "observability",
     title: "Observability / operator readiness",
     required: false,
-    proof: "owner",
+    proof: "external",
+    artifacts: Object.freeze(["artifacts/observability-readiness-evidence.json"]),
     description:
-      "Owner confirms alerts/runbooks for the target environment; not auto-proven by application CI.",
+      "Optional operator readiness JSON from `pnpm observability:ready` must validate (alert thresholds + in-repo probes/runbooks). Presence alone never clears; production vendor routing remains a human gate.",
   }),
   Object.freeze({
     id: "legal_surfaces",
     title: "Terms / Privacy / Community rules published",
     required: false,
-    proof: "owner",
-    description: "Content/legal publication for open beta is an owner content gate.",
+    proof: "repo",
+    description:
+      "In-repo Terms/Privacy/Community rules pages exist, are linked, and carry RU/EN substance. Counsel review remains a separate human gate—not invented by this harness.",
   }),
   Object.freeze({
     id: "deployment_authorization",
@@ -344,7 +348,23 @@ export function evaluateBetaCandidate({
         break;
       }
       case "external":
-        result = evaluateExternal(category, artifactRoot);
+        result =
+          category.id === "observability"
+            ? evaluateObservabilityEvidenceResidual({
+                artifactRoot,
+                relativePath:
+                  category.artifacts?.[0] ?? "artifacts/observability-readiness-evidence.json",
+              })
+            : evaluateExternal(category, artifactRoot);
+        break;
+      case "repo":
+        result =
+          category.id === "legal_surfaces"
+            ? evaluateLegalSurfaces(artifactRoot)
+            : {
+                status: "blocked",
+                reason: `Unknown repo proof category: ${category.id}`,
+              };
         break;
       case "owner":
         result = {
@@ -370,6 +390,7 @@ export function evaluateBetaCandidate({
       reason: result.reason,
       ...(result.incompleteFlags ? { incompleteFlags: result.incompleteFlags } : {}),
       ...(result.present ? { present: result.present } : {}),
+      ...(result.note ? { note: result.note } : {}),
     });
   });
 

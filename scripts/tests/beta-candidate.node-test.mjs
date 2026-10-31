@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import {
   BETA_CANDIDATE_CATEGORIES,
@@ -109,4 +112,34 @@ test("web_push residual stays residual without inventing PASS for mere file pres
   assert.ok(report.residuals.some((item) => item.startsWith("web_push:")));
   assert.equal(report.openBetaLive, false);
   assert.equal(report.productionAuthorized, false);
+});
+
+test("legal_surfaces can pass from in-repo pages without inventing counsel approval", () => {
+  const report = evaluateBetaCandidate({
+    candidateSha: sha,
+    dirtyWorkingTree: false,
+    ciEvidence: passingCiEvidence(),
+    artifactRoot: process.cwd(),
+  });
+  const legal = report.categories.find((item) => item.id === "legal_surfaces");
+  assert.equal(legal?.status, "passed");
+  assert.equal(legal?.proof, "repo");
+  assert.match(legal?.note ?? "", /not legal counsel/iu);
+});
+
+test("observability residual stays residual without validated evidence artifact", () => {
+  const dir = mkdtempSync(join(tmpdir(), "beta-obs-"));
+  try {
+    const report = evaluateBetaCandidate({
+      candidateSha: sha,
+      dirtyWorkingTree: false,
+      ciEvidence: passingCiEvidence(),
+      artifactRoot: dir,
+    });
+    const observability = report.categories.find((item) => item.id === "observability");
+    assert.equal(observability?.status, "residual");
+    assert.match(observability?.reason ?? "", /absent|invalid/u);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

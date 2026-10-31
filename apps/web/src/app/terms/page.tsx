@@ -15,7 +15,7 @@ export default async function TermsPage() {
 
   return (
     <LegalDocument
-      badge={legal.closedBeta}
+      badge={legal.openFreeBeta}
       title={document.title}
       lead={document.lead}
       lastUpdatedLabel={legal.lastUpdated}

@@ -91,6 +91,12 @@ export function Footer({ locale }: { locale: Locale }) {
             {dictionary.footer.privacy}
           </Link>
           <Link
+            href="/community-rules"
+            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {dictionary.footer.communityRules}
+          </Link>
+          <Link
             href="/copyright"
             className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >

@@ -59,6 +59,7 @@ const en = {
     workspace: "Workspace",
     terms: "Terms",
     privacy: "Privacy",
+    communityRules: "Community rules",
     copyright: "Copyright",
     disclaimer: "Not affiliated with Rockstar Games, Take-Two Interactive, or Multi Theft Auto.",
   },
@@ -1333,16 +1334,17 @@ const en = {
   },
   legal: {
     closedBeta: "Closed beta",
+    openFreeBeta: "Open free beta",
     lastUpdated: "Last updated",
     terms: {
-      metadataTitle: "Closed Beta Terms",
+      metadataTitle: "Open free beta terms",
       title: "Terms of use",
-      lead: "Effective for the MTA Nexus closed beta.",
-      updated: "16 September 2026",
+      lead: "Effective for the MTA Nexus open free beta. These product terms are published for users; they are not a substitute for counsel-reviewed contracts.",
+      updated: "31 October 2026",
       sections: [
         {
           title: "What the beta provides",
-          body: "MTA Nexus provides discovery features, community content, server listings, and free resources for Multi Theft Auto. Paid resources, balances, payouts, and cryptocurrency settlement are not available in this beta.",
+          body: "MTA Nexus provides discovery features, community content, server listings, and free resources for Multi Theft Auto. Paid marketplace checkout, balances, payouts, and cryptocurrency settlement remain out of scope for this free open beta.",
         },
         {
           title: "Your account and content",
@@ -1350,7 +1352,7 @@ const en = {
         },
         {
           title: "Beta availability",
-          body: "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the closed beta.",
+          body: "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the open free beta.",
         },
         {
           title: "Moderation",
@@ -1363,8 +1365,8 @@ const en = {
     privacy: {
       metadataTitle: "Privacy notice",
       title: "Privacy notice",
-      lead: "This notice describes the data used to operate and protect the MTA Nexus closed beta.",
-      updated: "16 September 2026",
+      lead: "This notice describes the data used to operate and protect the MTA Nexus open free beta. It is a product surface, not counsel certification.",
+      updated: "31 October 2026",
       sections: [
         {
           title: "Data we use",
@@ -1386,11 +1388,37 @@ const en = {
       contactLabel: "Privacy requests",
       contactEmail: "legal@nexus-mta.com",
     },
+    communityRules: {
+      metadataTitle: "Community rules",
+      title: "Community rules",
+      lead: "Rules for participation in MTA Nexus community surfaces during the open free beta.",
+      updated: "31 October 2026",
+      sections: [
+        {
+          title: "Be respectful",
+          body: "Do not harass, threaten, dox, or discriminate against other people. Keep discussion constructive. Personal disputes belong off the platform when they turn abusive.",
+        },
+        {
+          title: "No malware or stolen resources",
+          body: "Do not upload, link, or promote malware, cracked tools, credential dumps, or resources you do not have rights to distribute. Report suspected abuse through the copyright and abuse channel.",
+        },
+        {
+          title: "Honest listings and claims",
+          body: "Server and resource descriptions must not misrepresent ownership, compatibility, paid features, or safety status. Do not evade moderation or create accounts to bypass limits.",
+        },
+        {
+          title: "Enforcement",
+          body: "Staff may remove content, restrict features, or suspend accounts when these rules are broken. Appeals can be sent to the support contacts published on the site. Audit records may be retained for investigation.",
+        },
+      ],
+      contactLabel: "Community questions",
+      contactEmail: "legal@nexus-mta.com",
+    },
     copyright: {
       metadataTitle: "Copyright & abuse",
       title: "Copyright & abuse reports",
       lead: "Use this process to report harmful, stolen, or rights-infringing material on MTA Nexus.",
-      updated: "16 September 2026",
+      updated: "31 October 2026",
       sections: [
         {
           title: "Report harmful or infringing content",
@@ -1477,6 +1505,7 @@ const ru: typeof en = {
     workspace: "Рабочая зона",
     terms: "Условия",
     privacy: "Конфиденциальность",
+    communityRules: "Правила сообщества",
     copyright: "Авторские права",
     disclaimer:
       "MTA Nexus не связан с Rockstar Games, Take-Two Interactive или проектом Multi Theft Auto.",
@@ -2767,16 +2796,17 @@ const ru: typeof en = {
   },
   legal: {
     closedBeta: "Закрытая бета",
+    openFreeBeta: "Открытая бесплатная бета",
     lastUpdated: "Последнее обновление",
     terms: {
-      metadataTitle: "Условия закрытой беты",
+      metadataTitle: "Условия открытой бесплатной беты",
       title: "Условия использования",
-      lead: "Действуют для закрытой беты MTA Nexus.",
-      updated: "16 сентября 2026",
+      lead: "Действуют для открытой бесплатной беты MTA Nexus. Это продуктовая публикация для пользователей, а не замена юристам.",
+      updated: "31 октября 2026",
       sections: [
         {
           title: "Что предоставляет бета",
-          body: "MTA Nexus предоставляет поиск серверов и ресурсов, материалы сообщества, карточки серверов и бесплатные ресурсы для Multi Theft Auto. Платные ресурсы, балансы, выплаты и расчёты в криптовалюте в этой бете недоступны.",
+          body: "MTA Nexus предоставляет поиск серверов и ресурсов, материалы сообщества, карточки серверов и бесплатные ресурсы для Multi Theft Auto. Платный marketplace, балансы, выплаты и расчёты в криптовалюте остаются вне scope этой бесплатной открытой беты.",
         },
         {
           title: "Ваш аккаунт и контент",
@@ -2784,7 +2814,7 @@ const ru: typeof en = {
         },
         {
           title: "Доступность беты",
-          body: "Сервис является экспериментальным и во время разработки может меняться, приостанавливаться или удалять данные. Храните собственную копию каждого загруженного ресурса. В закрытой бете непрерывная доступность не гарантируется.",
+          body: "Сервис является экспериментальным и во время разработки может меняться, приостанавливаться или удалять данные. Храните собственную копию каждого загруженного ресурса. В открытой бесплатной бете непрерывная доступность не гарантируется.",
         },
         {
           title: "Модерация",
@@ -2797,8 +2827,8 @@ const ru: typeof en = {
     privacy: {
       metadataTitle: "Конфиденциальность",
       title: "Уведомление о конфиденциальности",
-      lead: "Здесь описаны данные, используемые для работы и защиты закрытой беты MTA Nexus.",
-      updated: "16 сентября 2026",
+      lead: "Здесь описаны данные, используемые для работы и защиты открытой бесплатной беты MTA Nexus. Это продуктовая поверхность, а не юридическая сертификация.",
+      updated: "31 октября 2026",
       sections: [
         {
           title: "Какие данные мы используем",
@@ -2820,11 +2850,37 @@ const ru: typeof en = {
       contactLabel: "Запросы по конфиденциальности",
       contactEmail: "legal@nexus-mta.com",
     },
+    communityRules: {
+      metadataTitle: "Правила сообщества",
+      title: "Правила сообщества",
+      lead: "Правила участия в поверхностях сообщества MTA Nexus во время открытой бесплатной беты.",
+      updated: "31 октября 2026",
+      sections: [
+        {
+          title: "Уважайте других",
+          body: "Нельзя преследовать, угрожать, публиковать персональные данные или дискриминировать людей. Обсуждение должно оставаться конструктивным. Личные конфликты, переходящие в оскорбления, нужно решать вне платформы.",
+        },
+        {
+          title: "Без вредоносного кода и украденных ресурсов",
+          body: "Нельзя загружать, распространять или рекламировать вредоносный код, взломанные инструменты, дампы учётных данных или ресурсы без прав на распространение. О подозрительных случаях сообщайте через канал авторских прав и жалоб.",
+        },
+        {
+          title: "Честные описания и заявления",
+          body: "Описания серверов и ресурсов не должны искажать владение, совместимость, платные функции или статус безопасности. Нельзя обходить модерацию и создавать аккаунты для обхода ограничений.",
+        },
+        {
+          title: "Применение правил",
+          body: "Сотрудники могут удалять контент, ограничивать функции или приостанавливать аккаунты при нарушении правил. Апелляции можно отправлять на контакты поддержки, опубликованные на сайте. Записи аудита могут сохраняться для расследования.",
+        },
+      ],
+      contactLabel: "Вопросы по сообществу",
+      contactEmail: "legal@nexus-mta.com",
+    },
     copyright: {
       metadataTitle: "Авторские права и злоупотребления",
       title: "Авторские права и жалобы",
       lead: "Используйте этот порядок, чтобы сообщить о вредоносных, украденных или нарушающих права материалах в MTA Nexus.",
-      updated: "16 сентября 2026",
+      updated: "31 октября 2026",
       sections: [
         {
           title: "Сообщить о вредоносном или нарушающем права контенте",
