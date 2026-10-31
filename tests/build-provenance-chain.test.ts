@@ -43,7 +43,33 @@ describe("build provenance chain behavior", () => {
 
     expect(html).toContain(copy.blockedMalicious);
     expect(html).toContain(copy.recordedAsSigned);
+    expect(html).toContain(copy.trustedCleanMissing);
     expect(html).toContain(copy.explanation);
     expect(html).not.toMatch(/SHA-256 verified|cryptographically verified/iu);
+  });
+
+  it("surfaces build id, version, size and trusted clean gate when recorded", () => {
+    const copy = getDictionary("en").provenance;
+    const html = renderBuild({
+      id: "bld_trusted_1",
+      version: "2.1.0",
+      status: "published",
+      sha256Hash: "56".repeat(32),
+      fileName: "release.zip",
+      fileSizeBytes: 4096,
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "clamav",
+      scannedAt: new Date("2026-10-08T00:00:00.000Z"),
+      mtaVersionTarget: "1.6.0",
+      isSigned: false,
+    });
+
+    expect(html).toContain("bld_trusted_1");
+    expect(html).toContain("2.1.0");
+    expect(html).toContain("4,096 B");
+    expect(html).toContain(copy.trustedCleanMet);
+    expect(html).toContain(copy.buildId);
+    expect(html).toContain(copy.version);
   });
 });

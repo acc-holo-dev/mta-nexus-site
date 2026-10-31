@@ -106,4 +106,17 @@ describe("author-facing MTA meta inspector", () => {
     expect(metaInspectorPreview(entries)).toEqual(entries.slice(0, 20));
     expect(entries).toHaveLength(25);
   });
+
+  it.each(["en", "ru"] as const)(
+    "keeps deepened manifest section copy for scripts/files/maps/settings in %s",
+    (locale) => {
+      const copy = getDictionary(locale).metaInspector;
+      expect(copy.scriptsDetails.length).toBeGreaterThan(0);
+      expect(copy.filesDetails.length).toBeGreaterThan(0);
+      expect(copy.mapsDetails.length).toBeGreaterThan(0);
+      expect(copy.settingsDetails.length).toBeGreaterThan(0);
+      expect(copy.scriptsNote).not.toMatch(/safe|verified|malware clean/iu);
+      expect(copy.filesNote).not.toMatch(/archive verified|security verdict/iu);
+    },
+  );
 });

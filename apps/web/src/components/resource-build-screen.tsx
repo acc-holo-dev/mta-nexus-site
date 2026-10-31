@@ -1,19 +1,20 @@
-import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
-import { resourceMediaCopy } from "../lib/resource-media-i18n";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { buildPackageCopy } from "../lib/build-package-i18n";
+import { getDictionary } from "../lib/i18n";
+import { getRequestLocale } from "../lib/i18n-server";
+import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
+import { resourceMediaCopy } from "../lib/resource-media-i18n";
+import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
+import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceBuildWorkspaceService } from "../lib/services/resource-build-workspace-service";
-import { getRequestLocale } from "../lib/i18n-server";
-import { getDictionary } from "../lib/i18n";
-import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
-import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
-import { ResourceBuildControls } from "./resource-build-controls";
 import { BuildModerationControls } from "./build-moderation-controls";
-import { buildPackageCopy } from "../lib/build-package-i18n";
 import { BuildPackageEvidencePanel } from "./build-package-evidence";
+import { BuildProvenanceDetails } from "./build-provenance-details";
+import { ResourceBuildControls } from "./resource-build-controls";
 export async function ResourceBuildScreen({
   productId,
   buildId,
@@ -107,39 +108,22 @@ export async function ResourceBuildScreen({
           </ul>
         </section>
       )}
-      <dl className="grid gap-3 rounded-lg border border-base p-5 text-sm">
-        <div>
-          <dt>{copy.file}</dt>
-          <dd className="break-words">
-            {build.fileName} · {build.fileSizeBytes.toLocaleString(locale)} B
-          </dd>
-        </div>
-        <div>
-          <dt>SHA-256</dt>
-          <dd className="break-all font-code">{build.sha256Hash}</dd>
-        </div>
-        <div>
-          <dt>{copy.scan}</dt>
-          <dd>
-            {copy.scans[build.scanStatus]}
-            {build.scanner && build.scannedAt && (
-              <>
-                {" "}
-                · {build.scanner} ·{" "}
-                {new Date(build.scannedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
-              </>
-            )}
-          </dd>
-        </div>
-        <div>
-          <dt>{copy.signed}</dt>
-          <dd>{build.isSigned ? copy.yes : copy.no}</dd>
-        </div>
-        <div>
-          <dt>{copy.target}</dt>
-          <dd className="break-words">{build.mtaVersionTarget || "—"}</dd>
-        </div>
-      </dl>
+      <BuildProvenanceDetails
+        build={{
+          id: build.id,
+          version: build.version,
+          status: build.status,
+          sha256Hash: build.sha256Hash,
+          fileName: build.fileName,
+          fileSizeBytes: build.fileSizeBytes,
+          scanStatus: build.scanStatus,
+          scanner: build.scanner ?? undefined,
+          scannedAt: build.scannedAt ?? undefined,
+          mtaVersionTarget: build.mtaVersionTarget ?? undefined,
+          isSigned: build.isSigned,
+        }}
+        locale={locale}
+      />
       {build.releaseNotes && (
         <section className="space-y-2">
           <h2 className="text-xl text-primary">{copy.notes}</h2>

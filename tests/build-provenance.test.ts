@@ -17,7 +17,26 @@ describe("build provenance presentation", () => {
       scanTone: "positive",
       scanner: "clamav",
       scannedAtLabel: "2026-09-25 12:34:56 UTC",
+      trustedCleanScan: true,
     });
+  });
+
+  it("requires scanner identity and scan time before trusted clean gate opens", () => {
+    expect(
+      getBuildProvenance({
+        scanStatus: "clean",
+        scanner: "clamav",
+        scannedAt: undefined,
+      }).trustedCleanScan,
+    ).toBe(false);
+
+    expect(
+      getBuildProvenance({
+        scanStatus: "clean",
+        scanner: "   ",
+        scannedAt: new Date("2026-09-25T12:34:56.000Z"),
+      }).trustedCleanScan,
+    ).toBe(false);
   });
 
   it("does not describe unscanned or scanner-error builds as clean", () => {
@@ -32,6 +51,7 @@ describe("build provenance presentation", () => {
       scanTone: "neutral",
       scanner: null,
       scannedAtLabel: null,
+      trustedCleanScan: false,
     });
 
     expect(
@@ -43,6 +63,7 @@ describe("build provenance presentation", () => {
     ).toMatchObject({
       scanStatus: "error",
       scanTone: "warning",
+      trustedCleanScan: false,
     });
   });
 

@@ -12,6 +12,16 @@ export type InspectionResponse = {
     byteLength: number;
     info: Record<string, string> | null;
     dependencyResources: string[];
+    scripts: Array<{
+      src: string | null;
+      type: "client" | "server" | "shared" | "unknown";
+      typeDeclared: boolean;
+      cache: string | null;
+      validate: string | null;
+    }>;
+    files: Array<Record<string, string>>;
+    maps: Array<Record<string, string>>;
+    settings: Array<Record<string, string>>;
     exports: Array<Record<string, string>>;
     aclRights: Array<Record<string, string>>;
     minMtaVersion: {
@@ -30,6 +40,7 @@ export type InspectionResponse = {
       exportCount: number;
       httpExportCount: number;
       aclRightCount: number;
+      settingCount: number;
       validationDisabledScripts: number;
     };
     issues: Array<{
@@ -126,6 +137,10 @@ export function MtaMetaInspectorPanel({
   }
 
   const inspection = result?.inspection;
+  const scripts = inspection?.scripts ?? [];
+  const files = inspection?.files ?? [];
+  const maps = inspection?.maps ?? [];
+  const settings = inspection?.settings ?? [];
   const versionSuggestion = getMtaVersionTargetSuggestion(inspection?.minMtaVersion ?? null);
 
   return (
@@ -195,6 +210,11 @@ export function MtaMetaInspectorPanel({
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.fileCount}
               </div>
+              {inspection.summary.mapCount > 0 && (
+                <div className="text-[10px] text-faint">
+                  {inspection.summary.mapCount} {copy.maps}
+                </div>
+              )}
             </div>
 
             <div className="rounded-lg border border-base bg-inset p-3">
@@ -202,6 +222,11 @@ export function MtaMetaInspectorPanel({
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.dependencyCount}
               </div>
+              {(inspection.summary.settingCount ?? 0) > 0 && (
+                <div className="text-[10px] text-faint">
+                  {inspection.summary.settingCount} {copy.settings}
+                </div>
+              )}
             </div>
 
             <div className="rounded-lg border border-base bg-inset p-3">
@@ -283,6 +308,151 @@ export function MtaMetaInspectorPanel({
                 ))}
               </div>
             </div>
+          )}
+
+          {scripts.length > 0 && (
+            <section aria-labelledby="meta-inspector-scripts-heading" className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 id="meta-inspector-scripts-heading" className="font-label uppercase text-faint">
+                  {copy.scriptsDetails}
+                </h3>
+                <span className="text-[10px] text-faint">
+                  {copy.manifestEntriesCount
+                    .replace(
+                      "{shown}",
+                      String(Math.min(scripts.length, metaInspectorClientPolicy.previewEntries)),
+                    )
+                    .replace("{total}", String(scripts.length))}
+                </span>
+              </div>
+              <ul className="grid gap-1.5 sm:grid-cols-2">
+                {withOccurrenceKeys(metaInspectorPreview(scripts), (entry) =>
+                  JSON.stringify([entry.src, entry.type, entry.cache, entry.validate]),
+                ).map(({ key, item: entry }) => (
+                  <li
+                    key={key}
+                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                  >
+                    <code className="break-all text-secondary">
+                      {entry.src || copy.scriptSourceMissing}
+                    </code>
+                    <span className="text-faint">
+                      {copy.scriptTypeLabel}: {entry.type}
+                      {" · "}
+                      {copy.cacheAttribute}: {entry.cache ?? copy.notDeclared}
+                      {" · "}
+                      {copy.validateAttribute}: {entry.validate ?? copy.notDeclared}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] leading-relaxed text-faint">{copy.scriptsNote}</p>
+            </section>
+          )}
+
+          {files.length > 0 && (
+            <section aria-labelledby="meta-inspector-files-heading" className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 id="meta-inspector-files-heading" className="font-label uppercase text-faint">
+                  {copy.filesDetails}
+                </h3>
+                <span className="text-[10px] text-faint">
+                  {copy.manifestEntriesCount
+                    .replace(
+                      "{shown}",
+                      String(Math.min(files.length, metaInspectorClientPolicy.previewEntries)),
+                    )
+                    .replace("{total}", String(files.length))}
+                </span>
+              </div>
+              <ul className="grid gap-1.5 sm:grid-cols-2">
+                {withOccurrenceKeys(metaInspectorPreview(files), (entry) =>
+                  JSON.stringify([entry.src, entry.download]),
+                ).map(({ key, item: entry }) => (
+                  <li
+                    key={key}
+                    className="rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                  >
+                    <code className="break-all text-secondary">
+                      {entry.src || copy.fileSourceMissing}
+                    </code>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] leading-relaxed text-faint">{copy.filesNote}</p>
+            </section>
+          )}
+
+          {maps.length > 0 && (
+            <section aria-labelledby="meta-inspector-maps-heading" className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 id="meta-inspector-maps-heading" className="font-label uppercase text-faint">
+                  {copy.mapsDetails}
+                </h3>
+                <span className="text-[10px] text-faint">
+                  {copy.manifestEntriesCount
+                    .replace(
+                      "{shown}",
+                      String(Math.min(maps.length, metaInspectorClientPolicy.previewEntries)),
+                    )
+                    .replace("{total}", String(maps.length))}
+                </span>
+              </div>
+              <ul className="grid gap-1.5 sm:grid-cols-2">
+                {withOccurrenceKeys(metaInspectorPreview(maps), (entry) =>
+                  JSON.stringify([entry.src, entry.dimension]),
+                ).map(({ key, item: entry }) => (
+                  <li
+                    key={key}
+                    className="rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                  >
+                    <code className="break-all text-secondary">
+                      {entry.src || copy.mapSourceMissing}
+                    </code>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] leading-relaxed text-faint">{copy.mapsNote}</p>
+            </section>
+          )}
+
+          {settings.length > 0 && (
+            <section aria-labelledby="meta-inspector-settings-heading" className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3
+                  id="meta-inspector-settings-heading"
+                  className="font-label uppercase text-faint"
+                >
+                  {copy.settingsDetails}
+                </h3>
+                <span className="text-[10px] text-faint">
+                  {copy.manifestEntriesCount
+                    .replace(
+                      "{shown}",
+                      String(Math.min(settings.length, metaInspectorClientPolicy.previewEntries)),
+                    )
+                    .replace("{total}", String(settings.length))}
+                </span>
+              </div>
+              <ul className="grid gap-1.5 sm:grid-cols-2">
+                {withOccurrenceKeys(metaInspectorPreview(settings), (entry) =>
+                  JSON.stringify([entry.name, entry.value]),
+                ).map(({ key, item: entry }) => (
+                  <li
+                    key={key}
+                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                  >
+                    <code className="break-all text-secondary">
+                      {entry.name || copy.settingNameMissing}
+                    </code>
+                    <span className="break-all text-faint">
+                      {copy.settingValue}: {entry.value ?? copy.notDeclared}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] leading-relaxed text-faint">{copy.settingsNote}</p>
+            </section>
           )}
 
           {inspection.aclRights.length > 0 && (

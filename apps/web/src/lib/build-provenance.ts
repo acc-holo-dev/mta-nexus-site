@@ -5,9 +5,11 @@ export type BuildProvenance = Readonly<{
   scanTone: "positive" | "neutral" | "warning" | "danger";
   scanner: string | null;
   scannedAtLabel: string | null;
+  /** Fail-closed public gate: clean verdict + scanner id + scan time must all be present. */
+  trustedCleanScan: boolean;
 }>;
 
-export function formatProvenanceTimestamp(value?: Date): string | null {
+export function formatProvenanceTimestamp(value?: Date | null): string | null {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
@@ -20,6 +22,8 @@ export function formatProvenanceTimestamp(value?: Date): string | null {
 export function getBuildProvenance(
   build: Pick<Build, "scanStatus" | "scanner" | "scannedAt">,
 ): BuildProvenance {
+  const scanner = build.scanner?.trim() || null;
+  const scannedAtLabel = formatProvenanceTimestamp(build.scannedAt);
   const scanTone =
     build.scanStatus === "clean"
       ? "positive"
@@ -32,7 +36,8 @@ export function getBuildProvenance(
   return Object.freeze({
     scanStatus: build.scanStatus,
     scanTone,
-    scanner: build.scanner?.trim() || null,
-    scannedAtLabel: formatProvenanceTimestamp(build.scannedAt),
+    scanner,
+    scannedAtLabel,
+    trustedCleanScan: build.scanStatus === "clean" && Boolean(scanner && scannedAtLabel),
   });
 }

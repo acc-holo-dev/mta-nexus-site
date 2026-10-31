@@ -1,31 +1,31 @@
-import { resourceMediaRepository } from "@nexus/db";
-import { ResourceGallery } from "../../../components/resource-gallery";
-import { AddResourceToCart } from "../../../components/resource-cart-controls";
-import { ResourceDownloadButton } from "../../../components/resource-download-button";
-import { ResourcePreview } from "../../../components/resource-preview";
-import { ResourceVariantChoices } from "../../../components/resource-variant-choices";
-import { resourceManagementService } from "../../../lib/services/resource-management-service";
-import { safeResourceImageUrl } from "../../../lib/resource-image-url";
 import { config } from "@nexus/config";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import type { Metadata } from "next";
-import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
-import { resourceReviewService } from "../../../lib/services/resource-review-service";
-import { ResourceReviewList } from "../../../components/resource-review-list";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { resourceMediaRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { productService } from "../../../lib/services/product-service";
-import { authService } from "../../../lib/services/auth-service";
-import { commerceService } from "../../../lib/services/commerce-service";
+import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
 import { ProductDependencyList } from "../../../components/product-dependency-list";
+import { AddResourceToCart } from "../../../components/resource-cart-controls";
+import { ResourceDownloadButton } from "../../../components/resource-download-button";
+import { ResourceGallery } from "../../../components/resource-gallery";
+import { ResourcePreview } from "../../../components/resource-preview";
+import { ResourceReviewList } from "../../../components/resource-review-list";
+import { ResourceVariantChoices } from "../../../components/resource-variant-choices";
 import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
 import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
+import { safeResourceImageUrl } from "../../../lib/resource-image-url";
+import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { authService } from "../../../lib/services/auth-service";
+import { commerceService } from "../../../lib/services/commerce-service";
+import { productService } from "../../../lib/services/product-service";
+import { resourceManagementService } from "../../../lib/services/resource-management-service";
+import { resourceReviewService } from "../../../lib/services/resource-review-service";
 
 export const dynamic = "force-dynamic";
 
@@ -299,7 +299,23 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                       <span>{formatScanStatus(build.scanStatus, copy)}</span>
                     </div>
 
-                    <BuildProvenanceDetails build={build} locale={locale} />
+                    <BuildProvenanceDetails
+                      build={{
+                        id: build.id,
+                        version: build.version,
+                        status: build.status,
+                        sha256Hash: build.sha256Hash,
+                        fileName: build.fileName,
+                        fileSizeBytes: build.fileSizeBytes,
+                        mimeType: build.mimeType,
+                        scanStatus: build.scanStatus,
+                        scanner: build.scanner,
+                        scannedAt: build.scannedAt,
+                        mtaVersionTarget: build.mtaVersionTarget,
+                        isSigned: build.isSigned,
+                      }}
+                      locale={locale}
+                    />
 
                     {build.releaseNotes && (
                       <div className="whitespace-pre-line rounded border border-base bg-surface p-2.5 font-mono text-xs text-secondary">

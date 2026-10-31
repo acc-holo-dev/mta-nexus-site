@@ -10,26 +10,29 @@ const toneClass = {
   danger: "border-[color:var(--nexus-danger)]/20 bg-danger-soft text-danger",
 } as const;
 
+export type BuildProvenanceDetailsBuild = Pick<
+  Build,
+  | "status"
+  | "sha256Hash"
+  | "fileName"
+  | "scanStatus"
+  | "scanner"
+  | "scannedAt"
+  | "mtaVersionTarget"
+  | "isSigned"
+> &
+  Partial<Pick<Build, "id" | "version" | "mimeType" | "fileSizeBytes">>;
+
 export function BuildProvenanceDetails({
   build,
   locale = "en",
 }: {
-  build: Pick<
-    Build,
-    | "status"
-    | "sha256Hash"
-    | "fileName"
-    | "mimeType"
-    | "scanStatus"
-    | "scanner"
-    | "scannedAt"
-    | "mtaVersionTarget"
-    | "isSigned"
-  >;
+  build: BuildProvenanceDetailsBuild;
   locale?: Locale;
 }) {
   const copy = getDictionary(locale).provenance;
   const provenance = getBuildProvenance(build);
+  const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const scanLabel =
     provenance.scanStatus === "clean"
@@ -65,9 +68,31 @@ export function BuildProvenanceDetails({
             <span>{scanLabel}</span>
           </div>
           <div className="mt-1 opacity-80">{scanDetail}</div>
+          <div className="mt-2 font-semibold">
+            {copy.trustedCleanGate}:{" "}
+            {provenance.trustedCleanScan ? copy.trustedCleanMet : copy.trustedCleanMissing}
+          </div>
         </div>
 
         <dl className="grid gap-2 sm:grid-cols-[8rem_minmax(0,1fr)]">
+          {build.id ? (
+            <>
+              <dt className="text-faint">{copy.buildId}</dt>
+              <dd>
+                <code className="block select-all break-all rounded border border-base bg-inset px-2 py-1.5 font-mono text-[10px] leading-relaxed text-secondary">
+                  {build.id}
+                </code>
+              </dd>
+            </>
+          ) : null}
+
+          {build.version ? (
+            <>
+              <dt className="text-faint">{copy.version}</dt>
+              <dd className="font-mono text-secondary">{build.version}</dd>
+            </>
+          ) : null}
+
           <dt className="text-faint">SHA-256</dt>
           <dd>
             <code className="block select-all break-all rounded border border-base bg-inset px-2 py-1.5 font-mono text-[10px] leading-relaxed text-secondary">
@@ -83,8 +108,17 @@ export function BuildProvenanceDetails({
           <dt className="text-faint">{copy.artifactFile}</dt>
           <dd className="break-all text-secondary">{build.fileName}</dd>
 
+          {typeof build.fileSizeBytes === "number" ? (
+            <>
+              <dt className="text-faint">{copy.fileSize}</dt>
+              <dd className="font-mono text-secondary">
+                {build.fileSizeBytes.toLocaleString(numberLocale)} B
+              </dd>
+            </>
+          ) : null}
+
           <dt className="text-faint">{copy.mimeType}</dt>
-          <dd className="font-mono text-secondary">{build.mimeType}</dd>
+          <dd className="font-mono text-secondary">{build.mimeType?.trim() || copy.notRecorded}</dd>
 
           <dt className="text-faint">{copy.mtaTarget}</dt>
           <dd className="font-mono text-secondary">
