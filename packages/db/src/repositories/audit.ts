@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   type AuditEvent,
+  SECURITY_BUILD_INCIDENT_SUBJECT_ACTIONS,
   SECURITY_LICENSE_SUBJECT_ACTIONS,
   SECURITY_REPORT_SUBJECT_ACTIONS,
   SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
@@ -22,6 +23,7 @@ import {
   auditEvents,
   licenses,
   reports,
+  resourceDeliveryReceipts,
   servers,
   supportCases,
   users,
@@ -420,6 +422,25 @@ export class AuditRepository {
           .where(and(eq(reports.id, auditEvents.targetId), eq(reports.reporterId, userId))),
       ),
     );
+    // Align with SEC-002: only when moderators opted into downloader notice and
+    // the viewer has a served delivery receipt for that build.
+    const buildIncidentSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_BUILD_INCIDENT_SUBJECT_ACTIONS]),
+      eq(auditEvents.targetType, "build"),
+      sql`${auditEvents.details}->>'notifyAffectedDownloaders' = 'true'`,
+      exists(
+        db
+          .select({ id: resourceDeliveryReceipts.id })
+          .from(resourceDeliveryReceipts)
+          .where(
+            and(
+              eq(resourceDeliveryReceipts.buildId, auditEvents.targetId),
+              eq(resourceDeliveryReceipts.userId, userId),
+              eq(resourceDeliveryReceipts.status, "served"),
+            ),
+          ),
+      ),
+    );
     const subjectScope = and(
       ne(auditEvents.actorId, userId),
       or(
@@ -429,6 +450,7 @@ export class AuditRepository {
         verificationSubjectScope,
         serverVerificationSubjectScope,
         reportSubjectScope,
+        buildIncidentSubjectScope,
       ),
     );
     const rows = await db

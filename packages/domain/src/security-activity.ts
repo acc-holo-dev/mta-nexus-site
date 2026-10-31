@@ -68,6 +68,14 @@ export const SECURITY_REPORT_SUBJECT_ACTIONS = [
 
 export type SecurityReportSubjectAction = (typeof SECURITY_REPORT_SUBJECT_ACTIONS)[number];
 
+// SEC-002/SEC-005: staff quarantine with explicit downloader notice targets a build;
+// the account is a served downloader of that build. Restore has no notify gate or
+// incident fanout, so it is not projected here.
+export const SECURITY_BUILD_INCIDENT_SUBJECT_ACTIONS = ["build.quarantined"] as const;
+
+export type SecurityBuildIncidentSubjectAction =
+  (typeof SECURITY_BUILD_INCIDENT_SUBJECT_ACTIONS)[number];
+
 export type SecuritySubjectAction =
   | SecuritySubjectDetailAction
   | SecurityLicenseSubjectAction
@@ -75,7 +83,8 @@ export type SecuritySubjectAction =
   | SecuritySupportSubjectAction
   | SecurityVerificationSubjectAction
   | SecurityServerVerificationSubjectAction
-  | SecurityReportSubjectAction;
+  | SecurityReportSubjectAction
+  | SecurityBuildIncidentSubjectAction;
 
 export const SECURITY_SUBJECT_ACTIONS = [
   ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
@@ -85,4 +94,5 @@ export const SECURITY_SUBJECT_ACTIONS = [
   ...SECURITY_VERIFICATION_SUBJECT_ACTIONS,
   ...SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
   ...SECURITY_REPORT_SUBJECT_ACTIONS,
+  ...SECURITY_BUILD_INCIDENT_SUBJECT_ACTIONS,
 ] as const satisfies readonly SecuritySubjectAction[];

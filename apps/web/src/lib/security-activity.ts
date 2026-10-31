@@ -53,6 +53,8 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "report.resolve",
   "report.dismiss",
   "report.remove_comment",
+  // SEC-002/SEC-005 quarantine notice (actor for staff; subject for served downloaders)
+  "build.quarantined",
 ] as const;
 
 export type SecurityActivityAction = (typeof SECURITY_ACTIVITY_ACTIONS)[number];
@@ -108,6 +110,7 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "report.resolve": "reportResolved",
   "report.dismiss": "reportDismissed",
   "report.remove_comment": "reportCommentRemoved",
+  "build.quarantined": "buildQuarantined",
 } as const satisfies Record<SecurityActivityAction, string>;
 
 export const SECURITY_SUBJECT_LABEL_KEYS = {
@@ -131,6 +134,7 @@ export const SECURITY_SUBJECT_LABEL_KEYS = {
   "report.resolve": "reportResolvedNotice",
   "report.dismiss": "reportDismissedNotice",
   "report.remove_comment": "reportCommentRemovedNotice",
+  "build.quarantined": "buildQuarantinedNotice",
 } as const satisfies Record<SecuritySubjectAction, string>;
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);
