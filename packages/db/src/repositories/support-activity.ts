@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql, type SQL } from "drizzle-orm";
+import { and, desc, eq, sql, type SQL } from "drizzle-orm";
 import { AppError } from "@nexus/domain";
 import { db } from "../client";
 import { auditEvents } from "../schema";
@@ -10,10 +10,12 @@ class SupportActivityRepository {
     return db.transaction(
       async (tx) => {
         await supportAccess(tx, id, actorId, false);
+        // Status timeline only: message audits lack from/to and belong in the thread UI /
+        // Security Center projection, not this status-change feed.
         const scope = and(
           eq(auditEvents.targetType, "support_case"),
           eq(auditEvents.targetId, id),
-          inArray(auditEvents.action, ["support.case.status_changed", "support.message.created"]),
+          eq(auditEvents.action, "support.case.status_changed"),
           sql`${auditEvents.details}->>'from' in ('open','resolved','closed') and ${auditEvents.details}->>'to' in ('open','resolved','closed') and ${auditEvents.details}->>'from' <> ${auditEvents.details}->>'to'`,
         );
         let older: SQL | undefined;

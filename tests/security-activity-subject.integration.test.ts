@@ -508,7 +508,7 @@ describe("security activity subject lookup", () => {
     expect(serialized).not.toContain(fixture.otherServerId);
   });
 
-  it("returns staff support status changes for the requester via support case ownership", async () => {
+  it("returns staff support status changes and replies for the requester via support case ownership", async () => {
     await clearFixtures();
     await userRepository.create({
       id: fixture.userId,
@@ -554,6 +554,18 @@ describe("security activity subject lookup", () => {
         createdAt: new Date("2026-10-16T00:00:00.000Z"),
       },
       {
+        id: "aud_secsub_support_message",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "support.message.created",
+        targetId: fixture.caseId,
+        targetType: "support_case",
+        ipAddress: "203.0.113.81",
+        userAgent: "Staff Console",
+        details: { authorRole: "staff", body: "private-staff-reply" },
+        createdAt: new Date("2026-10-16T01:00:00.000Z"),
+      },
+      {
         id: "aud_secsub_support_other",
         actorId: "usr_secsub_admin",
         actorType: "admin",
@@ -563,14 +575,26 @@ describe("security activity subject lookup", () => {
         details: { from: "open", to: "closed" },
         createdAt: new Date("2026-10-17T00:00:00.000Z"),
       },
+      {
+        id: "aud_secsub_support_other_message",
+        actorId: "usr_secsub_admin",
+        actorType: "admin",
+        action: "support.message.created",
+        targetId: fixture.otherCaseId,
+        targetType: "support_case",
+        details: { authorRole: "staff" },
+        createdAt: new Date("2026-10-17T01:00:00.000Z"),
+      },
     ]);
 
     const result = await new SecurityCenterService().listActivity(fixture.userId, 20);
     expect(result.map((item) => [item.id, item.perspective, item.action])).toEqual([
+      ["aud_secsub_support_message", "subject", "support.message.created"],
       ["aud_secsub_support_status", "subject", "support.case.status_changed"],
     ]);
     const serialized = JSON.stringify(result);
     expect(serialized).not.toContain("staff-private");
+    expect(serialized).not.toContain("private-staff-reply");
     expect(serialized).not.toContain("usr_secsub_admin");
     expect(serialized).not.toContain("203.0.113.80");
     expect(serialized).not.toContain("Staff Console");

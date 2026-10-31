@@ -316,6 +316,7 @@ it("returns only status labels with bounded history and an opaque cursor after p
   expect(q.params).toContain(id);
   expect(q.params.at(-1)).toBe(21);
   expect(q.params).toContain("support.case.status_changed");
+  expect(q.params).not.toContain("support.message.created");
   expect(q.sql).not.toContain('"audit_events"."details",');
   expect(q.sql).not.toContain('"audit_events"."ip_address"');
   expect(state.config).toEqual({ isolationLevel: "repeatable read", accessMode: "read only" });

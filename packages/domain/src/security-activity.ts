@@ -25,12 +25,15 @@ export const SECURITY_COMMERCE_SUBJECT_ACTIONS = ["commerce.order_case.reviewed"
 
 export type SecurityCommerceSubjectAction = (typeof SECURITY_COMMERCE_SUBJECT_ACTIONS)[number];
 
-// Staff (or other non-requester) support status changes target the case; the account is the requester.
-export const SECURITY_SUPPORT_SUBJECT_ACTIONS = ["support.case.status_changed"] as const;
+// Staff (or other non-requester) support events target the case; the account is the requester.
+export const SECURITY_SUPPORT_SUBJECT_ACTIONS = [
+  "support.case.status_changed",
+  "support.message.created",
+] as const;
 
 export type SecuritySupportSubjectAction = (typeof SECURITY_SUPPORT_SUBJECT_ACTIONS)[number];
 
-// Support-case rows projected to the requester (order-case review + status changes).
+// Support-case rows projected to the requester (order-case review + status/message events).
 export const SECURITY_SUPPORT_CASE_SUBJECT_ACTIONS = [
   ...SECURITY_COMMERCE_SUBJECT_ACTIONS,
   ...SECURITY_SUPPORT_SUBJECT_ACTIONS,
