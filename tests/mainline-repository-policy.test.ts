@@ -13,7 +13,7 @@ describe("mainline repository policy", () => {
     const dollar = "$";
     const imageCacheKey = `nexus-production-image-${dollar}{{ runner.os }}-${dollar}{{ github.sha }}`;
     const bestEffortArtifact = `continue-on-error: ${dollar}{{ github.ref_type != 'tag' }}`;
-    expect(coordinator).toContain("actions/cache/save@v4");
+    expect(coordinator).toContain("actions/cache/save@v6");
     expect(coordinator).toContain(imageCacheKey);
     expect(coordinator).not.toContain("actions/download-artifact");
     const coordinatorArtifactUploads = coordinator
@@ -32,7 +32,7 @@ describe("mainline repository policy", () => {
       const content = read(path);
       expect(content, path).toContain("workflow_call:");
       expect(content, path).not.toMatch(/^\s+(?:push|pull_request|schedule):/m);
-      expect(content, path).toContain("actions/cache/restore@v4");
+      expect(content, path).toContain("actions/cache/restore@v6");
       expect(content, path).toContain(imageCacheKey);
       expect(content, path).not.toContain("actions/download-artifact");
     }
