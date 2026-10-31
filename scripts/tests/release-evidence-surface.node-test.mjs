@@ -47,6 +47,17 @@ test("CI runs separate test projects and reports the selected verification scope
   assert.match(workflow, /node scripts\/ci-summary\.mjs/u);
   assert.match(workflow, /toJSON\(needs\)/u);
   assert.doesNotMatch(workflow, /run: pnpm release:verify/u);
+
+  const releaseEvidence = read("scripts/release-evidence.mjs");
+  const composeVerify = read("compose.verify.yaml");
+  const alignedRunner = read("scripts/run-ci-aligned-vitest.mjs");
+  assert.match(releaseEvidence, /scripts\/run-ci-aligned-vitest\.mjs/u);
+  assert.doesNotMatch(releaseEvidence, /\["test"\]/u);
+  assert.match(composeVerify, /run-ci-aligned-vitest\.mjs/u);
+  assert.doesNotMatch(composeVerify, /^\s+pnpm test$/mu);
+  assert.match(alignedRunner, /delete unitEnv\.NEXT_PUBLIC_APP_URL/u);
+  assert.match(alignedRunner, /test:unit/u);
+  assert.match(alignedRunner, /test:database/u);
 });
 
 test("core release evidence requires every named gate including lint and typecheck", () => {

@@ -56,9 +56,10 @@ scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 | Mail capture | `pnpm dev:mail` |
 | Code gate (no Docker) | `pnpm check:code` |
 | Focused tests | `pnpm test:focus path/to/file.test.ts` |
-| Disposable DB suite | `pnpm test:isolated` (нужен Docker stack) |
+| Disposable DB suite | `pnpm test:isolated` (нужен Docker stack; unit без APP_URL, database с APP_URL) |
+| Local disposable verify | `NEXUS_LOCAL_VERIFY=true` + `scripts/check-local-verification.sh` → `compose.verify.yaml` (зеркало CI: unit / database / build) |
 | Docs links | `pnpm docs:check` |
-| Release evidence | `pnpm release:verify` (не deploy) |
+| Release evidence | `pnpm release:verify` (не deploy; Vitest через `run-ci-aligned-vitest.mjs`) |
 
 Preflight: `pnpm nexus:doctor` (также `dev:preflight`).
 

@@ -43,7 +43,7 @@ try {
     throw "Disposable Docker verification failed."
   }
 
-  Write-Output "PASS: disposable Docker verification completed typecheck, tests and production Next.js build on a fresh database."
+  Write-Output "PASS: disposable Docker verification completed typecheck, CI-aligned Vitest (unit without APP_URL, database with APP_URL) and production Next.js build on a fresh database."
 }
 catch {
   $failure = $_

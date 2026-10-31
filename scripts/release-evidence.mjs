@@ -124,7 +124,8 @@ const gates = [
   ),
   runGate("lint", pnpmCommand, ["lint"]),
   runGate("typecheck", pnpmCommand, ["typecheck"]),
-  runGate("tests", pnpmCommand, ["test"]),
+  // Same Vitest split as CI (unit without APP_URL, database with APP_URL).
+  runGate("tests", "node", ["scripts/run-ci-aligned-vitest.mjs"]),
   runGate("next_build", pnpmCommand, ["build"]),
 ];
 

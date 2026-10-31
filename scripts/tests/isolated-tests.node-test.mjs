@@ -49,12 +49,14 @@ test("isolated runs own different databases and remove only their database", () 
   assert.notEqual(database, second.calls[0].at(-1));
   assert.deepEqual(
     first.calls.map((args) => args.at(-1)),
-    [database, "db:migrate", "test", database],
+    [database, "db:migrate", "test:unit", "test:database", database],
   );
-  assert.ok(first.calls[3].includes("dropdb"));
+  assert.ok(first.calls[2].includes("env") && first.calls[2].includes("-u"));
+  assert.ok(first.calls[2].includes("NEXT_PUBLIC_APP_URL"));
+  assert.ok(first.calls[4].includes("dropdb"));
   assert.ok(
     first.calls
-      .slice(1, 3)
+      .slice(1, 4)
       .every((args) =>
         args.includes(`DATABASE_URL=postgres://nexus:nexus_secret@postgres:5432/${database}`),
       ),
@@ -70,8 +72,9 @@ test("isolated runs own different databases and remove only their database", () 
 for (const [failure, commands] of [
   ["createdb", 1],
   ["db:migrate", 3],
-  ["test", 4],
-  ["dropdb", 4],
+  ["test:unit", 4],
+  ["test:database", 5],
+  ["dropdb", 5],
 ]) {
   test(`isolated runner preserves ${failure} failure and cleans up only an owned database`, () => {
     const { result, calls } = run(failure);

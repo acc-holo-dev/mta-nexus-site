@@ -42,13 +42,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # Mirrors CI: unit without NEXT_PUBLIC_APP_URL, then migrate/database with APP_URL,
+    # then a production-shaped Next.js build. Do not replace with bare `pnpm test`.
     command:
       - sh
       - -ec
       - |
         pnpm db:migrate
         pnpm typecheck
-        pnpm test
+        node scripts/run-ci-aligned-vitest.mjs
         env \
           NODE_ENV=production \
           NEXT_PUBLIC_APP_URL=https://nexus-mta.test \
