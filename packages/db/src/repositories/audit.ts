@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   type AuditEvent,
+  SECURITY_COMMERCE_SUBJECT_ACTIONS,
   SECURITY_LICENSE_SUBJECT_ACTIONS,
   SECURITY_SUBJECT_DETAIL_KEYS,
   SERVER_ACTIVITY_ACTIONS,
@@ -14,7 +15,7 @@ import {
 import { and, desc, eq, exists, inArray, ne, or, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
-import { auditEvents, licenses, servers, users } from "../schema";
+import { auditEvents, licenses, servers, supportCases, users } from "../schema";
 import { serverContentContext } from "./server-content";
 import { managedServerScope } from "./server-management-scope";
 
@@ -354,9 +355,21 @@ export class AuditRepository {
           .where(and(eq(licenses.id, auditEvents.targetId), eq(licenses.userId, userId))),
       ),
     );
+    const commerceSubjectScope = and(
+      inArray(auditEvents.action, [...SECURITY_COMMERCE_SUBJECT_ACTIONS]),
+      eq(auditEvents.targetType, "support_case"),
+      exists(
+        db
+          .select({ id: supportCases.id })
+          .from(supportCases)
+          .where(
+            and(eq(supportCases.id, auditEvents.targetId), eq(supportCases.requesterId, userId)),
+          ),
+      ),
+    );
     const subjectScope = and(
       ne(auditEvents.actorId, userId),
-      or(organizationSubjectScope, licenseSubjectScope),
+      or(organizationSubjectScope, licenseSubjectScope, commerceSubjectScope),
     );
     const rows = await db
       .select({

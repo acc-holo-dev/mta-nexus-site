@@ -25,6 +25,7 @@ describe("security activity contract", () => {
       "order.unpaid_cancelled",
       "commerce.subscription_expired",
       "commerce.order_case.created",
+      "commerce.order_case.reviewed",
       "license.bound",
       "license.binding_refreshed",
       "license.token_rotated",
@@ -241,6 +242,41 @@ describe("security activity contract", () => {
         "usr_owner",
       ),
     ).toMatchObject({ perspective: "subject", action: "license.expired" });
+  });
+
+  it("shows staff order-case reviews to the buyer without notes, evidence, or staff network", () => {
+    const reviewed = toSecurityActivityItem(
+      {
+        id: "aud_case_reviewed",
+        actorId: "usr_staff",
+        action: "commerce.order_case.reviewed",
+        targetType: "support_case",
+        ipAddress: "203.0.113.40",
+        userAgent: "Staff Console",
+        details: {
+          orderId: "ord_private",
+          action: "resolve",
+          notes: "staff-private-notes",
+          evidence: { refundedRecordCount: 0 },
+        },
+        createdAt: new Date("2026-10-09T00:00:00.000Z"),
+      },
+      "usr_buyer",
+    );
+    expect(reviewed).toEqual({
+      id: "aud_case_reviewed",
+      action: "commerce.order_case.reviewed",
+      targetType: "support_case",
+      perspective: "subject",
+      createdAt: new Date("2026-10-09T00:00:00.000Z"),
+    });
+    expect(SECURITY_SUBJECT_LABEL_KEYS["commerce.order_case.reviewed"]).toBe(
+      "orderCaseReviewedNotice",
+    );
+    expect(JSON.stringify(reviewed)).not.toContain("usr_staff");
+    expect(JSON.stringify(reviewed)).not.toContain("staff-private-notes");
+    expect(JSON.stringify(reviewed)).not.toContain("ord_private");
+    expect(JSON.stringify(reviewed)).not.toContain("203.0.113.40");
   });
 
   it("rejects non-security audit events", () => {

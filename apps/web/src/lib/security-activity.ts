@@ -15,6 +15,7 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "order.unpaid_cancelled",
   "commerce.subscription_expired",
   "commerce.order_case.created",
+  "commerce.order_case.reviewed",
   "license.bound",
   "license.binding_refreshed",
   "license.token_rotated",
@@ -50,6 +51,7 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "order.unpaid_cancelled": "orderUnpaidCancelled",
   "commerce.subscription_expired": "subscriptionExpired",
   "commerce.order_case.created": "orderCaseCreated",
+  "commerce.order_case.reviewed": "orderCaseReviewed",
   "license.bound": "licenseBound",
   "license.binding_refreshed": "licenseBindingRefreshed",
   "license.token_rotated": "licenseTokenRotated",
@@ -79,6 +81,7 @@ export const SECURITY_SUBJECT_LABEL_KEYS = {
   "license.restored": "licenseRestoredByStaff",
   "license.expired": "licenseExpiredNotice",
   "license.expiring": "licenseExpiringNotice",
+  "commerce.order_case.reviewed": "orderCaseReviewedNotice",
 } as const satisfies Record<SecuritySubjectAction, string>;
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);
