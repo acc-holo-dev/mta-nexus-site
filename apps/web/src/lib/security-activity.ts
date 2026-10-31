@@ -16,6 +16,7 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "commerce.subscription_expired",
   "commerce.order_case.created",
   "commerce.order_case.reviewed",
+  "commerce.plan_review_saved",
   "license.bound",
   "license.binding_refreshed",
   "license.token_rotated",
@@ -32,6 +33,8 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   "organization.member_left",
   "server.claim_challenge_issued",
   "server.control_proof_recorded",
+  "server.verification_approved",
+  "server.verification_rejected",
   "verification.requested",
   "verification.approved",
   "verification.rejected",
@@ -56,6 +59,7 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "commerce.subscription_expired": "subscriptionExpired",
   "commerce.order_case.created": "orderCaseCreated",
   "commerce.order_case.reviewed": "orderCaseReviewed",
+  "commerce.plan_review_saved": "planReviewSaved",
   "license.bound": "licenseBound",
   "license.binding_refreshed": "licenseBindingRefreshed",
   "license.token_rotated": "licenseTokenRotated",
@@ -72,6 +76,8 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "organization.member_left": "organizationMemberLeft",
   "server.claim_challenge_issued": "serverClaimChallengeIssued",
   "server.control_proof_recorded": "serverControlProofRecorded",
+  "server.verification_approved": "serverVerificationApproved",
+  "server.verification_rejected": "serverVerificationRejected",
   "verification.requested": "verificationRequested",
   "verification.approved": "verificationApproved",
   "verification.rejected": "verificationRejected",
@@ -92,6 +98,8 @@ export const SECURITY_SUBJECT_LABEL_KEYS = {
   "commerce.order_case.reviewed": "orderCaseReviewedNotice",
   "verification.approved": "verificationApprovedNotice",
   "verification.rejected": "verificationRejectedNotice",
+  "server.verification_approved": "serverVerificationApprovedNotice",
+  "server.verification_rejected": "serverVerificationRejectedNotice",
 } as const satisfies Record<SecuritySubjectAction, string>;
 
 const SECURITY_ACTIVITY_SET = new Set<string>(SECURITY_ACTIVITY_ACTIONS);

@@ -34,15 +34,27 @@ export const SECURITY_VERIFICATION_SUBJECT_ACTIONS = [
 export type SecurityVerificationSubjectAction =
   (typeof SECURITY_VERIFICATION_SUBJECT_ACTIONS)[number];
 
+// Staff server-claim outcomes target a server row; the account is the claim requester.
+// Audit ids are written as aud_server_verification_<verificationRequestId>.
+export const SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS = [
+  "server.verification_approved",
+  "server.verification_rejected",
+] as const;
+
+export type SecurityServerVerificationSubjectAction =
+  (typeof SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS)[number];
+
 export type SecuritySubjectAction =
   | SecuritySubjectDetailAction
   | SecurityLicenseSubjectAction
   | SecurityCommerceSubjectAction
-  | SecurityVerificationSubjectAction;
+  | SecurityVerificationSubjectAction
+  | SecurityServerVerificationSubjectAction;
 
 export const SECURITY_SUBJECT_ACTIONS = [
   ...(Object.keys(SECURITY_SUBJECT_DETAIL_KEYS) as SecuritySubjectDetailAction[]),
   ...SECURITY_LICENSE_SUBJECT_ACTIONS,
   ...SECURITY_COMMERCE_SUBJECT_ACTIONS,
   ...SECURITY_VERIFICATION_SUBJECT_ACTIONS,
+  ...SECURITY_SERVER_VERIFICATION_SUBJECT_ACTIONS,
 ] as const satisfies readonly SecuritySubjectAction[];

@@ -26,10 +26,13 @@ describe("security activity contract", () => {
       "commerce.subscription_expired",
       "commerce.order_case.created",
       "commerce.order_case.reviewed",
+      "commerce.plan_review_saved",
       "verification.requested",
       "verification.approved",
       "verification.rejected",
       "server.control_proof_recorded",
+      "server.verification_approved",
+      "server.verification_rejected",
       "license.bound",
       "license.binding_refreshed",
       "license.token_rotated",
@@ -350,6 +353,62 @@ describe("security activity contract", () => {
         createdAt: new Date("2026-10-12T03:00:00.000Z"),
       })?.action,
     ).toBe("server.control_proof_recorded");
+  });
+
+  it("maps plan-review saves without leaking plan or subject details", () => {
+    const saved = toSecurityActivityItem({
+      id: "aud_plan_review",
+      actorId: "usr_seller",
+      action: "commerce.plan_review_saved",
+      targetType: "commercial_plan_review",
+      details: {
+        planId: "plan_private",
+        revision: 3,
+        subjectType: "user",
+        subjectId: "usr_seller",
+      },
+      createdAt: new Date("2026-10-13T00:00:00.000Z"),
+    });
+    expect(saved).toEqual({
+      id: "aud_plan_review",
+      action: "commerce.plan_review_saved",
+      targetType: "commercial_plan_review",
+      perspective: "actor",
+      createdAt: new Date("2026-10-13T00:00:00.000Z"),
+    });
+    expect(JSON.stringify(saved)).not.toContain("plan_private");
+  });
+
+  it("shows staff server-claim outcomes to the requester without staff network", () => {
+    const approved = toSecurityActivityItem(
+      {
+        id: "aud_server_verification_ver_owned",
+        actorId: "usr_staff",
+        action: "server.verification_approved",
+        targetType: "server",
+        ipAddress: "203.0.113.70",
+        userAgent: "Moderator Console",
+        details: { reason: "staff-private" },
+        createdAt: new Date("2026-10-14T00:00:00.000Z"),
+      },
+      "usr_claimer",
+    );
+    expect(approved).toEqual({
+      id: "aud_server_verification_ver_owned",
+      action: "server.verification_approved",
+      targetType: "server",
+      perspective: "subject",
+      createdAt: new Date("2026-10-14T00:00:00.000Z"),
+    });
+    expect(SECURITY_SUBJECT_LABEL_KEYS["server.verification_approved"]).toBe(
+      "serverVerificationApprovedNotice",
+    );
+    expect(SECURITY_SUBJECT_LABEL_KEYS["server.verification_rejected"]).toBe(
+      "serverVerificationRejectedNotice",
+    );
+    expect(JSON.stringify(approved)).not.toContain("usr_staff");
+    expect(JSON.stringify(approved)).not.toContain("staff-private");
+    expect(JSON.stringify(approved)).not.toContain("203.0.113.70");
   });
 
   it("rejects non-security audit events", () => {
