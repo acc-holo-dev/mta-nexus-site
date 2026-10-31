@@ -23,6 +23,8 @@ describe("security activity contract", () => {
     const required = [
       "order.terms_recorded",
       "order.unpaid_cancelled",
+      "commerce.subscription_expired",
+      "commerce.order_case.created",
       "license.bound",
       "license.binding_refreshed",
       "license.token_rotated",
@@ -112,6 +114,56 @@ describe("security activity contract", () => {
         createdAt: new Date("2026-10-07T00:00:00.000Z"),
       })?.action,
     ).toBe("organization.ownership_transferred");
+  });
+
+  it("maps buyer commerce audits without leaking order or subscription details", () => {
+    const expired = toSecurityActivityItem({
+      id: "aud_sub_expired",
+      actorId: "usr_buyer",
+      action: "commerce.subscription_expired",
+      targetType: "subscription",
+      details: { expiresAt: "2026-10-01T00:00:00.000Z" },
+      createdAt: new Date("2026-10-07T00:00:00.000Z"),
+    });
+    expect(expired).toEqual({
+      id: "aud_sub_expired",
+      action: "commerce.subscription_expired",
+      targetType: "subscription",
+      perspective: "actor",
+      createdAt: new Date("2026-10-07T00:00:00.000Z"),
+    });
+    expect(JSON.stringify(expired)).not.toContain("expiresAt");
+
+    const orderCase = toSecurityActivityItem(
+      {
+        id: "aud_order_case",
+        actorId: "usr_buyer",
+        action: "commerce.order_case.created",
+        targetType: "support_case",
+        ipAddress: "198.51.100.20",
+        userAgent: "Buyer Browser",
+        details: {
+          orderId: "ord_private",
+          kind: "refund",
+          toReview: "intake",
+          notes: "staff-never",
+        },
+        createdAt: new Date("2026-10-07T01:00:00.000Z"),
+      },
+      "usr_buyer",
+    );
+    expect(orderCase).toEqual({
+      id: "aud_order_case",
+      action: "commerce.order_case.created",
+      targetType: "support_case",
+      perspective: "actor",
+      ipAddress: "198.51.100.20",
+      userAgent: "Buyer Browser",
+      createdAt: new Date("2026-10-07T01:00:00.000Z"),
+    });
+    expect(JSON.stringify(orderCase)).not.toContain("ord_private");
+    expect(JSON.stringify(orderCase)).not.toContain("staff-never");
+    expect(JSON.stringify(orderCase)).not.toContain("toReview");
   });
 
   it("shows organization changes that name this account without the actor network or details", () => {

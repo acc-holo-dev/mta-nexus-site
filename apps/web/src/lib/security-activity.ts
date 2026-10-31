@@ -13,6 +13,8 @@ export const SECURITY_ACTIVITY_ACTIONS = [
   // SEC-005 commerce / ownership / delivery (actor-scoped allowlist; existing audit actions)
   "order.terms_recorded",
   "order.unpaid_cancelled",
+  "commerce.subscription_expired",
+  "commerce.order_case.created",
   "license.bound",
   "license.binding_refreshed",
   "license.token_rotated",
@@ -46,6 +48,8 @@ export const SECURITY_ACTIVITY_LABEL_KEYS = {
   "user.other_sessions_revoked": "otherSessionsRevoked",
   "order.terms_recorded": "orderTermsRecorded",
   "order.unpaid_cancelled": "orderUnpaidCancelled",
+  "commerce.subscription_expired": "subscriptionExpired",
+  "commerce.order_case.created": "orderCaseCreated",
   "license.bound": "licenseBound",
   "license.binding_refreshed": "licenseBindingRefreshed",
   "license.token_rotated": "licenseTokenRotated",
