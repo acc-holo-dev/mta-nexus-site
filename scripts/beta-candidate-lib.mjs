@@ -352,7 +352,8 @@ export function evaluateBetaCandidate({
           category.id === "observability"
             ? evaluateObservabilityEvidenceResidual({
                 artifactRoot,
-                relativePath: category.artifacts?.[0] ?? "artifacts/observability-readiness-evidence.json",
+                relativePath:
+                  category.artifacts?.[0] ?? "artifacts/observability-readiness-evidence.json",
               })
             : evaluateExternal(category, artifactRoot);
         break;

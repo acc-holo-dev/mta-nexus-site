@@ -4,12 +4,14 @@ import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import process from "node:process";
 import {
-  OBSERVABILITY_ALERT_ENV_KEYS,
   buildObservabilityReadinessEvidence,
+  OBSERVABILITY_ALERT_ENV_KEYS,
 } from "./observability-evidence-lib.mjs";
 
 if (process.env.NEXUS_OBSERVABILITY_READY_ACK !== "YES") {
-  throw new Error("Refusing observability readiness write without NEXUS_OBSERVABILITY_READY_ACK=YES");
+  throw new Error(
+    "Refusing observability readiness write without NEXUS_OBSERVABILITY_READY_ACK=YES",
+  );
 }
 
 /** Load missing keys from local `.env` without overriding the process environment. */
