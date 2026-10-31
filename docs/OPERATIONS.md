@@ -1106,6 +1106,26 @@ non-zero so the container restart policy can recover it; durable leases/outbox
 rows remain authoritative and are reclaimed after expiry.
 
 
+### Web Push VAPID triplet generation
+
+Configure all three `WEB_PUSH_VAPID_*` values together or leave them empty so the
+push worker stays healthy-idle. For a new environment (not routine maintenance
+rotation), generate a matching P-256 pair accepted by `@nexus/config`:
+
+```bash
+node scripts/generate-web-push-vapid.mjs
+```
+
+Pass a real operator contact as the optional argument when the placeholder
+`mailto:ops@example.invalid` subject is not appropriate:
+
+```bash
+node scripts/generate-web-push-vapid.mjs 'mailto:ops@your-domain.example'
+```
+
+Copy the printed lines into the protected environment file only; never commit the
+private key or treat generator output as beta/release evidence.
+
 ### Push worker container hardening
 
 The production Web Push worker uses the same approved runtime image as the web
