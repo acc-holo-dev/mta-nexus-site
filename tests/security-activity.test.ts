@@ -31,6 +31,10 @@ describe("security activity contract", () => {
       "commerce.plan_review_saved",
       "support.case.created",
       "support.case.status_changed",
+      "support.message.created",
+      "resource.cart_acquired",
+      "verification.application_updated",
+      "user.privacy_updated",
       "verification.requested",
       "verification.approved",
       "verification.rejected",
@@ -469,6 +473,68 @@ describe("security activity contract", () => {
     expect(JSON.stringify(changed)).not.toContain("staff-private");
     expect(JSON.stringify(changed)).not.toContain("203.0.113.80");
     expect(JSON.stringify(changed)).not.toContain("resolved");
+  });
+
+  it("shows staff support replies to the requester without message body or staff network", () => {
+    const reply = toSecurityActivityItem(
+      {
+        id: "aud_support_message",
+        actorId: "usr_staff",
+        action: "support.message.created",
+        targetType: "support_case",
+        ipAddress: "203.0.113.81",
+        userAgent: "Staff Console",
+        details: { authorRole: "staff", body: "private-staff-reply" },
+        createdAt: new Date("2026-10-16T01:00:00.000Z"),
+      },
+      "usr_requester",
+    );
+    expect(reply).toEqual({
+      id: "aud_support_message",
+      action: "support.message.created",
+      targetType: "support_case",
+      perspective: "subject",
+      createdAt: new Date("2026-10-16T01:00:00.000Z"),
+    });
+    expect(SECURITY_SUBJECT_LABEL_KEYS["support.message.created"]).toBe(
+      "supportMessageCreatedNotice",
+    );
+    expect(JSON.stringify(reply)).not.toContain("private-staff-reply");
+    expect(JSON.stringify(reply)).not.toContain("usr_staff");
+    expect(JSON.stringify(reply)).not.toContain("203.0.113.81");
+  });
+
+  it("maps cart acquisition, verification application updates and privacy changes without details", () => {
+    expect(
+      toSecurityActivityItem({
+        id: "aud_cart",
+        actorId: "usr_buyer",
+        action: "resource.cart_acquired",
+        targetType: "product",
+        details: { productId: "prd_private" },
+        createdAt: new Date("2026-10-16T02:00:00.000Z"),
+      }),
+    ).toMatchObject({ action: "resource.cart_acquired", perspective: "actor" });
+    expect(
+      toSecurityActivityItem({
+        id: "aud_ver_app",
+        actorId: "usr_requester",
+        action: "verification.application_updated",
+        targetType: "verification",
+        details: { proofUrl: "https://private.example" },
+        createdAt: new Date("2026-10-16T03:00:00.000Z"),
+      }),
+    ).toMatchObject({ action: "verification.application_updated", perspective: "actor" });
+    const privacy = toSecurityActivityItem({
+      id: "aud_privacy",
+      actorId: "usr_owner",
+      action: "user.privacy_updated",
+      targetType: "user",
+      details: { fields: ["showEmail"] },
+      createdAt: new Date("2026-10-16T04:00:00.000Z"),
+    });
+    expect(privacy).toMatchObject({ action: "user.privacy_updated", perspective: "actor" });
+    expect(JSON.stringify(privacy)).not.toContain("showEmail");
   });
 
   it("rejects non-security audit events", () => {
