@@ -341,10 +341,7 @@ export class AuditRepository {
         : undefined;
     const organizationSubjectScope = or(
       ...Object.entries(SECURITY_SUBJECT_DETAIL_KEYS).map(([action, detailKey]) =>
-        and(
-          eq(auditEvents.action, action),
-          sql`${auditEvents.details}->>${detailKey} = ${userId}`,
-        ),
+        and(eq(auditEvents.action, action), sql`${auditEvents.details}->>${detailKey} = ${userId}`),
       ),
     );
     const licenseSubjectScope = and(

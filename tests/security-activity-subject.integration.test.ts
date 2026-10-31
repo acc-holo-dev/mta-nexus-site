@@ -35,9 +35,7 @@ async function clearFixtures() {
   await db
     .delete(products)
     .where(inArray(products.id, [fixture.productId, fixture.otherProductId]));
-  await db
-    .delete(users)
-    .where(inArray(users.id, [fixture.userId, fixture.otherUserId]));
+  await db.delete(users).where(inArray(users.id, [fixture.userId, fixture.otherUserId]));
 }
 
 describe("security activity subject lookup", () => {
