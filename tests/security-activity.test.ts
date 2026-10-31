@@ -142,7 +142,12 @@ describe("security activity contract", () => {
         targetType: "support_case",
         ipAddress: "198.51.100.20",
         userAgent: "Buyer Browser",
-        details: { orderId: "ord_private", kind: "refund", toReview: "intake", notes: "staff-never" },
+        details: {
+          orderId: "ord_private",
+          kind: "refund",
+          toReview: "intake",
+          notes: "staff-never",
+        },
         createdAt: new Date("2026-10-07T01:00:00.000Z"),
       },
       "usr_buyer",
