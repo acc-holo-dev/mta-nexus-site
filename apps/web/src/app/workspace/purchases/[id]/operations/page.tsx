@@ -13,6 +13,7 @@ import {
   formatHistoryDate,
   parseHistoryPage,
 } from "../../../../../lib/commerce-history-format";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Order operations | MTA NEXUS",
@@ -37,7 +38,10 @@ export default async function OrderOperationsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref("login", `/workspace/purchases/${encodeURIComponent(id)}/operations`)}
+          className="text-accent underline"
+        >
           {copy.signIn}
         </Link>
       </section>

@@ -20,6 +20,7 @@ import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { DiscussionReportBatch } from "./discussion-report-batch";
+import { authEntryHref } from "./auth-return-path";
 export async function DiscussionReportsScreen({
   id,
   commentId,
@@ -50,7 +51,7 @@ export async function DiscussionReportsScreen({
         </p>
         {!actor && !failure && (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", path)}
             className="inline-flex min-h-11 items-center text-accent underline"
           >
             {general.signIn}

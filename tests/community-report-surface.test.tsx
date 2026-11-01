@@ -168,7 +168,9 @@ it("preserves literal query text across pages and displays a strict recovery sta
 });
 it("does not load private data for anonymous users or nonstaff on staff screens", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await CommunityReportScreen({}))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await CommunityReportScreen({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Freports"',
+  );
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
   expect(renderToStaticMarkup(await CommunityReportScreen({ staff: true }))).toContain(
     communityReportCopy("en").forbidden,

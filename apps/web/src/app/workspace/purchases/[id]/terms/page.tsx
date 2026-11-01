@@ -9,6 +9,7 @@ import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
 import { orderTermsPageQuery } from "../../../../../lib/order-terms-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { orderTermsService } from "../../../../../lib/services/order-terms-service";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Order terms | MTA NEXUS",
@@ -33,7 +34,10 @@ export default async function TermsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display">{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref("login", `/workspace/purchases/${encodeURIComponent(id)}/terms`)}
+          className="text-accent underline"
+        >
           {c.signIn}
         </Link>
       </section>

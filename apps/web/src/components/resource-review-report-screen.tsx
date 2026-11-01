@@ -9,6 +9,7 @@ import { resourceReviewCopy, resourceReviewState } from "../lib/resource-review-
 import { resourceReviewPageQuery } from "../lib/resource-review-query";
 import { ResourceReviewPager } from "./resource-review-list";
 import { ResourceReviewDecisionForm } from "./resource-review-controls";
+import { authEntryHref } from "./auth-return-path";
 export async function ResourceReviewReportScreen({
   staff,
   id,
@@ -21,16 +22,17 @@ export async function ResourceReviewReportScreen({
   const [locale, cookieStore] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = resourceReviewCopy(locale),
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  const base = staff ? "/admin/commerce/reviews" : "/workspace/review-reports";
+  const loginReturn = id ? `${base}/${encodeURIComponent(id)}` : base;
   if (!actor)
     return (
       <section className="py-12">
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", loginReturn)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
   if (staff && !["admin", "moderator"].includes(actor.role)) notFound();
-  const base = staff ? "/admin/commerce/reviews" : "/workspace/review-reports";
   if (id) {
     const report = await resourceReviewService.reportDetail(actor, staff, id).catch((error) => {
       if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();

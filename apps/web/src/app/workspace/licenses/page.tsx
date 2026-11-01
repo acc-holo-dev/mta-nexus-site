@@ -32,7 +32,14 @@ export default async function LicensesHistoryPage({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getCommerceHistoryCopy(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user) return <HistorySignIn copy={copy} />;
+  if (!user) {
+    const page = typeof query.page === "string" ? query.page : undefined;
+    const returnPath =
+      page && page !== "1"
+        ? `/workspace/licenses?page=${encodeURIComponent(page)}`
+        : "/workspace/licenses";
+    return <HistorySignIn copy={copy} returnPath={returnPath} />;
+  }
 
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {

@@ -12,6 +12,7 @@ import {
   financialReferenceLabel,
 } from "../../../lib/financial-i18n";
 import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
+import { authEntryHref } from "../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Financial statements | MTA NEXUS",
@@ -30,15 +31,22 @@ export default async function FinancialStatements({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getFinancialCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user)
+  if (!user) {
+    const returnQuery = new URLSearchParams();
+    for (const key of ["page", "currency", "organizationId", "scopePage"] as const) {
+      const value = query[key];
+      if (typeof value === "string") returnQuery.set(key, value);
+    }
+    const returnPath = `/workspace/finance${returnQuery.size ? `?${returnQuery}` : ""}`;
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
+  }
   const currency = ["USD", "EUR", "RUB"].find((value) => value === query.currency),
     organizationId =
       typeof query.organizationId === "string" &&

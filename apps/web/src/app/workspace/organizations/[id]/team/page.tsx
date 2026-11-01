@@ -17,6 +17,7 @@ import { getOrganizationCopy } from "../../../../../lib/organization-workspace-c
 import { authService } from "../../../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../../../lib/services/organization-team-service";
 import { platformFieldClass } from "../../../../../lib/user-platform-client";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -60,7 +61,7 @@ export default async function TeamPage({
           </>
         ) : (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", organizationTeamHref(id, { query: "" }))}
             className="inline-flex min-h-11 items-center text-sm text-accent underline"
           >
             {locale === "ru" ? "Войти" : "Sign in"}

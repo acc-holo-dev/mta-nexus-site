@@ -15,6 +15,7 @@ import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
 import { CommunityReportDetailView } from "./community-report-detail";
 import { CommunityReportList } from "./community-report-list";
+import { authEntryHref } from "./auth-return-path";
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -27,13 +28,20 @@ export async function CommunityReportScreen({
   const locale = await getRequestLocale(),
     copy = communityReportCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  const loginReturn = staff
+    ? id
+      ? `/admin/reports/${encodeURIComponent(id)}`
+      : "/admin/reports"
+    : id
+      ? `/workspace/reports/${encodeURIComponent(id)}`
+      : "/workspace/reports";
   if (!actor || (staff && !can(actor, "admin.moderation")))
     return (
       <div className="nexus-panel space-y-3 p-8">
         <h1 className="text-xl font-semibold text-primary">
           {staff ? copy.forbidden : copy.title}
         </h1>
-        <Link className="text-sm text-accent underline" href="/auth/login">
+        <Link className="text-sm text-accent underline" href={authEntryHref("login", loginReturn)}>
           {copy.signIn}
         </Link>
       </div>

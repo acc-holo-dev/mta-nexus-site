@@ -220,7 +220,9 @@ it("labels legacy owner entries without implying actual ownership", () => {
 });
 it("does not load private team data for guests and separates session failures from login", async () => {
   mocks.session.mockResolvedValueOnce(null);
-  expect(renderToStaticMarkup(await TeamPage(teamParams))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await TeamPage(teamParams))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fteam"',
+  );
   expect(mocks.team).not.toHaveBeenCalled();
   mocks.session.mockRejectedValueOnce(new Error("private session"));
   const failed = renderToStaticMarkup(await TeamPage(teamParams));

@@ -13,6 +13,7 @@ import {
   subscriptionActivationQuery,
   subscriptionPageParams,
 } from "../../../../lib/subscriptions-query";
+import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Activate free subscription | MTA NEXUS",
@@ -26,13 +27,16 @@ export default async function SubscriptionActivationPage({
   const [store, locale, raw] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = subscriptionsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    const params = subscriptionPageParams(raw);
+    const returnPath = `/workspace/subscriptions/activate${params.size ? `?${params}` : ""}`;
     return (
       <section className="space-y-4 py-8">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login">{c.signIn}</Link>
+        <Link href={authEntryHref("login", returnPath)}>{c.signIn}</Link>
       </section>
     );
+  }
   try {
     const query = subscriptionActivationQuery(subscriptionPageParams(raw)),
       plan = await subscriptionsService.plan(query.planId);

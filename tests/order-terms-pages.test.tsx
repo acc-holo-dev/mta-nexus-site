@@ -98,7 +98,9 @@ beforeEach(() => {
 });
 it("signed-out buyers and non-admin staff cannot request terms pages", async () => {
   state.actor = null;
-  expect(renderToStaticMarkup(await Buyer(input))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await Buyer(input))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fpurchases%2Ford_a%2Fterms"',
+  );
   await expect(Admin(input)).rejects.toThrow("NOT_FOUND");
   state.actor = { id: "usr_a", role: "moderator" };
   await expect(Admin(input)).rejects.toThrow("NOT_FOUND");

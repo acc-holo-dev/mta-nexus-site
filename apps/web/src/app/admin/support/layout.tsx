@@ -6,6 +6,7 @@ import { can } from "@nexus/security";
 import { authService } from "../../../lib/services/auth-service";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { authEntryHref } from "../../../components/auth-return-path";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function AdminSupportLayout({ children }: { children: React
         <h1 className="font-display text-primary">{dictionary.admin.accessDenied}</h1>
         <p className="font-caption text-muted">{dictionary.admin.accessDeniedDescription}</p>
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", "/admin/support")}
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white"
         >
           {dictionary.admin.signIn}

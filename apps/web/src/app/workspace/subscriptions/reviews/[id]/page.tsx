@@ -6,9 +6,14 @@ import { notFound } from "next/navigation";
 import { PlanReviewDetailView } from "../../../../../components/plan-review-detail";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
-import { planReviewsPageParams, planReviewsQuery } from "../../../../../lib/plan-reviews-query";
+import {
+  planReviewHref,
+  planReviewsPageParams,
+  planReviewsQuery,
+} from "../../../../../lib/plan-reviews-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Recorded plan terms | MTA NEXUS",
@@ -29,15 +34,18 @@ export default async function PlanReviewPage({
     ]),
     c = planReviewsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    const pageParams = planReviewsPageParams(query);
+    const returnPath = planReviewHref(id, pageParams.get("organizationId") ?? undefined);
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   try {
     const selection = planReviewsQuery(planReviewsPageParams(query), true),
       detail = await planReviewsService.detail(actor, id, selection.organizationId);

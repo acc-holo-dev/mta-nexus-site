@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import type { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
+import { authEntryHref } from "./auth-return-path";
 
 export type HistoryArea = "purchases" | "licenses" | "sales";
 export type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;
 
-export function HistorySignIn({ copy }: { copy: HistoryCopy }) {
+export function HistorySignIn({ copy, returnPath }: { copy: HistoryCopy; returnPath: string }) {
   return (
     <section className="mx-auto max-w-xl space-y-4 py-16 text-center">
       <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-      <Link href="/auth/login" className="text-accent underline">
+      <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
         {copy.signIn}
       </Link>
     </section>

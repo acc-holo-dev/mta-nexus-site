@@ -127,7 +127,7 @@ describe("closed-beta workspace behavior", () => {
     for (const page of [LicensesPage, PurchasesPage, SalesPage]) {
       const html = renderToStaticMarkup(await page(input));
       expect(html).toContain("Sign in to view your private history");
-      expect(html).toContain('href="/auth/login"');
+      expect(html).toMatch(/href="\/auth\/login\?next=%2Fworkspace%2F(purchases|licenses|sales)/);
     }
     expect(state.redirects).toEqual([]);
   });

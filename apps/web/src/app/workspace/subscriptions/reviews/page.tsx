@@ -14,6 +14,7 @@ import {
 } from "../../../../lib/plan-reviews-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../lib/services/plan-reviews-service";
+import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Saved plan reviews | MTA NEXUS",
@@ -27,15 +28,18 @@ export default async function PlanReviewsPage({
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = planReviewsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    const query = planReviewsPageParams(params);
+    const returnPath = `/workspace/subscriptions/reviews${query.size ? `?${query}` : ""}`;
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   try {
     const normalized = { ...params };
     if (normalized.organizationId === "") delete normalized.organizationId;

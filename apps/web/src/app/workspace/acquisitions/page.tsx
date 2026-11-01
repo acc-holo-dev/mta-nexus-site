@@ -12,6 +12,7 @@ import {
   acquisitionHistoryHref,
 } from "../../../lib/resource-activity-view";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
+import { authEntryHref } from "../../../components/auth-return-path";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -31,15 +32,22 @@ export default async function AcquisitionHistoryPage({
   ]);
   const copy = getResourceActivityCopy(locale);
   const actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    const returnQuery = new URLSearchParams();
+    for (const key of ["page", "source"] as const) {
+      const value = query[key];
+      if (typeof value === "string") returnQuery.set(key, value);
+    }
+    const returnPath = `/workspace/acquisitions${returnQuery.size ? `?${returnQuery}` : ""}`;
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
+  }
   const result = await resourceActivityService.buyerHistory(
     actor,
     acquisitionPage(query.page),

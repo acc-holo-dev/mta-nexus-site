@@ -32,6 +32,7 @@ import { adminService } from "../../lib/services/admin-service";
 import { authService } from "../../lib/services/auth-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { authEntryHref } from "../../components/auth-return-path";
 import { adminStatusLabel, adminStatusTone } from "./status-labels";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
@@ -104,7 +105,7 @@ export default async function AdminPage({
         <h1 className="font-display text-primary">{copy.accessDenied}</h1>
         <p className="font-caption text-muted">{copy.accessDeniedDescription}</p>
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", "/admin")}
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {copy.signIn}

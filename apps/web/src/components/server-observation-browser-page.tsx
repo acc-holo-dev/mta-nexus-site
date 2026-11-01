@@ -23,6 +23,7 @@ import {
   serverStatisticsService,
 } from "../lib/services/server-statistics-service";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { authEntryHref } from "./auth-return-path";
 import { ServerObservationPeriodControls } from "./server-observation-period-controls";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
 export async function serverObservationBrowserMetadata() {
@@ -75,7 +76,7 @@ export async function ServerObservationBrowserPage({
       <div className="nexus-panel space-y-3 p-5">
         <h1 className="text-xl font-bold text-primary">{copy.signIn}</h1>
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", path)}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >
           {stats.signInAction}

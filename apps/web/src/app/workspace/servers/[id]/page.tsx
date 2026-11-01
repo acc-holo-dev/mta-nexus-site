@@ -11,6 +11,7 @@ import { readManagedServerClaimStatus } from "@nexus/db";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";
+import { authEntryHref } from "../../../../components/auth-return-path";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -36,7 +37,7 @@ export default async function ServerManagementPage({
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <p className="font-caption text-muted">{copy.signInMessage}</p>
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", `/workspace/servers/${encodeURIComponent(id)}`)}
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white"
         >
           {copy.signIn}

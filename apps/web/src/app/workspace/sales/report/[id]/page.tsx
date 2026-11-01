@@ -9,6 +9,7 @@ import { sellerSalesCopy, sellerSalesTime } from "../../../../../lib/seller-sale
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../../../../../lib/seller-sales-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../../lib/services/seller-sales-service";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sale line | MTA NEXUS",
@@ -29,15 +30,21 @@ export default async function SellerSalePage({
     ]),
     c = sellerSalesCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    const pageParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string") pageParams.set(key, value);
+    }
+    const returnPath = `/workspace/sales/report/${encodeURIComponent(id)}${pageParams.size ? `?${pageParams}` : ""}`;
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display">{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   const values = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (Array.isArray(value)) notFound();

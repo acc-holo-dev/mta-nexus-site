@@ -11,6 +11,7 @@ import { resourceCartReceiptId } from "../../../../../lib/resource-cart-receipts
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { ResourceCartReviewEvidence } from "../../../../../components/resource-cart-review-evidence";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -30,7 +31,13 @@ export default async function ResourceCartReceiptPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref(
+            "login",
+            `/workspace/acquisitions/receipts/${encodeURIComponent(id)}`,
+          )}
+          className="text-accent underline"
+        >
           {copy.signIn}
         </Link>
       </section>

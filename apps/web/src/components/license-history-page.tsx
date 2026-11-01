@@ -30,11 +30,17 @@ export async function LicenseHistoryPage({
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]),
     copy = getLicenseControlCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <HistorySignIn copy={getCommerceHistoryCopy(locale)} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (Array.isArray(value)) for (const item of value) params.append(key, item);
     else if (value !== undefined) params.append(key, value);
+  }
+  if (!actor) {
+    const base = moderation
+      ? `/admin/licenses/${encodeURIComponent(licenseId)}/history`
+      : `/workspace/licenses/${encodeURIComponent(licenseId)}/history`;
+    const returnPath = `${base}${params.size ? `?${params}` : ""}`;
+    return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
   }
   let page = 1;
   try {

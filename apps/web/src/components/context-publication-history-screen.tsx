@@ -20,6 +20,7 @@ import {
 import { authService } from "../lib/services/auth-service";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { AuthorPublicationRestore } from "./author-publication-restore";
+import { authEntryHref } from "./auth-return-path";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
@@ -65,7 +66,7 @@ export async function ContextPublicationHistoryScreen({
           </p>
         ) : (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", path)}
             className="inline-flex min-h-11 items-center text-accent underline"
           >
             {labels.signIn}

@@ -19,7 +19,13 @@ export const metadata: Metadata = {
 export default async function LicensePage({ params }: { params: Promise<{ id: string }> }) {
   const [store, locale, { id }] = await Promise.all([cookies(), getRequestLocale(), params]);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user) return <HistorySignIn copy={getCommerceHistoryCopy(locale)} />;
+  if (!user)
+    return (
+      <HistorySignIn
+        copy={getCommerceHistoryCopy(locale)}
+        returnPath={`/workspace/licenses/${encodeURIComponent(id)}`}
+      />
+    );
   const license = await licenseControlService.detail(user, id);
   if (!license) notFound();
   const servers =

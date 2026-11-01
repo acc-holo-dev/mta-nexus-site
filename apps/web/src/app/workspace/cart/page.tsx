@@ -6,6 +6,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
+import { authEntryHref } from "../../../components/auth-return-path";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default async function ResourceCartPage() {
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signIn}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", "/workspace/cart")} className="text-accent underline">
           {copy.login}
         </Link>
       </section>

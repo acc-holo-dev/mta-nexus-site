@@ -126,7 +126,13 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]),
     copy = orderCaseCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <HistorySignIn copy={getCommerceHistoryCopy(locale)} />;
+  if (!actor)
+    return (
+      <HistorySignIn
+        copy={getCommerceHistoryCopy(locale)}
+        returnPath={`/workspace/purchases/${encodeURIComponent(orderId)}/support`}
+      />
+    );
   const result = await orderCaseService.orderDetail(orderId, actor).catch(scopedError);
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
@@ -171,7 +177,14 @@ export async function OrderCaseListPage({
     copy = orderCaseCopy(locale),
     base = staff ? "/admin/commerce/order-cases" : "/workspace/order-cases";
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <HistorySignIn copy={getCommerceHistoryCopy(locale)} />;
+  if (!actor) {
+    const pageParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string") pageParams.set(key, value);
+    }
+    const returnPath = `${base}${pageParams.size ? `?${pageParams}` : ""}`;
+    return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
+  }
   let filters: ReturnType<typeof orderCasePageQuery>;
   try {
     filters = orderCasePageQuery(query, true);
@@ -287,7 +300,17 @@ export async function OrderCaseDetailPage({
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]),
     copy = orderCaseCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <HistorySignIn copy={getCommerceHistoryCopy(locale)} />;
+  if (!actor) {
+    const detailBase = staff
+      ? `/admin/commerce/order-cases/${encodeURIComponent(caseId)}`
+      : `/workspace/order-cases/${encodeURIComponent(caseId)}`;
+    const pageParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string") pageParams.set(key, value);
+    }
+    const returnPath = `${detailBase}${pageParams.size ? `?${pageParams}` : ""}`;
+    return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
+  }
   let page = 1;
   try {
     page = orderCasePageQuery(query).page;

@@ -15,6 +15,7 @@ import { serverWorkspaceCopy, serverWorkspaceError } from "../lib/server-workspa
 import { authService } from "../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../lib/services/server-workspace-history-service";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { authEntryHref } from "./auth-return-path";
 export async function ServerWorkspaceHistoryScreen({
   id,
   searchParams,
@@ -42,7 +43,10 @@ export async function ServerWorkspaceHistoryScreen({
             {failure}
           </p>
         ) : (
-          <Link href="/auth/login" className="inline-flex min-h-11 text-accent underline">
+          <Link
+            href={authEntryHref("login", `/workspace/servers/${encodeURIComponent(id)}/history`)}
+            className="inline-flex min-h-11 text-accent underline"
+          >
             {labels.signIn}
           </Link>
         )}

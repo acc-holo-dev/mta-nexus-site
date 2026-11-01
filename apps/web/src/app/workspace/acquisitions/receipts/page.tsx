@@ -13,6 +13,7 @@ import {
 } from "../../../../lib/resource-cart-receipts-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../lib/services/resource-cart-receipts-service";
+import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -28,15 +29,21 @@ export default async function ResourceCartReceiptsPage({
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
     copy = resourceCartReceiptsCopy(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user)
+  if (!user) {
+    const pageParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(raw)) {
+      if (typeof value === "string") pageParams.set(key, value);
+    }
+    const returnPath = `/workspace/acquisitions/receipts${pageParams.size ? `?${pageParams}` : ""}`;
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
+  }
   let query: ReturnType<typeof resourceCartReceiptQuery>;
   try {
     const params = new URLSearchParams();

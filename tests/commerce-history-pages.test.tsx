@@ -113,7 +113,7 @@ describe("private legacy commerce pages", () => {
     state.user = null;
     for (const Component of [Purchases, Licenses, Sales]) {
       const html = renderToStaticMarkup(await Component(input()));
-      expect(html).toContain('href="/auth/login"');
+      expect(html).toMatch(/href="\/auth\/login\?next=%2Fworkspace%2F(purchases|licenses|sales)/);
     }
     expect(state.buyer).not.toHaveBeenCalled();
     expect(state.licenses).not.toHaveBeenCalled();

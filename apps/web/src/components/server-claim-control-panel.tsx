@@ -3,7 +3,7 @@
 import { Button } from "@nexus/ui";
 import { KeyRound, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../lib/server-claim-confirmation";
 import { serverClaimErrorMessage } from "../lib/server-claim-status-view";
 import { useNexusLocale } from "./locale-context";
+import { authEntryHref } from "./auth-return-path";
 
 export function ServerClaimControlPanel({
   serverId,
@@ -24,6 +25,7 @@ export function ServerClaimControlPanel({
   refreshOnSuccess?: boolean;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.serverClaim;
   const [challenge, setChallenge] = useState<IssuedServerClaimChallenge | null>(null);
@@ -191,7 +193,10 @@ export function ServerClaimControlPanel({
 
       {requiresLogin && (
         <p className="text-xs text-secondary">
-          <Link href="/auth/login" className="font-semibold text-accent hover:underline">
+          <Link
+            href={authEntryHref("login", pathname)}
+            className="font-semibold text-accent hover:underline"
+          >
             {copy.signIn}
           </Link>{" "}
           {copy.signInHint}

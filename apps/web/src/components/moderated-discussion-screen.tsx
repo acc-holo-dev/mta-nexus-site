@@ -23,6 +23,7 @@ import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { ModeratedDiscussionRemoval } from "./moderated-discussion-removal";
+import { authEntryHref } from "./auth-return-path";
 export async function ModeratedDiscussionScreen({
   id,
   commentId,
@@ -52,7 +53,7 @@ export async function ModeratedDiscussionScreen({
         </p>
         {!actor && !unavailable && (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", href)}
             className="inline-flex min-h-11 items-center text-accent underline"
           >
             {general.signIn}

@@ -89,7 +89,9 @@ beforeEach(() => {
 });
 it("does not read reports when signed out and disables indexing", async () => {
   state.actor = null;
-  expect(renderToStaticMarkup(await Page(input))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await Page(input))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fsales%2Freport%3Fpage%3D2%26days%3D90%26organizationId%3Dorg_a%26currency%3DRUB%26evidence%3Dreview%26productId%3Dprd_a"',
+  );
   expect(
     renderToStaticMarkup(
       await Detail({
@@ -98,7 +100,7 @@ it("does not read reports when signed out and disables indexing", async () => {
         searchParams: Promise.resolve({}),
       }),
     ),
-  ).toContain('href="/auth/login"');
+  ).toContain('href="/auth/login?next=%2Fworkspace%2Fsales%2Freport%2Fitm_a"');
   expect(state.report).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
   expect(metadata.robots).toEqual({ index: false, follow: false });

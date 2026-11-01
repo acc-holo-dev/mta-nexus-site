@@ -9,6 +9,7 @@ import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
 import { sellerSalesPageQuery } from "../../../../lib/seller-sales-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
+import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sales report | MTA NEXUS",
@@ -22,15 +23,21 @@ export default async function SellerSalesPage({
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = sellerSalesCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    const pageParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (typeof value === "string") pageParams.set(key, value);
+    }
+    const returnPath = `/workspace/sales/report${pageParams.size ? `?${pageParams}` : ""}`;
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display">{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   try {
     // Empty form fields are omitted only on the SSR form surface; private APIs stay strict.
     const normalized = { ...params };

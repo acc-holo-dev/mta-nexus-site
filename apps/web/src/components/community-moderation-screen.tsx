@@ -21,6 +21,7 @@ import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { ContentModerationControls } from "./content-moderation-controls";
+import { authEntryHref } from "./auth-return-path";
 export async function CommunityModerationScreen({
   id,
   searchParams,
@@ -47,7 +48,7 @@ export async function CommunityModerationScreen({
         </p>
         {!actor && !authError ? (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", id ? moderationDetailHref(id) : "/admin/community")}
             className="inline-flex min-h-11 items-center text-sm text-accent underline"
           >
             {copy.signIn}

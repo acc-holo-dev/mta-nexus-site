@@ -39,7 +39,10 @@ export default async function OrderDetailsPage({
   ]);
   const copy = getCommerceHistoryCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <HistorySignIn copy={copy} />;
+  if (!actor)
+    return (
+      <HistorySignIn copy={copy} returnPath={`/workspace/purchases/${encodeURIComponent(id)}`} />
+    );
   const result = await commerceService.getBuyerOrderDetails(
     actor,
     id,
