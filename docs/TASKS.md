@@ -4260,6 +4260,8 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F4. **Приоритет:** P3. **Решение:** proposal. **Очередь:** deferred. **Исполнение:** not_started. **Область полномочий:** local_development.
 
+**Заметка исполнения.** 2026-11-01: local proposal draft at docs/SERVER-PACK-SPEC.md (manual snapshot shape, non-goals, sample probe). Still blocked on GROW-02 pilot selection; no runtime/schema.
+
 **Исходные пункты:** RET08. **Решения обсуждения:** NX-009, NX-011.
 
 **Сейчас.** Collection manifest содержит product IDs; точные build/version и проверка совместного запуска — отдельный контракт.
@@ -4268,6 +4270,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ### Область изменений
 
+- `docs/SERVER-PACK-SPEC.md`
 - `packages/domain/src/library-collections.ts`
 - `planned: versioned server pack specification`
 

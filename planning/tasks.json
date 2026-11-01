@@ -6335,6 +6335,7 @@
       "current": "Collection manifest содержит product IDs; точные build/version и проверка совместного запуска — отдельный контракт.",
       "goal": "Получить воспроизводимый snapshot набора, не переписывая уже имеющиеся коллекции и выбор версии.",
       "scope_files": [
+        "docs/SERVER-PACK-SPEC.md",
         "packages/domain/src/library-collections.ts",
         "planned: versioned server pack specification"
       ],
@@ -6385,7 +6386,9 @@
           "id": "OPS-06",
           "when": "Если выбранная реализация добавляет или изменяет схему БД."
         }
-      ]
+      ],
+      "execution_notes": "2026-11-01: local proposal draft at docs/SERVER-PACK-SPEC.md (manual snapshot shape, non-goals, sample probe). Still blocked on GROW-02 pilot selection; no runtime/schema.",
+      "execution_updated_on": "2026-11-01"
     },
     {
       "id": "GROW-09",
