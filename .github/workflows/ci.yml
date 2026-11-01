@@ -703,7 +703,7 @@ jobs:
           docker load --input "$RUNNER_TEMP/production.tar"
           bash scripts/validate-ci-image.sh
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
