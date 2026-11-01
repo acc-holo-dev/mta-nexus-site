@@ -76,7 +76,7 @@ export const community = {
     description:
       "Open and track NEXUS support cases in one place. Cases keep their context and message history.",
     noGuaranteedSla:
-      "Closed beta: response times are not guaranteed yet. Critical security incidents are prioritized.",
+      "Open free beta: response times are not guaranteed yet. Critical security incidents are prioritized.",
     staffQueue: "Support queue",
     staffFilters: "Filter support cases",
     filterStatus: "Status",

@@ -1,7 +1,7 @@
 export const discovery = {
   home: {
     brand: "MTA NEXUS",
-    liveEcosystem: "Closed beta",
+    liveEcosystem: "Open free beta",
     title: "Live servers, community, and free resources",
     description:
       "Provisional home copy while the brand line stays open: browse the official MTA directory, community updates, and free resources.",

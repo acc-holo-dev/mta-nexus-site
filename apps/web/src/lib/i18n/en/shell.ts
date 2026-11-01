@@ -2,7 +2,7 @@ export const shell = {
   meta: {
     title: "MTA NEXUS — Live Servers, Community & Free Resources",
     description:
-      "Discover live Multi Theft Auto servers, community updates, and free resources during the MTA Nexus closed beta.",
+      "Discover live Multi Theft Auto servers, community updates, and free resources during the MTA Nexus open free beta.",
   },
   nav: {
     ecosystem: "Ecosystem",
@@ -33,7 +33,7 @@ export const shell = {
     collapse: "Collapse sidebar",
     expand: "Expand sidebar",
     search: "Search servers, resources, creators...",
-    closedBeta: "Closed beta",
+    closedBeta: "Open free beta",
   },
   locale: {
     label: "Language",
@@ -41,7 +41,7 @@ export const shell = {
   },
   footer: {
     summary:
-      "Live MTA server activity, community updates, and free resources in one place. Paid commerce is not enabled during the closed beta.",
+      "Live MTA server activity, community updates, and free resources in one place. Paid commerce is not enabled during the open free beta.",
     discover: "Discover",
     contribute: "Contribute",
     liveServers: "Live servers",
