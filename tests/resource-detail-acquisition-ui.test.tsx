@@ -519,4 +519,53 @@ describe("resource detail acquisition behavior", () => {
     expect(html).not.toContain(">0.0 / 5.0");
     expect(html).not.toMatch(/usr_|install/i);
   });
+
+  it("shows version-scoped help for the published download version", async () => {
+    const productId = `prd_${"c".repeat(24)}`;
+    const buildId = `bld_${"d".repeat(24)}`;
+    state.product = {
+      ...product(0),
+      id: productId,
+      shortDescription: "Scoped purpose",
+    };
+    state.builds = [
+      {
+        ...build(buildId, "2.0.0"),
+        releaseNotes: "Configure cache\n```cfg\nset fpslimit 60\n```",
+      },
+      build("bld_old", "1.0.0"),
+    ];
+
+    const copy = getDictionary("en").versionHelpUi;
+    const html = renderPage(
+      await ProductDetailPage({
+        params: Promise.resolve({ slug: "detail-resource" }),
+      }),
+    );
+
+    expect(html).toContain('data-testid="resource-version-help"');
+    expect(html).toContain('data-version="2.0.0"');
+    expect(html).toContain("Scoped purpose");
+    expect(html).toContain("set fpslimit 60");
+    expect(html).toContain(copy.acquireDisclaimer);
+    expect(html).toContain('href="#resource-qa"');
+    expect(html).toContain("/support?category=resource");
+    expect(html).not.toMatch(/incompatible|guaranteed/iu);
+  });
+
+  it("shows missing instruction copy without inventing setup for another version", async () => {
+    state.product = { ...product(0), shortDescription: "" };
+    state.builds = [build("bld_latest", "2.0.0")];
+    const copy = getDictionary("en").versionHelpUi;
+
+    const html = renderPage(
+      await ProductDetailPage({
+        params: Promise.resolve({ slug: "detail-resource" }),
+      }),
+    );
+
+    expect(html).toContain("The author has not added version-specific setup notes yet");
+    expect(html).not.toContain(copy.sections.setup);
+    expect(html).not.toContain("set fpslimit 60");
+  });
 });

@@ -1,8 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { buildResourceVersionHelp, splitInstructionPlainText } from "@nexus/domain";
 import { buildProductDependencyResolution } from "../apps/web/src/lib/product-dependency-resolution";
 import { ProductDependencyList } from "../apps/web/src/components/product-dependency-list";
+import { ResourceVersionHelpSection } from "../apps/web/src/components/resource-version-help-section";
 
 const mocks = vi.hoisted(() => ({
   findPublishedFreeBySlugs: vi.fn(),
@@ -146,5 +148,76 @@ describe("resource dependency resolution behavior", () => {
       <ProductDependencyList declared={[]} resolution={null} locale="en" />,
     );
     expect(empty).toContain(copy.noneDeclared);
+  });
+});
+
+describe("resource version help projection", () => {
+  const productId = `prd_${"a".repeat(24)}`;
+  const buildId = `bld_${"b".repeat(24)}`;
+
+  it("keeps fenced setup code as plain text and omits automatic incompatibility", () => {
+    const projection = buildResourceVersionHelp({
+      version: "2.0.0",
+      shortDescription: "Utility helpers",
+      description: "Longer catalog description",
+      licenseModel: "unlimited",
+      compatibility: {},
+      releaseNotes: "Run setup:\n```lua\n<script>alert(1)</script>\n```",
+      mtaVersionTarget: null,
+      productId,
+      buildId,
+    });
+
+    expect(projection.version).toBe("2.0.0");
+    expect(projection.setup?.codeBlocks).toEqual(['<script>alert(1)</script>']);
+    expect(projection.limits.find((line) => line.key === "catalogMtaMin")).toMatchObject({
+      known: false,
+    });
+    expect(projection.support).toEqual({ productId, buildId });
+  });
+
+  it.each(["en", "ru"] as const)(
+    "renders version-scoped help without executing author markup in %s",
+    (locale) => {
+      const copy = getDictionary(locale).versionHelpUi;
+      const projection = buildResourceVersionHelp({
+        version: "1.4.0",
+        shortDescription: "Purpose line",
+        description: "Description body",
+        licenseModel: "unlimited",
+        compatibility: { mtaMinVersion: "1.6.0", dependencies: [] },
+        releaseNotes: "```lua\n<script>alert(1)</script>\n```",
+        mtaVersionTarget: "1.6.0",
+        productId,
+        buildId,
+      });
+      const markup = renderToStaticMarkup(
+        <ResourceVersionHelpSection projection={projection} locale={locale} />,
+      );
+
+      expect(markup).toContain('data-version="1.4.0"');
+      expect(markup).toContain(copy.sections.setup);
+      expect(markup).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+      expect(markup).not.toMatch(/<script>alert/iu);
+      expect(markup).toContain('href="#resource-qa"');
+      expect(markup).toContain("/support?category=resource");
+      expect(markup).not.toMatch(/incompatible|guaranteed/iu);
+    },
+  );
+
+  it("reports missing author instructions when purpose and setup are empty", () => {
+    const projection = buildResourceVersionHelp({
+      version: "3.0.0",
+      shortDescription: "  ",
+      description: "Catalog description only",
+      licenseModel: "unlimited",
+      compatibility: null,
+      releaseNotes: null,
+      mtaVersionTarget: null,
+      productId,
+      buildId: null,
+    });
+    expect(projection.missingAuthorContent).toBe(true);
+    expect(splitInstructionPlainText("```sh\necho hi\n```").codeBlocks).toEqual(["echo hi"]);
   });
 });

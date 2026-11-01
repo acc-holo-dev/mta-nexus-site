@@ -3515,7 +3515,9 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-20 — Инструкция и помощь для конкретного ресурса и версии
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Public resource detail Help/Instructions section bound to current published download version; releaseNotes fenced blocks render as copyable plain code; optional compatibility shows unknown without auto-incompatible claims; support/Q&A links use FLOW-19 object context without private license/evidence.
 
 **Исходные пункты:** PX08, PX12. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 

@@ -4624,9 +4624,11 @@
         "Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.",
         "Новые секции и контекстная помощь остаются proposal, не обязательным publishing gate."
       ],
-      "execution_state": "not_started",
+      "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
-      "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
+      "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
+      "execution_notes": "Public resource detail Help/Instructions section bound to current published download version; releaseNotes fenced blocks render as copyable plain code; optional compatibility shows unknown without auto-incompatible claims; support/Q&A links use FLOW-19 object context without private license/evidence.",
+      "execution_updated_on": "2026-11-01"
     },
     {
       "id": "UX-21",

@@ -113,6 +113,40 @@ export const product = {
     explanation:
       "The SHA-256 identifies the stored artifact bytes. A clean malware scan is a separate recorded fact and is not a cryptographic signature. Public delivery requires a published version plus a trusted clean scan (scanner identity and time). Download responses expose the same recorded hash through the X-Content-SHA256 header.",
   },
+  versionHelpUi: {
+    title: "Help and instructions for v{version}",
+    versionScope:
+      "Everything below applies to the published version shown for download, not a hidden latest.",
+    missingBody:
+      "The author has not added version-specific setup notes yet. Use Q&A or support below with this resource in context.",
+    sections: {
+      purpose: "Purpose",
+      acquire: "Get this version",
+      setup: "Setup notes",
+      limits: "Limits and compatibility hints",
+      support: "Get help",
+    },
+    acquireBody:
+      "Version {version} is delivered through library claim or download. NEXUS records entitlement and checksum only.",
+    acquireDisclaimer:
+      "A successful download or browser handoff does not mean the resource is enabled or running on your server.",
+    limits: {
+      licenseModel: "Access model",
+      versionMtaTarget: "MTA target for this version",
+      catalogMtaMin: "Catalog MTA minimum",
+      dependencies: "Declared dependencies",
+    },
+    unknown: "Unknown",
+    limitsNotice:
+      "Compatibility metadata is optional. Unknown values are omitted from guarantees; NEXUS does not infer automatic incompatibility.",
+    supportBody: "Ask in the resource Q&A or open a support case with this resource attached.",
+    openQa: "Open resource Q&A",
+    openSupport: "Contact support about this resource",
+    copyCode: "Copy code",
+    copiedCode: "Copied",
+    authorReleaseNotesHint:
+      "Plain text only. Use fenced ``` blocks for copyable setup commands shown on the public resource page.",
+  },
   dependencyUi: {
     noneDeclared: "None declared",
     resolutionUnavailable: "Catalogue resolution temporarily unavailable",

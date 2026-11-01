@@ -4,7 +4,7 @@ import {
   notificationRepository,
   resourceMediaRepository,
 } from "@nexus/db";
-import { AppError } from "@nexus/domain";
+import { AppError, buildResourceVersionHelp } from "@nexus/domain";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -17,10 +17,11 @@ import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { ResourceGallery } from "../../../components/resource-gallery";
 import { ResourcePreview } from "../../../components/resource-preview";
-import { ResourceReleaseWatchControl } from "../../../components/resource-release-watch-control";
 import { ResourceQaPanel } from "../../../components/resource-qa-panel";
+import { ResourceReleaseWatchControl } from "../../../components/resource-release-watch-control";
 import { ResourceReviewList } from "../../../components/resource-review-list";
 import { ResourceVariantChoices } from "../../../components/resource-variant-choices";
+import { ResourceVersionHelpSection } from "../../../components/resource-version-help-section";
 import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -223,6 +224,24 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   };
   const commerceEnabled = notificationPrefs?.commerceEnabled !== false;
 
+  const versionHelpBuild =
+    builds.find(
+      (build) => build.version === product.currentVersion && build.status === "published",
+    ) ??
+    builds.find((build) => build.version === product.currentVersion) ??
+    null;
+  const versionHelp = buildResourceVersionHelp({
+    version: product.currentVersion,
+    shortDescription: product.shortDescription,
+    description: product.description,
+    licenseModel: product.licenseModel,
+    compatibility: product.compatibility,
+    releaseNotes: versionHelpBuild?.releaseNotes,
+    mtaVersionTarget: versionHelpBuild?.mtaVersionTarget,
+    productId: product.id,
+    buildId: versionHelpBuild?.id,
+  });
+
   const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
   return (
@@ -318,6 +337,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               ))}
             </div>
           </section>
+
+          <ResourceVersionHelpSection projection={versionHelp} locale={locale} />
 
           <section className="nexus-panel space-y-4 p-6">
             <div className="flex flex-col justify-between gap-2 border-b border-base pb-3 sm:flex-row sm:items-center">
@@ -455,16 +476,18 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </section>
 
           {isPublished ? (
-            <ResourceQaPanel
-              productId={product.id}
-              locale={locale}
-              authenticated={Boolean(user)}
-              canManage={canManageProduct || isAdmin}
-              initial={qaPage}
-              builds={builds
-                .filter((build) => build.status === "published" && build.scanStatus === "clean")
-                .map((build) => ({ id: build.id, version: build.version }))}
-            />
+            <div id="resource-qa">
+              <ResourceQaPanel
+                productId={product.id}
+                locale={locale}
+                authenticated={Boolean(user)}
+                canManage={canManageProduct || isAdmin}
+                initial={qaPage}
+                builds={builds
+                  .filter((build) => build.status === "published" && build.scanStatus === "clean")
+                  .map((build) => ({ id: build.id, version: build.version }))}
+              />
+            </div>
           ) : null}
         </div>
 

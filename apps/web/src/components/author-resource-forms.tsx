@@ -547,6 +547,7 @@ export function AuthorResourceForms({
               rows={4}
               className={textareaClass}
             />
+            <p className="text-xs text-muted">{dictionary.versionHelpUi.authorReleaseNotesHint}</p>
           </div>
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-build-file`} className={nativeLabelClass}>
