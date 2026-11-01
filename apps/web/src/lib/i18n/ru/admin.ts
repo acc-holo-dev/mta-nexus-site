@@ -128,7 +128,7 @@ export const admin = {
     writable: "чтение/запись",
     configured: "настроено",
     disabled: "отключено",
-    localOnly: "Только development",
+    localOnly: "Только для разработки",
   },
   securityCenter: {
     title: "Центр безопасности",

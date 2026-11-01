@@ -1,7 +1,7 @@
+import { BadgeCheck, CheckCircle2, Megaphone, ShieldCheck, Star } from "lucide-react";
 import type * as React from "react";
-import { cn } from "./utils";
 import { withOccurrenceKeys } from "./list-keys";
-import { ShieldCheck, BadgeCheck, CheckCircle2, Megaphone, Star } from "lucide-react";
+import { cn } from "./utils";
 
 /* ============================================================
    StatCard — unified dashboard metric card (TASK-018)
@@ -51,9 +51,16 @@ export interface SectionHeaderProps {
   description?: string;
   action?: React.ReactNode;
   className?: string;
+  titleId?: string;
 }
 
-export function SectionHeader({ title, description, action, className }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  description,
+  action,
+  className,
+  titleId,
+}: SectionHeaderProps) {
   return (
     <div
       className={cn(
@@ -62,7 +69,9 @@ export function SectionHeader({ title, description, action, className }: Section
       )}
     >
       <div className="min-w-0 max-w-full flex-1">
-        <h2 className="break-words font-heading text-primary">{title}</h2>
+        <h2 id={titleId} className="break-words font-heading text-primary">
+          {title}
+        </h2>
         {description && <p className="mt-0.5 break-words font-caption text-muted">{description}</p>}
       </div>
       {action && <div className="max-w-full shrink-0">{action}</div>}

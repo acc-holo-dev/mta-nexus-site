@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -25,6 +26,20 @@ describe("development diagnostics", () => {
     ]) {
       expect(page).not.toContain(secret);
     }
+
+    expect(page).toContain('aria-labelledby="dev-environment-heading"');
+    expect(page).toContain('titleId="dev-environment-heading"');
+    expect(page).toContain('aria-labelledby="dev-app-url-heading"');
+    expect(page).toContain('id="dev-app-url-heading"');
+  });
+
+  it("keeps Russian dev diagnostics copy fully localized", () => {
+    const ru = getDictionary("ru");
+
+    expect(ru.dev.localOnly).toBe("Только для разработки");
+    expect(ru.dev.localOnly).not.toMatch(/development/iu);
+    expect(ru.nav.devTools).toBe("Статус разработки");
+    expect(ru.nav.devTools).not.toMatch(/\bDEV\b/u);
   });
 
   it("only exposes the navigation entry outside production", () => {

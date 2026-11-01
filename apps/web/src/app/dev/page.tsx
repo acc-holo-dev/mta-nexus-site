@@ -1,10 +1,10 @@
 import { constants } from "node:fs";
 import { access } from "node:fs/promises";
-import { notFound } from "next/navigation";
-import { Database, Globe2, HardDrive, Mail, ScanLine, TerminalSquare } from "lucide-react";
 import { config } from "@nexus/config";
 import { checkDatabaseConnection } from "@nexus/db";
 import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
+import { Database, Globe2, HardDrive, Mail, ScanLine, TerminalSquare } from "lucide-react";
+import { notFound } from "next/navigation";
 import packageMetadata from "../../../../../package.json";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
@@ -55,8 +55,8 @@ export default async function DevelopmentStatusPage() {
         <StatusBadge status={copy.localOnly} tone="warning" />
       </div>
 
-      <section>
-        <SectionHeader title={copy.environment} />
+      <section aria-labelledby="dev-environment-heading">
+        <SectionHeader title={copy.environment} titleId="dev-environment-heading" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
             label={copy.environment}
@@ -96,14 +96,20 @@ export default async function DevelopmentStatusPage() {
         </div>
       </section>
 
-      <section className="nexus-panel p-5">
-        <div className="flex items-center gap-2 text-sm text-secondary">
+      <section aria-labelledby="dev-app-url-heading" className="nexus-panel space-y-2 p-5">
+        <h2
+          id="dev-app-url-heading"
+          className="flex items-center gap-2 text-sm font-semibold text-primary"
+        >
           <Globe2 className="h-4 w-4 text-accent" aria-hidden="true" />
-          <span className="font-semibold text-primary">{copy.appUrl}:</span>
-          <a href={config.NEXT_PUBLIC_APP_URL} className="truncate text-accent hover:underline">
-            {config.NEXT_PUBLIC_APP_URL}
-          </a>
-        </div>
+          {copy.appUrl}
+        </h2>
+        <a
+          href={config.NEXT_PUBLIC_APP_URL}
+          className="block truncate text-sm text-accent hover:underline"
+        >
+          {config.NEXT_PUBLIC_APP_URL}
+        </a>
       </section>
     </div>
   );

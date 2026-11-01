@@ -22,7 +22,7 @@ export const shell = {
     support: "Поддержка",
     securityCenter: "Безопасность",
     admin: "Админ",
-    devTools: "DEV-статус",
+    devTools: "Статус разработки",
     home: "Главная",
     mobileResources: "Ресурсы",
     mobileMarket: "Маркет",
