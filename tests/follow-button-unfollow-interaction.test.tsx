@@ -42,6 +42,9 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/saved",
+}));
 
 import { FollowButton } from "../apps/web/src/components/follow-button";
 import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
