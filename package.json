@@ -30,6 +30,7 @@
     "db:seed": "pnpm --filter @nexus/db seed",
     "format": "biome format . --write",
     "format:check": "biome format .",
+    "format:push": "pnpm format && pnpm format:check",
     "nexus:doctor": "node scripts/nexus-doctor.mjs",
     "nexus:doctor:test": "node --test scripts/tests/nexus-doctor.node-test.mjs",
     "ci:diagnose": "node scripts/ci-diagnose.mjs",
