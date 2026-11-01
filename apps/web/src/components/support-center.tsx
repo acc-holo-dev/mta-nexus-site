@@ -491,7 +491,17 @@ export function SupportCenter({
             </h2>
 
             {loading ? (
-              <p className="text-sm text-muted">{copy.loading}</p>
+              <div role="status" aria-live="polite" className="space-y-3">
+                <p className="text-sm text-muted">{copy.loading}</p>
+                <div className="animate-pulse space-y-3" aria-hidden="true">
+                  {[1, 2, 3].map((key) => (
+                    <div key={key} className="nexus-panel h-24 p-4">
+                      <div className="mb-3 h-4 max-w-md rounded bg-inset" />
+                      <div className="h-3 w-32 rounded bg-inset" />
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : error ? (
               <Button
                 type="button"

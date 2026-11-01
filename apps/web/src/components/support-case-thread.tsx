@@ -276,7 +276,26 @@ export function SupportCaseThread({
   const backHref = staffMode ? "/admin/support" : "/support";
 
   if (loading) {
-    return <p className="mx-auto max-w-4xl text-sm text-muted">{copy.loading}</p>;
+    return (
+      <div
+        className="mx-auto max-w-4xl space-y-6"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div className="h-4 w-32 animate-pulse rounded bg-inset" aria-hidden="true" />
+        <div className="space-y-3 border-b border-base pb-5" aria-hidden="true">
+          <div className="h-8 max-w-lg animate-pulse rounded bg-inset" />
+          <div className="h-4 w-40 animate-pulse rounded bg-inset" />
+        </div>
+        <p className="text-sm text-muted">{copy.loading}</p>
+        <div className="animate-pulse space-y-3" aria-hidden="true">
+          {[1, 2, 3].map((key) => (
+            <div key={key} className="h-16 rounded bg-inset" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (!supportCase) {
