@@ -108,6 +108,8 @@ it.each(["en", "ru"] as const)(
     const copy = followCopy(locale);
     const html = renderToStaticMarkup(await SavedLoading());
     expect(html).toContain('aria-busy="true"');
+    expect(html).toContain('id="saved-follows-loading-heading"');
+    expect(html).toContain('aria-labelledby="saved-follows-loading-heading"');
     expect(html).toContain(`>${copy.title}<`);
     expect(html).toContain(copy.loading);
   },

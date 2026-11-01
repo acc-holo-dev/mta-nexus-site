@@ -5,9 +5,11 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 export default async function Loading() {
   const copy = followCopy(await getRequestLocale());
   return (
-    <div className="space-y-6" aria-busy="true">
+    <div className="space-y-6" aria-busy="true" aria-labelledby="saved-follows-loading-heading">
       <header className="border-b border-base pb-6">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 id="saved-follows-loading-heading" className="text-2xl font-extrabold text-primary">
+          {copy.title}
+        </h1>
         <p role="status" className="mt-2 text-sm text-muted">
           {copy.loading}
         </p>
