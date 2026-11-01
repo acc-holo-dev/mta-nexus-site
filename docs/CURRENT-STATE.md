@@ -4,8 +4,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `ded09fe19e50d50cb549c3b3859bed6995703e32` (`fix(web): auth return paths on remaining guest surfaces`).
-- **Verified CI green on that tip:** [CI 41356180883](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41356180883) (lint/unit, DB, image build, production browser smoke).
+- **Tip SHA:** `73c8e2c24a1031398950fb8fada51a81bcc82c03` (`fix(web): mock usePathname in follow and publication tests`).
+- **Verified CI green on that tip:** [CI 41357918304](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41357918304) (lint/unit, DB, image build, production browser smoke).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** safe internal return paths on shell, servers, verification, and remaining guest surfaces; acquire/product intent preserved through auth.
 - **Empty-honesty wave (tip series):** loading shells and copy distinguish empty catalog/library/filter results from failed loads and from zero-as-meaningful-metric.

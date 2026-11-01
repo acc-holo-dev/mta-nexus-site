@@ -1,10 +1,17 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../lib/library-collections-i18n";
+
 export default async function Loading() {
-  const c = libraryCollectionsCopy(await getRequestLocale());
+  const copy = libraryCollectionsCopy(await getRequestLocale());
   return (
-    <p role="status" className="mx-auto max-w-4xl py-16 text-secondary">
-      {c.loading}
-    </p>
+    <div
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      className="nexus-panel mx-auto min-h-40 max-w-4xl space-y-3 p-6 text-sm text-muted"
+    >
+      <p className="font-medium text-foreground">{copy.title}</p>
+      <p>{copy.loading}</p>
+    </div>
   );
 }
