@@ -61,6 +61,7 @@ export const discovery = {
     popular: "Popular",
     newest: "New",
     rating: "Top Rated",
+    loading: "Loading resources…",
     showing: "Resources shown:",
     searchLabel: "Search resources",
     searchPlaceholder: "Search free MTA resources",

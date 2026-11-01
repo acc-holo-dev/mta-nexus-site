@@ -1,4 +1,4 @@
-import { PRODUCT_TYPES } from "@nexus/domain";
+import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -56,6 +56,16 @@ export default async function MarketPage({
     nextPage = 1,
   ) => marketHref({ type: nextType, sort: nextSort, query: nextQuery, page: nextPage });
   const filtersActive = type !== "all" || sort !== "popular" || Boolean(query) || page > 1;
+  const activeCategoryLabel =
+    type !== "all"
+      ? `${dictionary.market.categoryLabel}: ${dictionary.market[PRODUCT_CATEGORY_KEYS[type as ProductType]]}`
+      : null;
+  const activeSortOption = SORTS.find((option) => option.id === sort);
+  const activeSortLabel =
+    sort !== "popular" && activeSortOption
+      ? `${dictionary.market.sortLabel}: ${dictionary.market[activeSortOption.key]}`
+      : null;
+  const activeQueryLabel = query ? `${dictionary.market.searchLabel}: ${query}` : null;
 
   return (
     <div className="space-y-6">
@@ -172,9 +182,9 @@ export default async function MarketPage({
             <div className="mx-auto max-w-lg space-y-2 text-left text-sm text-secondary">
               <p className="font-semibold text-primary">{dictionary.market.activeFilters}</p>
               <ul className="list-inside list-disc space-y-1">
-                {type !== "all" ? <li>type: {type}</li> : null}
-                {sort !== "popular" ? <li>sort: {sort}</li> : null}
-                {query ? <li>q: {query}</li> : null}
+                {activeCategoryLabel ? <li>{activeCategoryLabel}</li> : null}
+                {activeSortLabel ? <li>{activeSortLabel}</li> : null}
+                {activeQueryLabel ? <li>{activeQueryLabel}</li> : null}
                 {page > 1 ? (
                   <li>
                     {dictionary.market.pageLabel} {page}

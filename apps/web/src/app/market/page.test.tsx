@@ -19,9 +19,18 @@ vi.mock("../../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 
+import MarketLoading from "./loading";
 import MarketPage from "./page";
 
 describe("free resource catalog as rendered for visitors", () => {
+  it("renders an honest loading shell with localized title and status", async () => {
+    mocks.locale = "en";
+    const html = renderToStaticMarkup(await MarketLoading());
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain("Free Resource Library");
+    expect(html).toContain("Loading resources");
+  });
+
   it("renders Russian search and a next link that keeps filters and the search term", async () => {
     mocks.locale = "ru";
     mocks.listPublicPage.mockResolvedValueOnce({
@@ -78,7 +87,9 @@ describe("free resource catalog as rendered for visitors", () => {
     );
     expect(html).toContain("Nothing matches the active Market filters");
     expect(html).toContain("Active filters");
-    expect(html).toContain("type: script");
+    expect(html).toContain("Resource categories: Scripts");
+    expect(html).toContain("Sort resources: Top Rated");
+    expect(html).toContain("Search resources: missing");
     expect(html).toContain('href="/market?type=script&amp;sort=rating"');
     expect(html).toContain('href="/market?type=all&amp;sort=rating&amp;q=missing"');
   });
