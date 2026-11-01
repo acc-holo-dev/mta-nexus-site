@@ -158,8 +158,11 @@ describe("admin/actions staff_action fresh-auth HTTP enforcement", () => {
       }),
       "test-session",
     );
-    const audit = resolveReport.mock.calls[0]?.[3] as { details?: Record<string, unknown> };
-    expect(audit.details).not.toHaveProperty("currentPassword");
+    const audit = resolveReport.mock.calls.at(0)?.at(3) as
+      | { details?: Record<string, unknown> }
+      | undefined;
+    expect(audit).toBeDefined();
+    expect(audit?.details).not.toHaveProperty("currentPassword");
     expect(JSON.stringify(audit)).not.toContain("Staff-password-123!");
   });
 });

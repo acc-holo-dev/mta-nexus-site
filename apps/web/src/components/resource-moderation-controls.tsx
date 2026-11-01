@@ -1,8 +1,8 @@
 "use client";
 import {
+  type ProductStatus,
   resourceModerationActionsFor,
   resourceModerationTarget,
-  type ProductStatus,
   unavailableBuildSupportHref,
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
@@ -63,13 +63,16 @@ export function ResourceModerationControls({
   async function send(event: FormEvent) {
     event.preventDefault();
     if (lock.current || saved) return;
-    if (observedStatus.current !== product.status || observedRevision.current !== product.updatedAt) {
-      setError(copy.errors.PRODUCT_STATE_CHANGED ?? copy.errors.fallback);
+    if (
+      observedStatus.current !== product.status ||
+      observedRevision.current !== product.updatedAt
+    ) {
+      setError(resourceReleaseControlError(locale, "PRODUCT_STATE_CHANGED"));
       router.refresh();
       return;
     }
     if (!target || allowed.length === 0) {
-      setError(copy.errors.PRODUCT_STATE_CHANGED ?? copy.errors.fallback);
+      setError(resourceReleaseControlError(locale, "PRODUCT_STATE_CHANGED"));
       router.refresh();
       return;
     }

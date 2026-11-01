@@ -64,7 +64,7 @@ export async function loadPersonalChangesSummary(
       return { formatted, raw };
     })(),
     resourceReleaseWatchesRepository.page(actorId, 1, "enabled", ""),
-    followWorkspaceService.page(actorId, { type: "content", query: "" }),
+    followWorkspaceService.page(actorId, { type: "content", query: "", cursor: undefined }),
   ]);
 
   if (inboxResult.status === "fulfilled") {

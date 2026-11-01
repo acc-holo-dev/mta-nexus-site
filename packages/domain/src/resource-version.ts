@@ -15,8 +15,7 @@
  * Published historical version strings and bytes are not rewritten.
  */
 
-export const RESOURCE_VERSION_PATTERN =
-  /^v?[0-9]+\.[0-9]+(?:\.[0-9]+)?(?:-[a-zA-Z0-9.]+)?$/;
+export const RESOURCE_VERSION_PATTERN = /^v?[0-9]+\.[0-9]+(?:\.[0-9]+)?(?:-[a-zA-Z0-9.]+)?$/;
 
 export type ParsedResourceVersion = {
   /** Version without optional leading `v`; used for storage/uniqueness of new releases. */
@@ -75,7 +74,7 @@ export function parseResourceVersion(value: string): ParsedResourceVersion | nul
   };
 }
 
-function comparePreReleaseIdentifiers(left: string, right: string): number {
+function comparePreReleaseIdentifiers(left: string, right: string): -1 | 0 | 1 {
   const leftNumeric = /^[0-9]+$/.test(left);
   const rightNumeric = /^[0-9]+$/.test(right);
   if (leftNumeric && rightNumeric) {

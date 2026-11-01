@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
+import type { Build, User } from "@nexus/domain";
+import { ForbiddenError } from "@nexus/domain";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ForbiddenError } from "@nexus/domain";
-import type { Build, User } from "@nexus/domain";
 
 const findExactPendingRetry = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({
@@ -10,6 +10,7 @@ vi.mock("@nexus/db", () => ({
   productRepository: {},
   organizationRepository: {},
 }));
+
 import { ProductService } from "../apps/web/src/lib/services/product-service";
 
 describe("pending upload retry authorization", () => {
@@ -65,8 +66,7 @@ vi.mock("../packages/db/src/client", async () => {
   return {
     db: new Proxy(database, {
       get(target, key) {
-        if (key === "transaction")
-          return (run: (tx: typeof database) => unknown) => run(database);
+        if (key === "transaction") return (run: (tx: typeof database) => unknown) => run(database);
         const value = Reflect.get(target, key);
         return typeof value === "function" ? value.bind(target) : value;
       },
@@ -112,7 +112,7 @@ describe("build upload final initiating-session gate", () => {
     submitState.rows = [];
   });
 
-  function liveRows(session: unknown[] = [["ses_author", "2099-01-01T00:00:00.000Z"]]) {
+  function liveRows(session: unknown[][] = [["ses_author", "2099-01-01T00:00:00.000Z"]]) {
     const values: Record<string, unknown> = { ...pending, createdAt: new Date() };
     const buildRow = Object.keys(getTableColumns(builds)).map((key) => {
       const value = values[key];
@@ -147,21 +147,18 @@ describe("build upload final initiating-session gate", () => {
   });
 
   it.each([
-    { label: "missing", session: [] as unknown[] },
-    { label: "expired", session: [["ses_author", "2000-01-01T00:00:00.000Z"]] },
-  ])(
-    "refuses a $label initiating session without a new build or audit",
-    async ({ session }) => {
-      liveRows(session);
-      await expect(submitForReview(pending, audit, token)).rejects.toMatchObject({
-        statusCode: 401,
-        code: "UNAUTHORIZED",
-      });
-      expect(writes("builds")).toHaveLength(0);
-      expect(writes("products")).toHaveLength(0);
-      expect(writes("audit_events")).toHaveLength(0);
-    },
-  );
+    { label: "missing", session: [] as unknown[][] },
+    { label: "expired", session: [["ses_author", "2000-01-01T00:00:00.000Z"]] as unknown[][] },
+  ])("refuses a $label initiating session without a new build or audit", async ({ session }) => {
+    liveRows(session);
+    await expect(submitForReview(pending, audit, token)).rejects.toMatchObject({
+      statusCode: 401,
+      code: "UNAUTHORIZED",
+    });
+    expect(writes("builds")).toHaveLength(0);
+    expect(writes("products")).toHaveLength(0);
+    expect(writes("audit_events")).toHaveLength(0);
+  });
 
   it("does not accept another live session for the same actor", async () => {
     liveRows([]);

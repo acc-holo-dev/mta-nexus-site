@@ -258,6 +258,7 @@ it("links available noncommercial follows to their own feeds while unavailable t
     id: `follow_${targetType}`,
     targetId: targetType,
     targetType,
+    notifyComments: false,
     title: "Title",
     description: null,
     image: null,

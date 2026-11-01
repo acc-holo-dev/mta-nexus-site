@@ -1,17 +1,17 @@
 "use client";
 
-import { Button } from "@nexus/ui";
 import type {
   ResourceQaCapabilities,
   ResourceQaThreadDetail,
   ResourceQaThreadSummary,
 } from "@nexus/domain";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 
 type BuildOption = { id: string; version: string };
 
@@ -105,8 +105,7 @@ export function ResourceQaPanel({
         privateApiRequest({
           method: "POST",
           timeoutMs: 15_000,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          json: body,
         }),
       ).catch(() => null);
       const payload: unknown = response ? await response.json().catch(() => null) : null;
@@ -129,16 +128,13 @@ export function ResourceQaPanel({
     event.preventDefault();
     const body = question.trim();
     if (body.length < 3) return;
-    const ok = await mutate(
-      base,
-      { body, buildId: buildId || null },
-      (payload) =>
-        Boolean(
-          payload &&
-            typeof payload === "object" &&
-            (payload as { success?: boolean; id?: string }).success &&
-            typeof (payload as { id?: string }).id === "string",
-        ),
+    const ok = await mutate(base, { body, buildId: buildId || null }, (payload) =>
+      Boolean(
+        payload &&
+          typeof payload === "object" &&
+          (payload as { success?: boolean; id?: string }).success &&
+          typeof (payload as { id?: string }).id === "string",
+      ),
     );
     if (!ok) return;
     const text = question;
@@ -338,7 +334,13 @@ export function ResourceQaPanel({
           </div>
 
           {canResolve && detail.thread.status === "resolved" ? (
-            <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => void onReopen()}>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={busy}
+              onClick={() => void onReopen()}
+            >
               {copy.reopen}
             </Button>
           ) : null}

@@ -31,6 +31,7 @@ export type EntityPrefix =
   | "cmt"
   | "rec"
   | "fol"
+  | "omi"
   | "not"
   | "aud"
   | "dlv"

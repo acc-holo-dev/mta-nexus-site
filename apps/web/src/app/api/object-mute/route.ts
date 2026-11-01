@@ -1,8 +1,8 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { objectMuteCommandSchema } from "../../../lib/follow-workspace-contract";
 import { followError } from "../../../lib/follow-workspace-copy";
 import { resolveLocale } from "../../../lib/i18n";
@@ -95,7 +95,7 @@ export const POST = withBrowserMutation((request: NextRequest) =>
         targetType,
         targetId,
         duration,
-        generateId("mute"),
+        generateId("omi"),
       );
       return {
         success: true,

@@ -123,6 +123,7 @@ const base = {
   id: "f",
   targetType: "organization" as const,
   targetId: "org",
+  notifyComments: false,
   createdAt: "2026-10-10T12:00:00.000Z",
   title: "Team",
   description: "Public organization",

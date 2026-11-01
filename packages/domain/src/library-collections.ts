@@ -268,14 +268,14 @@ export type LibraryCollectionItemResult = {
 export function collectionCommandItemResults(
   command: LibraryCollectionCommand,
 ): LibraryCollectionItemResult[] {
-  if (command.action === "add" || command.action === "add-many")
-    return (command.action === "add" ? [command.productId] : command.productIds).map(
-      (productId) => ({ productId, outcome: "added" as const }),
-    );
-  if (command.action === "remove" || command.action === "remove-many")
-    return (command.action === "remove" ? [command.productId] : command.productIds).map(
-      (productId) => ({ productId, outcome: "removed" as const }),
-    );
+  if (command.action === "add")
+    return [{ productId: command.productId, outcome: "added" as const }];
+  if (command.action === "add-many")
+    return command.productIds.map((productId) => ({ productId, outcome: "added" as const }));
+  if (command.action === "remove")
+    return [{ productId: command.productId, outcome: "removed" as const }];
+  if (command.action === "remove-many")
+    return command.productIds.map((productId) => ({ productId, outcome: "removed" as const }));
   if (command.action === "copy-items")
     return command.productIds.map((productId) => ({ productId, outcome: "copied" as const }));
   if (command.action === "move-items")

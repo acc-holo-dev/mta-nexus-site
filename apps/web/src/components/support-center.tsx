@@ -310,7 +310,12 @@ export function SupportCenter({
                 <select
                   value={category}
                   disabled={creating}
-                  onChange={(event) => setCategory(event.target.value)}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    if (categories.some(([value]) => value === next)) {
+                      setCategory(next as (typeof categories)[number][0]);
+                    }
+                  }}
                   className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {categories.map(([value, label]) => (

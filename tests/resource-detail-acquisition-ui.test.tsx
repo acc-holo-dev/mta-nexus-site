@@ -1,4 +1,4 @@
-import { createElement, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
@@ -128,13 +128,7 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
 vi.mock("../apps/web/src/components/resource-release-watch-control", async () => {
   const ReactModule = await import("react");
   return {
-    ResourceReleaseWatchControl: ({
-      guest,
-      hasAccess,
-    }: {
-      guest?: boolean;
-      hasAccess?: boolean;
-    }) =>
+    ResourceReleaseWatchControl: ({ guest, hasAccess }: { guest?: boolean; hasAccess?: boolean }) =>
       ReactModule.createElement("div", {
         "data-testid": "resource-release-watch",
         "data-guest": guest ? "true" : "false",
@@ -173,13 +167,7 @@ vi.mock("@nexus/db", () => ({
 vi.mock("../apps/web/src/components/follow-button", async () => {
   const ReactModule = await import("react");
   return {
-    FollowButton: ({
-      targetType,
-      targetId,
-    }: {
-      targetType: string;
-      targetId: string;
-    }) =>
+    FollowButton: ({ targetType, targetId }: { targetType: string; targetId: string }) =>
       ReactModule.createElement("button", {
         type: "button",
         "data-testid": "resource-save",
@@ -221,15 +209,13 @@ vi.mock("../apps/web/src/components/reverse-dependency-list", async () => {
 });
 
 import ProductDetailPage, { generateMetadata } from "../apps/web/src/app/market/[slug]/page";
+import { getRequestLocale } from "../apps/web/src/lib/i18n-server";
+import { authService } from "../apps/web/src/lib/services/auth-service";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import { resourceReviewService } from "../apps/web/src/lib/services/resource-review-service";
-import { authService } from "../apps/web/src/lib/services/auth-service";
-import { getRequestLocale } from "../apps/web/src/lib/i18n-server";
 
 function renderPage(element: ReactNode) {
-  return renderToStaticMarkup(
-    createElement(LocaleProvider, { locale: state.locale }, element),
-  );
+  return renderToStaticMarkup(<LocaleProvider locale={state.locale}>{element}</LocaleProvider>);
 }
 
 function deferred<T>() {
