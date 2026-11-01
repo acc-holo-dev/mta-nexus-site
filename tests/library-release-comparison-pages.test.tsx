@@ -1,6 +1,7 @@
 import { AppError, compareLibraryReleases, type LibraryComparableRelease } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en",
@@ -20,7 +21,9 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
+
 import { LibraryReleaseComparisonScreen } from "../apps/web/src/components/library-release-comparison-screen";
+
 const release = (id: string, hash: string): LibraryComparableRelease => ({
   id,
   version: id,
@@ -60,6 +63,9 @@ it.each(["en", "ru"])(
     h.locale = locale;
     const html = await screen();
     expect(html).toContain(locale === "ru" ? "Сравнить выпуски" : "Compare releases");
+    expect(html).toContain('id="library-release-comparison-heading"');
+    expect(html).toContain('aria-labelledby="library-release-comparison-heading"');
+    expect(html).toContain("<caption");
     expect(html).toContain("Current &amp; resource");
     expect(html).toContain("a".repeat(64));
     expect(html).toContain("b".repeat(64));

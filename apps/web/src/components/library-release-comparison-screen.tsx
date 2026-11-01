@@ -1,14 +1,14 @@
-import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
-import { libraryReleaseComparisonQuery } from "../lib/library-release-comparison-query";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
+import { libraryReleaseComparisonQuery } from "../lib/library-release-comparison-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
+import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
 export async function LibraryReleaseComparisonScreen({
   params,
   searchParams,
@@ -55,7 +55,9 @@ export async function LibraryReleaseComparisonScreen({
       <Link href={`${base}?page=${query.returnPage}`} className="text-accent underline">
         {c.back}
       </Link>
-      <h1 className="font-display">{c.title}</h1>
+      <h1 id="library-release-comparison-heading" className="font-display">
+        {c.title}
+      </h1>
       <h2 className="break-words">{result.product.title}</h2>
       <p className="text-secondary">{c.note}</p>
       <p role="status" className="font-semibold">
@@ -64,8 +66,9 @@ export async function LibraryReleaseComparisonScreen({
       <p>
         {c.delta}: {result.sizeDeltaBytes}
       </p>
-      <div className="overflow-x-auto">
+      <section aria-labelledby="library-release-comparison-heading" className="overflow-x-auto">
         <table className="w-full text-left text-sm">
+          <caption className="sr-only">{c.title}</caption>
           <thead>
             <tr>
               <th scope="col">{c.field}</th>
@@ -85,7 +88,7 @@ export async function LibraryReleaseComparisonScreen({
             ))}
           </tbody>
         </table>
-      </div>
+      </section>
       <div className="grid gap-5 md:grid-cols-2">
         {([result.from, result.to] as const).map((release, index) => (
           <section key={release.id} className="nexus-panel space-y-3 p-5">
