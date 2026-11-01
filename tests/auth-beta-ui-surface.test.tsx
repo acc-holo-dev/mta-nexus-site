@@ -46,6 +46,26 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
     }
   });
 
+  it("keeps alternate login/register links on the validated next path before hydration", () => {
+    const html = renderToStaticMarkup(
+      createElement(AuthForm, {
+        mode: "login",
+        locale: "en",
+        initialReturnPath: "/support",
+      }),
+    );
+    expect(html).toContain('href="/auth/register?next=%2Fsupport"');
+
+    const registerHtml = renderToStaticMarkup(
+      createElement(AuthForm, {
+        mode: "register",
+        locale: "en",
+        initialReturnPath: "/settings",
+      }),
+    );
+    expect(registerHtml).toContain('href="/auth/login?next=%2Fsettings"');
+  });
+
   it("wires labeled fields, alerts, and loading affordances on login and register", () => {
     for (const locale of ["en", "ru"] as const) {
       const copy = getDictionary(locale).auth;
@@ -90,6 +110,7 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
     expect(auth).toContain('role="alert"');
     expect(auth).toContain("aria-busy={loading}");
     expect(auth).toContain("bg-danger-soft");
+    expect(auth).toContain("initialReturnPath");
     expect(auth).toContain("resolveAuthReturnPath");
     expect(auth).toContain("window.location.replace(next)");
     expect(auth).not.toContain('window.location.replace("/workspace")');

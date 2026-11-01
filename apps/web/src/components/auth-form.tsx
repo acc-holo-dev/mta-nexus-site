@@ -21,13 +21,21 @@ function responseError(value: unknown, fallback: string): string {
   return typeof data.error === "string" ? data.error : fallback;
 }
 
-export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
+export function AuthForm({
+  mode,
+  locale,
+  initialReturnPath = null,
+}: {
+  mode: AuthMode;
+  locale: Locale;
+  initialReturnPath?: string | null;
+}) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.auth;
   const registering = mode === "register";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [returnPath, setReturnPath] = useState<string | null>(null);
+  const [returnPath, setReturnPath] = useState<string | null>(initialReturnPath);
 
   useEffect(() => {
     setReturnPath(parseAuthReturnPath(new URLSearchParams(window.location.search).get("next")));
