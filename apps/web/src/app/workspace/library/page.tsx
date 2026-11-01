@@ -148,7 +148,7 @@ export default async function ResourceLibraryPage({
       {result.items.length === 0 ? (
         <EmptyState
           title={result.counts.all === 0 ? copy.empty : copy.emptyFilter}
-          description={copy.subtitle}
+          description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilterHint}
           action={
             <Link href="/market?maxPrice=0" className="text-sm font-medium text-accent underline">
               {copy.browse}

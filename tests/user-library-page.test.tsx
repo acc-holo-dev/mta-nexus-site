@@ -194,6 +194,7 @@ describe("private resource library", () => {
   });
 
   it("distinguishes empty library from empty filtered view and keeps the route private", async () => {
+    const copy = getLibraryCopy("en");
     state.page.mockResolvedValueOnce({
       items: [],
       counts: { all: 0, ready: 0, unavailable: 0 },
@@ -203,7 +204,24 @@ describe("private resource library", () => {
       totalPages: 1,
     });
     const html = renderToStaticMarkup(await LibraryPage(pageProps()));
-    expect(html).toContain("Your resource library is empty.");
+    expect(html).toContain(copy.empty);
+    expect(html).toContain(copy.emptyHint);
+    expect(html).not.toContain(copy.emptyFilterHint);
+    expect(copy.emptyHint).not.toBe(copy.subtitle);
     expect(metadata.robots).toMatchObject({ index: false, follow: false });
+
+    state.page.mockResolvedValueOnce({
+      items: [],
+      counts: { all: 3, ready: 0, unavailable: 3 },
+      total: 0,
+      page: 1,
+      pageSize: 12,
+      totalPages: 1,
+    });
+    const filtered = renderToStaticMarkup(await LibraryPage(pageProps({ filter: "ready" })));
+    expect(filtered).toContain(copy.emptyFilter);
+    expect(filtered).toContain(copy.emptyFilterHint);
+    expect(filtered).not.toContain(copy.emptyHint);
+    expect(copy.emptyFilterHint).not.toBe(copy.subtitle);
   });
 });
