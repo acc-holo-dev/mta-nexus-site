@@ -1,6 +1,6 @@
 # Проверенный срез проекта
 
-**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `0c4647b2683e576f89ac243187ceacb7a00d7f42` (`fix(web): satisfy Biome children prop rule in notification tabs test`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `f3b400d5ff9724270a416a6f9c7b40a71ee9ec72` (`fix(ops): harden local observability readiness evidence`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
 ## Оценка стадии
 
@@ -18,7 +18,7 @@
 
 На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Локальная волна (uncommitted → следующий tip):** **UX-06** завершён (`window.confirm` → `confirmAction`); guest discussion compose draft persistence без auto-publish; GROW-01 window helpers + тесты; server-review reload на `Button`.
+**Последняя локальная волна на tip:** UX-06 (`confirmAction`), guest discussion draft, GROW-01 window helpers, UX surface tests, observability evidence hardening.
 
 ## Свидетельства и ограничения
 
