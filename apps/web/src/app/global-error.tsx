@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@nexus/ui";
 import { useEffect, useState } from "react";
 import { readSafePublicErrorReference } from "../lib/safe-public-error-reference";
 
@@ -187,24 +186,23 @@ export default function GlobalError({
               >
                 {text.referenceHint}
               </p>
-              <Button
+              <button
                 type="button"
-                size="sm"
-                variant="outline"
                 onClick={() => void copyReference()}
-                className="font-semibold"
                 style={{
                   marginTop: "12px",
                   minHeight: "36px",
                   border: "1px solid #39414c",
                   borderRadius: "8px",
                   padding: "0 12px",
+                  cursor: "pointer",
                   background: "transparent",
                   color: "#f5f7fa",
+                  fontWeight: 600,
                 }}
               >
                 {text.copyReference}
-              </Button>
+              </button>
               {copyMessage ? (
                 <p
                   role="status"
@@ -228,22 +226,22 @@ export default function GlobalError({
               marginTop: "22px",
             }}
           >
-            <Button
+            <button
               type="button"
-              size="sm"
               onClick={reset}
-              className="font-bold"
               style={{
                 minHeight: "40px",
                 border: 0,
                 borderRadius: "8px",
                 padding: "0 16px",
+                cursor: "pointer",
                 background: "#5865f2",
                 color: "#ffffff",
+                fontWeight: 700,
               }}
             >
               {text.retry}
-            </Button>
+            </button>
             <a
               href="/"
               style={{

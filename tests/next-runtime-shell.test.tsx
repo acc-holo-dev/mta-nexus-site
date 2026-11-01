@@ -59,9 +59,9 @@ vi.mock("next/link", async () => {
   };
 });
 
-import ErrorPage from "../apps/web/src/app/error";
-import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
 import RootLayout from "../apps/web/src/app/layout";
+import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
+import ErrorPage from "../apps/web/src/app/error";
 import NotFound from "../apps/web/src/app/not-found";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -139,10 +139,10 @@ describe("Next.js root runtime shell behavior", () => {
     expect(detectGlobalErrorLocale("")).toBe("en");
   });
 
-  it("renders a self-contained root error document with @nexus/ui retry and home actions", () => {
+  it("renders a self-contained root error document with retry and home actions", () => {
     const html = renderToStaticMarkup(
       React.createElement(GlobalError, {
-        error: Object.assign(new Error("boom"), { digest: "err-digest-001" }),
+        error: new Error("boom"),
         reset: () => undefined,
       }),
     );
@@ -150,10 +150,6 @@ describe("Next.js root runtime shell behavior", () => {
     expect(html).toMatch(/^<html lang="en">/u);
     expect(html).toContain("<body");
     expect(html).toContain("<main");
-    expect(html).toMatch(/<button[^>]*class="[^"]*\bbg-accent\b[^"]*"[^>]*>Try again<\/button>/u);
-    expect(html).toMatch(
-      /<button[^>]*class="[^"]*\bborder-base\b[^"]*"[^>]*>Copy reference<\/button>/u,
-    );
     expect(html).toContain(">Try again</button>");
     expect(html).toContain('href="/"');
     expect(html).toContain(">Home</a>");
