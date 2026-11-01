@@ -23,6 +23,10 @@ import {
 } from "../lib/verification-workspace-copy";
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
+
+const filterNavLinkClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function VerificationWorkspace({
   initial,
   initialTeams,
@@ -427,7 +431,7 @@ export function VerificationWorkspace({
         <nav className="flex flex-wrap gap-3" aria-label={copy.title}>
           <Link
             href="/workspace/verification/history"
-            className="min-h-11 rounded-md border border-base px-3 py-2 text-sm text-accent"
+            className={`min-h-11 rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
           >
             {verificationApplicationsCopy(locale).title}
           </Link>
@@ -436,7 +440,7 @@ export function VerificationWorkspace({
               key={view}
               href={href({ view, page: 1 })}
               aria-current={filters.view === view ? "page" : undefined}
-              className="min-h-9 rounded-md border border-base px-3 py-2 text-sm text-accent"
+              className={`min-h-9 rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
             >
               {copy[view]}
             </Link>

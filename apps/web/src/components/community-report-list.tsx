@@ -11,6 +11,10 @@ import {
 import { communityReportCopy, communityReportError } from "../lib/community-report-copy";
 import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+
+const filterNavLinkClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function CommunityReportList({
   initial,
   filters,
@@ -73,7 +77,7 @@ export function CommunityReportList({
             key={view}
             href={href({ view, page: 1 })}
             aria-current={filters.view === view ? "page" : undefined}
-            className={`min-h-9 rounded-md border border-base px-3 py-2 text-sm ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`min-h-9 rounded-md border border-base px-3 py-2 text-sm ${filterNavLinkClass} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {copy[view]}
           </Link>
