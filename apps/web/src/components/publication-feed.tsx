@@ -35,8 +35,7 @@ export function PublicationFeed({
     error = initial ? "" : errorCode ? publicationError(locale, errorCode) : copy.error;
   const linkControl =
     "min-h-11 rounded-lg border border-base px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
-  const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) =>
-    type === "review" ? (locale === "ru" ? "Обзор" : "Review") : types[type];
+  const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) => types[type];
   return (
     <div className="space-y-5">
       {following && filters.target && (
