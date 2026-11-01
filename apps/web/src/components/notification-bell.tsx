@@ -10,14 +10,17 @@ import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
 } from "../lib/notification-inbox-events";
+import { notificationInboxCopy } from "../lib/notification-inbox-copy";
 import { privateApiRequest } from "../lib/private-api-request";
 import { startVisiblePolling } from "../lib/visible-polling";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notificationBell;
+  const inboxCopy = notificationInboxCopy(locale);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loaded, setLoaded] = useState(false);
@@ -74,6 +77,19 @@ export function NotificationBell() {
 
   async function markAllRead() {
     if (marking || !loaded || unreadCount === 0) return;
+    if (
+      !(await confirmAction({
+        title: inboxCopy.markAllRead,
+        object: inboxCopy.title,
+        scope: String(unreadCount),
+        consequences: inboxCopy.allConfirm,
+        confirmLabel: inboxCopy.markAllRead,
+        cancelLabel: inboxCopy.reset,
+        closeLabel: inboxCopy.reset,
+        danger: false,
+      }))
+    )
+      return;
 
     mutationGeneration.current += 1;
     stopPolling.current?.();
@@ -189,7 +205,7 @@ export function NotificationBell() {
                 className="h-auto min-h-6 gap-1 px-1 text-[11px] font-semibold text-accent hover:underline"
               >
                 <CheckCheck className="h-3 w-3" aria-hidden="true" />
-                <span>{copy.markAllRead}</span>
+                <span>{inboxCopy.markAllRead}</span>
               </Button>
             )}
           </div>
@@ -269,7 +285,8 @@ export function NotificationBell() {
             )}
           </div>
 
-          <div className="border-t border-base px-3 py-2 text-center">
+          <div className="space-y-1.5 border-t border-base px-3 py-2 text-center">
+            <p className="font-caption text-faint">{copy.previewFootnote}</p>
             <Link
               href="/notifications"
               onClick={() => setIsOpen(false)}

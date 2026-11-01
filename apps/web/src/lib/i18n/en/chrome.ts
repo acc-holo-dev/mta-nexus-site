@@ -20,6 +20,8 @@ export const chrome = {
     loading: "Loading notifications...",
     empty: "No notifications yet",
     openCenter: "Open notification center",
+    previewFootnote:
+      "Preview shows up to 6 recent items; the unread count covers your entire inbox.",
     loadError: "Could not load notifications.",
     markError: "Could not mark notifications as read.",
     retry: "Retry",
