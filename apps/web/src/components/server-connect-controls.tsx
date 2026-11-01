@@ -2,7 +2,7 @@
 
 import { Button } from "@nexus/ui";
 import { Copy } from "lucide-react";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
 
 /**
@@ -27,6 +27,7 @@ export function ServerConnectControls({
   showAddressField?: boolean;
 }) {
   const copy = getDictionary(locale).servers;
+  const connectHintId = useId();
   const addressInput = useRef<HTMLInputElement>(null);
   const [copyMessage, setCopyMessage] = useState("");
   const [copying, setCopying] = useState(false);
@@ -55,6 +56,7 @@ export function ServerConnectControls({
         <a
           href={connectUri}
           aria-label={`${connectLabel}: ${name}`}
+          aria-describedby={connectHint ? connectHintId : undefined}
           title={connectHint}
           className="inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
         >
@@ -96,7 +98,11 @@ export function ServerConnectControls({
           className="sr-only"
         />
       )}
-      {connectHint ? <p className="text-[11px] text-faint">{connectHint}</p> : null}
+      {connectHint ? (
+        <p id={connectHintId} className="text-[11px] text-faint">
+          {connectHint}
+        </p>
+      ) : null}
       <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
         {copyMessage}
       </p>
