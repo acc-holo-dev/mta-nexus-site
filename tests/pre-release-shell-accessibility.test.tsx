@@ -88,6 +88,24 @@ describe("pre-release shell accessibility behavior", () => {
     },
   );
 
+  it("hides app chrome on auth routes while keeping the focusable main landmark", () => {
+    nav.pathname = "/auth/login";
+    const dictionary = getDictionary("en");
+    const html = renderToStaticMarkup(
+      <NexusShell locale="en">
+        <h1>Sign in</h1>
+      </NexusShell>,
+    );
+
+    expect(html).toMatch(
+      new RegExp(`<a[^>]*href="#main-content"[^>]*>${dictionary.nav.skipToContent}</a>`, "u"),
+    );
+    expect(html).toMatch(/<main[^>]*id="main-content"[^>]*tabindex="-1"/u);
+    expect(html).toContain("<h1>Sign in</h1>");
+    expect(html).not.toContain('href="/discover"');
+    expect(html).not.toContain(`aria-label="${dictionary.nav.ecosystem}"`);
+  });
+
   it("marks the active mobile destination and keeps the More dialog relation closed until opened", () => {
     const dictionary = getDictionary("en");
     const html = renderToStaticMarkup(React.createElement(MobileNav, { locale: "en" }));
