@@ -109,7 +109,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('name="q"');
     expect(html).toContain('maxLength="80"');
     expect(html).toContain(copy.searchHelp);
-    expect(html).toContain(copy.empty);
+    expect(html).toContain(copy.emptyFiltered);
     expect(html).toContain(
       'href="/api/workspace/organizations/org/activity/export?period=7&amp;group=team&amp;q=Owner&amp;until=2026-10-12T00%3A00%3A00.123456Z"',
     );
@@ -142,6 +142,37 @@ it.each([{ actorId: "foreign" }, { period: ["7", "30"] }, { q: "private" }, { cu
     expect(html).toContain('role="alert"');
     expect(html).toContain(privateChangeHistoryCopy("en").invalid);
     expect(mock.profile).not.toHaveBeenCalled();
+  },
+);
+it.each(["en", "ru"] as const)(
+  "distinguishes lifetime-empty profile history from filtered-empty results in %s",
+  (locale) => {
+    const copy = privateChangeHistoryCopy(locale),
+      base = {
+        username: "owner",
+        until: stamp,
+        items: [],
+        hasMore: false,
+        nextCursor: null,
+      };
+    const lifetime = renderToStaticMarkup(
+      <ProfileChangeHistoryView
+        data={{ ...base, period: "all", group: "all" }}
+        filters={{ period: "all", group: "all", query: "" }}
+        locale={locale}
+      />,
+    );
+    expect(lifetime).toContain(copy.empty);
+    expect(lifetime).not.toContain(copy.emptyFiltered);
+    const filtered = renderToStaticMarkup(
+      <ProfileChangeHistoryView
+        data={{ ...base, period: "30", group: "privacy" }}
+        filters={{ period: "30", group: "privacy", query: "" }}
+        locale={locale}
+      />,
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).not.toContain(copy.empty);
   },
 );
 it("preserves normalized organization selectors and renders a read failure distinctly", async () => {

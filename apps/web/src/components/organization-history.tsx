@@ -29,7 +29,13 @@ export function OrganizationHistoryView({
   error?: string;
   filters?: ChangeHistoryFilters<OrganizationChangeGroup>;
 }) {
-  const journal = privateChangeHistoryCopy(locale);
+  const journal = privateChangeHistoryCopy(locale),
+    filtered =
+      filters.period !== "all" ||
+      filters.group !== "all" ||
+      !!filters.query ||
+      !!filters.cursor ||
+      !!filters.until;
   const copy = organizationGovernanceCopy(locale),
     teamCopy = getOrganizationCopy(locale),
     path = `/workspace/organizations/${encodeURIComponent(id)}/activity`;
@@ -78,7 +84,9 @@ export function OrganizationHistoryView({
         </p>
       )}
       {data?.items.length === 0 && (
-        <p className="nexus-panel p-5 text-sm text-muted">{journal.empty}</p>
+        <p className="nexus-panel p-5 text-sm text-muted">
+          {filtered ? journal.emptyFiltered : journal.empty}
+        </p>
       )}
       {data?.items.map((item) => (
         <article className="nexus-panel space-y-3 p-5" key={item.id}>

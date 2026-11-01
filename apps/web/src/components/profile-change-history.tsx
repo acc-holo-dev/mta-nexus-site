@@ -24,7 +24,13 @@ export function ProfileChangeHistoryView({
   error?: string;
 }) {
   const copy = privateChangeHistoryCopy(locale),
-    path = "/settings/history";
+    path = "/settings/history",
+    filtered =
+      filters.period !== "all" ||
+      filters.group !== "all" ||
+      !!filters.query ||
+      !!filters.cursor ||
+      !!filters.until;
   return (
     <div className="space-y-5">
       <header className="space-y-2">
@@ -63,7 +69,11 @@ export function ProfileChangeHistoryView({
             </a>
             <p className="text-xs text-muted">{copy.exportHelp}</p>
           </div>
-          {!data.items.length && <p className="nexus-panel p-5 text-sm text-muted">{copy.empty}</p>}
+          {!data.items.length && (
+            <p className="nexus-panel p-5 text-sm text-muted">
+              {filtered ? copy.emptyFiltered : copy.empty}
+            </p>
+          )}
           {data.items.map((item) => (
             <article key={item.id} className="nexus-panel space-y-3 p-5">
               <div className="flex flex-wrap justify-between gap-3">

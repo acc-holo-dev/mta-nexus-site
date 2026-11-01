@@ -9,6 +9,7 @@ import { followActionCopy, followCopy, followError } from "../lib/follow-workspa
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 type InitialFollowState = {
@@ -126,10 +127,22 @@ function FollowControl({
       (state !== "following" && state !== "not-following")
     )
       return;
+    const desired = state !== "following";
+    if (
+      !desired &&
+      !(await confirmAction({
+        title: shared.removeConfirmTitle,
+        object: targetName,
+        consequences: shared.removeConfirm,
+        confirmLabel: copy.unfollow,
+        cancelLabel: shared.cancel,
+        closeLabel: shared.cancel,
+      }))
+    )
+      return;
     busy.current = true;
     setPending(true);
     setMessage("");
-    const desired = state !== "following";
     const controller = new AbortController();
     write.current = controller;
     try {

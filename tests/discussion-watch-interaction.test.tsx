@@ -38,6 +38,8 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { FollowButton } from "../apps/web/src/components/follow-button";
 import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
@@ -82,6 +84,7 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
+  confirmAction.mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
 });
 afterEach(() => {
