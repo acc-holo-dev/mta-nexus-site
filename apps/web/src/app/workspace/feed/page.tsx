@@ -29,9 +29,7 @@ export default async function FollowingFeedPage({
     if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
     else if (value !== undefined) returnParams.append(key, value);
   }
-  const returnPath = returnParams.size
-    ? `/workspace/feed?${returnParams}`
-    : "/workspace/feed";
+  const returnPath = returnParams.size ? `/workspace/feed?${returnParams}` : "/workspace/feed";
   let actor: User | null;
   try {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);

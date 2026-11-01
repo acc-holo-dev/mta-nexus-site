@@ -128,7 +128,9 @@ export function CommunityReportList({
         {pending ? copy.loading : copy.reload}
       </Button>
       {page?.items.length === 0 && (
-        <div className="nexus-panel p-8 text-sm text-muted">{copy.empty}</div>
+        <div className="nexus-panel p-8 text-sm text-muted">
+          {filters.target || filters.type || filters.query ? copy.emptyFiltered : copy.empty}
+        </div>
       )}
       <div className="space-y-3">
         {page?.items.map((report) => (

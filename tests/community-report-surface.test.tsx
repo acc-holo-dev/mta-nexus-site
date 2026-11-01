@@ -81,20 +81,31 @@ it.each(["en", "ru"] as const)(
     expect(html).not.toContain("<script>");
   },
 );
-it("distinguishes empty, failed reads and confirmed target-unavailable reports", () => {
+it("distinguishes empty, filtered empty, failed reads and confirmed target-unavailable reports", () => {
   const failure = renderToStaticMarkup(
     <CommunityReportList initial={null} filters={filters} locale="en" />,
   );
   expect(failure).toContain('role="alert"');
   expect(failure).not.toContain(communityReportCopy("en").empty);
+  expect(failure).not.toContain(communityReportCopy("en").emptyFiltered);
   const empty = renderToStaticMarkup(
+    <CommunityReportList
+      initial={{ items: [], hasMore: false, page: 1, view: "pending" }}
+      filters={{ view: "pending", page: 1 }}
+      locale="en"
+    />,
+  );
+  expect(empty).toContain(communityReportCopy("en").empty);
+  expect(empty).not.toContain(communityReportCopy("en").emptyFiltered);
+  const filteredEmpty = renderToStaticMarkup(
     <CommunityReportList
       initial={{ items: [], hasMore: false, page: 2, view: "pending" }}
       filters={filters}
       locale="en"
     />,
   );
-  expect(empty).toContain(communityReportCopy("en").empty);
+  expect(filteredEmpty).toContain(communityReportCopy("en").emptyFiltered);
+  expect(filteredEmpty).not.toContain(communityReportCopy("en").empty);
   const detail = renderToStaticMarkup(
     <CommunityReportDetailView id="report" initial={{ ...row, target: null }} locale="en" />,
   );
