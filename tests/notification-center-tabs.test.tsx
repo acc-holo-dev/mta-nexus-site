@@ -6,12 +6,15 @@ import { NotificationCenterTabs } from "../apps/web/src/components/notification-
 describe("NotificationCenterTabs keyboard focus", () => {
   it("renders reading-state filters with a visible focus ring", () => {
     const html = renderToStaticMarkup(
-      createElement(NotificationCenterTabs, {
-        state: "all",
-        filters: { query: "", state: "all", category: "all" },
-        labels: { title: "Notifications", all: "All", unread: "Unread", read: "Read" },
-        children: null,
-      }),
+      createElement(
+        NotificationCenterTabs,
+        {
+          state: "all",
+          filters: { query: "", state: "all", category: "all" },
+          labels: { title: "Notifications", all: "All", unread: "Unread", read: "Read" },
+        },
+        null,
+      ),
     );
 
     expect(html).toContain('href="/notifications?state=unread"');
