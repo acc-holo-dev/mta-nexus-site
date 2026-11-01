@@ -102,12 +102,8 @@ it("gates server-rendered support pages before showing private controls", async 
   expect(filtered).toContain(
     'href="/auth/login?next=%2Fsupport%3Fq%3Dbilling%26status%3Dopen%26category%3Daccount"',
   );
-  const caseGuest = renderToStaticMarkup(
-    await SupportPageSurface({ id: `sup_${"a".repeat(24)}` }),
-  );
-  expect(caseGuest).toContain(
-    `href="/auth/login?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`,
-  );
+  const caseGuest = renderToStaticMarkup(await SupportPageSurface({ id: `sup_${"a".repeat(24)}` }));
+  expect(caseGuest).toContain(`href="/auth/login?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
   expect(renderToStaticMarkup(await SupportPageSurface({ staff: true }))).toContain(
     supportWorkspaceCopy("en").forbidden,

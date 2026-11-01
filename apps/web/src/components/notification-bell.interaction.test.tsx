@@ -9,7 +9,11 @@ const harness = vi.hoisted(() => ({
   announce: vi.fn(),
   observe: vi.fn(() => () => {}),
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 
+vi.mock("./confirm-action", () => ({
+  confirmAction,
+}));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
   useState: (initial: unknown) => {
@@ -51,6 +55,8 @@ vi.mock("./locale-context", () => ({
         loading: "Loading notifications...",
         empty: "No notifications yet",
         openCenter: "Open notification center",
+        previewFootnote:
+          "Preview shows up to 6 recent items. The unread count covers your entire inbox.",
         loadError: "Could not load notifications.",
         markError: "Could not mark notifications as read.",
         retry: "Retry",
@@ -220,10 +226,11 @@ it("preserves confirmed unread counts when account-wide mark-all fails", async (
   openPopover();
   await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
   const mark = render().find(
-    (node) => node.type === "button" && textOf(node).includes("Mark all read"),
+    (node) => node.type === "button" && textOf(node).includes("Mark entire inbox as read"),
   );
   if (!mark) throw Error("Missing mark all");
   await (mark.props.onClick as () => Promise<void>)();
+  expect(confirmAction).toHaveBeenCalled();
   await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
   expect(bellButton().props["aria-label"]).toBe("3 unread notifications");
   expect(harness.fetch.mock.calls.some(([url]) => url === "/api/notifications/mark-read")).toBe(

@@ -32,9 +32,7 @@ export default async function SavedPage({
     const requestedQuery = first(params?.q);
     if (requestedType) returnParams.set("type", requestedType);
     if (requestedQuery) returnParams.set("q", requestedQuery);
-    const returnPath = returnParams.size
-      ? `/workspace/saved?${returnParams}`
-      : "/workspace/saved";
+    const returnPath = returnParams.size ? `/workspace/saved?${returnParams}` : "/workspace/saved";
     return (
       <div className="nexus-panel mx-auto max-w-md space-y-4 p-8 text-center">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
