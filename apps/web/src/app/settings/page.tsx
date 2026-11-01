@@ -383,8 +383,21 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div role="status" className="py-20 text-center text-sm text-muted">
-        {copy.loading}
+      <div className="max-w-3xl space-y-8" aria-busy="true">
+        <div>
+          <h1 className="font-display text-primary">{copy.title}</h1>
+          <p role="status" className="mt-1 font-caption text-muted">
+            {copy.loading}
+          </p>
+        </div>
+        <div className="animate-pulse space-y-8" aria-hidden="true">
+          {[1, 2, 3, 4].map((key) => (
+            <div key={key} className="nexus-panel space-y-4 p-5 shadow-nexus-sm">
+              <div className="h-4 w-1/3 rounded bg-inset" />
+              <div className="h-20 rounded bg-inset" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
