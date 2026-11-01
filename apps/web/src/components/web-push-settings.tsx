@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { BellRing } from "lucide-react";
 import { Button } from "@nexus/ui";
+import { notificationInboxCopy } from "../lib/notification-inbox-copy";
 import { useNexusLocale } from "./locale-context";
 
 type PushStatus =
@@ -172,10 +173,13 @@ async function readEffectivePushStatus(publicKeyHint?: string | null): Promise<{
 }
 
 export function WebPushSettings() {
-  const { dictionary } = useNexusLocale();
+  const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
+  const openBetaNote = notificationInboxCopy(locale).openBetaNote;
   const titleId = useId();
   const descriptionId = useId();
+  const openBetaNoteId = useId();
+  const describedBy = `${descriptionId} ${openBetaNoteId}`;
   const [status, setStatus] = useState<PushStatus>("loading");
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -305,7 +309,7 @@ export function WebPushSettings() {
   return (
     <section
       aria-labelledby={titleId}
-      aria-describedby={descriptionId}
+      aria-describedby={describedBy}
       className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="min-w-0">
@@ -315,6 +319,9 @@ export function WebPushSettings() {
         </h3>
         <p id={descriptionId} className="mt-1 text-xs text-muted">
           {description}
+        </p>
+        <p id={openBetaNoteId} className="mt-1 text-xs text-muted">
+          {openBetaNote}
         </p>
         <span
           role={status === "error" ? "alert" : "status"}
@@ -331,7 +338,7 @@ export function WebPushSettings() {
           size="sm"
           variant="outline"
           isLoading={pending}
-          aria-describedby={descriptionId}
+          aria-describedby={describedBy}
           onClick={() => void disable()}
         >
           {copy.webPushDisable}
@@ -341,7 +348,7 @@ export function WebPushSettings() {
           type="button"
           size="sm"
           isLoading={pending}
-          aria-describedby={descriptionId}
+          aria-describedby={describedBy}
           onClick={() => void enable()}
         >
           {copy.webPushEnable}
