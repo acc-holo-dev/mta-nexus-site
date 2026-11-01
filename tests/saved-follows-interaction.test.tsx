@@ -76,15 +76,11 @@ function descendants(node: ReactNode): Element[] {
 }
 function render(locale: "en" | "ru" = "en") {
   harness.cursor = 0;
-  return descendants(
-    FollowWorkspace({ initial: initialPage, query: "", locale }),
-  );
+  return descendants(FollowWorkspace({ initial: initialPage, query: "", locale }));
 }
 function removeButton(nodes: Element[], locale: "en" | "ru") {
   const label = `${followCopy(locale).remove}: Team`;
-  const found = nodes.find(
-    (node) => node.type === "button" && node.props["aria-label"] === label,
-  );
+  const found = nodes.find((node) => node.type === "button" && node.props["aria-label"] === label);
   if (!found) throw Error(`Missing remove control for ${locale}`);
   return found;
 }

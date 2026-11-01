@@ -33,9 +33,7 @@ export default async function ResourceDownloadsPage({
   if (!user) {
     let returnPath = "/workspace/library/downloads";
     try {
-      returnPath = resourceDeliveriesUrl(
-        resourceDeliveriesQuery(deliverySearchParams(raw)),
-      );
+      returnPath = resourceDeliveriesUrl(resourceDeliveriesQuery(deliverySearchParams(raw)));
     } catch {
       // Keep the list route when filters are invalid for unsigned visitors.
     }
