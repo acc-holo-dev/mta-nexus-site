@@ -44,6 +44,10 @@ const en = {
   unavailableTarget: "This target is no longer available",
   removed: "Removed from your follows.",
   remove: "Remove",
+  removeConfirmTitle: "Remove save or follow?",
+  removeConfirm:
+    "This removes the save or follow for this target. Skipped notifications are not delivered later.",
+  cancel: "Cancel",
   removing: "Removing…",
   older: "Older follows",
   previous: "Previous",
@@ -114,6 +118,10 @@ const ru: Record<keyof typeof en, string> = {
   unavailableTarget: "Объект больше недоступен",
   removed: "Подписка удалена.",
   remove: "Удалить",
+  removeConfirmTitle: "Убрать сохранение или подписку?",
+  removeConfirm:
+    "Это удалит сохранение или подписку для этого объекта. Пропущенные уведомления потом не доставляются.",
+  cancel: "Отмена",
   removing: "Удаление…",
   older: "Ранние подписки",
   previous: "Назад",

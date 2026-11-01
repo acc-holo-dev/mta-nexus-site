@@ -15,6 +15,7 @@ import type { Locale } from "../lib/i18n";
 import { publicationHref } from "../lib/publication-feed-contract";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { platformRequest } from "../lib/user-platform-client";
+import { confirmAction } from "./confirm-action";
 
 export function FollowWorkspace({
   initial,
@@ -103,6 +104,18 @@ export function FollowWorkspace({
   }
   async function remove(item: FollowPage["items"][number]) {
     if (busy.current) return;
+    const objectLabel = item.title ?? copy.unavailableTarget;
+    if (
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: objectLabel,
+        consequences: copy.removeConfirm,
+        confirmLabel: copy.remove,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+      }))
+    )
+      return;
     busy.current = true;
     setPending(item.id);
     setError("");
