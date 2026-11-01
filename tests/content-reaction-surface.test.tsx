@@ -143,7 +143,9 @@ it.each(["en", "ru"] as const)(
 );
 it("does not fetch private reactions for an anonymous viewer", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await ReactionsPage({}))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await ReactionsPage({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Freactions"',
+  );
   expect(mocks.page).not.toHaveBeenCalled();
 });
 it("rejects duplicate/unknown SSR parameters and provides a fresh-state recovery link", async () => {

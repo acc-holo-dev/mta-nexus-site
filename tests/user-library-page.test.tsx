@@ -100,7 +100,7 @@ describe("private resource library", () => {
   it("requires login before any rights or library lookup", async () => {
     state.user = null;
     const html = renderToStaticMarkup(await LibraryPage(pageProps()));
-    expect(html).toContain("/auth/login");
+    expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary"');
     expect(html).toContain("Sign in to view your resource library");
     expect(state.page).not.toHaveBeenCalled();
   });

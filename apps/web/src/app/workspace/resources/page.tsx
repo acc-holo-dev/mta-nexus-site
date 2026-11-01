@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { ResourcePublisherFilters } from "../../../components/resource-publisher-filters";
 import { getCommercialCopy } from "../../../lib/commercial-i18n";
 import { getDictionary } from "../../../lib/i18n";
@@ -31,19 +32,29 @@ export default async function AuthorResourcesPage({
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const copy = dictionary.authorResources;
+  const rawParams = await searchParams;
   const user = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!user)
+  if (!user) {
+    const returnParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(rawParams)) {
+      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+      else if (value !== undefined) returnParams.append(key, value);
+    }
+    const returnPath = returnParams.size
+      ? `/workspace/resources?${returnParams}`
+      : "/workspace/resources";
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {dictionary.workspace.signIn}
         </Link>
       </section>
     );
+  }
   let query: ReturnType<typeof resourcePublisherQuery>;
   try {
-    query = resourcePublisherQuery(publisherSearchParams(await searchParams));
+    query = resourcePublisherQuery(publisherSearchParams(rawParams));
   } catch (error) {
     if (error instanceof AppError && error.statusCode === 400) notFound();
     throw error;

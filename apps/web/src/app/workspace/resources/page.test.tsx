@@ -64,7 +64,17 @@ it("does not query private resources when signed out", async () => {
   mocks.actor = null;
   const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
   expect(mocks.list).not.toHaveBeenCalled();
-  expect(html).toContain("/auth/login");
+  expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fresources"');
+});
+it("preserves publisher filters in the guest login return path", async () => {
+  mocks.actor = null;
+  const html = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ status: "pending_review", page: "2" }) }),
+  );
+  expect(mocks.list).not.toHaveBeenCalled();
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fresources%3Fstatus%3Dpending_review%26page%3D2"',
+  );
 });
 it("rejects invalid status filters before querying", async () => {
   await expect(Page({ searchParams: Promise.resolve({ status: "admin-only" }) })).rejects.toThrow(

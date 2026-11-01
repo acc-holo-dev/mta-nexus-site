@@ -127,7 +127,9 @@ it("keeps infrastructure failures distinct from missing sessions on list and det
 });
 it("does not load private data for guests", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await OwnPage({}))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await OwnPage({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fdiscussions"',
+  );
   expect(renderToStaticMarkup(await DetailPage(detail))).toContain('href="/auth/login"');
   expect(mocks.page).not.toHaveBeenCalled();
   expect(mocks.own).not.toHaveBeenCalled();

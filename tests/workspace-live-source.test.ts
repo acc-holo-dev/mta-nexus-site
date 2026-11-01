@@ -293,4 +293,12 @@ describe("workspace live telemetry behavior", () => {
     expect(html).not.toContain("prd_private");
     expect(html).not.toContain("/market/undefined");
   });
+
+  it("routes guests through login with a workspace return path", async () => {
+    state.user = null;
+    const html = renderToStaticMarkup(await WorkspacePage());
+    expect(html).toContain('href="/auth/login?next=%2Fworkspace"');
+    expect(repos.library).not.toHaveBeenCalled();
+    expect(repos.managedServers).not.toHaveBeenCalled();
+  });
 });

@@ -2,6 +2,7 @@ import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/doma
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { ReactionRemoval } from "../../../components/reaction-removal";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
@@ -19,22 +20,32 @@ export default async function ReactionsPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const locale = await getRequestLocale(),
-    copy = reactionCopy(locale),
-    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor)
+    copy = reactionCopy(locale);
+  const rawSearchParams = (await searchParams) ?? {};
+  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  if (!actor) {
+    const returnParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(rawSearchParams)) {
+      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+      else if (value !== undefined) returnParams.append(key, value);
+    }
+    const returnPath = returnParams.size
+      ? `/workspace/reactions?${returnParams}`
+      : "/workspace/reactions";
     return (
       <div className="nexus-panel mx-auto max-w-md space-y-4 p-8 text-center">
         <h1 className="text-xl font-bold text-primary">{copy.my}</h1>
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", returnPath)}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >
           {copy.signIn}
         </Link>
       </div>
     );
+  }
   const params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {})) {
+  for (const [key, value] of Object.entries(rawSearchParams)) {
     if (Array.isArray(value)) for (const part of value) params.append(key, part);
     else if (value !== undefined) params.append(key, value);
   }

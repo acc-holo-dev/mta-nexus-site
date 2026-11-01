@@ -3,6 +3,7 @@ import { EmptyState, StatusBadge } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -47,19 +48,22 @@ export default async function ResourceLibraryPage({
   const copy = getLibraryCopy(locale);
   const releaseCopy = getReleaseHistoryCopy(locale);
   const user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  const filter = parseLibraryFilter(query.filter);
+  const page = parseLibraryPage(query.page);
   if (!user) {
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-sm text-accent underline">
+        <Link
+          href={authEntryHref("login", libraryHref(filter, page))}
+          className="text-sm text-accent underline"
+        >
           {copy.signIn}
         </Link>
       </section>
     );
   }
 
-  const filter = parseLibraryFilter(query.filter);
-  const page = parseLibraryPage(query.page);
   const result = await userLibraryRepository.pageByUser(user.id, page, filter);
   const filters: readonly UserLibraryFilter[] = ["all", "ready", "unavailable"];
 

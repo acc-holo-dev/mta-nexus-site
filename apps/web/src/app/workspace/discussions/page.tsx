@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import {
   ownDiscussionHref,
   parseOwnDiscussionQuery,
@@ -26,6 +27,7 @@ export default async function OwnDiscussionsPage({
 }) {
   const locale = await getRequestLocale(),
     copy = ownDiscussionCopy(locale);
+  const rawSearchParams = (await searchParams) ?? {};
   let authFailed = false;
   const actor = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
@@ -33,7 +35,15 @@ export default async function OwnDiscussionsPage({
       authFailed = true;
       return null;
     });
-  if (!actor)
+  if (!actor) {
+    const returnParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(rawSearchParams)) {
+      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+      else if (value !== undefined) returnParams.append(key, value);
+    }
+    const returnPath = returnParams.size
+      ? `/workspace/discussions?${returnParams}`
+      : "/workspace/discussions";
     return (
       <div className="nexus-panel mx-auto max-w-md space-y-4 p-8 text-center">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
@@ -51,7 +61,7 @@ export default async function OwnDiscussionsPage({
           </>
         ) : (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", returnPath)}
             className="inline-flex min-h-11 items-center text-sm text-accent underline"
           >
             {copy.signIn}
@@ -59,8 +69,9 @@ export default async function OwnDiscussionsPage({
         )}
       </div>
     );
+  }
   const params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {})) {
+  for (const [key, value] of Object.entries(rawSearchParams)) {
     if (Array.isArray(value)) for (const part of value) params.append(key, part);
     else if (value !== undefined) params.append(key, value);
   }

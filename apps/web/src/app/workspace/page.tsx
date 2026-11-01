@@ -16,6 +16,7 @@ import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
 import { getLibraryCopy } from "../../lib/library-view";
 import { getManagedServerCopy } from "../../lib/managed-server-view";
 import { formatHistoryDate } from "../../lib/commerce-history-format";
+import { authEntryHref } from "../../components/auth-return-path";
 import { ManagedServerCard } from "../../components/managed-server-card";
 import { reactionCopy } from "../../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../../lib/discussion-workspace-copy";
@@ -41,7 +42,7 @@ export default async function WorkspacePage() {
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
         <p className="font-caption text-muted">{dictionary.workspace.signInMessage}</p>
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", "/workspace")}
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {dictionary.workspace.signIn}
