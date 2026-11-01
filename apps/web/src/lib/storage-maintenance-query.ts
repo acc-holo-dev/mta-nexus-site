@@ -12,7 +12,7 @@ export const storageCleanupSchema = z
     confirmation: z.literal("delete_unreferenced"),
   })
   .strict();
-export const storageListSchema = z
+const storageListSchema = z
   .object({
     page: z.coerce.number().int().min(1).max(99999).default(1),
     view: z

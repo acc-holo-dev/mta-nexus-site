@@ -3,7 +3,7 @@ import { inflateRaw } from "node:zlib";
 import { AppError, MAX_UPLOAD_FILE_SIZE_BYTES, type BuildPackageEvidence } from "@nexus/domain";
 import { inspectMtaMetaXml, MetaInspectionInputError } from "../mta-meta-inspector";
 
-export const packageInspectionLimits = Object.freeze({
+const packageInspectionLimits = Object.freeze({
   entries: 1000,
   unpackedBytes: 128 * 1024 * 1024,
   entryBytes: 64 * 1024 * 1024,

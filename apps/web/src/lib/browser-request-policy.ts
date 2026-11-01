@@ -1,9 +1,9 @@
 /** HTTP boundary only: no database, session lookup, or domain authorization. */
-export type BrowserRequestDecision =
+type BrowserRequestDecision =
   | { allowed: true }
   | { allowed: false; status: 403 | 503; code: "CSRF_REJECTED" | "CSRF_CONFIG_INVALID" };
 
-export function isSafeRequestMethod(method: string): boolean {
+function isSafeRequestMethod(method: string): boolean {
   return method === "GET" || method === "HEAD" || method === "OPTIONS";
 }
 

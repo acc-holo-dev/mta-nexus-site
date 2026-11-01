@@ -19,7 +19,7 @@ import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery"
 function pending() {
   return sql`exists (select 1 from ${events} where ${events.productId} = ${watches.productId} and ${events.sequence} > ${watches.lastSequence})`;
 }
-export class ResourceReleaseWorkerRepository {
+class ResourceReleaseWorkerRepository {
   async runBatch(limit = 20, signal?: AbortSignal): Promise<ResourceReleaseWorkerResult> {
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > RESOURCE_RELEASE_WORKER_LIMIT)
       throw new RangeError("Invalid release worker batch");

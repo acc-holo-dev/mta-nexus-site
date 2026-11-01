@@ -14,13 +14,7 @@
     "apps/web": {
       "entry": ["scripts/**/*.ts"],
       "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
-      "next": true,
-      "ignoreIssues": {
-        "src/lib/auth-request-body.ts": ["exports"],
-        "src/lib/browser-request-policy.ts": ["exports"],
-        "src/lib/services/build-package-inspection.ts": ["exports"],
-        "src/lib/storage-maintenance-query.ts": ["exports"]
-      }
+      "next": true
     },
     "packages/*": {
       "project": ["src/**/*.{ts,tsx}"]
@@ -29,10 +23,7 @@
       // The worker integration test starts this fixture through a computed fork path.
       "entry": ["scripts/**/*.{ts,mjs}", "src/repositories/account-mail-worker.fixture.ts"],
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],
-      "drizzle": true,
-      "ignoreIssues": {
-        "src/repositories/resource-release-worker.ts": ["exports"]
-      }
+      "drizzle": true
     },
     "packages/validation": {
       "project": ["src/**/*.{ts,tsx}"],

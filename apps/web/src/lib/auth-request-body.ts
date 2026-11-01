@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { readBoundedJson, requireServerJsonContentType } from "./bounded-json";
 
-export const AUTH_JSON_MAX_BODY_BYTES = 8 * 1024;
+const AUTH_JSON_MAX_BODY_BYTES = 8 * 1024;
 
 export async function readAuthJson(request: Request): Promise<unknown> {
   requireServerJsonContentType(request);
