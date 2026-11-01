@@ -149,7 +149,7 @@ it("uses authenticated SSR scope and presents login for anonymous feed", async (
   mocks.session.mockResolvedValue(null);
   mocks.page.mockClear();
   const html = renderToStaticMarkup(await FollowingPage({}));
-  expect(html).toContain('href="/auth/login"');
+  expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Ffeed"');
   expect(mocks.page).not.toHaveBeenCalled();
 });
 it("restores a filtered following-feed page from its URL and rejects duplicate page parameters", async () => {

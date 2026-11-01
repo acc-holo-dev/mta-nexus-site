@@ -18,7 +18,8 @@ const en = {
   latest: "Latest changes",
   older: "Older changes",
   newer: "Newer changes",
-  empty: "No matching publications on this page.",
+  empty: "You have no publications yet.",
+  emptyFiltered: "No publications match these filters.",
   history: "Status history",
   historyDescription:
     "Retained creation, editing and status events for your publication. Private moderation notes and account details are not included.",
@@ -66,7 +67,8 @@ const ru: typeof en = {
   latest: "Последние изменения",
   older: "Более ранние изменения",
   newer: "Более поздние изменения",
-  empty: "На этой странице нет подходящих публикаций.",
+  empty: "У вас пока нет публикаций.",
+  emptyFiltered: "По этим фильтрам публикаций нет.",
   history: "История статусов",
   historyDescription:
     "Сохранённые события создания, редактирования и изменения статуса вашей публикации. Внутренние заметки модерации и данные аккаунтов скрыты.",

@@ -191,17 +191,38 @@ it("rejects unknown and duplicate private filters before reading publication dat
 });
 it("requires a session on the desk and history without exposing target titles", async () => {
   state.actor = null;
+  expect(renderToStaticMarkup(await Desk({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fcontent"',
+  );
+  expect(
+    renderToStaticMarkup(await History({ params: Promise.resolve({ id: "article" }) })),
+  ).toContain('href="/auth/login"');
   for (const page of [
     await Desk({}),
     await History({ params: Promise.resolve({ id: "article" }) }),
   ]) {
-    const html = renderToStaticMarkup(page);
-    expect(html).toContain('href="/auth/login"');
-    expect(html).not.toContain("Private title");
+    expect(renderToStaticMarkup(page)).not.toContain("Private title");
   }
   expect(state.desk).not.toHaveBeenCalled();
   expect(state.history).not.toHaveBeenCalled();
 });
+it.each(["en", "ru"] as const)(
+  "distinguishes an empty filtered desk from an empty author library in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = authorPublicationDeskCopy(locale);
+    expect(copy.emptyFiltered).not.toBe(copy.empty);
+    state.desk.mockResolvedValue({ items: [], olderCursor: null, newerCursor: null });
+    const empty = renderToStaticMarkup(await Desk({ searchParams: Promise.resolve({}) }));
+    expect(empty).toContain(copy.empty);
+    expect(empty).not.toContain(copy.emptyFiltered);
+    const filtered = renderToStaticMarkup(
+      await Desk({ searchParams: Promise.resolve({ status: "draft" }) }),
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).not.toContain(copy.empty);
+  },
+);
 it("distinguishes auth, unavailable and forbidden-target errors from empty histories", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH_DETAILS"));
   const desk = renderToStaticMarkup(await Desk({}));

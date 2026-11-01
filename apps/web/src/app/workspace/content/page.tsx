@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import {
   authorPublicationDeskHref,
   parseAuthorPublicationDeskQuery,
@@ -33,11 +34,13 @@ export default async function AuthorContentPage({
   const locale = await getRequestLocale(),
     copy = authorPublicationDeskCopy(locale),
     labels = getUserPlatformCopy(locale),
+    rawSearchParams = (await searchParams) ?? {},
     params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {}))
+  for (const [key, value] of Object.entries(rawSearchParams))
     if (value !== undefined)
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseAuthorPublicationDeskQuery(params);
+  const returnPath = params.size ? `/workspace/content?${params}` : "/workspace/content";
   let error = filters ? "" : copy.invalid,
     signIn = false;
   const report = await (async () => {
@@ -72,7 +75,7 @@ export default async function AuthorContentPage({
       </header>
       {signIn ? (
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", returnPath)}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >
           {labels.signIn}
@@ -170,7 +173,16 @@ export default async function AuthorContentPage({
             </p>
           )}
           {report && !report.items.length && (
-            <p className="nexus-panel p-6 text-sm text-muted">{copy.empty}</p>
+            <p className="nexus-panel p-6 text-sm text-muted">
+              {filters?.cursor ||
+              filters?.query ||
+              filters?.tag ||
+              filters?.status !== "all" ||
+              filters?.type !== "all" ||
+              filters?.source !== "all"
+                ? copy.emptyFiltered
+                : copy.empty}
+            </p>
           )}
           <ul className="space-y-3">
             {filters &&
