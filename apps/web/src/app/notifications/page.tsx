@@ -3,6 +3,7 @@ import { AppError } from "@nexus/domain";
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../components/auth-return-path";
 import { NotificationCenterTabs } from "../../components/notification-center-tabs";
 import { NotificationInbox } from "../../components/notification-inbox";
 import { getRequestLocale } from "../../lib/i18n-server";
@@ -36,6 +37,7 @@ export default async function NotificationCenterPage({
     if (Array.isArray(value)) for (const part of value) params.append(key, part);
     else if (value !== undefined) params.append(key, value);
   }
+  const returnPath = params.size ? `/notifications?${params}` : "/notifications";
   const filters = parseNotificationInboxQuery(params);
   let error = filters ? "" : copy.invalid,
     authenticated = false;
@@ -173,7 +175,7 @@ export default async function NotificationCenterPage({
         )}
         {!authenticated && error === copy.unauthorized && (
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", returnPath)}
             className="inline-flex min-h-11 items-center text-sm text-accent underline"
           >
             {copy.signIn}

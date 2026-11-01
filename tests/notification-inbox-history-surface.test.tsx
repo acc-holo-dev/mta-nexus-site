@@ -93,8 +93,16 @@ it("shows sign-in when the session is absent without reading another inbox", asy
   expect(html).not.toContain('role="tablist"');
   expect(html).not.toContain('role="tabpanel"');
   expect(html).toContain("rounded-lg");
-  expect(html).toContain("/auth/login");
+  expect(html).toContain('href="/auth/login?next=%2Fnotifications"');
   expect(html).not.toContain("No notifications yet");
+  expect(state.page).not.toHaveBeenCalled();
+});
+it("preserves notification filters in the guest login return path", async () => {
+  state.session.mockResolvedValue(null);
+  const html = await render({ q: "needle", state: "unread", category: "content" });
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fnotifications%3Fq%3Dneedle%26state%3Dunread%26category%3Dcontent"',
+  );
   expect(state.page).not.toHaveBeenCalled();
 });
 it("rejects duplicated filters before inbox queries and offers recovery", async () => {

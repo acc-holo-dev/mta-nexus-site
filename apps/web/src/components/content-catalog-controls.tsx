@@ -7,6 +7,7 @@ import {
   type writerTypes,
 } from "../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
+import { authEntryHref } from "./auth-return-path";
 type Filters = ReturnType<typeof parseContentPage>;
 export function ContentCatalogControls({
   path,
@@ -114,12 +115,18 @@ export function ContentPageNavigation({
     </nav>
   );
 }
-export function PlatformSignIn({ locale }: { locale: Locale }) {
+export function PlatformSignIn({
+  locale,
+  returnPath,
+}: {
+  locale: Locale;
+  returnPath?: string | null;
+}) {
   const copy = getUserPlatformCopy(locale);
   return (
     <section className="space-y-4 py-16 text-center">
       <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-      <Link href="/auth/login" className="text-sm text-accent underline">
+      <Link href={authEntryHref("login", returnPath)} className="text-sm text-accent underline">
         {copy.signIn}
       </Link>
     </section>

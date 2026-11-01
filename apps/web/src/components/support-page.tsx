@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { can } from "@nexus/security";
+import { authEntryHref } from "./auth-return-path";
 import { SupportCenter } from "./support-center";
 import { SupportCaseThread } from "./support-case-thread";
 import { PlatformSignIn } from "./content-catalog-controls";
@@ -25,12 +26,19 @@ export async function SupportPageSurface({
   const locale = await getRequestLocale(),
     copy = supportWorkspaceCopy(locale),
     support = getDictionary(locale).support;
+  const base = staff ? "/admin/support" : "/support";
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries((await searchParams) ?? {})) {
+    if (Array.isArray(value)) for (const item of value) params.append(key, item);
+    else if (value !== undefined) params.append(key, value);
+  }
+  const listReturnPath = params.size ? `${base}?${params}` : base;
   const store = await cookies(),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     // Case detail stays a plain sign-in gate; the list keeps the Support H1 the
     // shell a11y acceptance asserts for guests on /support.
-    if (id !== undefined) return <PlatformSignIn locale={locale} />;
+    if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={`${base}/${id}`} />;
     return (
       <div className="mx-auto max-w-5xl space-y-8">
         <header className="space-y-2 border-b border-base pb-6">
@@ -41,7 +49,7 @@ export async function SupportPageSurface({
         <div className="nexus-panel space-y-3 p-5">
           <p className="text-sm text-secondary">{support.authRequired}</p>
           <Link
-            href="/auth/login"
+            href={authEntryHref("login", listReturnPath)}
             className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {support.signIn}
@@ -64,13 +72,7 @@ export async function SupportPageSurface({
         {copy.notFound}
       </p>
     );
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {})) {
-    if (Array.isArray(value)) for (const item of value) params.append(key, item);
-    else if (value !== undefined) params.append(key, value);
-  }
-  const filters = supportQuery(params),
-    base = staff ? "/admin/support" : "/support";
+  const filters = supportQuery(params);
   if (!filters)
     return (
       <div className="space-y-3">

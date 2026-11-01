@@ -21,6 +21,7 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../lib/support-workspace-copy";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { useNexusLocale } from "./locale-context";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
@@ -104,6 +105,7 @@ export function SupportCenter({
   const pendingCreate = useRef<{ payload: string; key: string } | null>(null);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
+  const [loginHref, setLoginHref] = useState("/auth/login");
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState(initialFilters.category ?? "account");
   const [subject, setSubject] = useState("");
@@ -116,6 +118,10 @@ export function SupportCenter({
   );
   const [staffCategory, setStaffCategory] = useState(initialFilters.category ?? "");
   const loadSequence = useRef(0);
+
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, []);
 
   useEffect(() => {
     if (initialContext) {
@@ -286,7 +292,7 @@ export function SupportCenter({
         <div className="nexus-panel space-y-3 p-5">
           <p className="text-sm text-secondary">{copy.authRequired}</p>
           <Link
-            href="/auth/login"
+            href={loginHref}
             className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.signIn}

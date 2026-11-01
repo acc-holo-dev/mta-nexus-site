@@ -43,7 +43,20 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("renders a sign-in boundary without reading saved follows", async () => {
-  expect(renderToStaticMarkup(await SavedPage({}))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await SavedPage({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fsaved"',
+  );
+  expect(state.page).not.toHaveBeenCalled();
+});
+it("preserves saved filters in the guest login return path", async () => {
+  const html = renderToStaticMarkup(
+    await SavedPage({
+      searchParams: Promise.resolve({ type: "organization", q: "Team" }),
+    }),
+  );
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fsaved%3Ftype%3Dorganization%26q%3DTeam"',
+  );
   expect(state.page).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(
