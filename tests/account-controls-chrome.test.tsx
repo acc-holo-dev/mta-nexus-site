@@ -72,7 +72,7 @@ beforeEach(() => {
     false,
     null,
     0,
-    '/auth/login?next=%2Fworkspace',
+    "/auth/login?next=%2Fworkspace",
     true,
     true,
     true,
