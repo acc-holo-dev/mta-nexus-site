@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../components/auth-return-path";
+import { confirmAction } from "../../components/confirm-action";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { useNexusLocale } from "../../components/locale-context";
 import { ProfileChangeHistoryLink } from "../../components/private-change-history-controls";
@@ -322,7 +323,19 @@ export default function SettingsPage() {
     });
   }
 
-  function revokeSession(sessionId: string) {
+  async function revokeSession(sessionId: string, sessionLabel: string) {
+    if (
+      !(await confirmAction({
+        title: copy.endSessionConfirmTitle,
+        object: sessionLabel,
+        consequences: copy.endSessionConfirm,
+        confirmLabel: copy.endSession,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
     void perform(async () => {
       const data = await requestSettings<{
         success: boolean;
@@ -336,7 +349,19 @@ export default function SettingsPage() {
     });
   }
 
-  function revokeOthers() {
+  async function revokeOthers() {
+    if (
+      !(await confirmAction({
+        title: copy.endOtherSessionsConfirmTitle,
+        object: copy.endOtherSessions,
+        consequences: copy.endOtherSessionsConfirm,
+        confirmLabel: copy.endOtherSessions,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
     void perform(async () => {
       const data = await requestSettings<{
         success: boolean;
@@ -688,7 +713,7 @@ export default function SettingsPage() {
             variant="ghost"
             size="sm"
             disabled={pending}
-            onClick={revokeOthers}
+            onClick={() => void revokeOthers()}
             className="h-auto px-0 font-semibold text-danger"
           >
             {copy.endOtherSessions}
@@ -720,7 +745,9 @@ export default function SettingsPage() {
                   variant="ghost"
                   size="sm"
                   disabled={pending}
-                  onClick={() => revokeSession(session.id)}
+                  onClick={() =>
+                    void revokeSession(session.id, session.userAgent || copy.deviceUnavailable)
+                  }
                   className="h-auto px-0 font-semibold text-danger"
                 >
                   {copy.endSession}

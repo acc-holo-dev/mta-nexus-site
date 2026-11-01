@@ -5,6 +5,7 @@ import { confirmedReactionRemoval } from "../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { confirmAction } from "./confirm-action";
 export function ReactionRemoval({
   contentId,
   reloadHref,
@@ -29,6 +30,18 @@ export function ReactionRemoval({
   }, []);
   async function remove() {
     if (busy.current || phase !== "idle") return;
+    if (
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: contentId,
+        consequences: copy.removeConfirm,
+        confirmLabel: copy.remove,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
     busy.current = true;
     setPhase("saving");
     setMessage("");

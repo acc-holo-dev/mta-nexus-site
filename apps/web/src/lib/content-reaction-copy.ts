@@ -7,6 +7,10 @@ const en = {
   insight: "Insightful",
   choose: "React to this publication",
   remove: "Remove reaction",
+  removeConfirmTitle: "Remove your reaction?",
+  removeConfirm:
+    "Your reaction will be removed from this publication. You can react again later if the publication is still available.",
+  cancel: "Cancel",
   own: "Your publication: reactions from other readers are shown here.",
   signIn: "Sign in to react",
   loading: "Loading reactions…",
@@ -42,6 +46,10 @@ const ru: Record<keyof typeof en, string> = {
   insight: "Интересная мысль",
   choose: "Оцените публикацию",
   remove: "Удалить реакцию",
+  removeConfirmTitle: "Удалить вашу реакцию?",
+  removeConfirm:
+    "Реакция будет снята с этой публикации. При доступности публикации вы сможете отреагировать снова.",
+  cancel: "Отмена",
   own: "Ваша публикация: здесь показаны реакции других читателей.",
   signIn: "Войдите, чтобы оставить реакцию",
   loading: "Загрузка реакций…",

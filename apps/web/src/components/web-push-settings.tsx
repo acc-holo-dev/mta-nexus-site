@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from "react";
 import { BellRing } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { notificationInboxCopy } from "../lib/notification-inbox-copy";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 type PushStatus =
@@ -271,6 +272,23 @@ export function WebPushSettings() {
     }
   }
 
+  async function requestDisable() {
+    if (pending) return;
+    if (
+      !(await confirmAction({
+        title: copy.webPushDisableConfirmTitle,
+        object: copy.webPush,
+        consequences: copy.webPushDisableConfirm,
+        confirmLabel: copy.webPushDisable,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    void disable();
+  }
+
   async function disable() {
     if (pending) return;
     setPending(true);
@@ -339,7 +357,7 @@ export function WebPushSettings() {
           variant="outline"
           isLoading={pending}
           aria-describedby={describedBy}
-          onClick={() => void disable()}
+          onClick={() => void requestDisable()}
         >
           {copy.webPushDisable}
         </Button>

@@ -14,6 +14,7 @@ import {
 } from "../lib/resource-commerce-confirmation";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
@@ -156,6 +157,22 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         setBusy(false);
       }
     }
+  }
+  async function confirmRemove(item: (typeof cart.items)[number]) {
+    const objectLabel = item.title ?? copy.unavailable;
+    if (
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: objectLabel,
+        consequences: copy.removeConfirm,
+        confirmLabel: copy.remove,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    void run((signal) => remove(item.productId, signal));
   }
   async function remove(productId: string, signal: AbortSignal) {
     const response = await fetch(
@@ -305,7 +322,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                     variant="outline"
                     disabled={busy || uncertain}
                     aria-label={`${copy.remove}: ${item.title ?? copy.unavailable}`}
-                    onClick={() => void run((signal) => remove(item.productId, signal))}
+                    onClick={() => void confirmRemove(item)}
                     className={outlineButtonClass}
                   >
                     {copy.remove}

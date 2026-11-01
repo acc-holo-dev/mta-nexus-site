@@ -255,6 +255,10 @@ export const admin = {
       "Optional alerts for this browser only. Enabling asks for browser permission. Turning push off removes this browser subscription and does not delete inbox messages or change watches.",
     webPushEnable: "Enable push",
     webPushDisable: "Disable push",
+    webPushDisableConfirmTitle: "Disable browser push?",
+    webPushDisableConfirm:
+      "Push alerts stop for this browser only. Inbox messages and watches stay unchanged.",
+    cancel: "Cancel",
     webPushEnabled:
       "Enabled for this signed-in browser. Ending this session also removes its server-side push subscription. Inbox and watches stay unchanged.",
     webPushUnsupported: "This browser does not support Web Push.",
@@ -290,6 +294,11 @@ export const admin = {
     deviceUnavailable: "Device details unavailable",
     ipUnavailable: "IP unavailable",
     endSession: "End session",
+    endSessionConfirmTitle: "End this session?",
+    endSessionConfirm: "That sign-in will lose access to your account immediately.",
+    endOtherSessionsConfirmTitle: "End all other sessions?",
+    endOtherSessionsConfirm:
+      "Every other signed-in browser or device will lose access. This browser stays signed in.",
     unconfirmedSessionRevocation: "Unconfirmed session revocation",
     sessionEnded: "Session ended. That sign-in can no longer access your account.",
     sessionUnavailable: "The session list is unavailable. Reload settings to check it.",

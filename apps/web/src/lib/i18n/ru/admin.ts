@@ -259,6 +259,10 @@ export const admin = {
       "Дополнительные оповещения только для этого браузера. Включение запросит разрешение браузера. Отключение push снимает подписку этого браузера и не удаляет входящие и не меняет watch.",
     webPushEnable: "Включить push",
     webPushDisable: "Отключить push",
+    webPushDisableConfirmTitle: "Отключить push браузера?",
+    webPushDisableConfirm:
+      "Оповещения push прекратятся только для этого браузера. Входящие и watch не изменятся.",
+    cancel: "Отмена",
     webPushEnabled:
       "Включено для этого авторизованного браузера. Завершение этой сессии также удалит её серверную push-подписку. Входящие и watch не меняются.",
     webPushUnsupported: "Этот браузер не поддерживает Web Push.",
@@ -295,6 +299,11 @@ export const admin = {
     deviceUnavailable: "Данные устройства недоступны",
     ipUnavailable: "IP недоступен",
     endSession: "Завершить сессию",
+    endSessionConfirmTitle: "Завершить эту сессию?",
+    endSessionConfirm: "Этот вход сразу потеряет доступ к аккаунту.",
+    endOtherSessionsConfirmTitle: "Завершить все другие сессии?",
+    endOtherSessionsConfirm:
+      "Все остальные браузеры и устройства потеряют доступ. Этот браузер останется авторизован.",
     unconfirmedSessionRevocation: "Завершение сессии не подтверждено",
     sessionEnded: "Сессия завершена и больше не имеет доступа к аккаунту.",
     sessionUnavailable: "Список сессий недоступен. Обновите настройки, чтобы проверить его.",
