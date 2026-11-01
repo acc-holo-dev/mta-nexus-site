@@ -120,9 +120,21 @@ export default async function ReactionsPage({
         </p>
       )}
       {page && !page.items.length && (
-        <p className="nexus-panel p-6 text-sm text-muted">
-          {filters?.cursor || filters?.query || filters?.reaction ? copy.emptyFiltered : copy.empty}
-        </p>
+        <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+          <p>
+            {filters?.cursor || filters?.query || filters?.reaction
+              ? copy.emptyFiltered
+              : copy.empty}
+          </p>
+          {(filters?.cursor || filters?.query || filters?.reaction) && (
+            <Link
+              href="/workspace/reactions"
+              className="inline-flex min-h-11 items-center text-accent underline"
+            >
+              {copy.reset}
+            </Link>
+          )}
+        </div>
       )}
       {page && (
         <ul className="space-y-3">

@@ -152,14 +152,24 @@ export async function LibraryCollectionsScreen({
                 key={status}
                 href={collectionHref(undefined, "", { status })}
                 aria-current={result.status === status ? "page" : undefined}
-                className="text-accent underline aria-[current=page]:font-bold"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-[current=page]:font-bold"
               >
                 {c[status]}
               </Link>
             ))}
           </nav>
           {!result.items.length && (
-            <p role="status">{result.status === "active" ? c.empty : c.emptyFiltered}</p>
+            <div className="space-y-3 text-sm text-muted" role="status">
+              <p>{result.status === "active" ? c.empty : c.emptyFiltered}</p>
+              {result.status !== "active" && (
+                <Link
+                  href={collectionHref()}
+                  className="inline-flex min-h-11 items-center text-accent underline"
+                >
+                  {c.clear}
+                </Link>
+              )}
+            </div>
           )}
           <ol className="grid gap-4 sm:grid-cols-2">
             {result.items.map((item) => (
@@ -567,7 +577,17 @@ export async function LibraryCollectionsScreen({
           {c.items}: {result.total} · {c.ready}: {result.ready}
         </p>
         {!result.items.length && (
-          <p role="status">{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
+          <div className="space-y-3 text-sm text-muted" role="status">
+            <p>{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
+            {result.q && (
+              <Link
+                href={collectionHref(id, adding ? "add" : "")}
+                className="inline-flex min-h-11 items-center text-accent underline"
+              >
+                {c.clear}
+              </Link>
+            )}
+          </div>
         )}
         {collection.status === "active" && result.items.length > 0 && (
           <LibraryCollectionBatchForm

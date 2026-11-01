@@ -144,11 +144,21 @@ export default async function OwnDiscussionsPage({
         </p>
       )}
       {page && !page.items.length && (
-        <p className="nexus-panel p-6 text-sm text-muted">
-          {filters?.cursor || filters?.query || filters?.availability
-            ? copy.emptyFiltered
-            : copy.empty}
-        </p>
+        <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+          <p>
+            {filters?.cursor || filters?.query || filters?.availability
+              ? copy.emptyFiltered
+              : copy.empty}
+          </p>
+          {(filters?.cursor || filters?.query || filters?.availability) && (
+            <Link
+              href="/workspace/discussions"
+              className="inline-flex min-h-11 items-center text-accent underline"
+            >
+              {copy.reset}
+            </Link>
+          )}
+        </div>
       )}
       {page && (
         <ul className="space-y-3">

@@ -161,7 +161,7 @@ export function FollowWorkspace({
             key={value ?? "all"}
             href={href(value)}
             aria-current={type === value ? "page" : undefined}
-            className={`min-h-11 whitespace-nowrap rounded-lg border px-3 py-3 text-sm ${type === value ? "border-accent text-accent" : "border-base text-secondary"}`}
+            className={`min-h-11 whitespace-nowrap rounded-lg border px-3 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] ${type === value ? "border-accent text-accent" : "border-base text-secondary"}`}
           >
             {value ? copy[value] : copy.all}
           </Link>
