@@ -1,6 +1,5 @@
 import { Buffer } from "node:buffer";
 import { createECDH } from "node:crypto";
-import { describe, expect, it } from "vitest";
 import {
   BUILD_PLACEHOLDER_AUTH_SECRET,
   BUILD_PLACEHOLDER_DATABASE_URL,
@@ -9,6 +8,7 @@ import {
   readWebPushVapidConfig,
   resolveApplicationOrigin,
 } from "@nexus/config";
+import { describe, expect, it } from "vitest";
 
 const productionBase = {
   NODE_ENV: "production",
@@ -137,6 +137,24 @@ describe("production configuration", () => {
         DATABASE_URL: BUILD_PLACEHOLDER_DATABASE_URL,
       }),
     ).toThrow("Invalid configuration parameters");
+  });
+
+  it("allows Dockerfile build placeholders only during image compile", () => {
+    const previous = process.env.NEXUS_IMAGE_COMPILE;
+    process.env.NEXUS_IMAGE_COMPILE = "1";
+    try {
+      const config = getEnvConfig({
+        ...productionBase,
+        NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
+        AUTH_SECRET: BUILD_PLACEHOLDER_AUTH_SECRET,
+        DATABASE_URL: BUILD_PLACEHOLDER_DATABASE_URL,
+      });
+      expect(config.AUTH_SECRET).toBe(BUILD_PLACEHOLDER_AUTH_SECRET);
+      expect(config.DATABASE_URL).toBe(BUILD_PLACEHOLDER_DATABASE_URL);
+    } finally {
+      if (previous === undefined) delete process.env.NEXUS_IMAGE_COMPILE;
+      else process.env.NEXUS_IMAGE_COMPILE = previous;
+    }
   });
 
   it("accepts the same production secrets under two HTTPS runtime origins", () => {

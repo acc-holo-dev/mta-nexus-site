@@ -1,5 +1,5 @@
-import { ECDH, createECDH, timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { createECDH, ECDH, timingSafeEqual } from "node:crypto";
 import { isIP } from "node:net";
 import { z } from "zod";
 
@@ -180,6 +180,16 @@ export function readMtaMasterMirrorUrls(
 export const BUILD_PLACEHOLDER_AUTH_SECRET = "build-only-secret-that-is-long-enough-for-validation";
 export const BUILD_PLACEHOLDER_DATABASE_URL =
   "postgres://nexus:build-only@127.0.0.1:5432/mta_nexus";
+
+/**
+ * True only while compiling the production image / Next production build.
+ * Runtime processes must never set these — placeholder secrets stay rejected there.
+ */
+export function isImageCompilePhase(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return env.NEXUS_IMAGE_COMPILE === "1" || env.NEXT_PHASE === "phase-production-build";
+}
 
 /** Allowed public health JSON keys — never dump full EnvConfig. */
 export const PUBLIC_HEALTH_BODY_KEYS = Object.freeze(["status", "database", "timestamp"] as const);
@@ -370,10 +380,11 @@ export const envSchema = z
       if (appUrl.hostname === "localhost" || appUrl.hostname === "127.0.0.1") {
         addIssue("NEXT_PUBLIC_APP_URL", "Production application URL cannot point to localhost");
       }
-      if (value.AUTH_SECRET === BUILD_PLACEHOLDER_AUTH_SECRET) {
+      // Dockerfile / Next compile may use placeholders; live production processes may not.
+      if (!isImageCompilePhase() && value.AUTH_SECRET === BUILD_PLACEHOLDER_AUTH_SECRET) {
         addIssue("AUTH_SECRET", "Production must not use the image build-placeholder auth secret");
       }
-      if (value.DATABASE_URL === BUILD_PLACEHOLDER_DATABASE_URL) {
+      if (!isImageCompilePhase() && value.DATABASE_URL === BUILD_PLACEHOLDER_DATABASE_URL) {
         addIssue(
           "DATABASE_URL",
           "Production must not use the image build-placeholder database URL",

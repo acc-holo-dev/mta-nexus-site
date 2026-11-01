@@ -30,7 +30,7 @@ describe("resource submission success state", () => {
 
       expect(html).toContain(copy.submittedTitle);
       expect(html).toContain(copy.submittedDescription);
-      expect(html).toContain('href="/workspace/resources/prd_review"');
+      expect(html).toContain('href="/workspace/resources/prd_review#publication-readiness"');
       if (locale === "en") {
         expect(copy.submittedTitle).toBe("Resource submitted for review");
         expect(copy.submittedDescription).toContain("moderator approval");

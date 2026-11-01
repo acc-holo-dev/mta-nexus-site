@@ -26,6 +26,7 @@ RUN npm install --global pnpm@12.4.2
 # the same image digest — no per-domain rebuild. @nexus/config rejects the
 # build-placeholder AUTH_SECRET / DATABASE_URL if they reach a production process.
 ENV NODE_ENV=production \
+    NEXUS_IMAGE_COMPILE=1 \
     NEXT_PUBLIC_APP_URL=https://nexus-mta.com \
     DATABASE_URL=postgres://nexus:build-only@127.0.0.1:5432/mta_nexus \
     AUTH_SECRET=build-only-secret-that-is-long-enough-for-validation \

@@ -1,7 +1,4 @@
-import {
-  buildResourcePublicationReadiness,
-  hasTrustedCleanScan,
-} from "@nexus/domain";
+import { buildResourcePublicationReadiness, hasTrustedCleanScan } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
 
 const baseInput = {
@@ -20,9 +17,7 @@ const baseInput = {
 describe("resource publication readiness", () => {
   it("marks compatibility and media as recommendations only", () => {
     const summary = buildResourcePublicationReadiness(baseInput);
-    expect(summary.items.find((item) => item.id === "compatibility")?.tier).toBe(
-      "recommendation",
-    );
+    expect(summary.items.find((item) => item.id === "compatibility")?.tier).toBe("recommendation");
     expect(summary.items.find((item) => item.id === "media")?.tier).toBe("recommendation");
     expect(summary.items.find((item) => item.id === "description")?.tier).toBe("required");
   });

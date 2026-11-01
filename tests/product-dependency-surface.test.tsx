@@ -169,7 +169,7 @@ describe("resource version help projection", () => {
     });
 
     expect(projection.version).toBe("2.0.0");
-    expect(projection.setup?.codeBlocks).toEqual(['<script>alert(1)</script>']);
+    expect(projection.setup?.codeBlocks).toEqual(["<script>alert(1)</script>"]);
     expect(projection.limits.find((line) => line.key === "catalogMtaMin")).toMatchObject({
       known: false,
     });
