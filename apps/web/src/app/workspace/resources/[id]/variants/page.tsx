@@ -2,6 +2,7 @@ import { NotFoundError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { ResourceVariantsForm } from "../../../../../components/resource-variants-form";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -27,11 +28,12 @@ export default async function ResourceVariantsPage({
   ]);
   const copy = getResourceManagementCopy(locale),
     dictionary = getDictionary(locale);
+  const returnPath = `/workspace/resources/${encodeURIComponent(id)}/variants`;
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {dictionary.workspace.signIn}
         </Link>
       </section>

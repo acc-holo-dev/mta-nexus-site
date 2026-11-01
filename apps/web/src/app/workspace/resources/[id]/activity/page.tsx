@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import type { Metadata } from "next";
 import { NotFoundError, RESOURCE_ACTIVITY_DAYS } from "@nexus/domain";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -30,12 +31,20 @@ export default async function ResourceActivityPage({
     searchParams,
   ]);
   const copy = getResourceActivityCopy(locale);
+  const returnParams = new URLSearchParams();
+  if (query.days !== undefined) {
+    for (const part of Array.isArray(query.days) ? query.days : [query.days])
+      returnParams.append("days", part);
+  }
+  const basePath = `/workspace/resources/${encodeURIComponent(id)}/activity`;
+  const returnQuery = returnParams.toString();
+  const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
   const actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>

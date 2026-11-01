@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "./auth-return-path";
 import { getRequestLocale } from "../lib/i18n-server";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { authService } from "../lib/services/auth-service";
@@ -18,11 +19,12 @@ export async function ResourceMediaScreen({
   const locale = await getRequestLocale(),
     copy = resourceMediaCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  const returnPath = `/workspace/resources/${encodeURIComponent(productId)}/media`;
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href="/auth/login">{copy.signIn}</Link>
+        <Link href={authEntryHref("login", returnPath)}>{copy.signIn}</Link>
       </section>
     );
   let gallery: Awaited<ReturnType<typeof resourceMediaService.managed>>;

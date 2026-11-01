@@ -231,7 +231,10 @@ export function NotificationBell() {
             </div>
           )}
 
-          <div className="min-h-0 max-h-80 divide-y divide-[color:var(--nexus-border)] overflow-y-auto">
+          <section
+            aria-label={copy.previewList}
+            className="min-h-0 max-h-80 divide-y divide-[color:var(--nexus-border)] overflow-y-auto"
+          >
             {!loaded ? (
               <div role="status" className="py-6 text-center font-caption text-muted">
                 {copy.loading}
@@ -283,7 +286,7 @@ export function NotificationBell() {
             ) : (
               <div className="py-6 text-center font-caption text-muted">{copy.empty}</div>
             )}
-          </div>
+          </section>
 
           <div className="space-y-1.5 border-t border-base px-3 py-2 text-center">
             <p className="font-caption text-faint">{copy.previewFootnote}</p>

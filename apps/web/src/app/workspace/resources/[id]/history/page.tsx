@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourcePublisherService } from "../../../../../lib/services/resource-publisher-service";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -33,10 +34,36 @@ export default async function Page({
     params,
     searchParams,
   ]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
   const copy = getResourcePublisherCopy(locale),
     dictionary = getDictionary(locale);
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(raw)) {
+    if (value === undefined) continue;
+    for (const part of Array.isArray(value) ? value : [value]) returnParams.append(key, part);
+  }
+  const basePath = `/workspace/resources/${encodeURIComponent(id)}/history`;
+  const returnQuery = returnParams.toString();
+  const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
+  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  if (!actor)
+    return (
+      <div className="mx-auto max-w-4xl space-y-6 py-8">
+        <Link
+          href={`/workspace/resources/${encodeURIComponent(id)}`}
+          className="text-accent underline"
+        >
+          {copy.back}
+        </Link>
+        <h1 className="font-display text-primary">{copy.history}</h1>
+        <p className="text-sm text-muted">{copy.historyNote}</p>
+        <section className="space-y-4 py-8 text-center">
+          <h2 className="font-display text-primary">{dictionary.workspace.signInRequired}</h2>
+          <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+            {dictionary.workspace.signIn}
+          </Link>
+        </section>
+      </div>
+    );
   let query: ReturnType<typeof resourcePublisherHistoryQuery>;
   try {
     query = resourcePublisherHistoryQuery(publisherSearchParams(raw));

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCopyCopy, resourceCopyError } from "../../../../../lib/resource-copy-i18n";
@@ -33,17 +34,25 @@ export default async function ResourceCopiesPage({
       searchParams,
     ]),
     c = resourceCopyCopy(locale);
+  const id = resourceCopyId(path.id);
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(raw)) {
+    if (value === undefined) continue;
+    for (const part of Array.isArray(value) ? value : [value]) returnParams.append(key, part);
+  }
+  const basePath = `/workspace/resources/${encodeURIComponent(id)}/copies`;
+  const returnQuery = returnParams.toString();
+  const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
       <section className="space-y-4 py-8">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login">{c.signIn}</Link>
+        <Link href={authEntryHref("login", returnPath)}>{c.signIn}</Link>
       </section>
     );
   try {
     const query = resourceCopiesQuery(resourceCopiesPageParams(raw), true),
-      id = resourceCopyId(path.id),
       result = await resourceCopyService.page(actor, id, query);
     const base = `/workspace/resources/${encodeURIComponent(id)}/copies`,
       href = (page: number) =>

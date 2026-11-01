@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { AppError } from "@nexus/domain";
 import { authService } from "../../../../../lib/services/auth-service";
 import { productService } from "../../../../../lib/services/product-service";
@@ -32,12 +33,20 @@ export default async function PublisherModerationHistory({
     searchParams,
   ]);
   const copy = getResourceReleaseControlCopy(locale),
-    user = await authService.getSession(store.get("nexus_session")?.value);
+    returnParams = new URLSearchParams();
+  if (query.page !== undefined) {
+    for (const part of Array.isArray(query.page) ? query.page : [query.page])
+      returnParams.append("page", part);
+  }
+  const basePath = `/workspace/resources/${encodeURIComponent(id)}/moderation`;
+  const returnQuery = returnParams.toString();
+  const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
+  const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>

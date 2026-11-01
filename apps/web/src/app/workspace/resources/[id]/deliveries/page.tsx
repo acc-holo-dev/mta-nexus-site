@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";
@@ -34,12 +35,20 @@ export default async function PublisherDeliveriesPage({
     searchParams,
   ]);
   const copy = resourceDeliveriesCopy(locale),
-    user = await authService.getSession(store.get("nexus_session")?.value);
+    returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(raw)) {
+    if (value === undefined) continue;
+    for (const part of Array.isArray(value) ? value : [value]) returnParams.append(key, part);
+  }
+  const basePath = `/workspace/resources/${encodeURIComponent(id)}/deliveries`;
+  const returnQuery = returnParams.toString();
+  const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
+  const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>

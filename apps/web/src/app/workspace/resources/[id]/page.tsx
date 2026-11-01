@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../../../components/resource-publication-readiness-panel";
@@ -27,24 +28,28 @@ export default async function ManageResourcePage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const locale = await getRequestLocale();
+  const [locale, { id }, query] = await Promise.all([getRequestLocale(), params, searchParams]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.authorResources;
+  const returnParams = new URLSearchParams();
+  if (query.page) returnParams.set("page", query.page);
+  const returnQuery = returnParams.toString();
+  const resourcePath = `/workspace/resources/${encodeURIComponent(id)}`;
+  const returnPath = returnQuery ? `${resourcePath}?${returnQuery}` : resourcePath;
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {dictionary.workspace.signIn}
         </Link>
       </section>
     );
-  const { id } = await params;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
   const [history, lifecycleHistory, publicationReadiness] = await Promise.all([
-    productService.getManagedHistory(id, actor, Number((await searchParams).page ?? 1)),
+    productService.getManagedHistory(id, actor, Number(query.page ?? 1)),
     productService.getResourceLifecycleHistory(id, actor),
     resourcePublicationReadinessService.summary(id, actor),
   ]);

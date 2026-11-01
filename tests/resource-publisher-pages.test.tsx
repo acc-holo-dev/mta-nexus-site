@@ -163,8 +163,11 @@ it("checks authentication before parsing private queries or querying repositorie
     renderToStaticMarkup(
       await InventoryPage({ searchParams: Promise.resolve({ ownerId: "other" }) }),
     ),
-  ).toContain("/auth/login");
-  await expect(HistoryPage(context)).rejects.toThrow("NEXT_NOT_FOUND");
+  ).toContain("/auth/login?next=");
+  const historyHtml = renderToStaticMarkup(await HistoryPage(context));
+  expect(historyHtml).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fresources%2Fprd_a%2Fhistory%3Fkind%3Dchanges%26page%3D2"',
+  );
   expect(state.inventory).not.toHaveBeenCalled();
   expect(state.history).not.toHaveBeenCalled();
 });
