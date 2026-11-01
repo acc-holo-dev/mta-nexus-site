@@ -4559,9 +4559,11 @@
         "Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.",
         "Lightbox — предложение; текущая галерея не считается отсутствующей."
       ],
-      "execution_state": "not_started",
+      "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
-      "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
+      "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
+      "execution_updated_on": "2026-11-01",
+      "execution_notes": "Native dialog lightbox on resource gallery; original href preserved; focused tests PASS."
     },
     {
       "id": "UX-20",

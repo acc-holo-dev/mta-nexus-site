@@ -70,6 +70,8 @@ it("staff preview uses live moderation authority and excludes editing controls",
   const html = renderToStaticMarkup(await ResourceMediaScreen({ productId: "prd_a", staff: true }));
   expect(state.managed).toHaveBeenCalledWith("prd_a", "usr_a", true);
   expect(html).toContain('href="/admin/resources/prd_a"');
+  expect(html).toContain('aria-haspopup="dialog"');
+  expect(html).toContain("View larger in gallery");
   expect(html).not.toContain('type="file"');
   expect(html).not.toContain("Make cover");
 });

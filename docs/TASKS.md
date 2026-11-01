@@ -3469,7 +3469,9 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-19 — Просмотр галереи внутри страницы как расширение
 
-**Фаза:** F2. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Native dialog lightbox on resource gallery; original href preserved; focused tests PASS.
 
 **Исходные пункты:** PX07. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
