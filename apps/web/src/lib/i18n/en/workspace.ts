@@ -1,6 +1,7 @@
 export const workspace = {
   authorResources: {
     title: "My resources",
+    loading: "Loading your resources…",
     subtitle: "Manage personal resources and resources you can administer for an organization.",
     all: "All statuses",
     empty: "You have not created any resources yet.",
@@ -79,6 +80,7 @@ export const workspace = {
     signInMessage: "Sign in to manage your resource library and MTA servers.",
     signIn: "Sign in",
     title: "Workspace",
+    loading: "Loading workspace…",
     subtitle: "your resources and servers",
     liveNote:
       "Live status comes only from the official MTA master-list; missing observations stay unknown.",
