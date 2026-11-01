@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { before, after, test } from "node:test";
-import { createRequire } from "node:module";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
 import { execFile } from "node:child_process";
+import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { join, resolve } from "node:path";
+import { after, before, test } from "node:test";
 import { promisify } from "node:util";
 
 // Test tools are installed outside the application workspace, at exact CI versions.
@@ -153,7 +153,7 @@ check(
     await expect(region(page)).toContainText("Updates are delayed");
     await expect(region(page).locator("time")).toHaveAttribute("datetime", fetchedAt);
     await expect(
-      page.getByRole("link", { name: "Connect: Nexus Drift", exact: true }),
+      page.getByRole("link", { name: "Open in MTA: Nexus Drift", exact: true }),
     ).toHaveAttribute("href", "mtasa://192.0.2.1:22003");
     await expect(
       page.getByRole("textbox", { name: "Server address: Nexus Drift", exact: true }),
@@ -286,7 +286,9 @@ check("J1-07 keyboard connection and actual clipboard copy", async ({ page, cont
   const address = page.getByRole("textbox", { name: "Server address: Nexus Drift", exact: true });
   await address.focus();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Connect: Nexus Drift", exact: true })).toBeFocused();
+  await expect(
+    page.getByRole("link", { name: "Open in MTA: Nexus Drift", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("button", { name: "Copy address: Nexus Drift", exact: true }),

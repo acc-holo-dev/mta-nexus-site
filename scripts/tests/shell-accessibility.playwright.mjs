@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import "../register-ts-directory-resolve.mjs";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 import { waitForReadyCapture } from "../browser-page-ready.mjs";
+
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
@@ -709,28 +710,28 @@ for (const locale of ["en", "ru"]) {
     ).toBeVisible();
     await expect(
       moreDialog.getByRole("link", {
-        name: dictionary.nav.notifications,
-        exact: true,
-      }),
-    ).toBeVisible();
-    await expect(
-      moreDialog.getByRole("link", {
-        name: dictionary.nav.mobileWorkspace,
-        exact: true,
-      }),
-    ).toBeVisible();
-    await expect(
-      moreDialog.getByRole("link", {
         name: dictionary.nav.support,
         exact: true,
       }),
     ).toBeVisible();
     await expect(
       moreDialog.getByRole("link", {
-        name: dictionary.nav.settings,
+        name: dictionary.workspace.signIn,
         exact: true,
       }),
     ).toBeVisible();
+    await expect(
+      moreDialog.getByRole("link", {
+        name: dictionary.nav.notifications,
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await expect(
+      moreDialog.getByRole("link", {
+        name: dictionary.nav.mobileWorkspace,
+        exact: true,
+      }),
+    ).toHaveCount(0);
     await page.keyboard.press("Escape");
     await expect(moreDialog).toHaveCount(0);
     await expect(moreButton).toHaveAttribute("aria-expanded", "false");

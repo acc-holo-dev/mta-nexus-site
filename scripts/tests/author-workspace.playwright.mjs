@@ -389,7 +389,10 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const build = committedFirstBuild;
   assert.equal(productCreates, 2);
   const resourceStatus = page.getByRole("link", { name: "Open resource status", exact: true });
-  await expect(resourceStatus).toHaveAttribute("href", `/workspace/resources/${product.id}`);
+  await expect(resourceStatus).toHaveAttribute(
+    "href",
+    `/workspace/resources/${product.id}#publication-readiness`,
+  );
   assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), pendingCreationKey), null);
   await resourceStatus.click();
   await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
@@ -714,7 +717,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   ).toBeVisible();
   await outsider.getByRole("link", { name: "Open resource", exact: true }).click();
   const downloadPromise = outsider.waitForEvent("download");
-  await outsider.getByRole("button", { name: "Download Build v1.0.0", exact: true }).click();
+  await outsider.getByRole("button", { name: "Download latest v1.0.0", exact: true }).click();
   const download = await downloadPromise;
   assert.equal(await download.failure(), null);
   const downloadedPath = await download.path();

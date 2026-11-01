@@ -39,7 +39,7 @@ export function NotificationCenterTabs({
               key={item}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-lg px-3 py-1.5 text-xs font-semibold ${
+              className={`inline-flex min-h-11 items-center rounded-lg px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] ${
                 active ? "bg-accent text-white" : "border border-base text-muted"
               }`}
             >

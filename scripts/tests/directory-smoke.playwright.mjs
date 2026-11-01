@@ -92,7 +92,7 @@ test("J1 native-runner smoke: honest counts, freshness and connection actions", 
   await expect(directory.locator("time")).toHaveAttribute("datetime", fetchedAt);
   await expect(
     page.getByRole("link", {
-      name: "Connect: Nexus Drift",
+      name: "Open in MTA: Nexus Drift",
       exact: true,
     }),
   ).toHaveAttribute("href", "mtasa://192.0.2.1:22003");

@@ -148,7 +148,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
     await expect(page.getByText("Preview unavailable", { exact: true })).toBeVisible();
     await expect(page.getByRole("img", { name: productTitle, exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Add to library", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Download Build/u })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Download latest/u })).toHaveCount(0);
 
     const addToLibraryLink = page.getByRole("link", {
       name: "Add to library",
@@ -196,7 +196,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
     await expect(page.getByText("In your library", { exact: true })).toBeVisible();
     await expect(
       page.getByRole("button", {
-        name: "Download Build v1.0.0",
+        name: "Download latest v1.0.0",
         exact: true,
       }),
     ).toBeVisible();
@@ -218,7 +218,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
       }),
     );
     const keyboardDownload = page.getByRole("button", {
-      name: "Download Build v1.0.0",
+      name: "Download latest v1.0.0",
       exact: true,
     });
     await keyboardDownload.focus();
@@ -251,7 +251,10 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
           });
         };
       }, productId);
-    const downloadButton = page.getByRole("button", { name: "Download Build v1.0.0", exact: true });
+    const downloadButton = page.getByRole("button", {
+      name: "Download latest v1.0.0",
+      exact: true,
+    });
     const preparingButton = page.getByRole("button", { name: "Preparing download…", exact: true });
 
     await stallNextDownload();
@@ -290,7 +293,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
       const downloadPromise = page.waitForEvent("download");
       await page
         .getByRole("button", {
-          name: "Download Build v1.0.0",
+          name: "Download latest v1.0.0",
           exact: true,
         })
         .click();
@@ -326,7 +329,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
     // Exercise the actual language control, including the server-rendered reload.
     await page.getByRole("button", { name: "Language", exact: true }).click();
     const russianDownload = page.getByRole("button", {
-      name: "Скачать сборку v1.0.0",
+      name: "Скачать последнюю v1.0.0",
       exact: true,
     });
     await expect(russianDownload).toBeVisible();

@@ -56,7 +56,7 @@ export function ServerConnectControls({
           href={connectUri}
           aria-label={`${connectLabel}: ${name}`}
           title={connectHint}
-          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
         >
           {connectLabel}
         </a>
@@ -88,6 +88,7 @@ export function ServerConnectControls({
       ) : (
         <input
           ref={addressInput}
+          aria-label={`${copy.serverAddress}: ${name}`}
           aria-hidden="true"
           readOnly
           tabIndex={-1}
