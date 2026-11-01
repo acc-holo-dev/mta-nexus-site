@@ -2,6 +2,7 @@
 
 import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   ContentCommentSubmitError,
@@ -54,12 +55,13 @@ export function ContentDiscussion({
   initialError?: string;
 }) {
   const copy = getDiscussionCopy(locale);
+  const pathname = usePathname();
   const [page, setPage] = useState<DiscussionPage | null>(initial);
   const [loading, setLoading] = useState(false);
   const [readError, setReadError] = useState(initialError || (initial ? "" : copy.unavailable));
   const [search, setSearch] = useState(initialQuery);
   const [focusedId, setFocusedId] = useState(initialFocus);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const activeQuery = useRef(initialQuery);
   const readController = useRef<AbortController | null>(null);
   const alive = useRef(true);
@@ -97,9 +99,12 @@ export function ContentDiscussion({
         : { parentId: undefined, parentName: undefined }),
     });
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
   useEffect(() => {
     alive.current = true;
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
     if (!draftRestored.current) {
       draftRestored.current = true;
       const stored = readDiscussionComposeDraft(contentId);

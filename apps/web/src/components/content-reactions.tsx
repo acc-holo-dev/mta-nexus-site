@@ -2,6 +2,7 @@
 import { CONTENT_REACTION_EMOJI, CONTENT_REACTIONS, type ContentReaction } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   confirmedReactionMutation,
@@ -23,18 +24,22 @@ export function ContentReactions({
   initial: ReactionState | null;
   locale: Locale;
 }) {
+  const pathname = usePathname();
   const copy = reactionCopy(locale),
     [state, setState] = useState(initial),
     [pending, setPending] = useState(false),
     [blocked, setBlocked] = useState(!initial),
     [message, setMessage] = useState(initial ? "" : copy.unavailable),
-    [loginHref, setLoginHref] = useState("/auth/login");
+    [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const busy = useRef(false),
     alive = useRef(true),
     request = useRef<AbortController | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
   useEffect(() => {
     alive.current = true;
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
     return () => {
       alive.current = false;
       request.current?.abort();

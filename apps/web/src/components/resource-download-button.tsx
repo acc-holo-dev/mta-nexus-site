@@ -3,6 +3,7 @@
 import { Button } from "@nexus/ui";
 import { Download } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { resourceDeliveriesCopy } from "../lib/resource-deliveries-i18n";
 import {
@@ -29,6 +30,7 @@ export function ResourceDownloadButton({
   unavailableReason?: string | null;
 }) {
   const { dictionary, locale } = useNexusLocale();
+  const pathname = usePathname();
   const copy = dictionary.product;
   const resolvedIntent = intent ?? (buildId ? "selected" : "latest");
   const active = useRef<AbortController | null>(null);
@@ -37,15 +39,18 @@ export function ResourceDownloadButton({
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<DownloadFailure | null>(null);
   const [notice, setNotice] = useState<"cancelled" | "saved" | null>(null);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [receipt, setReceipt] = useState<{
     id: string;
     productId: string;
     buildId?: string;
     version: string;
   } | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
+  useEffect(() => {
     return () => {
       active.current?.abort();
       active.current = null;

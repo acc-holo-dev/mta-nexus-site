@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   states: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));
 vi.mock("@nexus/db", () => ({ followWorkspaceRepository: { states: mocks.states } }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.viewer },

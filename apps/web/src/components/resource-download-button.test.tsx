@@ -1,5 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/market/resource" }));
 import { LocaleProvider } from "./locale-context";
 import { ResourceDownloadButton } from "./resource-download-button";
 

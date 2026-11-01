@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/articles/guide",
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
@@ -99,7 +100,7 @@ it("shows sign-in for guests and disables votes for an author while allowing old
       locale="en"
     />,
   );
-  expect(guest).toContain('href="/auth/login"');
+  expect(guest).toContain('href="/auth/login?next=%2Farticles%2Fguide"');
   expect(guest.match(/disabled=""/gu)).toHaveLength(3);
   const own = renderToStaticMarkup(
     <ContentReactions

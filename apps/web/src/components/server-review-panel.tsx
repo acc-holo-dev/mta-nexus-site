@@ -2,6 +2,7 @@
 
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { confirmedServerReview } from "../lib/server-review-confirmation";
 import { serverReviewCopy, serverReviewError, serverReviewState } from "../lib/server-review-i18n";
@@ -53,6 +54,7 @@ export function ServerReviewPanel({
   loadState?: "ready" | "unavailable";
 }) {
   const { locale } = useNexusLocale();
+  const pathname = usePathname();
   const copy = serverReviewCopy(locale);
   const loadCopy = reviewsUnavailableCopy(locale);
   const statusId = useId();
@@ -73,7 +75,7 @@ export function ServerReviewPanel({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [confirmed, setConfirmed] = useState(false);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
 
   const refreshMine = useCallback(async () => {
     const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
@@ -99,8 +101,12 @@ export function ServerReviewPanel({
     }
   }, [serverId, confirmed]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
+
+  useEffect(() => {
     let cancelled = false;
     void refreshMine().then(() => {
       if (cancelled) return;

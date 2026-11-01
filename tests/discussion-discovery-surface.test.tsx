@@ -16,6 +16,7 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getUserById: async () => null, getSession: async () => null },
 }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
 
 import Page from "../apps/web/src/app/articles/[slug]/page";
 
@@ -139,7 +140,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain('href="/workspace/saved?type=content"');
     expect(html).toContain('href="/settings#notification-heading"');
-    expect(html).toContain('href="/auth/login"');
+    expect(html).toContain('href="/auth/login?next=%2Farticles%2Farticle"');
     expect(html).not.toContain("Checking");
   },
 );

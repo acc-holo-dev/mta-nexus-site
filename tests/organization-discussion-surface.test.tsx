@@ -7,7 +7,10 @@ import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
 import type { OrganizationWorkspace } from "../apps/web/src/lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+  usePathname: () => "/articles/article",
+}));
 const organization = {
   id: "org",
   slug: "team",
@@ -119,7 +122,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.older);
     expect(html).toContain(copy.reply);
     expect(html).toContain("/users/author");
-    expect(html).toContain('href="/auth/login"');
+    expect(html).toContain('href="/auth/login?next=%2Farticles%2Farticle"');
     expect(html).toContain("@parent_author");
     expect(html).toContain("&lt;script&gt;");
     expect(html).not.toContain("<script>");

@@ -2,6 +2,7 @@
 import { Button } from "@nexus/ui";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import type { FollowTargetType } from "../lib/follow-workspace-contract";
@@ -45,10 +46,12 @@ function FollowControl({
   const locale = providedLocale ?? appLocale;
   const shared = followCopy(locale);
   const copy = followActionCopy(locale, targetType);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const pathname = usePathname();
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
-  }, []);
+  }, [pathname]);
   const [state, setState] = useState<
     "checking" | "anonymous" | "self" | "following" | "not-following" | "error"
   >(
