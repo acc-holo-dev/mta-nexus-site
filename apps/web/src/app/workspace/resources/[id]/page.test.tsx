@@ -22,6 +22,21 @@ vi.mock("../../../../lib/services/product-service", () => ({
     getResourceLifecycleHistory: async () => [],
   },
 }));
+vi.mock("../../../../lib/services/resource-publication-readiness-service", () => ({
+  resourcePublicationReadinessService: {
+    summary: async () => ({
+      productId: "resource",
+      productStatus: "published",
+      metadataReviewRequired: false,
+      inventoryReadiness: "published",
+      canSubmitForReview: false,
+      items: [],
+    }),
+  },
+}));
+vi.mock("../../../../components/resource-publication-readiness-panel", () => ({
+  ResourcePublicationReadinessPanel: () => null,
+}));
 vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../../../../components/author-resource-forms", () => ({
   AuthorResourceForms: (props: unknown) => {

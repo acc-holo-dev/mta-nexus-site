@@ -2,11 +2,11 @@
 
 import {
   classifyBuildAvailability,
+  type ProductStatus,
+  type ResourceLifecycleAction,
   resourceLifecycleActionsFor,
   resourceLifecycleNextStep,
   resourceLifecycleTarget,
-  type ProductStatus,
-  type ResourceLifecycleAction,
   unavailableBuildSupportHref,
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
@@ -138,7 +138,11 @@ export function ResourceLifecycleControls({
               : null;
 
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-labelledby={`${fieldId}-heading`}>
+    <section
+      id="author-resource-lifecycle"
+      className="nexus-panel space-y-4 p-5"
+      aria-labelledby={`${fieldId}-heading`}
+    >
       <h2 id={`${fieldId}-heading`} className="text-xl font-semibold text-primary">
         {copy.lifecycle}
       </h2>

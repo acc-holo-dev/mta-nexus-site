@@ -75,7 +75,7 @@ export default async function AuthorResourcesPage({
           {result.items.map((product) => (
             <li key={product.id} className="min-w-0 rounded-lg border border-base bg-surface p-5">
               <Link
-                href={`/workspace/resources/${product.id}`}
+                href={`/workspace/resources/${product.id}#publication-readiness`}
                 className="break-words text-lg font-semibold text-primary hover:text-accent"
               >
                 {product.title}

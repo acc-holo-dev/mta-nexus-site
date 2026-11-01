@@ -412,6 +412,7 @@ export function AuthorResourceForms({
         )}
       </div>
       <form
+        id="author-resource-details"
         onSubmit={save}
         aria-label={copy.edit}
         className="space-y-4 rounded-lg border border-base bg-surface p-5"
@@ -489,6 +490,7 @@ export function AuthorResourceForms({
         </Button>
       </form>
       <form
+        id="author-resource-version"
         onSubmit={upload}
         aria-label={copy.newVersion}
         className="space-y-4 rounded-lg border border-base bg-surface p-5"

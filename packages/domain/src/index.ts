@@ -34,6 +34,7 @@ export * from "./build-package-evidence";
 export * from "./resource-media";
 export * from "./storage-maintenance";
 export * from "./resource-requirements";
+export * from "./resource-publication-readiness";
 export * from "./seller-sales";
 export * from "./order-terms";
 export * from "./plan-reviews";

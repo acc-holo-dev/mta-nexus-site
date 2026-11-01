@@ -85,6 +85,7 @@ export * from "./resource-moderation";
 export * from "./resource-publisher";
 export * from "./resource-release-watches";
 export * from "./resource-requirements";
+export * from "./resource-publication-readiness";
 export { resourceReviewsRepository } from "./resource-reviews";
 export { resourceQaRepository } from "./resource-qa";
 export { serverReviewsRepository } from "./server-reviews";

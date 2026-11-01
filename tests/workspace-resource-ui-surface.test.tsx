@@ -94,7 +94,9 @@ import { PublicProfileForm } from "../apps/web/src/components/public-profile-for
 import { ResourceCompatibilityForm } from "../apps/web/src/components/resource-compatibility-form";
 import { ResourceCopyForm } from "../apps/web/src/components/resource-copy-form";
 import { ResourceLifecycleControls } from "../apps/web/src/components/resource-lifecycle-controls";
+import { ResourcePublicationReadinessPanel } from "../apps/web/src/components/resource-publication-readiness-panel";
 import { ResourcePublisherFilters } from "../apps/web/src/components/resource-publisher-filters";
+import { getResourcePublicationReadinessCopy } from "../apps/web/src/lib/resource-publication-readiness-i18n";
 
 describe("workspace and resource UI surface", () => {
   it.each(["en", "ru"] as const)(
@@ -172,6 +174,49 @@ describe("workspace and resource UI surface", () => {
     expect(html).toContain(copy.create);
     expect(html).toContain('data-ui="button"');
   });
+
+  it.each(["en", "ru"] as const)(
+    "shows publication readiness with required and recommendation labels in %s",
+    (locale) => {
+      localeState.locale = locale;
+      const panelCopy = getResourcePublicationReadinessCopy(locale);
+      const html = renderToStaticMarkup(
+        createElement(ResourcePublicationReadinessPanel, {
+          locale,
+          previewHref: "/market/demo",
+          summary: {
+            productId: "prd_a",
+            productStatus: "draft",
+            metadataReviewRequired: false,
+            inventoryReadiness: "needs_version",
+            canSubmitForReview: false,
+            items: [
+              {
+                id: "description",
+                tier: "required",
+                state: "complete",
+                detailKey: "complete",
+                actionPath: "/workspace/resources/prd_a#author-resource-details",
+              },
+              {
+                id: "compatibility",
+                tier: "recommendation",
+                state: "pending",
+                detailKey: "optional",
+                actionPath: "/workspace/resources/prd_a/compatibility",
+              },
+            ],
+          },
+        }),
+      );
+      expect(html).toContain(panelCopy.title);
+      expect(html).toContain(panelCopy.required);
+      expect(html).toContain(panelCopy.recommendation);
+      expect(html).toContain(panelCopy.checklistNote);
+      expect(html).toContain('href="/market/demo"');
+      expect(html).toContain('id="publication-readiness"');
+    },
+  );
 
   it("edits compatibility and lifecycle with shared buttons", () => {
     localeState.locale = "en";

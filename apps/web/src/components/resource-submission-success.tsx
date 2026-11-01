@@ -20,7 +20,7 @@ export function ResourceSubmissionSuccess({
         <h1 className="text-2xl font-black text-primary">{copy.submittedTitle}</h1>
         <p className="text-sm leading-relaxed text-muted">{copy.submittedDescription}</p>
         <Link
-          href={`/workspace/resources/${encodeURIComponent(resultId)}`}
+          href={`/workspace/resources/${encodeURIComponent(resultId)}#publication-readiness`}
           className="inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {copy.openStatus}

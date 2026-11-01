@@ -4691,7 +4691,7 @@
       "queue_state": "needs_decision",
       "priority": "P2",
       "source_ids": ["PX10"],
-      "current": "Есть resource forms, draft recovery, media/version/compatibility screens; общей readiness сводки нет.",
+      "current": "Author resource overview показывает server-derived readiness checklist с required/recommendation, fix links и disclaimers для preview/scan.",
       "goal": "Краткий обзор реального publishing workflow с причиной и переходом к существующему исправлению.",
       "scope_files": [
         "apps/web/src/components/new-resource-form.tsx",
@@ -4730,9 +4730,11 @@
         "Review package v1: specified — подготовленный контракт, не разрешение на внедрение или включение.",
         "Readiness overview — proposal, не уже принятое обязательное окно."
       ],
-      "execution_state": "not_started",
+      "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
-      "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"]
+      "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
+      "execution_notes": "Publication readiness panel on managed resource overview; domain summary + DB snapshot; focused tests PASS; author-workspace playwright not run.",
+      "execution_updated_on": "2026-11-01"
     },
     {
       "id": "UX-23",

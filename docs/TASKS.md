@@ -3357,7 +3357,7 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
-Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
+ Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -3614,11 +3614,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-22 — Автор видит причины неготовности публикации
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** not_started. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Publication readiness panel on managed resource overview; domain summary + DB snapshot; focused tests PASS; author-workspace playwright not run.
 
 **Исходные пункты:** PX10. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Есть resource forms, draft recovery, media/version/compatibility screens; общей readiness сводки нет.
+**Сейчас.** Author resource overview показывает server-derived readiness checklist с required/recommendation, fix links и disclaimers для preview/scan.
 
 **Результат.** Краткий обзор реального publishing workflow с причиной и переходом к существующему исправлению.
 

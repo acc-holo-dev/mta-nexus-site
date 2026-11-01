@@ -1,16 +1,18 @@
-import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
-import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
-import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { authService } from "../../../../lib/services/auth-service";
-import { productService } from "../../../../lib/services/product-service";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
+import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
+import { ResourcePublicationReadinessPanel } from "../../../../components/resource-publication-readiness-panel";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../lib/resource-build-workspace-i18n";
-import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
+import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
+import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
+import { authService } from "../../../../lib/services/auth-service";
+import { productService } from "../../../../lib/services/product-service";
+import { resourcePublicationReadinessService } from "../../../../lib/services/resource-publication-readiness-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -41,9 +43,10 @@ export default async function ManageResourcePage({
   const { id } = await params;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
-  const [history, lifecycleHistory] = await Promise.all([
+  const [history, lifecycleHistory, publicationReadiness] = await Promise.all([
     productService.getManagedHistory(id, actor, Number((await searchParams).page ?? 1)),
     productService.getResourceLifecycleHistory(id, actor),
+    resourcePublicationReadinessService.summary(id, actor),
   ]);
   const commerceCopy = getResourceCommerceCopy(locale);
   const buildCopy = getResourceBuildWorkspaceCopy(locale);
@@ -65,6 +68,11 @@ export default async function ManageResourcePage({
       {product.metadataReviewRequired && (
         <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
       )}
+      <ResourcePublicationReadinessPanel
+        summary={publicationReadiness}
+        locale={locale}
+        previewHref={`/market/${product.slug}`}
+      />
       <ResourceLifecycleControls
         key={`lifecycle:${product.id}:${product.status}:${new Date(product.updatedAt).toISOString()}`}
         product={{
