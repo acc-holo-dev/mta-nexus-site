@@ -51,9 +51,13 @@ it.each(["en", "ru"] as const)(
       locale === "ru" ? "нет подходящих уведомлений" : "No matching notifications",
     );
     expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
-    expect(renderToStaticMarkup(await Loading())).toContain(
-      locale === "ru" ? "Обновление уведомлений" : "Refreshing notifications",
-    );
+    const copy = notificationInboxCopy(locale);
+    const loadingHtml = renderToStaticMarkup(await Loading());
+    expect(loadingHtml).toContain('aria-busy="true"');
+    expect(loadingHtml).toContain('id="notification-inbox-loading-heading"');
+    expect(loadingHtml).toContain('aria-labelledby="notification-inbox-loading-heading"');
+    expect(loadingHtml).toContain(`>${copy.title}<`);
+    expect(loadingHtml).toContain(copy.loading);
   },
 );
 it.each(["en", "ru"] as const)(

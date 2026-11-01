@@ -140,9 +140,13 @@ it.each(["en", "ru"] as const)(
     expect(page?.searchParams.get("tag")).toBe("MTA");
     expect(page?.searchParams.has("page")).toBe(false);
     expect((await deskMetadata()).robots.index).toBe(false);
-    expect(renderToStaticMarkup(await Loading())).toContain(
-      authorPublicationDeskCopy(locale).loading,
-    );
+    const loadingCopy = authorPublicationDeskCopy(locale);
+    const loadingHtml = renderToStaticMarkup(await Loading());
+    expect(loadingHtml).toContain('aria-busy="true"');
+    expect(loadingHtml).toContain('id="publication-desk-loading-heading"');
+    expect(loadingHtml).toContain('aria-labelledby="publication-desk-loading-heading"');
+    expect(loadingHtml).toContain(`>${loadingCopy.title}<`);
+    expect(loadingHtml).toContain(loadingCopy.loading);
   },
 );
 it.each(["en", "ru"] as const)(
