@@ -1,4 +1,4 @@
-import { SectionHeader, buttonClassName } from "@nexus/ui";
+import { buttonClassName, SectionHeader } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -13,8 +13,8 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { contentService } from "../lib/services/content-service";
 import {
-  matchesMtaEndpoint,
   type MtaMasterServer,
+  matchesMtaEndpoint,
   mtaMasterDirectoryService,
 } from "../lib/services/mta-master-directory-service";
 import { productService } from "../lib/services/product-service";
@@ -144,6 +144,7 @@ export default async function HomePage() {
           copy={{
             title: dictionary.home.personalTitle,
             description: dictionary.home.personalDescription,
+            scopeNote: dictionary.home.personalScopeNote,
             empty: dictionary.home.personalEmpty,
             error: dictionary.home.personalError,
             partial: dictionary.home.personalPartial,

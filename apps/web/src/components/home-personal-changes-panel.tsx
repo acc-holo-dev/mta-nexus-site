@@ -7,6 +7,7 @@ import { HomePersonalOptOut } from "./home-personal-opt-out";
 export type HomePersonalCopy = {
   title: string;
   description: string;
+  scopeNote: string;
   empty: string;
   error: string;
   partial: string;
@@ -47,6 +48,7 @@ export function HomePersonalChangesPanel({
           />
         }
       />
+      <p className="text-xs text-muted">{copy.scopeNote}</p>
 
       {summary.status === "hidden" ? <p className="text-sm text-muted">{copy.hidden}</p> : null}
 

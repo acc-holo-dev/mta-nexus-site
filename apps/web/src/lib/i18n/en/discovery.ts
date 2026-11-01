@@ -30,6 +30,8 @@ export const discovery = {
     personalTitle: "Your changes",
     personalDescription:
       "Updates from release watches, discussion follows, and unread replies to you.",
+    personalScopeNote:
+      "Open free beta: up to 12 recent items from those sources on Home. Your notification inbox keeps the full history and read state.",
     personalEmpty: "Nothing new from your watches, follows, or replies right now.",
     personalError:
       "Your personal changes could not be loaded. Public Home sections below are still available.",

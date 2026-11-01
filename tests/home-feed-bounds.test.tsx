@@ -82,6 +82,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import HomePage from "../apps/web/src/app/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 describe("bounded home feed reads", () => {
   beforeEach(() => {
@@ -135,5 +136,17 @@ describe("bounded home feed reads", () => {
     expect(html).toContain("Server 1");
     expect(html).toContain("Server 6");
     expect(html).not.toContain("Server 7");
+  });
+
+  it("shows the bounded personal-changes honesty note for signed-in users", async () => {
+    mocks.getSession.mockResolvedValue({ id: "actor" });
+    mocks.loadPersonal.mockResolvedValue({ status: "empty", items: [], failedSources: [] });
+
+    const html = renderToStaticMarkup(await HomePage());
+    const copy = getDictionary("en").home;
+
+    expect(mocks.loadPersonal).toHaveBeenCalledOnce();
+    expect(html).toContain(copy.personalScopeNote);
+    expect(html).toContain(copy.personalTitle);
   });
 });
