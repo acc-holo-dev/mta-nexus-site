@@ -13,7 +13,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: () => undefined, refresh: () => undefined }),
+  usePathname: () => "/workspace/servers/srv/content",
 }));
+
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
@@ -72,10 +74,11 @@ it.each(["en", "ru"] as const)(
 it("does not load private server data without a session", async () => {
   mocks.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }))).toContain(
-    'href="/auth/login"',
+    'href="/auth/login?next=%2Fworkspace%2Fservers%2Fsrv%2Fcontent"',
   );
   expect(mocks.page).not.toHaveBeenCalled();
 });
+
 it("shows revoked authority and recovery without creating editor actions", async () => {
   mocks.page.mockRejectedValue(new AppError("private role details", 403, "FORBIDDEN"));
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }));

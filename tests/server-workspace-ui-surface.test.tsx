@@ -5,7 +5,9 @@ import { getDictionary } from "../apps/web/src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
+  usePathname: () => "/workspace/servers/srv_1",
 }));
+
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {

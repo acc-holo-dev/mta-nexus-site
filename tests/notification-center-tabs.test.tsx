@@ -15,6 +15,7 @@ describe("NotificationCenterTabs keyboard focus", () => {
     );
 
     expect(html).toContain('href="/notifications?state=unread"');
-    expect(html).toContain("focus-visible:ring-2");
+    expect(html).toContain("focus-visible:outline-2");
+    expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
   });
 });

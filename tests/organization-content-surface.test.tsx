@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: () => undefined, refresh: () => undefined }),
+  usePathname: () => "/workspace/organizations/org/content",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -74,10 +75,11 @@ it.each(["en", "ru"] as const)(
 it("does not load private organization data without a session", async () => {
   mocks.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }))).toContain(
-    'href="/auth/login"',
+    'href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"',
   );
   expect(mocks.page).not.toHaveBeenCalled();
 });
+
 it("shows revoked authority and recovery without creating editor actions", async () => {
   mocks.page.mockRejectedValue(new AppError("private role details", 403, "FORBIDDEN"));
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }));

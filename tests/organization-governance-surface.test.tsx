@@ -6,7 +6,11 @@ const mocks = vi.hoisted(() => ({
   history: vi.fn(),
   locale: "en" as "en" | "ru",
 }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+  usePathname: () => "/workspace/organizations/org/activity",
+}));
+
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
