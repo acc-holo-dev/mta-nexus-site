@@ -1,6 +1,6 @@
 # Проверенный срез проекта
 
-**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `03c9b73651d4f2bdfa1505614b88a88f196d2911` (`fix(test): remove non-null assertions in readiness panel coverage`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `f2df5e1fa1ed70faa869193b4c6551c3724b117c` (`fix(web): localize RU dev chrome and label diagnostic sections`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
 ## Оценка стадии
 

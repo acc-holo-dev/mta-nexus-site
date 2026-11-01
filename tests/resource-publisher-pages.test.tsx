@@ -98,6 +98,9 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(
       locale === "ru" ? "Чистая версия готова к отправке" : "Ready to submit a clean version",
     );
+    expect(html).toContain(
+      locale === "ru" ? 'aria-label="Мои ресурсы"' : 'aria-label="My resources"',
+    );
   },
 );
 it.each(["en", "ru"] as const)(

@@ -74,7 +74,7 @@ export default async function AuthorResourcesPage({
       {result.items.length === 0 ? (
         <p className="py-10 text-secondary">{emptyMessage}</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul aria-label={copy.title} className="grid gap-4 sm:grid-cols-2">
           {result.items.map((product) => (
             <li key={product.id} className="min-w-0 rounded-lg border border-base bg-surface p-5">
               <Link

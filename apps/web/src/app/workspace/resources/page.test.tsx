@@ -54,6 +54,9 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("/workspace/resources/resource");
     expect(html).toContain("status=pending_review&amp;page=3");
     expect(html).toContain(locale === "ru" ? "Мои ресурсы" : "My resources");
+    expect(html).toContain(
+      locale === "ru" ? 'aria-label="Мои ресурсы"' : 'aria-label="My resources"',
+    );
     expect(metadata.robots).toMatchObject({ index: false });
   },
 );
