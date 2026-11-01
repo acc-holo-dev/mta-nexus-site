@@ -5,7 +5,9 @@ import { CheckCircle2, Library, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useState } from "react";
+import { authEntryHref } from "../../components/auth-return-path";
 import { useNexusLocale } from "../../components/locale-context";
+import { licenseModelLabel } from "../../lib/license-model-i18n";
 import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
 import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";
 
@@ -24,6 +26,7 @@ function AcquireContent() {
   const productId = searchParams.get("productId");
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.checkout;
+  const authCopy = dictionary.auth;
   const activityCopy = getResourceActivityCopy(locale);
   const summaryHeadingId = useId();
   const accessHeadingId = useId();
@@ -36,6 +39,10 @@ function AcquireContent() {
   const [claimedAccess, setClaimedAccess] =
     useState<ReturnType<typeof confirmedResourceClaim>>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  const acquireReturnPath = productId
+    ? `/acquire?productId=${encodeURIComponent(productId)}`
+    : null;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(loadRevision): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
@@ -90,6 +97,7 @@ function AcquireContent() {
 
     setLoading(true);
     setError(null);
+    setNeedsSignIn(false);
     try {
       const response = await fetch("/api/resources/claim", {
         method: "POST",
@@ -101,6 +109,11 @@ function AcquireContent() {
       });
 
       const data = await response.json().catch(() => null);
+      if (response.status === 401) {
+        setNeedsSignIn(true);
+        setError(dictionary.product.downloadErrors.signIn);
+        return;
+      }
       const confirmed = confirmedResourceClaim(data, product.id);
       if (!response.ok || !confirmed) {
         throw new Error(data?.error || copy.claimFailed);
@@ -162,7 +175,7 @@ function AcquireContent() {
               {copy.openResource}
             </Link>
             <Link
-              href="/workspace"
+              href="/workspace/library"
               className="rounded-lg border border-base bg-surface px-5 py-2.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
             >
               {copy.openLibrary}
@@ -236,7 +249,23 @@ function AcquireContent() {
           role="alert"
           className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
         >
-          {error}
+          <p>{error}</p>
+          {needsSignIn && acquireReturnPath ? (
+            <p className="mt-3 flex flex-wrap items-center justify-center gap-3 text-sm">
+              <Link
+                href={authEntryHref("login", acquireReturnPath)}
+                className="font-semibold text-accent underline"
+              >
+                {authCopy.signIn}
+              </Link>
+              <Link
+                href={authEntryHref("register", acquireReturnPath)}
+                className="font-semibold text-accent underline"
+              >
+                {authCopy.create}
+              </Link>
+            </p>
+          ) : null}
         </div>
       )}
 
@@ -258,8 +287,8 @@ function AcquireContent() {
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.licenseModel}</dt>
-            <dd className="text-right capitalize text-primary">
-              {product.licenseModel.replace(/_/g, " ")}
+            <dd className="text-right text-primary">
+              {licenseModelLabel(locale, product.licenseModel)}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-2">

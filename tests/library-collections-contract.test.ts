@@ -11,6 +11,10 @@ import {
   collectionPageParams,
   collectionsQuery,
 } from "../apps/web/src/lib/library-collections-query";
+import {
+  collectionCommandItemResults,
+  LIBRARY_COLLECTION_BATCH_LIMIT,
+} from "@nexus/domain";
 import { libraryCollectionCommandSchema } from "../packages/validation/src/library-collections";
 
 const requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
@@ -145,6 +149,30 @@ it("keeps own RU/EN copy and actionable state errors", () => {
   expect(libraryCollectionsCopy("en").subtitle).toContain("do not grant");
   expect(libraryCollectionError("ru", "COLLECTION_CONFLICT")).toContain("изменилась");
   expect(libraryCollectionError("en", "COLLECTION_ITEM_LIMIT")).toContain("limit");
+  expect(libraryCollectionError("en", "COLLECTION_ITEM_LIMIT")).toContain(
+    libraryCollectionsCopy("en").itemLimitNext,
+  );
+  expect(libraryCollectionError("en", "COLLECTION_LIMIT")).toContain(
+    libraryCollectionsCopy("en").collectionLimitNext,
+  );
+  expect(libraryCollectionsCopy("en").toCollection).not.toBe(
+    libraryCollectionsCopy("en").resourceCollections,
+  );
+  expect(libraryCollectionsCopy("en").emptyFilteredItems).not.toBe(
+    libraryCollectionsCopy("en").emptyItems,
+  );
+  expect(
+    collectionCommandItemResults({
+      requestId,
+      action: "add-many",
+      productIds: ["prd_a", "prd_b"],
+      expectedRevision: 1,
+    }),
+  ).toEqual([
+    { productId: "prd_a", outcome: "added" },
+    { productId: "prd_b", outcome: "added" },
+  ]);
+  expect(LIBRARY_COLLECTION_BATCH_LIMIT).toBe(20);
 });
 it.each(["add-many", "remove-many"] as const)(
   "canonicalizes and strictly bounds %s commands",

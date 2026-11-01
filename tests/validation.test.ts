@@ -1,11 +1,16 @@
 import { describe, it, expect } from "vitest";
 import {
+  compareResourceVersions,
+  resourceVersionsConflict,
+} from "@nexus/domain";
+import {
   createServerSchema,
   createOrganizationSchema,
   updateServerSchema,
   safeExternalWebUrl,
   createProductSchema,
   createBuildSchema,
+  resourceVersionSchema,
   checkoutSchema,
   changePasswordSchema,
   notificationPreferencesSchema,
@@ -121,6 +126,41 @@ describe("Validation Schemas", () => {
         mtaVersionTarget: "1.6.0-preview",
       }).success,
     ).toBe(false);
+  });
+
+  it("normalizes optional leading v on new resource versions and keeps MTA target separate", () => {
+    const parsed = createBuildSchema.safeParse({
+      productId: "prd_ops19",
+      version: "v1.2.3-beta.1",
+      storageKey: "builds/ops19.zip",
+      sha256Hash: "b".repeat(64),
+      fileSizeBytes: 2,
+      mtaVersionTarget: "1.6.0",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.version).toBe("1.2.3-beta.1");
+      expect(parsed.data.mtaVersionTarget).toBe("1.6.0");
+    }
+
+    expect(resourceVersionSchema.safeParse("v2.0").success).toBe(true);
+    expect(resourceVersionSchema.safeParse("v2.0").data).toBe("2.0");
+    expect(resourceVersionSchema.safeParse("not-a-version").success).toBe(false);
+    expect(resourceVersionSchema.safeParse("1.0.0+build.1").success).toBe(false);
+  });
+
+  it("compares SemVer-like resource versions with prerelease precedence", () => {
+    expect(compareResourceVersions("v1.0.0", "1.0.0")).toBe(0);
+    expect(compareResourceVersions("1.0", "1.0.0")).toBe(0);
+    expect(compareResourceVersions("1.0.0-alpha", "1.0.0")).toBe(-1);
+    expect(compareResourceVersions("1.0.0", "1.0.0-alpha")).toBe(1);
+    expect(compareResourceVersions("1.0.0-alpha.1", "1.0.0-alpha.beta")).toBe(-1);
+    expect(compareResourceVersions("1.0.0-alpha.beta", "1.0.0-beta")).toBe(-1);
+    expect(compareResourceVersions("1.0.0-beta.2", "1.0.0-beta.11")).toBe(-1);
+    expect(compareResourceVersions("1.9.9", "1.10.0")).toBe(-1);
+    expect(compareResourceVersions("bad", "1.0.0")).toBeNull();
+    expect(resourceVersionsConflict("v1.2.3", "1.2.3")).toBe(true);
+    expect(resourceVersionsConflict("1.2.3", "1.2.4")).toBe(false);
   });
 
   it("should reject password reuse and accept a strong replacement", () => {

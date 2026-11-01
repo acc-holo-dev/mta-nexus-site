@@ -3,7 +3,10 @@
 import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { submitContentCommentRequest } from "../lib/content-comment-client";
+import {
+  createCommentIntentKey,
+  submitContentCommentRequest,
+} from "../lib/content-comment-client";
 import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../lib/content-discussion-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
@@ -11,9 +14,10 @@ import { followCopy } from "../lib/follow-workspace-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
-import { FollowButton } from "./follow-button";
+import { ContentFollowControls } from "./content-follow-controls";
 
 export function ContentDiscussion({
   slug,
@@ -44,6 +48,7 @@ export function ContentDiscussion({
   const [readError, setReadError] = useState(initialError || (initial ? "" : copy.unavailable));
   const [search, setSearch] = useState(initialQuery);
   const [focusedId, setFocusedId] = useState(initialFocus);
+  const [loginHref, setLoginHref] = useState("/auth/login");
   const activeQuery = useRef(initialQuery);
   const readController = useRef<AbortController | null>(null);
   const alive = useRef(true);
@@ -58,10 +63,16 @@ export function ContentDiscussion({
   const readGuard = useRef(false);
   const writeGuard = useRef(false);
   const managementGuard = useRef(false);
+  const pendingIntent = useRef<{
+    key: string;
+    text: string;
+    parentId?: string;
+  } | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
   useEffect(() => {
     alive.current = true;
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
     return () => {
       alive.current = false;
       readController.current?.abort();
@@ -134,13 +145,25 @@ export function ContentDiscussion({
       }));
       return true;
     } catch (caught) {
-      if (alive.current && !controller.signal.aborted)
+      if (alive.current && !controller.signal.aborted) {
         setReadError(caught instanceof Error ? caught.message : copy.unavailable);
+        if (focusId) setFocusedId(focusId);
+      }
       return false;
     } finally {
       readGuard.current = false;
       if (alive.current && !controller.signal.aborted) setLoading(false);
     }
+  }
+  function returnToDiscussion() {
+    setFocusedId(undefined);
+    if (typeof window !== "undefined" && window.location.hash.startsWith("#comment-")) {
+      const url = new URL(window.location.href);
+      url.hash = "discussion";
+      url.searchParams.delete("comment");
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+    void load(false, activeQuery.current);
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -154,15 +177,25 @@ export function ContentDiscussion({
     setSubmitting(true);
     setWriteError("");
     setPublished(false);
+    const parentId = reply?.id;
+    const frozen =
+      pendingIntent.current &&
+      pendingIntent.current.text === normalized &&
+      pendingIntent.current.parentId === parentId
+        ? pendingIntent.current
+        : { key: createCommentIntentKey(), text: normalized, parentId };
+    pendingIntent.current = frozen;
     try {
       await submitContentCommentRequest({
         slug,
         contentId,
-        parentId: reply?.id,
+        parentId,
         text: normalized,
+        intentKey: frozen.key,
         locale,
         fallbackError: copy.writeUnavailable,
       });
+      pendingIntent.current = null;
       setText("");
       setReply(null);
       setPublished(true);
@@ -170,6 +203,7 @@ export function ContentDiscussion({
       // Saved state is independent from a subsequent read failure.
       await load(false, "");
     } catch (caught) {
+      // Keep draft + frozen intent so a lost-response retry reuses one key.
       setWriteError(caught instanceof Error ? caught.message : copy.unavailable);
     } finally {
       writeGuard.current = false;
@@ -179,13 +213,21 @@ export function ContentDiscussion({
   return (
     <section id="discussion" className="nexus-panel space-y-5 p-5 sm:p-6">
       <div className="nexus-panel space-y-3 p-4">
-        <p className="text-sm text-muted">{followCopy(locale).discussionHelp}</p>
-        <FollowButton
-          targetType="content"
-          targetId={contentId}
-          targetName={title ?? slug}
+        <ContentFollowControls
+          contentId={contentId}
+          title={title ?? slug}
           locale={locale}
-          initial={viewer ? undefined : { authenticated: false, following: false }}
+          initial={
+            viewer
+              ? undefined
+              : {
+                  authenticated: false,
+                  following: false,
+                  notifyComments: false,
+                  muted: false,
+                  mutedUntil: null,
+                }
+          }
         />
         <div className="flex flex-wrap gap-4">
           <Link
@@ -218,6 +260,7 @@ export function ContentDiscussion({
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            // Search refreshes the list only; the compose draft stays in React state.
             void load(false, search.trim());
           }}
           className="flex flex-wrap items-end gap-3"
@@ -241,6 +284,9 @@ export function ContentDiscussion({
             {copy.applySearch}
           </Button>
         </form>
+        {text.trim().length > 0 && (
+          <p className="mt-2 text-xs text-muted">{copy.searchKeepsDraft}</p>
+        )}
       </search>
       <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
         {reply && (
@@ -284,7 +330,7 @@ export function ContentDiscussion({
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
           {!viewer && (
-            <Link className="text-xs text-accent underline" href="/auth/login">
+            <Link className="text-xs text-accent underline" href={loginHref}>
               {copy.signIn}
             </Link>
           )}
@@ -399,6 +445,7 @@ export function ContentDiscussion({
                     if (pending) setManagementSuccess("");
                   }}
                   onSaved={(value, revision) => {
+                    const ownRemoval = viewer.id === comment.author?.id;
                     setPage((current) =>
                       current
                         ? {
@@ -428,7 +475,13 @@ export function ContentDiscussion({
                       setDisplayCount((current) => Math.max(0, current - 1));
                       if (reply?.id === comment.id) setReply(null);
                     }
-                    setManagementSuccess(value === undefined ? copy.removed : copy.edited);
+                    setManagementSuccess(
+                      value === undefined
+                        ? ownRemoval
+                          ? copy.removed
+                          : copy.moderatedRemoved
+                        : copy.edited,
+                    );
                   }}
                 />
               )}
@@ -439,9 +492,22 @@ export function ContentDiscussion({
         <p className="text-sm text-muted">{activeQuery.current ? copy.noMatches : copy.first}</p>
       )}
       {readError && (
-        <p role="alert" className="text-sm text-danger">
-          {readError}
-        </p>
+        <div className="space-y-2">
+          <p role="alert" className="text-sm text-danger">
+            {readError}
+          </p>
+          {(readError === copy.focusMissing || focusedId) && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-auto px-0 text-sm text-accent underline"
+              disabled={loading || submitting || !!managingId}
+              onClick={returnToDiscussion}
+            >
+              {copy.returnDiscussion}
+            </Button>
+          )}
+        </div>
       )}
       <div className="flex flex-wrap gap-3">
         {page?.hasMore && (

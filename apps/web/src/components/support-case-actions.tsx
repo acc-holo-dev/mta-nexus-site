@@ -39,6 +39,13 @@ export function SupportCaseActions({
   return (
     <div className="space-y-2">
       {!staff && <p className="text-sm text-muted">{workspace.ownHelp}</p>}
+      {supportCase.status === "resolved" && !staff ? (
+        <p className="text-sm text-secondary">
+          {locale === "ru"
+            ? "Ответ в решённом обращении снова откроет его."
+            : "A reply on a resolved case reopens it."}
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         {actions.map((action) => (
           <Button

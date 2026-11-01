@@ -1,6 +1,12 @@
 import { productRepository, reportRepository, verificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { can, consumeRateLimit, generateId } from "@nexus/security";
+import {
+  can,
+  consumeRateLimit,
+  criticalStaffAdminFreshAuthAction,
+  freshAuthProofAccepted,
+  generateId,
+} from "@nexus/security";
 import { resourceModerationCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -25,6 +31,9 @@ function json(body: unknown, status = 200) {
   });
 }
 
+/** FLOW-22: plaintext proof stays out of audit/details and request logs. */
+const currentPasswordField = z.string().min(1).max(128);
+
 const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({
     targetType: z.literal("product"),
@@ -32,18 +41,21 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
     action: z.enum(["feature", "unfeature", "suspend", "restore"]),
     notes: z.string().max(2000).optional(),
     expectedUpdatedAt: z.string().max(40).optional(),
+    currentPassword: currentPasswordField,
   }),
   z.object({
     targetType: z.literal("report"),
     targetId: z.string().min(1),
     action: z.enum(["resolve", "dismiss"]),
     notes: z.string().trim().min(3).max(2000),
+    currentPassword: currentPasswordField,
   }),
   z.object({
     targetType: z.literal("verification"),
     targetId: z.string().min(1),
     action: z.enum(["approve", "reject"]),
     notes: z.string().trim().min(3).max(2000),
+    currentPassword: currentPasswordField,
   }),
   z.object({
     targetType: z.literal("build"),
@@ -53,6 +65,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
     expectedRevision: z.number().int().min(1).max(2147483646).optional(),
     /** SEC-002: enqueue durable notices for users with a served download receipt. */
     notifyAffectedDownloaders: z.boolean().optional(),
+    currentPassword: currentPasswordField,
   }),
   z
     .object({
@@ -61,6 +74,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
       action: z.enum(["publish", "archive"]),
       notes: z.string().trim().min(3).max(2000),
       expectedUpdatedAt: z.iso.datetime(),
+      currentPassword: currentPasswordField,
     })
     .strict(),
 ]);
@@ -95,7 +109,16 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       parsed.data.expectedRevision === undefined
     )
       throw new AppError("Observed build revision is required", 400, "BUILD_REVISION_REQUIRED");
-    const { targetType, targetId, action, notes } = parsed.data;
+    const { targetType, targetId, action, notes, currentPassword } = parsed.data;
+
+    const staffFreshAuth = criticalStaffAdminFreshAuthAction(targetType, action);
+    if (!staffFreshAuth || !freshAuthProofAccepted(staffFreshAuth, "current_password")) {
+      throw new AppError("Current password is required", 401, "FRESH_AUTH_REQUIRED");
+    }
+    const { expectedPasswordHash } = await authService.confirmStaffActionPassword({
+      email: user.email,
+      currentPassword,
+    });
 
     const makeAudit = () => ({
       id: generateId("aud"),
@@ -192,6 +215,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
             decision: action,
             notes,
             expectedRevision: parsed.data.expectedRevision as number,
+            expectedPasswordHash,
           },
           user,
           token,

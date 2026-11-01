@@ -52,11 +52,15 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.title);
     expect(html).toContain(copy.scope);
     expect(html).toContain(copy.reloadHint.replaceAll("'", "&#x27;"));
+    expect(html).toContain(copy.refreshVersionHint);
+    expect(html).toContain(copy.guestPreview);
+    expect(html).toContain(copy.guestPreviewAlways);
     expect(html).toContain('name="showActivity"');
     expect(html).toContain('name="showProfessionalContacts"');
     expect(html).not.toContain('checked=""');
     expect(html).toContain('aria-describedby="privacy-contacts-description"');
     expect(html).toContain('href="/users/member"');
+    expect(html).toContain('href="/users/member?preview=guest"');
     expect(html).toContain('href="/settings/developer"');
     expect(await generateMetadata()).toEqual({
       title: copy.title,

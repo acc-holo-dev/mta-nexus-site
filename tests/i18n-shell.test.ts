@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { adminStatusLabel } from "../apps/web/src/app/admin/status-labels";
 import { getDictionary, resolveLocale } from "../apps/web/src/lib/i18n";
 
 describe("RU/EN shell foundation", () => {
@@ -48,5 +49,29 @@ describe("RU/EN shell foundation", () => {
     expect(keys(getDictionary("ru"))).toEqual(keys(getDictionary("en")));
     expect(getDictionary("ru").workspaceContext.retry).toBe("Повторить");
     expect(getDictionary("en").workspaceContext.retry).toBe("Try again");
+  });
+
+  it("localizes moderation and scan status labels without changing enums", () => {
+    for (const status of [
+      "pending",
+      "approved",
+      "rejected",
+      "open",
+      "under_review",
+      "resolved",
+      "dismissed",
+      "clean",
+      "malicious",
+      "quarantined",
+    ] as const) {
+      expect(adminStatusLabel("en", status)).not.toBe(adminStatusLabel("ru", status));
+      expect(adminStatusLabel("en", status).toLowerCase().replace(/\s+/gu, "_")).not.toBe(
+        "success",
+      );
+    }
+    expect(adminStatusLabel("en", "pending")).toBe("Pending");
+    expect(adminStatusLabel("ru", "under_review")).toBe("На проверке");
+    expect(adminStatusLabel("en", "totally_unknown_enum")).toBe("Unknown status");
+    expect(adminStatusLabel("ru", "totally_unknown_enum")).toBe("Неизвестный статус");
   });
 });

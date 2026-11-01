@@ -494,6 +494,7 @@ describe("support HTTP authorization and privacy", () => {
       }),
       expect.objectContaining({ actorId: "usr_member", operation: "case", caseId }),
       "initiating-token",
+      null,
     );
   });
 

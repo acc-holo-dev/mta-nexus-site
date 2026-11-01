@@ -13,6 +13,7 @@ import {
   confirmedResourceCart,
 } from "../lib/resource-commerce-confirmation";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { useNexusLocale } from "./locale-context";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
@@ -24,21 +25,32 @@ const outlineButtonClass =
 export function AddResourceToCart({
   productId,
   signedIn,
+  returnPath,
 }: {
   productId: string;
   signedIn: boolean;
+  /** Guest return preserves cart intent without auto-claim after login. */
+  returnPath?: string | null;
 }) {
   const { locale } = useNexusLocale();
   const copy = getResourceCommerceCopy(locale);
   const [busy, setBusy] = useState(false);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
+  const [loginHref, setLoginHref] = useState(authEntryHref("login", returnPath ?? null));
   const lock = useRef(false);
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", returnPath ?? currentBrowserReturnPath()));
+  }, [returnPath]);
   if (!signedIn)
     return (
-      <Link href="/auth/login" className={buttonClass}>
-        {copy.signIn}
-      </Link>
+      <div className="space-y-2">
+        <p className="text-xs text-muted">{copy.batchIntent}</p>
+        <Link href={loginHref} className={buttonClass}>
+          {copy.signIn}
+        </Link>
+        <p className="text-xs text-muted">{copy.guestReturnNote}</p>
+      </div>
     );
   async function add() {
     if (lock.current) return;
@@ -64,7 +76,8 @@ export function AddResourceToCart({
     }
   }
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-acquire-intent="batch">
+      <p className="text-xs text-muted">{copy.batchIntent}</p>
       {added ? (
         <Link href="/workspace/cart" className={`${buttonClass} block text-center`}>
           {copy.added} · {copy.openCart}
@@ -221,10 +234,11 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
   const uncertain = pending.current !== null,
     unavailable = cart.items.some((item) => !item.available);
   return (
-    <div className="space-y-5" aria-busy={busy}>
+    <div className="space-y-5" aria-busy={busy} data-acquire-intent="batch">
       <p aria-live="polite" className="text-sm text-secondary">
         {copy.cart}: {cart.items.length}/{cart.limit}
       </p>
+      <p className="text-sm text-secondary">{copy.batchIntent}</p>
       <p
         role="note"
         className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
@@ -232,12 +246,16 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         {receiptCopy.reviewNote}
       </p>
       {error ? (
-        <p role="alert" className="rounded-lg bg-danger-soft p-4 text-sm text-danger">
+        <p role="alert" className="rounded-lg bg-danger-soft p-4 text-sm text-danger" data-cart-state="error">
           {error}
         </p>
       ) : null}
       {receiptId ? (
-        <div role="status" className="rounded-lg bg-success-soft p-4 text-sm text-success">
+        <div
+          role="status"
+          className="rounded-lg bg-success-soft p-4 text-sm text-success"
+          data-cart-state="receipt"
+        >
           <p>{copy.done}</p>
           <Link href={resourceCartReceiptUrl(receiptId)} className="underline">
             {receiptCopy.receipt}
@@ -245,7 +263,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         </div>
       ) : null}
       {uncertain && !busy ? (
-        <p role="status" className="text-sm text-warning">
+        <p role="status" className="text-sm text-warning" data-cart-state="pending">
           {receiptCopy.pending}
         </p>
       ) : null}
@@ -273,7 +291,9 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                       {item.available ? `${copy.free} · ${item.version}` : copy.unavailableNote}
                     </p>
                     {item.alreadyOwned ? (
-                      <p className="text-sm text-success">{copy.owned}</p>
+                      <p className="text-sm text-success" data-cart-state="owned">
+                        {copy.owned}
+                      </p>
                     ) : null}
                   </div>
                   <Button

@@ -22,6 +22,7 @@ export function listMigrationEvidence(migrationsDir) {
 
 export const REQUIRED_RELEASE_GATES = Object.freeze([
   "repository_identity",
+  "toolchain_policy",
   "release_evidence_harness",
   "database_migrations",
   "lint",
@@ -108,6 +109,271 @@ export function summarizeExternalEvidence(items) {
     complete: entries.length > 0 && missingOrInvalid.length === 0,
     missingOrInvalid,
   });
+}
+
+/** OPS-08 release candidate manifest (extends core release-evidence). */
+export const RELEASE_MANIFEST_SCHEMA_VERSION = 1;
+
+/**
+ * CI artifact retention is short. Durable release-bundle retention duration and
+ * location are an owner decision (OPS-16); scripts must not invent a duration.
+ */
+export const RELEASE_RETENTION_CONTRACT = Object.freeze({
+  ciArtifactDays: 14,
+  releaseBundle: Object.freeze({
+    status: "owner_decision_required",
+    note: "Keep the current and required previous release bundles/images outside the 14-day CI cache; duration and store are owner-approved, not invented here.",
+  }),
+  secretsForbidden: true,
+});
+
+export const RELEASE_MANIFEST_ROLE_INVENTORY = Object.freeze([
+  "app",
+  "push-worker",
+  "license-worker",
+  "resource-release-worker",
+  "mail-worker",
+  "postgres",
+  "clamav",
+  "caddy",
+]);
+
+const SHA_RE = /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/u;
+const DIGEST_RE = /^sha256:[a-f0-9]{64}$/u;
+
+/**
+ * Build a versioned release manifest document. productionAuthorized is always false.
+ * Image digest may be unresolved until trusted GHCR publish records it (OPS-10/11).
+ */
+export function buildReleaseManifest({
+  appVersion,
+  sha,
+  lockfileSha256,
+  toolchain,
+  image = null,
+  infraImages = null,
+  postgresMajor,
+  schema,
+  migrations,
+  roles = RELEASE_MANIFEST_ROLE_INVENTORY,
+  overlays = [],
+  evidenceRefs = {},
+  previousApprovedRelease = null,
+  retention = RELEASE_RETENTION_CONTRACT,
+} = {}) {
+  return Object.freeze({
+    schemaVersion: RELEASE_MANIFEST_SCHEMA_VERSION,
+    kind: "release_manifest",
+    productionAuthorized: false,
+    openBetaLive: false,
+    appVersion: appVersion ?? null,
+    repository: Object.freeze({
+      sha: sha ?? null,
+    }),
+    toolchain: toolchain ?? null,
+    lockfileSha256: lockfileSha256 ?? null,
+    image: image
+      ? Object.freeze({
+          digest: image.digest ?? null,
+          platform: image.platform ?? null,
+          sourceSha: image.sourceSha ?? sha ?? null,
+          status: image.status ?? (image.digest ? "resolved" : "unresolved"),
+        })
+      : Object.freeze({
+          digest: null,
+          platform: null,
+          sourceSha: sha ?? null,
+          status: "unresolved",
+        }),
+    infraImages: infraImages ?? null,
+    postgresMajor: postgresMajor ?? null,
+    schema: schema
+      ? Object.freeze({
+          baseline: schema.baseline ?? null,
+          target: schema.target ?? null,
+        })
+      : null,
+    migrations: migrations ?? null,
+    inventory: Object.freeze({
+      roles: Object.freeze([...(roles ?? [])]),
+      overlays: Object.freeze([...(overlays ?? [])]),
+      secretsRedacted: true,
+    }),
+    evidenceRefs: Object.freeze({ ...(evidenceRefs ?? {}) }),
+    previousApprovedRelease: previousApprovedRelease ?? null,
+    retention: Object.freeze({
+      ciArtifactDays: retention?.ciArtifactDays ?? RELEASE_RETENTION_CONTRACT.ciArtifactDays,
+      releaseBundle: Object.freeze({
+        ...(retention?.releaseBundle ?? RELEASE_RETENTION_CONTRACT.releaseBundle),
+      }),
+      secretsForbidden: retention?.secretsForbidden !== false,
+    }),
+  });
+}
+
+/**
+ * Strict evaluator for missing/mismatch digest, SHA, schema and unknown versions.
+ * Does not grant productionAuthorized.
+ */
+export function evaluateReleaseManifest(
+  manifest,
+  {
+    expectedSha = null,
+    expectedSchema = null,
+    requireImageDigest = false,
+    requireResolvedInfra = false,
+  } = {},
+) {
+  if (!manifest || typeof manifest !== "object") {
+    return { ok: false, status: "blocked", reason: "Release manifest is missing." };
+  }
+  if (manifest.schemaVersion !== RELEASE_MANIFEST_SCHEMA_VERSION) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: `Unknown release manifest schemaVersion ${manifest.schemaVersion ?? "missing"}; expected ${RELEASE_MANIFEST_SCHEMA_VERSION}.`,
+    };
+  }
+  if (manifest.productionAuthorized === true || manifest.openBetaLive === true) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest must not auto-set productionAuthorized or openBetaLive.",
+    };
+  }
+  if (typeof manifest.appVersion !== "string" || !manifest.appVersion) {
+    return { ok: false, status: "blocked", reason: "Release manifest appVersion is missing." };
+  }
+  const sha = manifest.repository?.sha ?? null;
+  if (typeof sha !== "string" || !SHA_RE.test(sha)) {
+    return { ok: false, status: "blocked", reason: "Release manifest exact SHA is missing or invalid." };
+  }
+  if (expectedSha && sha !== expectedSha) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: `Release manifest SHA mismatch: manifest=${sha}, expected=${expectedSha}.`,
+    };
+  }
+  if (
+    typeof manifest.lockfileSha256 !== "string" ||
+    !/^[a-f0-9]{64}$/u.test(manifest.lockfileSha256)
+  ) {
+    return { ok: false, status: "blocked", reason: "Release manifest lockfileSha256 is missing." };
+  }
+  if (manifest.postgresMajor !== 18) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: `Release manifest postgresMajor is ${manifest.postgresMajor ?? "missing"}, expected 18.`,
+    };
+  }
+  const baseline = manifest.schema?.baseline ?? null;
+  const target = manifest.schema?.target ?? null;
+  if (!baseline || !target) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest schema baseline/target are missing.",
+    };
+  }
+  if (expectedSchema) {
+    if (expectedSchema.baseline && baseline !== expectedSchema.baseline) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: `Release manifest schema baseline mismatch: ${baseline} !== ${expectedSchema.baseline}.`,
+      };
+    }
+    if (expectedSchema.target && target !== expectedSchema.target) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: `Release manifest schema target mismatch: ${target} !== ${expectedSchema.target}.`,
+      };
+    }
+  }
+  if (!Array.isArray(manifest.migrations) || manifest.migrations.length === 0) {
+    return { ok: false, status: "blocked", reason: "Release manifest migration hashes are missing." };
+  }
+  const image = manifest.image ?? {};
+  if (image.sourceSha && image.sourceSha !== sha) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: `Release manifest image.sourceSha ${image.sourceSha} does not match repository SHA ${sha}.`,
+    };
+  }
+  if (requireImageDigest) {
+    if (!DIGEST_RE.test(image.digest ?? "")) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: "Release manifest app image digest is missing or invalid.",
+      };
+    }
+    if (typeof image.platform !== "string" || !image.platform.includes("/")) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: "Release manifest app image platform is missing.",
+      };
+    }
+  } else if (image.status === "resolved" && !DIGEST_RE.test(image.digest ?? "")) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest marks image resolved without a valid digest.",
+    };
+  }
+  if (image.digest && !DIGEST_RE.test(image.digest)) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest app image digest format is invalid.",
+    };
+  }
+  if (requireResolvedInfra) {
+    const infra = manifest.infraImages;
+    if (!Array.isArray(infra) || infra.length === 0) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: "Release manifest infra image digests are missing.",
+      };
+    }
+    for (const entry of infra) {
+      if (!DIGEST_RE.test(entry?.digest ?? "")) {
+        return {
+          ok: false,
+          status: "blocked",
+          reason: `Release manifest infra digest missing for role ${entry?.role ?? "unknown"}.`,
+        };
+      }
+    }
+  }
+  if (manifest.retention?.ciArtifactDays !== 14) {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest must record CI artifact retention as 14 days.",
+    };
+  }
+  if (manifest.retention?.releaseBundle?.status !== "owner_decision_required") {
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release bundle retention must remain owner_decision_required until OPS-16.",
+    };
+  }
+
+  return {
+    ok: true,
+    status: "passed",
+    reason: null,
+    releaseCandidateTechnical: true,
+    productionAuthorized: false,
+  };
 }
 
 export function buildEvidenceChecksum(evidence) {

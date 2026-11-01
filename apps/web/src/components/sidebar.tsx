@@ -11,6 +11,7 @@ import {
   Compass,
   LayoutDashboard,
   Library,
+  LogIn,
   MessageSquare,
   Plus,
   Server,
@@ -23,12 +24,26 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { communityReportCopy } from "../lib/community-report-copy";
+import { reactionCopy } from "../lib/content-reaction-copy";
+import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
+import {
+  showAdminDestination,
+  showGuestSignInCta,
+  showWorkspaceTools,
+} from "./shell-destination-policy";
+import { useAuthSession } from "./use-auth-session";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof Server;
+};
 
 export function Sidebar({
   locale,
@@ -42,8 +57,12 @@ export function Sidebar({
   const pathname = usePathname();
   const dictionary = getDictionary(locale);
   const serverCopy = getManagedServerCopy(locale);
+  const session = useAuthSession();
+  const workspaceTools = showWorkspaceTools(session);
+  const guestSignIn = showGuestSignInCta(session);
+  const adminVisible = showAdminDestination(session);
 
-  const primaryNav = [
+  const primaryNav: NavItem[] = [
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
     { href: "/discover", label: dictionary.nav.explore, icon: Compass },
     { href: "/market", label: dictionary.nav.freeResources, icon: Library },
@@ -52,18 +71,30 @@ export function Sidebar({
     { href: "/developers", label: dictionary.nav.creators, icon: Code2 },
   ];
 
-  const workspaceNav = [
-    { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
-    { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },
-    { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
-    { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
+  // Authenticated workspace: grouped by real objects (library / servers / publications), not roles.
+  const libraryNav: NavItem[] = [
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
-    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
+    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },
+  ];
+
+  const serversNav: NavItem[] = [
     { href: "/workspace/servers", label: serverCopy.title, icon: Server },
     { href: "/workspace/servers/new", label: dictionary.nav.registerServer, icon: Server },
-    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
+    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
+  ];
+
+  const publicationsNav: NavItem[] = [
+    { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
+    { href: "/workspace/discussions", label: ownDiscussionCopy(locale).title, icon: MessageSquare },
+    { href: "/workspace/reactions", label: reactionCopy(locale).my, icon: MessageSquare },
+    { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
+    { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
+    { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },
+  ];
+
+  const accountNav: NavItem[] = [
     { href: "/notifications", label: dictionary.nav.notifications, icon: Bell },
     { href: "/security", label: dictionary.nav.securityCenter, icon: ShieldCheck },
     { href: "/settings", label: dictionary.nav.settings, icon: Settings },
@@ -79,13 +110,7 @@ export function Sidebar({
         ? pathname === href || (pathname.startsWith(`${href}/`) && pathname !== `${href}/new`)
         : pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
-  const renderItems = (
-    items: Array<{
-      href: string;
-      label: string;
-      icon: typeof Server;
-    }>,
-  ) =>
+  const renderItems = (items: NavItem[]) =>
     items.map((item) => {
       const Icon = item.icon;
       const active = isActive(item.href);
@@ -107,6 +132,15 @@ export function Sidebar({
         </Link>
       );
     });
+
+  const renderGroup = (label: string, items: NavItem[], bordered = true) => (
+    <div className={`space-y-0.5 ${bordered ? "border-t border-base pt-3" : ""}`}>
+      {!isCollapsed && (
+        <div className="px-2.5 pb-1.5 font-label uppercase text-faint">{label}</div>
+      )}
+      {renderItems(items)}
+    </div>
+  );
 
   return (
     <aside
@@ -171,31 +205,50 @@ export function Sidebar({
           {renderItems(primaryNav)}
         </div>
 
-        <div className="space-y-0.5 border-t border-base pt-3">
-          {!isCollapsed && (
-            <div className="px-2.5 pb-1.5 font-label uppercase text-faint">
-              {dictionary.nav.workspace}
-            </div>
-          )}
-          {renderItems(workspaceNav)}
-        </div>
+        {workspaceTools ? (
+          <>
+            {renderGroup(dictionary.nav.workspace, libraryNav)}
+            {renderGroup(serverCopy.title, serversNav)}
+            {renderGroup(publicationCopy(locale).title, publicationsNav)}
+            {renderGroup(dictionary.nav.settings, accountNav)}
+          </>
+        ) : null}
 
-        <div className="space-y-0.5 border-t border-base pt-3">
-          <Link
-            href="/admin"
-            title={isCollapsed ? dictionary.nav.admin : undefined}
-            aria-label={isCollapsed ? dictionary.nav.admin : undefined}
-            aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-            className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
-              pathname.startsWith("/admin")
-                ? "bg-danger-soft font-semibold text-danger"
-                : "text-secondary hover:bg-hover hover:text-primary"
-            } ${isCollapsed ? "justify-center px-0" : ""}`}
-          >
-            <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
-            {!isCollapsed && <span>{dictionary.nav.admin}</span>}
-          </Link>
-        </div>
+        {/* UX-23 A: guest chrome Sign in only — no Workspace cluster. */}
+        {guestSignIn ? (
+          <div className="space-y-0.5 border-t border-base pt-3">
+            <Link
+              href="/auth/login"
+              title={isCollapsed ? dictionary.workspace.signIn : undefined}
+              aria-label={isCollapsed ? dictionary.workspace.signIn : undefined}
+              className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
+                isCollapsed ? "justify-center px-0" : ""
+              }`}
+            >
+              <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {!isCollapsed && <span className="font-semibold">{dictionary.workspace.signIn}</span>}
+            </Link>
+          </div>
+        ) : null}
+
+        {adminVisible && (
+          <div className="space-y-0.5 border-t border-base pt-3">
+            <Link
+              href="/admin"
+              title={isCollapsed ? dictionary.nav.admin : undefined}
+              aria-label={isCollapsed ? dictionary.nav.admin : undefined}
+              aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+              className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
+                pathname.startsWith("/admin")
+                  ? "bg-danger-soft font-semibold text-danger"
+                  : "text-secondary hover:bg-hover hover:text-primary"
+              } ${isCollapsed ? "justify-center px-0" : ""}`}
+            >
+              <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {!isCollapsed && <span>{dictionary.nav.admin}</span>}
+            </Link>
+          </div>
+        )}
       </nav>
 
       {isCollapsed && (

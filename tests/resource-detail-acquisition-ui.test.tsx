@@ -1,11 +1,9 @@
-vi.mock("@nexus/db", () => ({
-  resourceMediaRepository: { publicItems: async () => [], managed: async () => ({ items: [] }) },
-}));
-import type React from "react";
+import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+import { licenseModelLabel } from "../apps/web/src/lib/license-model-i18n";
 
 const state = vi.hoisted(() => ({
   user: null as null | {
@@ -27,6 +25,14 @@ const productService = vi.hoisted(() => ({
   getProductBuilds: vi.fn(async () => state.builds),
   getDependencyResolution: vi.fn(async () => null),
   getReverseDependencySummary: vi.fn(async () => null),
+  getPublicAttribution: vi.fn(async () => ({
+    organization: null,
+    author: {
+      displayName: "Detail Author",
+      username: "detail_author",
+      href: "/developers/detail_author",
+    },
+  })),
 }));
 
 vi.mock("../apps/web/src/lib/services/resource-management-service", () => ({
@@ -55,7 +61,7 @@ vi.mock("next/link", async () => {
       ...props
     }: {
       href: string;
-      children: React.ReactNode;
+      children: ReactNode;
       [key: string]: unknown;
     }) => ReactModule.createElement("a", { href, ...props }, children),
   };
@@ -101,11 +107,84 @@ vi.mock("../apps/web/src/components/resource-preview", async () => {
 vi.mock("../apps/web/src/components/resource-download-button", async () => {
   const ReactModule = await import("react");
   return {
-    ResourceDownloadButton: ({ productId, version }: { productId: string; version: string }) =>
+    ResourceDownloadButton: ({
+      productId,
+      version,
+      intent,
+    }: {
+      productId: string;
+      version: string;
+      intent?: string;
+    }) =>
       ReactModule.createElement("button", {
         "data-testid": "resource-download",
         "data-product-id": productId,
         "data-version": version,
+        "data-download-intent": intent ?? "latest",
+      }),
+  };
+});
+
+vi.mock("../apps/web/src/components/resource-release-watch-control", async () => {
+  const ReactModule = await import("react");
+  return {
+    ResourceReleaseWatchControl: ({
+      guest,
+      hasAccess,
+    }: {
+      guest?: boolean;
+      hasAccess?: boolean;
+    }) =>
+      ReactModule.createElement("div", {
+        "data-testid": "resource-release-watch",
+        "data-guest": guest ? "true" : "false",
+        "data-has-access": hasAccess === false ? "false" : "true",
+      }),
+  };
+});
+
+vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+  resourceReleaseWatchesService: {
+    detail: vi.fn(async () => ({
+      productId: "prd_detail",
+      enabled: false,
+      revision: 0,
+      updatedAt: null,
+    })),
+  },
+}));
+
+vi.mock("@nexus/db", () => ({
+  resourceMediaRepository: { publicItems: async () => [], managed: async () => ({ items: [] }) },
+  notificationRepository: {
+    getPreferences: vi.fn(async () => ({
+      followsEnabled: true,
+      contentEnabled: true,
+      serverEnabled: true,
+      commerceEnabled: true,
+      systemEnabled: true,
+    })),
+  },
+  followWorkspaceRepository: {
+    states: vi.fn(async () => [] as string[]),
+  },
+}));
+
+vi.mock("../apps/web/src/components/follow-button", async () => {
+  const ReactModule = await import("react");
+  return {
+    FollowButton: ({
+      targetType,
+      targetId,
+    }: {
+      targetType: string;
+      targetId: string;
+    }) =>
+      ReactModule.createElement("button", {
+        type: "button",
+        "data-testid": "resource-save",
+        "data-target-type": targetType,
+        "data-target-id": targetId,
       }),
   };
 });
@@ -147,8 +226,10 @@ import { resourceReviewService } from "../apps/web/src/lib/services/resource-rev
 import { authService } from "../apps/web/src/lib/services/auth-service";
 import { getRequestLocale } from "../apps/web/src/lib/i18n-server";
 
-function renderPage(element: React.ReactNode) {
-  return renderToStaticMarkup(<LocaleProvider locale={state.locale}>{element}</LocaleProvider>);
+function renderPage(element: ReactNode) {
+  return renderToStaticMarkup(
+    createElement(LocaleProvider, { locale: state.locale }, element),
+  );
 }
 
 function deferred<T>() {
@@ -333,10 +414,15 @@ describe("resource detail acquisition behavior", () => {
       );
 
       expect(html).toContain("Detail Resource");
+      expect(html).toContain(licenseModelLabel(locale, "unlimited"));
+      expect(html).not.toContain("multiple_servers");
       expect(html).toContain('href="/acquire?productId=prd_detail"');
       expect(html).toContain(copy.addToLibrary);
       expect(html).toContain(copy.latestBuildNotice);
       expect(html).toContain('href="/market/detail-resource/versions"');
+      expect(html).toContain('data-acquire-intent="single"');
+      expect(html).toContain('data-testid="resource-release-watch"');
+      expect(html).toContain('data-guest="true"');
       expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(2);
       expect(html).not.toContain('data-testid="resource-download"');
       expect(html).not.toContain(getDictionary(locale).checkout.paidDisabled);
@@ -378,7 +464,11 @@ describe("resource detail acquisition behavior", () => {
     expect((html.match(/data-testid="resource-download"/gu) ?? []).length).toBe(1);
     expect(html).toContain('data-product-id="prd_detail"');
     expect(html).toContain('data-version="2.0.0"');
-    expect(html).toContain('href="/workspace"');
+    expect(html).toContain('data-download-intent="latest"');
+    expect(html).toContain('data-testid="resource-release-watch"');
+    expect(html).toContain('data-has-access="true"');
+    expect(html).toContain('href="/workspace/library"');
+    expect(html).not.toMatch(/href="\/workspace"/u);
     expect(html).not.toContain("/acquire?productId=prd_detail");
     // History list (2) + download aside for published current version (1).
     expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(3);
@@ -402,5 +492,26 @@ describe("resource detail acquisition behavior", () => {
     expect(productService.getProductBuilds).toHaveBeenCalledWith("prd_detail", true);
     expect((html.match(/data-testid="resource-download"/gu) ?? []).length).toBe(1);
     expect(html).toContain(getDictionary("en").product.managementAccess);
+  });
+
+  it("shows public author attribution and honest zero-review copy without private ids", async () => {
+    state.product = product(0);
+    state.product.ratingCount = 0;
+    state.product.ratingAverage = 0;
+    const copy = getDictionary("en").product;
+
+    const html = renderPage(
+      await ProductDetailPage({
+        params: Promise.resolve({ slug: "detail-resource" }),
+      }),
+    );
+
+    expect(productService.getPublicAttribution).toHaveBeenCalledWith("prd_detail");
+    expect(html).toContain('href="/developers/detail_author"');
+    expect(html).toContain("Detail Author");
+    expect(html).toContain(copy.noReviewsYet);
+    expect(html).toContain(copy.libraryAdditions);
+    expect(html).not.toContain(">0.0 / 5.0");
+    expect(html).not.toMatch(/usr_|install/i);
   });
 });

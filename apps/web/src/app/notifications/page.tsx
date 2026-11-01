@@ -74,7 +74,16 @@ export default async function NotificationCenterPage({
           {copy.settings}
         </Link>
       </header>
-      <NotificationCenterTabs>
+      <NotificationCenterTabs
+        state={filters?.state ?? "all"}
+        filters={filters}
+        labels={{
+          title: copy.title,
+          all: copy.all,
+          unread: copy.unread,
+          read: copy.read,
+        }}
+      >
         {authenticated && (
           <form
             action="/notifications"
@@ -98,9 +107,9 @@ export default async function NotificationCenterPage({
                 defaultValue={filters?.state ?? "all"}
                 className={`${fieldClass} block min-h-11`}
               >
-                {(["all", "unread", "read"] as const).map((state) => (
-                  <option key={state} value={state}>
-                    {copy[state]}
+                {(["all", "unread", "read"] as const).map((value) => (
+                  <option key={value} value={value}>
+                    {copy[value]}
                   </option>
                 ))}
               </select>

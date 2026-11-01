@@ -120,6 +120,10 @@ export class ProductLifecycleRepository {
           status: target,
           reason: input.reason,
           submittedBuildId,
+          // Restore/archive never imply catalog publication; submit only queues review.
+          nextStep:
+            target === "draft" ? "submit_for_review" : target === "pending_review" ? "wait_review" : null,
+          autoPublished: false,
         },
       });
       return updated as unknown as Product;

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { confirmedServerReview } from "../apps/web/src/lib/server-review-confirmation";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
@@ -144,8 +145,30 @@ it("serves public review pages without session and rejects bad paging", async ()
   state.publicPage.mockResolvedValueOnce({ reviews: [], total: 0, page: 1, totalPages: 1 });
   const ok = await publicPage(request("/api/servers/srv_a/reviews"), context);
   expect(ok.status).toBe(200);
+  expect(await ok.json()).toMatchObject({ reviews: [], total: 0 });
   expect(state.publicPage).toHaveBeenCalledWith("srv_a", 1);
 
   const bad = await publicPage(request("/api/servers/srv_a/reviews?page=0"), context);
   expect(bad.status).toBe(400);
+});
+
+it("surfaces repository failures as unavailable instead of inventing total=0", async () => {
+  state.actor = null;
+  state.publicPage.mockRejectedValueOnce(new Error("review store unavailable"));
+  const response = await publicPage(request("/api/servers/srv_a/reviews"), context);
+  expect(response.status).toBe(503);
+  const body = await response.json();
+  expect(body).toMatchObject({ code: "REVIEWS_UNAVAILABLE" });
+  expect(body).not.toMatchObject({ reviews: [], total: 0 });
+});
+
+it("does not treat a non-incrementing mutation body as confirmed", async () => {
+  state.command.mockResolvedValueOnce({ id: "cmt_generated", revision: 0, status: "published" });
+  const response = await mutate(
+    request("/api/servers/srv_a/reviews", { text: "Good community", rating: 5 }),
+    context,
+  );
+  expect(response.status).toBe(201);
+  const body = await response.json();
+  expect(confirmedServerReview(body, 0, "save")).toBe(false);
 });

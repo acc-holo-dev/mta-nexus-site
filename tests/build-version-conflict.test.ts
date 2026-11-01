@@ -1,9 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DrizzleQueryError } from "drizzle-orm/errors";
-import type { User } from "@nexus/domain";
+import {
+  normalizeResourceVersionForStorage,
+  resourceVersionsConflict,
+  type User,
+} from "@nexus/domain";
 const submitForReview = vi.hoisted(() => vi.fn());
+const findExactPendingRetry = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({
-  buildRepository: { submitForReview },
+  buildRepository: { submitForReview, findExactPendingRetry },
   productRepository: {},
   organizationRepository: {},
 }));
@@ -28,11 +33,11 @@ function driverError(code = "23505", constraint_name = "builds_product_version_i
 
 describe("build version constraint error translation", () => {
   beforeEach(() => vi.clearAllMocks());
-  async function attempt(error: unknown) {
+  async function attempt(error: unknown, version = input.version) {
     const service = new ProductService();
     vi.spyOn(service, "assertCanReleaseBuild").mockResolvedValue({ id: "prd_target" } as never);
     submitForReview.mockRejectedValueOnce(error);
-    return service.releaseBuild(input, actor);
+    return service.releaseBuild({ ...input, version }, actor, "author-session");
   }
 
   it.each([
@@ -62,5 +67,39 @@ describe("build version constraint error translation", () => {
     const error = new Error("cyclic cause");
     error.cause = error;
     await expect(attempt(error)).rejects.toBe(error);
+  });
+
+  it("stores and retries new releases without optional leading v so duplicates share one identity", async () => {
+    expect(resourceVersionsConflict("v1.2.3", "1.2.3")).toBe(true);
+    expect(normalizeResourceVersionForStorage("v1.2.3")).toBe("1.2.3");
+
+    const service = new ProductService();
+    vi.spyOn(service, "assertCanReleaseBuild").mockResolvedValue({ id: "prd_target" } as never);
+    await expect(attempt(driverError(), "v1.2.3")).rejects.toMatchObject({
+      code: "BUILD_VERSION_EXISTS",
+    });
+    expect(submitForReview).toHaveBeenCalledWith(
+      expect.objectContaining({ version: "1.2.3" }),
+      expect.any(Object),
+      "author-session",
+    );
+
+    findExactPendingRetry.mockResolvedValueOnce({ id: "bld_existing", version: "1.2.3" });
+    await expect(
+      service.recoverPendingBuildUpload(
+        {
+          productId: "prd_target",
+          version: "v1.2.3",
+          sha256Hash: input.sha256Hash,
+          fileSizeBytes: input.fileSizeBytes,
+          fileName: input.fileName,
+          mimeType: input.mimeType,
+        },
+        actor,
+      ),
+    ).resolves.toMatchObject({ id: "bld_existing" });
+    expect(findExactPendingRetry).toHaveBeenCalledWith(
+      expect.objectContaining({ version: "1.2.3" }),
+    );
   });
 });

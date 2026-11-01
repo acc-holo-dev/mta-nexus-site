@@ -39,7 +39,8 @@ export function DiscussionCommentActions({
   const stale = mode !== null && revision !== comment.revision;
   const [reason, setReason] = useState(""),
     [error, setError] = useState(""),
-    [pending, setPending] = useState(false);
+    [pending, setPending] = useState(false),
+    [draftNotice, setDraftNotice] = useState("");
   const busy = useRef(false),
     alive = useRef(true),
     controller = useRef<AbortController | null>(null);
@@ -106,6 +107,14 @@ export function DiscussionCommentActions({
       if (alive.current) setPending(false);
     }
   }
+  async function copyDraft() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setDraftNotice(copy.draftCopied);
+    } catch {
+      setDraftNotice(copy.draftKept);
+    }
+  }
   return (
     <div className="space-y-3" aria-busy={pending}>
       {!mode ? (
@@ -119,6 +128,7 @@ export function DiscussionCommentActions({
                 setText(comment.text);
                 setRevision(comment.revision);
                 setError("");
+                setDraftNotice("");
                 setMode("edit");
               }}
               variant="outline"
@@ -133,11 +143,12 @@ export function DiscussionCommentActions({
             onClick={() => {
               setRevision(comment.revision);
               setError("");
+              setDraftNotice("");
               setMode("remove");
             }}
             variant="outline"
           >
-            {copy.remove}
+            {own ? copy.remove : copy.moderateRemove}
           </Button>
         </div>
       ) : (
@@ -164,7 +175,9 @@ export function DiscussionCommentActions({
             </label>
           ) : (
             <>
-              <p className="text-sm text-secondary">{copy.removeNote}</p>
+              <p className="text-sm text-secondary">
+                {own ? copy.removeNote : copy.moderateRemoveNote}
+              </p>
               {!own && (
                 <label className="block space-y-1 text-xs text-secondary">
                   {copy.reason}
@@ -188,7 +201,11 @@ export function DiscussionCommentActions({
               disabled={pending || disabled || stale || blocked}
               variant="outline"
             >
-              {mode === "edit" ? copy.saveEdit : copy.confirmRemove}
+              {mode === "edit"
+                ? copy.saveEdit
+                : own
+                  ? copy.confirmRemove
+                  : copy.confirmModerateRemove}
             </Button>
             <Button
               type="button"
@@ -206,6 +223,24 @@ export function DiscussionCommentActions({
         <p role="alert" className="text-sm text-danger">
           {stale ? copy.changed : error}
         </p>
+      )}
+      {stale && mode === "edit" && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted">{copy.draftKept}</p>
+          <Button
+            type="button"
+            className="min-h-9 text-xs"
+            variant="outline"
+            onClick={() => void copyDraft()}
+          >
+            {copy.copyDraft}
+          </Button>
+          {draftNotice && (
+            <p role="status" className="text-xs text-success">
+              {draftNotice}
+            </p>
+          )}
+        </div>
       )}
       {(blocked || stale) && (
         <a

@@ -29,6 +29,9 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { pageActivePublicByOwner: state.servers },
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/services/product-service", () => ({
+  productService: { getPublicAttributions: async () => new Map() },
+}));
 vi.mock("../../../lib/services/profile-privacy-service", () => ({
   profilePrivacyService: {
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
@@ -57,8 +60,17 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => ({ value: "session" }) }),
+}));
+vi.mock("../../../lib/services/auth-service", () => ({
+  authService: {
+    getSession: async () => ({ id: "user", role: "user" }),
+  },
+}));
 import Page, { generateMetadata } from "./page";
 import { getDictionary } from "../../../lib/i18n";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 const input = (page?: string | string[]) => ({
   params: Promise.resolve({ username: "member" }),
   searchParams: Promise.resolve({ page }),
@@ -180,4 +192,16 @@ it("hides the direct activity link while keeping public resources available", as
   expect(html).toContain("Second-page resource");
   state.showActivity = true;
   expect(renderToStaticMarkup(await Page(input()))).toContain('href="/users/member/activity"');
+});
+it("renders owner guest preview without follow chrome while keeping resources and attribution path", async () => {
+  const html = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ username: "member" }),
+      searchParams: Promise.resolve({ preview: "guest" }),
+    }),
+  );
+  expect(html).toContain(profilePrivacyCopy("en").guestPreviewNote);
+  expect(html).toContain(profilePrivacyCopy("en").scope);
+  expect(html).not.toContain(">Follow</button>");
+  expect(html).toContain("Second-page resource");
 });

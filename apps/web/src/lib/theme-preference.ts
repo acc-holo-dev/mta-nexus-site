@@ -32,3 +32,8 @@ export function nextThemePreference(preference: ThemePreference): ThemePreferenc
       return "system";
   }
 }
+
+/** CSS color-scheme value matching a resolved light/dark theme. */
+export function colorSchemeForTheme(resolved: ResolvedTheme): "light" | "dark" {
+  return resolved;
+}

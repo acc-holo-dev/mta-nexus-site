@@ -11,6 +11,7 @@ export * from "./server-activity";
 export * from "./security-activity";
 
 export * from "./server-claim-scope";
+export * from "./resource-version";
 export * from "./resource-commerce";
 export * from "./license-control";
 export * from "./license-maintenance";
@@ -24,6 +25,7 @@ export * from "./resource-release-watches";
 export * from "./resource-cart-receipts";
 export * from "./financial-journal";
 export * from "./resource-reviews";
+export * from "./resource-qa";
 export * from "./server-reviews";
 export * from "./resource-build-workspace";
 export * from "./order-cases";

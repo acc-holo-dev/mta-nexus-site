@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildRepository, productRepository, userRepository } from "@nexus/db";
+import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
 import type { Build } from "@nexus/domain";
 import { ProductService } from "../apps/web/src/lib/services/product-service";
 
@@ -36,6 +36,12 @@ describe("exact pending build retry lookup", () => {
       displayName: "Retry Author",
       role: "developer",
     });
+    await sessionRepository.create({
+      id: `ses_${authorId}`,
+      userId: authorId,
+      token: `tok_${authorId}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
     await productRepository.create({
       id: productId,
       title: "Retry Resource",
@@ -71,7 +77,11 @@ describe("exact pending build retry lookup", () => {
     if (!actor) throw new Error("Retry test author missing");
     const service = new ProductService();
     await expect(
-      service.releaseBuild({ ...base, storageKey: "assets/redundant-retry.zip" }, actor),
+      service.releaseBuild(
+        { ...base, storageKey: "assets/redundant-retry.zip" },
+        actor,
+        `tok_${authorId}`,
+      ),
     ).rejects.toMatchObject({ statusCode: 409, code: "BUILD_VERSION_EXISTS" });
     expect(await service.recoverPendingBuildUpload(input, actor)).toMatchObject({ id: base.id });
     const matching = (await buildRepository.listByProduct(productId)).filter(

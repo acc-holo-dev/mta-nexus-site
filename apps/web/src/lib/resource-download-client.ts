@@ -7,6 +7,7 @@ export type DownloadFailure =
   | "access"
   | "missing"
   | "unavailable"
+  | "integrity"
   | "rateLimit"
   | "timeout"
   | "failed";
@@ -178,7 +179,7 @@ async function readResourceDownload(
   // Do not hand an unverified artifact to the browser's save dialog.
   const validHash = await matchesDownloadedSha256(blob, expectedSha256, signal);
   signal.throwIfAborted();
-  if (!validHash) throw new ResourceDownloadError("failed");
+  if (!validHash) throw new ResourceDownloadError("integrity");
   const receipt = response.headers.get("X-Resource-Delivery-Id");
   const receiptId = receipt && /^dlv_[A-Za-z0-9_-]{1,124}$/u.test(receipt) ? receipt : null;
   return { blob, fileName, receiptId };

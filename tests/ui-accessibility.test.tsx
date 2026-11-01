@@ -2,7 +2,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Avatar } from "../packages/ui/src/avatar";
 import { EmptyState } from "../packages/ui/src/empty-state";
-import { Input } from "../packages/ui/src/input";
+import { fieldControlClass } from "../packages/ui/src/field-classes";
+import { Field, Input } from "../packages/ui/src/input";
+import {
+  DataTable,
+  DataTableCell,
+  DataTableHeader,
+  SectionHeader,
+} from "../packages/ui/src/platform";
 import { Tabs, nextTabIndex } from "../packages/ui/src/tabs";
 
 describe("Input accessibility wiring", () => {
@@ -41,6 +48,77 @@ describe("Input accessibility wiring", () => {
     expect(markup).toContain('id="account-email"');
     expect(markup).toContain('for="account-email"');
     expect(markup).toContain('aria-describedby="account-email-error"');
+  });
+
+  it("wires hint and disabled reason without relying on color alone", () => {
+    const markup = renderToStaticMarkup(
+      <Input
+        id="topic-tags"
+        label="Tags"
+        hint="Comma separated"
+        disabled
+        disabledReason="Publishing in progress"
+        pending
+      />,
+    );
+
+    expect(markup).toContain('aria-describedby="topic-tags-hint topic-tags-disabled"');
+    expect(markup).toContain('id="topic-tags-hint"');
+    expect(markup).toContain("Publishing in progress");
+    expect(markup).toContain('aria-busy="true"');
+    expect(fieldControlClass({ readOnly: true })).toContain("border-dashed");
+    expect(fieldControlClass({ size: "compact" })).toContain("h-8");
+    expect(fieldControlClass({ error: true })).toContain("nexus-danger");
+  });
+
+  it("exposes Field chrome for native select/textarea", () => {
+    const markup = renderToStaticMarkup(
+      <Field id="visibility" label="Visibility" hint="Public listings are searchable" error="Required">
+        {(control) => (
+          <select id={control.id} aria-describedby={control.describedBy} aria-invalid={control.invalid}>
+            <option value="">Choose</option>
+          </select>
+        )}
+      </Field>,
+    );
+
+    expect(markup).toContain('for="visibility"');
+    expect(markup).toContain('aria-describedby="visibility-error"');
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain("Required");
+    expect(markup).not.toContain("Public listings are searchable");
+  });
+});
+
+describe("SectionHeader and DataTable overflow chrome", () => {
+  it("wraps long section titles and names overflow regions", () => {
+    const header = renderToStaticMarkup(
+      <SectionHeader title="Очень длинный заголовок секции администрирования" action={<button type="button">Open</button>} />,
+    );
+    expect(header).toContain("flex-wrap");
+    expect(header).toContain("break-words");
+
+    const table = renderToStaticMarkup(
+      <DataTable label="Audit log">
+        <DataTableHeader
+          columns={[
+            { label: "When", type: "datetime" },
+            { label: "Count", type: "numeric" },
+          ]}
+        />
+        <tbody>
+          <tr>
+            <DataTableCell type="datetime">2026-11-01</DataTableCell>
+            <DataTableCell type="numeric">12</DataTableCell>
+          </tr>
+        </tbody>
+      </DataTable>,
+    );
+    expect(table).toContain('role="region"');
+    expect(table).toContain('aria-label="Audit log"');
+    expect(table).toContain('tabindex="0"');
+    expect(table).toContain("font-numeric");
+    expect(table).toContain("text-right");
   });
 });
 

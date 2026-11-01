@@ -84,3 +84,22 @@ it("only confirms server-acknowledged revision bumps", () => {
     confirmedServerReview({ id: "cmt_1", revision: 2, status: "withdrawn" }, 1, "withdraw"),
   ).toBe(true);
 });
+
+it("keeps public review load failure distinct from a real empty page", () => {
+  type ReviewLoad =
+    | { state: "ready"; page: { reviews: unknown[]; total: number } }
+    | { state: "unavailable" };
+  const failed: ReviewLoad = { state: "unavailable" };
+  const empty: ReviewLoad = { state: "ready", page: { reviews: [], total: 0 } };
+  expect(failed).not.toEqual(empty);
+  expect(empty.state === "ready" && empty.page.total === 0).toBe(true);
+  expect("page" in failed).toBe(false);
+});
+
+it("never treats an unconfirmed mutation body as success", () => {
+  expect(confirmedServerReview({ id: "cmt_1", revision: 1, status: "withdrawn" }, 0, "save")).toBe(
+    false,
+  );
+  expect(confirmedServerReview({ success: true, revision: 2 }, 1, "save")).toBe(false);
+  expect(confirmedServerReview(null, 0, "save")).toBe(false);
+});

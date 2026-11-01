@@ -46,6 +46,7 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService: {
     listProducts: mocks.products,
+    getPublicAttributions: async () => new Map(),
   },
 }));
 

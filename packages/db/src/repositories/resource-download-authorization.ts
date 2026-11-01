@@ -3,6 +3,7 @@ import { AppError, ForbiddenError, NotFoundError, type Build } from "@nexus/doma
 import { db } from "../client";
 import { auditEvents, builds, products, users, resourceDeliveryReceipts } from "../schema";
 import { lockUserDownloadAccess } from "./entitlements";
+import { lockInitiatingSession } from "./initiating-session";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
 
 export class ResourceDownloadAuthorizationRepository {
@@ -10,6 +11,7 @@ export class ResourceDownloadAuthorizationRepository {
    * through the start audit; revocation denies subsequent transfers. */
   async authorize(input: {
     actorId: string;
+    currentToken: string;
     auditId: string;
     receiptId: string;
     expected: Build;
@@ -79,6 +81,8 @@ export class ResourceDownloadAuthorizationRepository {
         throw new AppError("Build changed; reload before downloading", 409, "BUILD_STATE_CHANGED");
       if (accessExpiresAt && new Date(accessExpiresAt).getTime() <= Date.now())
         throw new ForbiddenError("Current download access is required");
+      // Authority/access/build first; initiating session before receipt or start audit.
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       await tx.insert(resourceDeliveryReceipts).values({
         id: input.receiptId,
         userId: input.actorId,

@@ -1,13 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Dialog, nextDialogFocusIndex } from "../packages/ui/src/dialog";
+import { ConfirmDialog, Dialog, nextDialogFocusIndex } from "../packages/ui/src/dialog";
 
 function attributeValues(markup: string, attribute: string) {
   return [...markup.matchAll(new RegExp(`${attribute}="([^"]+)"`, "gu"))].map((match) => match[1]);
 }
 
 describe("Dialog accessibility identity", () => {
-  it("gives concurrently rendered dialogs unique label and description ids", () => {
+  it("uses native dialog elements with unique label and description ids", () => {
     const markup = renderToStaticMarkup(
       <>
         <Dialog
@@ -28,6 +28,8 @@ describe("Dialog accessibility identity", () => {
         </Dialog>
       </>,
     );
+
+    expect(markup.match(/<dialog\b/gu)?.length).toBe(2);
 
     const ids = attributeValues(markup, "id");
     expect(ids).toHaveLength(4);
@@ -52,6 +54,29 @@ describe("Dialog accessibility identity", () => {
 
     expect(attributeValues(markup, "aria-labelledby")).toHaveLength(1);
     expect(attributeValues(markup, "aria-describedby")).toHaveLength(0);
+  });
+
+  it("shows object, scope and consequences in ConfirmDialog without submitting on cancel", () => {
+    const markup = renderToStaticMarkup(
+      <ConfirmDialog
+        isOpen
+        title="Remove selection"
+        object="Acme Org"
+        scope="3 members"
+        consequences="Access will be revoked."
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        onConfirm={() => undefined}
+        onCancel={() => undefined}
+      />,
+    );
+
+    expect(markup).toContain("<dialog");
+    expect(markup).toContain("Acme Org");
+    expect(markup).toContain("3 members");
+    expect(markup).toContain("Access will be revoked.");
+    expect(markup).toContain("Cancel");
+    expect(markup).toContain("Remove");
   });
 });
 

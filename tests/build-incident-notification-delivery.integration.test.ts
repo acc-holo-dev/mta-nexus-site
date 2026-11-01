@@ -161,8 +161,20 @@ async function startReceipt(userId: string, buildId: string) {
   const expected = await buildRepository.findById(buildId);
   if (!expected) throw Error("Missing fixture build");
   const receiptId = id("dlv");
+  const token = `tok_dlv_${userId}`;
+  try {
+    await sessionRepository.create({
+      id: id("ses"),
+      userId,
+      token,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+  } catch {
+    // Actor may already hold a download session from an earlier receipt.
+  }
   await authorization.authorize({
     actorId: userId,
+    currentToken: token,
     expected,
     pinned: true,
     receiptId,

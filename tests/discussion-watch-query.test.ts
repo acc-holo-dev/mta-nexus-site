@@ -34,10 +34,11 @@ beforeEach(() => {
   state.rows = [];
 });
 it("locks only a currently public editorial publication before subscribing with database time", async () => {
-  state.rows = [[["article"]], [["follow"]]];
+  state.rows = [[["article"]], [["follow", true]]];
   expect(await repository.setFollowing("reader", "content", "article", true, "follow")).toEqual({
     following: true,
     created: true,
+    notifyComments: true,
   });
   expect(state.queries[0].params).toEqual([JSON.stringify(["reader", "content", "article"])]);
   expect(state.queries[1].sql).toContain('"content"."product_id" is null');
@@ -48,12 +49,34 @@ it("locks only a currently public editorial publication before subscribing with 
   expect(state.queries[1].params).not.toContain("resource");
   expect(state.queries[2].sql).toContain("clock_timestamp()");
   expect(state.queries[2].sql).toContain("on conflict do nothing");
+  expect(state.queries[2].params).toEqual(expect.arrayContaining([true]));
+});
+it("stores quiet Save with notifyComments false and upgrades an existing row on watch", async () => {
+  state.rows = [[["article"]], [["follow", false]]];
+  expect(
+    await repository.setFollowing("reader", "content", "article", true, "follow", {
+      notifyComments: false,
+    }),
+  ).toEqual({ following: true, created: true, notifyComments: false });
+  expect(state.queries[2].params).toEqual(expect.arrayContaining([false]));
+  state.queries = [];
+  // conflict path: empty insert return, update (no returning), then select
+  state.rows = [[["article"]], [], [], [["existing", true]]];
+  expect(
+    await repository.setFollowing("reader", "content", "article", true, "follow", {
+      notifyComments: true,
+    }),
+  ).toEqual({ following: true, created: false, notifyComments: true });
+  expect(
+    state.queries.some((q) => q.sql.startsWith("update") && q.sql.includes("notify_comments")),
+  ).toBe(true);
 });
 it("confirms repeated subscriptions and denies an inaccessible publication", async () => {
-  state.rows = [[["article"]], [], [["existing"]]];
+  state.rows = [[["article"]], [], [], [["existing", true]]];
   expect(await repository.setFollowing("reader", "content", "article", true, "follow")).toEqual({
     following: true,
     created: false,
+    notifyComments: true,
   });
   expect(state.queries.at(-1)?.params).toEqual(["reader", "content", "article", 1]);
   state.rows = [[]];
@@ -62,7 +85,11 @@ it("confirms repeated subscriptions and denies an inaccessible publication", asy
   ).rejects.toMatchObject({ code: "NOT_FOUND" });
 });
 it("unsubscribes the exact private key without reading a deleted or archived target", async () => {
-  await repository.setFollowing("reader", "content", "deleted", false, "unused");
+  expect(await repository.setFollowing("reader", "content", "deleted", false, "unused")).toEqual({
+    following: false,
+    created: false,
+    notifyComments: false,
+  });
   expect(state.queries).toHaveLength(2);
   expect(state.queries[1].sql).toContain('delete from "follows"');
   expect(state.queries[1].params).toEqual(["reader", "content", "deleted"]);
@@ -107,24 +134,33 @@ it("walks fifty followers with a sentinel, event watermark and exact ascending t
   expect(page.items).toHaveLength(50);
   expect(page.nextCursor).toEqual({ id: "follow_49", createdAt: stamp });
   const query = state.queries[0];
-  expect(query.params).toEqual([
-    "content",
-    "article",
-    stamp,
-    "writer",
-    "owner",
-    "parent",
-    stamp,
-    "previous",
-    51,
-  ]);
+  expect(query.params).toEqual(
+    expect.arrayContaining([
+      "content",
+      "article",
+      true,
+      "writer",
+      "owner",
+      "parent",
+      stamp,
+      "previous",
+      51,
+    ]),
+  );
+  expect(query.sql).toContain('"follows"."notify_comments" =');
+  expect(query.sql).toContain("object_notification_mutes");
   expect(query.sql).toContain('"follows"."created_at"<=');
   expect(query.sql).toContain('("follows"."created_at","follows"."id")>');
   expect(query.sql).toContain('order by "follows"."created_at" asc, "follows"."id" asc');
   expect(query.sql).toContain('"follows"."follower_id" <>');
 });
 it("rechecks the exact current recipient subscription while locking the publication and comment", async () => {
-  state.rows = [[["article", "current-slug", "owner"]], [["writer", null, stamp]], [["follow"]]];
+  state.rows = [
+    [["article", "current-slug", "owner"]],
+    [["writer", null, stamp]],
+    [],
+    [["follow", true]],
+  ];
   const result = await notice();
   const digest = createHash("sha256")
     .update(JSON.stringify([1, "article", "reply", "reader"]))
@@ -136,15 +172,37 @@ it("rechecks the exact current recipient subscription while locking the publicat
     link: "/articles/current-slug?comment=reply#comment-reply",
   });
   expect(state.queries[0].params).toEqual([JSON.stringify(["reader", "content", "article"])]);
-  expect(state.queries.slice(1).every((q) => q.sql.includes("for share"))).toBe(true);
+  expect(state.queries.slice(1, 3).every((q) => q.sql.includes("for share"))).toBe(true);
   expect(state.queries[2].params).toEqual(["reply", "article", 1]);
-  expect(state.queries[3].params).toEqual(["reader", "content", "article", stamp, 1]);
+  expect(state.queries[3].sql).toContain("object_notification_mutes");
+  expect(state.queries[4].params).toEqual(["reader", "content", "article", stamp, 1]);
   expect(JSON.stringify(result)).not.toContain("writer");
 });
 it("recognizes a current parent participant without requiring a subscription", async () => {
-  state.rows = [[["article", "article", "owner"]], [["writer", "parent", stamp]], [["reader"]], []];
+  state.rows = [
+    [["article", "article", "owner"]],
+    [["writer", "parent", stamp]],
+    [],
+    [["reader"]],
+    [],
+  ];
   expect(await notice()).toMatchObject({ direct: true, following: false });
-  expect(state.queries[3].params).toEqual(["parent", "article", 1]);
+  expect(state.queries[4].params).toEqual(["parent", "article", 1]);
+});
+it("suppresses follow and direct delivery while an object mute is active", async () => {
+  state.rows = [[["article", "article", "owner"]], [["writer", null, stamp]], [["mute"]]];
+  expect(await notice()).toBeNull();
+  expect(state.queries.some((q) => q.sql.includes("object_notification_mutes"))).toBe(true);
+  expect(state.queries.every((q) => !q.sql.startsWith("insert"))).toBe(true);
+});
+it("treats quiet content follows as non-following for comment notices", async () => {
+  state.rows = [
+    [["article", "article", "owner"]],
+    [["writer", null, stamp]],
+    [],
+    [["follow", false]],
+  ];
+  expect(await notice()).toBeNull();
 });
 it.each(["unsubscribed", "late_subscription", "deleted_comment", "hidden_publication", "self"])(
   "suppresses %s delivery before any inbox write",
@@ -155,6 +213,7 @@ it.each(["unsubscribed", "late_subscription", "deleted_comment", "hidden_publica
       state.rows = [
         [["article", "article", "owner"]],
         [[kind === "self" ? "reader" : "writer", null, stamp]],
+        [],
         [],
       ];
     expect(await notice()).toBeNull();

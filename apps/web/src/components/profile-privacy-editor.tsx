@@ -41,7 +41,23 @@ export function ProfilePrivacyEditor({
     setActivity(saved.showActivity);
     setContacts(saved.showProfessionalContacts);
   }
-  async function reload() {
+
+  async function fetchPreferences(signal: AbortSignal) {
+    const response = await platformRequest(
+      "/api/account/privacy",
+      locale,
+      "GET",
+      undefined,
+      signal,
+      profilePrivacyError,
+    );
+    const saved = parseEditablePrivacy(response.preferences);
+    if (!saved || (profile && (saved.id !== profile.id || saved.username !== profile.username)))
+      throw new Error(copy.unavailable);
+    return saved;
+  }
+
+  async function loadPreferences(mode: "replace" | "revision") {
     if (guard.current) return;
     guard.current = true;
     setPending(true);
@@ -49,18 +65,15 @@ export function ProfilePrivacyEditor({
     const requestController = new AbortController();
     controller.current = requestController;
     try {
-      const response = await platformRequest(
-        "/api/account/privacy",
-        locale,
-        "GET",
-        undefined,
-        requestController.signal,
-        profilePrivacyError,
-      );
-      const saved = parseEditablePrivacy(response.preferences);
-      if (!saved || (profile && (saved.id !== profile.id || saved.username !== profile.username)))
-        throw new Error(copy.unavailable);
-      if (!requestController.signal.aborted) apply(saved);
+      const saved = await fetchPreferences(requestController.signal);
+      if (requestController.signal.aborted) return;
+      if (mode === "replace") apply(saved);
+      else
+        setProfile((current) =>
+          current
+            ? { ...current, updatedAt: saved.updatedAt }
+            : { ...saved, showActivity: activity, showProfessionalContacts: contacts },
+        );
     } catch (error) {
       if (!requestController.signal.aborted)
         setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
@@ -69,6 +82,7 @@ export function ProfilePrivacyEditor({
       if (!requestController.signal.aborted) setPending(false);
     }
   }
+
   async function save(event: FormEvent) {
     event.preventDefault();
     if (guard.current || !profile) return;
@@ -98,8 +112,22 @@ export function ProfilePrivacyEditor({
         router.refresh();
       }
     } catch (error) {
-      if (!requestController.signal.aborted)
-        setNotice({ text: error instanceof Error ? error.message : copy.uncertain, error: true });
+      if (requestController.signal.aborted) return;
+      const text = error instanceof Error ? error.message : copy.uncertain;
+      setNotice({ text, error: true });
+      if (text === copy.conflict) {
+        try {
+          const saved = await fetchPreferences(requestController.signal);
+          if (!requestController.signal.aborted)
+            setProfile((current) =>
+              current
+                ? { ...current, updatedAt: saved.updatedAt }
+                : { ...saved, showActivity: activity, showProfessionalContacts: contacts },
+            );
+        } catch {
+          // Keep conflict notice; local toggle choices remain selected.
+        }
+      }
     } finally {
       guard.current = false;
       if (!requestController.signal.aborted) setPending(false);
@@ -157,12 +185,24 @@ export function ProfilePrivacyEditor({
             type="button"
             variant="secondary"
             disabled={pending}
-            onClick={() => void reload()}
+            onClick={() => void loadPreferences("revision")}
+            aria-describedby="privacy-refresh-description"
+          >
+            {copy.refreshVersion}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending}
+            onClick={() => void loadPreferences("replace")}
             aria-describedby="privacy-reload-description"
           >
             {copy.reload}
           </Button>
         </div>
+        <p id="privacy-refresh-description" className="text-xs text-muted">
+          {copy.refreshVersionHint}
+        </p>
         <p id="privacy-reload-description" className="text-xs text-muted">
           {copy.reloadHint}
         </p>
@@ -181,12 +221,32 @@ export function ProfilePrivacyEditor({
         </p>
       )}
       {profile && (
-        <Link
-          href={`/users/${encodeURIComponent(profile.username)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        <section
+          className="space-y-3 rounded-lg border border-base p-4"
+          aria-label={copy.guestPreview}
         >
-          {copy.publicProfile}
-        </Link>
+          <h2 className="text-sm font-semibold text-primary">{copy.guestPreview}</h2>
+          <p className="text-sm text-muted">{copy.guestPreviewNote}</p>
+          <ul className="space-y-1 text-sm text-secondary">
+            <li>{activity ? copy.guestPreviewActivityOn : copy.guestPreviewActivityOff}</li>
+            <li>{contacts ? copy.guestPreviewContactsOn : copy.guestPreviewContactsOff}</li>
+            <li>{copy.guestPreviewAlways}</li>
+          </ul>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href={`/users/${encodeURIComponent(profile.username)}?preview=guest`}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {copy.openGuestPreview}
+            </Link>
+            <Link
+              href={`/users/${encodeURIComponent(profile.username)}`}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {copy.publicProfile}
+            </Link>
+          </div>
+        </section>
       )}
     </section>
   );

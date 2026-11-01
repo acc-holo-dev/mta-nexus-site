@@ -191,11 +191,21 @@ export function FollowWorkspace({
       )}
       {page && !page.items.length && (
         <div className="nexus-panel space-y-3 p-8 text-center">
-          <h2 className="text-lg font-bold text-primary">{copy.empty}</h2>
-          <p className="text-sm text-muted">{copy.emptyHint}</p>
-          <Link href="/discover" className="text-sm text-accent underline">
-            {copy.discover}
-          </Link>
+          <h2 className="text-lg font-bold text-primary">
+            {type || query ? copy.emptyFiltered : copy.empty}
+          </h2>
+          <p className="text-sm text-muted">
+            {type || query ? copy.emptyFilteredHint : copy.emptyHint}
+          </p>
+          {type || query ? (
+            <Link href={href(undefined, "")} className="text-sm text-accent underline">
+              {copy.clear}
+            </Link>
+          ) : (
+            <Link href="/discover" className="text-sm text-accent underline">
+              {copy.discover}
+            </Link>
+          )}
         </div>
       )}
       <div aria-busy={!!pending} className="grid gap-4 md:grid-cols-2">
@@ -227,6 +237,11 @@ export function FollowWorkspace({
                 )}
               </div>
             </div>
+            {item.targetType === "content" && (
+              <p className="text-xs text-muted">
+                {item.notifyComments ? copy.watchingDiscussion : copy.quietSaveHint}
+              </p>
+            )}
             {item.discussion && item.href && (
               <div className="space-y-2 text-sm text-muted">
                 <p>
@@ -244,6 +259,18 @@ export function FollowWorkspace({
               </div>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3">
+              {item.href && item.targetType === "product" && (
+                <span className="space-y-1">
+                  <Link
+                    prefetch={false}
+                    href={`/workspace/library/${encodeURIComponent(item.targetId)}/collections`}
+                    className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                    title={copy.toCollectionHint}
+                  >
+                    {copy.toCollection}
+                  </Link>
+                </span>
+              )}
               {item.href && item.targetType !== "product" && item.targetType !== "content" && (
                 <Link
                   prefetch={false}

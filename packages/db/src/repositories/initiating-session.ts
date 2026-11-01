@@ -5,11 +5,13 @@ import type { ResourceTransaction } from "../transaction";
 import { digestSessionToken } from "./sessions";
 
 // Caller locks the actor first. This locks the initiating session before a write.
+// Wall-clock expiry is rechecked after FOR UPDATE so a wait cannot keep a stale grant.
 export async function lockInitiatingSession(
   tx: ResourceTransaction,
   actorId: string,
   token: string,
 ) {
+  if (!token) throw new UnauthorizedError("Authentication required");
   const [current] = await tx
     .select({ id: sessions.id, expiresAt: sessions.expiresAt })
     .from(sessions)

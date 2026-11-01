@@ -4,6 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import "../register-ts-directory-resolve.mjs";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
+import { waitForReadyCapture } from "../browser-page-ready.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
@@ -26,9 +27,11 @@ test.afterAll(async () => {
     JSON.stringify(
       {
         commit: process.env.GITHUB_SHA,
+        fixture: "resource-browser disposable CI seed",
+        state: "ready",
         results: evidence,
         scope:
-          "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, WCAG 2.4.7 visible keyboard focus, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification.",
+          "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, WCAG 2.4.7 visible keyboard focus, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. Route and filter checks wait for settled ready content (no GlobalLoading skeleton) before axe/structure asserts. This is scoped acceptance, not a full assistive-technology certification.",
       },
       null,
       2,
@@ -38,6 +41,9 @@ test.afterAll(async () => {
     join(output, "shell-summary.md"),
     [
       "# Keyboard, mobile and locale acceptance",
+      "",
+      `Commit: ${process.env.GITHUB_SHA ?? "unknown"}`,
+      "Capture/assert state: ready",
       "",
       ...evidence.map((value) => `- PASS: ${value}`),
       "",
@@ -412,6 +418,7 @@ for (const locale of ["en", "ru"]) {
       },
     ]);
     await page.goto("/market");
+    await waitForReadyCapture(page);
     const reducedMotion = await page.evaluate(() => {
       const probe = document.createElement("div");
       probe.style.animationDuration = "5s";
@@ -467,6 +474,7 @@ for (const locale of ["en", "ru"]) {
     await expect(searchTrigger).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/discover(?:\?.*)?$/u);
+    await waitForReadyCapture(page);
 
     const discoverTabs = page.getByRole("navigation", {
       name: discoverCopy.tabsLabel,
@@ -479,6 +487,7 @@ for (const locale of ["en", "ru"]) {
     await resourcesTab.focus();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/discover\?type=resources(?:&.*)?$/u);
+    await waitForReadyCapture(page);
 
     // Landmark uses discovery-copy filter label; the searchbox is named by discover.searchLabel.
     const discoverSearch = page.getByRole("search", {
@@ -497,6 +506,7 @@ for (const locale of ["en", "ru"]) {
     await input.fill(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/discover\?type=resources&q=/u);
+    await waitForReadyCapture(page);
 
     const escapedTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE.replace(
       /[.*+?^${}()|[\]\\]/g,
@@ -512,6 +522,7 @@ for (const locale of ["en", "ru"]) {
     await expect(page).toHaveURL(
       new RegExp(`/market/${process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG}$`, "u"),
     );
+    await waitForReadyCapture(page);
     evidence.push(
       `${locale}: skip link and ordinary keyboard search navigation through Discover to a real resource`,
     );
@@ -564,6 +575,7 @@ for (const locale of ["en", "ru"]) {
       for (const route of routes) {
         const response = await page.goto(route);
         assert.equal(response.status(), 200, `${locale} ${width} ${route}`);
+        await waitForReadyCapture(page);
         await expect(page.locator("html")).toHaveAttribute("lang", locale);
         await expect(
           page
@@ -616,33 +628,58 @@ for (const locale of ["en", "ru"]) {
       );
     }
     await page.goto("/notifications");
-    const notificationTabs = page.getByRole("tablist", {
+    await waitForReadyCapture(page);
+    const notificationFilters = page.getByRole("navigation", {
       name: dictionary.notifications.title,
       exact: true,
     });
-    const allNotificationsTab = notificationTabs.getByRole("tab", {
+    const allNotificationsLink = notificationFilters.getByRole("link", {
       name: dictionary.notifications.all,
       exact: true,
     });
-    const unreadNotificationsTab = notificationTabs.getByRole("tab").nth(1);
-    await allNotificationsTab.focus();
-    await expect(allNotificationsTab).toHaveAttribute("aria-selected", "true");
-    await page.keyboard.press("ArrowRight");
-    await expect(unreadNotificationsTab).toBeFocused();
-    await assertVisibleFocusIndicator(unreadNotificationsTab, `${locale} unread notification tab`);
-    await expect(unreadNotificationsTab).toHaveAttribute("aria-selected", "true");
-    const controlledPanelId = await unreadNotificationsTab.getAttribute("aria-controls");
-    assert(controlledPanelId);
-    const notificationPanel = page.getByRole("tabpanel");
-    await expect(notificationPanel).toHaveAttribute("id", controlledPanelId);
-    await page.keyboard.press("Home");
-    await expect(allNotificationsTab).toBeFocused();
+    const unreadNotificationsLink = notificationFilters.getByRole("link", {
+      name: dictionary.notifications.unread,
+      exact: true,
+    });
+    await expect(allNotificationsLink).toHaveAttribute("aria-current", "page");
+    await expect(unreadNotificationsLink).toHaveAttribute("href", "/notifications?state=unread");
+    await unreadNotificationsLink.focus();
+    await assertVisibleFocusIndicator(
+      unreadNotificationsLink,
+      `${locale} unread notification filter`,
+    );
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/notifications\?state=unread$/u);
+    await waitForReadyCapture(page);
+    await expect(unreadNotificationsLink).toHaveAttribute("aria-current", "page");
+    await expect(allNotificationsLink).not.toHaveAttribute("aria-current", "page");
+    // List composition follows the same URL state as the select/service (no second local filter).
+    // Without a session the inbox rows are absent; assert the filter links alone compose that state.
+    const stateLinks = await notificationFilters.evaluate((nav) =>
+      [...nav.querySelectorAll("a")].map((link) => ({
+        href: link.getAttribute("href"),
+        current: link.getAttribute("aria-current"),
+        label: link.textContent?.trim() ?? "",
+      })),
+    );
+    assert.deepEqual(
+      stateLinks.map((link) => link.href),
+      ["/notifications", "/notifications?state=unread", "/notifications?state=read"],
+      `${locale}: notification All/Unread/Read links must encode the real inbox state query`,
+    );
+    assert.equal(
+      stateLinks.filter((link) => link.current === "page").length,
+      1,
+      `${locale}: exactly one reading-state filter may be current`,
+    );
+    assert.equal(stateLinks[1]?.current, "page");
     evidence.push(
-      `${locale}: notification filters implement roving tab focus, arrow/Home navigation and a real ARIA tabpanel relation`,
+      `${locale}: notification All/Unread/Read links sync URL state, restore aria-current, and compose the inbox filter without fake local tabs`,
     );
 
     await page.setViewportSize({ width: 390, height: 480 });
     await page.goto("/market");
+    await waitForReadyCapture(page);
     const mobileNavigation = page.getByRole("navigation", {
       name: dictionary.nav.ecosystem,
       exact: true,
@@ -713,6 +750,7 @@ for (const locale of ["en", "ru"]) {
       })
       .click();
     await expect(page).toHaveURL(/\/support$/u);
+    await waitForReadyCapture(page);
     await expect(
       page.getByRole("main").getByRole("heading", {
         level: 1,
@@ -731,6 +769,7 @@ for (const locale of ["en", "ru"]) {
     );
 
     await page.goto("/market");
+    await waitForReadyCapture(page);
     const mobileSearchTrigger = page
       .getByRole("banner")
       .getByRole("link", { name: dictionary.nav.search, exact: true });
@@ -738,6 +777,7 @@ for (const locale of ["en", "ru"]) {
     await mobileSearchTrigger.focus();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/discover(?:\?.*)?$/u);
+    await waitForReadyCapture(page);
     await expect(
       page.getByRole("searchbox", {
         name: discoverCopy.searchLabel,
@@ -824,6 +864,7 @@ for (const locale of ["en", "ru"]) {
     await page.setViewportSize({ width: 320, height: 844 });
 
     await page.goto("/auth/login");
+    await waitForReadyCapture(page);
     await expect(
       page.getByRole("main").getByRole("heading", {
         level: 1,
@@ -868,6 +909,7 @@ for (const locale of ["en", "ru"]) {
     });
     try {
       await page.goto("/auth/forgot-password");
+      await waitForReadyCapture(page);
       await expect(
         page.getByRole("main").getByRole("heading", {
           level: 1,
@@ -972,6 +1014,7 @@ for (const locale of ["en", "ru"]) {
       for (const spec of criticalRoutes) {
         const response = await page.goto(spec.route);
         assert.equal(response?.status(), 200, `${locale} ${width} ${spec.route}`);
+        await waitForReadyCapture(page);
         await expect(page.locator("html")).toHaveAttribute("lang", locale);
         await expect(
           page.getByRole("main").getByRole("heading", {

@@ -4,30 +4,43 @@ const en = {
   description: "Choose what visitors can see on your user and developer profiles.",
   activity: "Show my publication activity",
   activityDescription:
-    "Allow visitors to open your personal publication feed and see your publications in their feed of followed users.",
+    "Controls only your personal publication feed and appearances in other users' followed-user feeds. It does not hide your public resources, servers, trust page, bio or author attribution.",
   contacts: "Show professional contacts",
   contactsDescription:
-    "Show your portfolio URL and Discord contact on your user and developer profiles. Your specialties and verified experience remain public.",
+    "Show your portfolio URL and Discord contact on your user and developer profiles. Specialties and verified experience stay public. This is not a private account or block-user control.",
   scope:
-    "These settings do not make published content private. Publications remain available through community pages, direct links and organization, server or resource feeds. Your public resources, servers, author attribution and profile description remain visible.",
+    "These settings do not make published content private. Public authored resources, servers, publications, author attribution and your profile description stay visible and do not auto-hide when you change these toggles.",
   save: "Save privacy settings",
   saved: "Privacy settings saved.",
   reload: "Load saved settings",
   reloadHint:
-    "Loading saved settings replaces unsaved changes. Profile and professional profile edits also change this form's version.",
+    "Loading saved settings replaces unsaved toggle choices. Use refresh version after a conflict to keep your local choices and only update the form revision.",
+  refreshVersion: "Refresh version",
+  refreshVersionHint:
+    "Updates only the shared profile revision so you can save again. Your current toggle choices stay selected.",
   loading: "Loading privacy settings…",
   signIn: "Sign in to manage profile privacy",
   back: "Account settings",
   publicProfile: "View public profile",
+  guestPreview: "Guest preview",
+  guestPreviewNote:
+    "What a visitor sees with your current choices. Owner-only controls stay hidden. Public resources and servers remain listed.",
+  guestPreviewActivityOn: "Publication activity link: visible",
+  guestPreviewActivityOff: "Publication activity link: hidden",
+  guestPreviewContactsOn: "Professional contacts: visible on public profiles",
+  guestPreviewContactsOff: "Professional contacts: omitted from public profile data",
+  guestPreviewAlways:
+    "Always visible to guests: bio, resources, servers, trust, specialties and verified experience.",
+  openGuestPreview: "Open guest preview of public profile",
   professional: "Edit professional profile",
   invalid: "Choose both visibility settings and load the current profile version.",
   conflict:
-    "Your profile changed in another form or session. Load saved settings before saving again.",
+    "Your profile changed in another form or session. Your current toggle choices are kept — refresh the version, then save again.",
   unavailable: "Privacy settings are temporarily unavailable. Try loading them again.",
   uncertain:
-    "The save could not be confirmed. Load saved settings to check the result before trying again.",
+    "The save could not be confirmed. Refresh the version or load saved settings to check the result before trying again.",
   unconfirmed:
-    "The server did not confirm the saved settings. Load saved settings to check the result.",
+    "The server did not confirm the saved settings. Refresh the version or load saved settings to check the result.",
   forbidden: "Your current session cannot change these settings.",
   notFound: "This account is no longer available.",
   rate: "Too many requests. Wait a moment and try again.",
@@ -38,29 +51,43 @@ const ru: typeof en = {
     "Выберите, что посетители видят в вашем пользовательском и профессиональном профиле.",
   activity: "Показывать мою ленту публикаций",
   activityDescription:
-    "Разрешить посетителям открывать персональную ленту и видеть ваши публикации в ленте подписок на пользователей.",
+    "Управляет только персональной лентой публикаций и появлением в лентах подписок других пользователей. Не скрывает публичные ресурсы, серверы, страницу доверия, описание профиля и авторство.",
   contacts: "Показывать профессиональные контакты",
   contactsDescription:
-    "Показывать ссылку на портфолио и контакт Discord в пользовательском и профессиональном профиле. Специализации и подтверждённый опыт остаются публичными.",
+    "Показывать ссылку на портфолио и контакт Discord в пользовательском и профессиональном профиле. Специализации и подтверждённый опыт остаются публичными. Это не полный private account и не блокировка пользователя.",
   scope:
-    "Эти настройки не делают опубликованный контент приватным. Публикации доступны в сообществе, по прямым ссылкам и в лентах организаций, серверов или ресурсов. Публичные ресурсы, серверы, авторство и описание профиля остаются видимыми.",
+    "Эти настройки не делают опубликованный контент приватным. Публичные ресурсы, серверы, публикации, авторство и описание профиля остаются видимыми и не скрываются автоматически при смене этих переключателей.",
   save: "Сохранить приватность",
   saved: "Настройки приватности сохранены.",
   reload: "Загрузить сохранённые настройки",
   reloadHint:
-    "Загрузка сохранённых настроек заменит несохранённые изменения. Редактирование обычного или профессионального профиля также меняет версию этой формы.",
+    "Загрузка сохранённых настроек заменит несохранённый выбор переключателей. После конфликта используйте обновление версии, чтобы сохранить локальный выбор и обновить только редакцию формы.",
+  refreshVersion: "Обновить версию",
+  refreshVersionHint:
+    "Обновляет только общую редакцию профиля, чтобы снова сохранить. Текущий выбор переключателей остаётся.",
   loading: "Загрузка настроек приватности…",
   signIn: "Войдите, чтобы настроить приватность профиля",
   back: "Настройки аккаунта",
   publicProfile: "Открыть публичный профиль",
+  guestPreview: "Просмотр от лица гостя",
+  guestPreviewNote:
+    "Что видит посетитель при текущем выборе. Элементы только для владельца скрыты. Публичные ресурсы и серверы остаются в списке.",
+  guestPreviewActivityOn: "Ссылка на ленту публикаций: видна",
+  guestPreviewActivityOff: "Ссылка на ленту публикаций: скрыта",
+  guestPreviewContactsOn: "Профессиональные контакты: видны в публичных профилях",
+  guestPreviewContactsOff: "Профессиональные контакты: отсутствуют в публичных данных профиля",
+  guestPreviewAlways:
+    "Гостю всегда видны: описание, ресурсы, серверы, доверие, специализации и подтверждённый опыт.",
+  openGuestPreview: "Открыть публичный профиль как гость",
   professional: "Редактировать профессиональный профиль",
   invalid: "Выберите оба параметра видимости и загрузите актуальную версию профиля.",
   conflict:
-    "Профиль изменён в другой форме или сессии. Загрузите сохранённые настройки перед повторным сохранением.",
+    "Профиль изменён в другой форме или сессии. Текущий выбор переключателей сохранён — обновите версию и сохраните снова.",
   unavailable: "Настройки приватности временно недоступны. Попробуйте загрузить их снова.",
   uncertain:
-    "Не удалось подтвердить сохранение. Загрузите сохранённые настройки и проверьте результат перед повторной попыткой.",
-  unconfirmed: "Сервер не подтвердил сохранённые настройки. Загрузите их и проверьте результат.",
+    "Не удалось подтвердить сохранение. Обновите версию или загрузите сохранённые настройки и проверьте результат перед повторной попыткой.",
+  unconfirmed:
+    "Сервер не подтвердил сохранённые настройки. Обновите версию или загрузите их и проверьте результат.",
   forbidden: "Текущая сессия не позволяет изменить эти настройки.",
   notFound: "Этот аккаунт больше недоступен.",
   rate: "Слишком много запросов. Подождите немного и повторите попытку.",

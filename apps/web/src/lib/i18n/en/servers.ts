@@ -3,7 +3,9 @@ export const servers = {
     notFound: "Server not found",
     breadcrumb: "Servers",
     verifiedIdentity: "Verified identity",
-    connect: "Connect to server",
+    connect: "Open in MTA",
+    connectHint:
+      "Opens the mtasa:// link in your installed MTA client when the browser supports it. This is a connect intent only — NEXUS cannot verify that you joined or played.",
     language: "Language",
     region: "Region",
     website: "Website",
@@ -11,9 +13,9 @@ export const servers = {
     openMedia: "Open media",
     livePlayerLoad: "Live player load",
     noObservation: "No current observation in the official MTA directory.",
-    staleSnapshot: "Showing the latest available directory snapshot.",
+    staleSnapshot: "Showing the latest available directory snapshot. Player counts may be outdated.",
     connectionIp: "Connection IP",
-    selectHint: "Select and paste this address into MTA Quick Connect.",
+    selectHint: "If the protocol link does not open MTA, copy or select this address and paste it into MTA Quick Connect.",
     runtime: "Runtime & directory",
     officialDirectory: "Official MTA directory",
     runtimeDescription:

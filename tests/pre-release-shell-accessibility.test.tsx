@@ -2,8 +2,12 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import type { ShellAuthSession } from "../apps/web/src/components/shell-destination-policy";
 
 const nav = vi.hoisted(() => ({ pathname: "/market" }));
+const auth = vi.hoisted(() => ({
+  session: { status: "anonymous", user: null } as ShellAuthSession,
+}));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => nav.pathname,
@@ -23,6 +27,10 @@ vi.mock("next/link", async () => {
     }) => ReactModule.createElement("a", { href, ...props }, children),
   };
 });
+
+vi.mock("../apps/web/src/components/use-auth-session", () => ({
+  useAuthSession: () => auth.session,
+}));
 
 vi.mock("../apps/web/src/components/account-controls", async () => {
   const ReactModule = await import("react");
@@ -59,6 +67,7 @@ import { Sidebar } from "../apps/web/src/components/sidebar";
 describe("pre-release shell accessibility behavior", () => {
   beforeEach(() => {
     nav.pathname = "/market";
+    auth.session = { status: "anonymous", user: null };
   });
 
   it.each(["en", "ru"] as const)(
@@ -93,7 +102,7 @@ describe("pre-release shell accessibility behavior", () => {
     expect(html).not.toContain('id="mobile-more-menu"');
   });
 
-  it("gives collapsed sidebar destinations accessible names", () => {
+  it("gives collapsed sidebar destinations accessible names for guests without Workspace or Admin", () => {
     const dictionary = getDictionary("en");
     const html = renderToStaticMarkup(
       React.createElement(Sidebar, {
@@ -107,8 +116,32 @@ describe("pre-release shell accessibility behavior", () => {
       new RegExp(`<a[^>]*href="/discover"[^>]*aria-label="${dictionary.nav.explore}"`, "u"),
     );
     expect(html).toMatch(
+      new RegExp(`<a[^>]*href="/auth/login"[^>]*aria-label="${dictionary.workspace.signIn}"`, "u"),
+    );
+    expect(html).not.toContain('href="/admin"');
+    expect(html).not.toContain('href="/workspace"');
+    expect(html).not.toContain('href="/workspace/servers"');
+    expect(html).not.toContain(dictionary.nav.workspace);
+    expect(html).toMatch(new RegExp(`<button[^>]*aria-label="${dictionary.nav.expand}"`, "u"));
+  });
+
+  it("exposes Admin only for staff roles in collapsed sidebar", () => {
+    const dictionary = getDictionary("en");
+    auth.session = {
+      status: "authenticated",
+      user: { username: "mod", role: "moderator" },
+    };
+    const html = renderToStaticMarkup(
+      React.createElement(Sidebar, {
+        locale: "en",
+        isCollapsed: true,
+        onToggle: () => undefined,
+      }),
+    );
+
+    expect(html).toMatch(
       new RegExp(`<a[^>]*href="/admin"[^>]*aria-label="${dictionary.nav.admin}"`, "u"),
     );
-    expect(html).toMatch(new RegExp(`<button[^>]*aria-label="${dictionary.nav.expand}"`, "u"));
+    expect(html).toContain('href="/workspace/servers"');
   });
 });

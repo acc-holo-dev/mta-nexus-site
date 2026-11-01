@@ -1,4 +1,10 @@
 import { describe, expect, it } from "vitest";
+import {
+  compareResourceVersions,
+  isValidResourceVersion,
+  resourceVersionsConflict,
+} from "@nexus/domain";
+import { MTA_VERSION_PATTERN } from "@nexus/validation";
 import { getMtaVersionTargetSuggestion } from "../apps/web/src/lib/mta-version-target";
 
 describe("MTA minimum version suggestions", () => {
@@ -44,5 +50,20 @@ describe("MTA minimum version suggestions", () => {
       }),
     ).toBeNull();
     expect(getMtaVersionTargetSuggestion(null)).toBeNull();
+  });
+
+  it("keeps MTA compatibility targets in a separate field from human resource versions", () => {
+    const mtaTarget = "1.6.0-9.22279.0";
+    const resourceVersion = "2.0.0";
+    expect(MTA_VERSION_PATTERN.test(mtaTarget)).toBe(true);
+    // Human resource versions are not constrained to MTA's `1.x` sortable form.
+    expect(MTA_VERSION_PATTERN.test(resourceVersion)).toBe(false);
+    expect(isValidResourceVersion(resourceVersion)).toBe(true);
+    // OPS-19: fields stay separate even if some strings could parse under both helpers.
+    expect(resourceVersionsConflict(resourceVersion, mtaTarget)).toBe(false);
+    expect(compareResourceVersions(resourceVersion, "v2.0.0")).toBe(0);
+    expect(getMtaVersionTargetSuggestion({ client: null, server: null, both: mtaTarget })).toBe(
+      mtaTarget,
+    );
   });
 });

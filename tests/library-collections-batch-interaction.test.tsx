@@ -225,6 +225,20 @@ it("ignores stale handlers after a confirmed batch", async () => {
   expect(h.fetch).toHaveBeenCalledOnce();
   expect(h.refresh).toHaveBeenCalledOnce();
 });
+it("lists per-item batch outcomes after a confirmed remove-many", async () => {
+  const { libraryCollectionsCopy } = await import(
+    "../apps/web/src/lib/library-collections-i18n"
+  );
+  check(1);
+  check(2);
+  h.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>
+    success(JSON.parse(String(init.body))),
+  );
+  await submit();
+  const html = JSON.stringify(render());
+  expect(html).toContain(libraryCollectionsCopy("en").batchApplied);
+  expect(html).toContain("prd_a");
+});
 it("aborts a batch on unmount and ignores its late confirmation", async () => {
   check(0);
   check(2);

@@ -6,12 +6,12 @@ const en = {
   reports: "My review reports",
   queue: "Review report queue",
   subtitle:
-    "Reviews reflect acquired access, including free resources and legacy licenses. This does not confirm payment.",
+    "Reviews reflect acquired access, including free resources and legacy licenses. This does not confirm payment, install, or gameplay.",
   published: "Published",
   withdrawn: "Withdrawn",
   removed: "Removed by moderation",
-  entitlement: "Acquired access checked",
-  license: "License access checked",
+  entitlement: "Library access checked (not verified use)",
+  license: "License access checked (not verified use)",
   legacy: "Historical review; acquisition not reverified",
   rating: "Rating",
   text: "Your review",
@@ -22,7 +22,12 @@ const en = {
   unavailable: "Resource unavailable",
   empty: "No reviews yet.",
   access:
-    "Current acquired access and a safe published version are required to publish. Publishers cannot review their own resources.",
+    "Current library access and a safe published version are required to publish. Access is not proof of install or gameplay. Publishers and managers cannot review their own resources.",
+  ownerConflict:
+    "Authors, organization managers and staff cannot publish a review for this resource.",
+  accessRequired: "Add this resource to your library before publishing a review.",
+  resourceUnavailable: "A published safe version is required before a review can be published.",
+  moderatedEligibility: "This review was removed by moderation and cannot be republished.",
   reason: "Reason",
   notes: "Moderation reason (shown to the review author when removing)",
   report: "Report review",
@@ -68,12 +73,12 @@ const ru: typeof en = {
   reports: "Мои жалобы на отзывы",
   queue: "Жалобы на отзывы ресурсов",
   subtitle:
-    "Отзывы подтверждают доступ к ресурсу, включая бесплатные ресурсы и старые лицензии. Это не подтверждение оплаты.",
+    "Отзывы опираются на доступ к ресурсу, включая бесплатные ресурсы и старые лицензии. Это не подтверждение оплаты, установки или игровой сессии.",
   published: "Опубликован",
   withdrawn: "Отозван",
   removed: "Удалён модерацией",
-  entitlement: "Доступ к ресурсу проверен",
-  license: "Доступ по лицензии проверен",
+  entitlement: "Доступ в библиотеке проверен (не подтверждённое использование)",
+  license: "Доступ по лицензии проверен (не подтверждённое использование)",
   legacy: "Исторический отзыв; получение не перепроверено",
   rating: "Оценка",
   text: "Ваш отзыв",
@@ -84,7 +89,12 @@ const ru: typeof en = {
   unavailable: "Ресурс недоступен",
   empty: "Отзывов пока нет.",
   access:
-    "Для публикации нужен действующий доступ и безопасная опубликованная версия. Издатели не могут оценивать свои ресурсы.",
+    "Для публикации нужен действующий доступ в библиотеке и безопасная опубликованная версия. Доступ не доказывает установку или игру. Издатели и управляющие не могут оценивать свои ресурсы.",
+  ownerConflict:
+    "Авторы, управляющие организацией и сотрудники не могут публиковать отзыв об этом ресурсе.",
+  accessRequired: "Сначала добавьте ресурс в библиотеку, затем публикуйте отзыв.",
+  resourceUnavailable: "Для публикации отзыва нужна опубликованная безопасная версия.",
+  moderatedEligibility: "Отзыв удалён модерацией; повторная публикация недоступна.",
   reason: "Причина",
   notes: "Причина решения (при удалении видна автору отзыва)",
   report: "Пожаловаться на отзыв",
@@ -147,4 +157,21 @@ export function resourceReviewState(locale: Locale, state: string) {
     state === "dismissed"
     ? copy[state]
     : copy.unavailable;
+}
+export type ResourceReviewEligibilityReason =
+  | "ok"
+  | "owner_conflict"
+  | "access_required"
+  | "resource_unavailable"
+  | "moderated";
+export function resourceReviewEligibilityCopy(
+  locale: Locale,
+  reason: ResourceReviewEligibilityReason | string | null | undefined,
+) {
+  const copy = resourceReviewCopy(locale);
+  if (reason === "owner_conflict") return copy.ownerConflict;
+  if (reason === "access_required") return copy.accessRequired;
+  if (reason === "resource_unavailable") return copy.resourceUnavailable;
+  if (reason === "moderated") return copy.moderatedEligibility;
+  return null;
 }

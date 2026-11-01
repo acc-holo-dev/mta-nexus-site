@@ -21,6 +21,7 @@ import {
 } from "../lib/server-publication-history-copy";
 import { platformRequest } from "../lib/user-platform-client";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
+import { confirmAction } from "./confirm-action";
 export function AuthorPublicationRestore({
   id,
   revision,
@@ -64,7 +65,20 @@ export function AuthorPublicationRestore({
     };
   }, []);
   async function restore() {
-    if (pending.current || blocked || saved || !window.confirm(copy.restoreConfirm)) return;
+    if (
+      pending.current ||
+      blocked ||
+      saved ||
+      !(await confirmAction({
+        title: copy.restore,
+        object: id,
+        consequences: copy.restoreConfirm,
+        confirmLabel: copy.restore,
+        cancelLabel: getUserPlatformCopy(locale).back,
+        closeLabel: getUserPlatformCopy(locale).back,
+      }))
+    )
+      return;
     pending.current = true;
     setBusy(true);
     setBlocked(true);

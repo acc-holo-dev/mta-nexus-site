@@ -112,6 +112,7 @@ it("checks paired latest-comment selectors in paged saved discussions", () => {
     id: "follow",
     targetType: "content",
     targetId: "article",
+    notifyComments: true,
     createdAt: "2026-10-12T00:00:00.000Z",
     title: "Article",
     description: null,

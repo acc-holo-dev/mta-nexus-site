@@ -2,6 +2,9 @@
   email {$ACME_EMAIL}
 }
 
+# OPS-05: edge hostname is runtime {$DOMAIN}, not baked into the app image.
+# The same web image digest is promoted under any allowed HTTPS origin; Caddy
+# and Compose supply DOMAIN / APP_URL together.
 {$DOMAIN} {
   encode zstd gzip
 

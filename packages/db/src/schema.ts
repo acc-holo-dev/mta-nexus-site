@@ -415,6 +415,9 @@ export const builds = pgTable(
     productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
+    // OPS-19: human SemVer-like product version (new releases store without leading `v`).
+    // Separate from build id, sha256Hash/bytes, mtaVersionTarget, and packageEvidence.schemaVersion.
+    // Do not rewrite published historical version strings.
     version: text("version").notNull(),
     releaseNotes: text("release_notes"),
     status: text("status").notNull().default("draft"), // draft, testing, pending_review, published, rejected, deprecated, quarantined, retired
@@ -1235,6 +1238,111 @@ export const serverReviews = pgTable(
   ],
 );
 
+// 18c. Public resource Q&A (FLOW-12) — separate from reviews, release watches, and private support
+export const resourceQaThreads = pgTable(
+  "resource_qa_threads",
+  {
+    id: text("id").primaryKey(),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    status: text("status").notNull().default("open"),
+    revision: integer("revision").notNull().default(1),
+    buildId: text("build_id").references(() => builds.id, { onDelete: "set null" }),
+    buildVersionLabel: text("build_version_label"),
+    resolvedAnswerId: text("resolved_answer_id"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedBy: text("resolved_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (table) => [
+    check(
+      "resource_qa_threads_status_check",
+      sql`${table.status} IN ('open', 'resolved', 'removed')`,
+    ),
+    check("resource_qa_threads_revision_check", sql`${table.revision} > 0`),
+    check(
+      "resource_qa_threads_body_check",
+      sql`char_length(btrim(${table.body})) BETWEEN 3 AND 4000`,
+    ),
+    check(
+      "resource_qa_threads_build_label_check",
+      sql`(${table.buildId} IS NULL AND ${table.buildVersionLabel} IS NULL) OR (${table.buildVersionLabel} IS NOT NULL AND char_length(btrim(${table.buildVersionLabel})) BETWEEN 1 AND 64)`,
+    ),
+    check(
+      "resource_qa_threads_resolved_check",
+      sql`(${table.status} = 'resolved' AND ${table.resolvedAnswerId} IS NOT NULL AND ${table.resolvedAt} IS NOT NULL AND ${table.resolvedBy} IS NOT NULL) OR (${table.status} <> 'resolved' AND ${table.resolvedAnswerId} IS NULL AND ${table.resolvedAt} IS NULL AND ${table.resolvedBy} IS NULL)`,
+    ),
+    index("resource_qa_threads_product_public_time_id_idx")
+      .on(table.productId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.status} IN ('open', 'resolved')`),
+    index("resource_qa_threads_author_time_id_idx").on(
+      table.authorId,
+      table.createdAt.desc(),
+      table.id.desc(),
+    ),
+  ],
+);
+
+export const resourceQaAnswers = pgTable(
+  "resource_qa_answers",
+  {
+    id: text("id").primaryKey(),
+    threadId: text("thread_id")
+      .notNull()
+      .references(() => resourceQaThreads.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    status: text("status").notNull().default("published"),
+    revision: integer("revision").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (table) => [
+    check(
+      "resource_qa_answers_status_check",
+      sql`${table.status} IN ('published', 'removed')`,
+    ),
+    check("resource_qa_answers_revision_check", sql`${table.revision} > 0`),
+    check(
+      "resource_qa_answers_body_check",
+      sql`char_length(btrim(${table.body})) BETWEEN 3 AND 4000`,
+    ),
+    index("resource_qa_answers_thread_time_id_idx")
+      .on(table.threadId, table.createdAt.asc(), table.id.asc())
+      .where(sql`${table.status} = 'published'`),
+  ],
+);
+
+export const resourceQaThreadFollows = pgTable(
+  "resource_qa_thread_follows",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    threadId: text("thread_id")
+      .notNull()
+      .references(() => resourceQaThreads.id, { onDelete: "cascade" }),
+    enabled: boolean("enabled").notNull().default(true),
+    revision: integer("revision").notNull().default(1),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.threadId], name: "resource_qa_thread_follows_pk" }),
+    check("resource_qa_thread_follows_revision_check", sql`${table.revision} > 0`),
+    index("resource_qa_thread_follows_thread_enabled_idx")
+      .on(table.threadId)
+      .where(sql`${table.enabled} = true`),
+  ],
+);
+
 // 19. Reactions
 export const reactions = pgTable("reactions", {
   id: text("id").primaryKey(),
@@ -1257,6 +1365,8 @@ export const follows = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     targetType: text("target_type").notNull(),
     targetId: text("target_id").notNull(),
+    // FLOW-06: content-follow delivery flag. Existing rows default true; quiet Save sets false.
+    notifyComments: boolean("notify_comments").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
@@ -1265,6 +1375,35 @@ export const follows = pgTable(
       table.followerId,
       table.createdAt.desc(),
       table.id.desc(),
+    ),
+  ],
+);
+
+// 20b. Object notification mutes (FLOW-05). Independent of follows / release watches.
+export const objectNotificationMutes = pgTable(
+  "object_notification_mutes",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: text("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    mutedUntil: timestamp("muted_until", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("object_notification_mutes_user_target_idx").on(
+      table.userId,
+      table.targetType,
+      table.targetId,
+    ),
+    index("object_notification_mutes_active_lookup_idx").on(
+      table.userId,
+      table.targetType,
+      table.targetId,
+      table.mutedUntil,
     ),
   ],
 );

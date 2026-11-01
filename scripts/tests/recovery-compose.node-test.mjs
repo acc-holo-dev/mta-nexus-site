@@ -25,3 +25,8 @@ assert.equal(worker.environment?.ACCOUNT_MAIL_KEY_ID, "ci");
 assert.equal(worker.environment?.ACCOUNT_MAIL_PREVIOUS_KEY_ID, "ci-previous");
 assert.equal(worker.environment?.ACCOUNT_MAIL_SMTP_USERNAME, "nexus-ci-user");
 assert.equal(worker.environment?.ACCOUNT_MAIL_SMTP_PASSWORD, "nexus-ci-password");
+
+// Recovery+mail merge keeps license/resource-release writers (OPS-04 inventory).
+for (const name of ["push-worker", "license-worker", "resource-release-worker", "postgres", "caddy"]) {
+  assert(config.services?.[name], `recovery+mail inventory missing ${name}`);
+}

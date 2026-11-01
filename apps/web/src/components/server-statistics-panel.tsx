@@ -121,13 +121,13 @@ export function ServerStatisticsPanel({
                       {time(from)} — {time(to)} UTC
                     </span>
                   </th>
-                  <td className="p-2">{summary.observationCount}</td>
-                  <td className="p-2">
+                  <td className="p-2 font-numeric tabular-nums">{summary.observationCount}</td>
+                  <td className="p-2 font-numeric tabular-nums">
                     {summary.knownPlayerCount}
                     {summary.knownPlayerPercent == null ? "" : ` (${summary.knownPlayerPercent}%)`}
                   </td>
-                  <td className="p-2">{metric(summary.peakPlayers)}</td>
-                  <td className="p-2">{metric(summary.averagePlayers)}</td>
+                  <td className="p-2 font-numeric tabular-nums">{metric(summary.peakPlayers)}</td>
+                  <td className="p-2 font-numeric tabular-nums">{metric(summary.averagePlayers)}</td>
                 </tr>
               ))}
             </tbody>
@@ -226,8 +226,8 @@ export function ServerStatisticsPanel({
                     <th scope="row" className="whitespace-nowrap p-2 font-normal">
                       <time dateTime={item.observedAt}>{time(item.observedAt)}</time>
                     </th>
-                    <td className="p-2">{metric(item.currentPlayers)}</td>
-                    <td className="p-2">{metric(item.maxPlayers)}</td>
+                    <td className="p-2 font-numeric tabular-nums">{metric(item.currentPlayers)}</td>
+                    <td className="p-2 font-numeric tabular-nums">{metric(item.maxPlayers)}</td>
                     {[item.gameMode, item.mapName, item.mtaVersion].map((text, index) => (
                       <td
                         key={["mode", "map", "version"][index]}

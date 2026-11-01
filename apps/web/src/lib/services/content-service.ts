@@ -1,5 +1,6 @@
 import {
   contentRepository,
+  contentCommentsRepository,
   contentDiscussionRepository,
   authorContentRepository,
   productRepository,
@@ -139,40 +140,71 @@ export class ContentService {
       parentId?: string;
       text: string;
       rating?: number;
+      intentKey?: string;
     },
     actor: User,
-  ): Promise<Comment> {
+  ): Promise<{ comment: Comment; replayed: boolean }> {
     if (input.contentId) {
       const target = await contentRepository.findById(input.contentId);
       if (target?.status !== "published") {
         throw new NotFoundError("Content", input.contentId);
       }
+      if (!input.intentKey) {
+        throw new AppError(
+          "Comment intent key is required",
+          400,
+          "COMMENT_IDEMPOTENCY_KEY_INVALID",
+        );
+      }
+
+      if (input.parentId) {
+        const parent = await contentRepository.findCommentById(input.parentId);
+        if (!parent || parent.contentId !== input.contentId || parent.productId) {
+          throw new AppError(
+            "Parent comment was not found for this article",
+            400,
+            "COMMENT_PARENT_NOT_FOUND",
+          );
+        }
+      }
+
+      const result = await contentCommentsRepository.addArticleComment({
+        intentKey: input.intentKey,
+        contentId: input.contentId,
+        authorId: actor.id,
+        text: input.text,
+        parentId: input.parentId,
+        audit: {
+          id: generateId("aud"),
+          actorId: actor.id,
+          actorType: "user",
+          action: "content.comment_added",
+          targetId: input.contentId,
+          targetType: "content",
+        },
+      });
+      if (result.kind === "key_conflict") {
+        throw new AppError(
+          "Comment intent key was reused with a different payload",
+          409,
+          "COMMENT_IDEMPOTENCY_CONFLICT",
+        );
+      }
+      return { comment: result.comment, replayed: result.kind === "replayed" };
     }
 
     if (input.parentId) {
-      if (!input.contentId) {
-        throw new AppError(
-          "Parent comments are only supported for article discussions",
-          400,
-          "COMMENT_PARENT_TARGET_INVALID",
-        );
-      }
-      const parent = await contentRepository.findCommentById(input.parentId);
-      if (!parent || parent.contentId !== input.contentId || parent.productId) {
-        throw new AppError(
-          "Parent comment was not found for this article",
-          400,
-          "COMMENT_PARENT_NOT_FOUND",
-        );
-      }
+      throw new AppError(
+        "Parent comments are only supported for article discussions",
+        400,
+        "COMMENT_PARENT_TARGET_INVALID",
+      );
     }
 
     const comment = await contentRepository.addComment(
       {
         id: generateId("cmt"),
-        contentId: input.contentId,
         productId: input.productId,
-        parentId: input.parentId,
         authorId: actor.id,
         text: input.text,
         rating: input.rating,
@@ -180,19 +212,10 @@ export class ContentService {
         // set this flag only after an entitlement check.
         isVerifiedPurchase: false,
       },
-      input.contentId
-        ? {
-            id: generateId("aud"),
-            actorId: actor.id,
-            actorType: "user",
-            action: "content.comment_added",
-            targetId: input.contentId,
-            targetType: "content",
-          }
-        : undefined,
+      undefined,
     );
 
-    return comment;
+    return { comment, replayed: false };
   }
 
   async moderateContent(

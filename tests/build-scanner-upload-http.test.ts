@@ -110,7 +110,7 @@ describe("build upload scanner HTTP behavior", () => {
     const response = await POST(
       new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
         method: "POST",
-        headers: browserMutationHeaders(),
+        headers: browserMutationHeaders({ cookie: "nexus_session=tok_scanner" }),
         body: form,
       }),
       context,
@@ -231,6 +231,7 @@ describe("build upload scanner HTTP behavior", () => {
         }),
       }),
       expect.objectContaining({ id: "usr_scanner_author" }),
+      "tok_scanner",
     );
   });
 
@@ -252,6 +253,7 @@ describe("build upload scanner HTTP behavior", () => {
         scanStatus: "clean",
       }),
       expect.objectContaining({ id: "usr_scanner_author" }),
+      "tok_scanner",
     );
   });
 });

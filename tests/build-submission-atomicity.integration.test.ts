@@ -6,6 +6,7 @@ import {
   builds,
   db,
   productRepository,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 
@@ -23,6 +24,12 @@ describe("build submission transaction atomicity", () => {
       username: `build_atomic_${suffix}`,
       displayName: "Build Atomic Author",
       role: "developer",
+    });
+    await sessionRepository.create({
+      id: `ses_${userId}`,
+      userId,
+      token: `tok_${userId}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
     await productRepository.create({
       id: productId,
@@ -81,6 +88,7 @@ describe("build submission transaction atomicity", () => {
           targetId: buildId,
           targetType: "build",
         },
+        `tok_${userId}`,
       ),
     ).rejects.toBeTruthy();
 

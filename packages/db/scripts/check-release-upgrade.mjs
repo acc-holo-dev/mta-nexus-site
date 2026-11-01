@@ -7,7 +7,11 @@ import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
-import { releaseUpgradePlan } from "./release-upgrade-contract.mjs";
+import {
+  RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION,
+  assertReleaseUpgradeEvidence,
+  releaseUpgradePlan,
+} from "./release-upgrade-contract.mjs";
 
 // Never connect to an operator's database. This rehearsal owns one new database
 // on the hosted runner's loopback PostgreSQL service, with no production secrets.
@@ -35,6 +39,7 @@ const admin = postgres(url.toString(), { max: 1, onnotice: () => {} });
 let client;
 let created = false;
 const evidence = {
+  schemaVersion: RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION,
   buildPackageEvidenceSchemaPresent: false,
   resourceMediaSchemaPresent: false,
   storageMaintenanceSchemaPresent: false,
@@ -74,6 +79,7 @@ const evidence = {
   webPushSubscriptionSchemaPresent: false,
   webPushOutboxSchemaPresent: false,
   resourceReviewSchemaPresent: false,
+  resourceBuildWorkspaceSchemaPresent: false,
   commerceOrderCaseSchemaPresent: false,
   licenseBindingRecoverySchemaPresent: false,
   licenseTermMaintenanceSchemaPresent: false,
@@ -942,3 +948,4 @@ try {
   console.log(JSON.stringify(evidence, null, 2));
 }
 assert.equal(evidence.status, "PASS", "Existing-installation upgrade rehearsal failed");
+assertReleaseUpgradeEvidence(evidence, { candidateSha: evidence.sha });

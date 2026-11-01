@@ -17,6 +17,7 @@ import {
 import type { ResourceTransaction } from "./entitlements";
 
 export const fail = (code: string) => new AppError("Collection command is unavailable", 409, code);
+/** Membership helpers mutate only collection rows/receipts — never watches or entitlements. */
 export const fields = {
   id: collections.id,
   name: collections.name,

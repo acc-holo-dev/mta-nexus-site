@@ -117,10 +117,13 @@ describe("production runtime readiness", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
-    await expect(response.json()).resolves.toMatchObject({
+    const body = await response.json();
+    expect(body).toMatchObject({
       status: "ok",
       database: "reachable",
     });
+    expect(Object.keys(body).sort()).toEqual(["database", "status", "timestamp"].sort());
+    expect(JSON.stringify(body)).not.toMatch(/AUTH_SECRET|DATABASE_URL|STORAGE_S3|SMTP_PASS/u);
     expect(checkDatabaseConnection).toHaveBeenCalledOnce();
   });
 
@@ -133,12 +136,35 @@ describe("production runtime readiness", () => {
 
       expect(response.status).toBe(503);
       expect(response.headers.get("cache-control")).toBe("no-store");
-      await expect(response.json()).resolves.toMatchObject({
+      const body = await response.json();
+      expect(body).toMatchObject({
         status: "unavailable",
         database: "unreachable",
       });
+      expect(Object.keys(body).sort()).toEqual(["database", "status"]);
+      expect(JSON.stringify(body)).not.toMatch(/AUTH_SECRET|DATABASE_URL|config/u);
     } finally {
       errorLog.mockRestore();
+    }
+  });
+
+  it("fails readiness when public health exposes unexpected configuration fields", async () => {
+    const storagePath = await mkdtemp(join(tmpdir(), "nexus-readiness-leak-"));
+    try {
+      await expect(
+        checkLocalReadiness({
+          storagePath,
+          fetchFn: vi.fn(async () =>
+            healthResponse(200, {
+              status: "ok",
+              database: "reachable",
+              AUTH_SECRET: "should-not-appear",
+            }),
+          ),
+        }),
+      ).rejects.toThrow(/unexpected field: AUTH_SECRET/u);
+    } finally {
+      await rm(storagePath, { recursive: true, force: true });
     }
   });
 });

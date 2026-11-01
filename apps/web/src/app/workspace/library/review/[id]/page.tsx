@@ -41,6 +41,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         productId={target.id}
         review={detail.review}
         canReview={detail.canReview}
+        eligibility={detail.eligibility}
         locale={locale}
       />
     </section>

@@ -32,19 +32,47 @@ export async function GET(request: NextRequest) {
     )
       throw new AppError("Invalid follow target", 400, "VALIDATION_ERROR");
     const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    const following = actor
-      ? parsed.data.targetType === "content"
-        ? (
-            await followWorkspaceRepository.states(actor.id, "content", [parsed.data.targetId])
-          ).includes(parsed.data.targetId)
-        : await socialRepository.isFollowing(actor.id, parsed.data.targetType, parsed.data.targetId)
-      : false;
+    let following = false;
+    let notifyComments = false;
+    let muted = false;
+    let mutedUntil: string | null = null;
+    if (actor) {
+      if (parsed.data.targetType === "content") {
+        const [state] = await followWorkspaceRepository.contentStates(actor.id, [
+          parsed.data.targetId,
+        ]);
+        following = !!state;
+        notifyComments = state?.notifyComments === true;
+        muted = !!state?.mutedUntil;
+        mutedUntil = state?.mutedUntil ?? null;
+        if (!state) {
+          const mute = await followWorkspaceRepository.muteState(
+            actor.id,
+            "content",
+            parsed.data.targetId,
+          );
+          muted = mute.muted;
+          mutedUntil = mute.mutedUntil;
+        }
+      } else {
+        following = await socialRepository.isFollowing(
+          actor.id,
+          parsed.data.targetType,
+          parsed.data.targetId,
+        );
+        notifyComments = following;
+      }
+    }
     return jsonWithRequestId(
       context,
       {
         authenticated: !!actor,
         following,
-        ...parsed.data,
+        notifyComments,
+        muted,
+        mutedUntil,
+        targetType: parsed.data.targetType,
+        targetId: parsed.data.targetId,
         ...(actor && parsed.data.targetType === "user" && parsed.data.targetId === actor.id
           ? { self: true }
           : {}),
@@ -77,7 +105,7 @@ function mutation(request: NextRequest, following: boolean) {
       requireServerJsonContentType(request);
       const parsed = followCommandSchema.safeParse(await readBoundedJson(request, 32 * 1024));
       if (!parsed.success) throw new AppError("Invalid follow command", 400, "VALIDATION_ERROR");
-      const { targetType, targetId } = parsed.data;
+      const { targetType, targetId, notifyComments } = parsed.data;
       // Follower inbox notice commits in the same follow transaction; no after().
       const result = await followWorkspaceRepository.setFollowing(
         actor.id,
@@ -85,8 +113,15 @@ function mutation(request: NextRequest, following: boolean) {
         targetId,
         following,
         generateId("fol"),
+        following && targetType === "content" ? { notifyComments } : {},
       );
-      return { success: true, targetType, targetId, following: result.following };
+      return {
+        success: true,
+        targetType,
+        targetId,
+        following: result.following,
+        notifyComments: result.notifyComments,
+      };
     },
     200,
     followError,

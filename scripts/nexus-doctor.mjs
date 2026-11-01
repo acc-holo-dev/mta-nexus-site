@@ -5,16 +5,19 @@ import { totalmem } from "node:os";
 import { dirname, resolve } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import {
+  evaluateToolchainPolicy,
+  parseSemver,
+  readExactNodePin,
+  readPinnedPnpm,
+} from "./toolchain-policy.mjs";
 
 const execFileAsync = promisify(execFile);
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 function parseVersion(value) {
-  const match = String(value ?? "")
-    .trim()
-    .match(/^v?(\d+)(?:\.(\d+))?(?:\.(\d+))?/u);
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2] ?? 0), Number(match[3] ?? 0)];
+  const parsed = parseSemver(value);
+  return parsed ? [parsed.major, parsed.minor, parsed.patch] : null;
 }
 
 function compareVersion(left, right) {
@@ -119,7 +122,11 @@ export async function collectDoctor(options = {}) {
   const facts = {
     node: nodeVersion,
     nodePin: null,
+    nodeMajorOk: null,
+    nodeExactMatch: null,
     pnpm: null,
+    pnpmPin: null,
+    pnpmExactMatch: null,
     docker: null,
     compose: null,
     dockerOs: null,
@@ -155,24 +162,19 @@ export async function collectDoctor(options = {}) {
 
   let pinnedNode = "";
   try {
-    const [nvmrc, nodeVersionFile] = await Promise.all([
-      readFile(resolve(root, ".nvmrc"), "utf8"),
-      readFile(resolve(root, ".node-version"), "utf8"),
-    ]);
-    const nvmPin = nvmrc.trim();
-    const nodeVersionPin = nodeVersionFile.trim();
-    if (!nvmPin || nvmPin !== nodeVersionPin || !parseVersion(nvmPin)) {
+    const nodePin = readExactNodePin(root);
+    if (!nodePin.ok) {
       addCheck(
         checks,
         "node-pin",
         "fail",
-        "Repository Node version files are missing, invalid, or disagree.",
+        nodePin.reason ?? "Repository Node version files are missing, invalid, or disagree.",
         "Keep .nvmrc and .node-version on the same valid Node release.",
       );
     } else {
-      pinnedNode = nvmPin;
+      pinnedNode = nodePin.pin;
       facts.nodePin = pinnedNode;
-      addCheck(checks, "node-pin", "pass", `Repository host Node pin: ${pinnedNode}.`);
+      addCheck(checks, "node-pin", "pass", `Repository exact host/CI Node pin: ${pinnedNode}.`);
     }
   } catch {
     addCheck(
@@ -184,21 +186,54 @@ export async function collectDoctor(options = {}) {
     );
   }
 
-  const nodeMajor = parseVersion(nodeVersion)?.[0] ?? 0;
+  const pinnedPnpm = readPinnedPnpm(packageJson);
+  facts.pnpmPin = pinnedPnpm;
+  const pnpmResult = await runCommand("pnpm", ["--version"], { cwd: root });
+  const actualPnpm = pnpmResult.ok ? pnpmResult.stdout : null;
+  if (pnpmResult.ok) facts.pnpm = actualPnpm;
+
+  const toolchain = evaluateToolchainPolicy({
+    actualNode: nodeVersion,
+    actualPnpm,
+    enginesNode: packageJson.engines?.node,
+    exactNodePin: pinnedNode || null,
+    exactPnpmPin: pinnedPnpm,
+    mode: "local",
+  });
+  facts.nodeMajorOk = toolchain.majorOk;
+  facts.nodeExactMatch = toolchain.nodeExactMatch;
+  facts.pnpmExactMatch = toolchain.pnpmExactMatch;
+
   addCheck(
     checks,
     "node",
-    nodeMajor >= 26 ? "pass" : "fail",
-    `Node.js ${nodeVersion}; project requires Node.js 26 or newer for host-side tooling.`,
-    nodeMajor >= 26
+    toolchain.majorOk ? "pass" : "fail",
+    toolchain.majorOk
+      ? `Node.js ${nodeVersion}; engines major-ok (${packageJson.engines?.node ?? "unset"}).`
+      : `Node.js ${nodeVersion}; project requires Node.js major ${toolchain.requiredMajor ?? 26} for host-side tooling.`,
+    toolchain.majorOk
       ? undefined
       : pinnedNode
         ? `Use the repository Node ${pinnedNode} (for nvm: run \`nvm use\`) or the documented Docker-only startup.`
-        : "Use Node.js 26+ or the documented Docker-only startup.",
+        : "Use the supported Node major from package.json#engines or the documented Docker-only startup.",
   );
 
-  const pnpmResult = await runCommand("pnpm", ["--version"], { cwd: root });
-  const pinnedPnpm = String(packageJson.packageManager ?? "").replace(/^pnpm@/u, "");
+  if (toolchain.majorOk) {
+    addCheck(
+      checks,
+      "node-exact",
+      toolchain.nodeExactMatch ? "pass" : "warn",
+      toolchain.nodeExactMatch
+        ? `Host Node matches the exact release pin ${pinnedNode}.`
+        : `Host Node ${nodeVersion} is major-ok but differs from exact pin ${pinnedNode || "(missing)"}.`,
+      toolchain.nodeExactMatch
+        ? undefined
+        : pinnedNode
+          ? `Local work may continue on this major; release evidence requires exact pin ${pinnedNode} (or an intentional pin bump with checks).`
+          : "Restore .nvmrc / .node-version before release-mode tooling.",
+    );
+  }
+
   if (!pnpmResult.ok) {
     addCheck(
       checks,
@@ -208,19 +243,16 @@ export async function collectDoctor(options = {}) {
       "Docker-only local startup does not require host pnpm; install the pinned version only for host-side project commands.",
     );
   } else {
-    facts.pnpm = pnpmResult.stdout;
-    const pinned = Boolean(pinnedPnpm);
-    const matchesPin = pinned && pnpmResult.stdout === pinnedPnpm;
     addCheck(
       checks,
       "pnpm",
-      matchesPin ? "pass" : "warn",
-      pinned
-        ? `pnpm ${pnpmResult.stdout}; repository pins ${pinnedPnpm}.`
-        : `pnpm ${pnpmResult.stdout}; repository packageManager pin is unavailable.`,
-      matchesPin
+      toolchain.pnpmExactMatch ? "pass" : "warn",
+      pinnedPnpm
+        ? `pnpm ${actualPnpm}; repository exact pin ${pinnedPnpm}.`
+        : `pnpm ${actualPnpm}; repository packageManager pin is unavailable.`,
+      toolchain.pnpmExactMatch
         ? undefined
-        : pinned
+        : pinnedPnpm
           ? `Use pnpm ${pinnedPnpm} for reproducible host-side commands; package.json#packageManager is authoritative.`
           : "Restore package.json before relying on host-side pnpm commands.",
     );
@@ -349,7 +381,7 @@ export async function collectDoctor(options = {}) {
         ? "Local compose.yaml renders successfully without an implicit .env file."
         : "Local compose.yaml did not render successfully.",
       composeConfig.ok
-        ? undefined
+        ? "Supported overlays (dev/verify/production/recovery+mail/CI) are documented in docs/OPERATIONS.md; do not merge compose.yaml with compose.production.yaml."
         : "Inspect compose.yaml and the selected NEXUS_DEV_PORT before starting containers.",
     );
   }

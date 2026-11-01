@@ -123,6 +123,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       category: parsed.data.category,
       subject: parsed.data.subject,
       message: parsed.data.message,
+      ...(parsed.data.context ? { context: parsed.data.context } : {}),
     });
     const scope = {
       actorId: user.id,
@@ -191,6 +192,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       },
       { ...scope, caseId, messageId },
       currentToken,
+      parsed.data.context ?? null,
     );
     if (result.kind === "key_conflict") {
       return supportPrivateJson(

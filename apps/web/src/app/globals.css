@@ -7,6 +7,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: light;
+
   /* Surfaces */
   --nexus-page: #f6f7f9;
   --nexus-surface: #ffffff;
@@ -68,6 +70,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --nexus-page: #090a0f;
   --nexus-surface: #11131a;
   --nexus-elevated: #161923;
@@ -108,7 +112,10 @@
   body {
     background-color: var(--nexus-page);
     color: var(--nexus-text);
-    font: var(--font-body);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
@@ -116,6 +123,23 @@
   ::selection {
     background: var(--nexus-accent);
     color: #fff;
+  }
+
+  /* Keep native widgets and autofill aligned with resolved theme surfaces. */
+  input,
+  select,
+  textarea,
+  button {
+    color-scheme: inherit;
+  }
+
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--nexus-text);
+    caret-color: var(--nexus-text);
+    box-shadow: 0 0 0 1000px var(--nexus-inset) inset;
+    transition: background-color 99999s ease-out 0s;
   }
 }
 
@@ -211,25 +235,46 @@
     box-shadow: var(--nexus-shadow-lg);
   }
 
-  /* Typography utilities */
+  /*
+   * Typography roles use longhand properties so Tailwind size/weight utilities
+   * can compose without the `font` shorthand resetting family/line-height.
+   */
   .font-display {
-    font: var(--font-display);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.375rem;
+    font-weight: 700;
+    line-height: 1.25;
   }
   .font-heading {
-    font: var(--font-heading);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem;
+    font-weight: 650;
+    line-height: 1.35;
   }
   .font-label {
-    font: var(--font-label);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.4;
     letter-spacing: 0.04em;
   }
   .font-caption {
-    font: var(--font-caption);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    line-height: 1.45;
   }
   .font-numeric {
-    font: var(--font-numeric);
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 0.875rem;
+    font-weight: 650;
+    line-height: 1.2;
   }
   .font-code {
-    font: var(--font-code);
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
   }
 
   .nexus-panel {

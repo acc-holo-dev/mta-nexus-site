@@ -66,7 +66,10 @@ import { GET as reviewDownload } from "../apps/web/src/app/api/admin/builds/[bui
 
 describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
   const request = (signal?: AbortSignal) => {
-    const req = new NextRequest("http://nexus.test/download", { signal });
+    const req = new NextRequest("http://nexus.test/download", {
+      signal,
+      headers: { cookie: "nexus_session=tok_download" },
+    });
     return reviewer
       ? reviewDownload(req, { params: Promise.resolve({ buildId: "build" }) })
       : publicDownload(req, { params: Promise.resolve({ id: "product" }) });

@@ -29,6 +29,9 @@ vi.mock("@nexus/db", () => ({
   contentRepository: { pagePublishedEditorialByOrganization: state.content },
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/services/product-service", () => ({
+  productService: { getPublicAttributions: async () => new Map() },
+}));
 vi.mock("../../../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));

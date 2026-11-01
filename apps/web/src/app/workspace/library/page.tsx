@@ -179,6 +179,7 @@ export default async function ResourceLibraryPage({
                     productId={item.resourceId}
                     version={item.version}
                     buildId={item.buildId ?? undefined}
+                    intent={item.buildId ? "selected" : "latest"}
                   />
                   <div className="flex flex-wrap gap-4">
                     <Link

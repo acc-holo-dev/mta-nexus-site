@@ -92,39 +92,46 @@ export default async function WorkspacePage() {
           <p className="mt-1 max-w-2xl font-caption text-faint">{dictionary.workspace.liveNote}</p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/workspace/discussions"
-            className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
-          >
-            {ownDiscussionCopy(locale).title}
-          </Link>
-          <Link
-            href="/workspace/reactions"
-            className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
-          >
-            {reactionCopy(locale).my}
-          </Link>
-          <Link
-            href="/workspace/resources"
-            className="rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary"
-          >
-            {dictionary.authorResources.title}
-          </Link>
-          <Link
-            href="/workspace/resources/new"
-            className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
-          >
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-            {dictionary.workspace.publishResource}
-          </Link>
-          <Link
-            href="/workspace/servers/new"
-            className="flex items-center gap-1.5 rounded-md border border-base bg-surface px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary"
-          >
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-            {dictionary.workspace.registerServer}
-          </Link>
+        {/* UX-23 interim: group by library / servers / publications — history stays below. */}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2" aria-label={dictionary.workspace.libraryTitle}>
+            <Link
+              href="/workspace/resources"
+              className="rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary"
+            >
+              {dictionary.authorResources.title}
+            </Link>
+            <Link
+              href="/workspace/resources/new"
+              className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+            >
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+              {dictionary.workspace.publishResource}
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-2" aria-label={serverCopy.title}>
+            <Link
+              href="/workspace/servers/new"
+              className="flex items-center gap-1.5 rounded-md border border-base bg-surface px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary"
+            >
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+              {dictionary.workspace.registerServer}
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-2" aria-label={ownDiscussionCopy(locale).title}>
+            <Link
+              href="/workspace/discussions"
+              className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
+            >
+              {ownDiscussionCopy(locale).title}
+            </Link>
+            <Link
+              href="/workspace/reactions"
+              className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
+            >
+              {reactionCopy(locale).my}
+            </Link>
+          </div>
         </div>
       </header>
 

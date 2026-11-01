@@ -1,5 +1,9 @@
 import { config } from "@nexus/config";
-import { resourceMediaRepository } from "@nexus/db";
+import {
+  followWorkspaceRepository,
+  notificationRepository,
+  resourceMediaRepository,
+} from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -7,24 +11,32 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
+import { FollowButton } from "../../../components/follow-button";
 import { ProductDependencyList } from "../../../components/product-dependency-list";
 import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { ResourceGallery } from "../../../components/resource-gallery";
 import { ResourcePreview } from "../../../components/resource-preview";
+import { ResourceReleaseWatchControl } from "../../../components/resource-release-watch-control";
+import { ResourceQaPanel } from "../../../components/resource-qa-panel";
 import { ResourceReviewList } from "../../../components/resource-review-list";
 import { ResourceVariantChoices } from "../../../components/resource-variant-choices";
 import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { licenseModelLabel } from "../../../lib/license-model-i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
 import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
+import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
 import { safeResourceImageUrl } from "../../../lib/resource-image-url";
+import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { productService } from "../../../lib/services/product-service";
 import { resourceManagementService } from "../../../lib/services/resource-management-service";
+import { resourceQaService } from "../../../lib/services/resource-qa-service";
+import { resourceReleaseWatchesService } from "../../../lib/services/resource-release-watches-service";
 import { resourceReviewService } from "../../../lib/services/resource-review-service";
 
 export const dynamic = "force-dynamic";
@@ -117,6 +129,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   ]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.product;
+  const commerceCopy = getResourceCommerceCopy(locale);
+  const watchCopy = resourceReleaseWatchesCopy(locale);
   const product = await productService.getProductPreviewBySlug(slug, user);
 
   if (!product) {
@@ -128,16 +142,22 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     : Promise.resolve(false);
   const isPublished = product.status === "published";
   const isAdmin = user?.role === "admin";
+  const detailReturnPath = `/market/${encodeURIComponent(product.slug)}`;
 
   const [
     canManageProduct,
     isLicensed,
     builds,
     reviewPage,
+    qaPage,
     dependencyResolution,
     reverseDependencySummary,
     variantGroup,
     gallery,
+    attribution,
+    releaseWatch,
+    notificationPrefs,
+    savedFollowIds,
   ] = await Promise.all([
     managementAccess,
     user
@@ -157,6 +177,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           throw error;
         })
       : null,
+    isPublished
+      ? resourceQaService.publicPage(product.id, 1, user).catch((error) => {
+          if (error instanceof AppError && error.statusCode === 404) return null;
+          throw error;
+        })
+      : null,
     productService.getDependencyResolution(product).catch(() => null),
     productService.getReverseDependencySummary(product.slug).catch(() => null),
     isPublished ? resourceManagementService.publicVariants(product.id) : null,
@@ -165,14 +191,37 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       : managementAccess.then(async (allowed) =>
           allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : [],
         ),
+    productService.getPublicAttribution(product.id),
+    user
+      ? resourceReleaseWatchesService.detail(user, product.id).catch((error) => {
+          if (error instanceof AppError && error.statusCode === 404) return null;
+          throw error;
+        })
+      : null,
+    user ? notificationRepository.getPreferences(user.id).catch(() => null) : null,
+    user
+      ? followWorkspaceRepository.states(user.id, "product", [product.id]).catch(() => null)
+      : Promise.resolve([] as string[]),
   ]);
   const hasAccess = isPublished && (canManageProduct || isLicensed || isAdmin);
+  const saveInitial = {
+    authenticated: Boolean(user),
+    following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
+    error: savedFollowIds === null,
+  };
   // Download aside only shows provenance for the published current version; never invent clean.
   const downloadBuild = hasAccess
     ? (builds.find(
         (build) => build.status === "published" && build.version === product.currentVersion,
       ) ?? null)
     : null;
+  const watchState = releaseWatch ?? {
+    productId: product.id,
+    enabled: false,
+    revision: 0,
+    updatedAt: null,
+  };
+  const commerceEnabled = notificationPrefs?.commerceEnabled !== false;
 
   const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
@@ -198,6 +247,34 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <h1 className="text-3xl font-black tracking-tight text-primary sm:text-4xl">
         {product.title}
       </h1>
+
+      <div className="flex flex-col gap-1.5 text-sm text-secondary sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1">
+        {attribution?.organization ? (
+          <p className="min-w-0">
+            <span className="text-muted">{copy.publisher}: </span>
+            <Link
+              href={`/organizations/${encodeURIComponent(attribution.organization.slug)}`}
+              className="font-semibold text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+            >
+              {attribution.organization.name}
+            </Link>
+          </p>
+        ) : null}
+        {attribution?.author ? (
+          <p className="min-w-0">
+            <span className="text-muted">{copy.author}: </span>
+            <Link
+              href={attribution.author.href}
+              className="font-semibold text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+            >
+              {attribution.author.displayName}
+            </Link>
+          </p>
+        ) : null}
+        {!attribution?.organization && !attribution?.author ? (
+          <p className="text-muted">{copy.publisherUnavailable}</p>
+        ) : null}
+      </div>
 
       <ResourceVariantChoices group={variantGroup} productId={product.id} locale={locale} />
 
@@ -376,6 +453,19 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               </Link>
             )}
           </section>
+
+          {isPublished ? (
+            <ResourceQaPanel
+              productId={product.id}
+              locale={locale}
+              authenticated={Boolean(user)}
+              canManage={canManageProduct || isAdmin}
+              initial={qaPage}
+              builds={builds
+                .filter((build) => build.status === "published" && build.scanStatus === "clean")
+                .map((build) => ({ id: build.id, version: build.version }))}
+            />
+          ) : null}
         </div>
 
         <aside className="space-y-6">
@@ -384,11 +474,22 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <div className="text-3xl font-black text-primary">{formattedPrice}</div>
               <div className="mt-1 text-xs text-muted">
                 {copy.licenseModel}:{" "}
-                <span className="capitalize">{product.licenseModel.replace(/_/g, " ")}</span>
+                <span>{licenseModelLabel(locale, product.licenseModel)}</span>
               </div>
             </div>
 
             <div className="space-y-3 border-t border-base pt-4">
+              {isPublished ? (
+                <div className="space-y-1">
+                  <FollowButton
+                    targetType="product"
+                    targetId={product.id}
+                    targetName={product.title}
+                    initial={saveInitial}
+                    locale={locale}
+                  />
+                </div>
+              ) : null}
               {hasAccess ? (
                 <div className="space-y-3">
                   <div className="space-y-1 rounded-lg border border-[color:var(--nexus-success)]/20 bg-success-soft p-3.5">
@@ -399,7 +500,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     <p className="text-[11px] text-muted">{copy.authorized}</p>
                   </div>
 
-                  <ResourceDownloadButton productId={product.id} version={product.currentVersion} />
+                  <ResourceDownloadButton
+                    productId={product.id}
+                    version={product.currentVersion}
+                    intent="latest"
+                  />
 
                   {downloadBuild ? (
                     <BuildProvenanceDetails
@@ -422,25 +527,64 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                   ) : null}
 
                   <Link
-                    href="/workspace"
+                    href="/workspace/library"
                     className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-base bg-surface py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
                   >
                     <Key className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{copy.openLibrary}</span>
                   </Link>
+
+                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
+                    <h3 className="text-xs font-semibold uppercase text-primary">
+                      {watchCopy.title}
+                    </h3>
+                    <ResourceReleaseWatchControl
+                      key={`${product.id}:${watchState.revision}:${commerceEnabled}`}
+                      watch={watchState}
+                      available={Boolean(downloadBuild)}
+                      commerceEnabled={commerceEnabled}
+                      hasAccess
+                      surface="detail"
+                      returnPath={detailReturnPath}
+                    />
+                  </section>
                 </div>
               ) : isPublished && product.price === 0 ? (
                 <div className="space-y-3">
-                  <Link
-                    href={`/acquire?productId=${product.id}`}
-                    className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)]"
-                  >
-                    {copy.addToLibrary}
-                  </Link>
-                  <p className="text-center text-[11px] text-faint">{copy.claimRequired}</p>
+                  <div className="space-y-2" data-acquire-intent="single">
+                    <p className="text-center text-[11px] text-muted">{commerceCopy.singleIntent}</p>
+                    <Link
+                      href={`/acquire?productId=${product.id}`}
+                      className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)]"
+                    >
+                      {copy.addToLibrary}
+                    </Link>
+                    <p className="text-center text-[11px] text-faint">{copy.claimRequired}</p>
+                  </div>
                   {isPublished && (
-                    <AddResourceToCart key={product.id} productId={product.id} signedIn={!!user} />
+                    <AddResourceToCart
+                      key={product.id}
+                      productId={product.id}
+                      signedIn={!!user}
+                      returnPath={detailReturnPath}
+                    />
                   )}
+                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
+                    <h3 className="text-xs font-semibold uppercase text-primary">
+                      {watchCopy.title}
+                    </h3>
+                    <ResourceReleaseWatchControl
+                      key={`watch-guest-or-noaccess:${product.id}`}
+                      watch={watchState}
+                      available={false}
+                      commerceEnabled={commerceEnabled}
+                      hasAccess={false}
+                      acquireHref={`/acquire?productId=${product.id}`}
+                      guest={!user}
+                      surface="detail"
+                      returnPath={detailReturnPath}
+                    />
+                  </section>
                 </div>
               ) : (
                 <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
@@ -474,9 +618,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.rating}</span>
-                  <span className="font-mono text-warning">
-                    {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
-                  </span>
+                  {product.ratingCount > 0 ? (
+                    <span className="font-mono text-warning">
+                      {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
+                    </span>
+                  ) : (
+                    <span className="text-secondary">{copy.noReviewsYet}</span>
+                  )}
                 </div>
               </div>
             </div>

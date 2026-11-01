@@ -1,8 +1,10 @@
 import {
   PRODUCT_TYPES,
+  RESOURCE_VERSION_PATTERN,
   SUPPORT_CASE_CATEGORIES,
   SUPPORT_CASE_STATUSES,
   normalizeMtaAddress,
+  normalizeResourceVersionForStorage,
   isValidMtaAddress,
 } from "@nexus/domain";
 import { z } from "zod";
@@ -16,6 +18,12 @@ export * from "./resource-management";
 export * from "./resource-commerce";
 export * from "./license-control";
 export * from "./library-collections";
+
+/** New resource release version: SemVer-like; optional leading `v` stripped for storage/uniqueness. */
+export const resourceVersionSchema = z
+  .string()
+  .regex(RESOURCE_VERSION_PATTERN, "Semantic version expected")
+  .transform(normalizeResourceVersionForStorage);
 
 // Shared by input validation and rendering of legacy public links.
 export function safeExternalWebUrl(value: unknown): string | undefined {
@@ -259,11 +267,10 @@ export const createProductSchema = z.object({
 export const updateProductSchema = createProductSchema.partial();
 
 // --- Build Release Schemas ---
+// OPS-19: human `version` is separate from mtaVersionTarget and evidence schemaVersion.
 export const createBuildSchema = z.object({
   productId: z.string().min(1),
-  version: z
-    .string()
-    .regex(/^v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?$/, "Semantic version expected"),
+  version: resourceVersionSchema,
   releaseNotes: z.string().max(5000).optional(),
   storageKey: z.string().min(1),
   sha256Hash: z.string().length(64, "SHA-256 hash must be 64 characters"),
@@ -360,11 +367,27 @@ export const supportStaffQueueFiltersSchema = z
   })
   .strict();
 
+/** Verified resource/build/receipt context. relatedType/relatedId stay server-owned. */
+export const supportObjectContextSchema = z
+  .object({
+    productId: z.string().regex(/^prd_[a-f0-9]{24}$/u),
+    buildId: z
+      .string()
+      .regex(/^bld_[a-f0-9]{24}$/u)
+      .optional(),
+    receiptId: z
+      .string()
+      .regex(/^dlv_[a-f0-9]{24}$/u)
+      .optional(),
+  })
+  .strict();
+
 export const createSupportCaseSchema = z
   .object({
     category: z.enum(SUPPORT_CASE_CATEGORIES),
     subject: z.string().trim().min(5).max(120),
     message: z.string().trim().min(10).max(4_000),
+    context: supportObjectContextSchema.optional(),
   })
   .strict();
 
@@ -430,6 +453,7 @@ export const resourceCopyCommandSchema = z
   })
   .strict();
 export * from "./resource-reviews";
+export * from "./resource-qa";
 export * from "./server-reviews";
 export * from "./resource-build-workspace";
 export * from "./order-cases";

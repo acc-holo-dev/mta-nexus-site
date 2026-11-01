@@ -34,3 +34,7 @@ Thumbs.db
 
 # Generated release evidence
 artifacts/
+
+# Local agent scratch and private ops panel (not product)
+scripts/_agent_*
+.dsh-ops/

@@ -21,7 +21,7 @@ export function LocaleSwitcher({ locale }: { locale: Locale }) {
       variant="outline"
       size="sm"
       onClick={switchLocale}
-      className="h-8 shrink-0 gap-1.5 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+      className="shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
       aria-label={dictionary.locale.label}
       title={dictionary.locale.label}
     >

@@ -20,6 +20,7 @@ export function NotificationBell() {
   const copy = dictionary.notificationBell;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [loaded, setLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState<string | null>(null);
@@ -55,6 +56,7 @@ export function NotificationBell() {
         if (generation === mutationGeneration.current) {
           setNotifications(data.notifications);
           setUnreadCount(data.unreadCount);
+          setLoaded(true);
           setError(null);
         }
       },
@@ -71,7 +73,7 @@ export function NotificationBell() {
   }, [attempt, copy.loadError, marking]);
 
   async function markAllRead() {
-    if (marking || unreadCount === 0) return;
+    if (marking || !loaded || unreadCount === 0) return;
 
     mutationGeneration.current += 1;
     stopPolling.current?.();
@@ -89,10 +91,11 @@ export function NotificationBell() {
       }
 
       // Read the server state again; a notification may arrive during this request.
+      // Do not zero local counters until the next confirmed poll.
       setAnnouncement(copy.markedAllRead);
       announceNotificationInboxChange();
     } catch {
-      // Recheck the server after an ambiguous response or timeout.
+      // Recheck the server after an ambiguous response or timeout; keep last confirmed counts.
       setAttempt((value) => value + 1);
       setError(copy.markError);
     } finally {
@@ -100,7 +103,11 @@ export function NotificationBell() {
     }
   }
 
-  const bellLabel = unreadCount > 0 ? `${unreadCount} ${copy.unreadSuffix}` : copy.title;
+  const confirmedUnread = loaded ? unreadCount : null;
+  const bellLabel =
+    confirmedUnread !== null && confirmedUnread > 0
+      ? `${confirmedUnread} ${copy.unreadSuffix}`
+      : copy.title;
 
   return (
     <div className="relative">
@@ -109,6 +116,7 @@ export function NotificationBell() {
         variant="outline"
         size="icon"
         onClick={() => {
+          // Opening the popover refreshes the preview; it does not mark notifications read.
           if (!isOpen) setAttempt((value) => value + 1);
           setIsOpen((open) => !open);
         }}
@@ -119,12 +127,12 @@ export function NotificationBell() {
         aria-controls={isOpen ? "notification-popover" : undefined}
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
-        {unreadCount > 0 && (
+        {confirmedUnread !== null && confirmedUnread > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 font-numeric text-[10px] font-bold text-white">
-            {unreadCount}
+            {confirmedUnread}
           </span>
         )}
-        {error && unreadCount === 0 && (
+        {error && (confirmedUnread === null || confirmedUnread === 0) && (
           <span
             className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[var(--nexus-warning)]"
             aria-hidden="true"
@@ -171,7 +179,7 @@ export function NotificationBell() {
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </Button>
-            {unreadCount > 0 && (
+            {confirmedUnread !== null && confirmedUnread > 0 && (
               <Button
                 type="button"
                 variant="ghost"
@@ -208,7 +216,11 @@ export function NotificationBell() {
           )}
 
           <div className="min-h-0 max-h-80 divide-y divide-[color:var(--nexus-border)] overflow-y-auto">
-            {notifications.length > 0 ? (
+            {!loaded ? (
+              <div role="status" className="py-6 text-center font-caption text-muted">
+                {copy.loading}
+              </div>
+            ) : notifications.length > 0 ? (
               notifications.map((notification) => (
                 <article
                   key={notification.id}
@@ -240,6 +252,7 @@ export function NotificationBell() {
                     }
                   </p>
                   {notification.link && (
+                    // Destination navigation alone does not change isRead; use Mark all read or the center.
                     <Link
                       href={notification.link}
                       onClick={() => setIsOpen(false)}

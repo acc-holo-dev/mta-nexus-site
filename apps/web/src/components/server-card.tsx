@@ -1,9 +1,85 @@
-import Link from "next/link";
-import { Gamepad2, Users } from "lucide-react";
-import { TrustBadge } from "@nexus/ui";
+"use client";
+
 import type { Server } from "@nexus/domain";
+import { Button, TrustBadge } from "@nexus/ui";
+import { Copy, Gamepad2, Users } from "lucide-react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
-import { mtaLiveStatus, type MtaMasterServer } from "../lib/services/mta-master-directory-service";
+import { type MtaMasterServer, mtaLiveStatus } from "../lib/services/mta-master-directory-service";
+
+function playerCountLabel(
+  players: number | undefined,
+  maxPlayers: number | undefined,
+  unknown: string,
+) {
+  if (players == null) return unknown;
+  return `${players} / ${maxPlayers ?? "?"}`;
+}
+
+function CopyAddressControl({
+  address,
+  name,
+  locale,
+}: {
+  address: string;
+  name: string;
+  locale: Locale;
+}) {
+  const copy = getDictionary(locale).servers;
+  const addressInput = useRef<HTMLInputElement>(null);
+  const [copyMessage, setCopyMessage] = useState("");
+  const [copying, setCopying] = useState(false);
+
+  async function copyAddress() {
+    setCopying(true);
+    setCopyMessage("");
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard unavailable");
+      }
+      await navigator.clipboard.writeText(address);
+      setCopyMessage(`${copy.copied}: ${address}`);
+    } catch {
+      addressInput.current?.focus();
+      addressInput.current?.select();
+      setCopyMessage(copy.copyUnavailable);
+    } finally {
+      setCopying(false);
+    }
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-[11px] text-muted">
+        {copy.serverAddress}
+        <input
+          ref={addressInput}
+          aria-label={`${copy.serverAddress}: ${name}`}
+          readOnly
+          value={address}
+          onFocus={(event) => event.currentTarget.select()}
+          className="mt-1 w-full rounded-lg border border-base bg-inset px-2.5 py-1.5 font-mono text-xs text-primary"
+        />
+      </label>
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        aria-label={`${copy.copyAddress}: ${name}`}
+        disabled={copying}
+        onClick={() => void copyAddress()}
+        className="gap-1.5"
+      >
+        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+        {copying ? copy.copying : copy.copyAddress}
+      </Button>
+      <p role="status" className="text-[11px] text-secondary [overflow-wrap:anywhere]">
+        {copyMessage}
+      </p>
+    </div>
+  );
+}
 
 export function ServerCard({
   server,
@@ -13,7 +89,16 @@ export function ServerCard({
 }: {
   server: Pick<
     Server,
-    "id" | "slug" | "name" | "description" | "gameMode" | "bannerUrl" | "maxPlayers" | "isVerified"
+    | "id"
+    | "slug"
+    | "name"
+    | "description"
+    | "gameMode"
+    | "bannerUrl"
+    | "maxPlayers"
+    | "isVerified"
+    | "ipAddress"
+    | "port"
   >;
   locale?: Locale;
   observation?: MtaMasterServer | null;
@@ -31,19 +116,23 @@ export function ServerCard({
   const isOnline = liveStatus === "online";
   const liveLabel =
     liveStatus === "online" ? copy.online : liveStatus === "offline" ? copy.offline : copy.unknown;
+  const profileHref = `/servers/${encodeURIComponent(server.slug)}`;
+  const connectUri = `mtasa://${server.ipAddress}:${server.port}`;
+  const address = `${server.ipAddress}:${server.port}`;
 
   return (
-    <Link
-      href={`/servers/${server.slug}`}
-      className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
-    >
-      <div className="relative h-28 w-full overflow-hidden bg-inset">
+    <article className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus">
+      <Link
+        href={profileHref}
+        className="relative block h-28 w-full overflow-hidden bg-inset"
+        aria-label={`${server.name}`}
+      >
         {server.bannerUrl ? (
           <>
             {/* biome-ignore lint/performance/noImgElement: server-controlled remote banner stays outside the trusted image-optimizer allowlist. */}
             <img
               src={server.bannerUrl}
-              alt={server.name}
+              alt=""
               width={640}
               height={224}
               loading="lazy"
@@ -70,11 +159,13 @@ export function ServerCard({
             <TrustBadge variant="verifiedServer" label={copy.verifiedServer} />
           </div>
         )}
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <h3 className="line-clamp-1 text-xs font-heading text-primary transition-colors group-hover:text-accent">
-          {server.name}
+        <h3 className="line-clamp-1 text-xs font-heading text-primary">
+          <Link href={profileHref} className="transition-colors hover:text-accent">
+            {server.name}
+          </Link>
         </h3>
 
         <div className="flex items-center gap-2 font-caption text-muted">
@@ -89,7 +180,7 @@ export function ServerCard({
             <span className="flex items-center gap-1 font-medium text-secondary">
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">
-                {hasLiveData ? `${livePlayers} / ${maxPlayers ?? "?"}` : copy.unknown}
+                {playerCountLabel(hasLiveData ? livePlayers : undefined, maxPlayers, copy.unknown)}
               </span>
             </span>
             <span className="font-numeric text-faint">
@@ -105,7 +196,84 @@ export function ServerCard({
             />
           </div>
         </div>
+
+        <div className="flex flex-wrap gap-2 border-t border-base pt-2.5">
+          <a
+            href={connectUri}
+            aria-label={`${copy.connect}: ${server.name}`}
+            className="inline-flex items-center rounded-lg border border-base bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent"
+          >
+            {copy.connect}
+          </a>
+          <Link
+            href={profileHref}
+            className="inline-flex items-center rounded-lg border border-base px-3 py-1.5 text-xs font-semibold text-secondary hover:text-primary"
+          >
+            {getDictionary(locale).notificationBell.view}
+          </Link>
+        </div>
+
+        <CopyAddressControl address={address} name={server.name} locale={locale} />
       </div>
-    </Link>
+    </article>
+  );
+}
+
+/** Home/directory spotlight for an official master-list row; profile only when matched. */
+export function HomeNetworkServerCard({
+  observation,
+  locale = "en",
+  profileSlug,
+  isStale = false,
+}: {
+  observation: MtaMasterServer;
+  locale?: Locale;
+  profileSlug?: string;
+  isStale?: boolean;
+}) {
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.servers;
+  const home = dictionary.home;
+  const address = `${observation.address}:${observation.port}`;
+  const name = observation.name?.trim() || address;
+  const connectUri = `mtasa://${observation.address}:${observation.port}`;
+  const playersLabel = isStale
+    ? copy.unknown
+    : playerCountLabel(observation.players, observation.maxPlayers, copy.playersUnknown);
+
+  return (
+    <article aria-label={name} className="nexus-panel flex flex-col gap-3 p-5">
+      <div className="min-w-0 space-y-1">
+        <h3 className="truncate text-sm font-bold text-primary">{name}</h3>
+        <p className="truncate text-xs text-muted">
+          {[observation.gameMode, observation.mapName].filter(Boolean).join(" · ") || address}
+        </p>
+      </div>
+
+      <p className="text-sm font-semibold text-success">
+        {playersLabel}
+        {!isStale && observation.players != null ? ` ${home.players}` : null}
+      </p>
+
+      <div className="flex flex-wrap gap-2">
+        <a
+          href={connectUri}
+          aria-label={`${copy.connect}: ${name}`}
+          className="inline-flex items-center rounded-lg border border-base bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent"
+        >
+          {copy.connect}
+        </a>
+        {profileSlug ? (
+          <Link
+            href={`/servers/${encodeURIComponent(profileSlug)}`}
+            className="inline-flex items-center rounded-lg border border-base px-3 py-1.5 text-xs font-semibold text-secondary hover:text-primary"
+          >
+            {dictionary.notificationBell.view}
+          </Link>
+        ) : null}
+      </div>
+
+      <CopyAddressControl address={address} name={name} locale={locale} />
+    </article>
   );
 }

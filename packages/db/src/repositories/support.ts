@@ -19,7 +19,12 @@ import {
 } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
-import { supportAccess, supportActor } from "./support-access";
+import {
+  assertSupportObjectContext,
+  supportAccess,
+  supportActor,
+  type SupportObjectContext,
+} from "./support-access";
 import { supportRequesterNotice } from "./support-requester-notice";
 
 const revision = sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${supportCases.updatedAt}) + interval '1 millisecond')`;
@@ -427,6 +432,7 @@ export class SupportCaseRepository {
     audit: Omit<AuditEvent, "createdAt">,
     request: SupportMutationKey,
     currentToken: string,
+    objectContext?: SupportObjectContext | null,
   ): Promise<SupportCaseMutationResult> {
     if (
       request.operation !== "case" ||
@@ -439,6 +445,12 @@ export class SupportCaseRepository {
       message.caseId !== supportCase.id
     ) {
       throw new Error("Support creation idempotency scope mismatch");
+    }
+    if (
+      (supportCase.relatedType || supportCase.relatedId || objectContext) &&
+      !(objectContext?.productId || supportCase.relatedType === "product")
+    ) {
+      throw new AppError("Support object context is invalid", 400, "VALIDATION_ERROR");
     }
 
     const result = await db.transaction(async (tx) => {
@@ -455,12 +467,29 @@ export class SupportCaseRepository {
       // Recheck wall-clock expiry after that wait; our session row is already locked.
       await lockInitiatingSession(tx, request.actorId, currentToken);
 
+      const verified = objectContext
+        ? await assertSupportObjectContext(tx, request.actorId, objectContext)
+        : supportCase.relatedType === "product" && supportCase.relatedId
+          ? await assertSupportObjectContext(tx, request.actorId, {
+              productId: supportCase.relatedId,
+            })
+          : null;
+      if (
+        supportCase.relatedType &&
+        supportCase.relatedId &&
+        verified &&
+        (supportCase.relatedType !== verified.relatedType ||
+          supportCase.relatedId !== verified.relatedId)
+      ) {
+        throw new AppError("Support object context is invalid", 400, "VALIDATION_ERROR");
+      }
+
       const [created] = await tx
         .insert(supportCases)
         .values({
           ...supportCase,
-          relatedType: supportCase.relatedType ?? null,
-          relatedId: supportCase.relatedId ?? null,
+          relatedType: verified?.relatedType ?? supportCase.relatedType ?? null,
+          relatedId: verified?.relatedId ?? supportCase.relatedId ?? null,
           createdAt: now,
           updatedAt: now,
         })
@@ -472,7 +501,16 @@ export class SupportCaseRepository {
         authorId: message.authorId ?? null,
         createdAt: now,
       });
-      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await tx.insert(auditEvents).values({
+        ...audit,
+        createdAt: now,
+        details: {
+          ...((audit.details as Record<string, unknown> | undefined) ?? {}),
+          ...(verified?.buildId ? { buildId: verified.buildId } : {}),
+          ...(verified?.receiptId ? { receiptId: verified.receiptId } : {}),
+          ...(verified ? { relatedType: verified.relatedType, relatedId: verified.relatedId } : {}),
+        },
+      });
       await tx.insert(supportNotificationDeliveries).values({
         messageId: message.id,
         caseId: supportCase.id,

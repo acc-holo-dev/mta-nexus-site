@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
-  user: { id: "mod_1" } as { id: string } | null,
+  user: { id: "mod_1", email: "mod@nexus.test" } as {
+    id: string;
+    email: string;
+  } | null,
   authorized: true,
   rate: vi.fn(),
   resolve: vi.fn(),
@@ -12,15 +15,22 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: async () => mocks.user },
+  authService: {
+    getSession: async () => mocks.user,
+    confirmStaffActionPassword: async () => ({ expectedPasswordHash: "hash_mod" }),
+  },
 }));
 vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
 vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("@nexus/security", () => ({
-  can: () => mocks.authorized,
-  consumeRateLimit: mocks.rate,
-  generateId: () => "aud_test",
-}));
+vi.mock("@nexus/security", async () => {
+  const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
+  return {
+    ...actual,
+    can: () => mocks.authorized,
+    consumeRateLimit: mocks.rate,
+    generateId: () => "aud_test",
+  };
+});
 vi.mock("@nexus/db", () => ({
   reportRepository: { resolve: mocks.resolve, findById: mocks.findById },
   productRepository: {},
@@ -32,7 +42,13 @@ import { POST } from "../apps/web/src/app/api/admin/actions/route";
 function request(action = "resolve", notes = "Reviewed supporting evidence") {
   const req = new NextRequest("https://nexus.test/api/admin/actions", {
     method: "POST",
-    body: JSON.stringify({ targetType: "report", targetId: "rpt_1", action, notes }),
+    body: JSON.stringify({
+      targetType: "report",
+      targetId: "rpt_1",
+      action,
+      notes,
+      currentPassword: "Staff-password-123!",
+    }),
     headers: browserMutationHeaders({ "Content-Type": "application/json" }),
   });
   req.cookies.set("nexus_session", "session");
@@ -44,7 +60,7 @@ afterEach(() => {
 });
 beforeEach(() => {
   stubBrowserMutationOrigin();
-  mocks.user = { id: "mod_1" };
+  mocks.user = { id: "mod_1", email: "mod@nexus.test" };
   mocks.authorized = true;
   mocks.rate.mockReset().mockResolvedValue({ success: true });
   mocks.resolve.mockReset().mockResolvedValue({ id: "rpt_1", status: "resolved" });
@@ -60,6 +76,7 @@ describe("report decisions over HTTP", () => {
         targetId: "rpt_1",
         action: "resolve",
         notes: "Reviewed supporting evidence",
+        currentPassword: "Staff-password-123!",
       }),
       headers: browserMutationHeaders({ "Content-Type": "application/json" }),
     });

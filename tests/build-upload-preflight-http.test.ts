@@ -57,7 +57,10 @@ import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
 function invalidBodyRequest() {
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
     method: "POST",
-    headers: browserMutationHeaders({ "content-type": "application/json" }),
+    headers: browserMutationHeaders({
+      cookie: "nexus_session=tok_attacker",
+      "content-type": "application/json",
+    }),
     body: JSON.stringify({ intentionally: "not multipart" }),
   });
 }
@@ -66,6 +69,7 @@ function oversizedDeclaredRequest() {
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
     method: "POST",
     headers: browserMutationHeaders({
+      cookie: "nexus_session=tok_attacker",
       "content-type": "multipart/form-data; boundary=nexus-boundary",
       "content-length": String(65 * 1024 * 1024 + 1),
     }),
@@ -86,6 +90,7 @@ function oversizedChunkedRequest() {
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
     method: "POST",
     headers: browserMutationHeaders({
+      cookie: "nexus_session=tok_attacker",
       "content-type": "multipart/form-data; boundary=nexus-boundary",
     }),
     body,
@@ -108,6 +113,7 @@ function validChunkedRequest() {
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
     method: "POST",
     headers: browserMutationHeaders({
+      cookie: "nexus_session=tok_attacker",
       "content-type": "multipart/form-data; boundary=nexus-boundary",
     }),
     body: new ReadableStream<Uint8Array>({
@@ -197,6 +203,7 @@ describe("build upload authorization HTTP preflight", () => {
     const request = new NextRequest("http://nexus.test/api/products/prd_target/builds", {
       method: "POST",
       headers: browserMutationHeaders({
+        cookie: "nexus_session=tok_attacker",
         "content-type": "multipart/form-data; boundary=nexus-boundary",
       }),
       body: "not a multipart body",
@@ -283,6 +290,7 @@ describe("build upload authorization HTTP preflight", () => {
     expect(releaseBuild).toHaveBeenCalledWith(
       expect.objectContaining({ productId: "prd_target", version: "1.2.3" }),
       expect.objectContaining({ id: "usr_attacker" }),
+      "tok_attacker",
     );
   });
 });

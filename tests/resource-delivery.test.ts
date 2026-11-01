@@ -39,6 +39,13 @@ describe("free resource delivery lifecycle", () => {
       role: "moderator",
     });
     await sessionRepository.create({
+      id: `ses_${author.id}`,
+      userId: author.id,
+      token: `tok_${author.id}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+
+    await sessionRepository.create({
       id: `ses_${moderator.id}`,
       userId: moderator.id,
       token: `tok_${moderator.id}`,
@@ -104,6 +111,7 @@ describe("free resource delivery lifecycle", () => {
         scannedAt: new Date(),
       },
       author,
+      `tok_${author.id}`,
     );
     expect(build.status).toBe("pending_review");
     expect(build.isSigned).toBe(false);

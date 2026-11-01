@@ -167,6 +167,43 @@ export function readMtaMasterMirrorUrls(
   return parseMtaMasterMirrorUrls(env.MTA_MASTER_MIRROR_URLS ?? "");
 }
 
+/**
+ * OPS-05 / ARC10 — build vs runtime boundary.
+ *
+ * The Dockerfile build stage sets compile-only placeholders (origin, database URL,
+ * auth secret). Promotion supplies the real HTTPS origin at process start for the
+ * same image digest. Prefer canonical `APP_URL`; `NEXT_PUBLIC_APP_URL` remains the
+ * historical Compose/CI name for the *server* runtime origin and must not be read
+ * from client bundles if the domain changes without rebuild. Secrets never belong
+ * in Next `env` / public build constants.
+ */
+export const BUILD_PLACEHOLDER_AUTH_SECRET =
+  "build-only-secret-that-is-long-enough-for-validation";
+export const BUILD_PLACEHOLDER_DATABASE_URL =
+  "postgres://nexus:build-only@127.0.0.1:5432/mta_nexus";
+
+/** Allowed public health JSON keys — never dump full EnvConfig. */
+export const PUBLIC_HEALTH_BODY_KEYS = Object.freeze([
+  "status",
+  "database",
+  "timestamp",
+] as const);
+
+/**
+ * Resolve the server runtime application origin.
+ * `APP_URL` wins when set; both names must agree when both are present.
+ */
+export function resolveApplicationOrigin(
+  env: Record<string, string | undefined>,
+): string | undefined {
+  const appUrl = env.APP_URL?.trim() || undefined;
+  const legacy = env.NEXT_PUBLIC_APP_URL?.trim() || undefined;
+  if (appUrl && legacy && appUrl !== legacy) {
+    throw new Error("APP_URL and NEXT_PUBLIC_APP_URL must match when both are set");
+  }
+  return appUrl ?? legacy;
+}
+
 const developmentDefaults = {
   NODE_ENV: "development",
   PORT: "3000",
@@ -201,6 +238,7 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]),
     PORT: z.coerce.number().int().positive().max(65535),
+    // Server runtime origin (historical env name). Not a client-baked promotion pin.
     NEXT_PUBLIC_APP_URL: z
       .string()
       .url()
@@ -337,6 +375,18 @@ export const envSchema = z
       if (appUrl.hostname === "localhost" || appUrl.hostname === "127.0.0.1") {
         addIssue("NEXT_PUBLIC_APP_URL", "Production application URL cannot point to localhost");
       }
+      if (value.AUTH_SECRET === BUILD_PLACEHOLDER_AUTH_SECRET) {
+        addIssue(
+          "AUTH_SECRET",
+          "Production must not use the image build-placeholder auth secret",
+        );
+      }
+      if (value.DATABASE_URL === BUILD_PLACEHOLDER_DATABASE_URL) {
+        addIssue(
+          "DATABASE_URL",
+          "Production must not use the image build-placeholder database URL",
+        );
+      }
       if (value.STORAGE_PROVIDER === "local" && !value.STORAGE_LOCAL_PATH.startsWith("/")) {
         addIssue(
           "STORAGE_LOCAL_PATH",
@@ -356,6 +406,22 @@ export type EnvConfig = z.infer<typeof envSchema>;
 
 export function getEnvConfig(env: Record<string, string | undefined> = process.env): EnvConfig {
   const isProduction = env.NODE_ENV === "production";
+  let applicationOrigin: string | undefined;
+  try {
+    applicationOrigin = resolveApplicationOrigin(env);
+  } catch (error) {
+    console.error(
+      "Invalid environment variables:",
+      error instanceof Error ? error.message : error,
+    );
+    throw new Error("Invalid configuration parameters");
+  }
+
+  const withResolvedOrigin = {
+    ...env,
+    ...(applicationOrigin ? { NEXT_PUBLIC_APP_URL: applicationOrigin } : {}),
+  };
+
   const input = isProduction
     ? {
         NODE_ENV: "production",
@@ -381,9 +447,9 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
         WEB_PUSH_VAPID_PRIVATE_KEY: "",
         WEB_PUSH_VAPID_SUBJECT: "",
         MTA_MASTER_MIRROR_URLS: "",
-        ...env,
+        ...withResolvedOrigin,
       }
-    : { ...developmentDefaults, ...env };
+    : { ...developmentDefaults, ...withResolvedOrigin };
 
   const result = envSchema.safeParse(input);
   if (!result.success) {

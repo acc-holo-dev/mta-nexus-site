@@ -5,11 +5,15 @@ const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService }));
-vi.mock("@nexus/security", () => ({
-  can: () => false,
-  consumeRateLimit: vi.fn(async () => ({ success: true })),
-  generateId: () => "aud_test",
-}));
+vi.mock("@nexus/security", async () => {
+  const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
+  return {
+    ...actual,
+    can: () => false,
+    consumeRateLimit: vi.fn(async () => ({ success: true })),
+    generateId: () => "aud_test",
+  };
+});
 vi.mock("@nexus/db", () => ({
   productRepository: {},
   reportRepository: {},

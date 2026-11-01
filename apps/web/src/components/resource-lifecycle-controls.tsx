@@ -1,17 +1,23 @@
 "use client";
 
 import {
-  canTransitionResource,
+  classifyBuildAvailability,
+  resourceLifecycleActionsFor,
+  resourceLifecycleNextStep,
+  resourceLifecycleTarget,
   type ProductStatus,
   type ResourceLifecycleAction,
+  unavailableBuildSupportHref,
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { resourceLifecycleSchema } from "@nexus/validation";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useId, useRef, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import { useNexusLocale } from "./locale-context";
+import { stashSupportObjectContext } from "./support-center";
 
 const controlClass =
   "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
@@ -21,28 +27,55 @@ const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function ResourceLifecycleControls({
   product,
+  selectedBuild = null,
 }: {
   product: { id: string; status: ProductStatus; updatedAt: string };
+  selectedBuild?: { id: string; status: string; version?: string } | null;
 }) {
   const { locale } = useNexusLocale();
   const copy = getResourceCommerceCopy(locale);
   const router = useRouter();
   const fieldId = useId();
   const lock = useRef(false);
-  const actions = (["archive", "restore", "submit"] as const).filter((action) =>
-    canTransitionResource(product.status, action),
-  );
+  const observedStatus = useRef(product.status);
+  const observedRevision = useRef(product.updatedAt);
+  const actions = resourceLifecycleActionsFor(product.status);
   const [action, setAction] = useState<ResourceLifecycleAction>(actions[0] ?? "archive");
   const [busy, setBusy] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (
+      observedStatus.current !== product.status ||
+      observedRevision.current !== product.updatedAt
+    ) {
+      observedStatus.current = product.status;
+      observedRevision.current = product.updatedAt;
+      const next = resourceLifecycleActionsFor(product.status);
+      setAction(next[0] ?? "archive");
+      setConfirmed(false);
+      setSaved(false);
+      setError("");
+    }
+  }, [product.status, product.updatedAt]);
+
   const labels = { archive: copy.archive, restore: copy.restore, submit: copy.submit };
   const notes = { archive: copy.archiveNote, restore: copy.restoreNote, submit: copy.submitNote };
+  const nextStep = resourceLifecycleNextStep(product.status);
+  const buildAvailability = classifyBuildAvailability(selectedBuild?.status);
+  const target = resourceLifecycleTarget(product.status, action);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (lock.current || saved) return;
+    if (observedStatus.current !== product.status || observedRevision.current !== product.updatedAt) {
+      setError(copy.errors.PRODUCT_METADATA_CONFLICT ?? copy.errors.fallback);
+      router.refresh();
+      return;
+    }
     const parsed = resourceLifecycleSchema.safeParse({
       action,
       reason,
@@ -61,12 +94,13 @@ export function ResourceLifecycleControls({
         privateApiRequest({ method: "POST", json: parsed.data }),
       );
       const body = await response.json().catch(() => null);
-      const target =
-        action === "archive" ? "archived" : action === "restore" ? "draft" : "pending_review";
+      const expectedTarget =
+        target ??
+        (action === "archive" ? "archived" : action === "restore" ? "draft" : "pending_review");
       if (
         !response.ok ||
         body?.product?.id !== product.id ||
-        body.product.status !== target ||
+        body.product.status !== expectedTarget ||
         typeof body.product.updatedAt !== "string" ||
         !Number.isFinite(Date.parse(body.product.updatedAt)) ||
         Date.parse(body.product.updatedAt) <= Date.parse(product.updatedAt)
@@ -84,13 +118,79 @@ export function ResourceLifecycleControls({
       setBusy(false);
     }
   }
+
+  const nextStepCopy =
+    nextStep === "submit"
+      ? copy.submitNote
+      : nextStep === "restore"
+        ? copy.restoreNote
+        : nextStep === "wait_review"
+          ? locale === "ru"
+            ? "Ресурс ожидает проверки. Публикация не происходит автоматически."
+            : "This resource is waiting for review. It is not published automatically."
+          : nextStep === "suspended_support"
+            ? copy.blocked
+            : nextStep === "archive"
+              ? copy.archiveNote
+              : null;
+
   return (
     <section className="nexus-panel space-y-4 p-5" aria-labelledby={`${fieldId}-heading`}>
       <h2 id={`${fieldId}-heading`} className="text-xl font-semibold text-primary">
         {copy.lifecycle}
       </h2>
+      <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
+        <div>
+          <dt className="font-label uppercase text-muted">
+            {locale === "ru" ? "Статус ресурса" : "Resource status"}
+          </dt>
+          <dd className="text-primary">{product.status}</dd>
+        </div>
+        <div>
+          <dt className="font-label uppercase text-muted">
+            {locale === "ru" ? "Выбранная сборка" : "Selected build"}
+          </dt>
+          <dd className="text-primary">
+            {selectedBuild
+              ? `${selectedBuild.version ?? selectedBuild.id} · ${selectedBuild.status}`
+              : locale === "ru"
+                ? "Не выбрана"
+                : "None selected"}
+          </dd>
+        </div>
+      </dl>
+      {nextStepCopy ? <p className="text-sm text-secondary">{nextStepCopy}</p> : null}
+      {selectedBuild && buildAvailability !== "available" ? (
+        <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
+          <p>
+            {locale === "ru"
+              ? "Эта сборка недоступна для публичной выдачи. Скачивание и новая подписка на релизы блокируются, пока сборка снова не станет допустимой."
+              : "This build is unavailable for public delivery. Download and new release watches stay blocked until a valid build is available."}
+          </p>
+          <Link
+            href={unavailableBuildSupportHref()}
+            className="mt-2 inline-flex text-accent underline"
+            onClick={() =>
+              stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
+            }
+          >
+            {locale === "ru" ? "Обратиться в поддержку с этим контекстом" : "Contact support with this context"}
+          </Link>
+        </div>
+      ) : null}
       {actions.length === 0 ? (
-        <p className="text-sm text-warning">{copy.blocked}</p>
+        <div className="space-y-2">
+          <p className="text-sm text-warning">{copy.blocked}</p>
+          {product.status === "suspended" ? (
+            <Link
+              href={unavailableBuildSupportHref()}
+              className="inline-flex text-sm text-accent underline"
+              onClick={() => stashSupportObjectContext({ productId: product.id })}
+            >
+              {locale === "ru" ? "Открыть обращение" : "Open a support case"}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <form onSubmit={submit} aria-busy={busy} className="space-y-4">
           <div className="space-y-1.5">
@@ -116,6 +216,23 @@ export function ResourceLifecycleControls({
           </div>
           <p id={`${fieldId}-note`} className="text-sm text-secondary">
             {notes[action]}
+            {action === "restore" ? (
+              <span className="mt-1 block text-warning">
+                {locale === "ru"
+                  ? "После восстановления ресурс станет черновиком, а не снова опубликованным."
+                  : "Restore returns a draft. It does not republish the resource."}
+              </span>
+            ) : null}
+            {target ? (
+              <span className="mt-1 block">
+                {locale === "ru" ? "Следующее состояние" : "Next status"}: {target}
+                {target === "draft"
+                  ? locale === "ru"
+                    ? " → затем отправка на проверку"
+                    : " → then submit for review"
+                  : ""}
+              </span>
+            ) : null}
           </p>
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-reason`} className={nativeLabelClass}>
@@ -162,6 +279,11 @@ export function ResourceLifecycleControls({
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.updated}
+          {action === "restore"
+            ? locale === "ru"
+              ? " Черновик готов к проверке; автоматической публикации нет."
+              : " Draft is ready for review; nothing was auto-published."
+            : ""}
         </p>
       )}
     </section>

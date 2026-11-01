@@ -40,13 +40,15 @@ export async function resourceCommerceRequest(
                 ? "contentCreation"
                 : /\/(reviews|review)(?:\/|$)/u.test(request.nextUrl.pathname)
                   ? "reviewSubmission"
-                  : request.nextUrl.pathname.includes("/licenses/")
-                    ? "licenseControl"
-                    : /\/(lifecycle|variants|compatibility|builds|media|copy)(?:\/|$)/u.test(
-                          request.nextUrl.pathname,
-                        )
-                      ? "contentCreation"
-                      : "resourceClaim";
+                  : /\/qa(?:\/|$)/u.test(request.nextUrl.pathname)
+                    ? "contentCreation"
+                    : request.nextUrl.pathname.includes("/licenses/")
+                      ? "licenseControl"
+                      : /\/(lifecycle|variants|compatibility|builds|media|copy)(?:\/|$)/u.test(
+                            request.nextUrl.pathname,
+                          )
+                        ? "contentCreation"
+                        : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();
     }
     if (

@@ -192,6 +192,7 @@ describe("build moderation service behavior", () => {
           scannedAt: new Date("2026-01-01T00:00:00.000Z"),
         },
         moderator,
+        "moderator-session",
       ),
     ).resolves.toBe(pending);
 

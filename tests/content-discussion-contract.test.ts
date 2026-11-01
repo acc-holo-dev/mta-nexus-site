@@ -33,12 +33,15 @@ it("rejects authority injection, short text and oversized parents", () => {
   ).toBe(false);
   expect(discussionCommentSchema.safeParse({ text: "x".repeat(5000) }).success).toBe(true);
 });
-it("sends a scoped reply and confirms the persisted text, target and parent", async () => {
+const INTENT = "12345678-1234-4234-8234-123456789abc";
+
+it("sends a scoped reply with a frozen Idempotency-Key and confirms persistence", async () => {
   const fetchImpl = vi.fn(
     async (_url: RequestInfo | URL, _init?: RequestInit) =>
       new Response(
         JSON.stringify({
           comment: { id: "reply", contentId: "content", text: "Reply text", parentId: "parent" },
+          replayed: false,
         }),
         { status: 201 },
       ),
@@ -50,12 +53,16 @@ it("sends a scoped reply and confirms the persisted text, target and parent", as
         contentId: "content",
         text: " Reply text ",
         parentId: "parent",
+        intentKey: INTENT,
         locale: "ru",
         fallbackError: "error",
       },
       fetchImpl,
     ),
   ).toBe("reply");
+  expect(fetchImpl.mock.calls[0][1]?.headers).toMatchObject({
+    "Idempotency-Key": INTENT,
+  });
   expect(fetchImpl.mock.calls[0][1]?.body).toBe(
     JSON.stringify({ text: "Reply text", parentId: "parent" }),
   );
@@ -76,6 +83,7 @@ it.each([
         contentId: "content",
         text: "Reply text",
         parentId: "parent",
+        intentKey: INTENT,
         fallbackError: "Unconfirmed",
       },
       fetchImpl,

@@ -24,6 +24,7 @@ import {
 } from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
 import { SupportCaseActions } from "./support-case-actions";
+import { supportObjectContextHref, type SupportFormObjectContext } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";
 
 export function SupportCaseThread({
@@ -39,6 +40,7 @@ export function SupportCaseThread({
   const [capabilities, setCapabilities] = useState({ staff: false, requester: false });
   const [success, setSuccess] = useState("");
   const [supportCase, setSupportCase] = useState<SupportCaseData | null>(null);
+  const [relatedContext, setRelatedContext] = useState<SupportFormObjectContext | null>(null);
   const [messages, setMessages] = useState<SupportMessageData[]>([]);
   const [messagePage, setMessagePage] = useState(1);
   const [messageTotalPages, setMessageTotalPages] = useState(1);
@@ -89,6 +91,20 @@ export function SupportCaseThread({
         if (!response.ok || !validated) throw new Error(copy.loadError);
 
         setSupportCase(validated.supportCase);
+        const related = data?.supportCase;
+        setRelatedContext(
+          related?.relatedType === "product" &&
+            typeof related.relatedId === "string" &&
+            /^prd_[a-f0-9]{24}$/u.test(related.relatedId)
+            ? {
+                productId: related.relatedId,
+                ...(typeof related.buildId === "string" &&
+                /^bld_[a-f0-9]{24}$/u.test(related.buildId)
+                  ? { buildId: related.buildId }
+                  : {}),
+              }
+            : null,
+        );
         setCapabilities({ staff: validated.staff, requester: validated.requester });
         setMessages(validated.messages);
         setMessagePage(validated.messagePage);
@@ -98,6 +114,7 @@ export function SupportCaseThread({
       } catch {
         if (!isCurrent()) return false;
         setSupportCase(null);
+        setRelatedContext(null);
         setMessages([]);
         setError(copy.loadError);
         return false;
@@ -195,6 +212,7 @@ export function SupportCaseThread({
       }
       setReply("");
     } catch (caught) {
+      // Keep the composed reply so a lost response can retry with the same key.
       setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
     } finally {
       mutationInFlight.current = false;
@@ -451,9 +469,22 @@ export function SupportCaseThread({
           </Button>
         </form>
       ) : (
-        <p className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
-          {copy.closedReply}
-        </p>
+        <div className="space-y-3 rounded-lg border border-base bg-inset p-4 text-sm text-muted">
+          <p>{copy.closedReply}</p>
+          {!staffMode && capabilities.requester ? (
+            <p>
+              {locale === "ru"
+                ? "Закрытое обращение нельзя переоткрыть самостоятельно. Откройте новое связанное обращение, если проблема осталась."
+                : "You cannot reopen a staff-closed case yourself. Open a new related case if you still need help."}
+              <Link
+                href={supportObjectContextHref(relatedContext)}
+                className="ml-2 text-accent underline"
+              >
+                {locale === "ru" ? "Новое связанное обращение" : "Open a related case"}
+              </Link>
+            </p>
+          ) : null}
+        </div>
       )}
     </div>
   );

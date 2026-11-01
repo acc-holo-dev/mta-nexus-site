@@ -199,6 +199,70 @@ it("preserves explicit whole-inbox reading with a scope warning, cancellation an
   expect(harness.fetch.mock.calls[0][1]).toMatchObject({ method: "POST" });
   expect(harness.fetch.mock.calls[0][1]).not.toHaveProperty("body");
 });
+it("hides empty copy while a refresh is in flight and restores it only after success", async () => {
+  harness.slots = [];
+  harness.cursor = 0;
+  const emptyPage = {
+    items: [],
+    unreadCount: 0,
+    olderCursor: null,
+    newerCursor: null,
+  };
+  const emptyFiltered =
+    "No matching notifications on this page. Try another filter or return to the latest page.";
+  harness.slots[0] = emptyPage;
+  let complete!: (value: Response) => void;
+  harness.fetch.mockReset().mockReturnValueOnce(
+    new Promise<Response>((resolve) => {
+      complete = resolve;
+    }),
+  );
+  click(render(), "Reload saved inbox");
+  expect(render().some((node) => node.props.children === emptyFiltered)).toBe(false);
+  expect(
+    render().some((node) => node.props.children === "Refreshing notifications…"),
+  ).toBe(true);
+  complete(response(emptyPage));
+  await vi.waitFor(() =>
+    expect(render().some((node) => node.props.children === emptyFiltered)).toBe(true),
+  );
+});
+it("does not send a page selection larger than twenty-five notifications", async () => {
+  const oversized = {
+    ...initialPage,
+    items: Array.from({ length: 26 }, (_, n) => ({
+      ...initialPage.items[0],
+      id: `owned_${n}`,
+    })),
+  };
+  harness.slots = [];
+  harness.cursor = 0;
+  harness.slots[0] = oversized;
+  harness.slots[1] = oversized.items.map((item) => item.id);
+  harness.fetch.mockReset();
+  click(render(), "Mark selected as read");
+  expect(harness.fetch).not.toHaveBeenCalled();
+});
+it("keeps the last confirmed unread count after a conflicting expectedIsRead write", async () => {
+  harness.fetch
+    .mockReset()
+    .mockResolvedValueOnce(response({ code: "NOTIFICATION_STATE_CHANGED" }, 409));
+  expect(
+    render().some(
+      (node) =>
+        node.type === "strong" && node.props.children === 2,
+    ),
+  ).toBe(true);
+  click(render(), "Mark as read");
+  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  expect(
+    render().some(
+      (node) =>
+        node.type === "strong" && node.props.children === 2,
+    ),
+  ).toBe(true);
+  expect(harness.announce).not.toHaveBeenCalled();
+});
 it("coalesces rapid commands while a write or refresh is pending", async () => {
   let complete!: (value: Response) => void;
   harness.fetch

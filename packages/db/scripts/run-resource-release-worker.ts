@@ -2,6 +2,7 @@ import { rename, rm, writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { resourceReleaseWorkerOptions } from "../src/resource-release-worker-config";
 
+// Health state stays on tmpfs /tmp under production read_only (OPS-15).
 const healthFile = "/tmp/nexus-resource-release-worker-health.json",
   temporary = `${healthFile}.${process.pid}.tmp`;
 async function main() {

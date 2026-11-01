@@ -15,6 +15,7 @@ import {
 import type { OrganizationWorkspace } from "../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import { confirmAction } from "./confirm-action";
 export function OrganizationOwnershipTransfer({
   data,
   target,
@@ -61,7 +62,18 @@ export function OrganizationOwnershipTransfer({
       setError(copy.invalid);
       return;
     }
-    if (!window.confirm(`${copy.confirm}\n@${target.username} · ${data.organization.name}`)) return;
+    if (
+      !(await confirmAction({
+        title: copy.transfer,
+        object: `@${target.username} · ${data.organization.name}`,
+        scope: copy.selected,
+        consequences: copy.consequence,
+        confirmLabel: copy.submit,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+      }))
+    )
+      return;
     guard.current = true;
     onBusyChange(true);
     setError("");

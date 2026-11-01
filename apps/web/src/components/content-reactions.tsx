@@ -11,6 +11,7 @@ import {
 import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 export function ContentReactions({
   slug,
   contentId,
@@ -26,12 +27,14 @@ export function ContentReactions({
     [state, setState] = useState(initial),
     [pending, setPending] = useState(false),
     [blocked, setBlocked] = useState(!initial),
-    [message, setMessage] = useState(initial ? "" : copy.unavailable);
+    [message, setMessage] = useState(initial ? "" : copy.unavailable),
+    [loginHref, setLoginHref] = useState("/auth/login");
   const busy = useRef(false),
     alive = useRef(true),
     request = useRef<AbortController | null>(null);
   useEffect(() => {
     alive.current = true;
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
     return () => {
       alive.current = false;
       request.current?.abort();
@@ -88,7 +91,9 @@ export function ContentReactions({
   }
   return (
     <section className="space-y-3" aria-label={copy.title} aria-busy={pending}>
-      <p className="text-sm text-secondary">{state?.self ? copy.own : copy.choose}</p>
+      <p className="text-sm text-secondary">
+        {!state ? copy.unknownCounts : state.self ? copy.own : copy.choose}
+      </p>
       <div className="flex flex-wrap gap-2">
         {CONTENT_REACTIONS.map((reaction) => (
           <Button
@@ -96,12 +101,13 @@ export function ContentReactions({
             type="button"
             variant="outline"
             className={`min-h-11 gap-2 ${state?.reaction === reaction ? "bg-accent-soft text-accent" : "bg-inset"}`}
-            aria-pressed={state?.reaction === reaction}
+            aria-pressed={state ? state.reaction === reaction : undefined}
             disabled={pending || blocked || !state?.authenticated || state.self}
             onClick={() => void send(state?.reaction === reaction ? null : reaction)}
           >
             <span aria-hidden="true">{CONTENT_REACTION_EMOJI[reaction]}</span>
-            {copy[reaction]} <span className="font-numeric">{state?.counts[reaction] ?? "—"}</span>
+            {copy[reaction]}{" "}
+            <span className="font-numeric">{state ? state.counts[reaction] : "—"}</span>
           </Button>
         ))}
         {state?.reaction && (
@@ -128,7 +134,7 @@ export function ContentReactions({
       {state && !state.authenticated && (
         <Link
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          href="/auth/login"
+          href={loginHref}
         >
           {copy.signIn}
         </Link>

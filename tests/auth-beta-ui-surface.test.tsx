@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AuthForm } from "../apps/web/src/components/auth-form";
@@ -49,7 +50,7 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
     for (const locale of ["en", "ru"] as const) {
       const copy = getDictionary(locale).auth;
       for (const mode of ["login", "register"] as const) {
-        const html = renderToStaticMarkup(<AuthForm mode={mode} locale={locale} />);
+        const html = renderToStaticMarkup(createElement(AuthForm, { mode, locale }));
         expect(html).toContain(`>${copy.email}<`);
         expect(html).toContain(`>${copy.password}<`);
         expect(html).toContain('for="auth-email"');
@@ -89,6 +90,9 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
     expect(auth).toContain('role="alert"');
     expect(auth).toContain("aria-busy={loading}");
     expect(auth).toContain("bg-danger-soft");
+    expect(auth).toContain("resolveAuthReturnPath");
+    expect(auth).toContain("window.location.replace(next)");
+    expect(auth).not.toContain('window.location.replace("/workspace")');
     expect(forgot).toContain('role={notice.error ? "alert" : "status"}');
     expect(reset).toContain('role="status"');
     expect(reset).toContain('role="alert"');

@@ -3,7 +3,9 @@ export const servers = {
     notFound: "Сервер не найден",
     breadcrumb: "Серверы",
     verifiedIdentity: "Подтверждённая принадлежность",
-    connect: "Подключиться к серверу",
+    connect: "Открыть в MTA",
+    connectHint:
+      "Открывает ссылку mtasa:// в установленном клиенте MTA, если браузер это поддерживает. Это только намерение подключения — NEXUS не подтверждает вход или игру.",
     language: "Язык",
     region: "Регион",
     website: "Сайт",
@@ -11,9 +13,11 @@ export const servers = {
     openMedia: "Открыть медиа",
     livePlayerLoad: "Текущая нагрузка",
     noObservation: "В официальном каталоге MTA нет текущего наблюдения.",
-    staleSnapshot: "Показан последний доступный снимок каталога.",
+    staleSnapshot:
+      "Показан последний доступный снимок каталога. Число игроков может быть устаревшим.",
     connectionIp: "Адрес подключения",
-    selectHint: "Выделите адрес и вставьте его в MTA Quick Connect.",
+    selectHint:
+      "Если протокол не открыл MTA, скопируйте или выделите адрес и вставьте его в MTA Quick Connect.",
     runtime: "Runtime и каталог",
     officialDirectory: "Официальный каталог MTA",
     runtimeDescription:

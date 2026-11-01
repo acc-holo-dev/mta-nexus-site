@@ -28,3 +28,26 @@ assert.deepEqual(worker.command, [
   "-c",
   "cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready",
 ]);
+
+// Optional mail overlay must keep the production-base writer inventory (OPS-04/12).
+for (const name of ["app", "push-worker", "license-worker", "resource-release-worker", "postgres"]) {
+  assert(config.services?.[name], `production-base role missing beside mail-worker: ${name}`);
+}
+
+// OPS-15: mail-worker keeps the hardened writable profile; license/resource-release match it.
+assert.equal(worker.read_only, true);
+assert.equal(worker.pids_limit, 128);
+assert.deepEqual(worker.cap_drop, ["ALL"]);
+assert.ok(worker.tmpfs?.some((entry) => String(entry).startsWith("/tmp:")));
+assert.equal(worker.environment?.HOME, "/tmp");
+assert.equal(worker.environment?.TMPDIR, "/tmp");
+
+for (const name of ["license-worker", "resource-release-worker"]) {
+  const peer = config.services[name];
+  assert.equal(peer.read_only, true, `${name} read_only`);
+  assert.equal(peer.pids_limit, 128, `${name} pids_limit`);
+  assert.deepEqual(peer.cap_drop, ["ALL"], `${name} cap_drop`);
+  assert.ok(peer.tmpfs?.some((entry) => String(entry).startsWith("/tmp:")), `${name} tmpfs`);
+  assert.equal(peer.environment?.HOME, "/tmp", `${name} HOME`);
+  assert.equal(peer.environment?.TMPDIR, "/tmp", `${name} TMPDIR`);
+}

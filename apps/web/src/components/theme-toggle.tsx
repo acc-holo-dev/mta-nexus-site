@@ -4,6 +4,7 @@ import { Button } from "@nexus/ui";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
+  colorSchemeForTheme,
   nextThemePreference,
   parseThemePreference,
   resolveThemePreference,
@@ -32,7 +33,9 @@ export function ThemeToggle() {
     const media = window.matchMedia(SYSTEM_THEME_QUERY);
     const apply = () => {
       const resolved = resolveThemePreference(theme, media.matches);
-      document.documentElement.classList.toggle("dark", resolved === "dark");
+      const root = document.documentElement;
+      root.classList.toggle("dark", resolved === "dark");
+      root.style.colorScheme = colorSchemeForTheme(resolved);
     };
 
     apply();

@@ -13,6 +13,8 @@ const mocks = vi.hoisted(() => ({
   setFollowing: vi.fn(),
   isFollowing: vi.fn(),
   states: vi.fn(),
+  contentStates: vi.fn(),
+  muteState: vi.fn(),
   rate: vi.fn(),
   notifications: vi.fn(),
 }));
@@ -21,7 +23,12 @@ vi.mock("next/server", async (original) => ({
   after: (fn: () => Promise<unknown>) => state.callbacks.push(fn),
 }));
 vi.mock("@nexus/db", () => ({
-  followWorkspaceRepository: { setFollowing: mocks.setFollowing, states: mocks.states },
+  followWorkspaceRepository: {
+    setFollowing: mocks.setFollowing,
+    states: mocks.states,
+    contentStates: mocks.contentStates,
+    muteState: mocks.muteState,
+  },
   socialRepository: { isFollowing: mocks.isFollowing },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate, generateId: () => "generated" }));
@@ -64,9 +71,14 @@ beforeEach(() => {
   mocks.follows.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
   mocks.isFollowing.mockResolvedValue(true);
   mocks.states.mockResolvedValue(["publication"]);
-  mocks.setFollowing.mockImplementation(async (_actor, _type, _id, value) => ({
+  mocks.contentStates.mockResolvedValue([
+    { targetId: "publication", notifyComments: true, mutedUntil: null },
+  ]);
+  mocks.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
+  mocks.setFollowing.mockImplementation(async (_actor, _type, _id, value, _folId, options = {}) => ({
     following: value,
     created: value,
+    notifyComments: value ? (options.notifyComments ?? true) : false,
   }));
 });
 afterEach(() => {
@@ -232,7 +244,14 @@ it("allows removing an unavailable target and translates fresh availability deni
   const body = { targetType: "server", targetId: "missing" };
   const removed = await DELETE(request("/api/follow", "DELETE", body));
   expect(await removed.json()).toMatchObject({ success: true, following: false, ...body });
-  expect(mocks.setFollowing).toHaveBeenCalledWith("actor", "server", "missing", false, "generated");
+  expect(mocks.setFollowing).toHaveBeenCalledWith(
+    "actor",
+    "server",
+    "missing",
+    false,
+    "generated",
+    {},
+  );
   mocks.setFollowing.mockRejectedValue(new AppError("Target does not exist", 404, "NOT_FOUND"));
   const denied = await POST(request("/api/follow", "POST", body, "ru"));
   expect(denied.status).toBe(404);
@@ -245,10 +264,11 @@ it("reads only the authenticated reader's discussion subscription state", async 
   expect(await response.json()).toMatchObject({
     authenticated: true,
     following: true,
+    notifyComments: true,
     targetType: "content",
     targetId: "publication",
   });
-  expect(mocks.states).toHaveBeenCalledExactlyOnceWith("actor", "content", ["publication"]);
+  expect(mocks.contentStates).toHaveBeenCalledExactlyOnceWith("actor", ["publication"]);
   expect(mocks.isFollowing).not.toHaveBeenCalled();
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
@@ -268,6 +288,7 @@ it.each([POST, DELETE])(
       following: handler === POST,
       targetType: "content",
       targetId: "publication",
+      notifyComments: handler === POST,
     });
     expect(mocks.setFollowing).toHaveBeenCalledExactlyOnceWith(
       "actor",
@@ -275,6 +296,7 @@ it.each([POST, DELETE])(
       "publication",
       handler === POST,
       "generated",
+      handler === POST ? { notifyComments: undefined } : {},
     );
     expect(state.callbacks).toHaveLength(0);
   },

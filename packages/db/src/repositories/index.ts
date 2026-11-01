@@ -12,6 +12,11 @@ export * from "./commercial-plans";
 export { communityModerationWorkspaceRepository } from "./community-moderation-workspace";
 export { communityReportsRepository } from "./community-reports";
 export * from "./content";
+export {
+  commentIdFromIntentKey,
+  contentCommentsRepository,
+  parseCommentIntentKey,
+} from "./content-comments";
 export { contentDiscussionRepository } from "./content-discussion";
 export { contentReactionsRepository } from "./content-reactions";
 export type { ContentSummary } from "./content-summary";
@@ -81,6 +86,7 @@ export * from "./resource-publisher";
 export * from "./resource-release-watches";
 export * from "./resource-requirements";
 export { resourceReviewsRepository } from "./resource-reviews";
+export { resourceQaRepository } from "./resource-qa";
 export { serverReviewsRepository } from "./server-reviews";
 export * from "./resource-variants";
 export * from "./seller-sales";

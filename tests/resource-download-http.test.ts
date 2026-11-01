@@ -97,7 +97,10 @@ vi.mock("@nexus/security", () => ({
 import { GET } from "../apps/web/src/app/api/products/[id]/download/route";
 
 function request() {
-  return new NextRequest("http://nexus.test/api/products/prd_http/download", { method: "GET" });
+  return new NextRequest("http://nexus.test/api/products/prd_http/download", {
+    method: "GET",
+    headers: { cookie: "nexus_session=tok_player" },
+  });
 }
 
 const context = {
@@ -172,7 +175,10 @@ describe("resource download HTTP contract", () => {
       abort.abort();
     });
     const response = await GET(
-      new NextRequest("http://nexus.test/api/products/prd_http/download", { signal: abort.signal }),
+      new NextRequest("http://nexus.test/api/products/prd_http/download", {
+        signal: abort.signal,
+        headers: { cookie: "nexus_session=tok_player" },
+      }),
       context,
     );
     expect(response.status).toBe(499);
@@ -389,6 +395,7 @@ describe("resource download HTTP contract", () => {
     expect(auditRecord).toHaveBeenCalledWith(
       expect.objectContaining({
         actorId: "usr_player",
+        currentToken: "tok_player",
         expected: expect.objectContaining({ productId: "prd_http", id: "bld_http" }),
         pinned: false,
       }),
@@ -445,7 +452,9 @@ describe("pinned historical build downloads", () => {
   });
 
   function pinned(query = "?buildId=bld_historical_1") {
-    return new NextRequest(`http://nexus.test/api/products/prd_http/download${query}`);
+    return new NextRequest(`http://nexus.test/api/products/prd_http/download${query}`, {
+      headers: { cookie: "nexus_session=tok_player" },
+    });
   }
 
   it("serves the exact approved historical build without selecting the latest", async () => {
@@ -463,6 +472,7 @@ describe("pinned historical build downloads", () => {
     expect(await response.text()).toBe("historical");
     expect(auditRecord).toHaveBeenCalledWith(
       expect.objectContaining({
+        currentToken: "tok_player",
         expected: expect.objectContaining({
           id: "bld_historical_1",
           version: "1.0.0",

@@ -22,9 +22,11 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
+      email: "moderator@nexus.test",
       username: "moderator",
       role: "moderator",
     })),
+    confirmStaffActionPassword: vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),
   },
 }));
 
@@ -61,11 +63,15 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("@nexus/security", () => ({
-  can: vi.fn(() => true),
-  consumeRateLimit: vi.fn(async () => ({ success: true })),
-  generateId: vi.fn((prefix: string) => `${prefix}_test`),
-}));
+vi.mock("@nexus/security", async () => {
+  const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
+  return {
+    ...actual,
+    can: vi.fn(() => true),
+    consumeRateLimit: vi.fn(async () => ({ success: true })),
+    generateId: vi.fn((prefix: string) => `${prefix}_test`),
+  };
+});
 
 import { NextRequest } from "next/server";
 import { POST } from "../apps/web/src/app/api/admin/actions/route";
@@ -82,6 +88,7 @@ function request(action: "approve" | "reject") {
       targetId: "ver_1",
       action,
       notes: "Verification evidence reviewed.",
+      currentPassword: "Staff-password-123!",
     }),
   });
 }
@@ -138,6 +145,7 @@ describe("verification resolution durable push scheduling", () => {
           targetId: "ver_1",
           action: "approve",
           notes: "Verification evidence reviewed.",
+          currentPassword: "Staff-password-123!",
         }),
       }),
     );

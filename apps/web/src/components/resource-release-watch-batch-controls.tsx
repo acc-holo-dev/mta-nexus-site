@@ -37,6 +37,22 @@ export function ResourceReleaseWatchBatchControls({
       ? item.available === true && !item.enabled && (!resume || item.revision >= 1)
       : item.enabled,
   );
+  const skipped = enabling
+    ? items
+        .filter((item) => !eligible.some((row) => row.productId === item.productId))
+        .map((item) => ({
+          productId: item.productId,
+          title: item.title,
+          reason:
+            item.enabled
+              ? "alreadyOn"
+              : item.available === false
+                ? "noAccessItem"
+                : resume && item.revision < 1
+                  ? "noAccessItem"
+                  : "noAccessItem",
+        }))
+    : [];
   const capacity = enabling
     ? Math.max(
         0,
@@ -91,8 +107,12 @@ export function ResourceReleaseWatchBatchControls({
       !command.items.length ||
       command.items.length > RESOURCE_RELEASE_WATCH_BATCH_LIMIT ||
       (!pending && command.items.length > capacity)
-    )
+    ) {
+      if (!pending && command.items.length > RESOURCE_RELEASE_WATCH_BATCH_LIMIT) {
+        setError(copy.batchMaximum);
+      }
       return;
+    }
     frozen.current = command;
     const requestScope = scope.current ?? {
       url: collection
@@ -157,7 +177,21 @@ export function ResourceReleaseWatchBatchControls({
     <section className="nexus-panel space-y-4 p-5">
       <h2>{title}</h2>
       <p className="text-sm text-secondary">{note}</p>
+      <p className="text-xs text-muted">{copy.batchLimit}</p>
       {enabling && capacity === 0 && <p role="note">{copy.maximum}</p>}
+      {enabling && skipped.length > 0 ? (
+        <div className="space-y-2" role="note">
+          <p className="text-sm text-muted">{copy.skippedNote}</p>
+          <ul className="space-y-1 text-sm text-secondary">
+            {skipped.map((item) => (
+              <li key={item.productId}>
+                {item.title ?? copy.privateResource}:{" "}
+                {item.reason === "alreadyOn" ? copy.alreadyOn : copy.noAccessItem}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <fieldset disabled={busy || saved || pending !== null} className="space-y-3">
         <legend className="sr-only">{title}</legend>
         {eligible.map((item) => (

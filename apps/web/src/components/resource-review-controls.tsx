@@ -10,8 +10,10 @@ import {
 } from "../lib/resource-review-confirmation";
 import {
   resourceReviewCopy,
+  resourceReviewEligibilityCopy,
   resourceReviewError,
   resourceReviewState,
+  type ResourceReviewEligibilityReason,
 } from "../lib/resource-review-i18n";
 
 type Review = {
@@ -47,14 +49,17 @@ export function ResourceReviewEditor({
   productId,
   review,
   canReview,
+  eligibility = canReview ? "ok" : "access_required",
   locale,
 }: {
   productId: string;
   review: Review | null;
   canReview: boolean;
+  eligibility?: ResourceReviewEligibilityReason | string;
   locale: Locale;
 }) {
   const copy = resourceReviewCopy(locale);
+  const eligibilityNote = resourceReviewEligibilityCopy(locale, eligibility);
   const [text, setText] = useState(review?.text ?? ""),
     [rating, setRating] = useState(review?.rating ?? 5),
     [busy, setBusy] = useState(false),
@@ -87,6 +92,11 @@ export function ResourceReviewEditor({
   return (
     <section className="nexus-panel space-y-4 p-5">
       <p className="text-sm text-secondary">{copy.access}</p>
+      {eligibilityNote ? (
+        <p role="note" className="text-sm text-warning">
+          {eligibilityNote}
+        </p>
+      ) : null}
       {review && <p>{resourceReviewState(locale, review.status)}</p>}
       {review?.moderationReason && (
         <p className="text-sm text-secondary">
@@ -133,7 +143,11 @@ export function ResourceReviewEditor({
           </Button>
         </form>
       ) : (
-        review && <p className="whitespace-pre-wrap break-words text-sm">{review.text}</p>
+        review && (
+          <p className="whitespace-pre-wrap break-words text-sm" data-review-copyable="true">
+            {review.text}
+          </p>
+        )
       )}
       {review?.status === "published" && (
         <Button

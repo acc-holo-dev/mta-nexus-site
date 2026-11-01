@@ -46,7 +46,7 @@ function request() {
   form.set("mtaVersionTarget", "1.6.0");
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
     method: "POST",
-    headers: browserMutationHeaders(),
+    headers: browserMutationHeaders({ cookie: "nexus_session=tok_author" }),
     body: form,
   });
 }

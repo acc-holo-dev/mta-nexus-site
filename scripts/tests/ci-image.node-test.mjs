@@ -1,11 +1,24 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
 
 const sha = "a".repeat(40);
+
+test("OPS-10 publish path refuses missing cache identity instead of rebuilding", () => {
+  const workflow = readFileSync(new URL("../../.github/workflows/ci.yml", import.meta.url), "utf8");
+  const start = workflow.indexOf("\n  ghcr-publish:\n");
+  assert.ok(start >= 0);
+  const rest = workflow.slice(start + 1);
+  const next = rest.search(/\n {2}[a-z0-9-]+:\n/u);
+  const job = next >= 0 ? rest.slice(0, next) : rest;
+  assert.match(job, /actions\/cache\/restore@/u);
+  assert.match(job, /fail-on-cache-miss: true/u);
+  assert.doesNotMatch(job, /docker\/build-push-action/u);
+  assert.match(job, /record-ghcr-publish-receipt\.mjs/u);
+});
 
 test("prebuilt image validation accepts only a loaded image for the exact commit", () => {
   const directory = mkdtempSync(join(tmpdir(), "nexus-ci-image-"));

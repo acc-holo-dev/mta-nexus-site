@@ -7,6 +7,7 @@ import {
   db,
   productRepository,
   resourceDeliveriesRepository as receipts,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 import { AppError } from "@nexus/domain";
@@ -131,6 +132,21 @@ async function clearFixtures() {
   await db.delete(users).where(inArray(users.id, [fixture.userId, fixture.otherUserId]));
 }
 
+async function ensureDownloadSession(userId: string) {
+  const token = `tok_dlv_${userId}`;
+  try {
+    await sessionRepository.create({
+      id: `ses_dlv_${userId}`,
+      userId,
+      token,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+  } catch {
+    // Reused across served/started helpers in the same fixture.
+  }
+  return token;
+}
+
 async function servedReceipt(
   userId: string,
   productId: string,
@@ -147,8 +163,10 @@ async function servedReceipt(
   const expected = await buildRepository.findById(buildId);
   if (!expected) throw new Error("Missing quarantine fixture build");
   const receiptId = `dlv_secsub_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+  const currentToken = await ensureDownloadSession(userId);
   await authorization.authorize({
     actorId: userId,
+    currentToken,
     expected,
     pinned: true,
     receiptId,
@@ -179,8 +197,10 @@ async function startedReceipt(
   const expected = await buildRepository.findById(buildId);
   if (!expected) throw new Error("Missing quarantine fixture build");
   const receiptId = `dlv_secsub_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+  const currentToken = await ensureDownloadSession(userId);
   await authorization.authorize({
     actorId: userId,
+    currentToken,
     expected,
     pinned: true,
     receiptId,

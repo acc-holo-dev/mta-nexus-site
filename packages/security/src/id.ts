@@ -41,7 +41,10 @@ export type EntityPrefix =
   | "ver"
   | "sup"
   | "spm"
-  | "wps";
+  | "wps"
+  | "rqt"
+  | "rqa"
+  | "rqf";
 
 /**
  * Generates secure, collision-resistant, URL-safe opaque IDs with entity prefix.

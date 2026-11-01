@@ -144,6 +144,37 @@ function status(f: Fixture, who = f.owner, next: "open" | "closed" | "resolved" 
     f.supportCase.updatedAt,
   );
 }
+
+it("keeps closed cases staff-gated and rejects requester reopen after concurrent close", async () => {
+  const f = await fixture();
+  const closed = await cases.updateStatus(
+    f.caseId,
+    "closed",
+    audit(f.caseId, f.staff.userId, "support.case.status_changed"),
+    "open",
+    f.staff.token,
+    f.supportCase.updatedAt,
+  );
+  expect(closed?.status).toBe("closed");
+  await expect(
+    cases.updateStatus(
+      f.caseId,
+      "open",
+      audit(f.caseId, f.owner.userId, "support.case.status_changed"),
+      "closed",
+      f.owner.token,
+      closed?.updatedAt,
+    ),
+  ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+  const staleReply = await cases.addIdempotentMessage(
+    { ...f.message, expectedStatus: "open" },
+    audit(f.caseId, f.owner.userId),
+    f.request,
+    f.owner.token,
+  );
+  expect(staleReply.kind).toBe("stale");
+  expect((await cases.findById(f.caseId))?.status).toBe("closed");
+});
 for (const invalid of ["revoked", "expired", "foreign", "missing"] as const) {
   it(`rejects SUPPORT create, reply, status, no-op and replay with a ${invalid} initiator despite another live session`, async () => {
     const f = await fixture();

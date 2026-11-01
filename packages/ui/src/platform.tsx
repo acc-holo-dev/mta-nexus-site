@@ -57,15 +57,17 @@ export function SectionHeader({ title, description, action, className }: Section
   return (
     <div
       className={cn(
-        "flex items-center justify-between border-b border-base pb-2.5 mb-4",
+        "mb-4 flex flex-wrap items-start justify-between gap-x-3 gap-y-2 border-b border-base pb-2.5",
         className,
       )}
     >
-      <div>
-        <h2 className="font-heading text-primary">{title}</h2>
-        {description && <p className="font-caption text-muted mt-0.5">{description}</p>}
+      <div className="min-w-0 max-w-full flex-1">
+        <h2 className="break-words font-heading text-primary">{title}</h2>
+        {description && (
+          <p className="mt-0.5 break-words font-caption text-muted">{description}</p>
+        )}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div className="max-w-full shrink-0">{action}</div>}
     </div>
   );
 }
@@ -171,7 +173,7 @@ export function StatusBadge({ status, tone = "neutral", className }: StatusBadge
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-numeric font-bold uppercase border",
+        "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
         STATUS_TONES[tone],
         className,
       )}
@@ -184,32 +186,91 @@ export function StatusBadge({ status, tone = "neutral", className }: StatusBadge
 /* ============================================================
    DataTable primitives — consistent table system (TASK-019)
    ============================================================ */
+export type DataTableColumnAlign = "start" | "end" | "center";
+export type DataTableColumnType = "text" | "numeric" | "code" | "datetime";
+
+export type DataTableColumn = {
+  label: string;
+  align?: DataTableColumnAlign;
+  type?: DataTableColumnType;
+};
+
+const COLUMN_ALIGN: Record<DataTableColumnAlign, string> = {
+  start: "text-left",
+  end: "text-right",
+  center: "text-center",
+};
+
+const COLUMN_TYPE: Record<DataTableColumnType, string> = {
+  text: "font-caption break-words",
+  numeric: "font-numeric tabular-nums whitespace-nowrap",
+  code: "font-code break-all",
+  datetime: "font-caption whitespace-nowrap",
+};
+
+function normalizeColumns(columns: Array<string | DataTableColumn>): DataTableColumn[] {
+  return columns.map((column, index) => {
+    if (typeof column === "string") {
+      return {
+        label: column,
+        align: index === columns.length - 1 ? "end" : "start",
+        type: "text",
+      };
+    }
+    return {
+      label: column.label,
+      align: column.align ?? (column.type === "numeric" ? "end" : "start"),
+      type: column.type ?? "text",
+    };
+  });
+}
+
 export function DataTable({
   children,
   className,
+  label,
 }: {
   children: React.ReactNode;
   className?: string;
+  /** Accessible name for the keyboard-focusable overflow region. */
+  label?: string;
 }) {
   return (
-    <div className={cn("overflow-x-auto", className)}>
-      <table className="w-full text-left text-xs">{children}</table>
+    <div
+      role="region"
+      aria-label={label}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: Named overflow region needs keyboard focus for horizontal scrolling.
+      tabIndex={label ? 0 : undefined}
+      className={cn(
+        "max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]",
+        className,
+      )}
+    >
+      <table className="w-full min-w-0 text-left text-xs">{children}</table>
     </div>
   );
 }
 
-export function DataTableHeader({ columns }: { columns: string[] }) {
+export function DataTableHeader({ columns }: { columns: Array<string | DataTableColumn> }) {
+  const normalized = normalizeColumns(columns);
   return (
-    <thead className="font-label text-faint uppercase border-b border-base">
+    <thead className="border-b border-base font-label uppercase text-faint">
       <tr>
-        {withOccurrenceKeys(columns, (column) => column).map(({ key, item: col }, i) => (
-          <th
-            key={key}
-            className={cn("py-2.5 pr-4", i === columns.length - 1 && "text-right pr-0")}
-          >
-            {col}
-          </th>
-        ))}
+        {withOccurrenceKeys(normalized, (column) => column.label).map(
+          ({ key, item: column }, index) => (
+            <th
+              key={key}
+              scope="col"
+              className={cn(
+                "py-2.5 pr-4 align-bottom",
+                COLUMN_ALIGN[column.align ?? "start"],
+                index === normalized.length - 1 && "pr-0",
+              )}
+            >
+              {column.label}
+            </th>
+          ),
+        )}
       </tr>
     </thead>
   );
@@ -217,9 +278,37 @@ export function DataTableHeader({ columns }: { columns: string[] }) {
 
 export function DataTableBody({ children }: { children: React.ReactNode }) {
   return (
-    <tbody className="divide-y divide-[color:var(--nexus-border)] font-numeric text-secondary">
+    <tbody className="divide-y divide-[color:var(--nexus-border)] text-secondary">{children}</tbody>
+  );
+}
+
+export function DataTableCell({
+  children,
+  type = "text",
+  align,
+  className,
+  scope,
+}: {
+  children: React.ReactNode;
+  type?: DataTableColumnType;
+  align?: DataTableColumnAlign;
+  className?: string;
+  scope?: "row";
+}) {
+  const resolvedAlign = align ?? (type === "numeric" ? "end" : "start");
+  const Tag = scope === "row" ? "th" : "td";
+  return (
+    <Tag
+      scope={scope}
+      className={cn(
+        "max-w-[18rem] py-2.5 pr-4 align-top",
+        COLUMN_ALIGN[resolvedAlign],
+        COLUMN_TYPE[type],
+        className,
+      )}
+    >
       {children}
-    </tbody>
+    </Tag>
   );
 }
 

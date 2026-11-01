@@ -10,43 +10,52 @@ import {
   fetchResourceDownload,
   ResourceDownloadError,
 } from "../lib/resource-download-client";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { useNexusLocale } from "./locale-context";
 
 export function ResourceDownloadButton({
   productId,
   version,
   buildId,
+  intent,
+  unavailableReason,
 }: {
   productId: string;
   version: string;
   buildId?: string;
+  /** Public detail uses latest; library selection uses selected/pinned. */
+  intent?: "latest" | "selected";
+  /** When a fixed selection exists but cannot be downloaded, explain instead of silent latest. */
+  unavailableReason?: string | null;
 }) {
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.product;
+  const resolvedIntent = intent ?? (buildId ? "selected" : "latest");
   const active = useRef<AbortController | null>(null);
   const downloadUrl = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<DownloadFailure | null>(null);
   const [notice, setNotice] = useState<"cancelled" | "saved" | null>(null);
+  const [loginHref, setLoginHref] = useState("/auth/login");
   const [receipt, setReceipt] = useState<{
     id: string;
     productId: string;
     buildId?: string;
     version: string;
   } | null>(null);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    return () => {
       active.current?.abort();
       active.current = null;
       if (downloadUrl.current) URL.revokeObjectURL(downloadUrl.current);
       downloadUrl.current = null;
-    },
-    [],
-  );
+    };
+  }, []);
 
   async function download() {
-    if (active.current) return;
+    if (active.current || unavailableReason) return;
     const controller = new AbortController();
     active.current = controller;
     setBusy(true);
@@ -100,6 +109,22 @@ export function ResourceDownloadButton({
     }
   }
 
+  const label =
+    resolvedIntent === "selected"
+      ? `${copy.downloadSelected} v${version}`
+      : `${copy.downloadLatest} v${version}`;
+
+  if (unavailableReason) {
+    return (
+      <div className="space-y-2">
+        <p role="status" className="text-sm text-warning">
+          {unavailableReason}
+        </p>
+        <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <Button
@@ -107,11 +132,14 @@ export function ResourceDownloadButton({
         onClick={download}
         disabled={busy}
         aria-busy={busy}
+        data-download-intent={resolvedIntent}
+        data-build-id={buildId ?? ""}
         className="h-auto w-full gap-2 bg-success-solid py-3 text-sm font-bold shadow-nexus hover:opacity-90"
       >
         <Download className="h-4 w-4" aria-hidden="true" />
-        {busy ? copy.downloadPreparing : `${copy.downloadBuild} v${version}`}
+        {busy ? copy.downloadPreparing : label}
       </Button>
+      <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
       {busy && (
         <div className="space-y-2">
           <progress
@@ -136,7 +164,7 @@ export function ResourceDownloadButton({
         </p>
       )}
       {failure === "signIn" && (
-        <Link href="/auth/login" className="text-sm text-accent underline">
+        <Link href={loginHref} className="text-sm text-accent underline">
           {copy.downloadSignIn}
         </Link>
       )}

@@ -45,11 +45,17 @@ export const product = {
     inLibrary: "In your library",
     authorized: "You are authorized to download this published build.",
     downloadBuild: "Download Build",
+    downloadLatest: "Download latest",
+    downloadSelected: "Download selected",
     downloadPreparing: "Preparing download…",
     downloadProgress: "Download progress",
     downloadCancel: "Cancel download",
     downloadCancelled: "Download cancelled. You can try again.",
     downloadHandedOff: "File sent to your browser. Check your downloads.",
+    downloadNotInstalled:
+      "Browser handoff is confirmed only. NEXUS does not verify that the file was saved or installed.",
+    downloadFixedUnavailable:
+      "The selected build is unavailable. Your pinned choice was kept; latest was not substituted.",
     downloadSignIn: "Sign in",
     downloadErrors: {
       signIn: "Your session has expired. Sign in and try again.",
@@ -57,6 +63,7 @@ export const product = {
       missing: "The build file is unavailable. Try again later.",
       unavailable:
         "This build cannot be downloaded right now. Try again after it has been checked.",
+      integrity: "The downloaded bytes did not match the recorded checksum. Nothing was saved.",
       rateLimit: "Too many download attempts. Wait a moment and try again.",
       timeout: "The download stopped responding. Check your connection and try again.",
       failed: "The download could not be completed. Check your connection and try again.",
@@ -70,6 +77,10 @@ export const product = {
     dependencies: "Dependencies",
     libraryAdditions: "Library additions",
     rating: "Rating",
+    noReviewsYet: "No reviews yet",
+    publisher: "Publisher",
+    author: "Author",
+    publisherUnavailable: "Publisher unavailable",
     security:
       "Every release records its SHA-256 checksum, file size and compatibility. Downloads are entitlement-gated; a recorded checksum is not a malware verdict or signature.",
   },

@@ -18,9 +18,11 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
+      email: "moderator@nexus.test",
       username: "moderator",
       role: "moderator",
     })),
+    confirmStaffActionPassword: vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),
   },
 }));
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
@@ -49,11 +51,15 @@ vi.mock("@nexus/db", () => ({
     findById: vi.fn(),
   },
 }));
-vi.mock("@nexus/security", () => ({
-  can: vi.fn(() => true),
-  consumeRateLimit: vi.fn(async () => ({ success: true })),
-  generateId: vi.fn((prefix: string) => `${prefix}_test`),
-}));
+vi.mock("@nexus/security", async () => {
+  const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
+  return {
+    ...actual,
+    can: vi.fn(() => true),
+    consumeRateLimit: vi.fn(async () => ({ success: true })),
+    generateId: vi.fn((prefix: string) => `${prefix}_test`),
+  };
+});
 
 import { NextRequest } from "next/server";
 import { POST } from "../apps/web/src/app/api/admin/actions/route";
@@ -71,6 +77,7 @@ function request(action: "approve" | "reject" | "quarantine") {
       expectedRevision: 1,
       action,
       notes: "Reviewed build",
+      currentPassword: "Staff-password-123!",
     }),
   });
 }
@@ -95,6 +102,7 @@ describe("build review durable push scheduling", () => {
           decision: action,
           expectedRevision: 1,
           notes: "Reviewed build",
+          expectedPasswordHash: "hash_mod",
         },
         expect.objectContaining({ id: "usr_mod" }),
         "test-session",

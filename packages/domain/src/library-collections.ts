@@ -260,6 +260,34 @@ export function collectionCommandProductIds(command: LibraryCollectionCommand): 
         : [];
 }
 
+/** Per-item membership outcomes for confirmed batch/membership commands (watches/entitlements unchanged). */
+export type LibraryCollectionItemResult = {
+  productId: string;
+  outcome: "added" | "removed" | "copied" | "moved";
+};
+export function collectionCommandItemResults(
+  command: LibraryCollectionCommand,
+): LibraryCollectionItemResult[] {
+  if (command.action === "add" || command.action === "add-many")
+    return (command.action === "add" ? [command.productId] : command.productIds).map(
+      (productId) => ({ productId, outcome: "added" as const }),
+    );
+  if (command.action === "remove" || command.action === "remove-many")
+    return (command.action === "remove" ? [command.productId] : command.productIds).map(
+      (productId) => ({ productId, outcome: "removed" as const }),
+    );
+  if (command.action === "copy-items")
+    return command.productIds.map((productId) => ({ productId, outcome: "copied" as const }));
+  if (command.action === "move-items")
+    return command.productIds.map((productId) => ({ productId, outcome: "moved" as const }));
+  if (command.action === "reconcile-items")
+    return [
+      ...command.addProductIds.map((productId) => ({ productId, outcome: "added" as const })),
+      ...command.removeProductIds.map((productId) => ({ productId, outcome: "removed" as const })),
+    ];
+  return [];
+}
+
 /** Current reviewed changes; availability and recorded evidence are independent. */
 export type LibraryCollectionChangesPreview = Omit<LibraryCollectionImportPreview, "items"> & {
   items: (LibraryCollectionImportPreview["items"][number] & { canRemove: boolean })[];

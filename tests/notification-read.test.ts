@@ -1,10 +1,17 @@
 import { describe, expect, it } from "vitest";
+import {
+  NOTIFICATION_INBOX_SELECTION_LIMIT,
+  notificationInboxCommandSchema,
+} from "../apps/web/src/lib/notification-inbox-contract";
 import { parseNotificationReadTarget } from "../apps/web/src/lib/notification-read";
 
 describe("notification read target", () => {
-  it.each(["", "{}", " { } "])("accepts explicit bulk request %j", (body) => {
-    expect(parseNotificationReadTarget(body)).toEqual({ scope: "all" });
-  });
+  it.each(["", "{}", " { } "])(
+    "maps empty mark-read bodies to account-wide all-read, not page selection %j",
+    (body) => {
+      expect(parseNotificationReadTarget(body)).toEqual({ scope: "all" });
+    },
+  );
 
   it("normalizes a single id without changing scope", () => {
     expect(parseNotificationReadTarget('{"id":"  not_123  "}')).toEqual({
@@ -28,5 +35,34 @@ describe("notification read target", () => {
     " ".repeat(1025),
   ])("rejects malformed and ambiguous bulk action %j", (body) => {
     expect(parseNotificationReadTarget(body)).toBeNull();
+  });
+
+  it("keeps page selection commands distinct from account-wide all-read and refuses batches over 25", () => {
+    expect(NOTIFICATION_INBOX_SELECTION_LIMIT).toBe(25);
+    expect(
+      notificationInboxCommandSchema.safeParse({
+        isRead: true,
+        items: Array.from({ length: 25 }, (_, n) => ({
+          id: String(n),
+          expectedIsRead: false,
+        })),
+      }).success,
+    ).toBe(true);
+    expect(
+      notificationInboxCommandSchema.safeParse({
+        isRead: true,
+        items: Array.from({ length: 26 }, (_, n) => ({
+          id: String(n),
+          expectedIsRead: false,
+        })),
+      }).success,
+    ).toBe(false);
+    expect(
+      notificationInboxCommandSchema.safeParse({
+        isRead: true,
+        scope: "all",
+        items: [{ id: "owned", expectedIsRead: false }],
+      }).success,
+    ).toBe(false);
   });
 });

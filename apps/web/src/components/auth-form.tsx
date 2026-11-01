@@ -2,8 +2,20 @@
 
 import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
+import {
+  authEntryHref,
+  parseAuthReturnPath,
+  resolveAuthReturnPath,
+} from "./auth-return-path";
+
+export {
+  authEntryHref,
+  currentBrowserReturnPath,
+  parseAuthReturnPath,
+  resolveAuthReturnPath,
+} from "./auth-return-path";
 
 type AuthMode = "login" | "register";
 
@@ -26,6 +38,11 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
   const registering = mode === "register";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [returnPath, setReturnPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    setReturnPath(parseAuthReturnPath(new URLSearchParams(window.location.search).get("next")));
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,13 +73,19 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
         return;
       }
       if (data?.success !== true) throw new Error("Invalid authentication response");
+      const next = resolveAuthReturnPath(
+        new URLSearchParams(window.location.search).get("next"),
+      );
       // Replace the document so a previous account's router cache is not reused.
-      window.location.replace("/workspace");
+      // Landing alone must not claim, react, follow, or download.
+      window.location.replace(next);
     } catch {
       setError(registering ? copy.registerError : copy.loginError);
       setLoading(false);
     }
   }
+
+  const alternateHref = authEntryHref(registering ? "login" : "register", returnPath);
 
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-10 sm:px-0">
@@ -177,10 +200,7 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
         )}
         <p>
           {registering ? `${copy.already} ` : `${copy.newUser} `}
-          <Link
-            href={registering ? "/auth/login" : "/auth/register"}
-            className="font-semibold text-accent underline"
-          >
+          <Link href={alternateHref} className="font-semibold text-accent underline">
             {registering ? copy.signIn : copy.create}
           </Link>
         </p>

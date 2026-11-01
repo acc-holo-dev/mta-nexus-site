@@ -19,6 +19,10 @@ const copy = {
     owned: "Already in your library",
     done: "Resources added to your library.",
     note: "No payment is required. Access is granted only after every selected resource passes the server checks.",
+    batchIntent: "Batch acquire: collect free resources, then confirm the cart. Nothing is claimed until you confirm.",
+    singleIntent: "Single acquire: claim this free resource for your library.",
+    guestReturnNote:
+      "After sign-in you return here. Cart or claim actions are not started automatically.",
     working: "Saving…",
     signIn: "Sign in to use your resource cart",
     login: "Sign in",
@@ -80,6 +84,11 @@ const copy = {
     owned: "Уже в библиотеке",
     done: "Ресурсы добавлены в библиотеку.",
     note: "Оплата не требуется. Права выдаются после проверки каждого выбранного ресурса на сервере.",
+    batchIntent:
+      "Пакетное получение: соберите бесплатные ресурсы, затем подтвердите корзину. Без подтверждения claim не выполняется.",
+    singleIntent: "Одиночное получение: добавить этот бесплатный ресурс в библиотеку.",
+    guestReturnNote:
+      "После входа вы вернётесь сюда. Корзина или claim сами не запускаются.",
     working: "Сохранение…",
     signIn: "Войдите, чтобы пользоваться корзиной ресурсов",
     login: "Войти",

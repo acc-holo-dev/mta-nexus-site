@@ -1,6 +1,7 @@
 "use client";
 import {
   LIBRARY_COLLECTION_BATCH_LIMIT,
+  collectionCommandItemResults,
   type LibraryCollectionCommand,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
@@ -285,6 +286,11 @@ export function LibraryCollectionBatchForm({
           <p role="alert" className="text-sm text-warning">
             {error}
           </p>
+          {error.includes(c.fullCollection) && (
+            <p role="note" className="text-sm text-muted">
+              {c.itemLimitNext}
+            </p>
+          )}
           <a
             href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
             className="text-sm text-accent underline"
@@ -293,9 +299,19 @@ export function LibraryCollectionBatchForm({
           </a>
         </div>
       )}
-      {saved && (
+      {saved && pending.current && (
         <div className="space-y-2">
           <p role="status">{c.saved}</p>
+          <ul className="space-y-1 text-sm">
+            {collectionCommandItemResults(pending.current.command).map((entry) => {
+              const item = shownItems.find((value) => value.productId === entry.productId);
+              return (
+                <li key={entry.productId} className="break-words">
+                  {item?.title ?? entry.productId}: {c.batchApplied}
+                </li>
+              );
+            })}
+          </ul>
           <code className="block break-all text-xs">
             {c.receipt}: {receiptId}
           </code>
@@ -303,13 +319,13 @@ export function LibraryCollectionBatchForm({
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
           <a
-            href={collectionHref(pending.current?.collection.id ?? collection.id, "history")}
+            href={collectionHref(pending.current.collection.id, "history")}
             className="text-accent underline"
           >
             {c.history}
           </a>
           <a
-            href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
+            href={pending.current.reloadHref}
             className="text-accent underline"
           >
             {c.reload}

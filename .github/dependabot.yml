@@ -36,6 +36,9 @@ updates:
       timezone: "Europe/Moscow"
     open-pull-requests-limit: 3
 
+  # OPS-03: mutable Dockerfile/Compose tags stay updateable for security PRs.
+  # Candidate digests are recorded separately in deploy/infra-image-pins.json
+  # (scripts/resolve-infra-image-digests.mjs) and must not block Dependabot forever.
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

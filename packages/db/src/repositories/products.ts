@@ -339,6 +339,54 @@ export class ProductRepository {
     return (rows[0] as unknown as Product) || null;
   }
 
+  /**
+   * Batch public attribution for catalogue cards/detail.
+   * Selects only public identity fields — never email or password material.
+   */
+  async publicAttributionsFor(
+    productIds: readonly string[],
+  ): Promise<
+    Array<{
+      productId: string;
+      authorUsername: string | null;
+      authorDisplayName: string | null;
+      authorRole: string | null;
+      organizationSlug: string | null;
+      organizationName: string | null;
+    }>
+  > {
+    const uniqueIds = [...new Set(productIds.filter(Boolean))];
+    if (uniqueIds.length === 0) return [];
+
+    const rows: Array<{
+      productId: string;
+      authorUsername: string | null;
+      authorDisplayName: string | null;
+      authorRole: string | null;
+      organizationSlug: string | null;
+      organizationName: string | null;
+    }> = [];
+
+    for (let offset = 0; offset < uniqueIds.length; offset += 500) {
+      const batch = await db
+        .select({
+          productId: products.id,
+          authorUsername: users.username,
+          authorDisplayName: users.displayName,
+          authorRole: users.role,
+          organizationSlug: organizations.slug,
+          organizationName: organizations.name,
+        })
+        .from(products)
+        .leftJoin(users, eq(users.id, products.authorId))
+        .leftJoin(organizations, eq(organizations.id, products.organizationId))
+        .where(inArray(products.id, uniqueIds.slice(offset, offset + 500)));
+      rows.push(...batch);
+    }
+
+    return rows;
+  }
+
   async findPublishedFreeBySlugs(slugs: readonly string[]): Promise<Product[]> {
     const normalized = Array.from(
       new Set(slugs.map((slug) => slug.trim().toLowerCase()).filter(Boolean)),

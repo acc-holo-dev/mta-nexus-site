@@ -1,3 +1,7 @@
+const {
+  HTTP_DB_EXCEPTION_PATH,
+} = require("./.dependency-cruiser.exceptions.cjs");
+
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
@@ -26,6 +30,17 @@ module.exports = {
       severity: "error",
       from: { path: "^packages/ui/" },
       to: { path: "^packages/(db|storage|security|config)/" },
+    },
+    {
+      name: "http-handlers-use-services-for-db",
+      severity: "error",
+      comment:
+        "API routes must not take a new direct @nexus/db dependency outside the documented read/health or grandfathered service-required lists in docs/ARCHITECTURE.md.",
+      from: {
+        path: "^apps/web/src/app/api/",
+        pathNot: HTTP_DB_EXCEPTION_PATH,
+      },
+      to: { path: "^packages/db/" },
     },
     {
       name: "no-unresolved-imports",

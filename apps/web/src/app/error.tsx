@@ -3,15 +3,34 @@
 import { Button } from "@nexus/ui";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useNexusLocale } from "../components/locale-context";
+import { readSafePublicErrorReference } from "../lib/safe-public-error-reference";
 
-export default function GlobalError({
+export default function ErrorPage({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   const { dictionary } = useNexusLocale();
+  const reference = readSafePublicErrorReference(error);
+  const [copyMessage, setCopyMessage] = useState("");
+
+  async function copyReference() {
+    if (!reference) return;
+    setCopyMessage("");
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard unavailable");
+      }
+      await navigator.clipboard.writeText(reference);
+      setCopyMessage(dictionary.errors.referenceCopied);
+    } catch {
+      setCopyMessage(dictionary.errors.referenceCopyUnavailable);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-lg space-y-5 py-20 text-center">
@@ -24,6 +43,36 @@ export default function GlobalError({
           {dictionary.errors.message}
         </p>
       </div>
+
+      {reference ? (
+        <div className="mx-auto max-w-sm space-y-2 rounded-lg border border-base bg-elevated px-4 py-3 text-left">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-muted">
+            {dictionary.errors.referenceLabel}
+          </p>
+          <code
+            data-testid="error-public-reference"
+            className="block break-all font-mono text-sm text-primary"
+          >
+            {reference}
+          </code>
+          <p className="font-caption text-muted">{dictionary.errors.referenceHint}</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void copyReference()}
+            className="rounded-md px-3 font-semibold"
+          >
+            {dictionary.errors.copyReference}
+          </Button>
+          {copyMessage ? (
+            <p role="status" className="font-caption text-muted">
+              {copyMessage}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button
           type="button"

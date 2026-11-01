@@ -15,6 +15,8 @@ import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../lib/services/mta-master-directory-service";
+import { productService } from "../lib/services/product-service";
+import type { PublicResourceAttribution } from "../lib/public-resource-attribution";
 import { ArticleCard } from "./article-card";
 import { FollowButton } from "./follow-button";
 import { ProductCard } from "./product-card";
@@ -83,6 +85,25 @@ export function DirectoryFilters({
           <Button type="submit" className="min-h-11 font-semibold">
             {dictionary.searchButton}
           </Button>
+          {state.query ? (
+            <Link
+              href={
+                stream
+                  ? discoveryStreamHref({
+                      type: state.type as "servers" | "creators" | "organizations",
+                      query: "",
+                      verified: state.verified,
+                      language: state.language,
+                      region: state.region,
+                      gameMode: state.gameMode,
+                    })
+                  : discoverHref({ ...state, query: "", page: 1 }, path)
+              }
+              className="min-h-11 content-center text-sm text-accent underline"
+            >
+              {copy.clearQuery}
+            </Link>
+          ) : null}
           <Link
             href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
             className="min-h-11 content-center text-sm text-accent underline"
@@ -129,11 +150,14 @@ export async function DirectoryResults({
     ? discoveryService.stream(stream)
     : discoveryService.page(state)
   ).catch((failure: unknown) => {
-    if (stream)
-      loadError = discoveryStreamError(
-        locale,
-        failure instanceof AppError ? failure.code : "INTERNAL_ERROR",
-      );
+    const code = failure instanceof AppError ? failure.code : "INTERNAL_ERROR";
+    loadError = stream
+      ? discoveryStreamError(locale, code)
+      : code === "RATE_LIMIT_EXCEEDED"
+        ? copy.rate
+        : code === "INVALID_CURSOR" || code === "VALIDATION_ERROR"
+          ? copy.invalid
+          : copy.unavailable;
     return null;
   });
   if (!result)
@@ -142,7 +166,7 @@ export async function DirectoryResults({
         <p>{loadError}</p>
         <Link
           className="text-accent underline"
-          href={stream ? discoveryStreamHref(stream) : discoverHref(state, path)}
+          href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
         >
           {dictionary.searchButton}
         </Link>
@@ -156,6 +180,10 @@ export async function DirectoryResults({
         : result.type === "servers"
           ? "server"
           : "product";
+  const resourceAttributions: Map<string, PublicResourceAttribution> =
+    result.type === "resources"
+      ? await productService.getPublicAttributions(result.items)
+      : new Map();
   const readFollows = async () => {
     const viewer =
       result.items.length && result.type !== "content"
@@ -210,13 +238,54 @@ export async function DirectoryResults({
         </p>
       )}
       {!result.items.length ? (
-        <EmptyState title={copy.empty} description={copy.emptyHint} />
+        <div className="space-y-3">
+          <EmptyState
+            title={copy.empty}
+            description={hasActiveDiscoverFilters(state) ? copy.emptyFiltered : copy.emptyHint}
+          />
+          {hasActiveDiscoverFilters(state) && (
+            <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">
+              <p className="font-semibold text-primary">{copy.activeFilters}</p>
+              <ul className="list-inside list-disc space-y-1">
+                {state.query ? <li>q: {state.query}</li> : null}
+                {state.verified ? <li>{copy.verified}</li> : null}
+                {state.sort === "name" ? <li>{copy.name}</li> : null}
+                {state.language ? <li>{copy.language}: {state.language}</li> : null}
+                {state.region ? <li>{copy.region}: {state.region}</li> : null}
+                {state.gameMode ? <li>{copy.gameMode}: {state.gameMode}</li> : null}
+                {state.contentType ? <li>{copy.contentType}: {copy[state.contentType]}</li> : null}
+                {state.page > 1 ? (
+                  <li>
+                    {copy.page} {state.page}
+                  </li>
+                ) : null}
+              </ul>
+              <div className="flex flex-wrap gap-3 pt-1">
+                {state.query ? (
+                  <Link
+                    className="text-accent underline"
+                    href={discoverHref({ ...state, query: "", page: 1 }, path)}
+                  >
+                    {copy.clearQuery}
+                  </Link>
+                ) : null}
+                <Link className="text-accent underline" href={discoverHref({ type: state.type }, path)}>
+                  {copy.reset}
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {result.type === "resources" &&
             result.items.map((product) => (
               <div key={product.id} className="flex flex-col gap-2">
-                <ProductCard product={product} locale={locale} />
+                <ProductCard
+                  product={product}
+                  locale={locale}
+                  attribution={resourceAttributions.get(product.id) ?? null}
+                />
                 {followControl(product.id, product.title)}
               </div>
             ))}
@@ -328,6 +397,18 @@ export async function DirectoryResults({
         )
       )}
     </div>
+  );
+}
+function hasActiveDiscoverFilters(state: DiscoverQuery) {
+  return Boolean(
+    state.query ||
+      state.verified ||
+      state.sort === "name" ||
+      state.language ||
+      state.region ||
+      state.gameMode ||
+      state.contentType ||
+      state.page > 1,
   );
 }
 function DirectoryIdentity({

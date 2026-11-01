@@ -1,7 +1,25 @@
 import { Buffer } from "node:buffer";
 import { createECDH } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { getEnvConfig, readMtaMasterMirrorUrls, readWebPushVapidConfig } from "@nexus/config";
+import {
+  BUILD_PLACEHOLDER_AUTH_SECRET,
+  BUILD_PLACEHOLDER_DATABASE_URL,
+  getEnvConfig,
+  readMtaMasterMirrorUrls,
+  readWebPushVapidConfig,
+  resolveApplicationOrigin,
+} from "@nexus/config";
+
+const productionBase = {
+  NODE_ENV: "production",
+  DATABASE_URL: "postgres://nexus:secret@db.example.com:5432/nexus",
+  AUTH_SECRET: "a-production-secret-with-at-least-32-characters",
+  STORAGE_PROVIDER: "local",
+  STORAGE_LOCAL_PATH: "/data/uploads",
+  EMAIL_PROVIDER: "disabled",
+  BUILD_SCANNER: "clamav",
+  CLAMAV_HOST: "clamav",
+} as const;
 
 function vapidKeyPair() {
   const ecdh = createECDH("prime256v1");
@@ -99,6 +117,67 @@ describe("production configuration", () => {
         STORAGE_LOCAL_PATH: "/data/uploads",
         EMAIL_PROVIDER: "disabled",
         BUILD_SCANNER: "disabled",
+      }),
+    ).toThrow("Invalid configuration parameters");
+  });
+
+  it("rejects Dockerfile build-placeholder secrets before HTTP can open", () => {
+    expect(() =>
+      getEnvConfig({
+        ...productionBase,
+        NEXT_PUBLIC_APP_URL: "https://alpha.example.com",
+        AUTH_SECRET: BUILD_PLACEHOLDER_AUTH_SECRET,
+      }),
+    ).toThrow("Invalid configuration parameters");
+
+    expect(() =>
+      getEnvConfig({
+        ...productionBase,
+        NEXT_PUBLIC_APP_URL: "https://alpha.example.com",
+        DATABASE_URL: BUILD_PLACEHOLDER_DATABASE_URL,
+      }),
+    ).toThrow("Invalid configuration parameters");
+  });
+
+  it("accepts the same production secrets under two HTTPS runtime origins", () => {
+    const origins = ["https://alpha.example.com", "https://beta.example.com"] as const;
+    for (const origin of origins) {
+      const fromLegacy = getEnvConfig({
+        ...productionBase,
+        NEXT_PUBLIC_APP_URL: origin,
+      });
+      const fromCanonical = getEnvConfig({
+        ...productionBase,
+        APP_URL: origin,
+      });
+      expect(fromLegacy.NEXT_PUBLIC_APP_URL).toBe(origin);
+      expect(fromCanonical.NEXT_PUBLIC_APP_URL).toBe(origin);
+      expect(fromLegacy.AUTH_SECRET).toBe(productionBase.AUTH_SECRET);
+      expect(fromCanonical.DATABASE_URL).toBe(productionBase.DATABASE_URL);
+    }
+  });
+
+  it("prefers APP_URL and rejects conflicting origin names", () => {
+    expect(
+      resolveApplicationOrigin({
+        APP_URL: "https://alpha.example.com",
+        NEXT_PUBLIC_APP_URL: "https://alpha.example.com",
+      }),
+    ).toBe("https://alpha.example.com");
+
+    expect(
+      getEnvConfig({
+        ...productionBase,
+        APP_URL: "https://alpha.example.com",
+        NEXT_PUBLIC_APP_URL: "https://alpha.example.com",
+      }).NEXT_PUBLIC_APP_URL,
+    ).toBe("https://alpha.example.com");
+
+    expect(() =>
+      getEnvConfig({
+        ...productionBase,
+        APP_URL: "https://alpha.example.com",
+        NEXT_PUBLIC_APP_URL: "https://beta.example.com",
       }),
     ).toThrow("Invalid configuration parameters");
   });

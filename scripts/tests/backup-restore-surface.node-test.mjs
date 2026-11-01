@@ -193,6 +193,22 @@ test("backup restore rehearsal script still requires disposable runner and full 
   assert.doesNotMatch(script, /NEXUS_SKIP_DISPOSABLE|force.?production/iu);
 });
 
+test("OPERATIONS maintenance stop inventory includes every production-base writer", () => {
+  const ops = readFileSync(resolve(process.cwd(), "docs/OPERATIONS.md"), "utf8");
+  assert.match(
+    ops,
+    /dc stop caddy push-worker license-worker resource-release-worker app/u,
+  );
+  assert.match(ops, /license-worker/u);
+  assert.match(ops, /resource-release-worker/u);
+  assert.match(ops, /mail-worker/u);
+  assert.match(ops, /postgres/iu);
+  assert.doesNotMatch(
+    ops,
+    /^dc stop caddy push-worker app$/mu,
+  );
+});
+
 test("rendered compose.production.yaml still matches the backup restore mount contract", () => {
   const directory = mkdtempSync(join(tmpdir(), "nexus-backup-compose-"));
   const emptyEnv = join(directory, "empty.env");

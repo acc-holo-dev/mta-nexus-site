@@ -10,7 +10,17 @@ export function parseSupportIdempotencyKey(value: string | null): string | null 
 
 export function supportMutationFingerprint(
   input:
-    | { operation: "case"; category: string; subject: string; message: string }
+    | {
+        operation: "case";
+        category: string;
+        subject: string;
+        message: string;
+        context?: {
+          productId: string;
+          buildId?: string;
+          receiptId?: string;
+        };
+      }
     | {
         operation: "reply";
         caseId: string;

@@ -76,6 +76,7 @@ beforeEach(() => {
     product: { id: "prd_a", title: null, slug: null },
     review,
     canReview: false,
+    eligibility: "access_required",
   });
   state.publicPage.mockReset().mockResolvedValue({ reviews: [review], ...bounds });
   state.reportsPage.mockReset().mockResolvedValue({
@@ -124,12 +125,29 @@ it("moderated reviews expose their reason only to their author and cannot be rep
       productId="prd_a"
       review={{ ...review, status: "removed", moderationReason: "Repeated spam" }}
       canReview={false}
+      eligibility="moderated"
       locale="ru"
     />,
   );
   expect(html).toContain("Удалён модерацией");
   expect(html).toContain("Repeated spam");
+  expect(html).toContain("повторная публикация недоступна");
   expect(html).not.toContain("<form");
+});
+
+it("explains owner/manager conflict before a review can be submitted", () => {
+  const html = renderToStaticMarkup(
+    <ResourceReviewEditor
+      productId="prd_a"
+      review={null}
+      canReview={false}
+      eligibility="owner_conflict"
+      locale="en"
+    />,
+  );
+  expect(html).toContain("Authors, organization managers and staff cannot publish");
+  expect(html).toContain("not proof of install or gameplay");
+  expect(html).not.toContain("<textarea");
 });
 it.each(["en", "ru"] as const)(
   "public %s reviews expose public authors, distinguish legacy evidence and preserve pages",

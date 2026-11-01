@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { evaluateReleaseUpgradeEvidence } from "../packages/db/scripts/release-upgrade-contract.mjs";
 import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "./backup-restore-contract.mjs";
 import { requiredJobs } from "./ci-policy.mjs";
 import { evaluateLegalSurfaces } from "./legal-surfaces-lib.mjs";
@@ -190,17 +191,12 @@ function evaluateUpgradeArtifact(path, candidateSha) {
       reason: `Missing ${path}; download release-upgrade-<sha> from full_acceptance CI.`,
     };
   }
-  const sha = body.sha ?? body.repository?.sha ?? body.commit ?? null;
-  if (candidateSha && sha && !shaMatches(candidateSha, sha)) {
+  const result = evaluateReleaseUpgradeEvidence(body, { candidateSha });
+  if (!result.ok) {
     return {
       status: "blocked",
-      reason: "release-upgrade evidence SHA does not match the candidate commit.",
-    };
-  }
-  if (body.status !== "PASS") {
-    return {
-      status: "blocked",
-      reason: `release-upgrade status is ${body.status ?? "unknown"}, not PASS.`,
+      reason: result.reason,
+      ...(result.incompleteFlags ? { incompleteFlags: result.incompleteFlags } : {}),
     };
   }
   return { status: "passed", reason: null };

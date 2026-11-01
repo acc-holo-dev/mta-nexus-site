@@ -10,7 +10,10 @@ vi.mock("../../lib/i18n-server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("../../lib/services/product-service", () => ({
-  productService: { listPublicPage: mocks.listPublicPage },
+  productService: {
+    listPublicPage: mocks.listPublicPage,
+    getPublicAttributions: async () => new Map(),
+  },
 }));
 vi.mock("../../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
@@ -60,5 +63,23 @@ describe("free resource catalog as rendered for visitors", () => {
     expect(html).toContain("type=api");
     expect(html).toContain("q=maps");
     expect(html).toContain("page=2");
+    expect(html).toContain("Back to page 1 with the same filters");
+    expect(html).toContain("Clear search only");
+    expect(html).toContain("Show all categories");
+  });
+
+  it("explains zero results with active filters without wiping every parameter on partial reset", async () => {
+    mocks.locale = "en";
+    mocks.listPublicPage.mockResolvedValueOnce({ products: [], hasMore: false });
+    const html = renderToStaticMarkup(
+      await MarketPage({
+        searchParams: Promise.resolve({ type: "script", sort: "rating", q: "missing" }),
+      }),
+    );
+    expect(html).toContain("Nothing matches the active Market filters");
+    expect(html).toContain("Active filters");
+    expect(html).toContain("type: script");
+    expect(html).toContain('href="/market?type=script&amp;sort=rating"');
+    expect(html).toContain('href="/market?type=all&amp;sort=rating&amp;q=missing"');
   });
 });

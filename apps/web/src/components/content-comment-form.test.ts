@@ -37,7 +37,9 @@ describe("content discussion form", () => {
     expect(html).toContain(copy.publishComment);
   });
 
-  it("POSTs normalized text to the encoded comment endpoint", async () => {
+  const INTENT = "12345678-1234-4234-8234-123456789abc";
+
+  it("POSTs normalized text with Idempotency-Key to the encoded comment endpoint", async () => {
     const fetchImpl = vi.fn(
       async (_url: RequestInfo | URL, _init?: RequestInit) =>
         new Response(JSON.stringify({ comment: { id: "cmt_confirmed" } }), {
@@ -51,6 +53,7 @@ describe("content discussion form", () => {
         {
           slug: "hello world/one",
           text: "  Useful comment  ",
+          intentKey: INTENT,
           fallbackError: "Could not publish",
         },
         fetchImpl,
@@ -63,7 +66,10 @@ describe("content discussion form", () => {
       method: "POST",
       cache: "no-store",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": INTENT,
+      },
       body: JSON.stringify({ text: "Useful comment" }),
     });
     expect(init?.signal).toBeInstanceOf(AbortSignal);
@@ -82,6 +88,7 @@ describe("content discussion form", () => {
         {
           slug: "article",
           text: "Valid text",
+          intentKey: INTENT,
           fallbackError: "Could not publish",
         },
         fetchImpl,
@@ -98,6 +105,7 @@ describe("content discussion form", () => {
           {
             slug: "article",
             text,
+            intentKey: INTENT,
             fallbackError: "Could not publish",
           },
           fetchImpl,

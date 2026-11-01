@@ -3,6 +3,7 @@ type FollowMutation = {
   targetType?: unknown;
   targetId?: unknown;
   following?: unknown;
+  notifyComments?: unknown;
 };
 
 // A conflict is evidence of the desired state only when the server checked
@@ -13,6 +14,7 @@ export function confirmsFollowMutation(
   targetType: string,
   targetId: string,
   expectedFollowing: boolean,
+  expectedNotifyComments?: boolean,
 ): boolean {
   if (!payload || typeof payload !== "object") return false;
   const result = payload as FollowMutation;
@@ -20,6 +22,11 @@ export function confirmsFollowMutation(
     result.targetType !== targetType ||
     result.targetId !== targetId ||
     result.following !== expectedFollowing
+  )
+    return false;
+  if (
+    expectedNotifyComments !== undefined &&
+    result.notifyComments !== expectedNotifyComments
   )
     return false;
 

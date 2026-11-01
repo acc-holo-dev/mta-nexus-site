@@ -48,30 +48,65 @@ describe("mainline repository policy", () => {
       .filter((name) => name.endsWith(".md"))
       .sort();
 
-    // PROBLEMS.md is the single maintained problem registry (owner-requested).
-    // PROJECT-MAP.md is the compact repository navigation index (Phase 0 foundation).
+    // Core agent/product contracts integrated in DOC-02; handbook chapters remain until DOC-05/DOC-04.
+    // OPERATIONS.md path and operator contract stay pinned for evidence consumers.
     expect(documents).toEqual([
+      "AGENT.md",
       "ARCHITECTURE.md",
+      "COMMERCIAL-FUTURE.md",
+      "COMMUNITY.md",
+      "CURRENT-STATE.md",
+      "DECISIONS.md",
+      "DOCS-MIGRATION.md",
+      "FLOWS.md",
       "OPERATIONS.md",
       "PROBLEMS.md",
+      "PRODUCT.md",
       "PROJECT-MAP.md",
+      "RELEASE-PLAN.md",
+      "RESOURCES.md",
+      "RETENTION-PLAN.md",
+      "ROADMAP.md",
+      "SERVERS-ORGS.md",
+      "TASKS.md",
+      "TRACEABILITY.md",
+      "TRUST-STAFF.md",
+      "UX-CONTRACT.md",
     ]);
 
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
-    expect(handbook.length).toBeGreaterThanOrEqual(4);
+    // DOC-04: superseded subject chapters removed; thin nav + decision register remain.
+    expect(handbook.length).toBe(3);
     expect(handbook.every((name) => name.endsWith(".md"))).toBe(true);
-    expect(handbook).toEqual(
-      expect.arrayContaining([
-        "00-README.md",
-        "10-ROADMAP.md",
-        "13-DECISION-REGISTER.md",
-        "15-AI-CONTEXT-INDEX.md",
-      ]),
-    );
+    expect(handbook).toEqual([
+      "00-README.md",
+      "13-DECISION-REGISTER.md",
+      "15-AI-CONTEXT-INDEX.md",
+    ]);
 
     const readme = read("README.md");
+    expect(readme).toContain("docs/AGENT.md");
+    expect(readme).toContain("docs/DECISIONS.md");
+    expect(readme).toContain("docs/RESOURCES.md");
+    expect(readme).toContain("docs/TRUST-STAFF.md");
     expect(readme).toContain("docs/handbook/00-README.md");
     expect(readme).toContain("docs/handbook/13-DECISION-REGISTER.md");
+    expect(readme).toContain("docs/OPERATIONS.md");
+
+    const agents = read("AGENTS.md");
+    expect(agents).toContain("docs/AGENT.md");
+    expect(agents).toMatch(/прямого указания владельца|explicit instruction/i);
+
+    const decisions = read("docs/DECISIONS.md");
+    expect(decisions).toContain("NX-001");
+    expect(decisions).toContain("handbook/13-DECISION-REGISTER.md");
+    expect(decisions).toContain("AI-007");
+
+    const register = read("docs/handbook/13-DECISION-REGISTER.md");
+    const ai007 = [...register.matchAll(/^\|\s*AI-007\s*\|\s*CONFIRMED\s*\|\s*([^|]+)\|/gm)].map((m) => m[1].trim());
+    expect(ai007).toHaveLength(1);
+    expect(ai007[0].toLowerCase()).toContain("explicit instruction");
+    expect(ai007[0].toLowerCase()).not.toContain("push directly to");
   });
 
   it("keeps Docker DEV source mounts and polling enabled", () => {
@@ -90,8 +125,14 @@ describe("mainline repository policy", () => {
 
   it("assigns a unique identifier to each recorded product decision", () => {
     const register = read("docs/handbook/13-DECISION-REGISTER.md");
-    const ids = [...register.matchAll(/^\|\s*([A-Z]+-\d+)\s*\|/gm)].map((match) => match[1]);
-    expect(ids.length).toBeGreaterThan(0);
-    expect(new Set(ids).size).toBe(ids.length);
+    const registerIds = [...register.matchAll(/^\|\s*([A-Z]+-\d+)\s*\|/gm)].map((match) => match[1]);
+    expect(registerIds.length).toBe(309);
+    expect(new Set(registerIds).size).toBe(registerIds.length);
+
+    const supplements = read("docs/DECISIONS.md");
+    const nxIds = [...supplements.matchAll(/^\|\s*(NX-\d+)\s*\|/gm)].map((match) => match[1]);
+    expect(nxIds.length).toBeGreaterThan(0);
+    expect(new Set(nxIds).size).toBe(nxIds.length);
+    expect(registerIds.some((id) => nxIds.includes(id))).toBe(false);
   });
 });

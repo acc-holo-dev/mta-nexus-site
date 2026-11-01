@@ -17,6 +17,7 @@ export const chrome = {
     markAllRead: "Mark all read",
     markedAllRead: "All notifications marked as read.",
     view: "View",
+    loading: "Loading notifications...",
     empty: "No notifications yet",
     openCenter: "Open notification center",
     loadError: "Could not load notifications.",

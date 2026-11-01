@@ -212,6 +212,7 @@ it("denies a revoked license at the final gate without emitting a start audit", 
   await expect(
     downloads.authorize({
       actorId: "usr_buyer",
+      currentToken: "buyer-session",
       auditId: "aud_a",
       receiptId: "dlv_a",
       expected,
@@ -231,11 +232,14 @@ it("audits a licensed transfer only after locking current access and unchanged a
     [],
     [["lic_a", "2026-10-11T00:00:00Z"]],
     [buildRow()],
+    [["ses_buyer", "2099-01-01T00:00:00.000Z"]],
+    [],
     [],
   ];
   expect(
     await downloads.authorize({
       actorId: "usr_buyer",
+      currentToken: "buyer-session",
       auditId: "aud_a",
       receiptId: "dlv_a",
       expected,
@@ -255,6 +259,8 @@ it("audits a licensed transfer only after locking current access and unchanged a
   );
   expect(state.queries[4].sql).not.toContain('"key"');
   expect(state.queries[5].sql).toContain("for share");
+  expect(state.queries[6].sql).toContain('"sessions"');
+  expect(state.queries[6].sql).toContain("for update");
 });
 
 it.each([
@@ -273,6 +279,7 @@ it.each([
   await expect(
     downloads.authorize({
       actorId: "usr_author",
+      currentToken: "author-session",
       auditId: "aud_a",
       receiptId: "dlv_a",
       expected,
@@ -293,6 +300,7 @@ it("rechecks expiry after waiting for artifact locks", async () => {
   await expect(
     downloads.authorize({
       actorId: "usr_buyer",
+      currentToken: "buyer-session",
       auditId: "aud_a",
       receiptId: "dlv_a",
       expected,
@@ -307,6 +315,7 @@ it("rejects a resource archived during storage preparation", async () => {
   await expect(
     downloads.authorize({
       actorId: "usr_author",
+      currentToken: "author-session",
       auditId: "aud_a",
       receiptId: "dlv_a",
       expected,

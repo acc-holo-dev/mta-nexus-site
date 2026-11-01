@@ -69,6 +69,7 @@ test("core release evidence requires every named gate including lint and typeche
 
   assert.deepEqual(REQUIRED_RELEASE_GATES, [
     "repository_identity",
+    "toolchain_policy",
     "release_evidence_harness",
     "database_migrations",
     "lint",
@@ -177,6 +178,17 @@ test("CI keeps selected-scope evidence strict for releases without coupling bran
   assert.match(section, /retention-days: 14/u);
   assert.match(section, /continue-on-error: \$\{\{ github\.ref_type != 'tag' \}\}/u);
   assert.doesNotMatch(section, /include-hidden-files/u);
+});
+
+test("OPS-08 retention contract keeps CI 14-day artifacts distinct from owner release-bundle storage", () => {
+  const lib = read("scripts/release-evidence-lib.mjs");
+  const ops = read("docs/OPERATIONS.md");
+  assert.match(lib, /RELEASE_RETENTION_CONTRACT/u);
+  assert.match(lib, /owner_decision_required/u);
+  assert.match(lib, /ciArtifactDays:\s*14/u);
+  assert.match(ops, /Release manifest and retention/u);
+  assert.match(ops, /owner_decision_required/u);
+  assert.match(ops, /CI artifact retention remains \*\*14 days\*\*/u);
 });
 
 test("mail worker CI expects current structured terminal events", () => {

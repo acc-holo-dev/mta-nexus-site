@@ -16,6 +16,7 @@ const publicFields = {
   verifiedDeveloper: developerProfiles.verifiedDeveloper,
 };
 class DeveloperProfileRepository {
+  /** Guest/public projection: disabled contacts are SQL-nulled, not CSS-hidden. */
   async publicProfile(userId: string) {
     const [row] = await db
       .select({

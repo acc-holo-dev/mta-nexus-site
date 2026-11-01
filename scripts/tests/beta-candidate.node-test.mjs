@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { createReleaseUpgradeEvidence } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 import {
   BETA_CANDIDATE_CATEGORIES,
   BETA_CANDIDATE_OUT_OF_SCOPE,
@@ -141,5 +142,71 @@ test("observability residual stays residual without validated evidence artifact"
     assert.match(observability?.reason ?? "", /absent|invalid/u);
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("incomplete upgrade evidence stays blocked and never authorizes production", () => {
+  const root = mkdtempSync(join(tmpdir(), "beta-upgrade-neg-"));
+  try {
+    mkdirSync(join(root, "artifacts"), { recursive: true });
+    writeFileSync(
+      join(root, "artifacts", "release-upgrade.json"),
+      JSON.stringify({ status: "PASS", sha, phase: "complete" }),
+    );
+    const report = evaluateBetaCandidate({
+      candidateSha: sha,
+      dirtyWorkingTree: false,
+      ciEvidence: passingCiEvidence(),
+      artifactRoot: root,
+    });
+    const upgrade = report.categories.find((item) => item.id === "database_upgrade");
+    assert.equal(upgrade?.status, "blocked");
+    assert.equal(report.productionAuthorized, false);
+    assert.ok(report.technicalBlockers.some((item) => item.startsWith("database_upgrade:")));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("retained full-format upgrade fixture passes technical check without deploy auth", () => {
+  const root = mkdtempSync(join(tmpdir(), "beta-upgrade-retained-"));
+  try {
+    mkdirSync(join(root, "artifacts"), { recursive: true });
+    writeFileSync(
+      join(root, "artifacts", "release-upgrade.json"),
+      JSON.stringify(
+        createReleaseUpgradeEvidence({
+          sha,
+          includeSchemaVersion: false,
+        }),
+      ),
+    );
+    writeFileSync(
+      join(root, "artifacts", "backup-restore-evidence.json"),
+      JSON.stringify({
+        status: "PASS",
+        sha,
+        sourceDestroyedBeforeRestore: true,
+        backupChecksumsVerified: true,
+        databaseRowsRestored: true,
+        applicationSchemaRestored: true,
+        applicationRowsRestored: true,
+        migrationLedgerRestored: true,
+        uploadFilesRestored: true,
+        cleanupComplete: true,
+      }),
+    );
+    const report = evaluateBetaCandidate({
+      candidateSha: sha,
+      dirtyWorkingTree: false,
+      ciEvidence: passingCiEvidence(),
+      artifactRoot: root,
+    });
+    assert.equal(report.categories.find((item) => item.id === "database_upgrade")?.status, "passed");
+    assert.equal(report.checkableCandidate, true);
+    assert.equal(report.productionAuthorized, false);
+    assert.equal(report.openBetaLive, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });

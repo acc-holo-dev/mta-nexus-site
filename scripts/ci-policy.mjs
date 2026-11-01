@@ -2,7 +2,9 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-const documentationPath = /^(?:README\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md)$/;
+// Markdown docs plus planning JSON/tooling specs from DOC-02 (not executable app code).
+const documentationPath =
+  /^(?:README\.md|AGENTS\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md|planning\/(?:[^/\n]+\/)*[^/\n]+\.(?:json|md|py))$/;
 
 // Changes to deployment, dependencies and trust boundaries require full acceptance.
 const fullAcceptancePaths = [
@@ -98,6 +100,35 @@ export function summarizeJobs(policy, needs) {
           ? "fast_ci"
           : "documentation",
   };
+}
+
+/**
+ * OPS-10: trusted GHCR publish is prepared only after full_acceptance for an
+ * exact SHA on a trusted ref. Pull requests and other untrusted events never
+ * receive packages:write. Actual registry push stays gated (OPS-11/16).
+ */
+export function isTrustedGhcrPublishEvent({
+  eventName,
+  ref = "",
+  refType = "",
+  fullAcceptance = false,
+  publishEnabled = false,
+} = {}) {
+  if (eventName === "pull_request") return false;
+  if (!fullAcceptance) return false;
+  if (!publishEnabled) return false;
+  const trustedRef =
+    ref === "refs/heads/main" ||
+    refType === "tag" ||
+    (typeof ref === "string" && ref.startsWith("refs/tags/v"));
+  return Boolean(trustedRef && (eventName === "push" || eventName === "workflow_dispatch"));
+}
+
+/** Workflow-default permissions stay read-only; only the publish job may elevate. */
+export function ghcrPublishJobPermissions({ trustedPublish = false } = {}) {
+  return trustedPublish
+    ? Object.freeze({ contents: "read", packages: "write" })
+    : Object.freeze({ contents: "read" });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

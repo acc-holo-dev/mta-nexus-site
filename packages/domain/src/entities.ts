@@ -406,7 +406,21 @@ export interface Follow {
   followerId: string;
   targetType: "user" | "server" | "organization" | "product" | "content";
   targetId: string;
+  /** Content follows only: false = quiet bookmark, true = discussion notices. */
+  notifyComments: boolean;
   createdAt: Date;
+}
+
+export type ObjectMuteDuration = "24h" | "7d" | "30d";
+
+export interface ObjectNotificationMute {
+  id: string;
+  userId: string;
+  targetType: Follow["targetType"];
+  targetId: string;
+  mutedUntil: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type NotificationCategory =

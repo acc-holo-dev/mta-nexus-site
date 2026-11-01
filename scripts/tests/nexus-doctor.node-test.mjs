@@ -9,7 +9,13 @@ import { collectDoctor, formatDoctor } from "../nexus-doctor.mjs";
 async function fixtureRoot() {
   const root = await mkdtemp(join(tmpdir(), "nexus-doctor-"));
   await Promise.all([
-    writeFile(join(root, "package.json"), JSON.stringify({ packageManager: "pnpm@12.4.2" })),
+    writeFile(
+      join(root, "package.json"),
+      JSON.stringify({
+        packageManager: "pnpm@12.4.2",
+        engines: { node: ">=26.0.0 <27", pnpm: ">=12.4.2" },
+      }),
+    ),
     writeFile(join(root, ".nvmrc"), "26.10.0\n"),
     writeFile(join(root, ".node-version"), "26.10.0\n"),
     writeFile(join(root, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n"),
@@ -31,7 +37,7 @@ test("healthy local prerequisites produce a passing report", async () => {
   try {
     const report = await collectDoctor({
       repositoryRoot: root,
-      nodeVersion: "26.6.1",
+      nodeVersion: "26.10.0",
       memoryBytes: 8 * 1024 ** 3,
       env: {},
       pathExists: async () => true,
@@ -49,7 +55,47 @@ test("healthy local prerequisites produce a passing report", async () => {
     assert.equal(report.status, "pass");
     assert(report.checks.every((check) => check.status === "pass"));
     assert.equal(report.facts.nodePin, "26.10.0");
+    assert.equal(report.facts.nodeMajorOk, true);
+    assert.equal(report.facts.nodeExactMatch, true);
     assert.match(formatDoctor(report), /Result: PASS/u);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("major-ok Node that differs from the exact pin warns in local mode", async () => {
+  const root = await fixtureRoot();
+  try {
+    await writeFile(
+      join(root, "package.json"),
+      JSON.stringify({
+        packageManager: "pnpm@12.4.2",
+        engines: { node: ">=26.0.0 <27", pnpm: ">=12.4.2" },
+      }),
+    );
+    const report = await collectDoctor({
+      repositoryRoot: root,
+      nodeVersion: "26.6.1",
+      memoryBytes: 8 * 1024 ** 3,
+      env: {},
+      pathExists: async () => true,
+      probePort: async () => ({ available: true, code: null }),
+      runCommand: commandRunner({
+        "pnpm --version": { ok: true, stdout: "12.4.2" },
+        "docker version --format {{.Server.Version}}": { ok: true, stdout: "29.0.0" },
+        "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
+        "docker compose version --short": { ok: true, stdout: "2.40.0" },
+        "docker context show": { ok: true, stdout: "default" },
+        "docker compose -f compose.yaml config --quiet": { ok: true, stdout: "" },
+      }),
+    });
+
+    assert.equal(report.status, "warn");
+    assert.equal(report.checks.find((check) => check.id === "node")?.status, "pass");
+    assert.equal(report.checks.find((check) => check.id === "node-exact")?.status, "warn");
+    assert.equal(report.facts.nodeMajorOk, true);
+    assert.equal(report.facts.nodeExactMatch, false);
+    assert.match(report.checks.find((check) => check.id === "node-exact")?.hint ?? "", /26\.10\.0/u);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

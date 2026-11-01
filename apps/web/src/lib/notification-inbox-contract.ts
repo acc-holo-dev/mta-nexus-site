@@ -9,6 +9,8 @@ export const INBOX_CATEGORIES = [
   "security",
 ] as const;
 export const INBOX_PERIODS = ["all", "7", "30", "90", "365"] as const;
+/** Max ids in one explicit selection PATCH; account-wide all-read uses a separate route. */
+export const NOTIFICATION_INBOX_SELECTION_LIMIT = 25;
 const id = z
   .string()
   .min(1)
@@ -107,7 +109,7 @@ export const notificationInboxCommandSchema = z
     items: z
       .array(z.object({ id, expectedIsRead: z.boolean() }).strict())
       .min(1)
-      .max(25),
+      .max(NOTIFICATION_INBOX_SELECTION_LIMIT),
   })
   .strict()
   .refine((value) => new Set(value.items.map((item) => item.id)).size === value.items.length);
@@ -128,7 +130,7 @@ export const notificationInboxPageSchema = z
           })
           .strict(),
       )
-      .max(25),
+      .max(NOTIFICATION_INBOX_SELECTION_LIMIT),
     unreadCount: z.number().int().nonnegative(),
     olderCursor: z.string().max(2048).nullable(),
     newerCursor: z.string().max(2048).nullable(),
@@ -148,7 +150,10 @@ export function confirmedNotificationInboxCommand(
   command: z.infer<typeof notificationInboxCommandSchema>,
 ) {
   const parsed = z
-    .object({ isRead: z.boolean(), ids: z.array(id).min(1).max(25) })
+    .object({
+      isRead: z.boolean(),
+      ids: z.array(id).min(1).max(NOTIFICATION_INBOX_SELECTION_LIMIT),
+    })
     .strict()
     .safeParse(value);
   return (

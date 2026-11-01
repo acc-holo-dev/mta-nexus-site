@@ -40,6 +40,38 @@ export function resourceModerationTarget(
     : null;
 }
 
+/** Staff moderation actions allowed for the current resource status. */
+export function resourceModerationActionsFor(
+  status: ProductStatus,
+): ResourceModerationCommand["action"][] {
+  const actions: ResourceModerationCommand["action"][] = [];
+  if (resourceModerationTarget(status, "suspend")) actions.push("suspend");
+  if (resourceModerationTarget(status, "release")) actions.push("release");
+  return actions;
+}
+
+export type BuildAvailabilityKind =
+  | "available"
+  | "quarantined"
+  | "retired"
+  | "draft"
+  | "pending_review"
+  | "unavailable";
+
+export function classifyBuildAvailability(status: string | null | undefined): BuildAvailabilityKind {
+  if (status === "published") return "available";
+  if (status === "quarantined") return "quarantined";
+  if (status === "retired") return "retired";
+  if (status === "draft") return "draft";
+  if (status === "pending_review") return "pending_review";
+  return "unavailable";
+}
+
+/** Filter-safe support entry; stash product/build ids separately for the form. */
+export function unavailableBuildSupportHref(): string {
+  return "/support?category=resource";
+}
+
 export type LibraryReleaseItem = {
   productId: string;
   addedAt: Date;

@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   Library,
   LifeBuoy,
+  LogIn,
   Menu,
   MessageSquare,
   Server,
@@ -31,15 +32,31 @@ import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
+import {
+  showAdminDestination,
+  showGuestSignInCta,
+  showWorkspaceTools,
+} from "./shell-destination-policy";
+import { useAuthSession } from "./use-auth-session";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof Server;
+};
 
 export function MobileNav({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const dictionary = getDictionary(locale);
+  const session = useAuthSession();
+  const workspaceTools = showWorkspaceTools(session);
+  const guestSignIn = showGuestSignInCta(session);
+  const adminVisible = showAdminDestination(session);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const dialogRef = useModalDialog(isMoreOpen);
 
-  const items = [
+  const items: NavItem[] = [
     { href: "/", label: dictionary.nav.home, icon: Home },
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
     { href: "/market", label: dictionary.nav.mobileMarket, icon: Library },
@@ -50,28 +67,32 @@ export function MobileNav({ locale }: { locale: Locale }) {
     },
   ];
 
-  const moreItems = [
-    { href: "/workspace/discussions", label: ownDiscussionCopy(locale).title, icon: MessageSquare },
-    { href: "/workspace/reactions", label: reactionCopy(locale).my, icon: MessageSquare },
-    { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
-    { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },
-    { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
-    { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
-    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
-    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
-    { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
+  const publicMoreItems: NavItem[] = [
     { href: "/discover", label: dictionary.nav.explore, icon: Compass },
-    {
-      href: "/notifications",
-      label: dictionary.nav.notifications,
-      icon: Bell,
-    },
+    { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
+  ];
+
+  const workspaceMoreItems: NavItem[] = [
     {
       href: "/workspace",
       label: dictionary.nav.mobileWorkspace,
       icon: LayoutDashboard,
     },
-    { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
+    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
+    { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
+    { href: "/workspace/servers", label: dictionary.nav.liveServers, icon: Server },
+    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
+    { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
+    { href: "/workspace/discussions", label: ownDiscussionCopy(locale).title, icon: MessageSquare },
+    { href: "/workspace/reactions", label: reactionCopy(locale).my, icon: MessageSquare },
+    { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
+    { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
+    { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },
+    {
+      href: "/notifications",
+      label: dictionary.nav.notifications,
+      icon: Bell,
+    },
     { href: "/settings", label: dictionary.nav.settings, icon: Settings },
     {
       href: "/security",
@@ -79,6 +100,10 @@ export function MobileNav({ locale }: { locale: Locale }) {
       icon: ShieldCheck,
     },
   ];
+
+  const moreItems: NavItem[] = workspaceTools
+    ? [...workspaceMoreItems, ...publicMoreItems]
+    : publicMoreItems;
 
   const isActive = (href: string) =>
     href === "/" || href === "/workspace"
@@ -88,7 +113,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const moreActive =
     pathname === "/workspace" ||
     pathname.startsWith("/workspace/") ||
-    moreItems.some((item) => isActive(item.href));
+    moreItems.some((item) => isActive(item.href)) ||
+    (guestSignIn && pathname.startsWith("/auth/"));
 
   return (
     <nav
@@ -149,9 +175,9 @@ export function MobileNav({ locale }: { locale: Locale }) {
           onClick={(event) => {
             if (clickedDialogBackdrop(event)) setIsMoreOpen(false);
           }}
-          className="fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] top-auto m-0 ml-auto mr-auto open:flex w-auto max-w-lg flex-col overflow-hidden rounded-xl border border-strong bg-elevated p-0 text-primary shadow-nexus-lg backdrop:bg-black/30"
+          className="fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] top-[max(0.75rem,env(safe-area-inset-top))] m-0 ml-auto mr-auto max-h-[min(100%,calc(100dvh-5.5rem-env(safe-area-inset-bottom)-env(safe-area-inset-top)))] w-auto max-w-lg open:flex flex-col overflow-hidden rounded-xl border border-strong bg-elevated p-0 text-primary shadow-nexus-lg backdrop:bg-black/30"
         >
-          <div className="flex items-center justify-between gap-3 border-b border-base px-4 py-3">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-base px-4 py-3">
             <h2 className="font-heading text-sm text-primary">{dictionary.nav.more}</h2>
             <Button
               type="button"
@@ -165,28 +191,58 @@ export function MobileNav({ locale }: { locale: Locale }) {
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 p-3">
-            {moreItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.href);
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
+            {/* UX-23 A: guest chrome Sign in only — Workspace cluster stays hidden. */}
+            {guestSignIn ? (
+              <Link
+                href="/auth/login"
+                onClick={() => setIsMoreOpen(false)}
+                className="mb-3 flex min-h-12 items-center gap-2 rounded-lg border border-base bg-surface px-3 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{dictionary.workspace.signIn}</span>
+              </Link>
+            ) : null}
 
-              return (
+            <div className="grid grid-cols-2 gap-2">
+              {moreItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMoreOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    className={`flex min-h-12 items-center gap-2 rounded-lg border border-base px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
+                      active
+                        ? "bg-accent-soft text-accent"
+                        : "bg-surface text-secondary hover:bg-hover hover:text-primary"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span className="min-w-0 break-words">{item.label}</span>
+                  </Link>
+                );
+              })}
+
+              {adminVisible && (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  href="/admin"
                   onClick={() => setIsMoreOpen(false)}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={pathname.startsWith("/admin") ? "page" : undefined}
                   className={`flex min-h-12 items-center gap-2 rounded-lg border border-base px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
-                    active
-                      ? "bg-accent-soft text-accent"
+                    pathname.startsWith("/admin")
+                      ? "bg-danger-soft text-danger"
                       : "bg-surface text-secondary hover:bg-hover hover:text-primary"
                   }`}
                 >
-                  <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0 break-words">{dictionary.nav.admin}</span>
                 </Link>
-              );
-            })}
+              )}
+            </div>
           </div>
         </dialog>
       )}

@@ -50,9 +50,17 @@ const en = {
   archived: "Archived",
   all: "All",
   empty: "No collections here yet.",
-  emptyItems: "No matching resources.",
+  emptyFiltered: "No collections in this status filter.",
+  emptyItems: "This collection has no resources yet.",
+  emptyFilteredItems: "No resources match this search.",
   archivedNote:
     "This collection is archived. Restore it to change its name or contents. Your resource rights and version preferences are preserved.",
+  watchesIndependentNote:
+    "Release watches and notifications are separate. Collection membership does not enroll watches, and archiving a collection does not revoke download access.",
+  toCollection: "Add to collection",
+  batchApplied: "Applied for this resource",
+  collectionLimitNext: "Archive or delete an unused collection before creating another.",
+  itemLimitNext: "Remove references from this collection or choose another collection with free capacity.",
   archiveConfirm: "Archive this collection and keep its contents and history.",
   unavailable: "Resource unavailable",
   unavailableNote:
@@ -146,9 +154,17 @@ const ru: typeof en = {
   archived: "Архив",
   all: "Все",
   empty: "Здесь пока нет коллекций.",
-  emptyItems: "Подходящих ресурсов нет.",
+  emptyFiltered: "В этом фильтре статуса коллекций нет.",
+  emptyItems: "В этой коллекции пока нет ресурсов.",
+  emptyFilteredItems: "По этому поиску ресурсов нет.",
   archivedNote:
     "Коллекция в архиве. Восстановите её, чтобы изменить название или состав. Права на ресурсы и выбранные версии сохраняются.",
+  watchesIndependentNote:
+    "Подписки на выпуски и уведомления — отдельно. Членство в коллекции не включает watch, а архивирование коллекции не отзывает доступ к скачиванию.",
+  toCollection: "В коллекцию",
+  batchApplied: "Применено для этого ресурса",
+  collectionLimitNext: "Перед созданием новой архивируйте или удалите неиспользуемую коллекцию.",
+  itemLimitNext: "Уберите записи из этой коллекции или выберите другую с свободным местом.",
   archiveConfirm: "Отправить коллекцию в архив, сохранив состав и историю.",
   unavailable: "Ресурс недоступен",
   unavailableNote:
@@ -203,12 +219,9 @@ export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
     code === "COLLECTION_ARCHIVED"
   )
     return c.conflict;
-  if (
-    code === "COLLECTION_LIMIT" ||
-    code === "COLLECTION_ITEM_LIMIT" ||
-    code === "COLLECTION_HISTORY_LIMIT"
-  )
-    return c.quota;
+  if (code === "COLLECTION_ITEM_LIMIT") return `${c.fullCollection} ${c.itemLimitNext}`;
+  if (code === "COLLECTION_LIMIT") return `${c.quota} ${c.collectionLimitNext}`;
+  if (code === "COLLECTION_HISTORY_LIMIT") return c.quota;
   if (code === "UNAUTHORIZED") return c.signInRequired;
   if (code === "NOT_FOUND" || code === "FORBIDDEN" || code === "COLLECTION_ACCESS_CHANGED")
     return c.forbidden;

@@ -1,5 +1,5 @@
 import { AppError, LIBRARY_COLLECTION_COMPARISON_FILTERS } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, fieldClassBlock } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -87,13 +87,13 @@ export default async function Page({
           action={collectionHref(id, "compare")}
           className="flex flex-wrap items-end gap-3"
         >
-          <label className="grid min-w-0 max-w-full gap-1">
-            {h.destination}
+          <label className="grid min-w-0 max-w-full gap-1.5">
+            <span className="font-label uppercase text-secondary">{h.destination}</span>
             <select
               name="to"
               defaultValue={comparison?.destination.id ?? ""}
               required
-              className="min-w-0 max-w-full rounded border border-base bg-surface p-2"
+              className={`${fieldClassBlock} min-w-0 max-w-full`}
             >
               <option value="">{h.choose}</option>
               {report.targets.map((target) => (
@@ -105,12 +105,12 @@ export default async function Page({
           </label>
           {comparison && (
             <>
-              <label className="grid min-w-0 max-w-full gap-1">
-                {c.all}
+              <label className="grid min-w-0 max-w-full gap-1.5">
+                <span className="font-label uppercase text-secondary">{c.all}</span>
                 <select
                   name="filter"
                   defaultValue={comparison.filter}
-                  className="min-w-0 max-w-full rounded border border-base bg-surface p-2"
+                  className={`${fieldClassBlock} min-w-0 max-w-full`}
                 >
                   {LIBRARY_COLLECTION_COMPARISON_FILTERS.map((filter) => (
                     <option key={filter} value={filter}>
@@ -119,23 +119,23 @@ export default async function Page({
                   ))}
                 </select>
               </label>
-              <label className="grid min-w-0 max-w-full gap-1">
-                {c.search}
+              <label className="grid min-w-0 max-w-full gap-1.5">
+                <span className="font-label uppercase text-secondary">{c.search}</span>
                 <input
                   name="q"
                   defaultValue={comparison.q}
                   maxLength={80}
-                  className="min-w-0 max-w-full rounded border border-base bg-surface p-2"
+                  className={`${fieldClassBlock} min-w-0 max-w-full`}
                 />
               </label>
             </>
           )}
-          <label className="grid min-w-0 max-w-full gap-1">
-            {h.transfer}
+          <label className="grid min-w-0 max-w-full gap-1.5">
+            <span className="font-label uppercase text-secondary">{h.transfer}</span>
             <select
               name="transfer"
               defaultValue={comparison?.transfer ?? query.transfer}
-              className="min-w-0 max-w-full rounded border border-base bg-surface p-2"
+              className={`${fieldClassBlock} min-w-0 max-w-full`}
             >
               <option value="copy">{c["copy-items"]}</option>
               <option value="move">{c["move-items"]}</option>

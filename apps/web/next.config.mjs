@@ -12,6 +12,13 @@ const nextConfig = {
   allowedDevOrigins: ["app", "nexus-local-app-1"],
   output: "standalone",
   outputFileTracingRoot: repositoryRoot,
+  // OPS-05 / ARC10: deliberately omit next.config `env` so production secrets
+  // and database credentials cannot be copied into a public Next runtime
+  // config object. Application origin is supplied at container start and read
+  // server-side (@nexus/config / process.env). Client code must not read
+  // NEXT_PUBLIC_APP_URL for links or CSRF — that would pin the build-stage
+  // placeholder and break same-digest promotion across domains.
+  // Runtime writable mounts stay under /data/uploads (USER node).
   // Local storage and absolute mail-secret file paths are runtime mounts, so
   // Turbopack cannot prove a static tree and may warn about whole-project
   // tracing. These excludes keep non-runtime checkout trees out of the

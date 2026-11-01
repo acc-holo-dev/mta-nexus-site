@@ -70,7 +70,19 @@ export default async function DiscoverPage({
           return (
             <Link
               key={item}
-              href={discoverHref({ type: item, query })}
+              href={discoverHref({
+                type: item,
+                query,
+                // Compatible filters survive; parseDiscoverQuery drops entity-foreign ones.
+                // Page/cursor always restarts so a shared tab change cannot keep a stale page.
+                page: 1,
+                verified: state.verified,
+                sort: state.sort,
+                language: state.language,
+                region: state.region,
+                gameMode: state.gameMode,
+                contentType: state.contentType,
+              })}
               aria-current={active ? "page" : undefined}
               className={`-mb-px inline-flex min-h-11 items-center gap-2 whitespace-nowrap border-b-2 px-3.5 py-3 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-accent ${
                 active

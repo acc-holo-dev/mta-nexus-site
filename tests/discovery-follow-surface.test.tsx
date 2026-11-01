@@ -1,4 +1,6 @@
 import type { Content } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
+import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -20,6 +22,9 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: mocks.directory },
   indexMtaObservations: () => () => null,
 }));
+vi.mock("../apps/web/src/lib/services/product-service", () => ({
+  productService: { getPublicAttributions: async () => new Map() },
+}));
 vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
 vi.mock("../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
 vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
@@ -31,7 +36,7 @@ import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
 import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
 import type { FollowPage } from "../apps/web/src/lib/follow-workspace-contract";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -73,7 +78,21 @@ it("shows a directory read failure as an alert instead of an empty result", asyn
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(discoveryCopy("ru").unavailable);
+  expect(html).not.toContain(discoveryCopy("ru").empty);
   expect(html).not.toContain("private-database-detail");
+});
+it("shows rate-limit failures separately from empty directory results", async () => {
+  mocks.page.mockRejectedValue(new AppError("Too many searches", 429, "RATE_LIMIT_EXCEEDED"));
+  const html = renderToStaticMarkup(
+    await DirectoryResults({
+      state: parseDiscoverQuery({ type: "servers", q: "RP" }),
+      locale: "en",
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(discoveryCopy("en").rate);
+  expect(html).not.toContain(discoveryCopy("en").empty);
+  expect(html).not.toContain(discoveryCopy("en").unavailable);
 });
 it("renders creator identity without exposing private account fields or interpreting HTML", async () => {
   mocks.page.mockResolvedValue({
@@ -223,6 +242,8 @@ it("keeps catalog results visible and follow controls retryable after a state re
   expect(html).toContain("Visible creator");
   expect(html).toContain(followCopy("en").retry);
   expect(html).toContain('role="alert"');
+  expect(html).not.toContain('aria-pressed="false"');
+  expect(html).not.toContain(`>${followActionCopy("en", "user").follow}<`);
   expect(html).not.toContain("private-failure");
 });
 it.each([
@@ -292,6 +313,7 @@ it.each(["en", "ru"] as const)(
 it.each(["en", "ru"] as const)(
   "uses an explicit locale for discussion subscribe controls without requiring a page provider in %s",
   (locale) => {
+    const action = followActionCopy(locale, "content");
     const html = renderToStaticMarkup(
       <FollowButton
         locale={locale}
@@ -302,9 +324,28 @@ it.each(["en", "ru"] as const)(
       />,
     );
     expect(html).toContain('aria-pressed="true"');
-    expect(html).toContain(followCopy(locale).following);
-    expect(html).toContain(`${followCopy(locale).unfollow}: Article`);
+    expect(html).toContain(action.following);
+    expect(html).toContain(`${action.unfollow}: Article`);
+    expect(html).toContain(action.hint);
     expect(html).toContain("rounded-lg");
     expect(html).toContain("text-accent");
+  },
+);
+it.each(["en", "ru"] as const)(
+  "labels product follow as Save without promising release-watch in %s",
+  (locale) => {
+    const action = followActionCopy(locale, "product");
+    const html = renderToStaticMarkup(
+      <FollowButton
+        locale={locale}
+        targetType="product"
+        targetId="resource"
+        targetName="Pack"
+        initial={{ authenticated: true, following: false }}
+      />,
+    );
+    expect(html).toContain(action.follow);
+    expect(html).toContain(action.hint);
+    expect(html).not.toContain(followCopy(locale).follow);
   },
 );

@@ -83,3 +83,48 @@ test("invalid web configuration stops before migrations and HTTP", () => {
   assert.equal(result.calls.length, 1);
   assert.match(result.calls[0], /@nexus\/config/);
 });
+
+test("production entrypoint documents single migration phase and full writer pause", () => {
+  const script = readFileSync(new URL("../start-production.sh", import.meta.url), "utf8");
+  assert.match(script, /Single migration phase/u);
+  assert.match(script, /license-worker/u);
+  assert.match(script, /resource-release-worker/u);
+  assert.match(script, /mail-worker/u);
+  assert.match(script, /migrate\.ts/u);
+  assert.match(script, /server\.js/u);
+});
+
+test("entrypoint aligns APP_URL with NEXT_PUBLIC_APP_URL before config validation", () => {
+  const script = readFileSync(new URL("../start-production.sh", import.meta.url), "utf8");
+  assert.match(script, /OPS-05/u);
+  assert.match(script, /APP_URL/u);
+  assert.match(script, /export NEXT_PUBLIC_APP_URL="\$APP_URL"/u);
+  assert.match(script, /export APP_URL="\$NEXT_PUBLIC_APP_URL"/u);
+  const alignIndex = script.indexOf('export NEXT_PUBLIC_APP_URL="$APP_URL"');
+  const configIndex = script.indexOf("import '@nexus/config'");
+  assert.ok(alignIndex >= 0 && configIndex > alignIndex);
+});
+
+test("same prebuilt image contract: runtime origin comes from env, not the entrypoint", () => {
+  const script = readFileSync(new URL("../start-production.sh", import.meta.url), "utf8");
+  const dockerfile = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
+  const compose = readFileSync(new URL("../../compose.production.yaml", import.meta.url), "utf8");
+  const ciOverlay = readFileSync(
+    new URL("../../compose.production-ci.yaml", import.meta.url),
+    "utf8",
+  );
+
+  assert.doesNotMatch(script, /https:\/\/[a-z0-9.-]+\.[a-z]{2,}/iu);
+  assert.match(dockerfile, /compile-only placeholders|build-only/u);
+  assert.match(dockerfile, /same image digest|OPS-05/u);
+  assert.match(
+    compose,
+    /NEXT_PUBLIC_APP_URL:\s*https:\/\/\$\{DOMAIN:\?set DOMAIN in \.env\}/u,
+  );
+  assert.match(ciOverlay, /NEXT_PUBLIC_APP_URL:\s*https:\/\/nexus-ci\.test:8443/u);
+  assert.match(ciOverlay, /NEXUS_CI_IMAGE:\?use scripts\/check-production-startup\.sh/u);
+  // Two allowed HTTPS origins in the supported promotion path: DOMAIN-templated
+  // production and the disposable CI origin — both consume a prebuilt runtime image.
+  assert.match(compose, /build:\s*\n\s*context:\s*\.\s*\n\s*dockerfile:\s*Dockerfile/u);
+  assert.match(ciOverlay, /image:\s*\$\{NEXUS_CI_IMAGE/u);
+});

@@ -116,7 +116,8 @@ export const workspace = {
     searchPlaceholder: "Name, IP, mode or map",
     minimumPlayers: "Minimum players",
     anyPlayers: "Any player count",
-    connectHint: "Connect opens your installed MTA client. You can also copy the server address.",
+    connectHint:
+      "Open in MTA launches the mtasa:// protocol when your browser and client allow it. That click is a connect intent only — NEXUS does not verify play. You can also copy the address for manual Quick Connect.",
     stale:
       "Updates are delayed. Showing the last available snapshot; player counts may have changed.",
     tryAgain: "Try again",
@@ -128,7 +129,7 @@ export const workspace = {
     page: "Page",
     of: "of",
     serverAddress: "Server address",
-    connect: "Connect",
+    connect: "Open in MTA",
     copyAddress: "Copy address",
     copying: "Copying...",
     copied: "Address copied",

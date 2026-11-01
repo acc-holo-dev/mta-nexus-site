@@ -27,13 +27,28 @@ vi.mock("@nexus/security", () => ({
 }));
 vi.mock("@nexus/db", async () => ({
   followWorkspaceRepository: {
-    setFollowing: vi.fn(async (_actor: string, _type: string, _id: string, following: boolean) => {
-      if (following && !state.follow && !state.following) {
-        const { AppError } = await import("@nexus/domain");
-        throw new AppError("Unconfirmed", 503, "UNCONFIRMED");
-      }
-      return { following, created: following && !!state.follow };
-    }),
+    setFollowing: vi.fn(
+      async (
+        _actor: string,
+        _type: string,
+        _id: string,
+        following: boolean,
+        _folId: string,
+        options: { notifyComments?: boolean } = {},
+      ) => {
+        if (following && !state.follow && !state.following) {
+          const { AppError } = await import("@nexus/domain");
+          throw new AppError("Unconfirmed", 503, "UNCONFIRMED");
+        }
+        return {
+          following,
+          created: following && !!state.follow,
+          notifyComments: following ? (options.notifyComments ?? true) : false,
+        };
+      },
+    ),
+    contentStates: vi.fn(async () => []),
+    muteState: vi.fn(async () => ({ muted: false, mutedUntil: null })),
   },
   userRepository: { findById: vi.fn(async () => ({ id: "usr_2" })) },
   serverRepository: { findById: vi.fn(async () => null) },
@@ -99,6 +114,9 @@ describe("social and notification HTTP state contract", () => {
     expect(await anonymous.json()).toEqual({
       authenticated: false,
       following: false,
+      notifyComments: false,
+      muted: false,
+      mutedUntil: null,
       targetType: "server",
       targetId: "srv_1",
     });
@@ -113,6 +131,9 @@ describe("social and notification HTTP state contract", () => {
     expect(await authenticated.json()).toEqual({
       authenticated: true,
       following: true,
+      notifyComments: true,
+      muted: false,
+      mutedUntil: null,
       targetType: "user",
       targetId: "usr_2",
     });

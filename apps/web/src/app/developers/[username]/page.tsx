@@ -11,6 +11,7 @@ import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { Avatar, EmptyState, StatCard } from "@nexus/ui";
 import { authService } from "../../../lib/services/auth-service";
+import { productService } from "../../../lib/services/product-service";
 import { productRepository } from "@nexus/db";
 import type { Metadata } from "next";
 import { ProductCard } from "../../../components/product-card";
@@ -64,6 +65,7 @@ export default async function DeveloperProfilePage({
     profilePrivacyService.visibility(user.id),
   ]);
   const authorProducts = result.products;
+  const attributions = await productService.getPublicAttributions(authorProducts);
   const profilePath = `/developers/${encodeURIComponent(user.username)}`;
 
   return (
@@ -91,20 +93,25 @@ export default async function DeveloperProfilePage({
               {user.bio || copy.bioFallback}
             </p>
             <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
-            <Link
-              href={`/users/${encodeURIComponent(user.username)}/trust`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            <nav
+              aria-label={copy.creatorProfile}
+              className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2"
             >
-              {trustCopy(locale).title}
-            </Link>
-            {visibility.showActivity && (
               <Link
-                href={`/users/${encodeURIComponent(user.username)}/activity`}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                href={`/users/${encodeURIComponent(user.username)}/trust`}
+                className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
               >
-                {publicationCopy(locale).activity}
+                {trustCopy(locale).title}
               </Link>
-            )}
+              {visibility.showActivity && (
+                <Link
+                  href={`/users/${encodeURIComponent(user.username)}/activity`}
+                  className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+                >
+                  {publicationCopy(locale).activity}
+                </Link>
+              )}
+            </nav>
           </div>
         </div>
 
@@ -126,7 +133,12 @@ export default async function DeveloperProfilePage({
         {authorProducts.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {authorProducts.map((product) => (
-              <ProductCard key={product.id} product={product} locale={locale} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+                attribution={attributions.get(product.id) ?? null}
+              />
             ))}
           </div>
         ) : (

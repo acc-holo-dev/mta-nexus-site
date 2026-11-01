@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
-import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
+import {
+  classifyChanges,
+  requiredJobs,
+  summarizeJobs,
+  isTrustedGhcrPublishEvent,
+  ghcrPublishJobPermissions,
+} from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
   assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md"]), {
@@ -12,6 +18,10 @@ test("documentation does not trigger builds; executable docs/configuration do", 
   });
   assert.deepEqual(
     classifyChanges(["docs/handbook/13-DECISION-REGISTER.md", "docs/handbook/deep/note.md"]),
+    { code: false, unitOnly: false, full: false },
+  );
+  assert.deepEqual(
+    classifyChanges(["AGENTS.md", "docs/AGENT.md", "planning/tasks.json", "planning/tools/check_package.py"]),
     { code: false, unitOnly: false, full: false },
   );
   assert.deepEqual(classifyChanges(["docs/handbook/schema.sql", "docs/handbook/.config.yml"]), {
@@ -163,4 +173,50 @@ test("unit_only skips database image and smoke without skipping plan or unit", (
   const unitJob = workflow.slice(workflow.indexOf("  unit:"), workflow.indexOf("  verify:"));
   assert.match(unitJob, /needs\.plan\.outputs\.code == 'true'/u);
   assert.doesNotMatch(unitJob, /unit_only/u);
+});
+
+test("OPS-10 trusted GHCR publish requires full_acceptance and never trusts pull_request", () => {
+  assert.equal(
+    isTrustedGhcrPublishEvent({
+      eventName: "pull_request",
+      ref: "refs/heads/main",
+      fullAcceptance: true,
+      publishEnabled: true,
+    }),
+    false,
+  );
+  assert.equal(
+    isTrustedGhcrPublishEvent({
+      eventName: "push",
+      ref: "refs/heads/main",
+      fullAcceptance: true,
+      publishEnabled: false,
+    }),
+    false,
+  );
+  assert.equal(
+    isTrustedGhcrPublishEvent({
+      eventName: "push",
+      ref: "refs/heads/main",
+      fullAcceptance: false,
+      publishEnabled: true,
+    }),
+    false,
+  );
+  assert.equal(
+    isTrustedGhcrPublishEvent({
+      eventName: "push",
+      ref: "refs/heads/main",
+      fullAcceptance: true,
+      publishEnabled: true,
+    }),
+    true,
+  );
+  assert.deepEqual(ghcrPublishJobPermissions({ trustedPublish: false }), {
+    contents: "read",
+  });
+  assert.deepEqual(ghcrPublishJobPermissions({ trustedPublish: true }), {
+    contents: "read",
+    packages: "write",
+  });
 });

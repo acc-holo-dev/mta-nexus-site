@@ -1,8 +1,15 @@
 "use client";
+import {
+  resourceModerationActionsFor,
+  resourceModerationTarget,
+  type ProductStatus,
+  unavailableBuildSupportHref,
+} from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { resourceModerationCommandSchema } from "@nexus/validation";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useId, useRef, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedResourceModeration } from "../lib/resource-release-control-confirmation";
 import {
@@ -10,31 +17,64 @@ import {
   resourceReleaseControlError,
 } from "../lib/resource-release-control-i18n";
 import { useNexusLocale } from "./locale-context";
+import { stashSupportObjectContext } from "./support-center";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
 export function ResourceModerationControls({
   product,
+  selectedBuild = null,
 }: {
   product: { id: string; status: string; updatedAt: string };
+  selectedBuild?: { id: string; status: string; version?: string } | null;
 }) {
   const { locale } = useNexusLocale(),
     copy = getResourceReleaseControlCopy(locale),
     field = useId(),
     router = useRouter(),
     lock = useRef(false);
+  const status = product.status as ProductStatus;
+  const observedStatus = useRef(product.status);
+  const observedRevision = useRef(product.updatedAt);
+  const allowed = resourceModerationActionsFor(status);
+  const release = allowed.includes("release");
+  const action = release ? "release" : "suspend";
+  const target = resourceModerationTarget(status, action);
   const [reason, setReason] = useState(""),
     [confirmed, setConfirmed] = useState(false),
     [busy, setBusy] = useState(false),
     [saved, setSaved] = useState(false),
     [error, setError] = useState("");
-  const release = product.status === "suspended";
+
+  useEffect(() => {
+    if (
+      observedStatus.current !== product.status ||
+      observedRevision.current !== product.updatedAt
+    ) {
+      observedStatus.current = product.status;
+      observedRevision.current = product.updatedAt;
+      setConfirmed(false);
+      setSaved(false);
+      setError("");
+    }
+  }, [product.status, product.updatedAt]);
+
   async function send(event: FormEvent) {
     event.preventDefault();
     if (lock.current || saved) return;
+    if (observedStatus.current !== product.status || observedRevision.current !== product.updatedAt) {
+      setError(copy.errors.PRODUCT_STATE_CHANGED ?? copy.errors.fallback);
+      router.refresh();
+      return;
+    }
+    if (!target || allowed.length === 0) {
+      setError(copy.errors.PRODUCT_STATE_CHANGED ?? copy.errors.fallback);
+      router.refresh();
+      return;
+    }
     const parsed = resourceModerationCommandSchema.safeParse({
-      action: release ? "release" : "suspend",
+      action,
       reason,
       expectedUpdatedAt: product.updatedAt,
     });
@@ -65,11 +105,66 @@ export function ResourceModerationControls({
       setBusy(false);
     }
   }
+
+  if (allowed.length === 0) {
+    return (
+      <div className="nexus-panel space-y-3 p-5">
+        <p role="note" className="text-sm text-secondary">
+          {copy.moderationNote}
+        </p>
+        <p className="text-sm text-warning">
+          {locale === "ru"
+            ? "Для текущего статуса нет разрешённого moderation-перехода."
+            : "No moderation transition is allowed for the current status."}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={send} className="nexus-panel space-y-4 p-5">
       <p role="note" className="text-sm text-secondary">
         {copy.moderationNote}
       </p>
+      <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
+        <div>
+          <dt className="font-label uppercase text-muted">
+            {locale === "ru" ? "Статус ресурса" : "Resource status"}
+          </dt>
+          <dd className="text-primary">{product.status}</dd>
+        </div>
+        <div>
+          <dt className="font-label uppercase text-muted">
+            {locale === "ru" ? "Разрешённое действие" : "Allowed action"}
+          </dt>
+          <dd className="text-primary">{release ? copy.release : copy.suspend}</dd>
+        </div>
+      </dl>
+      {release ? (
+        <p className="text-sm text-warning">
+          {locale === "ru"
+            ? "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет."
+            : "Release returns a draft and requires a new review. Nothing is auto-published."}
+        </p>
+      ) : null}
+      {selectedBuild && selectedBuild.status !== "published" ? (
+        <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
+          <p>
+            {locale === "ru"
+              ? `Сборка ${selectedBuild.version ?? selectedBuild.id} сейчас ${selectedBuild.status}.`
+              : `Build ${selectedBuild.version ?? selectedBuild.id} is currently ${selectedBuild.status}.`}
+          </p>
+          <Link
+            href={unavailableBuildSupportHref()}
+            className="mt-2 inline-flex text-accent underline"
+            onClick={() =>
+              stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
+            }
+          >
+            {locale === "ru" ? "Контекст для поддержки" : "Support context"}
+          </Link>
+        </div>
+      ) : null}
       <fieldset disabled={busy || saved} className="space-y-4">
         <div className="space-y-1.5">
           <label htmlFor={`${field}-reason`} className={nativeLabelClass}>
@@ -106,6 +201,11 @@ export function ResourceModerationControls({
       {saved ? (
         <p role="status" className="text-sm text-success">
           {copy.saved}
+          {release
+            ? locale === "ru"
+              ? " Следующий шаг автора — отправка черновика на проверку."
+              : " Next author step: submit the draft for review."
+            : ""}
         </p>
       ) : null}
       <Button type="submit" isLoading={busy} disabled={saved || !confirmed} className="min-h-11">

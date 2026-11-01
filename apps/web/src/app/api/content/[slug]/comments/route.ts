@@ -15,6 +15,7 @@ import {
   logRequestEvent,
 } from "../../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
+import { parseCommentIntentKey } from "../../../../../lib/content-comment-client";
 import { authService } from "../../../../../lib/services/auth-service";
 import { contentService } from "../../../../../lib/services/content-service";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
@@ -79,16 +80,34 @@ export const POST = withBrowserMutation(
       if (!(await consumeRateLimit("commentCreation", user.id)).success)
         throw new RateLimitExceededError();
       requireServerJsonContentType(request);
+      const intentKey = parseCommentIntentKey(request.headers.get("Idempotency-Key"));
+      if (!intentKey) {
+        throw new AppError(
+          "A valid comment idempotency key is required",
+          400,
+          "COMMENT_IDEMPOTENCY_KEY_INVALID",
+        );
+      }
       const parsed = discussionCommentSchema.safeParse(await readBoundedJson(request, 32 * 1024));
       if (!parsed.success) throw new AppError("Invalid comment", 400, "VALIDATION_ERROR");
       const article = await contentService.getArticleBySlug(slug, { incrementView: false });
       if (!article) throw new NotFoundError("Content");
       // Reply fanout is committed with the comment as discussion_notification_deliveries.
-      const comment = await contentService.addComment(
-        { contentId: article.id, parentId: parsed.data.parentId, text: parsed.data.text },
+      // Intent key is the durable receipt (comments.id); replay returns the same row.
+      const { comment, replayed } = await contentService.addComment(
+        {
+          contentId: article.id,
+          parentId: parsed.data.parentId,
+          text: parsed.data.text,
+          intentKey,
+        },
         user,
       );
-      return jsonWithRequestId(context, { comment }, { status: 201, headers: privateHeaders });
+      return jsonWithRequestId(
+        context,
+        { comment, replayed },
+        { status: 201, headers: privateHeaders },
+      );
     } catch (error) {
       const known = error instanceof AppError;
       const code = known ? error.code : "INTERNAL_ERROR";

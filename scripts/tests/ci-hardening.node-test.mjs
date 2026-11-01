@@ -68,6 +68,27 @@ test("workflow Node versions use the same repository pin", () => {
   }
 });
 
+test("OPS-10 workflow keeps packages:write only on gated ghcr-publish job", () => {
+  const content = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
+  const top = content.slice(0, content.indexOf("\njobs:"));
+  assert.match(top, /^permissions:\n {2}contents: read$/mu);
+  assert.doesNotMatch(top, /packages:\s*write/u);
+
+  const start = content.indexOf("\n  ghcr-publish:\n");
+  assert.ok(start >= 0, "ghcr-publish job must exist");
+  const rest = content.slice(start + 1);
+  const next = rest.search(/\n {2}[a-z0-9-]+:\n/u);
+  const job = next >= 0 ? rest.slice(0, next) : rest;
+  assert.match(job, /permissions:\n {6}contents: read\n {6}packages: write/u);
+  assert.match(job, /github\.event_name != 'pull_request'/u);
+  assert.match(job, /needs\.plan\.outputs\.full == 'true'/u);
+  assert.match(job, /vars\.NEXUS_GHCR_PUBLISH_ENABLED == 'true'/u);
+  assert.match(job, /fail-on-cache-miss: true/u);
+  assert.match(job, /validate-ci-image\.sh/u);
+  assert.doesNotMatch(job, /docker build /u);
+  assert.doesNotMatch(job, /build-push-action/u);
+});
+
 test("pnpm install jobs enable setup-node cache only after pnpm/action-setup", () => {
   const content = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
   // Split on top-level jobs (two-space indent). Keep jobs that run workspace installs.

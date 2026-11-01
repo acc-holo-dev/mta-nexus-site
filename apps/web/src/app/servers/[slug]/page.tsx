@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
+import { ServerConnectControls } from "../../../components/server-connect-controls";
 import { ServerFollowButton } from "../../../components/server-follow-button";
 import { ServerHistoryPanel } from "../../../components/server-history-panel";
 import { ServerReviewPanel } from "../../../components/server-review-panel";
@@ -92,13 +93,10 @@ export default async function ServerDetailPage({
     serverHistoryService.getHistoryForServer(server, historyWindow).catch(() => null),
     contentService.listServerUpdates(server.id, 6).catch(() => null),
     server.visibility === "public" && server.status === "active"
-      ? serverReviewService.publicPage(server.id).catch(() => ({
-          reviews: [],
-          total: 0,
-          page: 1,
-          pageSize: 20,
-          totalPages: 1,
-        }))
+      ? serverReviewService
+          .publicPage(server.id)
+          .then((page) => ({ state: "ready" as const, page }))
+          .catch(() => ({ state: "unavailable" as const }))
       : Promise.resolve(null),
   ]);
 
@@ -111,9 +109,10 @@ export default async function ServerDetailPage({
   const maxPlayers = observedServer?.maxPlayers ?? server.maxPlayers;
   const occupancyPercent =
     currentPlayers == null || maxPlayers == null || maxPlayers === 0
-      ? 0
+      ? null
       : Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
   const connectUri = `mtasa://${server.ipAddress}:${server.port}`;
+  const connectAddress = `${server.ipAddress}:${server.port}`;
   const statusClass = isOnline
     ? "border-[color:var(--nexus-success)]/30 bg-success-soft text-success"
     : "border-base bg-inset text-secondary";
@@ -191,12 +190,14 @@ export default async function ServerDetailPage({
               </Link>
             )}
             <ServerFollowButton serverId={server.id} serverName={server.name} />
-            <a
-              href={connectUri}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
-            >
-              {copy.connect}
-            </a>
+            <ServerConnectControls
+              address={connectAddress}
+              connectUri={connectUri}
+              name={server.name}
+              locale={locale}
+              connectLabel={copy.connect}
+              connectHint={copy.connectHint}
+            />
           </div>
         </div>
       </div>
@@ -291,7 +292,11 @@ export default async function ServerDetailPage({
 
       <ServerUpdatesPanel updates={serverUpdates} locale={locale} serverSlug={server.slug} />
 
-      {reviewPage && <ServerReviewPanel serverId={server.id} initialPage={reviewPage} />}
+      {reviewPage?.state === "ready" ? (
+        <ServerReviewPanel serverId={server.id} initialPage={reviewPage.page} />
+      ) : reviewPage?.state === "unavailable" ? (
+        <ServerReviewPanel serverId={server.id} loadState="unavailable" />
+      ) : null}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="nexus-panel space-y-4 p-6">
@@ -306,7 +311,8 @@ export default async function ServerDetailPage({
           <div className="h-2 w-full overflow-hidden rounded-full bg-inset">
             <div
               className="h-full rounded-full bg-[var(--nexus-success)]"
-              style={{ width: `${occupancyPercent}%` }}
+              style={{ width: `${occupancyPercent ?? 0}%` }}
+              aria-hidden={occupancyPercent == null}
             />
           </div>
           {!observedServer && <div className="text-[11px] text-faint">{copy.noObservation}</div>}
@@ -318,7 +324,7 @@ export default async function ServerDetailPage({
             {copy.connectionIp}
           </div>
           <div className="select-all rounded border border-base bg-inset p-2.5 font-mono text-base text-primary">
-            {server.ipAddress}:{server.port}
+            {connectAddress}
           </div>
           <div className="text-[11px] text-faint">{copy.selectHint}</div>
         </div>

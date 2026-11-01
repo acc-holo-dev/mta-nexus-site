@@ -55,6 +55,7 @@ const audit = {
   targetId: pending.id,
   targetType: "build",
 };
+const initiatingToken = "build-submit-session";
 function rows(hasPublished: boolean, metadataReviewRequired = false) {
   const values: Record<string, unknown> = { ...pending, createdAt: new Date() };
   const buildRow = Object.keys(getTableColumns(builds)).map((key) => {
@@ -64,6 +65,7 @@ function rows(hasPublished: boolean, metadataReviewRequired = false) {
   state.rows = [
     [["product", "published", "author", null, metadataReviewRequired]],
     [["author", "developer"]],
+    [["ses_author", "2099-01-01T00:00:00.000Z"]],
     [buildRow],
     hasPublished ? [["approved"]] : [],
     [],
@@ -86,13 +88,15 @@ describe("build review continuity", () => {
     "preserves safe publication unless review is required: %j",
     async ({ hasPublished, metadataReviewRequired, movesToReview }) => {
       rows(hasPublished, metadataReviewRequired);
-      const created = await repository.submitForReview(pending, audit);
+      const created = await repository.submitForReview(pending, audit, initiatingToken);
       expect(created).toMatchObject({ id: pending.id, status: "pending_review", version: "2.0.0" });
       expect(state.transactions).toBe(1);
       expect(state.queries[0].sql).toContain("for no key update");
       expect(state.queries[1].sql).toContain("for share");
-      expect(state.queries[2].sql).toMatch(/^insert into "builds" /u);
-      const publication = state.queries[3];
+      expect(state.queries[2].sql).toContain('"sessions"');
+      expect(state.queries[2].sql).toContain("for update");
+      expect(state.queries[3].sql).toMatch(/^insert into "builds" /u);
+      const publication = state.queries[4];
       expect(publication.params).toEqual(["product", "published", "clean", 1]);
       expect(publication.sql).toContain('"builds"."scanner" is not null');
       expect(publication.sql).toContain('btrim("builds"."scanner") <> \'\'');
@@ -119,7 +123,9 @@ describe("build review continuity", () => {
     "rejects a %s parent before submitting a build",
     async (status) => {
       state.rows = [[["product", status, "author", null, false]]];
-      await expect(repository.submitForReview(pending, audit)).rejects.toMatchObject({
+      await expect(
+        repository.submitForReview(pending, audit, initiatingToken),
+      ).rejects.toMatchObject({
         code: "PRODUCT_STATE_CHANGED",
       });
       expect(state.queries).toHaveLength(1);
@@ -128,7 +134,9 @@ describe("build review continuity", () => {
 
   it("rejects lost live authority before build, publication or audit writes", async () => {
     state.rows = [[["product", "published", "other-author", null, false]], [["author", "user"]]];
-    await expect(repository.submitForReview(pending, audit)).rejects.toMatchObject({
+    await expect(
+      repository.submitForReview(pending, audit, initiatingToken),
+    ).rejects.toMatchObject({
       code: "NOT_FOUND",
     });
     expect(state.queries).toHaveLength(2);

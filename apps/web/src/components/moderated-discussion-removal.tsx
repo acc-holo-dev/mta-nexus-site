@@ -14,6 +14,7 @@ import {
   moderatedDiscussionError,
 } from "../lib/moderated-discussion-copy";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import { confirmAction } from "./confirm-action";
 export function ModeratedDiscussionRemoval({
   contentId,
   commentId,
@@ -45,7 +46,21 @@ export function ModeratedDiscussionRemoval({
   }, []);
   async function remove() {
     const input = moderatedDiscussionRemoveSchema.safeParse({ reason, expectedRevision: revision });
-    if (guard.current || blocked || !input.success || !window.confirm(copy.confirm)) return;
+    if (
+      guard.current ||
+      blocked ||
+      !input.success ||
+      !(await confirmAction({
+        title: copy.remove,
+        object: commentId,
+        scope: contentId,
+        consequences: copy.confirm,
+        confirmLabel: copy.remove,
+        cancelLabel: copy.back,
+        closeLabel: copy.back,
+      }))
+    )
+      return;
     guard.current = true;
     setPending(true);
     setError("");

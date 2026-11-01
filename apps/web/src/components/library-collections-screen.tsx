@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, collectionCommandItemResults } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -133,7 +133,9 @@ export async function LibraryCollectionsScreen({
               </Link>
             ))}
           </nav>
-          {!result.items.length && <p>{c.empty}</p>}
+          {!result.items.length && (
+            <p role="status">{result.status === "active" ? c.empty : c.emptyFiltered}</p>
+          )}
           <ol className="grid gap-4 sm:grid-cols-2">
             {result.items.map((item) => (
               <li key={item.id} className="nexus-panel space-y-2 p-5">
@@ -319,18 +321,42 @@ export async function LibraryCollectionsScreen({
                     </p>
                   </div>
                 )}
-                {"productIds" in item.command && (
-                  <ul className="space-y-1 text-sm">
-                    {item.command.productIds.map((id) => (
-                      <li key={id} className="break-all">
-                        {id}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {"productId" in item.command && (
-                  <p className="break-all text-sm">{item.command.productId}</p>
-                )}
+                {(() => {
+                  const results = collectionCommandItemResults(item.command);
+                  if (!results.length) {
+                    return (
+                      <>
+                        {"productIds" in item.command && (
+                          <ul className="space-y-1 text-sm">
+                            {item.command.productIds.map((id) => (
+                              <li key={id} className="break-all">
+                                {id}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {"productId" in item.command && (
+                          <p className="break-all text-sm">{item.command.productId}</p>
+                        )}
+                      </>
+                    );
+                  }
+                  const outcomeLabel = {
+                    added: c.add,
+                    removed: c.remove,
+                    copied: c["copy-items"],
+                    moved: c["move-items"],
+                  } as const;
+                  return (
+                    <ul className="space-y-1 text-sm">
+                      {results.map((entry) => (
+                        <li key={`${entry.outcome}:${entry.productId}`} className="break-all">
+                          {outcomeLabel[entry.outcome]}: {entry.productId} · {c.batchApplied}
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })()}
                 <p className="text-sm">
                   {c.created}:{" "}
                   <time dateTime={item.createdAt.toISOString()}>
@@ -396,6 +422,9 @@ export async function LibraryCollectionsScreen({
         )}
         {!adding && (
           <>
+            <p role="note" className="text-sm text-muted">
+              {c.watchesIndependentNote}
+            </p>
             <Link
               href={`/workspace/library/collections/${encodeURIComponent(id)}/watches`}
               className="text-accent underline"
@@ -512,7 +541,9 @@ export async function LibraryCollectionsScreen({
         <p className="text-sm">
           {c.items}: {result.total} · {c.ready}: {result.ready}
         </p>
-        {!result.items.length && <p>{c.emptyItems}</p>}
+        {!result.items.length && (
+          <p role="status">{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
+        )}
         {collection.status === "active" && result.items.length > 0 && (
           <LibraryCollectionBatchForm
             key={`batch:${collection.revision}:${adding}:${result.page}:${result.q}`}
@@ -540,7 +571,7 @@ export async function LibraryCollectionsScreen({
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/collections`}
                   className="text-accent underline"
                 >
-                  {c.resourceCollections}
+                  {c.toCollection}
                 </Link>
                 {item.slug && (
                   <Link
@@ -592,6 +623,16 @@ export async function LibraryCollectionsScreen({
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
+        {error.code === "COLLECTION_ITEM_LIMIT" && path?.id && (
+          <Link href={collectionHref(path.id)} className="text-accent underline">
+            {c.itemLimitNext}
+          </Link>
+        )}
+        {error.code === "COLLECTION_LIMIT" && (
+          <Link href={collectionHref(undefined, "", { status: "archived" })} className="text-accent underline">
+            {c.archived}
+          </Link>
+        )}
         <Link href={collectionHref()} className="text-accent underline">
           {c.title}
         </Link>

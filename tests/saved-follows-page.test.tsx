@@ -24,6 +24,7 @@ vi.mock("../apps/web/src/components/follow-workspace", () => ({
     query: string;
   }) => <div data-loaded={!!initial} data-type={type} data-query={query} />,
 }));
+import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 import SavedPage, { generateMetadata } from "../apps/web/src/app/workspace/saved/page";
 beforeEach(() => {
   vi.clearAllMocks();
@@ -31,6 +32,16 @@ beforeEach(() => {
   state.locale = "en";
   state.page.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
 });
+it.each(["en", "ru"] as const)(
+  "keeps filter-empty and add-to-collection copy distinct from plain empty in %s",
+  (locale) => {
+    const copy = followCopy(locale);
+    expect(copy.emptyFiltered).not.toBe(copy.empty);
+    expect(copy.emptyFilteredHint.length).toBeGreaterThan(0);
+    expect(copy.toCollection.length).toBeGreaterThan(0);
+    expect(copy.toCollectionHint).toMatch(/does not turn on|не включает/u);
+  },
+);
 it("renders a sign-in boundary without reading saved follows", async () => {
   expect(renderToStaticMarkup(await SavedPage({}))).toContain('href="/auth/login"');
   expect(state.page).not.toHaveBeenCalled();

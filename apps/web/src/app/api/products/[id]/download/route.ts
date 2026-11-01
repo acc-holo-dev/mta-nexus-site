@@ -52,9 +52,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id: productId } = await params;
     const token = request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(token);
+    const user = token ? await authService.getSession(token) : null;
 
-    if (!user) {
+    if (!token || !user) {
       return json(
         context,
         {
@@ -147,6 +147,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         auditId: generateId("aud"),
         receiptId: generateId("dlv"),
         actorId: user.id,
+        currentToken: token,
         expected: selectedBuild,
         pinned: selection.kind === "pinned",
       });

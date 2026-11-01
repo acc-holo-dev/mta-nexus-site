@@ -3,7 +3,9 @@ import { verificationWorkspaceService } from "../../../lib/services/verification
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
 import { FollowButton } from "../../../components/follow-button";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 import { trustCopy } from "../../../lib/public-user-trust-copy";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
@@ -20,6 +22,8 @@ import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
+import { authService } from "../../../lib/services/auth-service";
+import { productService } from "../../../lib/services/product-service";
 import { cache } from "react";
 
 export const dynamic = "force-dynamic";
@@ -51,27 +55,41 @@ export default async function UserProfilePage({
   searchParams,
 }: {
   params: Promise<{ username: string }>;
-  searchParams?: Promise<{ page?: string | string[]; serverPage?: string | string[] }>;
+  searchParams?: Promise<{
+    page?: string | string[];
+    serverPage?: string | string[];
+    preview?: string | string[];
+  }>;
 }) {
   const { username } = await params;
   const [locale, user] = await Promise.all([getRequestLocale(), getProfile(username)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.profiles;
+  const privacyCopy = profilePrivacyCopy(locale);
 
   if (!user) {
     notFound();
   }
 
   const query = await searchParams;
-  const [resourcePage, serverPage, professional, visibility] = await Promise.all([
+  const previewRaw = query?.preview;
+  const wantsGuestPreview =
+    (Array.isArray(previewRaw) ? previewRaw[0] : previewRaw) === "guest";
+  const sessionToken = wantsGuestPreview
+    ? (await cookies()).get("nexus_session")?.value
+    : undefined;
+  const [resourcePage, serverPage, professional, visibility, actor] = await Promise.all([
     productRepository.pagePublishedFreeByAuthor(user.id, parseProfilePage(query?.page), 24),
     serverRepository.pageActivePublicByOwner(user.id, parseProfilePage(query?.serverPage), 12),
     user.role === "developer" || user.role === "admin"
       ? verificationWorkspaceService.publicProfile(user.id).catch(() => null)
       : null,
     profilePrivacyService.visibility(user.id),
+    wantsGuestPreview ? authService.getSession(sessionToken) : Promise.resolve(null),
   ]);
+  const guestPreview = wantsGuestPreview && actor?.id === user.id;
   const userProducts = resourcePage.products;
+  const attributions = await productService.getPublicAttributions(userProducts);
   const userServers = serverPage.servers;
   const directory =
     userServers.length > 0
@@ -88,6 +106,11 @@ export default async function UserProfilePage({
 
   return (
     <div className="space-y-10">
+      {guestPreview && (
+        <p role="status" className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
+          {privacyCopy.guestPreviewNote} {privacyCopy.scope}
+        </p>
+      )}
       <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <Avatar
@@ -113,7 +136,9 @@ export default async function UserProfilePage({
             <p className="max-w-xl text-sm leading-relaxed text-muted">
               {user.bio || copy.memberFallback}
             </p>
-            <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+            {!guestPreview && (
+              <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+            )}
             {visibility.showActivity && (
               <Link
                 href={`/users/${encodeURIComponent(user.username)}/activity`}
@@ -151,7 +176,12 @@ export default async function UserProfilePage({
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {userProducts.map((product) => (
-              <ProductCard key={product.id} product={product} locale={locale} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+                attribution={attributions.get(product.id) ?? null}
+              />
             ))}
           </div>
           <ProfileResourcePagination

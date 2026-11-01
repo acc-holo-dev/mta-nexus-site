@@ -174,7 +174,14 @@ it("switches to sign in after session revocation and aborts the write on unmount
   await click();
   await click();
   expect(harness.fetch).toHaveBeenCalledOnce();
-  expect(render().some((node) => node.props.href === "/auth/login")).toBe(true);
+  expect(
+    render().some(
+      (node) =>
+        typeof node.props.href === "string" &&
+        (node.props.href === "/auth/login" ||
+          (node.props.href as string).startsWith("/auth/login?next=")),
+    ),
+  ).toBe(true);
   for (const cleanup of harness.cleanups) cleanup();
   expect(harness.fetch.mock.calls[0][1].signal.aborted).toBe(true);
 });

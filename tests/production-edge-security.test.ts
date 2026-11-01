@@ -32,4 +32,12 @@ describe("production edge security headers", () => {
 
     expect(caddy).not.toContain("Content-Security-Policy");
   });
+
+  it("binds the TLS edge to runtime DOMAIN for same-digest origin promotion", () => {
+    const caddy = read("deploy/Caddyfile");
+
+    expect(caddy).toContain("{$DOMAIN}");
+    expect(caddy).toMatch(/OPS-05|runtime \{\$DOMAIN\}/u);
+    expect(caddy).not.toMatch(/^[^{\n]*https:\/\/nexus-mta\.com/mu);
+  });
 });

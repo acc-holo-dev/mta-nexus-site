@@ -1,6 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+# Toolchain pins live outside this file: package.json#engines (Node major-ok),
+# .nvmrc/.node-version (exact host/CI Node), package.json#packageManager (exact pnpm).
+# Docker images use node:26-alpine for the same major branch, not the exact host patch.
 # The repository develops through the Docker path (no host node_modules).
 # Host-side orchestration scripts (pnpm dev:docker:*, pnpm test:isolated) must
 # not trigger pnpm's automatic dependency installation before running.

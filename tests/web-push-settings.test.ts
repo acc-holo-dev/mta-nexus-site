@@ -2,9 +2,11 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
   applicationServerKey,
+  derivePushStatus,
   endpointFingerprint,
   matchesApplicationServerKey,
   parsePushServerState,
+  readBrowserPushCapability,
 } from "../apps/web/src/components/web-push-settings";
 
 describe("Web Push settings state parser", () => {
@@ -85,5 +87,99 @@ describe("Web Push VAPID rotation detection", () => {
     expect(matchesApplicationServerKey(firstBuffer, first)).toBe(true);
     expect(matchesApplicationServerKey(firstBuffer, second)).toBe(false);
     expect(matchesApplicationServerKey(null, first)).toBe(false);
+  });
+});
+
+describe("Web Push effective status contract", () => {
+  it("keeps denied and unconfigured as distinct recovery states", () => {
+    const serverConfigured = {
+      configured: true,
+      publicKey: "public-key",
+      subscribed: false,
+    };
+    const serverUnconfigured = {
+      configured: false,
+      publicKey: null,
+      subscribed: false,
+    };
+    expect(
+      derivePushStatus(
+        {
+          supported: true,
+          permission: "denied",
+          hasLocalSubscription: false,
+          keyMatches: null,
+        },
+        serverConfigured,
+      ),
+    ).toBe("denied");
+    expect(
+      derivePushStatus(
+        {
+          supported: true,
+          permission: "default",
+          hasLocalSubscription: false,
+          keyMatches: null,
+        },
+        serverUnconfigured,
+      ),
+    ).toBe("unconfigured");
+    expect(
+      derivePushStatus(
+        {
+          supported: true,
+          permission: "denied",
+          hasLocalSubscription: false,
+          keyMatches: null,
+        },
+        serverUnconfigured,
+      ),
+    ).toBe("unconfigured");
+  });
+
+  it("requires both browser subscription and server subscription for enabled", () => {
+    expect(
+      derivePushStatus(
+        {
+          supported: true,
+          permission: "granted",
+          hasLocalSubscription: true,
+          keyMatches: true,
+        },
+        { configured: true, publicKey: "key", subscribed: true },
+      ),
+    ).toBe("enabled");
+    expect(
+      derivePushStatus(
+        {
+          supported: true,
+          permission: "granted",
+          hasLocalSubscription: false,
+          keyMatches: null,
+        },
+        { configured: true, publicKey: "key", subscribed: true },
+      ),
+    ).toBe("disabled");
+    expect(
+      derivePushStatus(
+        {
+          supported: true,
+          permission: "granted",
+          hasLocalSubscription: true,
+          keyMatches: true,
+        },
+        { configured: true, publicKey: "key", subscribed: false },
+      ),
+    ).toBe("disabled");
+  });
+
+  it("reads browser capability without requesting permission", () => {
+    const capability = readBrowserPushCapability();
+    expect(capability).toEqual(
+      expect.objectContaining({
+        supported: expect.any(Boolean),
+        permission: expect.stringMatching(/^(unsupported|default|granted|denied)$/u),
+      }),
+    );
   });
 });

@@ -45,6 +45,7 @@ const themeInitScript = `
     preference === 'dark' || (preference === 'system' && prefersDark);
 
   document.documentElement.classList.toggle('dark', useDark);
+  document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
 })();
 `;
 

@@ -27,10 +27,37 @@ vi.mock("../packages/db/src/client", async () => {
   };
 });
 
+import {
+  classifyBuildAvailability,
+  resourceLifecycleTarget,
+  resourceModerationActionsFor,
+  unavailableBuildSupportHref,
+} from "@nexus/domain";
 import { ProductRepository } from "../packages/db/src/repositories/products";
 import { ResourceLibrarySelectionsRepository } from "../packages/db/src/repositories/resource-library-selections";
 import { ResourceModerationRepository } from "../packages/db/src/repositories/resource-moderation";
 import { UserLibraryRepository } from "../packages/db/src/repositories/user-library";
+import { unavailableBuildGuidance } from "../packages/db/src/repositories/builds-lifecycle";
+
+it("shows restore/release as draft next steps and explains unavailable builds", () => {
+  expect(resourceLifecycleTarget("archived", "restore")).toBe("draft");
+  expect(resourceLifecycleTarget("draft", "submit")).toBe("pending_review");
+  expect(resourceModerationActionsFor("suspended")).toEqual(["release"]);
+  expect(resourceModerationActionsFor("published")).toEqual(["suspend"]);
+  expect(classifyBuildAvailability("quarantined")).toBe("quarantined");
+  expect(unavailableBuildSupportHref()).toBe("/support?category=resource");
+  expect(
+    unavailableBuildGuidance({
+      productId: "prd_a",
+      buildId: "bld_a",
+      status: "quarantined",
+    }),
+  ).toMatchObject({
+    downloadBlocked: true,
+    autoPublishedOnRestore: false,
+    supportHref: "/support?category=resource",
+  });
+});
 
 const library = new ResourceLibrarySelectionsRepository(),
   moderation = new ResourceModerationRepository();

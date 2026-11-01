@@ -3,7 +3,12 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  RELEASE_UPGRADE_BASELINE_TAG,
+  RELEASE_UPGRADE_EVIDENCE_FLAGS,
+  RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION,
   RELEASE_UPGRADE_TARGET_TAG,
+  createReleaseUpgradeEvidence,
+  evaluateReleaseUpgradeEvidence,
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
@@ -236,7 +241,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract keeps staff queue indexes and covers notification delivery", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0087_server_reviews");
+  assert.equal(plan.targetTag, "0089_resource_qa");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -473,4 +478,128 @@ test("library collections retain private references and immutable command histor
   assert.match(migration, /FOR NO KEY UPDATE/u);
   assert.doesNotMatch(migration, /INSERT INTO (entitlements|licenses|payments|ledger_entries)/iu);
   assert.match(readFileSync(script, "utf8"), /libraryCollectionsSchemaPresent = true/u);
+});
+
+const evidenceSha = "e".repeat(40);
+
+test("upgrade evidence validator accepts versioned and legacy full-format PASS artifacts", () => {
+  const versioned = createReleaseUpgradeEvidence({ sha: evidenceSha });
+  assert.equal(versioned.schemaVersion, RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION);
+  assert.equal(evaluateReleaseUpgradeEvidence(versioned, { candidateSha: evidenceSha }).ok, true);
+
+  const retained = createReleaseUpgradeEvidence({
+    sha: evidenceSha,
+    includeSchemaVersion: false,
+  });
+  assert.equal("schemaVersion" in retained, false);
+  assert.equal(evaluateReleaseUpgradeEvidence(retained, { candidateSha: evidenceSha }).ok, true);
+});
+
+test("upgrade evidence validator rejects status-only PASS and identity failures", () => {
+  assert.equal(
+    evaluateReleaseUpgradeEvidence({ status: "PASS", sha: evidenceSha }, { candidateSha: evidenceSha })
+      .ok,
+    false,
+  );
+  assert.equal(
+    evaluateReleaseUpgradeEvidence(createReleaseUpgradeEvidence({ sha: null }), {
+      candidateSha: evidenceSha,
+    }).ok,
+    false,
+  );
+  assert.match(
+    evaluateReleaseUpgradeEvidence(
+      createReleaseUpgradeEvidence({ sha: "f".repeat(40) }),
+      { candidateSha: evidenceSha },
+    ).reason ?? "",
+    /does not match/u,
+  );
+  assert.match(
+    evaluateReleaseUpgradeEvidence(
+      createReleaseUpgradeEvidence({
+        sha: evidenceSha,
+        baseline: "0000_wrong",
+      }),
+      { candidateSha: evidenceSha },
+    ).reason ?? "",
+    /baseline/u,
+  );
+  assert.match(
+    evaluateReleaseUpgradeEvidence(
+      createReleaseUpgradeEvidence({
+        sha: evidenceSha,
+        target: "0000_wrong",
+      }),
+      { candidateSha: evidenceSha },
+    ).reason ?? "",
+    /target/u,
+  );
+  assert.match(
+    evaluateReleaseUpgradeEvidence(
+      createReleaseUpgradeEvidence({
+        sha: evidenceSha,
+        phase: "upgrade",
+      }),
+      { candidateSha: evidenceSha },
+    ).reason ?? "",
+    /phase/u,
+  );
+  assert.match(
+    evaluateReleaseUpgradeEvidence(
+      createReleaseUpgradeEvidence({
+        sha: evidenceSha,
+        schemaVersion: 99,
+      }),
+      { candidateSha: evidenceSha },
+    ).reason ?? "",
+    /schemaVersion/u,
+  );
+  assert.equal(RELEASE_UPGRADE_BASELINE_TAG, "0024_product_type_invariant");
+});
+
+test("upgrade evidence validator rejects missing, false, and wrong-type required flags", () => {
+  const complete = createReleaseUpgradeEvidence({ sha: evidenceSha });
+  const missingFlag = { ...complete };
+  delete missingFlag.cleanupComplete;
+  assert.match(
+    evaluateReleaseUpgradeEvidence(missingFlag, { candidateSha: evidenceSha }).reason ?? "",
+    /cleanupComplete/u,
+  );
+
+  const falseFlag = { ...complete, failedMigrationRolledBack: false };
+  assert.match(
+    evaluateReleaseUpgradeEvidence(falseFlag, { candidateSha: evidenceSha }).reason ?? "",
+    /failedMigrationRolledBack/u,
+  );
+
+  const wrongType = { ...complete, rerunIdempotent: "true" };
+  assert.match(
+    evaluateReleaseUpgradeEvidence(wrongType, { candidateSha: evidenceSha }).reason ?? "",
+    /rerunIdempotent/u,
+  );
+
+  assert.ok(RELEASE_UPGRADE_EVIDENCE_FLAGS.includes("resourceBuildWorkspaceSchemaPresent"));
+  assert.match(readFileSync(script, "utf8"), /schemaVersion: RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION/u);
+  assert.match(readFileSync(script, "utf8"), /assertReleaseUpgradeEvidence\(/u);
+});
+
+test("forward-only authoring stays custom+guarded while meta snapshots lag the journal", () => {
+  const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
+  const pkg = JSON.parse(readFileSync("packages/db/package.json", "utf8"));
+  const guard = readFileSync("packages/db/scripts/guard-db-generate.mjs", "utf8");
+  const drizzleConfig = readFileSync("packages/db/drizzle.config.ts", "utf8");
+  const ops = readFileSync("docs/OPERATIONS.md", "utf8");
+
+  assert.ok(journal.entries.length >= 88);
+  assert.equal(existsSync("packages/db/migrations/meta/0000_snapshot.json"), true);
+  assert.equal(existsSync("packages/db/migrations/meta/0001_snapshot.json"), true);
+  assert.equal(existsSync("packages/db/migrations/meta/0002_snapshot.json"), false);
+  assert.equal(pkg.scripts.generate, "node scripts/guard-db-generate.mjs");
+  assert.equal(pkg.scripts["generate:custom"], "node scripts/guard-db-generate.mjs --custom");
+  assert.match(guard, /NEXUS_ALLOW_DB_GENERATE/u);
+  assert.match(guard, /Refusing plain drizzle-kit generate/u);
+  assert.match(drizzleConfig, /snapshots currently lag|Forward-only SQL/u);
+  assert.match(ops, /generate:custom/u);
+  assert.match(ops, /Never rewrite applied SQL|are not rewritten/u);
+  assert.equal(journal.entries.at(-1)?.tag, RELEASE_UPGRADE_TARGET_TAG);
 });

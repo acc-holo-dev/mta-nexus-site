@@ -12,7 +12,27 @@ import {
   listMigrationEvidence,
   summarizeReleaseEvidence,
   summarizeExternalEvidence,
+  buildReleaseManifest,
+  evaluateReleaseManifest,
+  RELEASE_MANIFEST_SCHEMA_VERSION,
+  RELEASE_RETENTION_CONTRACT,
 } from "../release-evidence-lib.mjs";
+
+const sampleSha = "a".repeat(40);
+const sampleLock = "b".repeat(64);
+
+function sampleManifest(overrides = {}) {
+  return buildReleaseManifest({
+    appVersion: "1.2.0-beta.3",
+    sha: sampleSha,
+    lockfileSha256: sampleLock,
+    toolchain: { actual: { node: "26.10.0", pnpm: "12.4.2" } },
+    postgresMajor: 18,
+    schema: { baseline: "0024_product_type_invariant", target: "0089_resource_qa" },
+    migrations: [{ name: "0001.sql", sha256: "c".repeat(64) }],
+    ...overrides,
+  });
+}
 
 test("release summary passes only a clean tree with all gates passed", () => {
   const summary = summarizeReleaseEvidence({
@@ -250,4 +270,92 @@ test("external evidence summary does not treat an empty declaration as complete"
     complete: false,
     missingOrInvalid: [],
   });
+});
+
+test("OPS-08 release manifest accepts unresolved image digests without authorizing production", () => {
+  const manifest = sampleManifest();
+  assert.equal(manifest.schemaVersion, RELEASE_MANIFEST_SCHEMA_VERSION);
+  assert.equal(manifest.productionAuthorized, false);
+  assert.equal(manifest.retention.ciArtifactDays, RELEASE_RETENTION_CONTRACT.ciArtifactDays);
+  assert.equal(manifest.retention.releaseBundle.status, "owner_decision_required");
+  const ok = evaluateReleaseManifest(manifest, {
+    expectedSha: sampleSha,
+    expectedSchema: {
+      baseline: "0024_product_type_invariant",
+      target: "0089_resource_qa",
+    },
+  });
+  assert.equal(ok.ok, true);
+  assert.equal(ok.productionAuthorized, false);
+});
+
+test("OPS-08 release manifest blocks missing or mismatched digest SHA schema and unknown versions", () => {
+  assert.match(
+    evaluateReleaseManifest(sampleManifest({ sha: "deadbeef" })).reason,
+    /SHA/u,
+  );
+  assert.match(
+    evaluateReleaseManifest(sampleManifest(), { expectedSha: "f".repeat(40) }).reason,
+    /SHA mismatch/u,
+  );
+  assert.match(
+    evaluateReleaseManifest({
+      ...sampleManifest(),
+      schemaVersion: 99,
+    }).reason,
+    /schemaVersion/u,
+  );
+  assert.match(
+    evaluateReleaseManifest(sampleManifest({ schema: { baseline: null, target: "x" } })).reason,
+    /baseline\/target/u,
+  );
+  assert.match(
+    evaluateReleaseManifest(sampleManifest(), {
+      expectedSchema: { baseline: "0024_product_type_invariant", target: "other" },
+    }).reason,
+    /target mismatch/u,
+  );
+  assert.match(
+    evaluateReleaseManifest(
+      sampleManifest({
+        image: { digest: null, platform: null, sourceSha: sampleSha, status: "unresolved" },
+      }),
+      { requireImageDigest: true },
+    ).reason,
+    /image digest/u,
+  );
+  assert.match(
+    evaluateReleaseManifest(
+      sampleManifest({
+        image: {
+          digest: "sha256:" + "1".repeat(64),
+          platform: "linux/amd64",
+          sourceSha: "e".repeat(40),
+          status: "resolved",
+        },
+      }),
+    ).reason,
+    /sourceSha/u,
+  );
+  assert.match(
+    evaluateReleaseManifest({
+      ...sampleManifest(),
+      productionAuthorized: true,
+    }).reason,
+    /productionAuthorized/u,
+  );
+  assert.equal(
+    evaluateReleaseManifest(
+      sampleManifest({
+        image: {
+          digest: "sha256:" + "1".repeat(64),
+          platform: "linux/amd64",
+          sourceSha: sampleSha,
+          status: "resolved",
+        },
+      }),
+      { requireImageDigest: true },
+    ).ok,
+    true,
+  );
 });

@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
+import { createReleaseUpgradeEvidence } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 import {
   BETA_CANDIDATE_CATEGORIES,
   evaluateBetaCandidate,
@@ -47,7 +48,7 @@ test("synthetic PASS artifacts yield checkable candidate awaiting owner deploy",
     mkdirSync(join(root, "artifacts"), { recursive: true });
     writeFileSync(
       join(root, "artifacts", "release-upgrade.json"),
-      JSON.stringify({ status: "PASS", sha }),
+      JSON.stringify(createReleaseUpgradeEvidence({ sha })),
     );
     writeFileSync(
       join(root, "artifacts", "backup-restore-evidence.json"),
@@ -81,6 +82,51 @@ test("synthetic PASS artifacts yield checkable candidate awaiting owner deploy",
     assert.equal(report.productionAuthorized, false);
     assert.deepEqual(report.technicalBlockers, []);
     assert.ok(report.blockers.some((item) => item.startsWith("deployment_authorization:")));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("status-only upgrade PASS never clears database_upgrade", () => {
+  const sha = "c".repeat(40);
+  const root = mkdtempSync(join(tmpdir(), "nexus-beta-upgrade-status-only-"));
+  try {
+    mkdirSync(join(root, "artifacts"), { recursive: true });
+    writeFileSync(
+      join(root, "artifacts", "release-upgrade.json"),
+      JSON.stringify({ status: "PASS", sha }),
+    );
+    writeFileSync(
+      join(root, "artifacts", "backup-restore-evidence.json"),
+      JSON.stringify({
+        status: "PASS",
+        sha,
+        sourceDestroyedBeforeRestore: true,
+        backupChecksumsVerified: true,
+        databaseRowsRestored: true,
+        applicationSchemaRestored: true,
+        applicationRowsRestored: true,
+        migrationLedgerRestored: true,
+        uploadFilesRestored: true,
+        cleanupComplete: true,
+      }),
+    );
+    const report = evaluateBetaCandidate({
+      candidateSha: sha,
+      dirtyWorkingTree: false,
+      artifactRoot: root,
+      ciEvidence: {
+        sha,
+        scope: "full_acceptance",
+        status: "PASS",
+        jobResults: Object.fromEntries(FULL_ACCEPTANCE_JOBS.map((name) => [name, "success"])),
+      },
+    });
+    const upgrade = report.categories.find((item) => item.id === "database_upgrade");
+    assert.equal(upgrade?.status, "blocked");
+    assert.match(upgrade?.reason ?? "", /baseline|incomplete|phase/u);
+    assert.equal(report.checkableCandidate, false);
+    assert.equal(report.productionAuthorized, false);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

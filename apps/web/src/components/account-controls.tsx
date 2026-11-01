@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, buttonClassName } from "@nexus/ui";
 import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -100,10 +100,11 @@ export function AccountControls() {
     }
   }
 
-  const linkControl =
-    "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-base bg-elevated px-2 text-xs font-semibold text-primary transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] sm:px-2.5";
-  const buttonControl =
-    "h-8 shrink-0 gap-1.5 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5";
+  const chromeControl = buttonClassName({
+    variant: "outline",
+    size: "sm",
+    className: "shrink-0 rounded-md border-base bg-elevated px-2 font-semibold text-primary sm:px-2.5",
+  });
 
   return (
     // biome-ignore lint/a11y/useSemanticElements: Mixed links and a button form a named group, not a form fieldset.
@@ -121,7 +122,7 @@ export function AccountControls() {
           <Link
             href="/workspace"
             aria-label={`${copy.workspaceFor} ${account.username}`}
-            className={linkControl}
+            className={chromeControl}
           >
             <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden max-w-24 truncate sm:block">@{account.username}</span>
@@ -135,7 +136,7 @@ export function AccountControls() {
             isLoading={signingOut}
             aria-label={signingOut ? copy.signingOut : copy.signOut}
             title={signingOut ? copy.signingOut : copy.signOut}
-            className={buttonControl}
+            className="shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
@@ -147,14 +148,14 @@ export function AccountControls() {
           variant="outline"
           size="sm"
           onClick={() => setAttempt((value) => value + 1)}
-          className={buttonControl}
+          className="shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
         >
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>
           <span className="sr-only sm:hidden">{copy.retry}</span>
         </Button>
       ) : (
-        <Link href="/auth/login" className={linkControl}>
+        <Link href="/auth/login" className={chromeControl}>
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.signIn}</span>
           <span className="sr-only sm:hidden">{copy.signIn}</span>

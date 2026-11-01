@@ -80,10 +80,12 @@ export async function GET(request: NextRequest) {
 
     const rateLimit = await consumeRateLimit("search", getTrustedRequestIp(request));
     if (!rateLimit.success) {
+      // Failure state: never return an empty results payload that looks like "no matches".
       return jsonWithRequestId(
         context,
         {
           error: "Search rate limit exceeded. Please try again shortly.",
+          unavailable: true,
         },
         {
           status: 429,
@@ -112,10 +114,12 @@ export async function GET(request: NextRequest) {
       status: 503,
       error,
     });
+    // Failure state: clients must not treat this as an empty successful search.
     return jsonWithRequestId(
       context,
       {
         error: "Search is temporarily unavailable",
+        unavailable: true,
       },
       {
         status: 503,

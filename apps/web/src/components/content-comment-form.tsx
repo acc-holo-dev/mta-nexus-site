@@ -1,9 +1,12 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
-import { submitContentCommentRequest } from "../lib/content-comment-client";
+import {
+  createCommentIntentKey,
+  submitContentCommentRequest,
+} from "../lib/content-comment-client";
 import { useNexusLocale } from "./locale-context";
 
 export function ContentCommentForm({ slug }: { slug: string }) {
@@ -13,6 +16,7 @@ export function ContentCommentForm({ slug }: { slug: string }) {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pendingIntent = useRef<{ key: string; text: string } | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,13 +25,20 @@ export function ContentCommentForm({ slug }: { slug: string }) {
 
     setSubmitting(true);
     setError(null);
+    const frozen =
+      pendingIntent.current && pendingIntent.current.text === normalized
+        ? pendingIntent.current
+        : { key: createCommentIntentKey(), text: normalized };
+    pendingIntent.current = frozen;
     try {
       await submitContentCommentRequest({
         slug,
         text: normalized,
+        intentKey: frozen.key,
         fallbackError: copy.commentError,
       });
 
+      pendingIntent.current = null;
       setText("");
       router.refresh();
     } catch (caught) {

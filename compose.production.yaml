@@ -145,11 +145,23 @@ services:
     user: node
     init: true
     restart: unless-stopped
-    stop_grace_period: 30s
+    # OPS-15: same writable/tmpfs hardening as push-worker; health state stays under /tmp.
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    stop_signal: SIGTERM
+    stop_grace_period: 75s
     working_dir: /app/packages/db
     command: ["node", "--import", "tsx", "scripts/run-license-maintenance.ts", "--loop"]
     environment:
       NODE_ENV: production
+      HOME: /tmp
+      TMPDIR: /tmp
       DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
       NEXUS_LICENSE_MAINTENANCE: "true"
       NEXUS_LICENSE_MAINTENANCE_BATCH_SIZE: ${NEXUS_LICENSE_MAINTENANCE_BATCH_SIZE:-20}
@@ -171,11 +183,23 @@ services:
     user: node
     init: true
     restart: unless-stopped
-    stop_grace_period: 30s
+    # OPS-15: same writable/tmpfs hardening as push-worker; health state stays under /tmp.
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    stop_signal: SIGTERM
+    stop_grace_period: 75s
     working_dir: /app/packages/db
     command: ["node", "--import", "tsx", "scripts/run-resource-release-worker.ts", "--loop"]
     environment:
       NODE_ENV: production
+      HOME: /tmp
+      TMPDIR: /tmp
       DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
       NEXUS_RESOURCE_RELEASE_WORKER: "true"
       NEXUS_RESOURCE_RELEASE_WORKER_BATCH_SIZE: ${NEXUS_RESOURCE_RELEASE_WORKER_BATCH_SIZE:-20}

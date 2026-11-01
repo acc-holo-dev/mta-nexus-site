@@ -23,12 +23,73 @@ import {
 } from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
 
+const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
+
+export type SupportFormObjectContext = {
+  productId: string;
+  buildId?: string;
+  receiptId?: string;
+};
+
+function isSupportFormObjectContext(value: unknown): value is SupportFormObjectContext {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  if (typeof record.productId !== "string" || !/^prd_[a-f0-9]{24}$/u.test(record.productId))
+    return false;
+  if (
+    record.buildId !== undefined &&
+    (typeof record.buildId !== "string" || !/^bld_[a-f0-9]{24}$/u.test(record.buildId))
+  )
+    return false;
+  if (
+    record.receiptId !== undefined &&
+    (typeof record.receiptId !== "string" || !/^dlv_[a-f0-9]{24}$/u.test(record.receiptId))
+  )
+    return false;
+  return true;
+}
+
+/** Stash verified-looking object ids for /support?category=resource (query stays filter-safe). */
+export function stashSupportObjectContext(context: SupportFormObjectContext) {
+  try {
+    sessionStorage.setItem(SUPPORT_OBJECT_CONTEXT_KEY, JSON.stringify(context));
+  } catch {
+    /* private mode */
+  }
+}
+
+export function readSupportObjectContext(): SupportFormObjectContext | null {
+  try {
+    const raw = sessionStorage.getItem(SUPPORT_OBJECT_CONTEXT_KEY);
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    return isSupportFormObjectContext(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearSupportObjectContext() {
+  try {
+    sessionStorage.removeItem(SUPPORT_OBJECT_CONTEXT_KEY);
+  } catch {
+    /* private mode */
+  }
+}
+
+export function supportObjectContextHref(context?: SupportFormObjectContext | null) {
+  if (context) stashSupportObjectContext(context);
+  return "/support?category=resource";
+}
+
 export function SupportCenter({
   staffMode = false,
   initialFilters = { page: 1, q: "" },
+  initialContext = null,
 }: {
   staffMode?: boolean;
   initialFilters?: SupportQuery;
+  initialContext?: SupportFormObjectContext | null;
 }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
@@ -44,14 +105,30 @@ export function SupportCenter({
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [category, setCategory] = useState("account");
+  const [category, setCategory] = useState(initialFilters.category ?? "account");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [objectContext, setObjectContext] = useState<SupportFormObjectContext | null>(
+    initialContext,
+  );
   const [staffStatus, setStaffStatus] = useState<SupportCaseStatus | "">(
     initialFilters.status ?? "",
   );
   const [staffCategory, setStaffCategory] = useState(initialFilters.category ?? "");
   const loadSequence = useRef(0);
+
+  useEffect(() => {
+    if (initialContext) {
+      setObjectContext(initialContext);
+      stashSupportObjectContext(initialContext);
+      return;
+    }
+    const stored = readSupportObjectContext();
+    if (stored) {
+      setObjectContext(stored);
+      if (!initialFilters.category) setCategory("resource");
+    }
+  }, [initialContext, initialFilters.category]);
 
   const categories = [
     ["account", copy.categoryAccount],
@@ -137,11 +214,13 @@ export function SupportCenter({
     setCreating(true);
     setError(null);
     setCreatedCaseId(null);
-    const payload = JSON.stringify({
+    const payloadBody: Record<string, unknown> = {
       category,
       subject: subject.trim(),
       message: message.trim(),
-    });
+    };
+    if (objectContext) payloadBody.context = objectContext;
+    const payload = JSON.stringify(payloadBody);
     try {
       const actorScope = await resolveSupportRetryActorScope();
       const attempt = await reserveSupportCaseRetry(payload, { actorScope });
@@ -170,11 +249,14 @@ export function SupportCenter({
 
       clearSupportRetry("case", requestKey, { actorScope });
       pendingCreate.current = null;
+      clearSupportObjectContext();
+      setObjectContext(null);
       setSubject("");
       setMessage("");
       setCreatedCaseId(created.id);
       if (!(await loadCases())) setError(workspaceCopy.savedRefresh);
     } catch (caught) {
+      // Keep subject/message/context so a lost response can retry with the same intent.
       setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
     } finally {
       creatingRef.current = false;
@@ -238,6 +320,43 @@ export function SupportCenter({
                   ))}
                 </select>
               </label>
+
+              {objectContext ? (
+                <div
+                  role="note"
+                  className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary"
+                >
+                  <p className="font-label uppercase text-muted">
+                    {locale === "ru" ? "Контекст обращения" : "Attached context"}
+                  </p>
+                  <p className="mt-1 break-all">
+                    {locale === "ru" ? "Ресурс" : "Resource"}: {objectContext.productId}
+                  </p>
+                  {objectContext.buildId ? (
+                    <p className="break-all">
+                      {locale === "ru" ? "Сборка" : "Build"}: {objectContext.buildId}
+                    </p>
+                  ) : null}
+                  {objectContext.receiptId ? (
+                    <p className="break-all">
+                      {locale === "ru" ? "Квитанция скачивания" : "Download receipt"}:{" "}
+                      {objectContext.receiptId}
+                    </p>
+                  ) : null}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={creating}
+                    className="mt-2 h-auto min-h-9 px-0 text-accent underline"
+                    onClick={() => {
+                      clearSupportObjectContext();
+                      setObjectContext(null);
+                    }}
+                  >
+                    {locale === "ru" ? "Убрать контекст" : "Remove context"}
+                  </Button>
+                </div>
+              ) : null}
 
               <Input
                 label={copy.subject}

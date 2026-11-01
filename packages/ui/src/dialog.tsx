@@ -1,9 +1,11 @@
 import * as React from "react";
 import { X } from "lucide-react";
+import { Button } from "./button";
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
+/** Shared Tab wrap math used by native dialogs and ConfirmDialog. */
 export function nextDialogFocusIndex(
   length: number,
   activeIndex: number,
@@ -21,74 +23,82 @@ export interface DialogProps {
   title: string;
   description?: string;
   children: React.ReactNode;
+  /** Localized accessible label for the close control. */
+  closeLabel?: string;
 }
 
-export function Dialog({ isOpen, onClose, title, description, children }: DialogProps) {
+/**
+ * Native `<dialog>` shell (UX-06 A). Prefer this over inventing a second overlay.
+ * Escape/backdrop/inert/return-focus come from the browser; Tab wrap is reinforced.
+ */
+export function Dialog({
+  isOpen,
+  onClose,
+  title,
+  description,
+  children,
+  closeLabel = "Close dialog",
+}: DialogProps) {
   const titleId = React.useId();
   const descriptionId = React.useId();
-  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const dialogRef = React.useRef<HTMLDialogElement>(null);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
-    if (!isOpen) return;
-
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (!isOpen) {
+      if (dialog.open) dialog.close();
+      return;
+    }
     const previousFocus = document.activeElement;
+    if (!dialog.open) dialog.showModal();
     closeButtonRef.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    const wrapFocus = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+      const targets = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (element) =>
+          element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden",
+      );
+      const activeIndex = targets.indexOf(document.activeElement as HTMLElement);
+      const nextIndex = nextDialogFocusIndex(targets.length, activeIndex, event.shiftKey);
+      if (nextIndex === null) return;
+      event.preventDefault();
+      targets[nextIndex]?.focus();
     };
-    window.addEventListener("keydown", closeOnEscape);
+    dialog.addEventListener("keydown", wrapFocus);
     return () => {
-      window.removeEventListener("keydown", closeOnEscape);
+      dialog.removeEventListener("keydown", wrapFocus);
+      if (dialog.open) dialog.close();
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
         previousFocus.focus();
       }
     };
-  }, [isOpen, onClose]);
-
-  const trapFocus = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Tab") return;
-    const root = dialogRef.current;
-    if (!root) return;
-
-    const targets = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-      (element) =>
-        element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden",
-    );
-    const activeIndex = targets.indexOf(document.activeElement as HTMLElement);
-    const nextIndex = nextDialogFocusIndex(targets.length, activeIndex, event.shiftKey);
-    if (nextIndex === null) return;
-
-    event.preventDefault();
-    targets[nextIndex]?.focus();
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-label="Close dialog"
-        onClick={onClose}
-        className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm"
-      />
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={description ? descriptionId : undefined}
-        onKeyDown={trapFocus}
-        className="relative w-full max-w-lg rounded-xl border border-base bg-elevated p-6 text-primary shadow-nexus-lg"
-      >
+    <dialog
+      ref={dialogRef}
+      aria-labelledby={titleId}
+      aria-describedby={description ? descriptionId : undefined}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 m-auto max-h-[min(100%,calc(100dvh-2rem))] w-[calc(100%-2rem)] max-w-lg open:flex flex-col overflow-hidden rounded-xl border border-base bg-elevated p-0 text-primary shadow-nexus-lg backdrop:bg-black/60"
+    >
+      <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-6">
         <button
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
           className="absolute right-4 top-4 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
-          aria-label="Close dialog"
+          aria-label={closeLabel}
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
@@ -96,14 +106,73 @@ export function Dialog({ isOpen, onClose, title, description, children }: Dialog
           <h3 id={titleId} className="text-lg font-bold text-primary">
             {title}
           </h3>
-          {description && (
+          {description ? (
             <p id={descriptionId} className="mt-1 text-sm text-muted">
               {description}
             </p>
-          )}
+          ) : null}
         </div>
         <div>{children}</div>
       </div>
-    </div>
+    </dialog>
+  );
+}
+
+export interface ConfirmDialogProps {
+  isOpen: boolean;
+  title: string;
+  /** Concrete object under change (name, handle, id label). */
+  object: string;
+  /** Optional scale of the action (count, selection size). */
+  scope?: string;
+  /** What happens if confirmed. */
+  consequences: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  closeLabel?: string;
+  danger?: boolean;
+  busy?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+/** Destructive confirm surface: object + optional scope + consequences. Cancel sends nothing. */
+export function ConfirmDialog({
+  isOpen,
+  title,
+  object,
+  scope,
+  consequences,
+  confirmLabel,
+  cancelLabel,
+  closeLabel = "Close dialog",
+  danger = true,
+  busy = false,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
+  return (
+    <Dialog isOpen={isOpen} onClose={onCancel} title={title} closeLabel={closeLabel}>
+      <div className="space-y-4">
+        <div className="space-y-2 text-sm">
+          <p className="break-words font-semibold text-primary">{object}</p>
+          {scope ? <p className="break-words text-secondary">{scope}</p> : null}
+          <p className="break-words text-secondary">{consequences}</p>
+        </div>
+        <div className="flex flex-wrap justify-end gap-2 pt-1">
+          <Button type="button" variant="outline" disabled={busy} onClick={onCancel}>
+            {cancelLabel}
+          </Button>
+          <Button
+            type="button"
+            variant={danger ? "danger" : "primary"}
+            disabled={busy}
+            onClick={onConfirm}
+          >
+            {confirmLabel}
+          </Button>
+        </div>
+      </div>
+    </Dialog>
   );
 }

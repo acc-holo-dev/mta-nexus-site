@@ -1,3 +1,5 @@
+import { licenseModelLabel } from "./license-model-i18n";
+
 const copies = {
   en: {
     title: "Recorded order terms",
@@ -87,7 +89,5 @@ export function orderTermsCopy(locale: string) {
 }
 
 export function orderTermsLicenseLabel(locale: string, model: string) {
-  if (model === "single_server")
-    return locale === "ru" ? "Одна лицензия — один сервер" : "One license, one server";
-  return locale === "ru" ? "Историческая декларация модели" : "Historical model declaration";
+  return licenseModelLabel(locale, model);
 }

@@ -20,6 +20,13 @@ export type PushServerState = {
   subscribed: boolean;
 };
 
+export type BrowserPushSnapshot = {
+  supported: boolean;
+  permission: NotificationPermission | "unsupported";
+  hasLocalSubscription: boolean;
+  keyMatches: boolean | null;
+};
+
 export function parsePushServerState(value: unknown): PushServerState | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
@@ -63,6 +70,31 @@ export async function endpointFingerprint(endpoint: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+/** Read-only capability check; never requests Notification permission. */
+export function readBrowserPushCapability(): Pick<BrowserPushSnapshot, "supported" | "permission"> {
+  if (
+    typeof window === "undefined" ||
+    !("serviceWorker" in navigator) ||
+    !("PushManager" in window) ||
+    !("Notification" in window)
+  ) {
+    return { supported: false, permission: "unsupported" };
+  }
+  return { supported: true, permission: Notification.permission };
+}
+
+export function derivePushStatus(
+  browser: BrowserPushSnapshot,
+  server: PushServerState,
+): Exclude<PushStatus, "loading" | "error"> {
+  if (!browser.supported || browser.permission === "unsupported") return "unsupported";
+  if (!server.configured || !server.publicKey) return "unconfigured";
+  if (browser.permission === "denied") return "denied";
+  if (browser.hasLocalSubscription && browser.keyMatches === false) return "disabled";
+  if (server.subscribed && browser.hasLocalSubscription) return "enabled";
+  return "disabled";
+}
+
 async function deleteStoredEndpoint(endpoint: string): Promise<boolean> {
   const response = await fetch("/api/notifications/push", {
     method: "DELETE",
@@ -92,6 +124,56 @@ async function readPushState(endpoint?: string) {
   return state;
 }
 
+async function readEffectivePushStatus(publicKeyHint?: string | null): Promise<{
+  status: Exclude<PushStatus, "loading" | "error">;
+  publicKey: string | null;
+}> {
+  const capability = readBrowserPushCapability();
+  if (!capability.supported) {
+    return { status: "unsupported", publicKey: publicKeyHint ?? null };
+  }
+  const registration = await navigator.serviceWorker.getRegistration("/");
+  const localSubscription = await registration?.pushManager.getSubscription();
+  const state = await readPushState(localSubscription?.endpoint);
+  const keyMatches =
+    localSubscription && state.publicKey
+      ? matchesApplicationServerKey(
+          localSubscription.options.applicationServerKey,
+          state.publicKey,
+        )
+      : localSubscription
+        ? false
+        : null;
+  if (localSubscription && keyMatches === false) {
+    await deleteStoredEndpoint(localSubscription.endpoint).catch(() => false);
+    await localSubscription.unsubscribe().catch(() => false);
+    return {
+      status: derivePushStatus(
+        {
+          supported: true,
+          permission: capability.permission,
+          hasLocalSubscription: false,
+          keyMatches: null,
+        },
+        { ...state, subscribed: false },
+      ),
+      publicKey: state.publicKey,
+    };
+  }
+  return {
+    status: derivePushStatus(
+      {
+        supported: true,
+        permission: capability.permission,
+        hasLocalSubscription: Boolean(localSubscription),
+        keyMatches,
+      },
+      state,
+    ),
+    publicKey: state.publicKey,
+  };
+}
+
 export function WebPushSettings() {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.settings;
@@ -104,41 +186,11 @@ export function WebPushSettings() {
   useEffect(() => {
     let active = true;
     async function load() {
-      if (
-        !("serviceWorker" in navigator) ||
-        !("PushManager" in window) ||
-        !("Notification" in window)
-      ) {
-        if (active) setStatus("unsupported");
-        return;
-      }
       try {
-        const registration = await navigator.serviceWorker.getRegistration("/");
-        const localSubscription = await registration?.pushManager.getSubscription();
-        const state = await readPushState(localSubscription?.endpoint);
+        const effective = await readEffectivePushStatus();
         if (!active) return;
-        setPublicKey(state.publicKey);
-        if (!state.configured || !state.publicKey) {
-          setStatus("unconfigured");
-          return;
-        }
-        if (Notification.permission === "denied") {
-          setStatus("denied");
-          return;
-        }
-        if (
-          localSubscription &&
-          !matchesApplicationServerKey(
-            localSubscription.options.applicationServerKey,
-            state.publicKey,
-          )
-        ) {
-          await deleteStoredEndpoint(localSubscription.endpoint).catch(() => false);
-          await localSubscription.unsubscribe().catch(() => false);
-          if (active) setStatus("disabled");
-          return;
-        }
-        setStatus(state.subscribed && localSubscription ? "enabled" : "disabled");
+        setPublicKey(effective.publicKey);
+        setStatus(effective.status);
       } catch {
         if (active) setStatus("error");
       }
@@ -208,7 +260,9 @@ export function WebPushSettings() {
         }
         throw new Error("push-enable");
       }
-      setStatus("enabled");
+      const confirmed = await readEffectivePushStatus(publicKey);
+      setPublicKey(confirmed.publicKey);
+      setStatus(confirmed.status);
     } catch {
       setStatus("error");
     } finally {
@@ -228,7 +282,9 @@ export function WebPushSettings() {
         }
         await subscription.unsubscribe();
       }
-      setStatus("disabled");
+      const confirmed = await readEffectivePushStatus(publicKey);
+      setPublicKey(confirmed.publicKey);
+      setStatus(confirmed.status === "enabled" ? "error" : confirmed.status);
     } catch {
       setStatus("error");
     } finally {

@@ -17,7 +17,7 @@ import {
   getSupportedBuildExtension,
   hasExpectedBuildFileFormat,
 } from "../../../../../lib/build-file-validation";
-import { mtaVersionSchema } from "@nexus/validation";
+import { mtaVersionSchema, resourceVersionSchema } from "@nexus/validation";
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
@@ -53,9 +53,7 @@ function privateJson(
 }
 
 const buildMetadataSchema = z.object({
-  version: z
-    .string()
-    .regex(/^v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?$/, "Semantic version expected"),
+  version: resourceVersionSchema,
   releaseNotes: z.string().max(5000).optional(),
   mtaVersionTarget: mtaVersionSchema.optional().or(z.literal("")),
 });
@@ -65,8 +63,8 @@ export const POST = withBrowserMutation(
     const context = createRequestLogContext(request);
     try {
       const token = request.cookies.get("nexus_session")?.value;
-      const user = await authService.getSession(token);
-      if (!user) {
+      const user = token ? await authService.getSession(token) : null;
+      if (!token || !user) {
         return privateJson(
           context,
           { error: "Authentication required", code: "UNAUTHORIZED" },
@@ -281,7 +279,7 @@ export const POST = withBrowserMutation(
         const build = await productService.releaseBuild(
           {
             productId,
-            version: parsed.data.version.replace(/^v/, ""),
+            version: parsed.data.version,
             releaseNotes: parsed.data.releaseNotes,
             mtaVersionTarget: parsed.data.mtaVersionTarget || undefined,
             storageKey: asset.key,
@@ -295,6 +293,7 @@ export const POST = withBrowserMutation(
             packageEvidence,
           },
           user,
+          token,
         );
         return privateJson(context, { build }, { status: 201 });
       } catch (error) {
@@ -303,7 +302,7 @@ export const POST = withBrowserMutation(
           const build = await productService.recoverPendingBuildUpload(
             {
               productId,
-              version: parsed.data.version.replace(/^v/, ""),
+              version: parsed.data.version,
               releaseNotes: parsed.data.releaseNotes,
               mtaVersionTarget: parsed.data.mtaVersionTarget || undefined,
               sha256Hash: asset.sha256Hash,

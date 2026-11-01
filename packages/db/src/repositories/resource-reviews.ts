@@ -68,12 +68,18 @@ async function available(tx: ResourceTransaction, product: Pick<Product, "id" | 
     .for("share");
   return !!build;
 }
+type ReviewAccess = NonNullable<Awaited<ReturnType<typeof lockUserDownloadAccess>>>;
+type ReviewGate =
+  | { reason: "ok"; access: ReviewAccess }
+  | { reason: "owner_conflict"; access: null }
+  | { reason: "access_required"; access: null };
+
 /** Product -> organization -> user -> membership -> access, matching publisher writes. */
-async function canReview(
+async function reviewGate(
   tx: ResourceTransaction,
   product: Pick<Product, "id" | "authorId" | "organizationId">,
   actorId: string,
-) {
+): Promise<ReviewGate> {
   const [organization] = product.organizationId
     ? await tx
         .select({ ownerId: organizations.ownerId })
@@ -111,14 +117,15 @@ async function canReview(
       (["owner", "admin"].includes(membership.role) ||
         membership.permissions.includes("manage_products")))
   )
-    return null;
+    return { reason: "owner_conflict", access: null };
   const access = await lockUserDownloadAccess(tx, actorId, product.id);
-  return access && (!access.expiresAt || access.expiresAt.getTime() > Date.now()) ? access : null;
+  if (access && (!access.expiresAt || access.expiresAt.getTime() > Date.now())) {
+    return { reason: "ok", access };
+  }
+  return { reason: "access_required", access: null };
 }
-function recheck(
-  access: Awaited<ReturnType<typeof lockUserDownloadAccess>>,
-): asserts access is NonNullable<Awaited<ReturnType<typeof lockUserDownloadAccess>>> {
-  if (!access || (access.expiresAt && access.expiresAt.getTime() <= Date.now()))
+function recheck(gate: ReviewGate): asserts gate is { reason: "ok"; access: ReviewAccess } {
+  if (gate.reason !== "ok" || !gate.access || (gate.access.expiresAt && gate.access.expiresAt.getTime() <= Date.now()))
     throw new AppError("Current acquired access is required", 403, "REVIEW_ACCESS_REQUIRED");
 }
 async function aggregate(tx: ResourceTransaction, productId: string) {
@@ -203,7 +210,13 @@ class ResourceReviewsRepository {
           .limit(1);
         const ready = await available(tx, product);
         if (!ready && !review) throw new NotFoundError("Resource", productId);
-        const access = await canReview(tx, product, actorId);
+        const gate = await reviewGate(tx, product, actorId);
+        const eligibility =
+          review?.status === "removed"
+            ? ("moderated" as const)
+            : !ready
+              ? ("resource_unavailable" as const)
+              : gate.reason;
         return {
           product: {
             id: productId,
@@ -213,11 +226,8 @@ class ResourceReviewsRepository {
           review: review
             ? { ...review, status: review.status as ResourceReviewView["status"] }
             : null,
-          canReview:
-            ready &&
-            !!access &&
-            (!access.expiresAt || access.expiresAt.getTime() > Date.now()) &&
-            review?.status !== "removed",
+          canReview: eligibility === "ok",
+          eligibility,
         };
       },
       { isolationLevel: "repeatable read" },
@@ -281,7 +291,7 @@ class ResourceReviewsRepository {
     return db.transaction(async (tx) => {
       const product = await currentProduct(tx, input.productId, true);
       // Locks authority even for withdrawal; a revoked account cannot write.
-      const access = await canReview(tx, product, input.actorId);
+      const gate = await reviewGate(tx, product, input.actorId);
       const [current] = await tx
         .select({
           id: comments.id,
@@ -323,12 +333,12 @@ class ResourceReviewsRepository {
         };
       }
       if (!(await available(tx, product))) throw new NotFoundError("Resource", product.id);
-      recheck(access);
+      recheck(gate);
       const values = {
         text: command.text.trim(),
         rating: command.rating,
         reviewStatus: "published",
-        reviewAccessSource: access.source,
+        reviewAccessSource: gate.access.source,
         isVerifiedPurchase: true,
         reviewRevision: (current?.revision ?? 0) + 1,
         reviewUpdatedAt: new Date(),
@@ -342,14 +352,14 @@ class ResourceReviewsRepository {
           ...values,
         });
       const totals = await aggregate(tx, product.id);
-      recheck(access);
+      recheck(gate);
       await audit(
         tx,
         input.actorId,
         input.auditId,
         current ? "product.review_edited" : "product.review_submitted",
         current?.id ?? input.reviewId,
-        { productId: product.id, rating: values.rating, accessSource: access.source },
+        { productId: product.id, rating: values.rating, accessSource: gate.access.source },
       );
       const [review] = await tx
         .select(publicFields)
@@ -357,7 +367,7 @@ class ResourceReviewsRepository {
         .leftJoin(users, eq(users.id, comments.authorId))
         .where(eq(comments.id, current?.id ?? input.reviewId))
         .limit(1);
-      recheck(access);
+      recheck(gate);
       return {
         id: current?.id ?? input.reviewId,
         revision: values.reviewRevision,

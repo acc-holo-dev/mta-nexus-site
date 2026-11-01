@@ -83,8 +83,9 @@ export class BuildRepository {
   submitForReview(
     data: Omit<Build, "createdAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Build> {
-    return buildModeration.submitForReview(data, audit);
+    return buildModeration.submitForReview(data, audit, currentToken);
   }
 
   moderatePending(
@@ -93,8 +94,16 @@ export class BuildRepository {
     audit: Omit<AuditEvent, "createdAt">,
     expectedRevision: number,
     currentToken: string,
+    expectedPasswordHash?: string,
   ): Promise<Build | null> {
-    return buildModeration.moderatePending(id, decision, audit, expectedRevision, currentToken);
+    return buildModeration.moderatePending(
+      id,
+      decision,
+      audit,
+      expectedRevision,
+      currentToken,
+      expectedPasswordHash,
+    );
   }
 
   retireAndRefreshProduct(

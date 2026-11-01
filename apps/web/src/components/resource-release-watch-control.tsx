@@ -1,17 +1,36 @@
 "use client";
 import type { ResourceReleaseWatch, ResourceReleaseWatchCommand } from "@nexus/domain";
 import { Button } from "@nexus/ui";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { useNexusLocale } from "./locale-context";
+
 export function ResourceReleaseWatchControl({
   watch,
   available = true,
+  commerceEnabled = true,
+  hasAccess = true,
+  acquireHref,
+  settingsHref = "/settings",
+  guest = false,
+  returnPath,
+  /** Public detail shows full effective-state copy; library embeds keep outer notes. */
+  surface = "embedded",
 }: {
   watch: ResourceReleaseWatch;
   available?: boolean;
+  /** Effective delivery category; false means notices stay suppressed without backlog. */
+  commerceEnabled?: boolean;
+  hasAccess?: boolean;
+  acquireHref?: string;
+  settingsHref?: string;
+  guest?: boolean;
+  returnPath?: string | null;
+  surface?: "detail" | "embedded";
 }) {
   const { locale } = useNexusLocale(),
     copy = resourceReleaseWatchesCopy(locale),
@@ -27,18 +46,30 @@ export function ResourceReleaseWatchControl({
     [error, setError] = useState(""),
     [saved, setSaved] = useState(false),
     [pending, setPending] = useState(false),
-    [blocked, setBlocked] = useState(false);
+    [blocked, setBlocked] = useState(false),
+    [loginHref, setLoginHref] = useState(authEntryHref("login", returnPath ?? null));
   const active = useRef<AbortController | null>(null);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", returnPath ?? currentBrowserReturnPath()));
+    return () => {
       active.current?.abort();
       active.current = null;
-    },
-    [],
-  );
+    };
+  }, [returnPath]);
+
+  const canToggle = hasAccess && (available || watch.enabled);
+  const disabledReason = guest
+    ? null
+    : !hasAccess
+      ? copy.acquireRequired
+      : !available && !watch.enabled
+        ? copy.noSafeBuild
+        : null;
+
   async function save() {
-    if (lock.current || settled.current || (!frozen.current && !available && !watch.enabled))
+    if (lock.current || settled.current || guest || (!frozen.current && !canToggle && !watch.enabled))
       return;
+    if (!frozen.current && !watch.enabled && !canToggle) return;
     const request = frozen.current ?? {
       productId: watch.productId,
       command: { enabled: !watch.enabled, expectedRevision: watch.revision },
@@ -105,14 +136,49 @@ export function ResourceReleaseWatchControl({
       }
     }
   }
+
+  if (guest) {
+    return (
+      <div className="space-y-2">
+        <p className="text-sm text-secondary">{copy.signInRequired}</p>
+        <p className="text-xs text-muted">{copy.note}</p>
+        <Link href={loginHref} className="text-sm text-accent underline">
+          {copy.signIn}
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
+      {surface === "detail" ? (
+        <>
+          <p className="text-sm text-secondary">{copy.note}</p>
+          <p className="text-xs text-muted">{copy.pinned}</p>
+          <p className="text-xs text-muted">{copy.limit}</p>
+        </>
+      ) : null}
+      {!commerceEnabled ? (
+        <p role="note" className="text-sm text-warning">
+          {copy.suppressed}
+        </p>
+      ) : null}
+      {disabledReason ? (
+        <p role="note" className="text-sm text-warning">
+          {disabledReason}
+        </p>
+      ) : null}
+      {!hasAccess && acquireHref ? (
+        <Link href={acquireHref} className="text-sm text-accent underline">
+          {copy.acquireRequired}
+        </Link>
+      ) : null}
       {!pending && (
         <Button
           type="button"
           variant="outline"
           onClick={save}
-          disabled={busy || saved || (!available && !watch.enabled)}
+          disabled={busy || saved || (!canToggle && !watch.enabled)}
           aria-busy={busy}
           className="text-accent"
         >
@@ -156,6 +222,18 @@ export function ResourceReleaseWatchControl({
         <p role="status" className="text-sm text-success">
           {copy.saved}
         </p>
+      ) : null}
+      {surface === "detail" || !commerceEnabled ? (
+        <div className="flex flex-wrap gap-3 text-sm">
+          <Link href={settingsHref} className="text-accent underline">
+            {copy.settings}
+          </Link>
+          {surface === "detail" ? (
+            <Link href="/workspace/library/watches" className="text-accent underline">
+              {copy.watchCenter}
+            </Link>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

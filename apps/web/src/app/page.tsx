@@ -1,35 +1,92 @@
-import { SectionHeader } from "@nexus/ui";
+import { SectionHeader, buttonClassName } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { ArticleCard } from "../components/article-card";
+import { HomePersonalChangesPanel } from "../components/home-personal-changes-panel";
 import { ProductCard } from "../components/product-card";
+import { HomeNetworkServerCard } from "../components/server-card";
+import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
+import {
+  HOME_PERSONAL_COOKIE,
+  parseHomePersonalPreference,
+} from "../lib/home-personal-preference";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
+import { authService } from "../lib/services/auth-service";
 import { contentService } from "../lib/services/content-service";
-import { mtaMasterDirectoryService } from "../lib/services/mta-master-directory-service";
+import {
+  matchesMtaEndpoint,
+  type MtaMasterServer,
+  mtaMasterDirectoryService,
+} from "../lib/services/mta-master-directory-service";
 import { productService } from "../lib/services/product-service";
+import { serverService } from "../lib/services/server-service";
 
 export const dynamic = "force-dynamic";
+
+function summarizeKnownPlayers(servers: readonly MtaMasterServer[]) {
+  let sum = 0;
+  let known = 0;
+  let unknown = 0;
+  for (const server of servers) {
+    if (server.players == null) {
+      unknown += 1;
+      continue;
+    }
+    known += 1;
+    sum += server.players;
+  }
+  return { sum, known, unknown, total: servers.length };
+}
 
 export default async function HomePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
-  const [directory, freeResources, articles] = await Promise.all([
+  const cookieStore = await cookies();
+  const session = await authService
+    .getSession(cookieStore.get("nexus_session")?.value)
+    .catch(() => null);
+  const personalPreference = parseHomePersonalPreference(
+    cookieStore.get(HOME_PERSONAL_COOKIE)?.value,
+  );
+  const [directory, freeResources, articles, nexusListings, personalSummary] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
     productService.listProducts({ maxPrice: 0, sort: "popular", limit: 4 }),
     contentService.listArticles(4),
+    serverService.listServers(200).catch(() => []),
+    session
+      ? loadPersonalChangesSummary(
+          session.id,
+          locale,
+          personalPreference === "hide",
+        ).catch(() => ({
+          status: "error" as const,
+          items: [],
+          failedSources: ["releaseWatch" as const, "discussionFollow" as const, "replyToMe" as const],
+        }))
+      : Promise.resolve(null),
   ]);
-  const playersOnline =
-    directory?.servers.reduce((total, server) => total + (server.players ?? 0), 0) ?? 0;
+  const resourceAttributions = await productService.getPublicAttributions(freeResources);
+  const playerSummary = directory ? summarizeKnownPlayers(directory.servers) : null;
   const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
   const directoryTone = directory?.isStale
     ? dictionary.home.latestSnapshot
     : directory
       ? dictionary.home.officialDirectory
       : dictionary.home.directoryUnavailable;
+  const playersPartial =
+    Boolean(directory && !directory.isStale && playerSummary && playerSummary.unknown > 0);
   const playersLabel =
-    directory && !directory.isStale ? playersOnline.toLocaleString(numberLocale) : "—";
+    !directory || directory.isStale || !playerSummary
+      ? "—"
+      : playerSummary.known === 0
+        ? dictionary.servers.playersUnknown
+        : playersPartial
+          ? `${playerSummary.sum.toLocaleString(numberLocale)} · ${dictionary.servers.playersUnknown}`
+          : playerSummary.sum.toLocaleString(numberLocale);
   const serversLabel = directory?.servers.length ?? "—";
+  const spotlight = directory?.servers.slice(0, 6) ?? [];
 
   return (
     <div className="space-y-14">
@@ -58,19 +115,50 @@ export default async function HomePage() {
           <div className="flex flex-wrap gap-3 pt-1 motion-safe:animate-[fade-in_1.1s_ease-out]">
             <Link
               href="/servers"
-              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-white transition-[transform,opacity] hover:opacity-90 motion-safe:hover:-translate-y-0.5"
+              className={buttonClassName({
+                variant: "primary",
+                size: "hero",
+                className:
+                  "transition-[transform,opacity] hover:opacity-90 motion-safe:hover:-translate-y-0.5",
+              })}
             >
               {dictionary.home.exploreServers}
             </Link>
             <Link
               href="/market?maxPrice=0"
-              className="rounded-lg border border-base bg-elevated px-5 py-2.5 text-sm font-semibold text-secondary transition-[transform,colors] hover:bg-hover hover:text-primary motion-safe:hover:-translate-y-0.5"
+              className={buttonClassName({
+                variant: "outline",
+                size: "hero",
+                className:
+                  "border-base bg-elevated font-semibold transition-[transform,colors] motion-safe:hover:-translate-y-0.5",
+              })}
             >
               {dictionary.home.browseResources}
             </Link>
           </div>
         </div>
       </section>
+
+      {session && personalSummary ? (
+        <HomePersonalChangesPanel
+          summary={personalSummary}
+          preference={personalPreference}
+          copy={{
+            title: dictionary.home.personalTitle,
+            description: dictionary.home.personalDescription,
+            empty: dictionary.home.personalEmpty,
+            error: dictionary.home.personalError,
+            partial: dictionary.home.personalPartial,
+            hidden: dictionary.home.personalHidden,
+            hidePreference: dictionary.home.personalHide,
+            showPreference: dictionary.home.personalShow,
+            reasonReleaseWatch: dictionary.home.personalReasonReleaseWatch,
+            reasonDiscussionFollow: dictionary.home.personalReasonDiscussionFollow,
+            reasonReplyToMe: dictionary.home.personalReasonReplyToMe,
+            openInbox: dictionary.home.personalOpenInbox,
+          }}
+        />
+      ) : null}
 
       <section>
         <SectionHeader
@@ -95,24 +183,18 @@ export default async function HomePage() {
         </p>
         {directory ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            {directory.servers.slice(0, 6).map((server) => (
-              <a
-                key={`${server.address}:${server.port}`}
-                href={`mtasa://${server.address}:${server.port}`}
-                className="nexus-panel p-5 transition-colors hover:border-strong"
-              >
-                <div className="truncate text-sm font-bold text-primary">
-                  {server.name || `${server.address}:${server.port}`}
-                </div>
-                <div className="mt-1 truncate text-xs text-muted">
-                  {[server.gameMode, server.mapName].filter(Boolean).join(" · ") ||
-                    `${server.address}:${server.port}`}
-                </div>
-                <div className="mt-4 text-sm font-semibold text-success">
-                  {server.players ?? 0} / {server.maxPlayers ?? "?"} {dictionary.home.players}
-                </div>
-              </a>
-            ))}
+            {spotlight.map((server) => {
+              const matched = nexusListings.find((listing) => matchesMtaEndpoint(listing, server));
+              return (
+                <HomeNetworkServerCard
+                  key={`${server.address}:${server.port}`}
+                  observation={server}
+                  locale={locale}
+                  profileSlug={matched?.slug}
+                  isStale={directory.isStale}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="nexus-panel p-8 text-center text-sm text-muted">
@@ -138,7 +220,12 @@ export default async function HomePage() {
         {freeResources.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {freeResources.map((product) => (
-              <ProductCard key={product.id} product={product} locale={locale} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+                attribution={resourceAttributions.get(product.id) ?? null}
+              />
             ))}
           </div>
         ) : (

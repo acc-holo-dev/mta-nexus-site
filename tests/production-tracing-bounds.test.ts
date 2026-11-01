@@ -43,4 +43,17 @@ describe("production tracing and standalone runtime bounds", () => {
     expect(dockerfile).toContain("COPY --from=build /app/apps/web/.next/standalone/ /app/");
     expect(dockerfile).toContain("pnpm --filter @nexus/db --prod deploy /runtime/db");
   });
+
+  it("documents build-only placeholders and refuses baking secrets via next.config env", () => {
+    const config = read("apps/web/next.config.mjs");
+    const dockerfile = read("Dockerfile");
+
+    expect(config).toMatch(/deliberately omit next\.config `env`|omit next\.config `env`/u);
+    expect(config).not.toMatch(/^\s*env:\s*\{/mu);
+    expect(config).not.toMatch(/\benv:\s*\{[\s\S]*AUTH_SECRET/u);
+    expect(config).not.toMatch(/\benv:\s*\{[\s\S]*DATABASE_URL/u);
+    expect(dockerfile).toContain("build-only-secret-that-is-long-enough-for-validation");
+    expect(dockerfile).toContain("postgres://nexus:build-only@127.0.0.1:5432/mta_nexus");
+    expect(dockerfile).toMatch(/compile-only placeholders|OPS-05/u);
+  });
 });

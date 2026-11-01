@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { readSafePublicErrorReference } from "../lib/safe-public-error-reference";
 
 type Locale = "en" | "ru";
 
@@ -11,6 +12,11 @@ const copy = {
       "A critical interface error prevented the application shell from loading. Retry the page or return to the home page.",
     retry: "Try again",
     home: "Home",
+    referenceLabel: "Support reference",
+    referenceHint: "Include this code when contacting support.",
+    copyReference: "Copy reference",
+    copied: "Copied",
+    copyUnavailable: "Select and copy the code manually",
   },
   ru: {
     title: "Не удалось запустить MTA NEXUS",
@@ -18,8 +24,20 @@ const copy = {
       "Критическая ошибка интерфейса помешала загрузить оболочку приложения. Повторите попытку или вернитесь на главную страницу.",
     retry: "Повторить",
     home: "На главную",
+    referenceLabel: "Код для поддержки",
+    referenceHint: "Укажите этот код при обращении в поддержку.",
+    copyReference: "Скопировать код",
+    copied: "Скопировано",
+    copyUnavailable: "Выделите и скопируйте код вручную",
   },
 } as const;
+
+const focusRingStyle = `
+  button:focus-visible, a:focus-visible {
+    outline: 2px solid #7b86f7;
+    outline-offset: 2px;
+  }
+`;
 
 export function detectGlobalErrorLocale(cookie: string): Locale {
   return cookie
@@ -36,18 +54,35 @@ function detectLocale(): Locale {
 }
 
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   const [locale, setLocale] = useState<Locale>("en");
+  const [copyMessage, setCopyMessage] = useState("");
+  const reference = readSafePublicErrorReference(error);
 
   useEffect(() => {
     setLocale(detectLocale());
   }, []);
 
   const text = copy[locale];
+
+  async function copyReference() {
+    if (!reference) return;
+    setCopyMessage("");
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard unavailable");
+      }
+      await navigator.clipboard.writeText(reference);
+      setCopyMessage(text.copied);
+    } catch {
+      setCopyMessage(text.copyUnavailable);
+    }
+  }
 
   return (
     <html lang={locale}>
@@ -64,6 +99,7 @@ export default function GlobalError({
           fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
         }}
       >
+        <style dangerouslySetInnerHTML={{ __html: focusRingStyle }} />
         <main
           style={{
             width: "100%",
@@ -104,6 +140,83 @@ export default function GlobalError({
           >
             {text.message}
           </p>
+
+          {reference ? (
+            <div
+              style={{
+                marginTop: "18px",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "1px solid #2a3038",
+                background: "#0b0d10",
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                  color: "#8d99a8",
+                  textTransform: "uppercase",
+                }}
+              >
+                {text.referenceLabel}
+              </p>
+              <code
+                data-testid="error-public-reference"
+                style={{
+                  display: "block",
+                  marginTop: "8px",
+                  fontSize: "14px",
+                  lineHeight: 1.4,
+                  wordBreak: "break-all",
+                  color: "#f5f7fa",
+                }}
+              >
+                {reference}
+              </code>
+              <p
+                style={{
+                  margin: "8px 0 0",
+                  fontSize: "13px",
+                  lineHeight: 1.5,
+                  color: "#b8c0ca",
+                }}
+              >
+                {text.referenceHint}
+              </p>
+              <button
+                type="button"
+                onClick={() => void copyReference()}
+                style={{
+                  marginTop: "12px",
+                  minHeight: "36px",
+                  border: "1px solid #39414c",
+                  borderRadius: "8px",
+                  padding: "0 12px",
+                  cursor: "pointer",
+                  background: "transparent",
+                  color: "#f5f7fa",
+                  fontWeight: 600,
+                }}
+              >
+                {text.copyReference}
+              </button>
+              {copyMessage ? (
+                <p
+                  role="status"
+                  style={{
+                    margin: "8px 0 0",
+                    fontSize: "12px",
+                    color: "#8d99a8",
+                  }}
+                >
+                  {copyMessage}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
 
           <div
             style={{

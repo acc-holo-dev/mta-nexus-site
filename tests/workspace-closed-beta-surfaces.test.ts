@@ -1,5 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  showAdminDestination,
+  showWorkspaceTools,
+} from "../apps/web/src/components/shell-destination-policy";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
@@ -126,5 +130,22 @@ describe("closed-beta workspace behavior", () => {
       expect(html).toContain('href="/auth/login"');
     }
     expect(state.redirects).toEqual([]);
+  });
+
+  it("keeps UX-23 A guest shell policy aligned with closed-beta sign-in gates", () => {
+    expect(showWorkspaceTools({ status: "anonymous", user: null })).toBe(false);
+    expect(showAdminDestination({ status: "anonymous", user: null })).toBe(false);
+    expect(
+      showAdminDestination({
+        status: "authenticated",
+        user: { username: "member", role: "user" },
+      }),
+    ).toBe(false);
+    expect(
+      showWorkspaceTools({
+        status: "authenticated",
+        user: { username: "member", role: "user" },
+      }),
+    ).toBe(true);
   });
 });

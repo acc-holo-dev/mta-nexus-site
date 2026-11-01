@@ -236,11 +236,14 @@ export const admin = {
     retry: "Try again",
     saving: "Saving account changes...",
     notificationPreferences: "Notification preferences",
-    notificationDescription: "These preferences do not control security-related messages.",
+    notificationDescription:
+      "These switches control whether NEXUS creates inbox messages for each category. Turning a category off suppresses new inbox entries; it does not store a backlog for later delivery. Security messages stay on regardless of these switches. Per-publication mute/snooze on a discussion is separate from these category switches and never blocks security or account notices. Browser push for this device is separate below and does not change inbox or watch settings.",
     newFollowers: "Followers and followed discussions",
-    newFollowersDescription: "New followers and replies to publications you follow.",
+    newFollowersDescription:
+      "New followers and replies to publications you watch for comments. Quiet saves do not use this category until discussion watch is enabled.",
     contentUpdates: "Content updates",
-    contentUpdatesDescription: "Publication updates and replies to your publications and comments.",
+    contentUpdatesDescription:
+      "Publication updates and direct replies to your publications and comments. Object mute on a publication also pauses these for that target only.",
     serverUpdates: "Server updates",
     serverUpdatesDescription: "Updates related to followed MTA servers.",
     resourceActivity: "Resource activity",
@@ -249,15 +252,16 @@ export const admin = {
     systemNotificationsDescription: "Important non-security account messages.",
     webPush: "Browser push",
     webPushDescription:
-      "Receive browser notifications using the same NEXUS notification preferences.",
+      "Optional alerts for this browser only. Enabling asks for browser permission. Turning push off removes this browser subscription and does not delete inbox messages or change watches.",
     webPushEnable: "Enable push",
     webPushDisable: "Disable push",
     webPushEnabled:
-      "Enabled for this signed-in browser. Ending this session also removes its server-side push subscription.",
+      "Enabled for this signed-in browser. Ending this session also removes its server-side push subscription. Inbox and watches stay unchanged.",
     webPushUnsupported: "This browser does not support Web Push.",
-    webPushUnconfigured: "Web Push is not configured on this deployment yet.",
+    webPushUnconfigured:
+      "Web Push is not configured on this deployment yet. Inbox preferences above still work; ask an operator to configure VAPID before enabling browser push.",
     webPushDenied:
-      "Browser notification permission is blocked. Change the site permission in your browser to enable push.",
+      "Browser notification permission is blocked for this site. Open your browser site settings, allow notifications, then return here and enable push. Inbox and watches are unaffected.",
     webPushError: "Web Push state could not be confirmed. Reload settings before retrying.",
     webPushLoading: "Checking browser push...",
     recoveryEmail: "Recovery email",

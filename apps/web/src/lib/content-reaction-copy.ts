@@ -15,6 +15,7 @@ const en = {
   removed: "Reaction removed.",
   unavailable: "Unable to load reactions. Try again.",
   uncertain: "The result is not confirmed. Reload the saved state before trying again.",
+  unknownCounts: "Counts unavailable until the saved state loads.",
   reload: "Reload saved state",
   invalid: "Invalid reaction or page. Open the latest page to continue.",
   my: "My reactions",
@@ -30,7 +31,8 @@ const en = {
   emptyFiltered: "No reactions match these filters.",
   hidden: "Publication unavailable",
   hiddenDescription: "The publication was removed or is no longer public.",
-  scope: "Reactions express reader feedback. Verification is reviewed separately.",
+  scope:
+    "Reactions are reader feedback only. Clicks are not points, reputation, or a usefulness score. Verification is reviewed separately.",
   back: "Back to workspace",
 };
 const ru: Record<keyof typeof en, string> = {
@@ -48,6 +50,7 @@ const ru: Record<keyof typeof en, string> = {
   removed: "Реакция удалена.",
   unavailable: "Не удалось загрузить реакции. Попробуйте ещё раз.",
   uncertain: "Результат не подтверждён. Загрузите сохранённое состояние перед повторной попыткой.",
+  unknownCounts: "Счётчики недоступны, пока не загружено сохранённое состояние.",
   reload: "Загрузить сохранённое состояние",
   invalid: "Некорректная реакция или страница. Откройте страницу новых реакций, чтобы продолжить.",
   my: "Мои реакции",
@@ -63,7 +66,8 @@ const ru: Record<keyof typeof en, string> = {
   emptyFiltered: "По этим фильтрам реакций нет.",
   hidden: "Публикация недоступна",
   hiddenDescription: "Публикация удалена или больше не является публичной.",
-  scope: "Реакции отражают мнение читателей. Верификация проходит отдельную проверку.",
+  scope:
+    "Реакции — только отзыв читателя. Клики не дают очки, репутацию или оценку полезности. Верификация проходит отдельно.",
   back: "К кабинету",
 };
 export const reactionCopy = (locale: Locale) => (locale === "ru" ? ru : en);

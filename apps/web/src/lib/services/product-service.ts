@@ -5,7 +5,13 @@ import {
   productLifecycleRepository,
 } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
-import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
+import {
+  AppError,
+  NotFoundError,
+  ForbiddenError,
+  eventBus,
+  normalizeResourceVersionForStorage,
+} from "@nexus/domain";
 import type {
   Product,
   Build,
@@ -21,6 +27,12 @@ import {
   reverseDependencyLimits,
 } from "../reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
+import {
+  mapPublicResourceAttribution,
+  type PublicResourceAttribution,
+} from "../public-resource-attribution";
+
+export type { PublicResourceAttribution };
 
 /**
  * The database mutation and audit are already durable before the event
@@ -163,6 +175,23 @@ export class ProductService {
       offset: (page - 1) * pageSize,
     });
     return { products: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
+  }
+
+  /** Batch public author/org labels for catalogue surfaces without N+1 or private fields. */
+  async getPublicAttributions(
+    products: readonly Pick<Product, "id">[],
+  ): Promise<Map<string, PublicResourceAttribution>> {
+    const rows = await productRepository.publicAttributionsFor(products.map((item) => item.id));
+    const byId = new Map<string, PublicResourceAttribution>();
+    for (const row of rows) {
+      byId.set(row.productId, mapPublicResourceAttribution(row));
+    }
+    return byId;
+  }
+
+  async getPublicAttribution(productId: string): Promise<PublicResourceAttribution | null> {
+    const [row] = await productRepository.publicAttributionsFor([productId]);
+    return row ? mapPublicResourceAttribution(row) : null;
   }
 
   async getProductBySlug(slug: string): Promise<Product | null> {
@@ -341,7 +370,11 @@ export class ProductService {
   ): Promise<Build | null> {
     // Permissions can change while scanning or uploading; do not reuse preflight access.
     await this.assertCanReleaseBuild(input.productId, actor);
-    return buildRepository.findExactPendingRetry(input);
+    return buildRepository.findExactPendingRetry({
+      ...input,
+      // OPS-19: match stored uniqueness key (optional leading `v` already stripped for new releases).
+      version: normalizeResourceVersionForStorage(input.version),
+    });
   }
 
   async releaseBuild(
@@ -361,8 +394,12 @@ export class ProductService {
       packageEvidence?: BuildPackageEvidence;
     },
     actor: User,
+    currentToken: string,
   ): Promise<Build> {
     const product = await this.assertCanReleaseBuild(input.productId, actor);
+    // OPS-19: new releases store the uniqueness key without optional leading `v`.
+    // Historical published rows are not rewritten; duplicate identity still maps to BUILD_VERSION_EXISTS.
+    const version = normalizeResourceVersionForStorage(input.version);
 
     const buildId = generateId("bld");
     const auditId = generateId("aud");
@@ -372,7 +409,7 @@ export class ProductService {
         {
           id: buildId,
           productId: input.productId,
-          version: input.version,
+          version,
           releaseNotes: input.releaseNotes,
           mtaVersionTarget: input.mtaVersionTarget,
           status: "pending_review",
@@ -395,8 +432,9 @@ export class ProductService {
           action: "build.submitted_for_review",
           targetId: buildId,
           targetType: "build",
-          details: { productId: product.id, version: input.version },
+          details: { productId: product.id, version },
         },
+        currentToken,
       );
     } catch (error: unknown) {
       if (isUniqueConstraintViolation(error, ["builds_product_version_idx"])) {
@@ -416,7 +454,7 @@ export class ProductService {
       payload: {
         buildId,
         productId: product.id,
-        version: input.version,
+        version,
         hash: input.sha256Hash,
       },
     }));
@@ -429,12 +467,17 @@ export class ProductService {
       decision: "approve" | "reject";
       notes?: string;
       expectedRevision: number;
+      /** FLOW-22: hash proven at HTTP; rechecked inside the moderation transaction. */
+      expectedPasswordHash?: string;
     },
     actor: User,
     currentToken: string,
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator privilege is required to review builds");
+    }
+    if (!input.expectedPasswordHash) {
+      throw new AppError("Current password is required", 401, "FRESH_AUTH_REQUIRED");
     }
 
     const build = await buildRepository.findById(input.buildId);
@@ -482,6 +525,7 @@ export class ProductService {
       },
       input.expectedRevision,
       currentToken,
+      input.expectedPasswordHash,
     );
     if (!reviewed) {
       throw new AppError(

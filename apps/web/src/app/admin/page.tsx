@@ -21,6 +21,7 @@ import {
 import {
   DataTable,
   DataTableBody,
+  DataTableCell,
   DataTableEmpty,
   DataTableHeader,
   SectionHeader,
@@ -31,6 +32,7 @@ import { adminService } from "../../lib/services/admin-service";
 import { authService } from "../../lib/services/auth-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { adminStatusLabel, adminStatusTone } from "./status-labels";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { moderationCopy } from "../../lib/community-moderation-copy";
@@ -326,14 +328,8 @@ export default async function AdminPage({
 
                 <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
                   <StatusBadge
-                    status={request.status}
-                    tone={
-                      request.status === "approved"
-                        ? "success"
-                        : request.status === "rejected"
-                          ? "danger"
-                          : "warning"
-                    }
+                    status={adminStatusLabel(locale, request.status)}
+                    tone={adminStatusTone(request.status)}
                   />
                   {request.status === "pending" && (
                     <VerificationModerationControls
@@ -430,7 +426,7 @@ export default async function AdminPage({
                     </Link>
                   </p>
                   <p className="font-caption text-faint">
-                    {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256
+                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · SHA-256
                   </p>
                   <code className="block break-all font-code text-[10px] text-faint">
                     {build.sha256Hash}
@@ -447,14 +443,8 @@ export default async function AdminPage({
                 </div>
                 <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
                   <StatusBadge
-                    status={build.scanStatus}
-                    tone={
-                      build.scanStatus === "clean"
-                        ? "success"
-                        : build.scanStatus === "malicious"
-                          ? "danger"
-                          : "warning"
-                    }
+                    status={adminStatusLabel(locale, build.scanStatus)}
+                    tone={adminStatusTone(build.scanStatus)}
                   />
                   <Link
                     href={`/admin/resources/${build.productId}/builds/${build.id}`}
@@ -513,8 +503,8 @@ export default async function AdminPage({
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge
-                      status={build.status}
-                      tone={build.status === "quarantined" ? "danger" : "success"}
+                      status={adminStatusLabel(locale, build.status)}
+                      tone={adminStatusTone(build.status)}
                     />
                     <span className="truncate font-code text-xs font-heading text-primary">
                       {build.fileName} · v{build.version}
@@ -544,7 +534,7 @@ export default async function AdminPage({
                     </Link>
                   </p>
                   <p className="font-caption text-faint">
-                    {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256
+                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · SHA-256
                   </p>
                   <code className="block break-all font-code text-[10px] text-faint">
                     {build.sha256Hash}
@@ -762,14 +752,8 @@ export default async function AdminPage({
                 </div>
                 <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
                   <StatusBadge
-                    status={report.status}
-                    tone={
-                      report.status === "resolved"
-                        ? "success"
-                        : report.status === "dismissed"
-                          ? "neutral"
-                          : "warning"
-                    }
+                    status={adminStatusLabel(locale, report.status)}
+                    tone={adminStatusTone(report.status)}
                   />
                   {(report.status === "open" || report.status === "under_review") &&
                     (report.targetType === "review" ? (
@@ -816,23 +800,35 @@ export default async function AdminPage({
         <section>
           <SectionHeader title={copy.auditLog} description={copy.auditDescription} />
           <div className="nexus-panel p-4">
-            <DataTable>
+            <DataTable label={copy.auditLog}>
               <DataTableHeader
-                columns={[copy.timestamp, copy.actor, copy.action, copy.target, copy.ip]}
+                columns={[
+                  { label: copy.timestamp, type: "datetime" },
+                  { label: copy.actor, type: "code" },
+                  { label: copy.action, type: "text" },
+                  { label: copy.target, type: "code" },
+                  { label: copy.ip, type: "code", align: "end" },
+                ]}
               />
               <DataTableBody>
                 {auditLogs.length > 0 ? (
                   auditLogs.map((log) => (
                     <tr key={log.id}>
-                      <td className="py-2.5 pr-4 text-faint">
+                      <DataTableCell type="datetime" className="text-faint">
                         {new Date(log.createdAt).toISOString()}
-                      </td>
-                      <td className="pr-4 text-purple">{log.actorId}</td>
-                      <td className="pr-4 font-semibold text-primary">{log.action}</td>
-                      <td className="pr-4 text-muted">
+                      </DataTableCell>
+                      <DataTableCell type="code" className="text-purple">
+                        {log.actorId}
+                      </DataTableCell>
+                      <DataTableCell type="text" className="font-semibold text-primary">
+                        {log.action}
+                      </DataTableCell>
+                      <DataTableCell type="code" className="text-muted">
                         {log.targetType}:{log.targetId}
-                      </td>
-                      <td className="text-right text-faint">{log.ipAddress || copy.internal}</td>
+                      </DataTableCell>
+                      <DataTableCell type="code" align="end" className="text-faint">
+                        {log.ipAddress || copy.internal}
+                      </DataTableCell>
                     </tr>
                   ))
                 ) : (

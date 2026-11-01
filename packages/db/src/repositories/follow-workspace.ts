@@ -1,13 +1,14 @@
 import { createHash } from "node:crypto";
-import type { Follow } from "@nexus/domain";
+import type { Follow, ObjectMuteDuration } from "@nexus/domain";
 import { AppError, NotFoundError } from "@nexus/domain";
-import { and, asc, desc, eq, exists, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   builds,
   comments,
   content,
   follows,
+  objectNotificationMutes,
   organizations,
   products,
   servers,
@@ -20,9 +21,22 @@ import { userFollowNotice } from "./user-follow-notice";
 type TargetType = Follow["targetType"];
 type Cursor = { createdAt: string; id: string };
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+const MUTE_DURATIONS = {
+  "24h": sql`clock_timestamp() + interval '24 hours'`,
+  "7d": sql`clock_timestamp() + interval '7 days'`,
+  "30d": sql`clock_timestamp() + interval '30 days'`,
+} as const;
 const validDiscussionId = (value: string) => /^[A-Za-z0-9_-]{1,128}$/u.test(value);
 const validAudienceTime = (value: string) =>
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/u.test(value);
+const notActivelyMuted = (userIdColumn: typeof follows.followerId, targetType: TargetType, targetId: string) =>
+  sql`not exists (
+    select 1 from ${objectNotificationMutes}
+    where ${objectNotificationMutes.userId} = ${userIdColumn}
+      and ${objectNotificationMutes.targetType} = ${targetType}
+      and ${objectNotificationMutes.targetId} = ${targetId}
+      and ${objectNotificationMutes.mutedUntil} > clock_timestamp()
+  )`;
 const availableDiscussion = and(
   eq(content.status, "published"),
   isNull(content.productId),
@@ -68,6 +82,37 @@ class FollowWorkspaceRepository {
       .limit(50);
     return rows.map((row) => row.targetId);
   }
+
+  async contentStates(actorId: string, targetIds: readonly string[]) {
+    const ids = [...new Set(targetIds)].slice(0, 50);
+    if (!ids.length) return [];
+    const rows = await db
+      .select({
+        targetId: follows.targetId,
+        notifyComments: follows.notifyComments,
+        mutedUntil: sql<
+          string | null
+        >`case when ${objectNotificationMutes.mutedUntil} > clock_timestamp() then to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') else null end`,
+      })
+      .from(follows)
+      .leftJoin(
+        objectNotificationMutes,
+        and(
+          eq(objectNotificationMutes.userId, actorId),
+          eq(objectNotificationMutes.targetType, "content"),
+          eq(objectNotificationMutes.targetId, follows.targetId),
+        ),
+      )
+      .where(
+        and(
+          eq(follows.followerId, actorId),
+          eq(follows.targetType, "content"),
+          inArray(follows.targetId, ids),
+        ),
+      )
+      .limit(50);
+    return rows;
+  }
   async page(
     actorId: string,
     filters: { type?: TargetType; query?: string; cursor?: Cursor } = {},
@@ -77,11 +122,13 @@ class FollowWorkspaceRepository {
       : undefined;
     // Access conditions live in JOINs: inaccessible targets retain a removable
     // follow key but expose no title, image, URL, status or other target metadata.
+    // Removal uses the follow row id/type only — never requires leaked target fields.
     const rows = await db
       .select({
         id: follows.id,
         targetType: follows.targetType,
         targetId: follows.targetId,
+        notifyComments: follows.notifyComments,
         createdAt: follows.createdAt,
         cursorTime: sql<string>`to_char(${follows.createdAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
         title: sql<
@@ -289,6 +336,8 @@ class FollowWorkspaceRepository {
         and(
           eq(follows.targetType, "content"),
           eq(follows.targetId, contentId),
+          eq(follows.notifyComments, true),
+          notActivelyMuted(follows.followerId, "content", contentId),
           sql`${follows.createdAt}<=${until}::timestamptz`,
           ...excluded.map((id) => ne(follows.followerId, id)),
           cursor
@@ -326,6 +375,8 @@ class FollowWorkspaceRepository {
         and(
           eq(follows.targetType, "content"),
           eq(follows.targetId, contentId),
+          eq(follows.notifyComments, true),
+          notActivelyMuted(follows.followerId, "content", contentId),
           sql`${follows.createdAt}<=${until}::timestamptz`,
           ...excluded.map((id) => ne(follows.followerId, id)),
           cursor
@@ -377,6 +428,21 @@ class FollowWorkspaceRepository {
       .for("share")
       .limit(1);
     if (!comment || comment.authorId === recipientId) return null;
+    // FLOW-05: active object mute suppresses follow + direct for this target.
+    // Security/account notices never consult this table.
+    const [muted] = await tx
+      .select({ id: objectNotificationMutes.id })
+      .from(objectNotificationMutes)
+      .where(
+        and(
+          eq(objectNotificationMutes.userId, recipientId),
+          eq(objectNotificationMutes.targetType, "content"),
+          eq(objectNotificationMutes.targetId, contentId),
+          gt(objectNotificationMutes.mutedUntil, sql`clock_timestamp()`),
+        ),
+      )
+      .limit(1);
+    if (muted) return null;
     const [parent] = comment.parentId
       ? await tx
           .select({ authorId: comments.authorId })
@@ -391,7 +457,7 @@ class FollowWorkspaceRepository {
           .limit(1)
       : [];
     const [follow] = await tx
-      .select({ id: follows.id })
+      .select({ id: follows.id, notifyComments: follows.notifyComments })
       .from(follows)
       .where(
         and(
@@ -403,11 +469,12 @@ class FollowWorkspaceRepository {
       )
       .for("share")
       .limit(1);
+    const following = !!follow?.notifyComments;
     const direct = publication.ownerId === recipientId || parent?.authorId === recipientId;
-    if (!direct && !follow) return null;
+    if (!direct && !following) return null;
     return {
       direct,
-      following: !!follow,
+      following,
       id: `ntf_reply_${createHash("sha256")
         .update(JSON.stringify([1, contentId, commentId, recipientId]))
         .digest("hex")}`,
@@ -421,9 +488,15 @@ class FollowWorkspaceRepository {
     targetId: string,
     following: boolean,
     id: string,
+    options: { notifyComments?: boolean } = {},
   ) {
     if (following && targetType === "user" && targetId === actorId)
       throw new AppError("Cannot follow yourself", 400, "SELF_FOLLOW");
+    if (targetType !== "content" && options.notifyComments !== undefined)
+      throw new AppError("notifyComments applies only to content follows", 400, "VALIDATION_ERROR");
+    // Quiet Save → false; discussion follow → true; non-content stays true.
+    const notifyComments =
+      targetType === "content" ? (options.notifyComments ?? true) : true;
     return db.transaction(async (tx) => {
       // Serialize desired-state commands for one actor/target, including
       // deletion when a polymorphic target has already disappeared.
@@ -437,7 +510,7 @@ class FollowWorkspaceRepository {
       );
       if (!following) {
         await tx.delete(follows).where(key);
-        return { following: false, created: false };
+        return { following: false, created: false, notifyComments: false };
       }
       // Share-lock the target through commit so a simultaneous archive,
       // suspension or privacy update cannot bypass the availability policy.
@@ -505,14 +578,30 @@ class FollowWorkspaceRepository {
           followerId: actorId,
           targetType,
           targetId,
+          notifyComments,
           createdAt: targetType === "content" ? sql`clock_timestamp()` : new Date(),
         })
         .onConflictDoNothing()
-        .returning({ id: follows.id });
+        .returning({ id: follows.id, notifyComments: follows.notifyComments });
       if (!created) {
-        const [existing] = await tx.select({ id: follows.id }).from(follows).where(key).limit(1);
+        // Content: resolved notifyComments (omit → true) updates delivery without
+        // recreating the row. Quiet Save sends false; Watch sends true/omit.
+        if (targetType === "content") {
+          await tx.update(follows).set({ notifyComments }).where(key);
+        }
+        const [existing] = await tx
+          .select({ id: follows.id, notifyComments: follows.notifyComments })
+          .from(follows)
+          .where(key)
+          .limit(1);
         if (!existing) throw new AppError("Follow could not be confirmed", 503, "UNCONFIRMED");
-      } else if (targetType === "user") {
+        return {
+          following: true,
+          created: false,
+          notifyComments: existing.notifyComments,
+        };
+      }
+      if (targetType === "user") {
         const [follower] = await tx
           .select({ username: users.username })
           .from(users)
@@ -520,7 +609,85 @@ class FollowWorkspaceRepository {
           .limit(1);
         if (follower) await userFollowNotice(tx, created.id, targetId, follower.username);
       }
-      return { following: true, created: !!created };
+      return { following: true, created: true, notifyComments: created.notifyComments };
+    });
+  }
+
+  async muteState(actorId: string, targetType: TargetType, targetId: string) {
+    if (!validDiscussionId(targetId))
+      throw new AppError("Invalid mute target", 400, "VALIDATION_ERROR");
+    const [row] = await db
+      .select({
+        mutedUntil: sql<
+          string | null
+        >`case when ${objectNotificationMutes.mutedUntil} > clock_timestamp() then to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') else null end`,
+      })
+      .from(objectNotificationMutes)
+      .where(
+        and(
+          eq(objectNotificationMutes.userId, actorId),
+          eq(objectNotificationMutes.targetType, targetType),
+          eq(objectNotificationMutes.targetId, targetId),
+        ),
+      )
+      .limit(1);
+    return { muted: !!row?.mutedUntil, mutedUntil: row?.mutedUntil ?? null };
+  }
+
+  async setObjectMute(
+    actorId: string,
+    targetType: TargetType,
+    targetId: string,
+    duration: ObjectMuteDuration | null,
+    id: string,
+  ) {
+    if (!validDiscussionId(targetId))
+      throw new AppError("Invalid mute target", 400, "VALIDATION_ERROR");
+    if (duration !== null && !(duration in MUTE_DURATIONS))
+      throw new AppError("Invalid mute duration", 400, "VALIDATION_ERROR");
+    return db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify(["mute", actorId, targetType, targetId])}, 0))`,
+      );
+      const key = and(
+        eq(objectNotificationMutes.userId, actorId),
+        eq(objectNotificationMutes.targetType, targetType),
+        eq(objectNotificationMutes.targetId, targetId),
+      );
+      if (duration === null) {
+        await tx.delete(objectNotificationMutes).where(key);
+        return { muted: false, mutedUntil: null as string | null };
+      }
+      // Mute does not require an existing follow — independent of unfollow/watch.
+      const untilExpr = MUTE_DURATIONS[duration];
+      const [upserted] = await tx
+        .insert(objectNotificationMutes)
+        .values({
+          id,
+          userId: actorId,
+          targetType,
+          targetId,
+          mutedUntil: untilExpr,
+          createdAt: sql`clock_timestamp()`,
+          updatedAt: sql`clock_timestamp()`,
+        })
+        .onConflictDoUpdate({
+          target: [
+            objectNotificationMutes.userId,
+            objectNotificationMutes.targetType,
+            objectNotificationMutes.targetId,
+          ],
+          set: {
+            mutedUntil: untilExpr,
+            updatedAt: sql`clock_timestamp()`,
+          },
+        })
+        .returning({
+          mutedUntil: sql<string>`to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+        });
+      if (!upserted)
+        throw new AppError("Mute could not be confirmed", 503, "UNCONFIRMED");
+      return { muted: true, mutedUntil: upserted.mutedUntil };
     });
   }
 }

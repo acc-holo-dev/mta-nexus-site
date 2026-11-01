@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   confirmedNotificationInboxCommand,
+  NOTIFICATION_INBOX_SELECTION_LIMIT,
   type NotificationInboxPage,
   type NotificationInboxQuery,
   notificationInboxHref,
@@ -16,6 +17,7 @@ import {
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
 } from "../lib/notification-inbox-export-client";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 export function NotificationInbox({
   initialPage,
@@ -145,7 +147,23 @@ export function NotificationInbox({
   }
   async function mark(isRead: boolean, ids = selected, entireInbox = false) {
     if (pending.current || blocked || (!entireInbox && !ids.length)) return;
-    if (entireInbox && (!page.unreadCount || !window.confirm(copy.allConfirm))) return;
+    // Page selection uses PATCH with expectedIsRead; account-wide all-read is a separate POST.
+    if (
+      entireInbox &&
+      (!page.unreadCount ||
+        !(await confirmAction({
+          title: copy.markAllRead,
+          object: copy.title,
+          scope: String(page.unreadCount),
+          consequences: copy.allConfirm,
+          confirmLabel: copy.markAllRead,
+          cancelLabel: copy.reset,
+          closeLabel: copy.reset,
+          danger: false,
+        })))
+    )
+      return;
+    if (!entireInbox && ids.length > NOTIFICATION_INBOX_SELECTION_LIMIT) return;
     const items = page.items
       .filter((item) => ids.includes(item.id))
       .map((item) => ({ id: item.id, expectedIsRead: item.isRead }));
@@ -196,6 +214,7 @@ export function NotificationInbox({
       setAnnouncement(copy.saved);
     } catch (failure) {
       if (mounted.current) {
+        // Keep last confirmed unreadCount; do not present a false zero after a failed write.
         setSelected([]);
         const message = failure instanceof Error ? failure.message : "";
         setError(
@@ -322,7 +341,7 @@ export function NotificationInbox({
           {copy.retry}
         </Button>
       </div>
-      {!page.items.length && (
+      {!busy && !page.items.length && (
         <p className="nexus-panel p-6 text-sm text-muted">
           {filters.cursor ||
           filters.query ||
@@ -378,6 +397,7 @@ export function NotificationInbox({
                   {item.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
                   <div className="flex flex-wrap items-center gap-4">
                     {item.link && (
+                      // Destination navigation alone does not change isRead; use the explicit mark controls.
                       <Link
                         prefetch={false}
                         href={item.link}

@@ -1,3 +1,6 @@
+# Node stages follow OPS-03 / toolchain policy: mutable major-branch tag node:26-alpine
+# (exact host/CI pin remains .nvmrc). Candidate digests are recorded in
+# deploy/infra-image-pins.json via scripts/resolve-infra-image-digests.mjs — not invented here.
 # Local development image. Compose bind-mounts source directories for hot reload while keeping dependencies inside the image.
 FROM node:26-alpine AS development
 WORKDIR /app
@@ -17,6 +20,11 @@ CMD ["sh", "-c", "pnpm db:migrate && exec pnpm --filter @nexus/web dev --hostnam
 FROM node:26-alpine AS build
 WORKDIR /app
 RUN npm install --global pnpm@12.4.2
+# OPS-05 / ARC10: these values are compile-only placeholders for `pnpm build`.
+# They are not the promotion origin or production secrets. Runtime Compose/CI
+# supplies the real HTTPS origin (APP_URL / NEXT_PUBLIC_APP_URL) and secrets for
+# the same image digest — no per-domain rebuild. @nexus/config rejects the
+# build-placeholder AUTH_SECRET / DATABASE_URL if they reach a production process.
 ENV NODE_ENV=production \
     NEXT_PUBLIC_APP_URL=https://nexus-mta.com \
     DATABASE_URL=postgres://nexus:build-only@127.0.0.1:5432/mta_nexus \

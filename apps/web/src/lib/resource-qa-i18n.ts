@@ -1,0 +1,92 @@
+import type { Locale } from "./i18n";
+
+const copy = {
+  en: {
+    title: "Questions & answers",
+    help: "Ask about using this resource. Questions are not reviews and do not change the rating. Thread follow is not a release watch.",
+    empty: "No public questions yet.",
+    unavailable: "Questions are unavailable for this resource right now.",
+    ask: "Ask a question",
+    asking: "Posting…",
+    answer: "Post answer",
+    answering: "Posting answer…",
+    resolve: "Mark as useful answer",
+    reopen: "Reopen question",
+    follow: "Follow thread",
+    unfollow: "Stop following thread",
+    followingHelp: "Get updates for this question only. This is not a new-release watch.",
+    signIn: "Sign in to ask a question",
+    accessRequired: "Add this resource to your library before asking.",
+    buildContext: "About version",
+    buildUnavailable: "Version context kept; that build is no longer a public download.",
+    resolved: "Resolved",
+    open: "Open",
+    noAnswers: "No answers yet.",
+    loadThread: "Open thread",
+    back: "Back to questions",
+    placeholder: "What do you need clarified?",
+    answerPlaceholder: "Share a useful answer for this question.",
+    optionalBuild: "Optional version context",
+    noBuild: "No specific version",
+    unknown: "The last action could not be confirmed. Reload and try again.",
+    errors: {
+      UNAUTHORIZED: "Sign in and try again.",
+      FORBIDDEN: "You do not have permission for that Q&A action.",
+      NOT_FOUND: "That question is no longer available.",
+      RESOURCE_QA_INVALID: "Check the question or answer and try again.",
+      RESOURCE_QA_CHANGED: "This thread changed. Reload it before continuing.",
+      RESOURCE_QA_ACCESS_REQUIRED: "Library access is required to ask about this resource.",
+      RATE_LIMITED: "Too many attempts. Wait a moment and try again.",
+      UNCONFIRMED: "The last action could not be confirmed. Reload and try again.",
+    } as Record<string, string>,
+  },
+  ru: {
+    title: "Вопросы и ответы",
+    help: "Спрашивайте об использовании ресурса. Вопрос — не отзыв и не меняет оценку. Подписка на ветку — не слежение за релизами.",
+    empty: "Публичных вопросов пока нет.",
+    unavailable: "Вопросы по этому ресурсу сейчас недоступны.",
+    ask: "Задать вопрос",
+    asking: "Отправка…",
+    answer: "Ответить",
+    answering: "Отправка ответа…",
+    resolve: "Отметить полезный ответ",
+    reopen: "Открыть вопрос снова",
+    follow: "Следить за веткой",
+    unfollow: "Не следить за веткой",
+    followingHelp: "Уведомления только по этому вопросу. Это не слежение за новыми релизами.",
+    signIn: "Войдите, чтобы задать вопрос",
+    accessRequired: "Сначала добавьте ресурс в библиотеку.",
+    buildContext: "Про версию",
+    buildUnavailable: "Контекст версии сохранён; эта сборка больше не публичная загрузка.",
+    resolved: "Решено",
+    open: "Открыт",
+    noAnswers: "Ответов пока нет.",
+    loadThread: "Открыть ветку",
+    back: "К списку вопросов",
+    placeholder: "Что нужно уточнить?",
+    answerPlaceholder: "Полезный ответ на этот вопрос.",
+    optionalBuild: "Необязательный контекст версии",
+    noBuild: "Без конкретной версии",
+    unknown: "Последнее действие не подтверждено. Обновите страницу и попробуйте снова.",
+    errors: {
+      UNAUTHORIZED: "Войдите и попробуйте снова.",
+      FORBIDDEN: "Недостаточно прав для этого действия Q&A.",
+      NOT_FOUND: "Этот вопрос больше недоступен.",
+      RESOURCE_QA_INVALID: "Проверьте текст вопроса или ответа и попробуйте снова.",
+      RESOURCE_QA_CHANGED: "Ветка изменилась. Обновите её перед продолжением.",
+      RESOURCE_QA_ACCESS_REQUIRED: "Чтобы спросить, нужен доступ из библиотеки.",
+      RATE_LIMITED: "Слишком много попыток. Подождите и попробуйте снова.",
+      UNCONFIRMED: "Последнее действие не подтверждено. Обновите страницу и попробуйте снова.",
+    } as Record<string, string>,
+  },
+} as const;
+
+export function resourceQaCopy(locale: Locale) {
+  return copy[locale] ?? copy.en;
+}
+
+export function resourceQaError(locale: Locale, code: string | null | undefined) {
+  const dictionary = resourceQaCopy(locale);
+  if (!code) return dictionary.unknown;
+  return dictionary.errors[code] ?? dictionary.unknown;
+}

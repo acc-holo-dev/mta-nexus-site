@@ -659,3 +659,72 @@ jobs:
           path: artifacts/ci-evidence.json
           if-no-files-found: error
           retention-days: 14
+  # OPS-10 prep: publish the already-built exact-SHA image without rebuild.
+  # packages:write is job-scoped only. Pull requests never enter this job.
+  # Actual registry push stays disabled until repository variable
+  # NEXUS_GHCR_PUBLISH_ENABLED=true after OPS-11 visibility/access acceptance.
+  # Missing cache/image fails closed — no silent rebuild under the same identity.
+  ghcr-publish:
+    name: Trusted GHCR publish prep
+    needs:
+      - plan
+      - image
+      - summary
+    if: >-
+      ${{ always()
+      && needs.plan.result == 'success'
+      && needs.plan.outputs.full == 'true'
+      && needs.image.result == 'success'
+      && needs.summary.result == 'success'
+      && github.event_name != 'pull_request'
+      && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch')
+      && vars.NEXUS_GHCR_PUBLISH_ENABLED == 'true' }}
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXUS_CI_PREBUILT_IMAGE: nexus-ci:${{ github.sha }}
+      GHCR_IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Restore shared production image by exact commit
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/production.tar
+          key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
+          fail-on-cache-miss: true
+      - name: Load and validate the exact commit image
+        run: |-
+          docker load --input "$RUNNER_TEMP/production.tar"
+          bash scripts/validate-ci-image.sh
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Retag and push the verified image without rebuild
+        run: |-
+          set -euo pipefail
+          source_image="$(bash scripts/validate-ci-image.sh)"
+          # Push by exact SHA tag, then record the registry digest. Mutable tags
+          # such as :latest are never production inputs.
+          docker tag "$source_image" "$GHCR_IMAGE"
+          docker push "$GHCR_IMAGE"
+          remote_digest="$(docker buildx imagetools inspect "$GHCR_IMAGE" --format '{{.Manifest.Digest}}')"
+          GHCR_DIGEST="$remote_digest" GHCR_PLATFORM=linux/amd64 \
+            node scripts/record-ghcr-publish-receipt.mjs
+      - name: Preserve GHCR publish receipt
+        if: ${{ always() }}
+        continue-on-error: ${{ github.ref_type != 'tag' }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: ghcr-publish-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/ghcr-publish-receipt.json
+          if-no-files-found: warn
+          retention-days: 14

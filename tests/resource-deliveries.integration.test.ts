@@ -6,6 +6,7 @@ import {
   userRepository,
   productRepository,
   buildRepository,
+  sessionRepository,
   resourceDownloadAuthorizationRepository as authorization,
   resourceDeliveriesRepository as receipts,
 } from "@nexus/db";
@@ -30,6 +31,12 @@ async function fixture() {
       displayName: id,
       role: "developer",
     });
+  await sessionRepository.create({
+    id: `ses_${owner}`,
+    userId: owner,
+    token: `tok_${owner}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await productRepository.create({
     id: productId,
     title: "Delivery archive",
@@ -72,6 +79,7 @@ async function fixture() {
   ) {
     await authorization.authorize({
       actorId: owner,
+      currentToken: `tok_${owner}`,
       expected,
       pinned: true,
       receiptId: id,

@@ -27,11 +27,19 @@ vi.mock("@nexus/ui", async () => {
       label,
       id,
       error: _error,
+      hint: _hint,
+      pending: _pending,
+      disabledReason: _disabledReason,
+      size: _size,
       ...props
     }: {
       label?: string;
       id?: string;
       error?: string;
+      hint?: string;
+      pending?: boolean;
+      disabledReason?: string;
+      size?: string;
       name?: string;
       defaultValue?: string | number;
       [key: string]: unknown;
@@ -42,6 +50,22 @@ vi.mock("@nexus/ui", async () => {
         label ? createElement("label", { htmlFor: id }, label) : null,
         createElement("input", { id, ...props }),
       ),
+    Field: ({
+      id,
+      label,
+      children,
+    }: {
+      id?: string;
+      label?: string;
+      children: (control: { id: string; className: string; describedBy?: string }) => ReactNode;
+    }) =>
+      createElement(
+        "div",
+        null,
+        label ? createElement("label", { htmlFor: id }, label) : null,
+        children({ id: id ?? "field", className: "field", describedBy: undefined }),
+      ),
+    fieldControlClass: () => "field",
   };
 });
 

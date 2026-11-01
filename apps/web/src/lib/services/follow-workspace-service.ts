@@ -1,7 +1,12 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { encodeDiscussionCursor } from "../content-discussion-contract";
-import type { FollowPage, parseFollowQuery } from "../follow-workspace-contract";
+import type {
+  FollowPage,
+  FollowTargetType,
+  ObjectMuteDuration,
+  parseFollowQuery,
+} from "../follow-workspace-contract";
 
 const paths = {
   user: "/users",
@@ -23,6 +28,7 @@ class FollowWorkspaceService {
         id: row.id,
         targetId: row.targetId,
         targetType: row.targetType as keyof typeof paths,
+        notifyComments: row.notifyComments,
         createdAt: row.createdAt.toISOString(),
         title: row.title,
         description: row.description,
@@ -35,6 +41,20 @@ class FollowWorkspaceService {
             : null,
       })),
     };
+  }
+
+  muteState(actorId: string, targetType: FollowTargetType, targetId: string) {
+    return followWorkspaceRepository.muteState(actorId, targetType, targetId);
+  }
+
+  setObjectMute(
+    actorId: string,
+    targetType: FollowTargetType,
+    targetId: string,
+    duration: ObjectMuteDuration | null,
+    id: string,
+  ) {
+    return followWorkspaceRepository.setObjectMute(actorId, targetType, targetId, duration, id);
   }
 }
 export const followWorkspaceService = new FollowWorkspaceService();

@@ -47,9 +47,11 @@ export default async function MarketPage({
     page,
     pageSize: MARKET_PAGE_SIZE,
   });
+  const attributions = await productService.getPublicAttributions(products);
 
-  const buildHref = (nextType: typeof type, nextSort: typeof sort, nextPage = 1) =>
-    marketHref({ type: nextType, sort: nextSort, query, page: nextPage });
+  const buildHref = (nextType: typeof type, nextSort: typeof sort, nextQuery = query, nextPage = 1) =>
+    marketHref({ type: nextType, sort: nextSort, query: nextQuery, page: nextPage });
+  const filtersActive = type !== "all" || sort !== "popular" || Boolean(query) || page > 1;
 
   return (
     <div className="space-y-6">
@@ -85,6 +87,14 @@ export default async function MarketPage({
             <Search className="h-4 w-4" aria-hidden="true" />
             {dictionary.market.searchButton}
           </Button>
+          {query ? (
+            <Link
+              href={buildHref(type, sort, "")}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {dictionary.market.clearQuery}
+            </Link>
+          ) : null}
         </form>
       </search>
 
@@ -97,7 +107,7 @@ export default async function MarketPage({
           return (
             <Link
               key={option.id}
-              href={buildHref(type, option.id)}
+              href={buildHref(type, option.id, query)}
               aria-current={isActive ? "page" : undefined}
               className={`-mb-px min-h-11 whitespace-nowrap border-b-2 px-3.5 py-3 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-accent ${
                 isActive
@@ -120,7 +130,7 @@ export default async function MarketPage({
           return (
             <Link
               key={category.id}
-              href={buildHref(category.id, sort)}
+              href={buildHref(category.id, sort, query)}
               aria-current={isActive ? "page" : undefined}
               className={`inline-flex min-h-11 items-center rounded-full px-3 text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                 isActive
@@ -137,20 +147,70 @@ export default async function MarketPage({
       {products.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} locale={locale} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              locale={locale}
+              attribution={attributions.get(product.id) ?? null}
+            />
           ))}
         </div>
       ) : (
-        <div className="nexus-panel py-16 text-center">
+        <div className="nexus-panel space-y-4 py-12 text-center">
           <p className="font-caption text-muted">
-            {page > 1 ? dictionary.market.endOfResults : dictionary.market.empty}
+            {page > 1
+              ? dictionary.market.endOfResults
+              : filtersActive
+                ? dictionary.market.emptyFiltered
+                : dictionary.market.empty}
           </p>
-          <Link
-            href={page > 1 ? buildHref(type, sort) : "/market"}
-            className="mt-3 inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
-          >
-            {dictionary.market.clear}
-          </Link>
+          {filtersActive && (
+            <div className="mx-auto max-w-lg space-y-2 text-left text-sm text-secondary">
+              <p className="font-semibold text-primary">{dictionary.market.activeFilters}</p>
+              <ul className="list-inside list-disc space-y-1">
+                {type !== "all" ? <li>type: {type}</li> : null}
+                {sort !== "popular" ? <li>sort: {sort}</li> : null}
+                {query ? <li>q: {query}</li> : null}
+                {page > 1 ? (
+                  <li>
+                    {dictionary.market.pageLabel} {page}
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          )}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {page > 1 ? (
+              <Link
+                href={buildHref(type, sort, query)}
+                className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+              >
+                {dictionary.market.firstPageSameFilters}
+              </Link>
+            ) : null}
+            {query ? (
+              <Link
+                href={buildHref(type, sort, "")}
+                className="text-sm text-accent underline"
+              >
+                {dictionary.market.clearQuery}
+              </Link>
+            ) : null}
+            {type !== "all" ? (
+              <Link
+                href={buildHref("all", sort, query)}
+                className="text-sm text-accent underline"
+              >
+                {dictionary.market.clearCategory}
+              </Link>
+            ) : null}
+            <Link
+              href="/market"
+              className="text-sm text-accent underline"
+            >
+              {dictionary.market.clear}
+            </Link>
+          </div>
         </div>
       )}
 
@@ -161,7 +221,7 @@ export default async function MarketPage({
         >
           {page > 1 ? (
             <Link
-              href={buildHref(type, sort, page - 1)}
+              href={buildHref(type, sort, query, page - 1)}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -175,7 +235,7 @@ export default async function MarketPage({
           </span>
           {hasMore && page < MAX_MARKET_PAGE ? (
             <Link
-              href={buildHref(type, sort, page + 1)}
+              href={buildHref(type, sort, query, page + 1)}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
             >
               {dictionary.market.nextPage}

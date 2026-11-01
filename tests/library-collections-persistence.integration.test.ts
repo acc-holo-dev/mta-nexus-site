@@ -8,6 +8,7 @@ import {
   libraryCollectionReceipts,
   libraryCollections,
   products,
+  resourceReleaseWatches,
   sessionRepository,
   userRepository,
 } from "@nexus/db";
@@ -122,6 +123,12 @@ it("references survive lost access, do not grant files and can be removed by the
     hasAccess: true,
     downloadable: false,
   });
+  expect(
+    await db
+      .select()
+      .from(resourceReleaseWatches)
+      .where(eq(resourceReleaseWatches.userId, f.userId)),
+  ).toHaveLength(0);
   await db.delete(entitlements).where(eq(entitlements.id, f.grantId));
   expect((await collections.detail(f.userId, id)).items[0]).toMatchObject({
     hasAccess: false,
@@ -138,6 +145,12 @@ it("references survive lost access, do not grant files and can be removed by the
   expect((await collections.detail(f.userId, id)).total).toBe(0);
   expect(
     await db.select().from(entitlements).where(eq(entitlements.subjectId, f.userId)),
+  ).toHaveLength(0);
+  expect(
+    await db
+      .select()
+      .from(resourceReleaseWatches)
+      .where(eq(resourceReleaseWatches.userId, f.userId)),
   ).toHaveLength(0);
 });
 it("database guards retain receipts and reject archived member writes and invalid revisions", async () => {

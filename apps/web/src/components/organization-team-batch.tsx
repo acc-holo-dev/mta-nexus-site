@@ -17,6 +17,7 @@ import type { OrganizationTeamPage } from "../lib/organization-team-contract";
 import { organizationRequest } from "../lib/organization-workspace-client";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { confirmAction } from "./confirm-action";
 export function OrganizationTeamBatch({
   data,
   actorId,
@@ -74,7 +75,20 @@ export function OrganizationTeamBatch({
         : { action };
   async function perform(write: boolean) {
     if (guard.current || disabled || !selected.length || (write && !preview?.changedCount)) return;
-    if (write && action === "remove" && !window.confirm(copy.confirmRemove)) return;
+    if (
+      write &&
+      action === "remove" &&
+      !(await confirmAction({
+        title: copy.title,
+        object: data.organization.name,
+        scope: `${selected.length}`,
+        consequences: copy.confirmRemove,
+        confirmLabel: copy.confirm,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+      }))
+    )
+      return;
     if (!acquire()) return;
     guard.current = true;
     setStage(write ? "saving" : "reviewing");

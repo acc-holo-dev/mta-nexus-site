@@ -3,16 +3,16 @@ import type { Locale } from "./i18n";
 const en = {
   title: "Server reviews",
   description:
-    "Reviews require a verified follow of this public server. Star ratings are one signal among others — not the server’s sole trust score.",
-  empty: "No verified-interaction reviews yet.",
+    "Reviews require an active follow of this public server. Follow is not proof of gameplay. Star ratings are one signal among others — not the server’s sole trust score.",
+  empty: "No follow-based reviews yet.",
   write: "Write or manage my review",
   access:
-    "Follow this public server to leave a verified-interaction review. Operators cannot review their own server.",
-  followRequired: "Follow this server before publishing a review.",
-  ownerConflict: "Server operators cannot review their own server.",
+    "Follow this public server to leave a review. Follow confirms a saved interest, not that you joined or played. Operators cannot review their own server.",
+  followRequired: "Follow this server before publishing a review. Eligibility refreshes after Follow.",
+  ownerConflict: "Server operators and managers cannot review their own server.",
   moderated: "This review was removed by moderation and cannot be republished.",
-  interaction: "Verified server interaction",
-  follow: "Follow evidence checked",
+  interaction: "Follow-based server review",
+  follow: "Follow evidence checked (not verified play)",
   rating: "Rating",
   text: "Your review",
   save: "Publish review",
@@ -32,23 +32,24 @@ const en = {
   missing: "The server or review is unavailable.",
   changed: "The review changed. Reload before trying again.",
   author: "Author",
-  all: "Verified reviews",
+  all: "Follow-based reviews",
   openTrust: "Server trust",
 };
 
 const ru: typeof en = {
   title: "Отзывы о сервере",
   description:
-    "Отзывы требуют подтверждённой подписки (follow) на этот публичный сервер. Оценка — один из сигналов, а не единственный рейтинг доверия.",
-  empty: "Пока нет отзывов с подтверждённым взаимодействием.",
+    "Отзывы требуют активной подписки (follow) на этот публичный сервер. Follow не доказывает игру. Оценка — один из сигналов, а не единственный рейтинг доверия.",
+  empty: "Пока нет отзывов на основании follow.",
   write: "Написать или изменить мой отзыв",
   access:
-    "Подпишитесь на этот публичный сервер, чтобы оставить отзыв с подтверждённым взаимодействием. Операторы не могут оценивать свой сервер.",
-  followRequired: "Сначала подпишитесь на сервер, затем публикуйте отзыв.",
-  ownerConflict: "Операторы сервера не могут оставлять отзыв о своём сервере.",
+    "Подпишитесь на этот публичный сервер, чтобы оставить отзыв. Follow подтверждает сохранённый интерес, а не вход в игру. Операторы не могут оценивать свой сервер.",
+  followRequired:
+    "Сначала подпишитесь на сервер, затем публикуйте отзыв. После Follow eligibility обновляется.",
+  ownerConflict: "Операторы и управляющие сервером не могут оставлять отзыв о своём сервере.",
   moderated: "Отзыв удалён модерацией и не может быть опубликован снова.",
-  interaction: "Подтверждённое взаимодействие с сервером",
-  follow: "Подписка (follow) проверена",
+  interaction: "Отзыв на основании follow",
+  follow: "Подписка (follow) проверена (не подтверждённая игра)",
   rating: "Оценка",
   text: "Ваш отзыв",
   save: "Опубликовать отзыв",
@@ -68,7 +69,7 @@ const ru: typeof en = {
   missing: "Сервер или отзыв недоступен.",
   changed: "Отзыв изменился. Обновите страницу и попробуйте снова.",
   author: "Автор",
-  all: "Проверенные отзывы",
+  all: "Отзывы на основании follow",
   openTrust: "Доверие к серверу",
 };
 

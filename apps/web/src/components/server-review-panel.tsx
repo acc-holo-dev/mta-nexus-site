@@ -2,9 +2,10 @@
 
 import { Button, fieldClassBlock } from "@nexus/ui";
 import Link from "next/link";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { confirmedServerReview } from "../lib/server-review-confirmation";
 import { serverReviewCopy, serverReviewError, serverReviewState } from "../lib/server-review-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { useNexusLocale } from "./locale-context";
 
 type Review = {
@@ -25,16 +26,39 @@ type PublicPage = {
   totalPages: number;
 };
 
+function reviewsUnavailableCopy(locale: "en" | "ru") {
+  return locale === "ru"
+    ? {
+        unavailable: "Отзывы временно недоступны. Это не означает, что отзывов нет.",
+        retry: "Повторить загрузку",
+        reloadReason: "Состояние сохранено на сервере. Обновите страницу, чтобы снова изменить отзыв.",
+      }
+    : {
+        unavailable: "Reviews are temporarily unavailable. This does not mean there are no reviews.",
+        retry: "Retry loading reviews",
+        reloadReason: "Your review is saved on the server. Reload to edit it again.",
+      };
+}
+
 export function ServerReviewPanel({
   serverId,
   initialPage,
+  loadState = "ready",
 }: {
   serverId: string;
-  initialPage: PublicPage;
+  initialPage?: PublicPage;
+  loadState?: "ready" | "unavailable";
 }) {
   const { locale } = useNexusLocale();
   const copy = serverReviewCopy(locale);
-  const [page, setPage] = useState(initialPage);
+  const loadCopy = reviewsUnavailableCopy(locale);
+  const statusId = useId();
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  const [page, setPage] = useState<PublicPage | null>(initialPage ?? null);
+  const [unavailable, setUnavailable] = useState(
+    loadState === "unavailable" || initialPage == null,
+  );
+  const [retrying, setRetrying] = useState(false);
   const [mine, setMine] = useState<{
     review: (Review & { moderationReason?: string | null }) | null;
     canReview: boolean;
@@ -46,34 +70,81 @@ export function ServerReviewPanel({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [loginHref, setLoginHref] = useState("/auth/login");
 
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
-        credentials: "same-origin",
-        cache: "no-store",
-      });
-      if (cancelled) return;
-      if (response.status === 401) {
-        setSignedIn(false);
-        return;
-      }
-      if (!response.ok) return;
-      const data = (await response.json()) as {
-        review: (Review & { moderationReason?: string | null }) | null;
-        canReview: boolean;
-        eligibility: string;
-      };
-      setSignedIn(true);
-      setMine(data);
+  const refreshMine = useCallback(async () => {
+    const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+    if (response.status === 401) {
+      setSignedIn(false);
+      setMine(null);
+      return;
+    }
+    if (!response.ok) return;
+    const data = (await response.json()) as {
+      review: (Review & { moderationReason?: string | null }) | null;
+      canReview: boolean;
+      eligibility: string;
+    };
+    setSignedIn(true);
+    setMine(data);
+    if (!confirmed) {
       setText(data.review?.text ?? "");
       setRating(data.review?.rating ?? 5);
-    })();
+    }
+  }, [serverId, confirmed]);
+
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    let cancelled = false;
+    void refreshMine().then(() => {
+      if (cancelled) return;
+    });
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void refreshMine();
+    };
+    const onFocus = () => {
+      void refreshMine();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
     };
-  }, [serverId]);
+  }, [refreshMine]);
+
+  useEffect(() => {
+    if (!message && !unavailable) return;
+    statusRef.current?.focus();
+  }, [message, unavailable, confirmed]);
+
+  async function retryLoad() {
+    if (retrying) return;
+    setRetrying(true);
+    setMessage("");
+    try {
+      const response = await fetch(
+        `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page?.page ?? 1}`,
+        { credentials: "same-origin", cache: "no-store" },
+      );
+      if (!response.ok) throw new Error("Reviews unavailable");
+      const next = (await response.json()) as PublicPage;
+      if (!Array.isArray(next.reviews) || !Number.isFinite(next.total)) {
+        throw new Error("Invalid review page");
+      }
+      setPage(next);
+      setUnavailable(false);
+    } catch {
+      setUnavailable(true);
+      setMessage(loadCopy.unavailable);
+    } finally {
+      setRetrying(false);
+    }
+  }
 
   async function submit(action: "save" | "withdraw") {
     if (busy || confirmed) return;
@@ -100,13 +171,28 @@ export function ServerReviewPanel({
         throw new Error("Unconfirmed review");
       }
       setConfirmed(true);
-      setMessage(copy.saved);
+      setMine((previous) => ({
+        canReview: previous?.canReview ?? false,
+        eligibility: previous?.eligibility ?? "ok",
+        review: {
+          id: value.id,
+          text: action === "save" ? text : (previous?.review?.text ?? text),
+          rating: action === "save" ? rating : (previous?.review?.rating ?? rating),
+          status: value.status as Review["status"],
+          revision: value.revision,
+          interactionSource: "follow",
+          moderationReason: previous?.review?.moderationReason ?? null,
+          author: previous?.review?.author ?? null,
+        },
+      }));
+      setMessage(`${copy.saved}. ${loadCopy.reloadReason}`);
       const refreshed = await fetch(
-        `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page.page}`,
+        `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page?.page ?? 1}`,
         { credentials: "same-origin", cache: "no-store" },
       );
       if (refreshed.ok) {
         setPage((await refreshed.json()) as PublicPage);
+        setUnavailable(false);
       }
     } catch {
       setMessage(copy.unknown);
@@ -129,35 +215,50 @@ export function ServerReviewPanel({
         <p className="text-xs leading-relaxed text-muted">{copy.description}</p>
       </header>
 
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-primary">
-          {copy.all} ({page.total})
-        </h3>
-        {page.reviews.length === 0 ? (
-          <p className="text-sm text-muted">{copy.empty}</p>
-        ) : (
-          <ul className="space-y-3">
-            {page.reviews.map((review) => (
-              <li key={review.id} className="nexus-panel space-y-2 p-4 text-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-                  <span>
-                    {copy.author}: {review.author?.displayName || review.author?.username || "—"}
-                  </span>
-                  <span>
-                    {copy.rating}: {review.rating}/5 · {copy.follow}
-                  </span>
-                </div>
-                <p className="whitespace-pre-wrap break-words text-secondary">{review.text}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {unavailable || !page ? (
+        <div className="nexus-panel space-y-3 p-5" role="alert">
+          <p className="text-sm text-warning">{loadCopy.unavailable}</p>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={retrying}
+            isLoading={retrying}
+            onClick={() => void retryLoad()}
+          >
+            {retrying ? copy.busy : loadCopy.retry}
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-primary">
+            {copy.all} ({page.total})
+          </h3>
+          {page.reviews.length === 0 ? (
+            <p className="text-sm text-muted">{copy.empty}</p>
+          ) : (
+            <ul className="space-y-3">
+              {page.reviews.map((review) => (
+                <li key={review.id} className="nexus-panel space-y-2 p-4 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+                    <span>
+                      {copy.author}: {review.author?.displayName || review.author?.username || "—"}
+                    </span>
+                    <span>
+                      {copy.rating}: {review.rating}/5 · {copy.follow}
+                    </span>
+                  </div>
+                  <p className="whitespace-pre-wrap break-words text-secondary">{review.text}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <div className="nexus-panel space-y-4 p-5">
         <h3 className="text-sm font-semibold text-primary">{copy.write}</h3>
         {!signedIn ? (
-          <Link href="/auth/login" className="text-sm text-accent underline">
+          <Link href={loginHref} className="text-sm text-accent underline">
             {copy.signIn}
           </Link>
         ) : (
@@ -176,6 +277,9 @@ export function ServerReviewPanel({
             )}
             {mine?.eligibility === "owner_conflict" && (
               <p className="text-xs text-warning">{copy.ownerConflict}</p>
+            )}
+            {mine?.eligibility === "moderated" && (
+              <p className="text-xs text-warning">{copy.moderated}</p>
             )}
             {mine?.canReview ? (
               <form className="space-y-4" onSubmit={onSave}>
@@ -230,7 +334,13 @@ export function ServerReviewPanel({
             )}
           </>
         )}
-        <p role="status" className="text-sm">
+        <p
+          ref={statusRef}
+          id={statusId}
+          role="status"
+          tabIndex={-1}
+          className="text-sm outline-none"
+        >
           {message}
         </p>
         {confirmed && (

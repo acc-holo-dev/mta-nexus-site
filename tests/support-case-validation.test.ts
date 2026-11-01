@@ -28,6 +28,19 @@ describe("support validation", () => {
 
     expect(
       createSupportCaseSchema.safeParse({
+        category: "resource",
+        subject: "Problem with a download",
+        message: "The selected build failed after the browser handoff.",
+        context: {
+          productId: `prd_${"a".repeat(24)}`,
+          buildId: `bld_${"b".repeat(24)}`,
+          receiptId: `dlv_${"c".repeat(24)}`,
+        },
+      }).success,
+    ).toBe(true);
+
+    expect(
+      createSupportCaseSchema.safeParse({
         category: "other",
         subject: "tiny",
         message: "short",

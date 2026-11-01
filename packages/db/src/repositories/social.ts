@@ -19,9 +19,12 @@ export class SocialRepository {
     return rows.length > 0;
   }
 
-  async follow(followData: Omit<Follow, "createdAt">): Promise<Follow | null> {
+  async follow(
+    followData: Omit<Follow, "createdAt" | "notifyComments"> & { notifyComments?: boolean },
+  ): Promise<Follow | null> {
     const values = {
       ...followData,
+      notifyComments: followData.notifyComments ?? true,
       createdAt: new Date(),
     };
 

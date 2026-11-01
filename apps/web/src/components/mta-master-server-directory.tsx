@@ -88,6 +88,7 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
           <a
             href={`mtasa://${server.address}:${server.port}`}
             aria-label={`${copy.connect}: ${name}`}
+            title={copy.connectHint}
             className={`${controlClass} inline-flex items-center bg-accent-soft font-semibold text-accent`}
           >
             {copy.connect}
@@ -98,7 +99,7 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
             size="sm"
             aria-label={`${copy.copyAddress}: ${name}`}
             disabled={copying}
-            onClick={copyAddress}
+            onClick={() => void copyAddress()}
             className="gap-1.5"
           >
             <Copy className="h-4 w-4" aria-hidden="true" />

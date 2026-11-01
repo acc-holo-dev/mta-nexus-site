@@ -18,6 +18,13 @@ export async function checkLocalReadiness({
   const health = await response.json();
   assert.equal(health.status, "ok", "Unexpected health status");
   assert.equal(health.database, "reachable", "Database is not reachable");
+  // Public health stays a narrow readiness signal — never a full config dump.
+  for (const key of Object.keys(health)) {
+    assert(
+      key === "status" || key === "database" || key === "timestamp",
+      `Public health must not expose unexpected field: ${key}`,
+    );
+  }
 
   // This checks the actual mounted directory as the app user, not only its existence.
   // Only this uniquely created probe directory can be deleted by this check.

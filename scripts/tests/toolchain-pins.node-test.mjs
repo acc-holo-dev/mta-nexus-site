@@ -3,11 +3,33 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import {
+  DOCKER_NODE_MAJOR_IMAGE,
+  evaluateToolchainPolicy,
+  nodeMajorFromEngines,
+  readExactNodePin,
+  readPinnedPnpm,
+} from "../toolchain-policy.mjs";
+import {
+  DOCKERFILE_NODE_STAGES,
+  evaluateDockerfileNodePolicy,
+  evaluateInfraImagePins,
+  evaluatePostgresLayout,
+  INFRA_IMAGE_REFS,
+  POSTGRES_MAJOR,
+  POSTGRES_VOLUME_PATH,
+  readInfraImagePins,
+} from "../infra-image-policy.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
 const rootPackage = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const dbPackage = JSON.parse(readFileSync(join(root, "packages/db/package.json"), "utf8"));
+const dockerfile = readFileSync(join(root, "Dockerfile"), "utf8");
+const composeProduction = readFileSync(join(root, "compose.production.yaml"), "utf8");
+const composeDev = readFileSync(join(root, "compose.yaml"), "utf8");
+const composeVerify = readFileSync(join(root, "compose.verify.yaml"), "utf8");
+const dependabot = readFileSync(join(root, ".github/dependabot.yml"), "utf8");
 const pnpmStore = join(root, "node_modules/.pnpm");
 
 function pnpmPackageDir(prefix) {
@@ -19,6 +41,130 @@ function pnpmPackageDir(prefix) {
 function readPkg(...parts) {
   return JSON.parse(readFileSync(join(...parts), "utf8"));
 }
+
+test("host/CI Node exact pin agrees and engines describe major-ok Node 26", () => {
+  const nodePin = readExactNodePin(root);
+  assert.equal(nodePin.ok, true);
+  assert.equal(nodePin.pin, "26.10.0");
+  assert.equal(nodeMajorFromEngines(rootPackage.engines.node), 26);
+  assert.match(rootPackage.engines.node, />=\s*26\.0\.0/u);
+  assert.match(rootPackage.engines.node, /<\s*27/u);
+  assert.equal(readPinnedPnpm(rootPackage), "12.4.2");
+  assert.equal(rootPackage.packageManager, "pnpm@12.4.2");
+  assert.match(dockerfile, new RegExp(`FROM ${DOCKER_NODE_MAJOR_IMAGE} AS`, "u"));
+
+  const releaseOk = evaluateToolchainPolicy({
+    actualNode: nodePin.pin,
+    actualPnpm: "12.4.2",
+    enginesNode: rootPackage.engines.node,
+    exactNodePin: nodePin.pin,
+    exactPnpmPin: "12.4.2",
+    mode: "release",
+  });
+  assert.equal(releaseOk.ok, true);
+  assert.equal(releaseOk.majorOk, true);
+  assert.equal(releaseOk.nodeExactMatch, true);
+
+  const majorOnlyLocal = evaluateToolchainPolicy({
+    actualNode: "26.6.1",
+    actualPnpm: "12.4.2",
+    enginesNode: rootPackage.engines.node,
+    exactNodePin: nodePin.pin,
+    exactPnpmPin: "12.4.2",
+    mode: "local",
+  });
+  assert.equal(majorOnlyLocal.ok, true);
+  assert.equal(majorOnlyLocal.nodeStatus, "warn");
+
+  const majorOnlyRelease = evaluateToolchainPolicy({
+    actualNode: "26.6.1",
+    actualPnpm: "12.4.2",
+    enginesNode: rootPackage.engines.node,
+    exactNodePin: nodePin.pin,
+    exactPnpmPin: "12.4.2",
+    mode: "release",
+  });
+  assert.equal(majorOnlyRelease.ok, false);
+  assert.equal(majorOnlyRelease.nodeStatus, "fail");
+});
+
+test("OPS-03 Node stages, PG18 volume, Dependabot docker updates, and pin schema", () => {
+  const nodeStages = evaluateDockerfileNodePolicy(dockerfile);
+  assert.equal(nodeStages.ok, true);
+  assert.deepEqual(
+    nodeStages.stages.map((entry) => entry.stage),
+    [...DOCKERFILE_NODE_STAGES],
+  );
+  for (const entry of nodeStages.stages) {
+    assert.match(entry.image, new RegExp(`^${DOCKER_NODE_MAJOR_IMAGE}(?:@sha256:[a-f0-9]{64})?$`, "u"));
+  }
+
+  for (const [label, source] of [
+    ["compose.yaml", composeDev],
+    ["compose.production.yaml", composeProduction],
+    ["compose.verify.yaml", composeVerify],
+  ]) {
+    assert.match(source, /image:\s*postgres:18-alpine/u, label);
+    assert.match(source, /pgdata:\/var\/lib\/postgresql\b/u, label);
+    const pg = evaluatePostgresLayout({
+      image: INFRA_IMAGE_REFS.postgres,
+      volumePath: POSTGRES_VOLUME_PATH,
+    });
+    assert.equal(pg.ok, true, label);
+    assert.equal(pg.major, POSTGRES_MAJOR);
+  }
+  assert.match(composeProduction, /image:\s*caddy:2-alpine/u);
+  assert.match(composeProduction, /image:\s*clamav\/clamav:1\.5/u);
+  assert.match(dependabot, /package-ecosystem:\s*"docker"/u);
+
+  const pins = readInfraImagePins(root);
+  const evaluation = evaluateInfraImagePins(pins, { requireResolved: false });
+  assert.equal(evaluation.ok, true);
+  assert.equal(pins.productionAuthorized, false);
+  assert.equal(pins.postgresMajor, 18);
+  assert.equal(pins.postgresVolumePath, POSTGRES_VOLUME_PATH);
+  const allResolved = pins.images.every((entry) => entry.status === "resolved");
+  for (const entry of pins.images) {
+    assert.equal(entry.ref, INFRA_IMAGE_REFS[entry.role]);
+    assert.ok(entry.status === "resolved" || entry.status === "unresolved");
+    if (entry.status === "resolved") {
+      assert.match(entry.digest, /^sha256:[a-f0-9]{64}$/u);
+      assert.match(String(entry.platform), /\//u);
+    } else {
+      assert.equal(entry.digest, null);
+      assert.equal(entry.platform, null);
+    }
+  }
+  assert.equal(
+    evaluateInfraImagePins(pins, { requireResolved: true }).ok,
+    allResolved,
+  );
+
+  const unresolvedFixture = {
+    ...pins,
+    images: pins.images.map((entry) => ({
+      ...entry,
+      digest: null,
+      platform: null,
+      status: "unresolved",
+    })),
+  };
+  assert.equal(evaluateInfraImagePins(unresolvedFixture, { requireResolved: false }).ok, true);
+  assert.equal(evaluateInfraImagePins(unresolvedFixture, { requireResolved: true }).ok, false);
+
+  assert.equal(
+    evaluateInfraImagePins({ ...pins, schemaVersion: 99 }).ok,
+    false,
+  );
+  assert.equal(
+    evaluateInfraImagePins({ ...pins, productionAuthorized: true }).ok,
+    false,
+  );
+  assert.equal(
+    evaluatePostgresLayout({ image: "postgres:17-alpine", volumePath: POSTGRES_VOLUME_PATH }).ok,
+    false,
+  );
+});
 
 test("Vite stays on the justified 8.3.5 override for the Vitest 5 unit toolchain", () => {
   assert.match(workspace, /^[ \t]*"vite":\s*"8\.3\.5"\s*$/mu);

@@ -1,5 +1,9 @@
+import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
+// Vite 7 classic JSX in this host needs a global React binding for page SSR markup.
+Object.assign(globalThis, { React });
 
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", session: vi.fn(), page: vi.fn() }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
@@ -79,11 +83,13 @@ it.each(["en", "ru"] as const)(
 it("shows sign-in when the session is absent without reading another inbox", async () => {
   state.session.mockResolvedValue(null);
   const html = await render();
-  expect(html).toContain('role="tablist"');
   expect(html).toContain('aria-label="Notification center"');
-  expect(html).toContain('role="tab"');
-  expect(html).toContain('aria-selected="true"');
-  expect(html).toContain('role="tabpanel"');
+  expect(html).toContain('aria-current="page"');
+  expect(html).toContain('href="/notifications"');
+  expect(html).toContain('href="/notifications?state=unread"');
+  expect(html).toContain('href="/notifications?state=read"');
+  expect(html).not.toContain('role="tablist"');
+  expect(html).not.toContain('role="tabpanel"');
   expect(html).toContain("rounded-lg");
   expect(html).toContain("/auth/login");
   expect(html).not.toContain("No notifications yet");
@@ -94,6 +100,98 @@ it("rejects duplicated filters before inbox queries and offers recovery", async 
   expect(html).toContain("Invalid notification filters");
   expect(state.page).not.toHaveBeenCalled();
   expect(html).toContain("Latest matching notifications");
+});
+it("filters the inbox from URL state and highlights the matching All/Unread/Read link", async () => {
+  state.page.mockResolvedValue({
+    items: [
+      {
+        id: "n-unread",
+        title: "Only unread row",
+        message: "body",
+        link: null,
+        category: "content",
+        isRead: false,
+        createdAt: "2026-10-13T00:00:00.000000Z",
+        truncated: false,
+      },
+    ],
+    unreadCount: 1,
+    olderCursor: null,
+    newerCursor: null,
+  });
+  const unread = await render({ q: "topic", state: "unread", category: "content", period: "7" });
+  expect(state.page).toHaveBeenCalledWith(
+    "actor",
+    expect.objectContaining({
+      query: "topic",
+      state: "unread",
+      category: "content",
+      period: "7",
+    }),
+    "en",
+  );
+  expect(unread).toContain("Only unread row");
+  expect(unread).toContain('href="/notifications?q=topic&amp;category=content&amp;period=7"');
+  expect(unread).toContain(
+    'href="/notifications?q=topic&amp;state=unread&amp;category=content&amp;period=7"',
+  );
+  expect(unread).toContain(
+    'href="/notifications?q=topic&amp;state=read&amp;category=content&amp;period=7"',
+  );
+  expect(unread).toMatch(
+    /aria-current="page"[^>]*>Unread<|>Unread<\/a[^>]*aria-current="page"/,
+  );
+  expect(unread).not.toMatch(/href="\/notifications\?q=topic"[^>]*aria-current="page"/);
+
+  state.page.mockClear();
+  state.page.mockResolvedValue({
+    items: [
+      {
+        id: "n-read",
+        title: "Only read row",
+        message: "body",
+        link: null,
+        category: "content",
+        isRead: true,
+        createdAt: "2026-10-13T00:00:00.000000Z",
+        truncated: false,
+      },
+    ],
+    unreadCount: 0,
+    olderCursor: null,
+    newerCursor: null,
+  });
+  const read = await render({ state: "read" });
+  expect(state.page).toHaveBeenCalledWith(
+    "actor",
+    expect.objectContaining({ state: "read" }),
+    "en",
+  );
+  expect(read).toContain("Only read row");
+  expect(read).toMatch(/aria-current="page"[^>]*>Read<|>Read<\/a[^>]*aria-current="page"/);
+  expect(read).not.toMatch(
+    /href="\/notifications"(?:(?!state=)[^>])*aria-current="page"|aria-current="page"[^>]*href="\/notifications"/,
+  );
+});
+it("drops cursor from All/Unread/Read links when the reading state changes", async () => {
+  const cursor = JSON.stringify({
+    id: "cursor-row",
+    createdAt: "2026-10-13T00:00:00.000000Z",
+    context: "a".repeat(64),
+    direction: "older",
+    version: 1,
+  });
+  const html = await render({ state: "unread", cursor, q: "needle" });
+  expect(state.page).toHaveBeenCalledWith(
+    "actor",
+    expect.objectContaining({ state: "unread", cursor: expect.objectContaining({ id: "cursor-row" }) }),
+    "en",
+  );
+  expect(html).toContain('href="/notifications?q=needle"');
+  expect(html).toContain('href="/notifications?q=needle&amp;state=unread"');
+  expect(html).toContain('href="/notifications?q=needle&amp;state=read"');
+  expect(html).not.toMatch(/href="\/notifications\?[^"]*state=(?:unread|read)[^"]*cursor=/);
+  expect(html).not.toMatch(/href="\/notifications\?q=needle"[^"]*cursor=/);
 });
 it.each(["session", "page"] as const)(
   "shows a recoverable failure for %s without an empty-success state",

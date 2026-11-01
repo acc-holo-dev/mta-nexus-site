@@ -35,6 +35,12 @@ async function fixture() {
       displayName: id,
     });
   await sessionRepository.create({
+    id: `ses_${owner}`,
+    userId: owner,
+    token: `tok_${owner}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
+  await sessionRepository.create({
     id: `ses_${moderator}`,
     userId: moderator,
     token: `tok_${moderator}`,
@@ -83,6 +89,7 @@ async function fixture() {
         targetType: "build",
         targetId: `bld_pkg_${key}_${suffix}`,
       },
+      `tok_${owner}`,
     );
     return { build, evidence };
   }

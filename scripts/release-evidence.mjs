@@ -15,7 +15,18 @@ import {
   sha256File,
   summarizeReleaseEvidence,
   summarizeExternalEvidence,
+  buildReleaseManifest,
+  evaluateReleaseManifest,
 } from "./release-evidence-lib.mjs";
+import {
+  collectRepositoryToolchain,
+  evaluateToolchainPolicy,
+} from "./toolchain-policy.mjs";
+import {
+  RELEASE_UPGRADE_BASELINE_TAG,
+  RELEASE_UPGRADE_TARGET_TAG,
+} from "../packages/db/scripts/release-upgrade-contract.mjs";
+import { readInfraImagePins, evaluateInfraImagePins } from "./infra-image-policy.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
@@ -95,6 +106,20 @@ const identityComplete =
   Boolean(gitSha && branchName && pnpmVersion && gitVersion) &&
   githubShaMatches;
 
+const repositoryToolchain = collectRepositoryToolchain(root, packageJson);
+const toolchainEvaluation = evaluateToolchainPolicy({
+  actualNode: process.versions.node,
+  actualPnpm: pnpmVersion,
+  enginesNode: repositoryToolchain.enginesNode,
+  exactNodePin: repositoryToolchain.nodePin.ok ? repositoryToolchain.nodePin.pin : null,
+  exactPnpmPin: repositoryToolchain.pnpmPin,
+  mode: "release",
+});
+const toolchainComplete =
+  repositoryToolchain.nodePin.ok &&
+  Boolean(repositoryToolchain.pnpmPin) &&
+  toolchainEvaluation.ok;
+
 const gates = [
   runGate(
     "repository_identity",
@@ -105,6 +130,19 @@ const gates = [
       : {
           blockedReason:
             "Git/pnpm identity is incomplete or GITHUB_SHA does not match the checked-out commit.",
+        },
+  ),
+  runGate(
+    "toolchain_policy",
+    "internal",
+    [],
+    toolchainComplete
+      ? {}
+      : {
+          blockedReason: repositoryToolchain.nodePin.ok
+            ? "Release toolchain requires engines major-ok plus exact Node (.nvmrc/.node-version) and pnpm (packageManager) matches; unexplained divergence is not a candidate."
+            : (repositoryToolchain.nodePin.reason ??
+              "Repository Node pin files are missing, invalid, or disagree."),
         },
   ),
   runGate("release_evidence_harness", "node", [
@@ -214,6 +252,22 @@ const evidenceCore = {
     platform: process.platform,
     arch: process.arch,
   },
+  toolchain: {
+    policy: {
+      enginesNode: repositoryToolchain.enginesNode,
+      enginesPnpm: repositoryToolchain.enginesPnpm,
+      exactNodePin: repositoryToolchain.nodePin.ok ? repositoryToolchain.nodePin.pin : null,
+      exactPnpmPin: repositoryToolchain.pnpmPin,
+      dockerNodeImage: repositoryToolchain.dockerNodeImage,
+      note: "engines = major-ok local compatibility; .nvmrc/.node-version and packageManager = exact release pins; Docker node:26-alpine follows the major branch.",
+    },
+    actual: {
+      node: process.versions.node,
+      pnpm: pnpmVersion,
+    },
+    evaluation: toolchainEvaluation,
+    lockfileSha256: sha256File(lockfilePath),
+  },
   project: {
     name: packageJson.name,
     version: packageJson.version,
@@ -239,6 +293,71 @@ const evidenceCore = {
   ],
   summary: summarizeReleaseEvidence({ dirty: dirty || finalDirty, gates }),
 };
+
+const infraPins = (() => {
+  try {
+    return readInfraImagePins(root);
+  } catch {
+    return null;
+  }
+})();
+const infraPinEvaluation = infraPins
+  ? evaluateInfraImagePins(infraPins, { requireResolved: false })
+  : { ok: false, reason: "deploy/infra-image-pins.json is missing." };
+
+const releaseManifest = buildReleaseManifest({
+  appVersion: packageJson.version,
+  sha: gitSha,
+  lockfileSha256: sha256File(lockfilePath),
+  toolchain: {
+    policy: evidenceCore.toolchain.policy,
+    actual: evidenceCore.toolchain.actual,
+    evaluation: toolchainEvaluation,
+  },
+  image: {
+    digest: null,
+    platform: null,
+    sourceSha: gitSha,
+    status: "unresolved",
+  },
+  infraImages: infraPins?.images ?? null,
+  postgresMajor: infraPins?.postgresMajor ?? 18,
+  schema: {
+    baseline: RELEASE_UPGRADE_BASELINE_TAG,
+    target: RELEASE_UPGRADE_TARGET_TAG,
+  },
+  migrations: migrationFiles,
+  overlays: [
+    "compose.production.yaml",
+    "compose.production-ci.yaml (CI only)",
+    "compose.recovery.yaml (optional)",
+    "compose.mail-worker.yaml (optional)",
+  ],
+  evidenceRefs: {
+    coreReleaseEvidence: "artifacts/release-evidence.json",
+    ciEvidence: "artifacts/ci-evidence.json",
+    releaseUpgrade: "artifacts/release-upgrade.json",
+    backupRestore: "artifacts/backup-restore-evidence.json",
+  },
+});
+const releaseManifestEvaluation = evaluateReleaseManifest(releaseManifest, {
+  expectedSha: gitSha,
+  expectedSchema: {
+    baseline: RELEASE_UPGRADE_BASELINE_TAG,
+    target: RELEASE_UPGRADE_TARGET_TAG,
+  },
+  requireImageDigest: false,
+  requireResolvedInfra: false,
+});
+
+Object.assign(evidenceCore, {
+  releaseManifest,
+  releaseManifestEvaluation,
+  infraImagePins: {
+    evaluation: infraPinEvaluation,
+    productionAuthorized: false,
+  },
+});
 
 const evidence = {
   ...evidenceCore,

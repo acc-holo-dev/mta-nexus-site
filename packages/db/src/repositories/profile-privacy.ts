@@ -25,6 +25,7 @@ class ProfilePrivacyRepository {
     return row;
   }
 
+  /** Public guest visibility — activity feed and professional contacts only. */
   async visibility(userId: string) {
     const [row] = await db
       .select(preferences)

@@ -6,7 +6,8 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "generate": "drizzle-kit generate",
+    "generate": "node scripts/guard-db-generate.mjs",
+    "generate:custom": "node scripts/guard-db-generate.mjs --custom",
     "migrate": "tsx src/migrate.ts",
     "seed": "tsx src/seed.ts",
     "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts",

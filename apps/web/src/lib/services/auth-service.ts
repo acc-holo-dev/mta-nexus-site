@@ -10,6 +10,7 @@ import {
   accountPasswordResetRepository,
 } from "@nexus/db";
 import {
+  freshAuthProofAccepted,
   generateId,
   generateSessionToken,
   hashPassword,
@@ -17,6 +18,7 @@ import {
   verifyPassword,
 } from "@nexus/security";
 import {
+  AppError,
   NotFoundError,
   UnauthorizedError,
   ConflictError,
@@ -135,6 +137,28 @@ class AuthService {
     if (!token) return null;
     const result = await sessionRepository.findValidSession(token);
     return result ? toPublicUser(result.user) : null;
+  }
+
+  /**
+   * FLOW-22: prove current_password for staff_action. Returns the hash that the
+   * final write must recheck. Never log or return the plaintext password.
+   */
+  async confirmStaffActionPassword(input: {
+    email: string;
+    currentPassword: string;
+  }): Promise<{ expectedPasswordHash: string }> {
+    if (!freshAuthProofAccepted("staff_action", "current_password")) {
+      throw new AppError("Current password is required", 401, "FRESH_AUTH_REQUIRED");
+    }
+    const password = input.currentPassword;
+    if (typeof password !== "string" || password.length < 1) {
+      throw new AppError("Current password is required", 401, "FRESH_AUTH_REQUIRED");
+    }
+    const stored = await userRepository.findByEmail(input.email);
+    if (!stored?.passwordHash || !(await verifyPassword(password, stored.passwordHash))) {
+      throw new AppError("Current password is incorrect", 401, "FRESH_AUTH_REQUIRED");
+    }
+    return { expectedPasswordHash: stored.passwordHash };
   }
 
   async getSessionIdentity(

@@ -29,6 +29,44 @@ export function canTransitionResource(
   return status === "draft";
 }
 
+/** Allowed author lifecycle actions for the current resource status. */
+export function resourceLifecycleActionsFor(
+  status: ProductStatus,
+): ResourceLifecycleAction[] {
+  return RESOURCE_LIFECYCLE_ACTIONS.filter((action) => canTransitionResource(status, action));
+}
+
+/**
+ * Target status after a successful author command. Restore/archive never imply
+ * automatic return to the public catalog.
+ */
+export function resourceLifecycleTarget(
+  status: ProductStatus,
+  action: ResourceLifecycleAction,
+): ProductStatus | null {
+  if (!canTransitionResource(status, action)) return null;
+  if (action === "archive") return "archived";
+  if (action === "restore") return "draft";
+  return "pending_review";
+}
+
+export type ResourceLifecycleNextStep =
+  | "archive"
+  | "restore"
+  | "submit"
+  | "wait_review"
+  | "suspended_support"
+  | "none";
+
+export function resourceLifecycleNextStep(status: ProductStatus): ResourceLifecycleNextStep {
+  if (status === "suspended") return "suspended_support";
+  if (status === "archived") return "restore";
+  if (status === "draft") return "submit";
+  if (status === "pending_review") return "wait_review";
+  if (status === "published") return "archive";
+  return "none";
+}
+
 export type ResourceCartItem = {
   productId: string;
   title: string | null;

@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import "../register-ts-directory-resolve.mjs";
+import { capturePageEvidence, waitForReadyCapture } from "../browser-page-ready.mjs";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
@@ -11,6 +12,7 @@ const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 const results = [];
+const captures = [];
 test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
@@ -19,9 +21,12 @@ test.afterAll(async () => {
     JSON.stringify(
       {
         commit: process.env.GITHUB_SHA,
+        fixture: "scripts/fixtures/public-portfolio.sql",
+        state: "ready",
+        captures,
         results,
         scope:
-          "Real production-rendered developer, user and organization portfolios: 125 safe resources and 25 articles; guest Chromium RU/EN on mobile and desktop.",
+          "Real production-rendered developer, user and organization portfolios: 125 safe resources and 25 articles; guest Chromium RU/EN on mobile and desktop. Ready PNGs wait for settled final content (no GlobalLoading skeleton).",
       },
       null,
       2,
@@ -32,7 +37,13 @@ test.afterAll(async () => {
     [
       "# Large public portfolio acceptance",
       "",
+      `Commit: ${process.env.GITHUB_SHA ?? "unknown"}`,
+      "Fixture: scripts/fixtures/public-portfolio.sql",
+      "Capture state: ready (loading/empty/error frames would use a distinct filename suffix)",
+      "",
       ...results.map((r) => `- ${r.status}: ${r.name}`),
+      "",
+      ...captures.map((c) => `- capture ${c.state}: ${c.path}`),
       "",
     ].join("\n"),
   );
@@ -70,6 +81,7 @@ for (const locale of ["en", "ru"]) {
         for (const width of [390, 1280]) {
           await page.setViewportSize({ width, height: 900 });
           await page.goto(path);
+          await waitForReadyCapture(page);
           await expect(
             page.getByRole("heading", { level: 1, name: title, exact: true }),
           ).toBeVisible();
@@ -77,17 +89,21 @@ for (const locale of ["en", "ru"]) {
           const nav = page.locator("#resources").getByRole("navigation");
           await expect(nav).toContainText(`${dictionary.market.pageLabel} 1 / 6`);
           await nav.getByRole("link", { name: dictionary.market.nextPage, exact: true }).click();
+          await waitForReadyCapture(page);
           await expect(nav).toContainText(`${dictionary.market.pageLabel} 2 / 6`);
           assert.deepEqual(await titles(), expectedTitles(101, 78));
           await page.goto(`${path}?page=5`);
+          await waitForReadyCapture(page);
           assert.deepEqual(await titles(), expectedTitles(29, 6));
           await page.goto(`${path}?page=999999999`);
+          await waitForReadyCapture(page);
           await expect(nav).toContainText(`${dictionary.market.pageLabel} 6 / 6`);
           assert.deepEqual(await titles(), expectedTitles(5, 1));
           await expect(
             nav.getByRole("link", { name: dictionary.market.nextPage, exact: true }),
           ).toHaveCount(0);
           await page.goto(`${path}?page=invalid`);
+          await waitForReadyCapture(page);
           assert.deepEqual(await titles(), expectedTitles(125, 102));
           await expect(page.getByText(/Hidden (draft|paid|missing|rejected|foreign)/u)).toHaveCount(
             0,
@@ -96,22 +112,33 @@ for (const locale of ["en", "ru"]) {
             await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
             `${path} overflows at ${width}`,
           );
-          await page.screenshot({
+          // Final PNG after the navigation series: wait again for settled ready content.
+          const capture = await capturePageEvidence(page, {
             path: join(
               process.env.NEXUS_BROWSER_REPORT_DIR,
               `portfolio-${locale}-${path.split("/")[1]}-${width}.png`,
             ),
+            state: "ready",
             fullPage: true,
+          });
+          captures.push({
+            locale,
+            path: capture.path,
+            state: capture.state,
+            route: `${path}?page=invalid`,
+            viewport: width,
           });
         }
       }
       await page.goto("/organizations/portfolio-ci?page=2&articlePage=2");
+      await waitForReadyCapture(page);
       const resourceNav = page.locator("#resources").getByRole("navigation");
       const articleNav = page.locator("#articles").getByRole("navigation");
       await expect(resourceNav).toContainText(`${dictionary.market.pageLabel} 2 / 6`);
       await expect(articleNav).toContainText(`${dictionary.market.pageLabel} 2 / 3`);
       assert.equal(await page.locator("#articles h3").count(), 12);
       await articleNav.getByRole("link", { name: dictionary.market.nextPage, exact: true }).click();
+      await waitForReadyCapture(page);
       await expect(page).toHaveURL(/page=2&articlePage=3#articles$/u);
       await expect(resourceNav).toContainText(`${dictionary.market.pageLabel} 2 / 6`);
       assert.deepEqual(await page.locator("#articles h3").allTextContents(), [
@@ -120,6 +147,7 @@ for (const locale of ["en", "ru"]) {
       await resourceNav
         .getByRole("link", { name: dictionary.market.nextPage, exact: true })
         .click();
+      await waitForReadyCapture(page);
       await expect(page).toHaveURL(/page=3&articlePage=3#resources$/u);
       await expect(articleNav).toContainText(`${dictionary.market.pageLabel} 3 / 3`);
       assert.deepEqual(errors, []);

@@ -46,6 +46,12 @@ async function fixture(privateDependency = false) {
       displayName: id,
     });
   await sessionRepository.create({
+    id: `ses_${owner}`,
+    userId: owner,
+    token: `tok_${owner}`,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
+  await sessionRepository.create({
     id: `ses_${buyer}`,
     userId: buyer,
     token: `tok_${buyer}`,
@@ -104,6 +110,7 @@ async function fixture(privateDependency = false) {
         targetType: "build",
         targetId: `bld_req_${key}_${index}`,
       },
+      `tok_${owner}`,
     );
     if (index < 2)
       await buildRepository.moderatePending(
@@ -156,6 +163,7 @@ async function fixture(privateDependency = false) {
         targetType: "build",
         targetId: id,
       },
+      `tok_${owner}`,
     );
     await buildRepository.moderatePending(
       build.id,

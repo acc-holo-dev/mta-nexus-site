@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import type { FollowTargetType } from "../lib/follow-workspace-contract";
-import { followCopy, followError } from "../lib/follow-workspace-copy";
+import { followActionCopy, followCopy, followError } from "../lib/follow-workspace-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 type InitialFollowState = {
@@ -41,7 +42,12 @@ function FollowControl({
 }) {
   const { locale: appLocale } = useNexusLocale();
   const locale = providedLocale ?? appLocale;
-  const copy = followCopy(locale);
+  const shared = followCopy(locale);
+  const copy = followActionCopy(locale, targetType);
+  const [loginHref, setLoginHref] = useState("/auth/login");
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, []);
   const [state, setState] = useState<
     "checking" | "anonymous" | "self" | "following" | "not-following" | "error"
   >(
@@ -155,7 +161,7 @@ function FollowControl({
       if (alive.current) {
         writeBlocked.current = true;
         setState("error");
-        setMessage(copy.unconfirmed);
+        setMessage(shared.unconfirmed);
       }
     } finally {
       busy.current = false;
@@ -164,10 +170,15 @@ function FollowControl({
   }
   const linkStyle =
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-accent";
+  const showHint =
+    state === "following" ||
+    state === "not-following" ||
+    state === "anonymous" ||
+    state === "self";
   return (
     <div className="space-y-2">
       {state === "anonymous" ? (
-        <Link href="/auth/login" className={linkStyle}>
+        <Link href={loginHref} className={linkStyle}>
           {copy.signIn}
         </Link>
       ) : state === "self" ? (
@@ -182,7 +193,7 @@ function FollowControl({
             setAttempt((value) => value + 1);
           }}
         >
-          {copy.retry}
+          {shared.retry}
         </Button>
       ) : (
         <Button
@@ -210,6 +221,7 @@ function FollowControl({
                 : copy.follow}
         </Button>
       )}
+      {showHint && <p className="max-w-sm text-xs text-muted">{copy.hint}</p>}
       {message && (
         <p
           role={state === "error" ? "alert" : "status"}
@@ -220,7 +232,7 @@ function FollowControl({
       )}
       {state === "error" && !message && (
         <p role="alert" className="text-xs text-danger">
-          {copy.error}
+          {shared.error}
         </p>
       )}
     </div>

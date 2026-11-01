@@ -42,6 +42,8 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 import { GET, POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
 
 const context = { params: Promise.resolve({ slug: "article" }) };
+const INTENT = "12345678-1234-4234-8234-123456789abc";
+
 function request(method: string, body?: unknown, query = "", locale = "en", headers = {}) {
   return new NextRequest(`http://nexus.test/api/content/article/comments${query}`, {
     method,
@@ -49,6 +51,7 @@ function request(method: string, body?: unknown, query = "", locale = "en", head
       ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: `nexus_locale=${locale};nexus_session=test`,
       "content-type": "application/json",
+      ...(method === "POST" ? { "Idempotency-Key": INTENT } : {}),
       ...headers,
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -68,9 +71,12 @@ beforeEach(() => {
   });
   mocks.page.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
   mocks.add.mockImplementation(async (input) => ({
-    ...input,
-    id: "comment",
-    authorId: "commenter",
+    comment: {
+      ...input,
+      id: "comment",
+      authorId: "commenter",
+    },
+    replayed: false,
   }));
   mocks.parent.mockResolvedValue("parentAuthor");
   mocks.rate.mockResolvedValue({ success: true });
@@ -110,7 +116,12 @@ it("persists a reply with transactional fanout instead of after() dispatch", asy
   );
   expect(response.status).toBe(201);
   expect(mocks.add).toHaveBeenCalledWith(
-    { contentId: "content", text: "A useful reply", parentId: "parent" },
+    {
+      contentId: "content",
+      text: "A useful reply",
+      parentId: "parent",
+      intentKey: INTENT,
+    },
     state.actor,
   );
   expect(mocks.notify).not.toHaveBeenCalled();
@@ -155,10 +166,51 @@ it("keeps a saved reply successful without after() registration", async () => {
   const response = await POST(request("POST", { text: "Saved reply" }), context);
   expect(response.status).toBe(201);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
-  expect(await response.json()).toMatchObject({ comment: { id: "comment" } });
+  expect(await response.json()).toMatchObject({
+    comment: { id: "comment" },
+    replayed: false,
+  });
   expect(mocks.add).toHaveBeenCalledOnce();
   expect(state.after).toHaveLength(0);
   expect(mocks.notify).not.toHaveBeenCalled();
+});
+it("replays the same intent after a lost response without a second create call side effect", async () => {
+  mocks.add.mockResolvedValueOnce({
+    comment: {
+      id: "comment",
+      contentId: "content",
+      text: "Same intent",
+      authorId: "commenter",
+    },
+    replayed: true,
+  });
+  const response = await POST(request("POST", { text: "Same intent" }), context);
+  expect(response.status).toBe(201);
+  expect(await response.json()).toMatchObject({
+    comment: { id: "comment", text: "Same intent" },
+    replayed: true,
+  });
+  expect(mocks.add).toHaveBeenCalledWith(
+    { contentId: "content", text: "Same intent", intentKey: INTENT },
+    state.actor,
+  );
+});
+it("rejects payload mismatch on a reused intent key", async () => {
+  mocks.add.mockRejectedValueOnce(
+    new AppError("Conflict", 409, "COMMENT_IDEMPOTENCY_CONFLICT"),
+  );
+  const response = await POST(request("POST", { text: "Changed payload" }), context);
+  expect(response.status).toBe(409);
+  expect(await response.json()).toMatchObject({ code: "COMMENT_IDEMPOTENCY_CONFLICT" });
+});
+it("requires a canonical UUIDv4 Idempotency-Key", async () => {
+  const response = await POST(
+    request("POST", { text: "reply" }, "", "en", { "Idempotency-Key": "not-a-uuid" }),
+    context,
+  );
+  expect(response.status).toBe(400);
+  expect(await response.json()).toMatchObject({ code: "COMMENT_IDEMPOTENCY_KEY_INVALID" });
+  expect(mocks.add).not.toHaveBeenCalled();
 });
 it.each([1, 5001])("rejects comment length %s", async (length) => {
   expect((await POST(request("POST", { text: "x".repeat(length) }), context)).status).toBe(400);

@@ -18,6 +18,7 @@ import {
 } from "../lib/user-platform-client";
 import { contentFieldsSchema, editorialTypes, writerTypes } from "../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
+import { confirmAction } from "./confirm-action";
 
 export function AuthorContentForm({
   locale,
@@ -140,7 +141,19 @@ export function AuthorContentForm({
     }
   }
   async function archive() {
-    if (!saved || pending.current || !window.confirm(copy.archiveConfirm)) return;
+    if (
+      !saved ||
+      pending.current ||
+      !(await confirmAction({
+        title: copy.archive,
+        object: saved.title,
+        consequences: copy.archiveConfirm,
+        confirmLabel: copy.archive,
+        cancelLabel: copy.back,
+        closeLabel: copy.back,
+      }))
+    )
+      return;
     pending.current = true;
     setBusy(true);
     setNotice(null);

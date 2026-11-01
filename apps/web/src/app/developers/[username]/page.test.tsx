@@ -28,6 +28,11 @@ vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getUserByUsername: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({ productRepository: { pagePublishedFreeByAuthor: state.products } }));
+vi.mock("../../../lib/services/product-service", () => ({
+  productService: {
+    getPublicAttributions: async () => new Map(),
+  },
+}));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../../../lib/services/profile-privacy-service", () => ({
   profilePrivacyService: {
@@ -158,4 +163,12 @@ it("hides personal activity links without hiding published resources", async () 
   expect(html).toContain("published resource");
   state.showActivity = true;
   expect(renderToStaticMarkup(await Page(params()))).toContain('href="/users/creator/activity"');
+});
+
+it("keeps Trust and Publications as separately focusable profile links", async () => {
+  const html = renderToStaticMarkup(await Page(params()));
+  expect(html).toContain('href="/users/creator/trust"');
+  expect(html).toContain('href="/users/creator/activity"');
+  expect(html).toMatch(/aria-label="Creator profile"/);
+  expect(html).toContain("sm:gap-x-5");
 });

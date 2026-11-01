@@ -1,9 +1,12 @@
 import { readFileSync } from "node:fs";
 import {
+  CRITICAL_STAFF_ADMIN_ACTIONS,
   FRESH_AUTH_ACTIONS,
+  criticalStaffAdminFreshAuthAction,
   freshAuthProofAccepted,
   freshAuthRequirement,
   ordinaryRecoveryEligible,
+  staffActionRequiresPasswordHashRecheck,
 } from "@nexus/security";
 import { describe, expect, it } from "vitest";
 
@@ -60,5 +63,43 @@ describe("fresh-auth requirements", () => {
       expect(source).toContain("ordinaryRecoveryEligible");
       expect(source).not.toContain('["admin", "moderator"]');
     }
+  });
+
+  it("binds every existing admin/actions command to staff_action → current_password", () => {
+    expect(CRITICAL_STAFF_ADMIN_ACTIONS).toEqual([
+      { targetType: "product", action: "feature" },
+      { targetType: "product", action: "unfeature" },
+      { targetType: "product", action: "suspend" },
+      { targetType: "product", action: "restore" },
+      { targetType: "report", action: "resolve" },
+      { targetType: "report", action: "dismiss" },
+      { targetType: "verification", action: "approve" },
+      { targetType: "verification", action: "reject" },
+      { targetType: "build", action: "approve" },
+      { targetType: "build", action: "reject" },
+      { targetType: "build", action: "quarantine" },
+      { targetType: "build", action: "restore" },
+      { targetType: "content", action: "publish" },
+      { targetType: "content", action: "archive" },
+    ]);
+    for (const row of CRITICAL_STAFF_ADMIN_ACTIONS) {
+      expect(criticalStaffAdminFreshAuthAction(row.targetType, row.action)).toBe("staff_action");
+      expect(freshAuthProofAccepted("staff_action", "session")).toBe(false);
+      expect(freshAuthProofAccepted("staff_action", "current_password")).toBe(true);
+    }
+    expect(criticalStaffAdminFreshAuthAction("product", "delete")).toBeNull();
+    expect(staffActionRequiresPasswordHashRecheck("build", "approve")).toBe(true);
+    expect(staffActionRequiresPasswordHashRecheck("build", "reject")).toBe(true);
+    expect(staffActionRequiresPasswordHashRecheck("build", "quarantine")).toBe(false);
+    expect(staffActionRequiresPasswordHashRecheck("report", "resolve")).toBe(false);
+  });
+
+  it("keeps admin/actions HTTP enforcement on the staff_action proof path", () => {
+    const route = readFileSync("apps/web/src/app/api/admin/actions/route.ts", "utf8");
+    expect(route).toContain("criticalStaffAdminFreshAuthAction");
+    expect(route).toContain("confirmStaffActionPassword");
+    expect(route).toContain("currentPassword");
+    expect(route).not.toMatch(/details:.*currentPassword/);
+    expect(route).not.toMatch(/logRequestEvent\([\s\S]*currentPassword/);
   });
 });

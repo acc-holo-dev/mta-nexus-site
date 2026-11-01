@@ -1,4 +1,5 @@
 import type { AuditEvent, Build } from "@nexus/domain";
+import { classifyBuildAvailability, unavailableBuildSupportHref } from "@nexus/domain";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, buildIncidentNotificationDeliveries, builds, products } from "../schema";
@@ -8,6 +9,24 @@ import {
   assertBuildModerationAuthority,
   assertProductMutationAuthority,
 } from "./product-mutation-authority";
+
+/** Explain an unavailable build without inventing download access. */
+export function unavailableBuildGuidance(input: {
+  productId: string;
+  buildId: string;
+  status: string;
+}) {
+  const availability = classifyBuildAvailability(input.status);
+  return {
+    availability,
+    downloadBlocked: availability !== "available",
+    supportHref: unavailableBuildSupportHref(),
+    supportContext: { productId: input.productId, buildId: input.buildId },
+    // Quarantine restore of a previously published clean build may republish;
+    // author archive restore never does.
+    autoPublishedOnRestore: false,
+  };
+}
 
 export async function retireAndRefreshProduct(
   id: string,

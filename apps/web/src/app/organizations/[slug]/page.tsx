@@ -14,6 +14,7 @@ import { ProductCard } from "../../../components/product-card";
 import { ArticleCard } from "../../../components/article-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { productService } from "../../../lib/services/product-service";
 import { cache } from "react";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,7 @@ export default async function OrganizationProfilePage({
     ),
   ]);
   const products = resourcePage.products;
+  const attributions = await productService.getPublicAttributions(products);
   const articles = articlePage.items;
 
   return (
@@ -161,7 +163,12 @@ export default async function OrganizationProfilePage({
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} locale={locale} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+                attribution={attributions.get(product.id) ?? null}
+              />
             ))}
           </div>
           <ProfileResourcePagination

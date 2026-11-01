@@ -1,5 +1,5 @@
 import type { AuditEvent, Build } from "@nexus/domain";
-import { AppError } from "@nexus/domain";
+import { AppError, ForbiddenError } from "@nexus/domain";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
@@ -25,6 +25,7 @@ import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery"
 export async function submitForReview(
   data: Omit<Build, "createdAt">,
   audit: Omit<AuditEvent, "createdAt">,
+  currentToken: string,
 ): Promise<Build> {
   return db.transaction(async (tx) => {
     const [parent] = await tx
@@ -44,6 +45,8 @@ export async function submitForReview(
     }
 
     await assertProductMutationAuthority(tx, parent, audit.actorId);
+    // Product and live actor first; initiating session before any build/audit write.
+    await lockInitiatingSession(tx, audit.actorId, currentToken);
 
     const createdAt = new Date();
     const rows = await tx
@@ -79,6 +82,8 @@ export async function moderatePending(
   audit: Omit<AuditEvent, "createdAt">,
   expectedRevision: number,
   currentToken: string,
+  /** FLOW-22 staff HTTP path supplies this; omitted only for legacy direct callers. */
+  expectedPasswordHash?: string,
 ): Promise<Build | null> {
   if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1)
     throw new AppError("Observed build revision is required", 400, "BUILD_REVISION_REQUIRED");
@@ -102,7 +107,23 @@ export async function moderatePending(
       .limit(1)
       .for("no key update");
     if (!parent) return null;
+    // Role first (share), then password hash under the user update lock so a
+    // concurrent password change cannot reuse a stale staff_action proof.
     await assertBuildModerationAuthority(tx, audit.actorId);
+    if (expectedPasswordHash !== undefined) {
+      const [actor] = await tx
+        .select({ passwordHash: users.passwordHash, role: users.role })
+        .from(users)
+        .where(eq(users.id, audit.actorId))
+        .limit(1)
+        .for("update");
+      if (!actor || (actor.role !== "admin" && actor.role !== "moderator")) {
+        throw new ForbiddenError("Moderator privilege is required");
+      }
+      if (!actor.passwordHash || actor.passwordHash !== expectedPasswordHash) {
+        throw new AppError("Current password is incorrect", 401, "FRESH_AUTH_REQUIRED");
+      }
+    }
     await lockInitiatingSession(tx, audit.actorId, currentToken);
     if (parent.status === "archived" || parent.status === "suspended") {
       throw new AppError("Resource is withdrawn from publication", 409, "PRODUCT_STATE_CHANGED");

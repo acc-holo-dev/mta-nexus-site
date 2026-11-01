@@ -155,6 +155,30 @@ vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
   };
 });
 
+vi.mock("../apps/web/src/components/server-connect-controls", async () => {
+  const React = await import("react");
+  return {
+    ServerConnectControls: ({
+      address,
+      connectUri,
+      connectLabel,
+      connectHint,
+    }: {
+      address: string;
+      connectUri: string;
+      connectLabel: string;
+      connectHint?: string;
+    }) =>
+      React.createElement(
+        "div",
+        { "data-testid": "server-connect" },
+        React.createElement("a", { href: connectUri }, connectLabel),
+        React.createElement("span", null, address),
+        connectHint ? React.createElement("p", null, connectHint) : null,
+      ),
+  };
+});
+
 vi.mock("../apps/web/src/components/server-review-panel", async () => {
   const React = await import("react");
   return {
@@ -237,8 +261,31 @@ describe("server detail behavior", () => {
     expect(html).toContain('data-testid="server-follow"');
     expect(html).toContain('data-server-id="srv_detail"');
     expect(html).toContain('href="mtasa://203.0.113.50:22003"');
+    expect(html).toContain("Open in MTA");
+    expect(html).toContain("connect intent");
+    expect(html).not.toMatch(/verified play|verified-play/iu);
     expect(html).toContain('data-testid="server-claim"');
     expect(html).toContain(">12 <");
+  });
+
+  it("keeps unknown live occupancy distinct from a fabricated zero fill", async () => {
+    mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
+    mocks.history.mockResolvedValue(null);
+    mocks.updates.mockResolvedValue([]);
+    mocks.matches.mockReturnValue(false);
+    mocks.liveStatus.mockReturnValue("unknown");
+
+    const html = renderToStaticMarkup(
+      await ServerDetailPage({
+        params: Promise.resolve({ slug: state.server.slug }),
+      }),
+    );
+
+    expect(html).toMatch(/>—\s*</u);
+    expect(html).toContain('style="width:0%"');
+    expect(html).toContain("Open in MTA");
+    expect(html).toContain("203.0.113.50:22003");
+    expect(html).not.toMatch(/>0\s*<span[^>]*>\/ 64</u);
   });
 
   it("hides claim controls for a verified server", async () => {
