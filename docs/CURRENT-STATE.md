@@ -1,6 +1,6 @@
 # Проверенный срез проекта
 
-**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `13eac8832c5e3364bd98b9dabcd207424ff45960` (`fix(web): type unfollow confirmAction mock for CI`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `917b99d7f95c1f0423be1438a584701ca4191870` (`fix(web): use section landmark on saved loading shell`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
 ## Оценка стадии
 
@@ -18,12 +18,12 @@
 
 На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна на tip:** free-beta UX honesty — unfollow через `confirmAction`, раздельные empty vs filtered состояния (profile history, reports), guest sign-in return paths; поверх UX-06, guest discussion draft + UNAUTHORIZED sign-in CTA, GROW-01 window helpers, UX surface tests, observability evidence hardening, GROW-08 server-pack spec draft. **Verified CI green on this tip:** https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41341277014
+**Последняя локальная волна на tip:** honest loading shells для `/workspace/reactions` и `/workspace/discussions` (section + `aria-busy` + skeleton); CURRENT-STATE синхронизирован с post-pull `main`. **Verified CI green on post-pull tip `917b99d7…`:** https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41344662960
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `13eac883…`. Не значит tip = production.
-- **CI:** Verified green на tip `13eac883…`: [CI 41341277014](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41341277014) (lint/unit, DB, image build, production browser smoke). Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)). PASS только на exact SHA; green CI ≠ deploy.
+- **Исходники:** DOC + P1/P2 в `main`; tip `917b99d7…`. Не значит tip = production.
+- **CI:** Verified green на post-pull tip `917b99d7f95c1f0423be1438a584701ca4191870`: [CI 41344662960](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41344662960) (lint/unit, DB, image build, production browser smoke). Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)). PASS только на exact SHA; green CI ≠ deploy.
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
 - **Tracker:** 64 done / 19 open (OPS external/github_settings, GROW pilots, ads UX-24–26). `done` ≠ production enablement.
