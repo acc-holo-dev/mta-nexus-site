@@ -74,9 +74,9 @@
     "test:properties": "vitest run --project unit tests/request-ip-properties.test.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.3",
+    "@biomejs/biome": "2.6.4",
     "@swc/core": "1.16.20",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "dependency-cruiser": "18.7.0",
