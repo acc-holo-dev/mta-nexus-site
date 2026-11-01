@@ -23,6 +23,7 @@ import {
 } from "../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { confirmAction } from "./confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";
@@ -112,7 +113,18 @@ export function OrganizationWorkspacePanel({
     }
   }
   async function leave() {
-    if (guard.current || !window.confirm(copy.leaveConfirm)) return;
+    if (guard.current) return;
+    if (
+      !(await confirmAction({
+        title: copy.leave,
+        object: data.organization.name,
+        consequences: copy.leaveConfirm,
+        confirmLabel: copy.leave,
+        cancelLabel: governanceCopy.cancel,
+        closeLabel: governanceCopy.cancel,
+      }))
+    )
+      return;
     guard.current = true;
     setBusy(true);
     setError("");
@@ -340,15 +352,25 @@ export function OrganizationWorkspacePanel({
                     copy.updated,
                   )
                 }
-                onRemove={() => {
-                  if (window.confirm(copy.removeConfirm))
-                    void mutate(
-                      "DELETE",
-                      `/members/${encodeURIComponent(member.id)}`,
-                      {},
-                      { userId: member.id, removed: true },
-                      copy.removed,
-                    );
+                onRemove={async () => {
+                  if (
+                    !(await confirmAction({
+                      title: copy.remove,
+                      object: `${member.displayName} (@${member.username})`,
+                      consequences: copy.removeConfirm,
+                      confirmLabel: copy.remove,
+                      cancelLabel: governanceCopy.cancel,
+                      closeLabel: governanceCopy.cancel,
+                    }))
+                  )
+                    return;
+                  void mutate(
+                    "DELETE",
+                    `/members/${encodeURIComponent(member.id)}`,
+                    {},
+                    { userId: member.id, removed: true },
+                    copy.removed,
+                  );
                 }}
                 onSelectOwner={
                   data.role === "owner" && ["admin", "developer", "member"].includes(member.role)

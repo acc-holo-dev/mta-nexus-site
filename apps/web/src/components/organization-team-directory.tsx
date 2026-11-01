@@ -18,6 +18,7 @@ import {
 import { organizationTeamCopy } from "../lib/organization-team-copy";
 import { organizationRequest } from "../lib/organization-workspace-client";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
+import { confirmAction } from "./confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
 export function OrganizationTeamDirectory({
@@ -210,9 +211,20 @@ export function OrganizationTeamDirectory({
                 )}
                 busy={pending || blocked}
                 onSave={(role, managesServers) => mutate(member, { role, managesServers })}
-                onRemove={() => {
-                  if (!pending && !blocked && window.confirm(team.removeConfirm))
-                    void mutate(member, null);
+                onRemove={async () => {
+                  if (pending || blocked) return;
+                  if (
+                    !(await confirmAction({
+                      title: team.remove,
+                      object: `${member.displayName} (@${member.username})`,
+                      consequences: team.removeConfirm,
+                      confirmLabel: team.remove,
+                      cancelLabel: organizationBatchCopy(locale).cancel,
+                      closeLabel: organizationBatchCopy(locale).cancel,
+                    }))
+                  )
+                    return;
+                  void mutate(member, null);
                 }}
               />
               {data.role === "owner" && ["admin", "developer", "member"].includes(member.role) && (

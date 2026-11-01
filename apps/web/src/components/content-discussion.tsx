@@ -6,6 +6,11 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { createCommentIntentKey, submitContentCommentRequest } from "../lib/content-comment-client";
 import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../lib/content-discussion-copy";
+import {
+  clearDiscussionComposeDraft,
+  readDiscussionComposeDraft,
+  writeDiscussionComposeDraft,
+} from "../lib/discussion-compose-draft";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { followCopy } from "../lib/follow-workspace-copy";
 import type { Locale } from "../lib/i18n";
@@ -13,8 +18,8 @@ import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { CommunityReportForm } from "./community-report-form";
-import { DiscussionCommentActions } from "./discussion-comment-actions";
 import { ContentFollowControls } from "./content-follow-controls";
+import { DiscussionCommentActions } from "./discussion-comment-actions";
 
 export function ContentDiscussion({
   slug,
@@ -66,15 +71,42 @@ export function ContentDiscussion({
     parentId?: string;
   } | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
+  const draftRestored = useRef(false);
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
+  function persistComposeDraft(nextText = text, nextReply = reply) {
+    const normalized = nextText.trimEnd();
+    if (normalized.length < 1) {
+      clearDiscussionComposeDraft(contentId);
+      return;
+    }
+    writeDiscussionComposeDraft({
+      contentId,
+      text: normalized.slice(0, 5000),
+      ...(nextReply
+        ? { parentId: nextReply.id, parentName: nextReply.name }
+        : { parentId: undefined, parentName: undefined }),
+    });
+  }
   useEffect(() => {
     alive.current = true;
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    if (!draftRestored.current) {
+      draftRestored.current = true;
+      const stored = readDiscussionComposeDraft(contentId);
+      if (stored) {
+        setText(stored.text);
+        setReply(
+          stored.parentId
+            ? { id: stored.parentId, name: stored.parentName ?? copy.anonymous }
+            : null,
+        );
+      }
+    }
     return () => {
       alive.current = false;
       readController.current?.abort();
     };
-  }, []);
+  }, [contentId, copy.anonymous]);
   useEffect(() => {
     if (focusedId)
       document.getElementById(`comment-${focusedId}`)?.scrollIntoView({ block: "center" });
@@ -193,6 +225,7 @@ export function ContentDiscussion({
         fallbackError: copy.writeUnavailable,
       });
       pendingIntent.current = null;
+      clearDiscussionComposeDraft(contentId);
       setText("");
       setReply(null);
       setPublished(true);
@@ -201,6 +234,8 @@ export function ContentDiscussion({
       await load(false, "");
     } catch (caught) {
       // Keep draft + frozen intent so a lost-response retry reuses one key.
+      // Guest 401 / auth return must keep text for the author without auto-publish.
+      persistComposeDraft(normalized, reply);
       setWriteError(caught instanceof Error ? caught.message : copy.unavailable);
     } finally {
       writeGuard.current = false;
@@ -296,7 +331,10 @@ export function ContentDiscussion({
               variant="ghost"
               type="button"
               disabled={submitting}
-              onClick={() => setReply(null)}
+              onClick={() => {
+                setReply(null);
+                persistComposeDraft(text, null);
+              }}
             >
               {copy.cancel}
             </Button>
@@ -314,7 +352,11 @@ export function ContentDiscussion({
             placeholder={copy.placeholder}
             disabled={submitting || !!managingId}
             value={text}
-            onChange={(event) => setText(event.target.value)}
+            onChange={(event) => {
+              const next = event.target.value;
+              setText(next);
+              persistComposeDraft(next, reply);
+            }}
           />
         </label>
         <div className="flex flex-wrap items-center gap-3">
@@ -327,7 +369,11 @@ export function ContentDiscussion({
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
           {!viewer && (
-            <Link className="text-xs text-accent underline" href={loginHref}>
+            <Link
+              className="text-xs text-accent underline"
+              href={loginHref}
+              onClick={() => persistComposeDraft()}
+            >
               {copy.signIn}
             </Link>
           )}
@@ -414,11 +460,13 @@ export function ContentDiscussion({
               type="button"
               disabled={submitting || !!managingId}
               onClick={() => {
-                setReply({
+                const nextReply = {
                   id: comment.id,
                   name: comment.author?.username ? `@${comment.author.username}` : copy.anonymous,
-                });
+                };
+                setReply(nextReply);
                 setPublished(false);
+                persistComposeDraft(text, nextReply);
                 textarea.current?.focus();
                 textarea.current?.scrollIntoView({ block: "center", behavior: "smooth" });
               }}

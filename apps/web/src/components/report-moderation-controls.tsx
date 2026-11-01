@@ -5,11 +5,12 @@ import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 export function ReportModerationControls({ reportId }: { reportId: string }) {
   const router = useRouter();
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.admin;
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState<"resolve" | "dismiss" | null>(null);
@@ -19,7 +20,15 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
   async function decide(action: "resolve" | "dismiss") {
     if (!ready || pending) return;
     if (
-      !window.confirm(action === "resolve" ? copy.resolveReportConfirm : copy.dismissReportConfirm)
+      !(await confirmAction({
+        title: action === "resolve" ? copy.resolveReport : copy.dismissReport,
+        object: reportId,
+        consequences: action === "resolve" ? copy.resolveReportConfirm : copy.dismissReportConfirm,
+        confirmLabel: action === "resolve" ? copy.resolveReport : copy.dismissReport,
+        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
+        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        ...(action === "resolve" ? { danger: false } : {}),
+      }))
     )
       return;
     setPending(action);

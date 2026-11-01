@@ -11,6 +11,7 @@ import {
   normalizeVerificationReviewNotes,
 } from "../lib/verification-moderation";
 import { verificationCopy, verificationDecisionError } from "../lib/verification-workspace-copy";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 export function VerificationModerationControls({
@@ -45,10 +46,20 @@ export function VerificationModerationControls({
     const payload = buildVerificationDecisionPayload(requestId, action, notes);
     if (!payload || guard.current || blocked) return;
 
-    const confirmed = window.confirm(
-      action === "approve" ? copy.approveVerificationConfirm : copy.rejectVerificationConfirm,
-    );
-    if (!confirmed) return;
+    const labels = verificationCopy(locale);
+    if (
+      !(await confirmAction({
+        title: action === "approve" ? copy.approve : copy.reject,
+        object: requestId,
+        consequences:
+          action === "approve" ? copy.approveVerificationConfirm : copy.rejectVerificationConfirm,
+        confirmLabel: action === "approve" ? copy.approve : copy.reject,
+        cancelLabel: labels.cancel,
+        closeLabel: labels.cancel,
+        ...(action === "approve" ? { danger: false } : {}),
+      }))
+    )
+      return;
 
     guard.current = true;
     setBlocked(true);

@@ -2824,25 +2824,34 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-06 — Один native modal pattern и понятное подтверждение действий
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Native dialog ConfirmDialog/confirmAction; 6 high-value confirms migrated; remaining window.confirm intentional. dialog-accessibility PASS.
+**Заметка исполнения.** Migrated remaining window.confirm call sites to confirmAction (moderation, quarantine, verification, org leave/remove, team directory). rg window.confirm apps/web is empty. dialog-accessibility PASS.
 
 **Исходные пункты:** UI13, UI15. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Actual native dialogs уже держат и возвращают focus; UI Dialog не используется. Window.confirm существует в 15 местах, в том числе защищённых ownership flows.
+**Сейчас.** ConfirmDialog + confirmAction is the native confirm pattern; window.confirm removed from apps/web. Destructive flows show title/object/consequences; Cancel does not submit; password/slug/revision/busy guards stay at call sites.
 
 **Результат.** Согласовать один native modal pattern и выборочное подтверждение с объектом/последствиями.
 
 ### Область изменений
 
-- `packages/ui/src/dialog.tsx`
-- `packages/ui/src/index.ts`
-- `apps/web/src/components/use-modal-dialog.ts`
+- `apps/web/src/components/build-moderation-controls.tsx`
+- `apps/web/src/components/build-quarantine-controls.tsx`
+- `apps/web/src/components/confirm-action.tsx`
+- `apps/web/src/components/content-moderation-controls.tsx`
 - `apps/web/src/components/mobile-nav.tsx`
 - `apps/web/src/components/notification-bell.tsx`
 - `apps/web/src/components/organization-ownership-transfer.tsx`
 - `apps/web/src/components/organization-team-batch.tsx`
+- `apps/web/src/components/organization-team-directory.tsx`
+- `apps/web/src/components/organization-workspace.tsx`
+- `apps/web/src/components/report-moderation-controls.tsx`
+- `apps/web/src/components/use-modal-dialog.ts`
+- `apps/web/src/components/verification-application-amend.tsx`
+- `apps/web/src/components/verification-moderation-controls.tsx`
+- `packages/ui/src/dialog.tsx`
+- `packages/ui/src/index.ts`
 
 ### Приёмка
 
@@ -3357,7 +3366,7 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
-Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
+ Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 

@@ -1,37 +1,39 @@
 # Проверенный срез проекта
 
-**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **База пакета (до интеграции):** `385e577e7443cf7d7b817419ce5c3b8afe87b690`. **Интеграционный feat-коммит:** `ce6cf8eab394689b8eac9d14f2ec6203a4b65fd2`. Актуальный tip — `git rev-parse origin/main` после `git pull`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Tip (последний коммит):** `0c4647b2683e576f89ac243187ceacb7a00d7f42` (`fix(web): satisfy Biome children prop rule in notification tabs test`). **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
 ## Оценка стадии
 
-Рабочая формулировка: **кандидат бесплатной beta с незакрытой продуктовой и эксплуатационной приёмкой**. Оценка по коду и локальным проверкам на `main`, не утверждение о production.
+Рабочая формулировка: **кандидат бесплатной beta с незакрытой продуктовой и эксплуатационной приёмкой**. Оценка по коду и проверкам на зафиксированном tip SHA; **не** утверждение о production readiness.
 
 ## Старт для следующего агента
 
-1. Только **`main`**: `git checkout main && git pull` → чистый `git status`. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (61 `done` / 22 `not_started`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
+1. Только **`main`**: `git checkout main && git pull` → чистый `git status` (локальные WIP не путать с tip). Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started` по `python3 scripts/_agent_list_open_tasks.py`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
 2. Локальный scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore` и не должен появляться в коммитах. Не ведите параллельные handoff-журналы.
 3. Defaults владельца A/B — [DECISIONS.md](DECISIONS.md) (FLOW-05/06/12, UX-06/14/17/23, OPS-19, GROW-01). Ads/commerce/GROW пилоты не активированы.
-4. Schema tip: `0089_resource_qa`. Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
+4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
-7. Очередь: OPS-09…20 (live), UX-19/20/22/24–26, GROW-02…09. Не открывать ads/commerce без нового поручения.
+7. Очередь: **OPS-09…20** (external/github_settings и live gates), **UX-24–26** (ads proposals), **GROW-02…09** (пилоты). **UX-06/19/20/22** в tracker `done` — не открывать ads/commerce без нового поручения.
 
-Локально закрыты кодовые разрывы аудита (PROBLEMS): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13/ARC14(authoring) + FLOW/UX/OPS/GROW-01. TypeScript-блокеры tip `main` после интеграции исправлены отдельным коммитом (library-collections narrowing, mute prefix, privateApiRequest json, support category, SemVer compare). **Не** закрыты F03/F04 и полный `full_acceptance` до зелёного CI на новом tip.
+На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
+
+**Локальная волна (uncommitted → следующий tip):** **UX-06** завершён (`window.confirm` → `confirmAction`); guest discussion compose draft persistence без auto-publish; GROW-01 window helpers + тесты; server-review reload на `Button`.
 
 ## Свидетельства и ограничения
 
 | Область         | Что установлено                                                                                                                                                                                                                                                            | Что из этого не следует                   |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| Исходники       | DOC + P1/P2 в `main`; рабочая ветка интеграции удалена                                                                                                                                                                                                                     | Tip ≠ production                          |
-| CI              | База `385e577e…`: [full acceptance 41247970713](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41247970713). Tip после merge имел TS failures в [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461); фикс уходит новым tip | PASS только на exact SHA                  |
+| Исходники       | DOC + P1/P2 в `main`; tip `0c4647b2…`                                                                                                                                                                                                                                      | Tip ≠ production                          |
+| CI              | **PASS на tip `0c4647b2…`:** [full acceptance 41303746452](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41303746452) — lint/unit, DB, image build, production browser smoke. База `385e577e…`: [41247970713](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41247970713). Промежуточный tip после merge: TS failures [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461) | PASS только на exact SHA; green CI ≠ deploy |
 | Upgrade/restore | Retained artifacts базы: PASS disposable                                                                                                                                                                                                                                   | Не production backup practice             |
 | GitHub          | Public; main protection на проверке базы отсутствовала                                                                                                                                                                                                                     | Не менять settings без поручения          |
-| Tracker         | 61 done / 22 open                                                                                                                                                                                                                                                          | `done` ≠ production enablement            |
-| Архитектура     | `pnpm analyze:architecture` PASS                                                                                                                                                                                                                                           | Не заменяет unit/database/full_acceptance |
+| Tracker         | 64 done / 19 open (OPS external/github_settings, GROW pilots, ads UX-24–26)                                                                                                                                                                                                | `done` ≠ production enablement            |
+| Архитектура     | `pnpm analyze:architecture` PASS (на tip-волне)                                                                                                                                                                                                                            | Не заменяет unit/database/full_acceptance |
 
 ## Приоритетные остатки
 
-Operational: F03/F04, OPS live. Product: GROW пилоты, UX 19/20/22/24–26. Перед DDL — disposable generate rehearsal. После зелёного CI — `full_acceptance` / `pnpm beta:candidate` на exact tip.
+**Operational gates:** F03 (alert routing), F04 (backup/recovery contract), OPS live/github_settings. **Product:** GROW пилоты, ads **UX-24–26**. Перед следующим DDL — disposable generate rehearsal. После нужных human gates — `pnpm beta:fetch` / `pnpm beta:candidate` на **exact tip SHA** (см. [PROBLEMS.md](PROBLEMS.md)).
 
 ## Версии и инфраструктура
 
@@ -39,6 +41,6 @@ Node `26.10.0`, pnpm `12.4.2`; Docker `node:26-alpine`. PostgreSQL 18. См. [OP
 
 ## Как обновлять этот файл
 
-После значимой интеграции: tip `main`, доказательства, открытые gates. История в Git.
+После значимой интеграции: tip `main`, доказательства CI/acceptance, открытые gates. История в Git.
 
 **Источники:** [AGENT.md](AGENT.md), [PROBLEMS.md](PROBLEMS.md), [DECISIONS.md](DECISIONS.md), [ROADMAP.md](ROADMAP.md), `planning/tasks.json`, [AGENTS.md](../AGENTS.md).

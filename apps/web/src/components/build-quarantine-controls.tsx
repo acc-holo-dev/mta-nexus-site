@@ -5,6 +5,7 @@ import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 export function BuildQuarantineControls({
@@ -15,7 +16,7 @@ export function BuildQuarantineControls({
   status: "published" | "quarantined";
 }) {
   const router = useRouter();
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.admin;
   const [reason, setReason] = useState("");
   const [notifyAffectedDownloaders, setNotifyAffectedDownloaders] = useState(false);
@@ -25,14 +26,23 @@ export function BuildQuarantineControls({
 
   async function act(action: "quarantine" | "restore") {
     if (pending || !hasReason) return;
-    const confirmed = window.confirm(
-      action === "quarantine"
-        ? notifyAffectedDownloaders
-          ? copy.quarantineBuildNotifyConfirm
-          : copy.quarantineBuildConfirm
-        : copy.restoreBuildConfirm,
-    );
-    if (!confirmed) return;
+    if (
+      !(await confirmAction({
+        title: action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild,
+        object: buildId,
+        consequences:
+          action === "quarantine"
+            ? notifyAffectedDownloaders
+              ? copy.quarantineBuildNotifyConfirm
+              : copy.quarantineBuildConfirm
+            : copy.restoreBuildConfirm,
+        confirmLabel: action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild,
+        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
+        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        ...(action === "restore" ? { danger: false } : {}),
+      }))
+    )
+      return;
 
     setPending(action);
     setError(null);

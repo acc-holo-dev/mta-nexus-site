@@ -346,13 +346,14 @@ export function ServerReviewPanel({
           {message}
         </p>
         {confirmed && (
-          <button
+          <Button
             type="button"
-            className="text-sm text-accent underline"
+            variant="ghost"
+            className="h-auto px-0 text-sm text-accent underline"
             onClick={() => window.location.reload()}
           >
             {copy.reload}
-          </button>
+          </Button>
         )}
       </div>
     </section>

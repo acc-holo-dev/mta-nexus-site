@@ -10,6 +10,7 @@ import {
   moderationDetailHref,
 } from "../lib/community-moderation-contract";
 import { moderationCopy, moderationError } from "../lib/community-moderation-copy";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 export function ContentModerationControls({
@@ -55,10 +56,20 @@ export function ContentModerationControls({
     )
       return;
 
-    const confirmed = window.confirm(
-      action === "publish" ? copy.publishContentConfirm : copy.archiveContentConfirm,
-    );
-    if (!confirmed) return;
+    const general = moderationCopy(locale);
+    if (
+      !(await confirmAction({
+        title: action === "publish" ? copy.publish : copy.archive,
+        object: contentId,
+        consequences:
+          action === "publish" ? copy.publishContentConfirm : copy.archiveContentConfirm,
+        confirmLabel: action === "publish" ? copy.publish : copy.archive,
+        cancelLabel: general.back,
+        closeLabel: general.back,
+        ...(action === "publish" ? { danger: false } : {}),
+      }))
+    )
+      return;
 
     requestPending.current = true;
     setPending(action);

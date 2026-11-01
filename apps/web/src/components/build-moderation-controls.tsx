@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { buildModerationUiState } from "../lib/build-moderation-ui";
 import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 export function BuildModerationControls({
@@ -51,10 +52,18 @@ export function BuildModerationControls({
       return;
     }
 
-    const confirmed = window.confirm(
-      action === "approve" ? copy.approveBuildConfirm : copy.rejectBuildConfirm,
-    );
-    if (!confirmed) return;
+    if (
+      !(await confirmAction({
+        title: action === "approve" ? copy.approve : copy.reject,
+        object: buildId,
+        consequences: action === "approve" ? copy.approveBuildConfirm : copy.rejectBuildConfirm,
+        confirmLabel: action === "approve" ? copy.approve : copy.reject,
+        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
+        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        ...(action === "approve" ? { danger: false } : {}),
+      }))
+    )
+      return;
 
     busy.current = true;
     setPending(action);

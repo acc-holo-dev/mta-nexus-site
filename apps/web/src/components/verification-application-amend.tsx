@@ -14,6 +14,7 @@ import {
   verificationApplicationsError,
 } from "../lib/verification-applications-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
+import { confirmAction } from "./confirm-action";
 export function VerificationApplicationAmend({
   id,
   revision,
@@ -58,7 +59,17 @@ export function VerificationApplicationAmend({
       setNotice(copy.invalid);
       return;
     }
-    if (!window.confirm(copy.confirm)) return;
+    if (
+      !(await confirmAction({
+        title: copy.amend,
+        object: id,
+        consequences: copy.confirm,
+        confirmLabel: copy.amend,
+        cancelLabel: labels.cancel,
+        closeLabel: labels.cancel,
+      }))
+    )
+      return;
     pending.current = true;
     setBusy(true);
     setBlocked(true);

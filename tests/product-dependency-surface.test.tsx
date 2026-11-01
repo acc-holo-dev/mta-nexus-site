@@ -220,4 +220,57 @@ describe("resource version help projection", () => {
     expect(projection.missingAuthorContent).toBe(true);
     expect(splitInstructionPlainText("```sh\necho hi\n```").codeBlocks).toEqual(["echo hi"]);
   });
+
+  it.each(["en", "ru"] as const)(
+    "renders version-scoped acquire copy, help actions, and missing-author notice in %s",
+    (locale) => {
+      const copy = getDictionary(locale).versionHelpUi;
+      const projection = buildResourceVersionHelp({
+        version: "2.2.0",
+        shortDescription: "  ",
+        description: "Catalog description only",
+        licenseModel: "unlimited",
+        compatibility: { mtaMinVersion: "1.6.0", dependencies: ["core-ui"] },
+        releaseNotes: null,
+        mtaVersionTarget: "1.6.0",
+        productId,
+        buildId,
+      });
+      const markup = renderToStaticMarkup(
+        <ResourceVersionHelpSection projection={projection} locale={locale} qaAnchorId="resource-qa-panel" />,
+      );
+
+      expect(markup).toContain(copy.title.replace("{version}", "2.2.0"));
+      expect(markup).toContain(copy.versionScope);
+      expect(markup).toContain(copy.acquireBody.replace("{version}", "2.2.0"));
+      expect(markup).toContain(copy.missingBody.replace(/&/gu, "&amp;"));
+      expect(markup).toContain(copy.sections.acquire);
+      expect(markup).toContain(copy.openQa.replace(/&/gu, "&amp;"));
+      expect(markup).toContain('href="#resource-qa-panel"');
+      expect(markup).toContain(copy.openSupport);
+      expect(markup).toContain("&gt;= 1.6.0");
+    },
+  );
+
+  it("omits support contact when product context is unavailable", () => {
+    const copy = getDictionary("en").versionHelpUi;
+    const projection = buildResourceVersionHelp({
+      version: "1.0.0",
+      shortDescription: "Purpose",
+      description: "Description",
+      licenseModel: "unlimited",
+      compatibility: null,
+      releaseNotes: null,
+      mtaVersionTarget: null,
+      productId: "invalid",
+      buildId: null,
+    });
+    const markup = renderToStaticMarkup(
+      <ResourceVersionHelpSection projection={projection} locale="en" />,
+    );
+
+    expect(markup).toContain('href="#resource-qa"');
+    expect(markup).not.toContain(copy.openSupport);
+    expect(markup).not.toContain("/support?category=resource");
+  });
 });
