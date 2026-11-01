@@ -13,6 +13,7 @@ export function serverActivityHref(serverId: string, cursor?: string | null): st
 const en = {
   title: "Server activity",
   open: "View activity",
+  loading: "Loading server activity…",
   description:
     "Registration, listing edits, control proofs and verification decisions. Only recorded events are shown.",
   private: "This history is available to current server managers and platform administrators.",
@@ -58,6 +59,7 @@ const en = {
 const ru: typeof en = {
   title: "История сервера",
   open: "Открыть историю",
+  loading: "Загрузка истории сервера…",
   description:
     "Регистрация, правки карточки, доказательства контроля и решения по подтверждению. Показаны только сохранённые события.",
   private: "Эта история доступна текущим управляющим сервера и администраторам платформы.",

@@ -11,6 +11,7 @@ export default function GlobalLoading() {
     <div
       className="mx-auto max-w-7xl space-y-6"
       role="status"
+      aria-busy="true"
       aria-label={dictionary.errors.loading}
     >
       <div className="h-8 w-64 animate-pulse rounded-md bg-inset" />

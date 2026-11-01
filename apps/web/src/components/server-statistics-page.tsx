@@ -135,8 +135,11 @@ export async function ServerStatisticsPage({
 export async function ServerStatisticsLoading() {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return (
-    <div className="mx-auto max-w-6xl space-y-4 py-8" role="status" aria-busy="true">
-      <p className="text-lg font-bold text-primary">{copy.title}</p>
+    <div className="mx-auto max-w-6xl space-y-4 py-8" aria-busy="true">
+      <h1 className="text-lg font-bold text-primary">{copy.title}</h1>
+      <p role="status" className="text-sm text-muted">
+        {copy.loading}
+      </p>
       <div className="h-40 animate-pulse rounded-lg bg-inset" aria-hidden="true" />
     </div>
   );

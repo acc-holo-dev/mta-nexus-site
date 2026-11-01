@@ -2,6 +2,7 @@ import type { Locale } from "./i18n";
 const en = {
   title: "Server statistics",
   open: "Detailed statistics",
+  loading: "Loading server statistics…",
   back: "Back to server",
   management: "Back to server management",
   description: "Explore saved MTA master-list observations and compare consecutive periods.",
@@ -76,6 +77,7 @@ const en = {
 const ru: typeof en = {
   title: "Статистика сервера",
   open: "Подробная статистика",
+  loading: "Загрузка статистики сервера…",
   back: "Назад к серверу",
   management: "Назад к управлению сервером",
   description:
