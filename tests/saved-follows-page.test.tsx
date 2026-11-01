@@ -18,13 +18,23 @@ vi.mock("../apps/web/src/components/follow-workspace", () => ({
     initial,
     type,
     query,
+    sectionLabelledBy,
   }: {
     initial: unknown;
     type?: string;
     query: string;
-  }) => <div data-loaded={!!initial} data-type={type} data-query={query} />,
+    sectionLabelledBy?: string;
+  }) => (
+    <div
+      data-loaded={!!initial}
+      data-type={type}
+      data-query={query}
+      {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
+    />
+  ),
 }));
 import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import SavedLoading from "../apps/web/src/app/workspace/saved/loading";
 import SavedPage, { generateMetadata } from "../apps/web/src/app/workspace/saved/page";
 beforeEach(() => {
   vi.clearAllMocks();
@@ -76,6 +86,8 @@ it.each(["en", "ru"] as const)(
     });
     expect(html).toContain('data-type="organization"');
     expect(html).toContain('data-query="Team"');
+    expect(html).toContain('id="saved-follows-heading"');
+    expect(html).toContain('aria-labelledby="saved-follows-heading"');
     expect((await generateMetadata()).robots.index).toBe(false);
   },
 );
@@ -86,3 +98,14 @@ it("distinguishes a failed initial read from an empty saved list", async () => {
   expect(html).toContain('data-loaded="false"');
   expect(html).not.toContain("database-secret");
 });
+it.each(["en", "ru"] as const)(
+  "renders an honest saved loading shell with visible title in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = followCopy(locale);
+    const html = renderToStaticMarkup(await SavedLoading());
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain(`>${copy.title}<`);
+    expect(html).toContain(copy.loading);
+  },
+);

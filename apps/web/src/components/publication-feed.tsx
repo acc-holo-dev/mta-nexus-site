@@ -20,6 +20,7 @@ export function PublicationFeed({
   following = false,
   server = false,
   errorCode,
+  sectionLabelledBy,
 }: {
   initial: PublicationPage | null;
   filters: PublicationQuery;
@@ -28,6 +29,7 @@ export function PublicationFeed({
   following?: boolean;
   server?: boolean;
   errorCode?: string;
+  sectionLabelledBy?: string;
 }) {
   const copy = publicationCopy(locale),
     types = getUserPlatformCopy(locale);
@@ -36,8 +38,12 @@ export function PublicationFeed({
   const linkControl =
     "min-h-11 rounded-lg border border-base px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) => types[type];
+  const Root = sectionLabelledBy ? "section" : "div";
   return (
-    <div className="space-y-5">
+    <Root
+      {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
+      className="space-y-5"
+    >
       {following && filters.target && (
         <p className="nexus-panel flex flex-wrap items-center gap-3 p-4 text-sm text-muted">
           <span>{copy.targetSelected}</span>
@@ -276,6 +282,6 @@ export function PublicationFeed({
           </Link>
         )}
       </nav>
-    </div>
+    </Root>
   );
 }

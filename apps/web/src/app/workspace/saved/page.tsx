@@ -56,7 +56,9 @@ export default async function SavedPage({
   return (
     <div className="space-y-6">
       <header className="border-b border-base pb-6">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 id="saved-follows-heading" className="text-2xl font-extrabold text-primary">
+          {copy.title}
+        </h1>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
       <FollowWorkspace
@@ -65,6 +67,7 @@ export default async function SavedPage({
         type={type}
         query={query}
         locale={locale}
+        sectionLabelledBy="saved-follows-heading"
       />
     </div>
   );

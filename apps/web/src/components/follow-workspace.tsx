@@ -22,11 +22,13 @@ export function FollowWorkspace({
   type,
   query,
   locale,
+  sectionLabelledBy,
 }: {
   initial: FollowPage | null;
   type?: FollowTargetType;
   query: string;
   locale: Locale;
+  sectionLabelledBy?: string;
 }) {
   const copy = followCopy(locale);
   const [page, setPage] = useState(initial);
@@ -147,8 +149,12 @@ export function FollowWorkspace({
       if (alive.current) setPending("");
     }
   }
+  const Root = sectionLabelledBy ? "section" : "div";
   return (
-    <div className="space-y-5">
+    <Root
+      {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
+      className="space-y-5"
+    >
       <nav aria-label={copy.title} className="flex gap-2 overflow-x-auto">
         {[undefined, ...FOLLOW_TYPES].map((value) => (
           <Link
@@ -204,7 +210,7 @@ export function FollowWorkspace({
       )}
       {page && !page.items.length && (
         <div className="nexus-panel space-y-3 p-8 text-center">
-          <h2 className="text-lg font-bold text-primary">
+          <h2 id="saved-follows-empty-heading" className="text-lg font-bold text-primary">
             {type || query ? copy.emptyFiltered : copy.empty}
           </h2>
           <p className="text-sm text-muted">
@@ -344,6 +350,6 @@ export function FollowWorkspace({
           </Button>
         </nav>
       )}
-    </div>
+    </Root>
   );
 }

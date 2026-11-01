@@ -65,7 +65,9 @@ export default async function FollowingFeedPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+        <h1 id="following-feed-heading" className="text-2xl font-bold text-primary">
+          {copy.title}
+        </h1>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
       <PublicationFeed
@@ -76,6 +78,7 @@ export default async function FollowingFeedPage({
         path="/workspace/feed"
         errorCode={errorCode}
         following
+        sectionLabelledBy="following-feed-heading"
       />
     </div>
   );
