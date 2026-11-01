@@ -9,7 +9,10 @@ const state = vi.hoisted(() => ({
   failed: false,
 }));
 const mocks = vi.hoisted(() => ({ articles: vi.fn(), community: vi.fn() }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => "/workspace/content",
+}));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: { pageArticles: mocks.articles, pageCommunity: mocks.community },
@@ -18,7 +21,10 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
 import ArticlesPage from "../apps/web/src/app/articles/page";
 import CommunityPage from "../apps/web/src/app/community/page";
 import { AuthorContentForm } from "../apps/web/src/components/author-content-form";
-import { ContentPageNavigation } from "../apps/web/src/components/content-catalog-controls";
+import {
+  ContentPageNavigation,
+  PlatformSignIn,
+} from "../apps/web/src/components/content-catalog-controls";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -88,6 +94,17 @@ it("renders service failure separately from an empty feed and hides internal tex
   expect(html).toContain(getUserPlatformCopy("en").unavailable);
   expect(html).not.toContain("DB private details");
 });
+it("adds login next from pathname when PlatformSignIn has no returnPath", () => {
+  const html = renderToStaticMarkup(<PlatformSignIn locale="en" />);
+  expect(html).toContain("/auth/login?next=%2Fworkspace%2Fcontent");
+});
+
+it("prefers explicit returnPath over pathname for PlatformSignIn login href", () => {
+  const html = renderToStaticMarkup(<PlatformSignIn locale="en" returnPath="/settings/history" />);
+  expect(html).toContain("/auth/login?next=%2Fsettings%2Fhistory");
+  expect(html).not.toContain("%2Fworkspace%2Fcontent");
+});
+
 it("preserves authored status/search/type filters in the paginator", () => {
   const html = renderToStaticMarkup(
     <ContentPageNavigation
