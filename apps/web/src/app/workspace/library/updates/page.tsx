@@ -2,6 +2,7 @@ import { libraryReleaseHistoryCopy } from "../../../../lib/library-release-histo
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { authService } from "../../../../lib/services/auth-service";
@@ -22,6 +23,9 @@ export default async function LibraryUpdatesPage({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getResourceReleaseControlCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
+  const filter = LIBRARY_RELEASE_FILTERS.find((value) => value === query.filter) ?? "all";
+  const page = Math.min(parseHistoryPage(query.page), 1000);
+  const returnPath = `/workspace/library/updates?${new URLSearchParams({ filter, page: String(page) })}`;
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
@@ -29,17 +33,12 @@ export default async function LibraryUpdatesPage({
           {libraryReleaseHistoryCopy(locale).title}
         </Link>
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
-  const filter = LIBRARY_RELEASE_FILTERS.find((value) => value === query.filter) ?? "all";
-  const result = await libraryReleaseService.page(
-    user,
-    Math.min(parseHistoryPage(query.page), 1000),
-    filter,
-  );
+  const result = await libraryReleaseService.page(user, page, filter);
   const href = (page: number, value = filter) =>
     `/workspace/library/updates?${new URLSearchParams({ filter: value, page: String(page) })}`;
   return (

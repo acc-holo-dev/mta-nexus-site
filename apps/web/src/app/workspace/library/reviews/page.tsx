@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../../lib/services/resource-review-service";
@@ -27,9 +28,17 @@ export default async function Page({
   ]);
   const copy = resourceReviewCopy(locale),
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+    else if (value !== undefined) returnParams.append(key, value);
+  }
+  const returnPath = returnParams.size
+    ? `/workspace/library/reviews?${returnParams}`
+    : "/workspace/library/reviews";
   if (!actor)
     return (
-      <Link href="/auth/login" className="text-accent underline">
+      <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
         {copy.signIn}
       </Link>
     );

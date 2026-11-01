@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../../components/auth-return-path";
 import { LibraryCollectionItemCopyForm } from "../../../../../../components/library-collection-item-copy";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionComparisonCopy } from "../../../../../../lib/library-collection-comparison-i18n";
@@ -44,15 +45,23 @@ export default async function Page({
   const c = libraryCollectionsCopy(locale),
     h = libraryCollectionComparisonCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    let returnPath = collectionHref(id, "compare");
+    try {
+      const query = libraryCollectionComparisonQuery(collectionPageParams(raw));
+      returnPath = `${returnPath}?${libraryCollectionComparisonSuffix(query)}`;
+    } catch {
+      // Keep the route when filters are invalid for unsigned visitors.
+    }
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   try {
     const query = libraryCollectionComparisonQuery(collectionPageParams(raw));
     const report = await libraryCollectionsService.comparison(actor, id, query),

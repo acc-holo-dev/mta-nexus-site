@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { authEntryHref } from "./auth-return-path";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -35,6 +36,23 @@ import { ResourceDownloadButton } from "./resource-download-button";
 
 type Query = Record<string, string | string[] | undefined>;
 type Bounds = { page: number; totalPages: number; total: number };
+type CollectionsView = "list" | "detail" | "add" | "history" | "copy" | "copy-items" | "move-items";
+function guestCollectionsReturnPath(
+  view: CollectionsView,
+  queryValues: Query,
+  collectionId?: string,
+): string {
+  const params = collectionPageParams(queryValues);
+  const query = Object.fromEntries(params.entries());
+  const sectionByView: Partial<Record<CollectionsView, string>> = {
+    history: "history",
+    add: "add",
+    copy: "copy",
+    "copy-items": "copy-items",
+    "move-items": "move-items",
+  };
+  return collectionHref(collectionId, sectionByView[view] ?? "", query);
+}
 function Pagination({
   bounds,
   locale,
@@ -78,13 +96,20 @@ export async function LibraryCollectionsScreen({
     searchParams,
     params,
   ]);
+  const routeCollectionId = path?.id;
   const c = libraryCollectionsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref(
+            "login",
+            guestCollectionsReturnPath(view, queryValues, routeCollectionId),
+          )}
+          className="text-accent underline"
+        >
           {c.signIn}
         </Link>
       </section>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -28,7 +29,10 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref("login", `/workspace/library/downloads/${encodeURIComponent(id)}`)}
+          className="text-accent underline"
+        >
           {copy.signIn}
         </Link>
       </section>

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../../components/auth-return-path";
 import { LibraryCollectionImport } from "../../../../../../components/library-collection-import";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionManifestsCopy } from "../../../../../../lib/library-collection-manifests-i18n";
@@ -30,7 +31,12 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
+  const [locale, store, { id }, raw] = await Promise.all([
+    getRequestLocale(),
+    cookies(),
+    params,
+    searchParams,
+  ]);
   const c = libraryCollectionsCopy(locale),
     m = libraryCollectionManifestsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
@@ -38,7 +44,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref("login", collectionHref(id, "reconcile"))}
+          className="text-accent underline"
+        >
           {c.signIn}
         </Link>
       </section>

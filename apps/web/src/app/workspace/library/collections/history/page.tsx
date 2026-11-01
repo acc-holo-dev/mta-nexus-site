@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import {
@@ -48,15 +49,23 @@ export default async function Page({
   const c = libraryCollectionsCopy(locale),
     h = libraryCollectionHistoryCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    let returnPath = "/workspace/library/collections/history";
+    try {
+      const query = libraryCollectionHistoryQuery(collectionPageParams(raw));
+      returnPath = `${returnPath}?${libraryCollectionHistorySuffix(query)}`;
+    } catch {
+      // Keep the list route when filters are invalid for unsigned visitors.
+    }
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   try {
     const query = libraryCollectionHistoryQuery(collectionPageParams(raw));
     const result = await libraryCollectionsService.accountHistory(actor, query);

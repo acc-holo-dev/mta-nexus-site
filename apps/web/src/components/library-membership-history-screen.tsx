@@ -7,6 +7,7 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "./auth-return-path";
 import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
@@ -27,20 +28,37 @@ export async function LibraryMembershipHistoryScreen({
   params?: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
+  const [locale, store, raw, path] = await Promise.all([
+    getRequestLocale(),
+    cookies(),
+    searchParams,
+    params,
+  ]);
   const c = libraryCollectionsCopy(locale),
     h = libraryCollectionHistoryCopy(locale),
     m = libraryMembershipHistoryCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
+    let returnPath = membershipHistoryHref();
+    if (path) {
+      returnPath = membershipHistoryHref(path.id);
+    } else {
+      try {
+        const query = libraryMembershipHistoryQuery(collectionPageParams(raw));
+        returnPath = `${membershipHistoryHref()}?${libraryMembershipHistorySuffix(query)}`;
+      } catch {
+        // Keep the list route when filters are invalid for unsigned visitors.
+      }
+    }
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {c.signIn}
         </Link>
       </section>
     );
+  }
   try {
     const filters = collectionPageParams(raw);
     if (params) {

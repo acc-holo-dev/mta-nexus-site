@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { LibraryCollectionCommandForm } from "../../../../../components/library-collection-command";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
@@ -43,7 +44,10 @@ export default async function ResourceCollectionsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref("login", `/workspace/library/${encodeURIComponent(id)}/collections`)}
+          className="text-accent underline"
+        >
           {c.signIn}
         </Link>
       </section>

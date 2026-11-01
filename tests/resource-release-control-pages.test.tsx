@@ -198,8 +198,12 @@ beforeEach(() => {
 });
 it("requires sign-in before reading the buyer library", async () => {
   state.user = null;
-  expect(renderToStaticMarkup(await Updates(input))).toContain("/auth/login");
-  expect(renderToStaticMarkup(await Versions(input))).toContain("/auth/login");
+  expect(renderToStaticMarkup(await Updates(input))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Fupdates%3Ffilter%3Dall%26page%3D2"',
+  );
+  expect(renderToStaticMarkup(await Versions(input))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Fprd_a%2Fversions%3Fpage%3D2"',
+  );
   expect(state.updates).not.toHaveBeenCalled();
   expect(state.versions).not.toHaveBeenCalled();
   expect(metadata.robots).toMatchObject({ index: false, follow: false });

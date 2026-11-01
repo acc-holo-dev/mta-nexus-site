@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { ResourceReleaseWatchBatchControls } from "../../../../components/resource-release-watch-batch-controls";
 import { ResourceReleaseWatchControl } from "../../../../components/resource-release-watch-control";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
@@ -30,15 +31,28 @@ export default async function ReleaseWatchesPage({
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
     copy = resourceReleaseWatchesCopy(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user)
+  if (!user) {
+    let returnPath = "/workspace/library/watches";
+    try {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(raw)) {
+        if (Array.isArray(value)) for (const item of value) params.append(key, item);
+        else if (value !== undefined) params.append(key, value);
+      }
+      const parsed = resourceReleaseWatchesQuery(params);
+      returnPath = resourceReleaseWatchesUrl(parsed.filter, parsed.page, parsed.query);
+    } catch {
+      // Keep the list route when filters are invalid for unsigned visitors.
+    }
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
+  }
   let query: ReturnType<typeof resourceReleaseWatchesQuery>;
   try {
     const params = new URLSearchParams();

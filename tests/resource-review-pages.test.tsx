@@ -108,7 +108,7 @@ it.each(["en", "ru"] as const)(
 it("does not fetch private reviews while signed out", async () => {
   state.actor = null;
   expect(renderToStaticMarkup(await Own({ searchParams: Promise.resolve({}) }))).toContain(
-    "/auth/login",
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Freviews"',
   );
   expect(
     renderToStaticMarkup(await Editor({ params: Promise.resolve({ id: "prd_a" }) })),

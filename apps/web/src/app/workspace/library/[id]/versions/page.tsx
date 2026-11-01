@@ -5,6 +5,7 @@ import { libraryReleaseHistoryCopy } from "../../../../../lib/library-release-hi
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
@@ -38,6 +39,11 @@ export default async function LibraryVersionsPage({
   ]);
   const copy = getResourceReleaseControlCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
+  const page = Math.min(parseHistoryPage(query.page), 1000);
+  const returnPath =
+    page > 1
+      ? `/workspace/library/${encodeURIComponent(id)}/versions?page=${page}`
+      : `/workspace/library/${encodeURIComponent(id)}/versions`;
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
@@ -48,17 +54,15 @@ export default async function LibraryVersionsPage({
           {libraryReleaseHistoryCopy(locale).title}
         </Link>
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
-  const result = await libraryReleaseService
-    .detail(user, id, Math.min(parseHistoryPage(query.page), 1000))
-    .catch((error) => {
-      if (error instanceof AppError && error.statusCode === 404) notFound();
-      throw error;
-    });
+  const result = await libraryReleaseService.detail(user, id, page).catch((error) => {
+    if (error instanceof AppError && error.statusCode === 404) notFound();
+    throw error;
+  });
   const current = result.selection.mode === "fixed" ? result.selected : result.latest;
   const watch = await resourceReleaseWatchesService.detail(user, id).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
