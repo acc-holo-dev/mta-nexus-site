@@ -1,6 +1,7 @@
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { followCopy } from "../../../lib/follow-workspace-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
+// Honest loading shell for /workspace/saved.
 export default async function Loading() {
   const copy = followCopy(await getRequestLocale());
   return (
