@@ -140,6 +140,8 @@ it("distinguishes unavailable reads, filtered empty results and empty following 
     />,
   );
   expect(filtered).toContain(publicationCopy("en").emptyFiltered);
+  expect(filtered).toContain(publicationCopy("en").reset);
+  expect(filtered).toContain('href="/workspace/feed"');
 });
 it("uses authenticated SSR scope and presents login for anonymous feed", async () => {
   await FollowingPage({ searchParams: Promise.resolve({ source: "server", q: "MTA" }) });

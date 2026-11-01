@@ -341,17 +341,26 @@ export function NotificationInbox({
           {copy.retry}
         </Button>
       </div>
-      {!busy && !page.items.length && (
-        <p className="nexus-panel p-6 text-sm text-muted">
-          {filters.cursor ||
-          filters.query ||
-          filters.category !== "all" ||
-          filters.state !== "all" ||
-          (filters.period && filters.period !== "all")
-            ? copy.emptyFiltered
-            : copy.empty}
-        </p>
-      )}
+      {!busy &&
+        !page.items.length &&
+        (filters.cursor ||
+        filters.query ||
+        filters.category !== "all" ||
+        filters.state !== "all" ||
+        (filters.period && filters.period !== "all") ? (
+          <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+            <p>{copy.emptyFiltered}</p>
+            <Link
+              prefetch={false}
+              href="/notifications"
+              className="inline-flex min-h-11 items-center text-accent underline"
+            >
+              {copy.reset}
+            </Link>
+          </div>
+        ) : (
+          <p className="nexus-panel p-6 text-sm text-muted">{copy.empty}</p>
+        ))}
       <ul className="space-y-3">
         {page.items.map((item) => (
           <li key={item.id}>

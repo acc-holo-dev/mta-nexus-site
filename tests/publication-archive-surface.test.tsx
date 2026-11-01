@@ -161,4 +161,6 @@ it("keeps operational errors safe and distinguishes a tag-filtered empty page", 
     />,
   );
   expect(empty).toContain(publicationCopy("en").emptyFiltered);
+  expect(empty).toContain(publicationCopy("en").reset);
+  expect(empty).toContain('href="/servers/mta/updates"');
 });

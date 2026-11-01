@@ -225,6 +225,24 @@ export function PublicationFeed({
                     ? copy.emptyFiltered
                     : copy.empty}
             </p>
+            {(filters.query || filters.type || filters.source || filters.author || filters.tag) &&
+              !filters.cursor && (
+                <Link
+                  prefetch={false}
+                  href={publicationHref(path, {
+                    ...filters,
+                    query: "",
+                    type: undefined,
+                    source: undefined,
+                    author: undefined,
+                    tag: undefined,
+                    cursor: undefined,
+                  })}
+                  className="inline-flex min-h-11 items-center text-accent underline"
+                >
+                  {copy.reset}
+                </Link>
+              )}
             {following && (
               <>
                 <p>{copy.emptyFollowing}</p>
