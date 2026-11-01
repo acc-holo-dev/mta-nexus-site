@@ -5,6 +5,7 @@ import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import { verificationCopy } from "../lib/verification-workspace-copy";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
@@ -26,6 +27,7 @@ export function BuildQuarantineControls({
 
   async function act(action: "quarantine" | "restore") {
     if (pending || !hasReason) return;
+    const labels = verificationCopy(locale);
     if (
       !(await confirmAction({
         title: action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild,
@@ -37,8 +39,8 @@ export function BuildQuarantineControls({
               : copy.quarantineBuildConfirm
             : copy.restoreBuildConfirm,
         confirmLabel: action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild,
-        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
-        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        cancelLabel: labels.cancel,
+        closeLabel: labels.cancel,
         ...(action === "restore" ? { danger: false } : {}),
       }))
     )

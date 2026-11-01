@@ -5,6 +5,7 @@ import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import { communityReportCopy } from "../lib/community-report-copy";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
@@ -19,14 +20,15 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
 
   async function decide(action: "resolve" | "dismiss") {
     if (!ready || pending) return;
+    const labels = communityReportCopy(locale);
     if (
       !(await confirmAction({
         title: action === "resolve" ? copy.resolveReport : copy.dismissReport,
         object: reportId,
         consequences: action === "resolve" ? copy.resolveReportConfirm : copy.dismissReportConfirm,
         confirmLabel: action === "resolve" ? copy.resolveReport : copy.dismissReport,
-        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
-        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        cancelLabel: labels.cancel,
+        closeLabel: labels.cancel,
         ...(action === "resolve" ? { danger: false } : {}),
       }))
     )
