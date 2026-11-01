@@ -4,7 +4,7 @@ export const discovery = {
     liveEcosystem: "Open free beta",
     title: "Live servers, community, and free resources",
     description:
-      "Provisional home copy while the brand line stays open: browse the official MTA directory, community updates, and free resources.",
+      "MTA Nexus is an open free beta. Browse the official MTA server directory, community updates, and free resources without payment.",
     exploreServers: "Explore MTA servers",
     browseResources: "Browse free resources",
     playersOnline: "Players online",

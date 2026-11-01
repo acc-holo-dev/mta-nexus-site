@@ -103,7 +103,12 @@ it.each(["en", "ru"] as const)(
         ),
     ).toBe(true);
     expect(await generateMetadata()).toMatchObject({ title: publicationCopy(locale).serverTitle });
-    expect(renderToStaticMarkup(await Loading())).toContain(publicationCopy(locale).loading);
+    const loadingHtml = renderToStaticMarkup(await Loading());
+    expect(loadingHtml).toContain('aria-busy="true"');
+    expect(loadingHtml).toContain('id="publication-feed-loading-heading"');
+    expect(loadingHtml).toContain('aria-labelledby="publication-feed-loading-heading"');
+    expect(loadingHtml).toContain(`>${publicationCopy(locale).serverTitle}<`);
+    expect(loadingHtml).toContain(publicationCopy(locale).loading);
   },
 );
 it("offers localized latest-page recovery without querying a malformed SSR cursor", async () => {

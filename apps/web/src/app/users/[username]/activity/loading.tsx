@@ -1,1 +1,5 @@
-export { PublicationFeedLoading as default } from "../../../../components/publication-feed-loading";
+import { PublicationFeedLoading } from "../../../../components/publication-feed-loading";
+
+export default function Loading() {
+  return PublicationFeedLoading({ heading: "activity" });
+}

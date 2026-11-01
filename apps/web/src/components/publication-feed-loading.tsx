@@ -1,10 +1,34 @@
 import { getRequestLocale } from "../lib/i18n-server";
 import { publicationCopy } from "../lib/publication-feed-copy";
-export async function PublicationFeedLoading() {
+
+type PublicationFeedLoadingHeading = "title" | "activity" | "serverTitle";
+
+export async function PublicationFeedLoading({
+  heading = "title",
+}: {
+  heading?: PublicationFeedLoadingHeading;
+} = {}) {
   const copy = publicationCopy(await getRequestLocale());
   return (
-    <div role="status" aria-live="polite" className="nexus-panel min-h-40 p-6 text-sm text-muted">
-      {copy.loading}
-    </div>
+    <section
+      className="space-y-6"
+      aria-busy="true"
+      aria-labelledby="publication-feed-loading-heading"
+    >
+      <header className="space-y-2">
+        <h1 id="publication-feed-loading-heading" className="text-2xl font-bold text-primary">
+          {copy[heading]}
+        </h1>
+        <p role="status" className="text-sm text-muted">
+          {copy.loading}
+        </p>
+      </header>
+      <div className="animate-pulse space-y-4" aria-hidden="true">
+        <div className="h-10 rounded bg-inset" />
+        {[1, 2, 3].map((key) => (
+          <div key={key} className="h-24 rounded bg-inset" />
+        ))}
+      </div>
+    </section>
   );
 }
