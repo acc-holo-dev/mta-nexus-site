@@ -24,7 +24,6 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { communityReportCopy } from "../lib/community-report-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
@@ -33,6 +32,7 @@ import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   showAdminDestination,
   showGuestSignInCta,
@@ -58,6 +58,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dialogRef = useModalDialog(isMoreOpen);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
   }, [pathname]);

@@ -21,6 +21,7 @@ export function AccountControls() {
   const [attempt, setAttempt] = useState(0);
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
   }, [pathname]);
