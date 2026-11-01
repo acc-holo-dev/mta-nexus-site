@@ -3,6 +3,7 @@ import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { ManagedServerCard } from "../../../components/managed-server-card";
 import { ManagedServerVisibilityBatch } from "../../../components/managed-server-visibility-batch";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -37,6 +38,7 @@ export default async function ManagedServersPage({
     searchParams,
   ]);
   const copy = getManagedServerCopy(locale);
+  const { filters, page } = parseManagedServerQuery(query);
   let failure = "";
   const user = await authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => {
     failure = serverWorkspaceCopy(locale).unavailable;
@@ -51,12 +53,14 @@ export default async function ManagedServersPage({
             {failure}
           </p>
         )}
-        <Link href="/auth/login" className="text-sm text-accent underline">
+        <Link
+          href={authEntryHref("login", managedServerHref(filters, page))}
+          className="text-sm text-accent underline"
+        >
           {copy.signIn}
         </Link>
       </section>
     );
-  const { filters, page } = parseManagedServerQuery(query);
   const result = await serverRepository
     .pageManagedByUser(user.id, page, filters, 20)
     .catch(() => null);

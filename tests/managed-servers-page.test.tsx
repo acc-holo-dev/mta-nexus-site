@@ -96,9 +96,24 @@ it.each(["en", "ru"] as const)(
 it("does not read private data or contact the directory for anonymous visitors", async () => {
   state.user = null;
   expect(await render()).toContain("Sign in to manage your servers");
+  expect(await render()).toContain('href="/auth/login?next=%2Fworkspace%2Fservers"');
   expect(state.page).not.toHaveBeenCalled();
   expect(state.directory).not.toHaveBeenCalled();
   expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
+});
+it("preserves managed-server query filters in the guest sign-in return path", async () => {
+  state.user = null;
+  const html = await render({
+    page: "2",
+    q: "Managed",
+    visibility: "private",
+    verification: "verified",
+    status: "maintenance",
+  });
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fservers%3Fq%3DManaged%26status%3Dmaintenance%26visibility%3Dprivate%26verification%3Dverified%26page%3D2"',
+  );
+  expect(state.page).not.toHaveBeenCalled();
 });
 it("avoids directory work for empty filters and offers a reset", async () => {
   state.page.mockResolvedValue({ servers: [], total: 0, page: 1, pageSize: 12, totalPages: 1 });

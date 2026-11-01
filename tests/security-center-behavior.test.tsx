@@ -78,7 +78,7 @@ describe("Security Center behavior", () => {
   it("renders a sign-in boundary without reading private security data", async () => {
     const html = renderToStaticMarkup(await SecurityPage());
 
-    expect(html).toContain('href="/auth/login"');
+    expect(html).toContain('href="/auth/login?next=%2Fsecurity"');
     expect(auth.listSessions).not.toHaveBeenCalled();
     expect(auth.getRecoveryEmailStatus).not.toHaveBeenCalled();
   });

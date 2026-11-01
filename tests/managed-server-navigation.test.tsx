@@ -46,7 +46,7 @@ it("hides managed-server tools for guests and keeps a sign-in CTA", () => {
     <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
   );
   expect(html).not.toContain('href="/workspace/servers"');
-  expect(html).toContain('href="/auth/login"');
+  expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fservers"');
   expect(html).toContain("Sign in");
 });
 

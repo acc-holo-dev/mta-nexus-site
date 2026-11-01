@@ -116,7 +116,10 @@ describe("pre-release shell accessibility behavior", () => {
       new RegExp(`<a[^>]*href="/discover"[^>]*aria-label="${dictionary.nav.explore}"`, "u"),
     );
     expect(html).toMatch(
-      new RegExp(`<a[^>]*href="/auth/login"[^>]*aria-label="${dictionary.workspace.signIn}"`, "u"),
+      new RegExp(
+        `<a[^>]*href="/auth/login\\?next=%2Fmarket"[^>]*aria-label="${dictionary.workspace.signIn}"`,
+        "u",
+      ),
     );
     expect(html).not.toContain('href="/admin"');
     expect(html).not.toContain('href="/workspace"');

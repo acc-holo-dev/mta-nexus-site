@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { communityReportCopy } from "../lib/community-report-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
@@ -55,7 +57,13 @@ export function Sidebar({
   onToggle: () => void;
 }) {
   const pathname = usePathname();
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dictionary = getDictionary(locale);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
   const serverCopy = getManagedServerCopy(locale);
   const session = useAuthSession();
   const workspaceTools = showWorkspaceTools(session);
@@ -216,7 +224,7 @@ export function Sidebar({
         {guestSignIn ? (
           <div className="space-y-0.5 border-t border-base pt-3">
             <Link
-              href="/auth/login"
+              href={loginHref}
               title={isCollapsed ? dictionary.workspace.signIn : undefined}
               aria-label={isCollapsed ? dictionary.workspace.signIn : undefined}
               className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
