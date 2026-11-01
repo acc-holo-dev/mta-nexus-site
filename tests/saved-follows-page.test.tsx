@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: null as null | { id: string },
   locale: "en" as "ru" | "en",
@@ -33,9 +34,11 @@ vi.mock("../apps/web/src/components/follow-workspace", () => ({
     />
   ),
 }));
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+
 import SavedLoading from "../apps/web/src/app/workspace/saved/loading";
 import SavedPage, { generateMetadata } from "../apps/web/src/app/workspace/saved/page";
+import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+
 beforeEach(() => {
   vi.clearAllMocks();
   state.actor = null;

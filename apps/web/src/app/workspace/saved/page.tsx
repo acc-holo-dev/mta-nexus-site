@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { FollowWorkspace } from "../../../components/follow-workspace";
-import { authService } from "../../../lib/services/auth-service";
-import { followWorkspaceService } from "../../../lib/services/follow-workspace-service";
 import { FOLLOW_TYPES, type FollowTargetType } from "../../../lib/follow-workspace-contract";
 import { followCopy } from "../../../lib/follow-workspace-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
+import { followWorkspaceService } from "../../../lib/services/follow-workspace-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const copy = followCopy(await getRequestLocale());
