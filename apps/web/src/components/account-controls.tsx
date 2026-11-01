@@ -5,6 +5,7 @@ import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { useNexusLocale } from "./locale-context";
 
 type Account = { username: string };
@@ -18,6 +19,11 @@ export function AccountControls() {
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Recheck the session after navigation, including sign-in and sign-out.
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
@@ -156,7 +162,7 @@ export function AccountControls() {
           <span className="sr-only sm:hidden">{copy.retry}</span>
         </Button>
       ) : (
-        <Link href="/auth/login" className={chromeControl}>
+        <Link href={loginHref} className={chromeControl}>
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.signIn}</span>
           <span className="sr-only sm:hidden">{copy.signIn}</span>

@@ -65,8 +65,18 @@ function render() {
   return descendants(AccountControls());
 }
 beforeEach(() => {
-  // account, checking, signingOut, error, attempt, session effect, focus effect
-  harness.slots = [{ username: "alice" }, false, false, null, 0, true, true];
+  // account, checking, signingOut, error, attempt, loginHref, login effect, session effect, focus effect
+  harness.slots = [
+    { username: "alice" },
+    false,
+    false,
+    null,
+    0,
+    '/auth/login?next=%2Fworkspace',
+    true,
+    true,
+    true,
+  ];
   harness.cursor = 0;
   harness.cleanups = [];
   harness.fetch.mockReset();

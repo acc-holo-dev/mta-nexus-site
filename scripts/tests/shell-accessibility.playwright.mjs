@@ -722,6 +722,12 @@ for (const locale of ["en", "ru"]) {
     ).toBeVisible();
     await expect(
       moreDialog.getByRole("link", {
+        name: dictionary.workspace.signIn,
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/auth/login?next=%2Fmarket");
+    await expect(
+      moreDialog.getByRole("link", {
         name: dictionary.nav.notifications,
         exact: true,
       }),
@@ -764,7 +770,7 @@ for (const locale of ["en", "ru"]) {
         name: dictionary.support.signIn,
         exact: true,
       }),
-    ).toHaveAttribute("href", "/auth/login");
+    ).toHaveAttribute("href", "/auth/login?next=%2Fsupport");
     evidence.push(
       `${locale}: mobile More menu restores focus and routes guests to the real Support sign-in state`,
     );

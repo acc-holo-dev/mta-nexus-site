@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { communityReportCopy } from "../lib/community-report-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
@@ -54,7 +55,12 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const guestSignIn = showGuestSignInCta(session);
   const adminVisible = showAdminDestination(session);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dialogRef = useModalDialog(isMoreOpen);
+
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
 
   const items: NavItem[] = [
     { href: "/", label: dictionary.nav.home, icon: Home },
@@ -195,7 +201,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
             {/* UX-23 A: guest chrome Sign in only — Workspace cluster stays hidden. */}
             {guestSignIn ? (
               <Link
-                href="/auth/login"
+                href={loginHref}
                 onClick={() => setIsMoreOpen(false)}
                 className="mb-3 flex min-h-12 items-center gap-2 rounded-lg border border-base bg-surface px-3 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
