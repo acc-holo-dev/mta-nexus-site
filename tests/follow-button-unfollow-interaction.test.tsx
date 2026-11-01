@@ -6,7 +6,10 @@ const harness = vi.hoisted(() => ({
   cursor: 0,
   cleanups: [] as (() => void)[],
   fetch: vi.fn(),
-  confirmAction: vi.fn(async () => true),
+}));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
@@ -38,9 +41,6 @@ vi.mock("react", async (original) => ({
 vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
-}));
-vi.mock("../apps/web/src/components/confirm-action", () => ({
-  confirmAction: (...args: unknown[]) => harness.confirmAction(...args),
 }));
 
 import { FollowButton } from "../apps/web/src/components/follow-button";
@@ -85,7 +85,7 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
-  harness.confirmAction.mockResolvedValue(true);
+  confirmAction.mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
 });
 it.each(["en", "ru"] as const)(
@@ -102,7 +102,7 @@ it.each(["en", "ru"] as const)(
       }),
     );
     await (toggle(render(locale)).props.onClick as () => Promise<void>)();
-    expect(harness.confirmAction).toHaveBeenCalledWith({
+    expect(confirmAction).toHaveBeenCalledWith({
       title: shared.removeConfirmTitle,
       object: "Member",
       consequences: shared.removeConfirm,
@@ -115,7 +115,7 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("skips unfollow when confirmation is cancelled", async () => {
-  harness.confirmAction.mockResolvedValueOnce(false);
+  confirmAction.mockResolvedValueOnce(false);
   await (toggle(render()).props.onClick as () => Promise<void>)();
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(toggle(render()).props["aria-pressed"]).toBe(true);
