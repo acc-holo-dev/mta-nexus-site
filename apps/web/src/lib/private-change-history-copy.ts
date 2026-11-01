@@ -10,6 +10,8 @@ const en = {
   recorded:
     "Records describe saved edit operations; they do not prove that every listed field had a different value.",
   unavailable: "Unable to load saved changes. Try again.",
+  signIn: "Sign in to view your history.",
+  rateLimited: "Too many requests. Try again later.",
   invalid: "Check the period, event group, search and history link.",
   expired: "This page is no longer available in the selected history. Open the latest events.",
   empty: "No recorded profile changes yet.",
@@ -74,6 +76,8 @@ const ru: typeof en = {
   recorded:
     "Записи описывают сохранённые операции редактирования и не доказывают, что каждое перечисленное поле изменило значение.",
   unavailable: "Не удалось загрузить сохранённые изменения. Попробуйте ещё раз.",
+  signIn: "Войдите, чтобы просматривать свою историю.",
+  rateLimited: "Слишком много запросов. Попробуйте позже.",
   invalid: "Проверьте период, группу событий, поиск и ссылку истории.",
   expired: "Страница больше недоступна в выбранной истории. Откройте последние события.",
   empty: "Сохранённых изменений профиля пока нет.",
@@ -136,13 +140,7 @@ export function privateChangeHistoryError(locale: Locale, code: unknown) {
     return copy.invalid;
   if (["CHANGE_HISTORY_EXPIRED", "ORGANIZATION_HISTORY_EXPIRED"].includes(String(code)))
     return copy.expired;
-  if (code === "UNAUTHORIZED")
-    return locale === "ru"
-      ? "Войдите, чтобы просматривать свою историю."
-      : "Sign in to view your history.";
-  if (code === "RATE_LIMIT_EXCEEDED")
-    return locale === "ru"
-      ? "Слишком много запросов. Попробуйте позже."
-      : "Too many requests. Try again later.";
+  if (code === "UNAUTHORIZED") return copy.signIn;
+  if (code === "RATE_LIMIT_EXCEEDED") return copy.rateLimited;
   return copy.unavailable;
 }

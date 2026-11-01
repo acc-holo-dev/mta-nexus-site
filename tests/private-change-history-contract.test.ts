@@ -3,7 +3,10 @@ import {
   organizationChangeHistorySchema,
   parseOrganizationChangeHistoryQuery,
 } from "../apps/web/src/lib/organization-governance-contract";
-import { privateChangeHistoryCopy } from "../apps/web/src/lib/private-change-history-copy";
+import {
+  privateChangeHistoryCopy,
+  privateChangeHistoryError,
+} from "../apps/web/src/lib/private-change-history-copy";
 import {
   changeHistoryHref,
   encodeChangeHistoryCursor,
@@ -147,6 +150,12 @@ it("keeps shared RU/EN groups, field labels and actions complete", () => {
   expect(Object.keys(privateChangeHistoryCopy("en"))).toEqual(
     Object.keys(privateChangeHistoryCopy("ru")),
   );
+});
+it.each(["en", "ru"] as const)("localizes auth and rate-limit errors in %s", (locale) => {
+  const copy = privateChangeHistoryCopy(locale);
+  expect(privateChangeHistoryError(locale, "UNAUTHORIZED")).toBe(copy.signIn);
+  expect(privateChangeHistoryError(locale, "RATE_LIMIT_EXCEEDED")).toBe(copy.rateLimited);
+  expect(privateChangeHistoryError(locale, "unknown internal SQL")).toBe(copy.unavailable);
 });
 it.each(["name", "slug"] as const)(
   "bounds current organization %s in exported history metadata",
