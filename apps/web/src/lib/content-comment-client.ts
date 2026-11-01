@@ -1,6 +1,6 @@
-import type { Locale } from "./i18n";
-import { discussionError } from "./content-discussion-copy";
 import { confirmedCommentId } from "./content-comment-confirmation";
+import { discussionError } from "./content-discussion-copy";
+import type { Locale } from "./i18n";
 
 export type ContentCommentFetch = (
   input: RequestInfo | URL,
@@ -16,6 +16,23 @@ export function createCommentIntentKey(): string {
 
 export function parseCommentIntentKey(value: string | null | undefined): string | null {
   return typeof value === "string" && uuidV4.test(value) ? value : null;
+}
+
+export class ContentCommentSubmitError extends Error {
+  readonly code: unknown;
+
+  constructor(message: string, code: unknown) {
+    super(message);
+    this.name = "ContentCommentSubmitError";
+    this.code = code;
+  }
+}
+
+function readCommentSubmitCode(payload: unknown): unknown {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return "UNCONFIRMED";
+  return "code" in payload
+    ? ((payload as Record<string, unknown>).code ?? "UNCONFIRMED")
+    : "UNCONFIRMED";
 }
 
 export async function submitContentCommentRequest(
@@ -63,6 +80,7 @@ export async function submitContentCommentRequest(
       payload?.comment?.text === normalized &&
       (payload?.comment?.parentId ?? undefined) === input.parentId);
   if (!id || !confirmed) {
+    const code = readCommentSubmitCode(payload);
     const message =
       payload &&
       typeof payload === "object" &&
@@ -70,8 +88,9 @@ export async function submitContentCommentRequest(
       typeof (payload as Record<string, unknown>).error === "string"
         ? (payload as Record<string, string>).error
         : input.fallbackError;
-    throw new Error(
-      input.locale ? discussionError(input.locale, payload?.code ?? "UNCONFIRMED") : message,
+    throw new ContentCommentSubmitError(
+      input.locale ? discussionError(input.locale, code) : message,
+      code,
     );
   }
   return id;

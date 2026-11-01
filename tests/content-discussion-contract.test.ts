@@ -1,13 +1,18 @@
 import { expect, it, vi } from "vitest";
+import { submitContentCommentRequest } from "../apps/web/src/lib/content-comment-client";
 import {
   discussionCommentSchema,
-  parseDiscussionCursor,
   encodeDiscussionCursor,
+  parseDiscussionCursor,
 } from "../apps/web/src/lib/content-discussion-contract";
-import { submitContentCommentRequest } from "../apps/web/src/lib/content-comment-client";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import {
+  discussionError,
+  discussionWriteNeedsSignIn,
+  getDiscussionCopy,
+} from "../apps/web/src/lib/content-discussion-copy";
 import { getDictionary } from "../apps/web/src/lib/i18n";
-import { discussionError, getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
+import { formatNotification } from "../apps/web/src/lib/notification-copy";
+
 it("round trips exact microsecond cursors through URL query encoding", () => {
   const cursor = { createdAt: "2026-10-10T12:00:00.000123Z", id: "id/with spaces" };
   const params = new URLSearchParams({ cursor: encodeDiscussionCursor(cursor) });
@@ -90,6 +95,38 @@ it.each([
     ),
   ).rejects.toThrow("Unconfirmed");
 });
+it.each(["en", "ru"] as const)(
+  "maps unauthorized comment writes to sign-in recovery in %s",
+  async (locale) => {
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ code: "UNAUTHORIZED" }), {
+          status: 401,
+          headers: { "content-type": "application/json" },
+        }),
+    );
+    await expect(
+      submitContentCommentRequest(
+        {
+          slug: "article",
+          contentId: "content",
+          text: "Guest draft",
+          intentKey: INTENT,
+          locale,
+          fallbackError: "fallback",
+        },
+        fetchImpl,
+      ),
+    ).rejects.toMatchObject({
+      name: "ContentCommentSubmitError",
+      code: "UNAUTHORIZED",
+      message: discussionError(locale, "UNAUTHORIZED"),
+    });
+    expect(discussionWriteNeedsSignIn("UNAUTHORIZED")).toBe(true);
+    expect(discussionWriteNeedsSignIn("FORBIDDEN")).toBe(false);
+  },
+);
+
 it.each(["en", "ru"] as const)(
   "localizes known reply errors and existing comment notifications in %s",
   (locale) => {

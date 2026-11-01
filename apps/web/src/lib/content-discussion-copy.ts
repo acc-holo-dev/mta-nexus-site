@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
+
 const en = {
   reloadSaved: "Reload saved comment",
   search: "Search comments or authors",
@@ -134,4 +135,7 @@ export function discussionMutationError(locale: Locale, code: unknown) {
   if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED")
     return getDiscussionCopy(locale).writeUnavailable;
   return discussionError(locale, code);
+}
+export function discussionWriteNeedsSignIn(code: unknown): boolean {
+  return code === "UNAUTHORIZED";
 }

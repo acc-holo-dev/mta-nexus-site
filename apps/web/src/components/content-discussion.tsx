@@ -3,9 +3,17 @@
 import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { createCommentIntentKey, submitContentCommentRequest } from "../lib/content-comment-client";
+import {
+  ContentCommentSubmitError,
+  createCommentIntentKey,
+  submitContentCommentRequest,
+} from "../lib/content-comment-client";
 import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
-import { discussionError, getDiscussionCopy } from "../lib/content-discussion-copy";
+import {
+  discussionError,
+  discussionWriteNeedsSignIn,
+  getDiscussionCopy,
+} from "../lib/content-discussion-copy";
 import {
   clearDiscussionComposeDraft,
   readDiscussionComposeDraft,
@@ -18,6 +26,7 @@ import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { CommunityReportForm } from "./community-report-form";
+import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 
@@ -55,6 +64,7 @@ export function ContentDiscussion({
   const readController = useRef<AbortController | null>(null);
   const alive = useRef(true);
   const [writeError, setWriteError] = useState("");
+  const [writeNeedsSignIn, setWriteNeedsSignIn] = useState(false);
   const [published, setPublished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [text, setText] = useState("");
@@ -205,6 +215,7 @@ export function ContentDiscussion({
     writeGuard.current = true;
     setSubmitting(true);
     setWriteError("");
+    setWriteNeedsSignIn(false);
     setPublished(false);
     const parentId = reply?.id;
     const frozen =
@@ -237,6 +248,9 @@ export function ContentDiscussion({
       // Guest 401 / auth return must keep text for the author without auto-publish.
       persistComposeDraft(normalized, reply);
       setWriteError(caught instanceof Error ? caught.message : copy.unavailable);
+      setWriteNeedsSignIn(
+        caught instanceof ContentCommentSubmitError && discussionWriteNeedsSignIn(caught.code),
+      );
     } finally {
       writeGuard.current = false;
       setSubmitting(false);
@@ -378,11 +392,13 @@ export function ContentDiscussion({
             </Link>
           )}
         </div>
-        {writeError && (
-          <p role="alert" className="text-sm text-danger">
-            {writeError}
-          </p>
-        )}
+        <DiscussionComposeWriteFeedback
+          error={writeError}
+          needsSignIn={writeNeedsSignIn}
+          loginHref={loginHref}
+          signInLabel={copy.signIn}
+          onPersistDraft={() => persistComposeDraft()}
+        />
         {published && (
           <p role="status" className="text-sm text-accent">
             {copy.saved}
