@@ -105,6 +105,7 @@ it("gates private pages before reading statistics and passes only session-bound 
     await ServerStatisticsPage({ target: { id: "server" }, managed: true, searchParams: {} }),
   );
   expect(html).toContain("Войдите");
+  expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fservers%2Fserver%2Fstatistics"');
   expect(state.read).not.toHaveBeenCalled();
   state.session.mockResolvedValue({ id: "manager", role: "admin" });
   await ServerStatisticsPage({ target: { id: "server" }, managed: true, searchParams: {} });

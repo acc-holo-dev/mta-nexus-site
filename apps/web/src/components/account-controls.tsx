@@ -100,7 +100,7 @@ export function AccountControls() {
         throw new Error(copy.signOutError);
       }
 
-      window.location.replace("/auth/login");
+      window.location.replace(authEntryHref("login", currentBrowserReturnPath()));
     } catch {
       setError(copy.signOutError);
       setSigningOut(false);
