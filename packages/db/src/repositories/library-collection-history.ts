@@ -23,7 +23,7 @@ import { historyPageBounds } from "./history-pagination";
 import { effectiveUserDownloadSources } from "./user-library";
 import { safePublishedBuildCondition } from "./build-safety";
 
-export function validateLibraryCollectionHistoryQuery(query: LibraryCollectionHistoryQuery) {
+function validateLibraryCollectionHistoryQuery(query: LibraryCollectionHistoryQuery) {
   if (
     !Number.isInteger(query.page) ||
     query.page < 1 ||

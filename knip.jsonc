@@ -31,8 +31,6 @@
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],
       "drizzle": true,
       "ignoreIssues": {
-        "src/repositories/library-collection-history.ts": ["exports"],
-        "src/repositories/library-membership-history.ts": ["exports"],
         "src/repositories/resource-release-worker.ts": ["exports"]
       }
     },

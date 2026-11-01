@@ -73,7 +73,7 @@ function parent(row: Row) {
     return null;
   return command.data;
 }
-export function validateLibraryMembershipHistoryQuery(query: LibraryMembershipHistoryQuery) {
+function validateLibraryMembershipHistoryQuery(query: LibraryMembershipHistoryQuery) {
   if (
     !Number.isInteger(query.page) ||
     query.page < 1 ||
