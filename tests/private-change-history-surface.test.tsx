@@ -120,12 +120,24 @@ it.each(["en", "ru"] as const)(
 );
 it("requires sign in before loading either private journal", async () => {
   mock.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await ProfilePage({}))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await ProfilePage({}))).toContain(
+    'href="/auth/login?next=%2Fsettings%2Fhistory"',
+  );
   expect(
     renderToStaticMarkup(await OrganizationPage({ params: Promise.resolve({ id: "org" }) })),
   ).toContain('href="/auth/login"');
   expect(mock.profile).not.toHaveBeenCalled();
   expect(mock.organization).not.toHaveBeenCalled();
+});
+it("preserves profile history filters in the guest login return path", async () => {
+  mock.session.mockResolvedValue(null);
+  const html = renderToStaticMarkup(
+    await ProfilePage({ searchParams: Promise.resolve({ period: "30", group: "professional" }) }),
+  );
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fsettings%2Fhistory%3Fperiod%3D30%26group%3Dprofessional"',
+  );
+  expect(mock.profile).not.toHaveBeenCalled();
 });
 it("passes only the session ID and normalized profile selectors into storage and hides private metadata from indexing", async () => {
   await ProfilePage({ searchParams: Promise.resolve({ period: "30", group: "professional" }) });

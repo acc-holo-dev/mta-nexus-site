@@ -1,6 +1,7 @@
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { ProfilePrivacyEditor } from "../../../components/profile-privacy-editor";
 import { authService } from "../../../lib/services/auth-service";
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
@@ -22,7 +23,7 @@ export default async function PrivacySettingsPage() {
     return (
       <div className="nexus-panel p-8">
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", "/settings/privacy")}
           className="inline-flex min-h-11 items-center text-accent underline"
         >
           {copy.signIn}

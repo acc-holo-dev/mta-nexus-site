@@ -70,7 +70,9 @@ it.each(["en", "ru"] as const)(
 );
 it("offers sign in without fetching private preferences for an anonymous visitor", async () => {
   state.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await PrivacyPage())).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await PrivacyPage())).toContain(
+    'href="/auth/login?next=%2Fsettings%2Fprivacy"',
+  );
   expect(state.own).not.toHaveBeenCalled();
 });
 it("lets ordinary users edit privacy without advertising role-restricted developer editing", async () => {

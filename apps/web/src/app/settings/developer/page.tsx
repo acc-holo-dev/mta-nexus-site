@@ -1,6 +1,7 @@
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { DeveloperProfileEditor } from "../../../components/developer-profile-editor";
 import { authService } from "../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
@@ -22,7 +23,10 @@ export default async function DeveloperSettingsPage() {
   if (!actor)
     return (
       <div className="nexus-panel p-8">
-        <Link className="text-accent underline" href="/auth/login">
+        <Link
+          className="text-accent underline"
+          href={authEntryHref("login", "/settings/developer")}
+        >
           {copy.signIn}
         </Link>
       </div>
