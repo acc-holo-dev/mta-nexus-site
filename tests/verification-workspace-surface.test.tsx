@@ -126,11 +126,28 @@ it("publishes a genuine experience badge only when that flag is verified; suppre
 });
 it("does not load private account data for anonymous sessions or professional settings for unrelated roles", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await VerificationPage({}))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await VerificationPage({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fverification"',
+  );
   expect(renderToStaticMarkup(await DeveloperSettingsPage())).toContain(
     'href="/auth/login?next=%2Fsettings%2Fdeveloper"',
   );
   expect(mocks.overview).not.toHaveBeenCalled();
+  expect(
+    renderToStaticMarkup(
+      await VerificationPage({
+        searchParams: Promise.resolve({
+          page: "2",
+          view: "history",
+          type: "developer",
+          teamsPage: "3",
+          teamsQ: "Team",
+        }),
+      }),
+    ),
+  ).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fverification%3Fpage%3D2%26view%3Dhistory%26type%3Ddeveloper%26teamsPage%3D3%26teamsQ%3DTeam"',
+  );
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
   expect(renderToStaticMarkup(await DeveloperSettingsPage())).toContain(
     verificationCopy("en").roleRequired,

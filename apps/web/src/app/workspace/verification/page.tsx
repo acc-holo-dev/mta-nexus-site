@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { VerificationWorkspace } from "../../../components/verification-workspace";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -34,15 +35,25 @@ export default async function VerificationPage({
       </p>
     );
   }
-  if (!actor)
+  if (!actor) {
+    const query = await searchParams;
+    const returnParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(query ?? {})) {
+      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+      else if (value !== undefined) returnParams.append(key, value);
+    }
+    const returnPath = returnParams.size
+      ? `/workspace/verification?${returnParams}`
+      : "/workspace/verification";
     return (
       <div className="nexus-panel space-y-4 p-8">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <Link className="text-accent underline" href="/auth/login">
+        <Link className="text-accent underline" href={authEntryHref("login", returnPath)}>
           {copy.signIn}
         </Link>
       </div>
     );
+  }
   const query = await searchParams,
     filters = verificationPageQuery(query),
     teamFilters = verificationPageQuery({ page: query?.teamsPage, q: query?.teamsQ }, true);

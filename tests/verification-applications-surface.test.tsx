@@ -136,11 +136,21 @@ it("rejects duplicate filters and does not read private data without a session",
   expect(html).toContain(verificationApplicationsCopy("en").invalid);
   expect(state.applications).not.toHaveBeenCalled();
   state.session.mockResolvedValue(null);
-  for (const page of [await History({}), await Detail(params)]) {
-    const markup = renderToStaticMarkup(page);
-    expect(markup).toContain('href="/auth/login"');
-    expect(markup).not.toContain("proof</script>");
-  }
+  expect(renderToStaticMarkup(await History({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"',
+  );
+  expect(renderToStaticMarkup(await Detail(params))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fverification%2Frequest"',
+  );
+  expect(
+    renderToStaticMarkup(
+      await History({
+        searchParams: Promise.resolve({ q: " Lua ", status: "pending", type: "developer" }),
+      }),
+    ),
+  ).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory%3Fq%3D%2BLua%2B%26status%3Dpending%26type%3Ddeveloper"',
+  );
   expect(state.application).not.toHaveBeenCalled();
 });
 it("distinguishes safe auth and target errors from an empty history", async () => {

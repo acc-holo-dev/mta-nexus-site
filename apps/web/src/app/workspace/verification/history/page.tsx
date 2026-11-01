@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
@@ -38,6 +39,9 @@ export default async function VerificationHistoryPage({
     if (value !== undefined)
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseVerificationApplicationsQuery(params);
+  const historyPath = params.size
+    ? `/workspace/verification/history?${params}`
+    : "/workspace/verification/history";
   let error = filters ? "" : copy.invalid,
     signIn = false;
   const report = await (async () => {
@@ -70,7 +74,7 @@ export default async function VerificationHistoryPage({
       </Link>
       {signIn ? (
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", historyPath)}
           className="inline-flex min-h-11 items-center text-accent underline"
         >
           {labels.signIn}

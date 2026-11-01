@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { VerificationApplicationAmend } from "../../../../components/verification-application-amend";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
@@ -69,7 +70,7 @@ export default async function VerificationApplicationPage({
       </Link>
       {signIn && (
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", `/workspace/verification/${encodeURIComponent(id)}`)}
           className="inline-flex min-h-11 items-center text-accent underline"
         >
           {labels.signIn}
