@@ -58,7 +58,9 @@ export type BuildAvailabilityKind =
   | "pending_review"
   | "unavailable";
 
-export function classifyBuildAvailability(status: string | null | undefined): BuildAvailabilityKind {
+export function classifyBuildAvailability(
+  status: string | null | undefined,
+): BuildAvailabilityKind {
   if (status === "published") return "available";
   if (status === "quarantined") return "quarantined";
   if (status === "retired") return "retired";

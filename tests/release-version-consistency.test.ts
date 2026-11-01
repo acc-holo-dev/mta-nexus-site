@@ -34,7 +34,9 @@ describe("release workspace version consistency", () => {
   });
 
   it("keeps Node exact pins aligned and engines on the supported major branch", () => {
-    const rootManifest = JSON.parse(readFileSync(resolve(process.cwd(), "package.json"), "utf8")) as {
+    const rootManifest = JSON.parse(
+      readFileSync(resolve(process.cwd(), "package.json"), "utf8"),
+    ) as {
       engines?: { node?: string; pnpm?: string };
       packageManager?: string;
     };

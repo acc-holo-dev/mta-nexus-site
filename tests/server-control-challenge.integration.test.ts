@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import {
+  INTEGRATION_STAFF_PASSWORD,
+  assignIntegrationStaffPassword,
+} from "./integration-staff-password";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 
@@ -111,6 +115,7 @@ describe("MTA server control challenge integration", () => {
       token: moderatorToken,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
+    await assignIntegrationStaffPassword(moderatorId);
     await serverRepository.create({
       id: serverId,
       name: "Control Challenge Server",
@@ -359,6 +364,7 @@ describe("MTA server control challenge integration", () => {
         targetId: verifiedBody.verificationRequest.id,
         action: "approve",
         notes: "Live MTA control proof reviewed.",
+        currentPassword: INTEGRATION_STAFF_PASSWORD,
       }),
     );
     expect(approved.status).toBe(200);

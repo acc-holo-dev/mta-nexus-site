@@ -27,7 +27,7 @@ vi.mock("react", async (original) => ({
     if (!(index in harness.slots)) harness.slots[index] = { current: initial };
     return harness.slots[index];
   },
-  useEffect: (effect: () => void | (() => void)) => {
+  useEffect: (effect: () => undefined | (() => void)) => {
     const index = harness.cursor++;
     if (!(index in harness.slots)) {
       harness.slots[index] = true;
@@ -108,7 +108,11 @@ function textOf(node: Element): string {
   const children = node.props.children;
   if (typeof children === "string" || typeof children === "number") return String(children);
   if (Array.isArray(children))
-    return children.map((child) => (typeof child === "object" && child ? textOf(child as Element) : String(child ?? ""))).join("");
+    return children
+      .map((child) =>
+        typeof child === "object" && child ? textOf(child as Element) : String(child ?? ""),
+      )
+      .join("");
   if (children && typeof children === "object" && "props" in children)
     return textOf(children as Element);
   return "";
@@ -180,9 +184,7 @@ it("shows loading instead of empty until the first successful inbox preview", as
 it("keeps a first-load failure distinct from empty and does not confirm a zero badge", async () => {
   harness.fetch.mockResolvedValueOnce(response({ error: "boom" }, 500));
   openPopover();
-  await vi.waitFor(() =>
-    expect(render().some((node) => node.props.role === "alert")).toBe(true),
-  );
+  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
   expect(render().some((node) => textOf(node).includes("No notifications yet"))).toBe(false);
   expect(render().some((node) => textOf(node).includes("Loading notifications..."))).toBe(true);
   expect(bellButton().props["aria-label"]).toBe("Notifications");
@@ -216,17 +218,13 @@ it("preserves confirmed unread counts when account-wide mark-all fails", async (
     .mockResolvedValueOnce(response({ error: "failed" }, 500))
     .mockResolvedValue(response(sample));
   openPopover();
-  await vi.waitFor(() =>
-    expect(bellButton().props["aria-label"]).toBe("3 unread notifications"),
-  );
+  await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
   const mark = render().find(
     (node) => node.type === "button" && textOf(node).includes("Mark all read"),
   );
   if (!mark) throw Error("Missing mark all");
   await (mark.props.onClick as () => Promise<void>)();
-  await vi.waitFor(() =>
-    expect(render().some((node) => node.props.role === "alert")).toBe(true),
-  );
+  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
   expect(bellButton().props["aria-label"]).toBe("3 unread notifications");
   expect(harness.fetch.mock.calls.some(([url]) => url === "/api/notifications/mark-read")).toBe(
     true,
@@ -237,12 +235,13 @@ it("keeps destination links from marking notifications read", async () => {
   harness.fetch.mockResolvedValue(response(sample));
   openPopover();
   await vi.waitFor(() =>
-    expect(render().some((node) => node.type === "a" && node.props.href === "/articles/topic")).toBe(
-      true,
-    ),
+    expect(
+      render().some((node) => node.type === "a" && node.props.href === "/articles/topic"),
+    ).toBe(true),
   );
   const link = render().find((node) => node.type === "a" && node.props.href === "/articles/topic");
-  (link?.props.onClick as () => void)();
+  if (!link) throw new Error("expected topic link in notification popover");
+  (link.props.onClick as () => void)();
   expect(
     harness.fetch.mock.calls.some(
       ([url, init]) =>

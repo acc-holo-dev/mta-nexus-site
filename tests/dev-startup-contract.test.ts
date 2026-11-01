@@ -67,7 +67,7 @@ describe("host toolchain version contract", () => {
 
     expect(nvm).toBe("26.10.0");
     expect(nodeVersion).toBe(nvm);
-    expect(pkg.engines.node).toBe(">=26.0.0");
+    expect(pkg.engines.node).toBe(">=26.0.0 <27");
     expect(pkg.packageManager).toBe("pnpm@12.4.2");
   });
 });

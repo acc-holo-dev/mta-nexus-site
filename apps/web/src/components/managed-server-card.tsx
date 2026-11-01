@@ -6,7 +6,7 @@ import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getServerActivityCopy } from "../lib/server-activity-view";
 import { serverContentCopy } from "../lib/server-content-copy";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";
-import { type MtaMasterServer, mtaLiveStatus } from "../lib/services/mta-master-directory-service";
+import { type MtaMasterServer, mtaLiveStatus } from "../lib/mta-master-directory-shared";
 
 export function ManagedServerCard({
   server,

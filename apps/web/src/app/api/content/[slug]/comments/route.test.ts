@@ -10,10 +10,13 @@ const getArticle = vi.hoisted(() =>
 );
 const addComment = vi.hoisted(() =>
   vi.fn(async () => ({
-    id: "cmt_1",
-    contentId: "cnt_1",
-    authorId: "usr_commenter",
-    text: "Useful comment",
+    comment: {
+      id: "cmt_1",
+      contentId: "cnt_1",
+      authorId: "usr_commenter",
+      text: "Useful comment",
+    },
+    replayed: false,
   })),
 );
 
@@ -57,6 +60,7 @@ function request() {
       ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: "nexus_session=test-session",
+      "Idempotency-Key": "a1b2c3d4-e5f6-4789-a012-3456789abcde",
     },
     body: JSON.stringify({ text: "Useful comment" }),
   });

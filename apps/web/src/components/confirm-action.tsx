@@ -6,7 +6,14 @@ import { createElement } from "react";
 
 export type ConfirmActionRequest = Pick<
   ConfirmDialogProps,
-  "title" | "object" | "scope" | "consequences" | "confirmLabel" | "cancelLabel" | "closeLabel" | "danger"
+  | "title"
+  | "object"
+  | "scope"
+  | "consequences"
+  | "confirmLabel"
+  | "cancelLabel"
+  | "closeLabel"
+  | "danger"
 >;
 
 /**

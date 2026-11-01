@@ -1,6 +1,5 @@
 import type { Content } from "@nexus/domain";
 import { AppError } from "@nexus/domain";
-import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 

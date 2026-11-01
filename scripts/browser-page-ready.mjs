@@ -52,13 +52,11 @@ export function inspectDocumentReadiness({
   const visible = (element) =>
     element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden";
 
-  const loadingStatusVisible = [...document.querySelectorAll('[role="status"]')].some(
-    (element) => {
-      if (!visible(element)) return false;
-      const label = element.getAttribute("aria-label")?.trim() ?? "";
-      return loadingLabels.includes(label);
-    },
-  );
+  const loadingStatusVisible = [...document.querySelectorAll('[role="status"]')].some((element) => {
+    if (!visible(element)) return false;
+    const label = element.getAttribute("aria-label")?.trim() ?? "";
+    return loadingLabels.includes(label);
+  });
 
   const mains = [...document.querySelectorAll("main")].filter(visible);
   const mainHeadingCount = mains

@@ -5,9 +5,7 @@
       "id": "LEG01",
       "title": "Общая Home: что происходит",
       "related_source_id": "PX01",
-      "task_ids": [
-        "UX-14"
-      ],
+      "task_ids": ["UX-14"],
       "scope_note": "Предложение finite summary поверх реальных объектов.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -15,9 +13,7 @@
       "id": "LEG02",
       "title": "Изменения с прошлого визита",
       "related_source_id": "PX01",
-      "task_ids": [
-        "UX-14"
-      ],
+      "task_ids": ["UX-14"],
       "scope_note": "Новая сводка, не обещание существующего personal feed.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -25,12 +21,7 @@
       "id": "LEG03",
       "title": "Подписка на интерес",
       "related_source_id": "INT01",
-      "task_ids": [
-        "FLOW-02",
-        "FLOW-03",
-        "FLOW-04",
-        "FLOW-09"
-      ],
+      "task_ids": ["FLOW-02", "FLOW-03", "FLOW-04", "FLOW-09"],
       "scope_note": "Follows/watch/inbox уже существуют; уточняются смысл и контроль.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -38,10 +29,7 @@
       "id": "LEG04",
       "title": "Обсуждение вокруг задачи",
       "related_source_id": "INT16",
-      "task_ids": [
-        "FLOW-12",
-        "GROW-03"
-      ],
+      "task_ids": ["FLOW-12", "GROW-03"],
       "scope_note": "Q&A ресурса и resolved answer — proposal.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -49,10 +37,7 @@
       "id": "LEG05",
       "title": "Практические руководства",
       "related_source_id": "PX08",
-      "task_ids": [
-        "UX-20",
-        "GROW-02"
-      ],
+      "task_ids": ["UX-20", "GROW-02"],
       "scope_note": "Начать с полезного материала и контекстной помощи.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -60,10 +45,7 @@
       "id": "LEG06",
       "title": "Приватное сохранить на потом",
       "related_source_id": "INT07",
-      "task_ids": [
-        "FLOW-02",
-        "FLOW-06"
-      ],
+      "task_ids": ["FLOW-02", "FLOW-06"],
       "scope_note": "Resource save есть; quiet publication bookmark — отдельное предложение.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -71,11 +53,7 @@
       "id": "LEG07",
       "title": "Именованные коллекции",
       "related_source_id": "INT23",
-      "task_ids": [
-        "FLOW-07",
-        "GROW-02",
-        "GROW-08"
-      ],
+      "task_ids": ["FLOW-07", "GROW-02", "GROW-08"],
       "scope_note": "Частные коллекции есть; versioned pack требует иного snapshot.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -83,10 +61,7 @@
       "id": "LEG08",
       "title": "Центр обновлений библиотеки",
       "related_source_id": "INT02",
-      "task_ids": [
-        "FLOW-03",
-        "FLOW-17"
-      ],
+      "task_ids": ["FLOW-03", "FLOW-17"],
       "scope_note": "Переиспользовать compare/watch/selected build.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -94,10 +69,7 @@
       "id": "LEG09",
       "title": "Совместимость в контексте задачи",
       "related_source_id": "ARC17",
-      "task_ids": [
-        "OPS-19",
-        "GROW-08"
-      ],
+      "task_ids": ["OPS-19", "GROW-08"],
       "scope_note": "Требования и self-report не равны тесту совместного запуска.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -105,11 +77,7 @@
       "id": "LEG10",
       "title": "Живая страница сервера",
       "related_source_id": "INT20",
-      "task_ids": [
-        "FLOW-16",
-        "GROW-04",
-        "GROW-07"
-      ],
+      "task_ids": ["FLOW-16", "GROW-04", "GROW-07"],
       "scope_note": "Существующие профили дополняются реальным содержанием/ритмом.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -117,10 +85,7 @@
       "id": "LEG11",
       "title": "Осмысленные отзывы",
       "related_source_id": "INT24",
-      "task_ids": [
-        "FLOW-18",
-        "UX-18"
-      ],
+      "task_ids": ["FLOW-18", "UX-18"],
       "scope_note": "Verified access не выдаётся за опыт установки или игры.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -128,9 +93,7 @@
       "id": "LEG12",
       "title": "Репутация за подтверждённый вклад",
       "related_source_id": "RET09",
-      "task_ids": [
-        "GROW-09"
-      ],
+      "task_ids": ["GROW-09"],
       "scope_note": "Сначала ссылки на результат; автоматический XP/ranking deferred.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -138,12 +101,7 @@
       "id": "LEG13",
       "title": "Обратная связь автору",
       "related_source_id": "PX10",
-      "task_ids": [
-        "UX-22",
-        "FLOW-19",
-        "GROW-01",
-        "GROW-09"
-      ],
+      "task_ids": ["UX-22", "FLOW-19", "GROW-01", "GROW-09"],
       "scope_note": "Полная creator analytics не объявлена готовой либо отсутствующей без проверки.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -151,9 +109,7 @@
       "id": "LEG14",
       "title": "Редакционный ритм и дайджест",
       "related_source_id": "RET07",
-      "task_ids": [
-        "GROW-07"
-      ],
+      "task_ids": ["GROW-07"],
       "scope_note": "Добровольный пилот после настройки управления доставкой.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -161,9 +117,7 @@
       "id": "LEG15",
       "title": "Календарь событий",
       "related_source_id": "RET04",
-      "task_ids": [
-        "GROW-04"
-      ],
+      "task_ids": ["GROW-04"],
       "scope_note": "Сначала ручной формат; отдельный calendar service deferred.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -171,10 +125,7 @@
       "id": "LEG16",
       "title": "Игровые и творческие активности",
       "related_source_id": "RET04",
-      "task_ids": [
-        "GROW-04",
-        "GROW-05"
-      ],
+      "task_ids": ["GROW-04", "GROW-05"],
       "scope_note": "Проверяются итог и нагрузка хозяина.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -182,9 +133,7 @@
       "id": "LEG17",
       "title": "Наглядный preview ассетов",
       "related_source_id": "PX07",
-      "task_ids": [
-        "UX-19"
-      ],
+      "task_ids": ["UX-19"],
       "scope_note": "Gallery есть; lightbox — proposal, сложный 3D preview — future.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -200,9 +149,7 @@
       "id": "NEW01",
       "title": "Клуб тестировщиков",
       "related_source_id": "RET05",
-      "task_ids": [
-        "GROW-05"
-      ],
+      "task_ids": ["GROW-05"],
       "scope_note": "Ограниченный запрос и принятый отчёт.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -210,9 +157,7 @@
       "id": "NEW02",
       "title": "Доска потребностей",
       "related_source_id": "RET06",
-      "task_ids": [
-        "GROW-06"
-      ],
+      "task_ids": ["GROW-06"],
       "scope_note": "Сначала manual proof; не платная биржа.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -220,9 +165,7 @@
       "id": "NEW03",
       "title": "Поддерживаемый server pack",
       "related_source_id": "RET08",
-      "task_ids": [
-        "GROW-08"
-      ],
+      "task_ids": ["GROW-08"],
       "scope_note": "После полезности редакционных подборок.",
       "decision_state": "proposal_or_preserved_future_target"
     },
@@ -230,9 +173,7 @@
       "id": "NEW04",
       "title": "Публичные кейсы",
       "related_source_id": "RET09",
-      "task_ids": [
-        "GROW-09"
-      ],
+      "task_ids": ["GROW-09"],
       "scope_note": "Self-report и проверенный результат различаются.",
       "decision_state": "proposal_or_preserved_future_target"
     },

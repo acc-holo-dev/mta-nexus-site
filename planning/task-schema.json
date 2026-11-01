@@ -30,13 +30,7 @@
     },
     "tracker": {
       "type": "object",
-      "required": [
-        "mode",
-        "activated_by",
-        "activated_on",
-        "import_baseline",
-        "issues_import"
-      ],
+      "required": ["mode", "activated_by", "activated_on", "import_baseline", "issues_import"],
       "properties": {
         "mode": {
           "const": "json_in_repo"
@@ -98,20 +92,10 @@
             "enum": ["F0", "F1", "F2", "F3", "F4", "F5", "F6"]
           },
           "decision_status": {
-            "enum": [
-              "existing_goal",
-              "accepted_direction",
-              "proposal",
-              "verification_required"
-            ]
+            "enum": ["existing_goal", "accepted_direction", "proposal", "verification_required"]
           },
           "queue_state": {
-            "enum": [
-              "specified",
-              "needs_decision",
-              "external_gate",
-              "deferred"
-            ]
+            "enum": ["specified", "needs_decision", "external_gate", "deferred"]
           },
           "priority": {
             "enum": ["P1", "P2", "P3"]
@@ -125,13 +109,7 @@
             ]
           },
           "execution_state": {
-            "enum": [
-              "not_started",
-              "in_progress",
-              "blocked",
-              "done",
-              "cancelled"
-            ]
+            "enum": ["not_started", "in_progress", "blocked", "done", "cancelled"]
           },
           "execution_notes": {
             "type": "string"

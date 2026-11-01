@@ -156,7 +156,12 @@ it.each([
     meta: { sizeBytes: 4, sha256Hash: build.sha256Hash },
   });
   state.authorize.mockRejectedValue(error);
-  const response = await download(request("/api/products/prd_a/download"), context);
+  const response = await download(
+    new NextRequest("https://nexus.test/api/products/prd_a/download", {
+      headers: { cookie: "nexus_session=resource-activity-session" },
+    }),
+    context,
+  );
   expect(response.status).toBe(error.statusCode);
   expect(stream.destroyed).toBe(true);
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");

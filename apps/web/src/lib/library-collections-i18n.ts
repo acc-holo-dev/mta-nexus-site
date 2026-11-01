@@ -60,7 +60,8 @@ const en = {
   toCollection: "Add to collection",
   batchApplied: "Applied for this resource",
   collectionLimitNext: "Archive or delete an unused collection before creating another.",
-  itemLimitNext: "Remove references from this collection or choose another collection with free capacity.",
+  itemLimitNext:
+    "Remove references from this collection or choose another collection with free capacity.",
   archiveConfirm: "Archive this collection and keep its contents and history.",
   unavailable: "Resource unavailable",
   unavailableNote:

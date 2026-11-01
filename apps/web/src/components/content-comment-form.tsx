@@ -3,10 +3,7 @@
 import { type FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
-import {
-  createCommentIntentKey,
-  submitContentCommentRequest,
-} from "../lib/content-comment-client";
+import { createCommentIntentKey, submitContentCommentRequest } from "../lib/content-comment-client";
 import { useNexusLocale } from "./locale-context";
 
 export function ContentCommentForm({ slug }: { slug: string }) {

@@ -195,18 +195,12 @@ test("backup restore rehearsal script still requires disposable runner and full 
 
 test("OPERATIONS maintenance stop inventory includes every production-base writer", () => {
   const ops = readFileSync(resolve(process.cwd(), "docs/OPERATIONS.md"), "utf8");
-  assert.match(
-    ops,
-    /dc stop caddy push-worker license-worker resource-release-worker app/u,
-  );
+  assert.match(ops, /dc stop caddy push-worker license-worker resource-release-worker app/u);
   assert.match(ops, /license-worker/u);
   assert.match(ops, /resource-release-worker/u);
   assert.match(ops, /mail-worker/u);
   assert.match(ops, /postgres/iu);
-  assert.doesNotMatch(
-    ops,
-    /^dc stop caddy push-worker app$/mu,
-  );
+  assert.doesNotMatch(ops, /^dc stop caddy push-worker app$/mu);
 });
 
 test("rendered compose.production.yaml still matches the backup restore mount contract", () => {

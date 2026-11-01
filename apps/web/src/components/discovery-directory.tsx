@@ -4,6 +4,7 @@ import { Avatar, Button, EmptyState } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { cache } from "react";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../lib/discover-query";
 import { discoveryCopy } from "../lib/discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../lib/discovery-stream-contract";
@@ -13,6 +14,7 @@ import { authService } from "../lib/services/auth-service";
 import { discoveryService } from "../lib/services/discovery-service";
 import {
   indexMtaObservations,
+  type MtaMasterServer,
   mtaMasterDirectoryService,
 } from "../lib/services/mta-master-directory-service";
 import { productService } from "../lib/services/product-service";
@@ -21,6 +23,10 @@ import { ArticleCard } from "./article-card";
 import { FollowButton } from "./follow-button";
 import { ProductCard } from "./product-card";
 import { ServerCard } from "./server-card";
+
+const observationLookupForSnapshot = cache((servers: readonly MtaMasterServer[]) =>
+  indexMtaObservations(servers),
+);
 
 export function DirectoryFilters({
   state,
@@ -213,7 +219,7 @@ export async function DirectoryResults({
       : null,
     readFollows(),
   ]);
-  const observationFor = indexMtaObservations(directory?.servers ?? []);
+  const observationFor = observationLookupForSnapshot(directory?.servers ?? []);
   const followControl = (id: string, name: string) => (
     <FollowButton
       targetType={targetType}
@@ -250,10 +256,26 @@ export async function DirectoryResults({
                 {state.query ? <li>q: {state.query}</li> : null}
                 {state.verified ? <li>{copy.verified}</li> : null}
                 {state.sort === "name" ? <li>{copy.name}</li> : null}
-                {state.language ? <li>{copy.language}: {state.language}</li> : null}
-                {state.region ? <li>{copy.region}: {state.region}</li> : null}
-                {state.gameMode ? <li>{copy.gameMode}: {state.gameMode}</li> : null}
-                {state.contentType ? <li>{copy.contentType}: {copy[state.contentType]}</li> : null}
+                {state.language ? (
+                  <li>
+                    {copy.language}: {state.language}
+                  </li>
+                ) : null}
+                {state.region ? (
+                  <li>
+                    {copy.region}: {state.region}
+                  </li>
+                ) : null}
+                {state.gameMode ? (
+                  <li>
+                    {copy.gameMode}: {state.gameMode}
+                  </li>
+                ) : null}
+                {state.contentType ? (
+                  <li>
+                    {copy.contentType}: {copy[state.contentType]}
+                  </li>
+                ) : null}
                 {state.page > 1 ? (
                   <li>
                     {copy.page} {state.page}
@@ -269,7 +291,10 @@ export async function DirectoryResults({
                     {copy.clearQuery}
                   </Link>
                 ) : null}
-                <Link className="text-accent underline" href={discoverHref({ type: state.type }, path)}>
+                <Link
+                  className="text-accent underline"
+                  href={discoverHref({ type: state.type }, path)}
+                >
                   {copy.reset}
                 </Link>
               </div>

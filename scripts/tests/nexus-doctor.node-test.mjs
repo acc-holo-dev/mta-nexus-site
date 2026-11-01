@@ -95,7 +95,10 @@ test("major-ok Node that differs from the exact pin warns in local mode", async 
     assert.equal(report.checks.find((check) => check.id === "node-exact")?.status, "warn");
     assert.equal(report.facts.nodeMajorOk, true);
     assert.equal(report.facts.nodeExactMatch, false);
-    assert.match(report.checks.find((check) => check.id === "node-exact")?.hint ?? "", /26\.10\.0/u);
+    assert.match(
+      report.checks.find((check) => check.id === "node-exact")?.hint ?? "",
+      /26\.10\.0/u,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }

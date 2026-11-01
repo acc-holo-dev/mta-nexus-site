@@ -196,9 +196,7 @@ it("replays the same intent after a lost response without a second create call s
   );
 });
 it("rejects payload mismatch on a reused intent key", async () => {
-  mocks.add.mockRejectedValueOnce(
-    new AppError("Conflict", 409, "COMMENT_IDEMPOTENCY_CONFLICT"),
-  );
+  mocks.add.mockRejectedValueOnce(new AppError("Conflict", 409, "COMMENT_IDEMPOTENCY_CONFLICT"));
   const response = await POST(request("POST", { text: "Changed payload" }), context);
   expect(response.status).toBe(409);
   expect(await response.json()).toMatchObject({ code: "COMMENT_IDEMPOTENCY_CONFLICT" });

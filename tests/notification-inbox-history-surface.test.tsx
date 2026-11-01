@@ -138,9 +138,7 @@ it("filters the inbox from URL state and highlights the matching All/Unread/Read
   expect(unread).toContain(
     'href="/notifications?q=topic&amp;state=read&amp;category=content&amp;period=7"',
   );
-  expect(unread).toMatch(
-    /aria-current="page"[^>]*>Unread<|>Unread<\/a[^>]*aria-current="page"/,
-  );
+  expect(unread).toMatch(/aria-current="page"[^>]*>Unread<|>Unread<\/a[^>]*aria-current="page"/);
   expect(unread).not.toMatch(/href="\/notifications\?q=topic"[^>]*aria-current="page"/);
 
   state.page.mockClear();
@@ -184,7 +182,10 @@ it("drops cursor from All/Unread/Read links when the reading state changes", asy
   const html = await render({ state: "unread", cursor, q: "needle" });
   expect(state.page).toHaveBeenCalledWith(
     "actor",
-    expect.objectContaining({ state: "unread", cursor: expect.objectContaining({ id: "cursor-row" }) }),
+    expect.objectContaining({
+      state: "unread",
+      cursor: expect.objectContaining({ id: "cursor-row" }),
+    }),
     "en",
   );
   expect(html).toContain('href="/notifications?q=needle"');

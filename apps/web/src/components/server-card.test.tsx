@@ -88,7 +88,13 @@ describe("home network server card honest states", () => {
     );
     const zero = renderToStaticMarkup(
       createElement(HomeNetworkServerCard, {
-        observation: { address: "198.51.100.3", port: 22003, name: "Beta", players: 0, maxPlayers: 64 },
+        observation: {
+          address: "198.51.100.3",
+          port: 22003,
+          name: "Beta",
+          players: 0,
+          maxPlayers: 64,
+        },
         locale: "en",
       }),
     );

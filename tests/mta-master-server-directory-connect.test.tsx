@@ -9,9 +9,7 @@ describe("MTA master directory connect honesty", () => {
     "uses Open in MTA intent copy and keeps clipboard fallback available in %s",
     (locale) => {
       const copy = getDictionary(locale).servers;
-      const html = renderToStaticMarkup(
-        createElement(MtaMasterServerDirectory, { locale }),
-      );
+      const html = renderToStaticMarkup(createElement(MtaMasterServerDirectory, { locale }));
 
       expect(copy.connect).toMatch(locale === "ru" ? /Открыть в MTA/u : /Open in MTA/u);
       expect(copy.connectHint).toMatch(locale === "ru" ? /не подтверждает/iu : /connect intent/iu);

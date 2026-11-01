@@ -202,7 +202,10 @@ test("retained full-format upgrade fixture passes technical check without deploy
       ciEvidence: passingCiEvidence(),
       artifactRoot: root,
     });
-    assert.equal(report.categories.find((item) => item.id === "database_upgrade")?.status, "passed");
+    assert.equal(
+      report.categories.find((item) => item.id === "database_upgrade")?.status,
+      "passed",
+    );
     assert.equal(report.checkableCandidate, true);
     assert.equal(report.productionAuthorized, false);
     assert.equal(report.openBetaLive, false);

@@ -177,17 +177,12 @@ export function readMtaMasterMirrorUrls(
  * from client bundles if the domain changes without rebuild. Secrets never belong
  * in Next `env` / public build constants.
  */
-export const BUILD_PLACEHOLDER_AUTH_SECRET =
-  "build-only-secret-that-is-long-enough-for-validation";
+export const BUILD_PLACEHOLDER_AUTH_SECRET = "build-only-secret-that-is-long-enough-for-validation";
 export const BUILD_PLACEHOLDER_DATABASE_URL =
   "postgres://nexus:build-only@127.0.0.1:5432/mta_nexus";
 
 /** Allowed public health JSON keys — never dump full EnvConfig. */
-export const PUBLIC_HEALTH_BODY_KEYS = Object.freeze([
-  "status",
-  "database",
-  "timestamp",
-] as const);
+export const PUBLIC_HEALTH_BODY_KEYS = Object.freeze(["status", "database", "timestamp"] as const);
 
 /**
  * Resolve the server runtime application origin.
@@ -376,10 +371,7 @@ export const envSchema = z
         addIssue("NEXT_PUBLIC_APP_URL", "Production application URL cannot point to localhost");
       }
       if (value.AUTH_SECRET === BUILD_PLACEHOLDER_AUTH_SECRET) {
-        addIssue(
-          "AUTH_SECRET",
-          "Production must not use the image build-placeholder auth secret",
-        );
+        addIssue("AUTH_SECRET", "Production must not use the image build-placeholder auth secret");
       }
       if (value.DATABASE_URL === BUILD_PLACEHOLDER_DATABASE_URL) {
         addIssue(
@@ -410,10 +402,7 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
   try {
     applicationOrigin = resolveApplicationOrigin(env);
   } catch (error) {
-    console.error(
-      "Invalid environment variables:",
-      error instanceof Error ? error.message : error,
-    );
+    console.error("Invalid environment variables:", error instanceof Error ? error.message : error);
     throw new Error("Invalid configuration parameters");
   }
 

@@ -2,6 +2,10 @@ import { readMtaMasterMirrorUrls } from "@nexus/config";
 import { normalizeMtaAddress } from "@nexus/domain";
 export { normalizeMtaAddress } from "@nexus/domain";
 import { MTA_MASTER_FRESH_TTL_MS } from "../mta-directory-cache";
+import type { MtaMasterServer } from "../mta-master-directory-shared";
+
+export type { MtaMasterServer } from "../mta-master-directory-shared";
+export { mtaLiveStatus } from "../mta-master-directory-shared";
 
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
 const MASTER_TOTAL_TIMEOUT_MS = 10_000;
@@ -30,29 +34,6 @@ const FLAG = {
   httpPort: 0x080000,
   special: 0x100000,
 } as const;
-
-export type MtaMasterServer = {
-  address: string;
-  port: number;
-  httpPort?: number;
-  name?: string;
-  gameName?: string;
-  gameMode?: string;
-  mapName?: string;
-  version?: string;
-  players?: number;
-  maxPlayers?: number;
-  passworded?: boolean;
-  responding?: boolean;
-};
-
-export function mtaLiveStatus(
-  observation: Pick<MtaMasterServer, "responding"> | null | undefined,
-  isStale = false,
-): "online" | "offline" | "unknown" {
-  if (isStale || !observation) return "unknown";
-  return observation.responding === false ? "offline" : "online";
-}
 
 export function matchesMtaEndpoint(
   editorial: { ipAddress: string; port: number },

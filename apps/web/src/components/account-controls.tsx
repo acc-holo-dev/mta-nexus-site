@@ -103,7 +103,8 @@ export function AccountControls() {
   const chromeControl = buttonClassName({
     variant: "outline",
     size: "sm",
-    className: "shrink-0 rounded-md border-base bg-elevated px-2 font-semibold text-primary sm:px-2.5",
+    className:
+      "shrink-0 rounded-md border-base bg-elevated px-2 font-semibold text-primary sm:px-2.5",
   });
 
   return (

@@ -67,7 +67,12 @@ export function ResourceReleaseWatchControl({
         : null;
 
   async function save() {
-    if (lock.current || settled.current || guest || (!frozen.current && !canToggle && !watch.enabled))
+    if (
+      lock.current ||
+      settled.current ||
+      guest ||
+      (!frozen.current && !canToggle && !watch.enabled)
+    )
       return;
     if (!frozen.current && !watch.enabled && !canToggle) return;
     const request = frozen.current ?? {

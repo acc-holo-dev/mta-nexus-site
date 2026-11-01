@@ -67,7 +67,7 @@ describe("global-error autonomy and public reference", () => {
     expect(html).toContain(">Home</a>");
     expect(html).not.toContain("class=");
     expect(html).not.toContain("nexus-shell");
-    expect(html).not.toContain("data-testid=\"error-public-reference\"");
+    expect(html).not.toContain('data-testid="error-public-reference"');
   });
 
   it("shows digest only when present and never leaks message/stack/secrets", () => {
@@ -95,7 +95,7 @@ describe("global-error autonomy and public reference", () => {
       }),
     );
 
-    expect(withoutDigest).not.toContain("data-testid=\"error-public-reference\"");
+    expect(withoutDigest).not.toContain('data-testid="error-public-reference"');
     expect(withoutDigest).not.toContain("Support reference");
     expect(withoutDigest).not.toContain(SECRET);
     expect(withoutDigest).not.toMatch(/ref[_-]?[0-9a-f]{8,}/iu);
@@ -150,7 +150,7 @@ describe("segment error boundary public reference", () => {
       </LocaleProvider>,
     );
 
-    expect(html).not.toContain("data-testid=\"error-public-reference\"");
+    expect(html).not.toContain('data-testid="error-public-reference"');
     expect(html).not.toContain("Support reference");
     expect(html).not.toContain(SECRET);
     expect(html).not.toMatch(/ref[_-]?[0-9a-f]{8,}/iu);

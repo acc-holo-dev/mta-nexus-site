@@ -1,30 +1,18 @@
+import "server-only";
+
 import { notificationRepository, resourceReleaseWatchesRepository } from "@nexus/db";
 import type { Locale } from "./i18n";
+import type { PersonalChangeReason, PersonalChangesSummary } from "./home-personal-changes-types";
 import { followWorkspaceService } from "./services/follow-workspace-service";
 import { notificationInboxService } from "./services/notification-inbox-service";
 
-export type PersonalChangeReason = "releaseWatch" | "discussionFollow" | "replyToMe";
-
-export type PersonalChangeItem = {
-  id: string;
-  reason: PersonalChangeReason;
-  title: string;
-  href: string;
-  createdAt: string;
-};
-
-export type PersonalChangesSummary = {
-  status: "ok" | "empty" | "partial" | "error" | "hidden";
-  items: PersonalChangeItem[];
-  failedSources: PersonalChangeReason[];
-};
+export type { PersonalChangesSummary } from "./home-personal-changes-types";
 
 const LIMIT = 12;
 
 function safeInternalHref(value: string | null | undefined): string | null {
   if (
-    !value ||
-    !value.startsWith("/") ||
+    !value?.startsWith("/") ||
     value.startsWith("//") ||
     Array.from(value).some((char) => char.charCodeAt(0) <= 32 || char.charCodeAt(0) === 127)
   )
@@ -44,7 +32,7 @@ export async function loadPersonalChangesSummary(
   if (optedOut) return { status: "hidden", items: [], failedSources: [] };
 
   const failedSources: PersonalChangeReason[] = [];
-  const items: PersonalChangeItem[] = [];
+  const items: PersonalChangesSummary["items"] = [];
   const seen = new Set<string>();
 
   const [inboxResult, watchesResult, followsResult] = await Promise.allSettled([

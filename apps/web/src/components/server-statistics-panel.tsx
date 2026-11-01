@@ -127,7 +127,9 @@ export function ServerStatisticsPanel({
                     {summary.knownPlayerPercent == null ? "" : ` (${summary.knownPlayerPercent}%)`}
                   </td>
                   <td className="p-2 font-numeric tabular-nums">{metric(summary.peakPlayers)}</td>
-                  <td className="p-2 font-numeric tabular-nums">{metric(summary.averagePlayers)}</td>
+                  <td className="p-2 font-numeric tabular-nums">
+                    {metric(summary.averagePlayers)}
+                  </td>
                 </tr>
               ))}
             </tbody>

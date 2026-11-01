@@ -10,13 +10,20 @@ const mocks = vi.hoisted(() => ({
   review: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: mocks.auth },
+  authService: {
+    getSession: mocks.auth,
+    confirmStaffActionPassword: vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),
+  },
 }));
-vi.mock("@nexus/security", () => ({
-  consumeRateLimit: mocks.rate,
-  can: () => true,
-  generateId: () => "aud_a",
-}));
+vi.mock("@nexus/security", async () => {
+  const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
+  return {
+    ...actual,
+    consumeRateLimit: mocks.rate,
+    can: () => true,
+    generateId: () => "aud_a",
+  };
+});
 vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: mocks.detail, command: mocks.command },
 }));
@@ -120,7 +127,13 @@ it("uses separate live staff authority for admin detail", async () => {
   expect(mocks.detail).toHaveBeenCalledWith("prd_a", "bld_a", actor, true);
 });
 it.each(["approve", "reject"])("requires the displayed revision for %s", async (action) => {
-  const body = { targetType: "build", targetId: "bld_a", action, notes: "Reviewed evidence" };
+  const body = {
+    targetType: "build",
+    targetId: "bld_a",
+    action,
+    notes: "Reviewed evidence",
+    currentPassword: "Staff-password-123!",
+  };
   const headers = { cookie: "nexus_session=staff-token" };
   const response = await moderate(req(body, headers, "/api/admin/actions", "POST"));
   expect(response.status).toBe(400);
@@ -130,7 +143,13 @@ it.each(["approve", "reject"])("requires the displayed revision for %s", async (
       .status,
   ).toBe(200);
   expect(mocks.review).toHaveBeenCalledWith(
-    { buildId: "bld_a", decision: action, notes: "Reviewed evidence", expectedRevision: 3 },
+    {
+      buildId: "bld_a",
+      decision: action,
+      notes: "Reviewed evidence",
+      expectedRevision: 3,
+      expectedPasswordHash: "hash_mod",
+    },
     actor,
     "staff-token",
   );

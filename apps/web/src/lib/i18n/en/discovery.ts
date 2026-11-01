@@ -31,7 +31,8 @@ export const discovery = {
     personalDescription:
       "Updates from release watches, discussion follows, and unread replies to you.",
     personalEmpty: "Nothing new from your watches, follows, or replies right now.",
-    personalError: "Your personal changes could not be loaded. Public Home sections below are still available.",
+    personalError:
+      "Your personal changes could not be loaded. Public Home sections below are still available.",
     personalPartial: "Some personal sources could not be loaded. Showing what is available.",
     personalHidden: "Personal changes are hidden on Home. Public sections below are unchanged.",
     personalHide: "Don't show personal changes on Home",

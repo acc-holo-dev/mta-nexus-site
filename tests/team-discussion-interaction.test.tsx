@@ -13,6 +13,10 @@ const harness = vi.hoisted(() => ({
   failure: vi.fn(),
   committed: vi.fn(),
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction,
+}));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
   useState: (initial: unknown) => {
@@ -168,6 +172,7 @@ beforeEach(() => {
   harness.acquire.mockReturnValue(true);
   harness.committed.mockResolvedValue(undefined);
   harness.confirm.mockReturnValue(true);
+  confirmAction.mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
   vi.stubGlobal("window", { confirm: harness.confirm });
 });
@@ -260,7 +265,7 @@ it.each([
 });
 it("cancels removal before requests when explicit confirmation is declined", () => {
   prepareComment();
-  harness.confirm.mockReturnValue(false);
+  confirmAction.mockResolvedValueOnce(false);
   click("comment", "Remove comment");
   expect(harness.fetch).not.toHaveBeenCalled();
 });

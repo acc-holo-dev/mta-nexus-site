@@ -4,12 +4,12 @@
 
 Предметный контракт DOC-05 для каталога ресурсов, версий/сборок, выдачи файла, приватной библиотеки, коллекций и seller-публикации. Не активирует коммерцию и не заменяет [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md). Платежи, settlement, commission, DRM-модели, payout и dispute timing — [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md) (план) и исходные handbook-главы до DOC-04.
 
-| Метка | Значение |
-|---|---|
-| **Текущий runtime** | Что делает код / closed beta сейчас |
-| **Цель владельца** | Утверждённая цель; строить можно при поручении, но free beta не включает реальные платежи |
-| **Предложение** | Не утверждено к сборке без владельца |
-| **Live unknown** | Нужно свидетельство кода/CI/среды |
+| Метка               | Значение                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| **Текущий runtime** | Что делает код / closed beta сейчас                                                       |
+| **Цель владельца**  | Утверждённая цель; строить можно при поручении, но free beta не включает реальные платежи |
+| **Предложение**     | Не утверждено к сборке без владельца                                                      |
+| **Live unknown**    | Нужно свидетельство кода/CI/среды                                                         |
 
 ---
 
@@ -29,10 +29,10 @@
 
 Один продукт может иметь Free / Premium edition, closed-code / open-source delivery, несколько license scopes, bundle membership, source-code premium variant.
 
-| Режим | DRM | Что видит покупатель |
-|---|---|---|
-| Closed code | Seller opt-in enable/disable | Закрытая сборка; DRM Protected только если включено |
-| Open source | Нет DRM | Явно: source + license model; source access может быть отдельным SKU |
+| Режим       | DRM                          | Что видит покупатель                                                 |
+| ----------- | ---------------------------- | -------------------------------------------------------------------- |
+| Closed code | Seller opt-in enable/disable | Закрытая сборка; DRM Protected только если включено                  |
+| Open source | Нет DRM                      | Явно: source + license model; source access может быть отдельным SKU |
 
 Seller задаёт цену сам; искусственный minimum price нет (кроме provider limits). **Цена не trust signal.** Fake markdown pricing запрещён.
 
@@ -73,10 +73,10 @@ Auto-publish = bypass **только** manual queue; **никогда** не byp
 
 Каталожные states (**цель**): `DRAFT`, `PENDING_REVIEW`, `PUBLISHED`, `UNLISTED`, `QUARANTINED`, `SUSPENDED`, `ARCHIVED`, `TAKEDOWN`.
 
-| State | Кто / правило |
-|---|---|
-| `UNLISTED` | Seller может включить сам |
-| `ARCHIVED` / `TAKEDOWN` | Сохраняют purchase, license/entitlement, build/version, moderation/audit, dispute/support refs |
+| State                            | Кто / правило                                                                                                                                                |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `UNLISTED`                       | Seller может включить сам                                                                                                                                    |
+| `ARCHIVED` / `TAKEDOWN`          | Сохраняют purchase, license/entitlement, build/version, moderation/audit, dispute/support refs                                                               |
 | Публичная archived/delisted page | Остаётся (если нет legal/security запрета): status, substantive reason, seller where allowed, latest safe metadata, **без purchase CTA**, guidance для buyer |
 
 ### 3.2 Publish Wizard (**цель**)
@@ -141,17 +141,17 @@ Full-page flow (не modal): Basic → Delivery → Files/Source → Dependencie
 
 Маршрут `/workspace/library` (замена полной загрузки всех entitlements/licenses в память):
 
-| Правило | Содержание |
-|---|---|
-| Выборка | Счётчик `all / ready / unavailable`, затем страница; порядок `MAX(grant.created_at) DESC, resource_id ASC` |
-| Размер | ≤12 на странице; preview кабинета ≤4 |
-| Право `product.download` | Действующие user entitlements с permission **или** исторические активные licenses с неистёкшим сроком; дубли → одна строка |
-| Не создают карточку | Отозванные / suspended / expired licenses; expired entitlements; права `product.update` |
-| `ready` | Опубликованный продукт **и** ≥1 опубликованная сборка с `clean`-сканом, именем сканера и временем |
-| Недоступный ранее acquired | Остаётся в private library **без** утечки title/slug/version/download |
-| Historical paid | Только при действующем праве; **не** открывает checkout |
-| `ready` label | Подсказка, **не** авторизация: download снова проверяет session, права, статус, trusted scan, audit |
-| Локализация / SEO | RU/EN; robots noindex |
+| Правило                    | Содержание                                                                                                                 |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Выборка                    | Счётчик `all / ready / unavailable`, затем страница; порядок `MAX(grant.created_at) DESC, resource_id ASC`                 |
+| Размер                     | ≤12 на странице; preview кабинета ≤4                                                                                       |
+| Право `product.download`   | Действующие user entitlements с permission **или** исторические активные licenses с неистёкшим сроком; дубли → одна строка |
+| Не создают карточку        | Отозванные / suspended / expired licenses; expired entitlements; права `product.update`                                    |
+| `ready`                    | Опубликованный продукт **и** ≥1 опубликованная сборка с `clean`-сканом, именем сканера и временем                          |
+| Недоступный ранее acquired | Остаётся в private library **без** утечки title/slug/version/download                                                      |
+| Historical paid            | Только при действующем праве; **не** открывает checkout                                                                    |
+| `ready` label              | Подсказка, **не** авторизация: download снова проверяет session, права, статус, trusted scan, audit                        |
+| Локализация / SEO          | RU/EN; robots noindex                                                                                                      |
 
 Коммерческие платежи, DRM и выдача **новых** платных лицензий этим контуром **не** реализуются.
 
@@ -167,11 +167,11 @@ Full-page flow (не modal): Basic → Delivery → Files/Source → Dependencie
 
 Authenticated, `noindex`; без изобретения payment/payout/invoice/DRM provider:
 
-| Маршрут | Что видно | Чего нет |
-|---|---|---|
-| `/workspace/purchases` | Historical order numbers, statuses, dates, totals | Payment tokens, emails, private provider data |
-| `/workspace/licenses` | Titles, expiration, model, boolean server-binding | Secret keys, entitlement JSON, server IDs; `Active` ≠ download grant |
-| `/workspace/sales` | Completed line items автора; gross line prices | Buyer identity; withdrawable balance / fees / payout auth |
+| Маршрут                | Что видно                                         | Чего нет                                                             |
+| ---------------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
+| `/workspace/purchases` | Historical order numbers, statuses, dates, totals | Payment tokens, emails, private provider data                        |
+| `/workspace/licenses`  | Titles, expiration, model, boolean server-binding | Secret keys, entitlement JSON, server IDs; `Active` ≠ download grant |
+| `/workspace/sales`     | Completed line items автора; gross line prices    | Buyer identity; withdrawable balance / fees / payout auth            |
 
 Ownership predicates + 20-row `created_at, id` DESC. Это **не** target cart/purchase workflow.
 
@@ -197,14 +197,14 @@ Update entitlement (**цель**): будущие updates бесплатно п�
 
 ### 6.2 Delist / seller-ban / free retention (**цель**, OWNER)
 
-| Случай | Правило |
-|---|---|
-| Добровольный delist | Новые purchases stop; buyers видят status/reason; **30 дней** download/access window; после — permanent redownload **не гарантируется**; правило видно buyer **до оплаты** и seller **до confirm** |
-| Seller ban | Good-faith buyers: 30-day transition; payout/dispute freeze по policy; malware/legal может закрыть download сразу; notification насколько позволяет safety/legal |
-| Delist freeze releases | В 30-day window seller **не** выпускает security hotfix обычным release flow; критичный дефект → platform security/moderation |
-| DRM после окна | 30 дней = hosting/redownload, **не** авто-обрыв уже активированной DRM-license; perpetual не получает искусственный expiry от delist; time-limited/subscription до оплаченного конца; malware/legal supersede |
-| Existing copies | NEXUS может прекратить hosting; не заявляет «удаление» уже скачанных binaries у пользователя |
-| Free resource retention | Safe free **не обязан** удаляться через 30 дней только из-за paid policy; дольше при отсутствии malware/legal, допустимой storage policy, валидных provenance/scan, ясном archived/unsupported UI |
+| Случай                  | Правило                                                                                                                                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Добровольный delist     | Новые purchases stop; buyers видят status/reason; **30 дней** download/access window; после — permanent redownload **не гарантируется**; правило видно buyer **до оплаты** и seller **до confirm**            |
+| Seller ban              | Good-faith buyers: 30-day transition; payout/dispute freeze по policy; malware/legal может закрыть download сразу; notification насколько позволяет safety/legal                                              |
+| Delist freeze releases  | В 30-day window seller **не** выпускает security hotfix обычным release flow; критичный дефект → platform security/moderation                                                                                 |
+| DRM после окна          | 30 дней = hosting/redownload, **не** авто-обрыв уже активированной DRM-license; perpetual не получает искусственный expiry от delist; time-limited/subscription до оплаченного конца; malware/legal supersede |
+| Existing copies         | NEXUS может прекратить hosting; не заявляет «удаление» уже скачанных binaries у пользователя                                                                                                                  |
+| Free resource retention | Safe free **не обязан** удаляться через 30 дней только из-за paid policy; дольше при отсутствии malware/legal, допустимой storage policy, валидных provenance/scan, ясном archived/unsupported UI             |
 
 ### 6.3 Reviews (**цель**)
 
@@ -270,15 +270,15 @@ Delist/archive UX: unlist доступен; history/buyer records survive; publi
 
 ## 9. Сводка статусов
 
-| Тема | Текущий runtime | Цель владельца | Предложение / Live unknown |
-|---|---|---|---|
-| Free claim, library, download gates | Да | Усиление UX FLOW-01/17 | Auth return gaps — FLOWS |
-| Historical versions + pinned download | Да | Сохранить gates | Read/stream race; E2E hash — live unknown |
-| Private collections | Да (private only) | FLOW-07 UX | Public/shared, server packs — нет / future |
-| Paid cart/checkout/DRM/payout | Выключено | Полный lifecycle + 1 license=1 server | Не строить без owner + COMMERCIAL gates |
-| Publish wizard / auto-publish / KYC UX | Частичный free path | Полный wizard + states | Readiness overview — предложение |
-| Buyer/Seller professional dashboards | Overview/library/sales archive | Полный KPI/analytics set | Org-wide finance roles — future |
-| Trial / Wishlist / multi-SKU | Нет в beta commerce | Owner-confirmed | Активация только с commerce phase |
+| Тема                                   | Текущий runtime                | Цель владельца                        | Предложение / Live unknown                 |
+| -------------------------------------- | ------------------------------ | ------------------------------------- | ------------------------------------------ |
+| Free claim, library, download gates    | Да                             | Усиление UX FLOW-01/17                | Auth return gaps — FLOWS                   |
+| Historical versions + pinned download  | Да                             | Сохранить gates                       | Read/stream race; E2E hash — live unknown  |
+| Private collections                    | Да (private only)              | FLOW-07 UX                            | Public/shared, server packs — нет / future |
+| Paid cart/checkout/DRM/payout          | Выключено                      | Полный lifecycle + 1 license=1 server | Не строить без owner + COMMERCIAL gates    |
+| Publish wizard / auto-publish / KYC UX | Частичный free path            | Полный wizard + states                | Readiness overview — предложение           |
+| Buyer/Seller professional dashboards   | Overview/library/sales archive | Полный KPI/analytics set              | Org-wide finance roles — future            |
+| Trial / Wishlist / multi-SKU           | Нет в beta commerce            | Owner-confirmed                       | Активация только с commerce phase          |
 
 ---
 

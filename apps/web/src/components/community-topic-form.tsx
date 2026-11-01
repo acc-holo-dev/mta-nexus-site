@@ -102,8 +102,7 @@ export function CommunityTopicForm() {
           ? communityTopicErrorMessage({ code: "REQUEST_TIMEOUT" }, copy.createError, locale)
           : null;
       setError(
-        timedOut ??
-          (caught instanceof Error && caught.message ? caught.message : copy.createError),
+        timedOut ?? (caught instanceof Error && caught.message ? caught.message : copy.createError),
       );
       setBusy(false);
     }

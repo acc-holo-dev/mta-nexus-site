@@ -58,7 +58,7 @@ export function stashSupportObjectContext(context: SupportFormObjectContext) {
   }
 }
 
-export function readSupportObjectContext(): SupportFormObjectContext | null {
+function readSupportObjectContext(): SupportFormObjectContext | null {
   try {
     const raw = sessionStorage.getItem(SUPPORT_OBJECT_CONTEXT_KEY);
     if (!raw) return null;
@@ -69,7 +69,7 @@ export function readSupportObjectContext(): SupportFormObjectContext | null {
   }
 }
 
-export function clearSupportObjectContext() {
+function clearSupportObjectContext() {
   try {
     sessionStorage.removeItem(SUPPORT_OBJECT_CONTEXT_KEY);
   } catch {

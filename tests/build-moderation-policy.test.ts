@@ -32,6 +32,8 @@ vi.mock("@nexus/security", () => ({
 
 import { ProductService } from "../apps/web/src/lib/services/product-service";
 
+const staffPasswordHash = "hash_mod";
+
 const moderator = {
   id: "usr_mod",
   username: "moderator",
@@ -108,7 +110,13 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
+        {
+          buildId: "bld_1",
+          expectedRevision: 1,
+          decision: "approve",
+          notes: "Reviewed",
+          expectedPasswordHash: staffPasswordHash,
+        },
         moderator,
         "staff-session",
       ),
@@ -121,7 +129,13 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
+        {
+          buildId: "bld_1",
+          expectedRevision: 1,
+          decision: "approve",
+          notes: "Reviewed",
+          expectedPasswordHash: staffPasswordHash,
+        },
         moderator,
         "staff-session",
       ),
@@ -141,7 +155,13 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
+        {
+          buildId: "bld_1",
+          expectedRevision: 1,
+          decision: "approve",
+          notes: "Reviewed",
+          expectedPasswordHash: staffPasswordHash,
+        },
         moderator,
         "staff-session",
       ),
@@ -157,7 +177,13 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", expectedRevision: 1, decision: "reject", notes: "Reviewed" },
+        {
+          buildId: "bld_1",
+          expectedRevision: 1,
+          decision: "reject",
+          notes: "Reviewed",
+          expectedPasswordHash: staffPasswordHash,
+        },
         moderator,
         "staff-session",
       ),
@@ -223,6 +249,7 @@ describe("build moderation service behavior", () => {
           expectedRevision: 1,
           decision: "approve",
           notes: "Reviewed clean build",
+          expectedPasswordHash: staffPasswordHash,
         },
         moderator,
         "staff-session",
@@ -238,6 +265,7 @@ describe("build moderation service behavior", () => {
       }),
       1,
       "staff-session",
+      staffPasswordHash,
     );
     expect(publishSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -253,7 +281,13 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", expectedRevision: 1, decision: "reject", notes: "Rejected" },
+        {
+          buildId: "bld_1",
+          expectedRevision: 1,
+          decision: "reject",
+          notes: "Rejected",
+          expectedPasswordHash: staffPasswordHash,
+        },
         moderator,
         "staff-session",
       ),

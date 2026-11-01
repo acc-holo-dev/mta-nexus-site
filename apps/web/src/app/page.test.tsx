@@ -63,9 +63,7 @@ vi.mock("../components/server-card", async () => {
           "data-profile": profileSlug ?? "",
         },
         observation.name,
-        profileSlug
-          ? React.createElement("a", { href: `/servers/${profileSlug}` }, "View")
-          : null,
+        profileSlug ? React.createElement("a", { href: `/servers/${profileSlug}` }, "View") : null,
         React.createElement(
           "a",
           { href: `mtasa://${observation.address}:${observation.port}` },
@@ -163,7 +161,9 @@ describe("home network honest player aggregates", () => {
     mocks.getDirectory.mockResolvedValueOnce({
       isStale: true,
       fetchedAt: "2026-11-01T00:00:00.000Z",
-      servers: [{ address: "203.0.113.10", port: 22003, name: "Stale", players: 9, maxPlayers: 32 }],
+      servers: [
+        { address: "203.0.113.10", port: 22003, name: "Stale", players: 9, maxPlayers: 32 },
+      ],
     });
 
     const html = renderToStaticMarkup(await HomePage());

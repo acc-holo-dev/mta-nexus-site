@@ -290,10 +290,7 @@ test("OPS-08 release manifest accepts unresolved image digests without authorizi
 });
 
 test("OPS-08 release manifest blocks missing or mismatched digest SHA schema and unknown versions", () => {
-  assert.match(
-    evaluateReleaseManifest(sampleManifest({ sha: "deadbeef" })).reason,
-    /SHA/u,
-  );
+  assert.match(evaluateReleaseManifest(sampleManifest({ sha: "deadbeef" })).reason, /SHA/u);
   assert.match(
     evaluateReleaseManifest(sampleManifest(), { expectedSha: "f".repeat(40) }).reason,
     /SHA mismatch/u,
@@ -328,7 +325,7 @@ test("OPS-08 release manifest blocks missing or mismatched digest SHA schema and
     evaluateReleaseManifest(
       sampleManifest({
         image: {
-          digest: "sha256:" + "1".repeat(64),
+          digest: `sha256:${"1".repeat(64)}`,
           platform: "linux/amd64",
           sourceSha: "e".repeat(40),
           status: "resolved",
@@ -348,7 +345,7 @@ test("OPS-08 release manifest blocks missing or mismatched digest SHA schema and
     evaluateReleaseManifest(
       sampleManifest({
         image: {
-          digest: "sha256:" + "1".repeat(64),
+          digest: `sha256:${"1".repeat(64)}`,
           platform: "linux/amd64",
           sourceSha: sampleSha,
           status: "resolved",

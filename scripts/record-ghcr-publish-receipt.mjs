@@ -35,5 +35,8 @@ const report = {
 };
 
 mkdirSync("artifacts", { recursive: true });
-writeFileSync(join("artifacts", "ghcr-publish-receipt.json"), `${JSON.stringify(report, null, 2)}\n`);
+writeFileSync(
+  join("artifacts", "ghcr-publish-receipt.json"),
+  `${JSON.stringify(report, null, 2)}\n`,
+);
 process.stdout.write(`Wrote artifacts/ghcr-publish-receipt.json digest=${digest}\n`);

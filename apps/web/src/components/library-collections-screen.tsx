@@ -629,7 +629,10 @@ export async function LibraryCollectionsScreen({
           </Link>
         )}
         {error.code === "COLLECTION_LIMIT" && (
-          <Link href={collectionHref(undefined, "", { status: "archived" })} className="text-accent underline">
+          <Link
+            href={collectionHref(undefined, "", { status: "archived" })}
+            className="text-accent underline"
+          >
             {c.archived}
           </Link>
         )}

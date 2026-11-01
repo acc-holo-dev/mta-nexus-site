@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
@@ -92,6 +92,25 @@ vi.mock("../apps/web/src/lib/services/resource-review-service", () => ({
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService,
 }));
+
+vi.mock("../apps/web/src/lib/services/resource-qa-service", () => ({
+  resourceQaService: {
+    publicPage: vi.fn(async () => ({
+      threads: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      capabilities: { canAsk: false, askReason: "guest" },
+    })),
+  },
+}));
+
+vi.mock("../apps/web/src/components/resource-qa-panel", async () => {
+  const ReactModule = await import("react");
+  return {
+    ResourceQaPanel: () => ReactModule.createElement("div", { "data-testid": "resource-qa" }),
+  };
+});
 
 vi.mock("../apps/web/src/components/resource-preview", async () => {
   const ReactModule = await import("react");

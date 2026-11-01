@@ -226,9 +226,7 @@ it("ignores stale handlers after a confirmed batch", async () => {
   expect(h.refresh).toHaveBeenCalledOnce();
 });
 it("lists per-item batch outcomes after a confirmed remove-many", async () => {
-  const { libraryCollectionsCopy } = await import(
-    "../apps/web/src/lib/library-collections-i18n"
-  );
+  const { libraryCollectionsCopy } = await import("../apps/web/src/lib/library-collections-i18n");
   check(1);
   check(2);
   h.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>

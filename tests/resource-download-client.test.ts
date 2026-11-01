@@ -504,7 +504,7 @@ describe("SHA-256 verification before saving", () => {
       .mockResolvedValue(response("archive", { "X-Content-SHA256": digest }));
     await expect(
       fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
-    ).rejects.toMatchObject({ reason: "failed" });
+    ).rejects.toMatchObject({ reason: digest === "bad" ? "failed" : "integrity" });
   });
 
   it("refuses altered bytes that retain the expected Content-Length", async () => {
@@ -513,7 +513,7 @@ describe("SHA-256 verification before saving", () => {
       .mockResolvedValue(response("corrupt", { "X-Content-SHA256": sha256("archive") }));
     await expect(
       fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
-    ).rejects.toMatchObject({ reason: "failed" });
+    ).rejects.toMatchObject({ reason: "integrity" });
   });
 
   it("accepts uppercase canonical SHA-256", async () => {

@@ -135,9 +135,7 @@ export function Sidebar({
 
   const renderGroup = (label: string, items: NavItem[], bordered = true) => (
     <div className={`space-y-0.5 ${bordered ? "border-t border-base pt-3" : ""}`}>
-      {!isCollapsed && (
-        <div className="px-2.5 pb-1.5 font-label uppercase text-faint">{label}</div>
-      )}
+      {!isCollapsed && <div className="px-2.5 pb-1.5 font-label uppercase text-faint">{label}</div>}
       {renderItems(items)}
     </div>
   );

@@ -5,58 +5,13 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
 import { createBackupRestoreEnvironment } from "../backup-restore-contract.mjs";
+import {
+  PRODUCTION_BASE_SERVICES,
+  PRODUCTION_BASE_WRITERS,
+  SUPPORTED_COMPOSE_SCENARIOS,
+} from "./compose-overlay-matrix-lib.mjs";
 
 const root = process.cwd();
-
-/** Production-base application writers + ingress (OPS-12 inventory). */
-export const PRODUCTION_BASE_WRITERS = Object.freeze([
-  "app",
-  "push-worker",
-  "license-worker",
-  "resource-release-worker",
-]);
-
-export const PRODUCTION_BASE_SERVICES = Object.freeze([
-  ...PRODUCTION_BASE_WRITERS,
-  "caddy",
-  "clamav",
-  "postgres",
-]);
-
-export const SUPPORTED_COMPOSE_SCENARIOS = Object.freeze([
-  {
-    id: "dev",
-    files: ["compose.yaml"],
-    services: [
-      "app",
-      "clamav",
-      "license-worker",
-      "postgres",
-      "push-worker",
-      "resource-release-worker",
-    ],
-  },
-  {
-    id: "verify",
-    files: ["compose.verify.yaml"],
-    services: ["postgres", "verify"],
-  },
-  {
-    id: "production",
-    files: ["compose.production.yaml"],
-    services: [...PRODUCTION_BASE_SERVICES].sort(),
-  },
-  {
-    id: "production-recovery-mail",
-    files: ["compose.production.yaml", "compose.recovery.yaml", "compose.mail-worker.yaml"],
-    services: [...PRODUCTION_BASE_SERVICES, "mail-worker"].sort(),
-  },
-  {
-    id: "production-ci",
-    files: ["compose.production.yaml", "compose.production-ci.yaml"],
-    services: [...PRODUCTION_BASE_SERVICES].sort(),
-  },
-]);
 
 function syntheticEnv(extra = {}) {
   return {
@@ -137,10 +92,7 @@ test("OPERATIONS documents the supported Compose overlay matrix and writer inven
   );
   assert.match(ops, /mail-worker/u);
   assert.match(ops, /PostgreSQL stays up for pg_dump|Keep PostgreSQL running|postgres.*dump/iu);
-  assert.doesNotMatch(
-    ops,
-    /dc stop caddy push-worker app\n(?!#)/u,
-  );
+  assert.doesNotMatch(ops, /dc stop caddy push-worker app\n(?!#)/u);
 });
 
 test("OPERATIONS documents the guarded custom migration authoring path", () => {
@@ -226,11 +178,7 @@ test("custom generate exits non-zero without NEXUS_ALLOW_DB_GENERATE", () => {
 
 test("supported Compose scenarios render predictable service inventories", () => {
   for (const scenario of SUPPORTED_COMPOSE_SCENARIOS) {
-    const config = renderCompose(
-      scenario.files,
-      syntheticEnv(),
-      `nexus-ops-matrix-${scenario.id}`,
-    );
+    const config = renderCompose(scenario.files, syntheticEnv(), `nexus-ops-matrix-${scenario.id}`);
     assert.deepEqual(
       Object.keys(config.services).sort(),
       [...scenario.services].sort(),

@@ -31,6 +31,8 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
 vi.mock("@nexus/ui", async () => {
   const { createElement } = await import("react");
   return {
+    fieldControlClass: (...parts: Array<string | false | undefined>) =>
+      parts.filter(Boolean).join(" "),
     Button: ({
       children,
       type,
@@ -78,6 +80,26 @@ vi.mock("@nexus/ui", async () => {
         { "data-ui": "input" },
         label ? createElement("label", { htmlFor: id }, label) : null,
         createElement("input", { id, ...props }),
+      ),
+    Field: ({
+      id,
+      label,
+      children,
+    }: {
+      id: string;
+      label: string;
+      children: (control: {
+        id: string;
+        describedBy?: string;
+        className?: string;
+        "aria-invalid"?: boolean;
+      }) => ReactNode;
+    }) =>
+      createElement(
+        "div",
+        { "data-ui": "field" },
+        createElement("label", { htmlFor: id }, label),
+        children({ id, describedBy: `${id}-hint`, className: "field-control" }),
       ),
   };
 });

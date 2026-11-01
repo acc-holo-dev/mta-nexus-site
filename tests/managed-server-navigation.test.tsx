@@ -42,7 +42,9 @@ it.each(["en", "ru"] as const)("exposes a localized managed-server destination i
 
 it("hides managed-server tools for guests and keeps a sign-in CTA", () => {
   state.session = { status: "anonymous", user: null };
-  const html = renderToStaticMarkup(<Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />);
+  const html = renderToStaticMarkup(
+    <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
+  );
   expect(html).not.toContain('href="/workspace/servers"');
   expect(html).toContain('href="/auth/login"');
   expect(html).toContain("Sign in");

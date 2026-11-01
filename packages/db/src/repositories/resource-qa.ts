@@ -63,7 +63,10 @@ async function currentProduct(tx: ResourceTransaction, id: string, write = false
   return product as ProductRow;
 }
 
-async function publiclyAvailable(tx: ResourceTransaction, product: Pick<ProductRow, "id" | "status">) {
+async function publiclyAvailable(
+  tx: ResourceTransaction,
+  product: Pick<ProductRow, "id" | "status">,
+) {
   if (product.status !== "published") return false;
   const [build] = await tx
     .select({ id: builds.id })
@@ -219,7 +222,10 @@ class ResourceQaRepository {
           eq(resourceQaThreads.productId, productId),
           inArray(resourceQaThreads.status, ["open", "resolved"]),
         );
-        const [summary] = await tx.select({ total: count() }).from(resourceQaThreads).where(visible);
+        const [summary] = await tx
+          .select({ total: count() })
+          .from(resourceQaThreads)
+          .where(visible);
         const bounds = historyPageBounds(summary?.total ?? 0, page);
         const rows = await tx
           .select({
@@ -474,7 +480,8 @@ class ResourceQaRepository {
         )
         .limit(1)
         .for("update");
-      if (!thread || thread.status === "removed") throw new NotFoundError("ResourceQaThread", input.threadId);
+      if (!thread || thread.status === "removed")
+        throw new NotFoundError("ResourceQaThread", input.threadId);
       if (thread.revision !== input.command.expectedThreadRevision) throw changed();
 
       await tx.insert(resourceQaAnswers).values({
@@ -548,7 +555,8 @@ class ResourceQaRepository {
         )
         .limit(1)
         .for("update");
-      if (!thread || thread.status === "removed") throw new NotFoundError("ResourceQaThread", input.threadId);
+      if (!thread || thread.status === "removed")
+        throw new NotFoundError("ResourceQaThread", input.threadId);
       if (thread.revision !== input.command.expectedRevision) throw changed();
 
       const [actor] = await tx
@@ -572,15 +580,7 @@ class ResourceQaRepository {
             updatedAt: new Date(),
           })
           .where(eq(resourceQaThreads.id, thread.id));
-        await audit(
-          tx,
-          input.actorId,
-          input.auditId,
-          "resource.qa_reopened",
-          thread.id,
-          {},
-          staff,
-        );
+        await audit(tx, input.actorId, input.auditId, "resource.qa_reopened", thread.id, {}, staff);
         return { threadId: thread.id, status: "open" as const, revision: nextRevision };
       }
 
@@ -595,7 +595,7 @@ class ResourceQaRepository {
         )
         .limit(1)
         .for("share");
-      if (!answer || answer.status !== "published") throw invalid("Answer is not available");
+      if (answer?.status !== "published") throw invalid("Answer is not available");
 
       await tx
         .update(resourceQaThreads)
@@ -702,12 +702,19 @@ class ResourceQaRepository {
             ),
           );
       }
-      await audit(tx, input.actorId, input.auditId, "resource.qa_thread_follow_changed", thread.id, {
-        enabled,
-        // Explicitly not a release watch and not a product bookmark.
-        releaseWatch: false,
-        productBookmark: false,
-      });
+      await audit(
+        tx,
+        input.actorId,
+        input.auditId,
+        "resource.qa_thread_follow_changed",
+        thread.id,
+        {
+          enabled,
+          // Explicitly not a release watch and not a product bookmark.
+          releaseWatch: false,
+          productBookmark: false,
+        },
+      );
       return {
         threadId: thread.id,
         following: enabled,

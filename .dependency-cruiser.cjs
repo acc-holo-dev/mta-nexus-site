@@ -1,6 +1,4 @@
-const {
-  HTTP_DB_EXCEPTION_PATH,
-} = require("./.dependency-cruiser.exceptions.cjs");
+const { HTTP_DB_EXCEPTION_PATH } = require("./.dependency-cruiser.exceptions.cjs");
 
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {

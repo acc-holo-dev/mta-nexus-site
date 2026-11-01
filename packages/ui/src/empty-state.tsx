@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { FolderOpen } from "lucide-react";
 import { cn } from "./utils";
 

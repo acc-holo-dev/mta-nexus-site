@@ -171,10 +171,7 @@ function FollowControl({
   const linkStyle =
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-accent";
   const showHint =
-    state === "following" ||
-    state === "not-following" ||
-    state === "anonymous" ||
-    state === "self";
+    state === "following" || state === "not-following" || state === "anonymous" || state === "self";
   return (
     <div className="space-y-2">
       {state === "anonymous" ? (

@@ -473,8 +473,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <div>
               <div className="text-3xl font-black text-primary">{formattedPrice}</div>
               <div className="mt-1 text-xs text-muted">
-                {copy.licenseModel}:{" "}
-                <span>{licenseModelLabel(locale, product.licenseModel)}</span>
+                {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
               </div>
             </div>
 
@@ -552,7 +551,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               ) : isPublished && product.price === 0 ? (
                 <div className="space-y-3">
                   <div className="space-y-2" data-acquire-intent="single">
-                    <p className="text-center text-[11px] text-muted">{commerceCopy.singleIntent}</p>
+                    <p className="text-center text-[11px] text-muted">
+                      {commerceCopy.singleIntent}
+                    </p>
                     <Link
                       href={`/acquire?productId=${product.id}`}
                       className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)]"

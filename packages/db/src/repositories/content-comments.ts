@@ -1,12 +1,7 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { AppError, NotFoundError, type AuditEvent, type Comment } from "@nexus/domain";
 import { db } from "../client";
-import {
-  auditEvents,
-  comments,
-  content,
-  discussionNotificationDeliveries,
-} from "../schema";
+import { auditEvents, comments, content, discussionNotificationDeliveries } from "../schema";
 
 const uuidV4 = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u;
 
@@ -145,11 +140,7 @@ export class ContentCommentsRepository {
 
     if (created) return { kind: "created", comment: created };
 
-    const [existing] = await db
-      .select()
-      .from(comments)
-      .where(eq(comments.id, id))
-      .limit(1);
+    const [existing] = await db.select().from(comments).where(eq(comments.id, id)).limit(1);
     if (!existing) {
       throw new Error("Missing comment after idempotent conflict");
     }

@@ -117,10 +117,7 @@ test("same prebuilt image contract: runtime origin comes from env, not the entry
   assert.doesNotMatch(script, /https:\/\/[a-z0-9.-]+\.[a-z]{2,}/iu);
   assert.match(dockerfile, /compile-only placeholders|build-only/u);
   assert.match(dockerfile, /same image digest|OPS-05/u);
-  assert.match(
-    compose,
-    /NEXT_PUBLIC_APP_URL:\s*https:\/\/\$\{DOMAIN:\?set DOMAIN in \.env\}/u,
-  );
+  assert.match(compose, /NEXT_PUBLIC_APP_URL:\s*https:\/\/\$\{DOMAIN:\?set DOMAIN in \.env\}/u);
   assert.match(ciOverlay, /NEXT_PUBLIC_APP_URL:\s*https:\/\/nexus-ci\.test:8443/u);
   assert.match(ciOverlay, /NEXUS_CI_IMAGE:\?use scripts\/check-production-startup\.sh/u);
   // Two allowed HTTPS origins in the supported promotion path: DOMAIN-templated

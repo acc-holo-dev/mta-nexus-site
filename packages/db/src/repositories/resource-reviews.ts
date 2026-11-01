@@ -125,7 +125,11 @@ async function reviewGate(
   return { reason: "access_required", access: null };
 }
 function recheck(gate: ReviewGate): asserts gate is { reason: "ok"; access: ReviewAccess } {
-  if (gate.reason !== "ok" || !gate.access || (gate.access.expiresAt && gate.access.expiresAt.getTime() <= Date.now()))
+  if (
+    gate.reason !== "ok" ||
+    !gate.access ||
+    (gate.access.expiresAt && gate.access.expiresAt.getTime() <= Date.now())
+  )
     throw new AppError("Current acquired access is required", 403, "REVIEW_ACCESS_REQUIRED");
 }
 async function aggregate(tx: ResourceTransaction, productId: string) {

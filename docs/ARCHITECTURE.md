@@ -30,10 +30,10 @@
 
 `dependency-cruiser` правило `http-handlers-use-services-for-db` запрещает новым `apps/web/src/app/api/**` маршрутам импортировать `packages/db`, кроме явного списка исключений в `.dependency-cruiser.exceptions.cjs`:
 
-| Категория | Смысл | Примеры |
-| --------- | ----- | ------- |
-| Allowed read/health | Простое чтение или health без оркестрации сценария | `api/health`, GET inbox `api/notifications/route.ts`, finance statements/scopes, support activity history, workspace server-organizations, admin commerce reconciliation GET, license check/check-release |
-| Service-required | Изменение состояния или сложная выдача; при правке переносить в service | `api/admin/actions`, mark-read/preferences/push, content/follow/reports/support/verification POST, auth context switch, product/admin build download, workspace content create |
+| Категория           | Смысл                                                                   | Примеры                                                                                                                                                                                                   |
+| ------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Allowed read/health | Простое чтение или health без оркестрации сценария                      | `api/health`, GET inbox `api/notifications/route.ts`, finance statements/scopes, support activity history, workspace server-organizations, admin commerce reconciliation GET, license check/check-release |
+| Service-required    | Изменение состояния или сложная выдача; при правке переносить в service | `api/admin/actions`, mark-read/preferences/push, content/follow/reports/support/verification POST, auth context switch, product/admin build download, workspace content create                            |
 
 Новый прямой импорт `@nexus/db` в API-маршруте вне этих списков должен падать на `pnpm analyze:architecture`. RSC-страницы (`app/**/page.tsx`) этим правилом не покрываются; для них сохраняется тот же смысловой контракт при появлении составных команд.
 

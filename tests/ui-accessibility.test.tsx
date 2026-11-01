@@ -73,9 +73,18 @@ describe("Input accessibility wiring", () => {
 
   it("exposes Field chrome for native select/textarea", () => {
     const markup = renderToStaticMarkup(
-      <Field id="visibility" label="Visibility" hint="Public listings are searchable" error="Required">
+      <Field
+        id="visibility"
+        label="Visibility"
+        hint="Public listings are searchable"
+        error="Required"
+      >
         {(control) => (
-          <select id={control.id} aria-describedby={control.describedBy} aria-invalid={control.invalid}>
+          <select
+            id={control.id}
+            aria-describedby={control.describedBy}
+            aria-invalid={control.invalid}
+          >
             <option value="">Choose</option>
           </select>
         )}
@@ -93,7 +102,10 @@ describe("Input accessibility wiring", () => {
 describe("SectionHeader and DataTable overflow chrome", () => {
   it("wraps long section titles and names overflow regions", () => {
     const header = renderToStaticMarkup(
-      <SectionHeader title="Очень длинный заголовок секции администрирования" action={<button type="button">Open</button>} />,
+      <SectionHeader
+        title="Очень длинный заголовок секции администрирования"
+        action={<button type="button">Open</button>}
+      />,
     );
     expect(header).toContain("flex-wrap");
     expect(header).toContain("break-words");
@@ -114,7 +126,7 @@ describe("SectionHeader and DataTable overflow chrome", () => {
         </tbody>
       </DataTable>,
     );
-    expect(table).toContain('role="region"');
+    expect(table).toContain("<section");
     expect(table).toContain('aria-label="Audit log"');
     expect(table).toContain('tabindex="0"');
     expect(table).toContain("font-numeric");

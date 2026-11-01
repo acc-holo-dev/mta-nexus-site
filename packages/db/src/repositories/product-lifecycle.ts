@@ -122,7 +122,11 @@ export class ProductLifecycleRepository {
           submittedBuildId,
           // Restore/archive never imply catalog publication; submit only queues review.
           nextStep:
-            target === "draft" ? "submit_for_review" : target === "pending_review" ? "wait_review" : null,
+            target === "draft"
+              ? "submit_for_review"
+              : target === "pending_review"
+                ? "wait_review"
+                : null,
           autoPublished: false,
         },
       });

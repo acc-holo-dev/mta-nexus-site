@@ -10,6 +10,7 @@ describe("acquire guest auth return (FLOW-01)", () => {
 
     expect(source).toContain('authEntryHref("login", acquireReturnPath)');
     expect(source).toContain('authEntryHref("register", acquireReturnPath)');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: assert acquire page source contains this template literal.
     expect(source).toContain("`/acquire?productId=${encodeURIComponent(productId)}`");
     expect(source).toContain("response.status === 401");
     expect(source).toContain('href="/workspace/library"');

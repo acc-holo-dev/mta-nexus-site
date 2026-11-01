@@ -43,14 +43,13 @@ export function ResourceReleaseWatchBatchControls({
         .map((item) => ({
           productId: item.productId,
           title: item.title,
-          reason:
-            item.enabled
-              ? "alreadyOn"
-              : item.available === false
+          reason: item.enabled
+            ? "alreadyOn"
+            : item.available === false
+              ? "noAccessItem"
+              : resume && item.revision < 1
                 ? "noAccessItem"
-                : resume && item.revision < 1
-                  ? "noAccessItem"
-                  : "noAccessItem",
+                : "noAccessItem",
         }))
     : [];
   const capacity = enabling

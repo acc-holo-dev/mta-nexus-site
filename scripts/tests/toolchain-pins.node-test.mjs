@@ -96,7 +96,10 @@ test("OPS-03 Node stages, PG18 volume, Dependabot docker updates, and pin schema
     [...DOCKERFILE_NODE_STAGES],
   );
   for (const entry of nodeStages.stages) {
-    assert.match(entry.image, new RegExp(`^${DOCKER_NODE_MAJOR_IMAGE}(?:@sha256:[a-f0-9]{64})?$`, "u"));
+    assert.match(
+      entry.image,
+      new RegExp(`^${DOCKER_NODE_MAJOR_IMAGE}(?:@sha256:[a-f0-9]{64})?$`, "u"),
+    );
   }
 
   for (const [label, source] of [
@@ -135,10 +138,7 @@ test("OPS-03 Node stages, PG18 volume, Dependabot docker updates, and pin schema
       assert.equal(entry.platform, null);
     }
   }
-  assert.equal(
-    evaluateInfraImagePins(pins, { requireResolved: true }).ok,
-    allResolved,
-  );
+  assert.equal(evaluateInfraImagePins(pins, { requireResolved: true }).ok, allResolved);
 
   const unresolvedFixture = {
     ...pins,
@@ -152,14 +152,8 @@ test("OPS-03 Node stages, PG18 volume, Dependabot docker updates, and pin schema
   assert.equal(evaluateInfraImagePins(unresolvedFixture, { requireResolved: false }).ok, true);
   assert.equal(evaluateInfraImagePins(unresolvedFixture, { requireResolved: true }).ok, false);
 
-  assert.equal(
-    evaluateInfraImagePins({ ...pins, schemaVersion: 99 }).ok,
-    false,
-  );
-  assert.equal(
-    evaluateInfraImagePins({ ...pins, productionAuthorized: true }).ok,
-    false,
-  );
+  assert.equal(evaluateInfraImagePins({ ...pins, schemaVersion: 99 }).ok, false);
+  assert.equal(evaluateInfraImagePins({ ...pins, productionAuthorized: true }).ok, false);
   assert.equal(
     evaluatePostgresLayout({ image: "postgres:17-alpine", volumePath: POSTGRES_VOLUME_PATH }).ok,
     false,

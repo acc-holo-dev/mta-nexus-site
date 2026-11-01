@@ -109,7 +109,7 @@ export function ResourceQaPanel({
         }),
       ).catch(() => null);
       const payload: unknown = response ? await response.json().catch(() => null) : null;
-      if (!response || !response.ok || !expected(payload)) {
+      if (!response?.ok || !expected(payload)) {
         const code =
           response?.status === 401
             ? "UNAUTHORIZED"

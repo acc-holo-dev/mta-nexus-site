@@ -14,14 +14,14 @@
 
 ## 2. Путь одной поставки
 
-| Шаг | Результат | OPS задачи |
-|---|---|---|
-| PR → защищённый main | Принятый исходный SHA и обязательный CI result | OPS-01, OPS-09 |
-| Подготовка кандидата | Согласованный toolchain, одна production сборка, full acceptance | OPS-02–OPS-07, OPS-10 |
-| Registry и bundle | Private image по digest, проверенный manifest и evidence | OPS-08, OPS-10, OPS-11 |
-| Публикация Release | Tag/SHA, notes, сохранённые assets; без утверждения о deployment | OPS-16 |
-| Решение оператора | Проверенные recovery/alerts, выбранный exact digest и разрешённое окно | OPS-12–OPS-14, OPS-17 |
-| Установка и фиксация результата | Все включённые роли одной поставки, readiness/HTTPS и deployment receipt | OPS-17 |
+| Шаг                             | Результат                                                                | OPS задачи             |
+| ------------------------------- | ------------------------------------------------------------------------ | ---------------------- |
+| PR → защищённый main            | Принятый исходный SHA и обязательный CI result                           | OPS-01, OPS-09         |
+| Подготовка кандидата            | Согласованный toolchain, одна production сборка, full acceptance         | OPS-02–OPS-07, OPS-10  |
+| Registry и bundle               | Private image по digest, проверенный manifest и evidence                 | OPS-08, OPS-10, OPS-11 |
+| Публикация Release              | Tag/SHA, notes, сохранённые assets; без утверждения о deployment         | OPS-16                 |
+| Решение оператора               | Проверенные recovery/alerts, выбранный exact digest и разрешённое окно   | OPS-12–OPS-14, OPS-17  |
+| Установка и фиксация результата | Все включённые роли одной поставки, readiness/HTTPS и deployment receipt | OPS-17                 |
 
 CI уже реализует часть этого пути: [build once](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/.github/workflows/ci.yml#L266-L294), [scope policy](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/scripts/ci-policy.mjs#L47-L84), [единый image ролей](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/compose.production-ci.yaml#L1-L23). GHCR publish, целостный manifest и deployment receipt — предлагаемые дополнения, не существующая готовая доставка.
 
@@ -89,4 +89,3 @@ OPS-19 относится к контракту resource versions для retenti
 Следующему ИИ выдают одну задачу с exact SHA, разрешённой средой, scope и критериями. Существующие focused commands в JSON — будущие способы проверки, здесь они не запускались. Структурный тест подтверждает структуру; stateful/live acceptance требует своего доказательства. После изменений принимается новый SHA; старые artifacts остаются историческими свидетельствами.
 
 Этот v1 принимается как review package, когда владелец согласовал границы и спорные decisions, зависимости проверены, а разрешения не перепутаны с queue state. Применение документации в repository, настройки GitHub, registry publication и deployment являются отдельными последующими действиями.
-

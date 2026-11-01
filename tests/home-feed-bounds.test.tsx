@@ -6,6 +6,9 @@ const mocks = vi.hoisted(() => ({
   directory: vi.fn(),
   products: vi.fn(),
   articles: vi.fn(),
+  listServers: vi.fn(),
+  getSession: vi.fn(),
+  loadPersonal: vi.fn(),
 }));
 
 vi.mock("next/link", async () => {
@@ -16,14 +19,18 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("@nexus/ui", () => ({
-  SectionHeader: ({ title, action }: { title: string; action?: React.ReactNode }) => (
-    <header>
-      <h2>{title}</h2>
-      {action}
-    </header>
-  ),
-}));
+vi.mock("@nexus/ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@nexus/ui")>();
+  return {
+    ...actual,
+    SectionHeader: ({ title, action }: { title: string; action?: React.ReactNode }) => (
+      <header>
+        <h2>{title}</h2>
+        {action}
+      </header>
+    ),
+  };
+});
 
 vi.mock("../apps/web/src/components/article-card", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
@@ -56,6 +63,24 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   },
 }));
 
+vi.mock("../apps/web/src/lib/services/server-service", () => ({
+  serverService: { listServers: mocks.listServers },
+}));
+
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: { getSession: mocks.getSession },
+}));
+
+vi.mock("../apps/web/src/lib/home-personal-changes", () => ({
+  loadPersonalChangesSummary: mocks.loadPersonal,
+}));
+
+vi.mock("next/headers", () => ({
+  cookies: async () => ({
+    get: () => undefined,
+  }),
+}));
+
 import HomePage from "../apps/web/src/app/page";
 
 describe("bounded home feed reads", () => {
@@ -67,6 +92,9 @@ describe("bounded home feed reads", () => {
     });
     mocks.products.mockResolvedValue([]);
     mocks.articles.mockResolvedValue([]);
+    mocks.listServers.mockResolvedValue([]);
+    mocks.getSession.mockResolvedValue(null);
+    mocks.loadPersonal.mockResolvedValue({ status: "empty", items: [], failedSources: [] });
   });
 
   it("requests only bounded free/popular resources and four editorial updates", async () => {
@@ -81,6 +109,10 @@ describe("bounded home feed reads", () => {
     expect(mocks.articles).toHaveBeenCalledOnce();
     expect(mocks.articles).toHaveBeenCalledWith(4);
     expect(mocks.directory).toHaveBeenCalledOnce();
+    expect(mocks.listServers).toHaveBeenCalledOnce();
+    expect(mocks.listServers).toHaveBeenCalledWith(200);
+    expect(mocks.getSession).toHaveBeenCalledOnce();
+    expect(mocks.loadPersonal).not.toHaveBeenCalled();
     expect(html).toContain('href="/market?maxPrice=0"');
     expect(html).toContain('href="/articles"');
   });

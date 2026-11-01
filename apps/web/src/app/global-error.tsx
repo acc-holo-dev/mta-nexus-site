@@ -99,7 +99,7 @@ export default function GlobalError({
           fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
         }}
       >
-        <style dangerouslySetInnerHTML={{ __html: focusRingStyle }} />
+        <style>{focusRingStyle}</style>
         <main
           style={{
             width: "100%",

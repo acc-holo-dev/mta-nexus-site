@@ -78,11 +78,7 @@ describe("mainline repository policy", () => {
     // DOC-04: superseded subject chapters removed; thin nav + decision register remain.
     expect(handbook.length).toBe(3);
     expect(handbook.every((name) => name.endsWith(".md"))).toBe(true);
-    expect(handbook).toEqual([
-      "00-README.md",
-      "13-DECISION-REGISTER.md",
-      "15-AI-CONTEXT-INDEX.md",
-    ]);
+    expect(handbook).toEqual(["00-README.md", "13-DECISION-REGISTER.md", "15-AI-CONTEXT-INDEX.md"]);
 
     const readme = read("README.md");
     expect(readme).toContain("docs/AGENT.md");
@@ -103,7 +99,9 @@ describe("mainline repository policy", () => {
     expect(decisions).toContain("AI-007");
 
     const register = read("docs/handbook/13-DECISION-REGISTER.md");
-    const ai007 = [...register.matchAll(/^\|\s*AI-007\s*\|\s*CONFIRMED\s*\|\s*([^|]+)\|/gm)].map((m) => m[1].trim());
+    const ai007 = [...register.matchAll(/^\|\s*AI-007\s*\|\s*CONFIRMED\s*\|\s*([^|]+)\|/gm)].map(
+      (m) => m[1].trim(),
+    );
     expect(ai007).toHaveLength(1);
     expect(ai007[0].toLowerCase()).toContain("explicit instruction");
     expect(ai007[0].toLowerCase()).not.toContain("push directly to");
@@ -125,7 +123,9 @@ describe("mainline repository policy", () => {
 
   it("assigns a unique identifier to each recorded product decision", () => {
     const register = read("docs/handbook/13-DECISION-REGISTER.md");
-    const registerIds = [...register.matchAll(/^\|\s*([A-Z]+-\d+)\s*\|/gm)].map((match) => match[1]);
+    const registerIds = [...register.matchAll(/^\|\s*([A-Z]+-\d+)\s*\|/gm)].map(
+      (match) => match[1],
+    );
     expect(registerIds.length).toBe(309);
     expect(new Set(registerIds).size).toBe(registerIds.length);
 

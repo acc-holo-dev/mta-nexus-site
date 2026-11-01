@@ -7,10 +7,7 @@ import { resourceCommerceRequest } from "../../../../../../../lib/resource-comme
 import { resourceQaService } from "../../../../../../../lib/services/resource-qa-service";
 
 export const POST = withBrowserMutation(
-  (
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string; threadId: string }> },
-  ) =>
+  (request: NextRequest, { params }: { params: Promise<{ id: string; threadId: string }> }) =>
     resourceCommerceRequest(request, true, async (actor) => {
       const body = resourceQaAnswerSchema.safeParse(await readBoundedJson(request, 16384));
       if (!body.success) throw new AppError("Invalid Q&A command", 400, "RESOURCE_QA_INVALID");

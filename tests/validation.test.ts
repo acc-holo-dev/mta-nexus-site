@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  compareResourceVersions,
-  resourceVersionsConflict,
-} from "@nexus/domain";
+import { compareResourceVersions, resourceVersionsConflict } from "@nexus/domain";
 import {
   createServerSchema,
   createOrganizationSchema,

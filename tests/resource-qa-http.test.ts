@@ -115,7 +115,10 @@ it("asks only as the authenticated actor and never touches review ratings", asyn
     expect.objectContaining({
       actorId: "usr_a",
       productId: "prd_a",
-      command: expect.objectContaining({ action: "ask", body: "How do I configure this resource?" }),
+      command: expect.objectContaining({
+        action: "ask",
+        body: "How do I configure this resource?",
+      }),
     }),
   );
   const payload = await response.json();

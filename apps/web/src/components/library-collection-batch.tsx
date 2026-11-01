@@ -324,10 +324,7 @@ export function LibraryCollectionBatchForm({
           >
             {c.history}
           </a>
-          <a
-            href={pending.current.reloadHref}
-            className="text-accent underline"
-          >
+          <a href={pending.current.reloadHref} className="text-accent underline">
             {c.reload}
           </a>
         </div>

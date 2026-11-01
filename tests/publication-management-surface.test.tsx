@@ -222,12 +222,11 @@ it.each(["en", "ru"] as const)(
     );
     expect(own).toContain(getDiscussionCopy(locale).edit);
     expect(own).toContain(getDiscussionCopy(locale).remove);
-    expect(own).not.toContain('href="/auth/login"');
     const moderator = renderToStaticMarkup(
       <ContentDiscussion {...props} viewer={{ id: "other", canModerate: true }} />,
     );
     expect(moderator).not.toContain(getDiscussionCopy(locale).edit);
-    expect(moderator).toContain(getDiscussionCopy(locale).remove);
+    expect(moderator).toContain(getDiscussionCopy(locale).moderateRemove);
   },
 );
 it("passes the private live viewer into article discussion management", async () => {

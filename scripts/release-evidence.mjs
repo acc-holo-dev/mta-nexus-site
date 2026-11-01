@@ -18,10 +18,7 @@ import {
   buildReleaseManifest,
   evaluateReleaseManifest,
 } from "./release-evidence-lib.mjs";
-import {
-  collectRepositoryToolchain,
-  evaluateToolchainPolicy,
-} from "./toolchain-policy.mjs";
+import { collectRepositoryToolchain, evaluateToolchainPolicy } from "./toolchain-policy.mjs";
 import {
   RELEASE_UPGRADE_BASELINE_TAG,
   RELEASE_UPGRADE_TARGET_TAG,
@@ -116,9 +113,7 @@ const toolchainEvaluation = evaluateToolchainPolicy({
   mode: "release",
 });
 const toolchainComplete =
-  repositoryToolchain.nodePin.ok &&
-  Boolean(repositoryToolchain.pnpmPin) &&
-  toolchainEvaluation.ok;
+  repositoryToolchain.nodePin.ok && Boolean(repositoryToolchain.pnpmPin) && toolchainEvaluation.ok;
 
 const gates = [
   runGate(

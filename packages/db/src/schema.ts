@@ -1306,10 +1306,7 @@ export const resourceQaAnswers = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }),
   },
   (table) => [
-    check(
-      "resource_qa_answers_status_check",
-      sql`${table.status} IN ('published', 'removed')`,
-    ),
+    check("resource_qa_answers_status_check", sql`${table.status} IN ('published', 'removed')`),
     check("resource_qa_answers_revision_check", sql`${table.revision} > 0`),
     check(
       "resource_qa_answers_body_check",

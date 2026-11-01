@@ -3,10 +3,7 @@
 import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import {
-  createCommentIntentKey,
-  submitContentCommentRequest,
-} from "../lib/content-comment-client";
+import { createCommentIntentKey, submitContentCommentRequest } from "../lib/content-comment-client";
 import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../lib/content-discussion-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";

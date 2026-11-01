@@ -58,14 +58,13 @@
 
 **owner target** (COM-003, PROF/community screens): секции `Feed / Forum / Articles / Events / Groups`.
 
-| Секция | Правило |
-|---|---|
-| Feed | Отделен от Home; может infinite scroll + cursor; permission/moderation aware; смешивает community activity, **не** marketplace/server search (FEED-002) |
-| Forum | `Categories → Boards → Topics → Posts`; servers/orgs могут вести managed spaces в том же permission/moderation framework |
-| Articles | Long-form guides/editorial/community; часть классов — premoderation по risk/promotion |
-| Events | Только eligible actors (verified entities, servers, orgs, staff — configurable); не право «купить рекламой» (CD-004) |
-| Groups | Public и private/invite-only; **отличны** от Organization и server ownership (CD-002) |
-
+| Секция   | Правило                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Feed     | Отделен от Home; может infinite scroll + cursor; permission/moderation aware; смешивает community activity, **не** marketplace/server search (FEED-002) |
+| Forum    | `Categories → Boards → Topics → Posts`; servers/orgs могут вести managed spaces в том же permission/moderation framework                                |
+| Articles | Long-form guides/editorial/community; часть классов — premoderation по risk/promotion                                                                   |
+| Events   | Только eligible actors (verified entities, servers, orgs, staff — configurable); не право «купить рекламой» (CD-004)                                    |
+| Groups   | Public и private/invite-only; **отличны** от Organization и server ownership (CD-002)                                                                   |
 - **текущий runtime:** `/community` (+ `/community/new`) на content types `post`/`question`; обсуждения/комментарии у публикаций; editorial `/articles`; workspace content/feed/discussions; follows; in-app notifications + Web Push; reactions (ограниченный набор). Отдельного `/forum`, hub Events/Groups, calendar social events **нет**.
 - **proposal:** полная Forum IA и Community Feed как в таблице выше.
 - **hard rule:** наличие/org team pages ≠ groups/clans; наличие ≠ DM.
@@ -179,15 +178,14 @@
 
 **owner target** public profile tabs: `Overview / Activity / Resources / Servers / Organizations / Reviews / Achievements / Trust` (PROF-001…003, TRUST-001).
 
-| Tab | Смысл |
-|---|---|
-| Overview | avatar/banner/bio; immutable identity / public id; vanity при entitlement; verified links; badges/selected achievements; selected resources/servers/orgs; public social links |
-| Activity | **full public activity feed**, constrained by privacy и visibility underlying entity; **никогда** private purchases, private group activity, support, disputes, internal staff actions (PROF-002) |
-| Resources / Servers / Organizations | только public associations; membership visibility — privacy user + org/server rules |
-| Reviews | eligible public reviews пользователя; moderation + entity visibility |
-| Achievements | community/seasonal/awards; не purchasable trust |
-| Trust/Reputation | отдельная публичная вкладка: verified evidence, exact successful sales/deals counts, verified reviews/badges, finalized public moderation history; **без** private amounts, internal notes, sensitive evidence (TRUST-001…003) |
-
+| Tab                                 | Смысл                                                                                                                                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Overview                            | avatar/banner/bio; immutable identity / public id; vanity при entitlement; verified links; badges/selected achievements; selected resources/servers/orgs; public social links                                                  |
+| Activity                            | **full public activity feed**, constrained by privacy и visibility underlying entity; **никогда** private purchases, private group activity, support, disputes, internal staff actions (PROF-002)                              |
+| Resources / Servers / Organizations | только public associations; membership visibility — privacy user + org/server rules                                                                                                                                            |
+| Reviews                             | eligible public reviews пользователя; moderation + entity visibility                                                                                                                                                           |
+| Achievements                        | community/seasonal/awards; не purchasable trust                                                                                                                                                                                |
+| Trust/Reputation                    | отдельная публичная вкладка: verified evidence, exact successful sales/deals counts, verified reviews/badges, finalized public moderation history; **без** private amounts, internal notes, sensitive evidence (TRUST-001…003) |
 - **owner target messaging entry:** Profiles могут давать `Message` по message-request/block/privacy; pre-sale resource questions могут входить в unified seller support (не путать с social DM readiness).
 - **текущий runtime:** `/users/[username]` (+ activity, trust); ресурсы/серверы автора; follow; **не** полный tab set Overview…Achievements как единая IA; Message CTA social DM отсутствует.
 - **mobile nav owner target (NAV/UX):** Community в top-level; Messages/Notifications — header/More; не означает наличие DM runtime.

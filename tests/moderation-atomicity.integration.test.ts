@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import {
+  INTEGRATION_STAFF_PASSWORD,
+  assignIntegrationStaffPassword,
+} from "./integration-staff-password";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import {
@@ -22,7 +26,7 @@ function adminRequest(token: string, body: Record<string, unknown>) {
       "content-type": "application/json",
       cookie: `nexus_session=${token}`,
     }),
-    body: JSON.stringify(body),
+    body: JSON.stringify({ currentPassword: INTEGRATION_STAFF_PASSWORD, ...body }),
   });
 }
 
@@ -59,6 +63,7 @@ describe("moderation atomicity integration", () => {
       token,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
+    await assignIntegrationStaffPassword(adminId);
 
     const makeProduct = async (
       id: string,

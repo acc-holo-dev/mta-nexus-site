@@ -39,6 +39,10 @@ export async function GET(
       status: 503,
       error,
     });
-    return jsonWithRequestId(context, { code: "RESOURCE_QA_UNAVAILABLE" }, { status: 503, headers });
+    return jsonWithRequestId(
+      context,
+      { code: "RESOURCE_QA_UNAVAILABLE" },
+      { status: 503, headers },
+    );
   }
 }

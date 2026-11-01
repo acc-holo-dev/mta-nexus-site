@@ -1124,7 +1124,7 @@ it("enrolls and delivers finite-access releases using database time despite appl
     await db
       .update(sessions)
       .set({ expiresAt: new Date("2099-01-01T00:00:00Z") })
-      .where(inArray(sessions.userId, [f.staff, f.buyer]));
+      .where(inArray(sessions.userId, [f.staff, f.buyer, f.owner]));
     clock = vi.spyOn(Date, "now").mockReturnValue(new Date("2036-01-01T00:00:00Z").getTime());
     const start = await resourceReleaseWatchesRepository.command({
       userId: f.buyer,

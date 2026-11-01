@@ -4,18 +4,7 @@ import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
-import {
-  authEntryHref,
-  parseAuthReturnPath,
-  resolveAuthReturnPath,
-} from "./auth-return-path";
-
-export {
-  authEntryHref,
-  currentBrowserReturnPath,
-  parseAuthReturnPath,
-  resolveAuthReturnPath,
-} from "./auth-return-path";
+import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "./auth-return-path";
 
 type AuthMode = "login" | "register";
 
@@ -73,9 +62,7 @@ export function AuthForm({ mode, locale }: { mode: AuthMode; locale: Locale }) {
         return;
       }
       if (data?.success !== true) throw new Error("Invalid authentication response");
-      const next = resolveAuthReturnPath(
-        new URLSearchParams(window.location.search).get("next"),
-      );
+      const next = resolveAuthReturnPath(new URLSearchParams(window.location.search).get("next"));
       // Replace the document so a previous account's router cache is not reused.
       // Landing alone must not claim, react, follow, or download.
       window.location.replace(next);

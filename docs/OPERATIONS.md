@@ -302,28 +302,28 @@ Paid commerce remains disabled.
 Compose merge order is significant. Do not combine the development base with the
 production base. Supported scenarios (OPS-04 / ARC09):
 
-| Scenario | Files (left → right merge order) | Expected roles |
-| --- | --- | --- |
-| Dev | `compose.yaml` | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker` (host source mounts + loopback app port) |
-| Dev + local mail capture | `compose.yaml` + `compose.mailpit.yaml` | Dev roles + Mailpit + durable account-mail worker (capture only) |
-| Isolated verify | `compose.verify.yaml` | Disposable `postgres` + `verify` (no production ports; not a deploy) |
-| Production | `compose.production.yaml` | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker`, `caddy` |
-| Production + recovery mail | `compose.production.yaml` + `compose.recovery.yaml` + `compose.mail-worker.yaml` | Production roles + optional `mail-worker`; recovery env on `app` |
-| Production + recovery mail + file secrets | …previous… + `compose.recovery-file-secrets.yaml` (and optional auth/CA/rotation file overlays) | Same roles; secrets via `/run/secrets` — do not mix conflicting env+file values for the same key |
-| Production CI | `compose.production.yaml` + `compose.production-ci.yaml` | Same production service set; Compose ≥ 2.24.4 for `!override`; Caddy published only on loopback `127.0.0.1:8080` / `127.0.0.1:8443` |
+| Scenario                                  | Files (left → right merge order)                                                                | Expected roles                                                                                                                      |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Dev                                       | `compose.yaml`                                                                                  | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker` (host source mounts + loopback app port)    |
+| Dev + local mail capture                  | `compose.yaml` + `compose.mailpit.yaml`                                                         | Dev roles + Mailpit + durable account-mail worker (capture only)                                                                    |
+| Isolated verify                           | `compose.verify.yaml`                                                                           | Disposable `postgres` + `verify` (no production ports; not a deploy)                                                                |
+| Production                                | `compose.production.yaml`                                                                       | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker`, `caddy`                                    |
+| Production + recovery mail                | `compose.production.yaml` + `compose.recovery.yaml` + `compose.mail-worker.yaml`                | Production roles + optional `mail-worker`; recovery env on `app`                                                                    |
+| Production + recovery mail + file secrets | …previous… + `compose.recovery-file-secrets.yaml` (and optional auth/CA/rotation file overlays) | Same roles; secrets via `/run/secrets` — do not mix conflicting env+file values for the same key                                    |
+| Production CI                             | `compose.production.yaml` + `compose.production-ci.yaml`                                        | Same production service set; Compose ≥ 2.24.4 for `!override`; Caddy published only on loopback `127.0.0.1:8080` / `127.0.0.1:8443` |
 
 **Inventory (production base writers and edge):**
 
-| Role | Service | Notes |
-| --- | --- | --- |
-| HTTP + migration phase | `app` | Entrypoint migrates before HTTP (`scripts/start-production.sh`) |
-| Web Push | `push-worker` | Always in production base |
-| License maintenance | `license-worker` | Always in production base |
-| Resource release notices | `resource-release-worker` | Always in production base |
-| Optional account mail | `mail-worker` | Only when mail overlays are enabled |
-| Ingress | `caddy` | Stop during maintenance; not a DB writer |
-| Database | `postgres` | Keep running for `pg_dump` |
-| Scanner | `clamav` | Keep available; not an application writer |
+| Role                     | Service                   | Notes                                                           |
+| ------------------------ | ------------------------- | --------------------------------------------------------------- |
+| HTTP + migration phase   | `app`                     | Entrypoint migrates before HTTP (`scripts/start-production.sh`) |
+| Web Push                 | `push-worker`             | Always in production base                                       |
+| License maintenance      | `license-worker`          | Always in production base                                       |
+| Resource release notices | `resource-release-worker` | Always in production base                                       |
+| Optional account mail    | `mail-worker`             | Only when mail overlays are enabled                             |
+| Ingress                  | `caddy`                   | Stop during maintenance; not a DB writer                        |
+| Database                 | `postgres`                | Keep running for `pg_dump`                                      |
+| Scanner                  | `clamav`                  | Keep available; not an application writer                       |
 
 Production rendered config must not carry development source bind-mounts
 (`./apps/...`, `./packages/...`). CI must not publish non-loopback host ports.
@@ -1194,16 +1194,16 @@ for its uploads mount.
 
 **Writer stop/resume inventory (must match the enabled Compose set):**
 
-| Stop before dump / migration | Resume after candidate readiness | Keep up |
-| --- | --- | --- |
-| `caddy` (ingress) | last, after HTTPS checks | — |
-| `app` | first (`up … app`; single migration phase) | — |
-| `push-worker` | with approved image + VAPID | — |
-| `license-worker` | with approved image | — |
-| `resource-release-worker` | with approved image | — |
-| `mail-worker` (if overlay enabled) | with approved image + retained mail secrets | — |
-| external writers (if any) | same inventory / version | — |
-| — | — | `postgres` (required for dump) |
+| Stop before dump / migration       | Resume after candidate readiness            | Keep up                        |
+| ---------------------------------- | ------------------------------------------- | ------------------------------ |
+| `caddy` (ingress)                  | last, after HTTPS checks                    | —                              |
+| `app`                              | first (`up … app`; single migration phase)  | —                              |
+| `push-worker`                      | with approved image + VAPID                 | —                              |
+| `license-worker`                   | with approved image                         | —                              |
+| `resource-release-worker`          | with approved image                         | —                              |
+| `mail-worker` (if overlay enabled) | with approved image + retained mail secrets | —                              |
+| external writers (if any)          | same inventory / version                    | —                              |
+| —                                  | —                                           | `postgres` (required for dump) |
 
 Example backup commands below require operator-selected values. `PRODUCTION_ENV`
 is an absolute protected environment-file path; `RELEASE_DIR` is the existing
@@ -1365,12 +1365,12 @@ isolation properties before acceptance continues.
 OPS-15 aligns production delivery workers to the same writable-path profile
 without changing batch/retry/SIGTERM delivery semantics:
 
-| Service | Writable paths | Notes |
-| --- | --- | --- |
-| `push-worker` | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Health + queue probes under `/tmp` |
-| `license-worker` | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Heartbeat JSON under `/tmp`; same read_only/cap_drop/pids/SIGTERM/75s |
-| `resource-release-worker` | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Same profile; durable queue/cursors stay in PostgreSQL |
-| `mail-worker` (optional overlay) | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Already matched this profile |
+| Service                          | Writable paths                 | Notes                                                                 |
+| -------------------------------- | ------------------------------ | --------------------------------------------------------------------- |
+| `push-worker`                    | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Health + queue probes under `/tmp`                                    |
+| `license-worker`                 | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Heartbeat JSON under `/tmp`; same read_only/cap_drop/pids/SIGTERM/75s |
+| `resource-release-worker`        | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Same profile; durable queue/cursors stay in PostgreSQL                |
+| `mail-worker` (optional overlay) | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Already matched this profile                                          |
 
 Do not extend `read_only` to `app`/PostgreSQL without a separate writable-path
 analysis. Structural Compose tests are necessary but not sufficient: rehearse a

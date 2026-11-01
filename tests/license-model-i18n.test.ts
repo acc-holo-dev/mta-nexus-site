@@ -1,8 +1,5 @@
 import { expect, it } from "vitest";
-import {
-  LICENSE_MODEL_VALUES,
-  licenseModelLabel,
-} from "../apps/web/src/lib/license-model-i18n";
+import { LICENSE_MODEL_VALUES, licenseModelLabel } from "../apps/web/src/lib/license-model-i18n";
 import { orderTermsLicenseLabel } from "../apps/web/src/lib/order-terms-i18n";
 
 const SUCCESSISH = [

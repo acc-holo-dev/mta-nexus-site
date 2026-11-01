@@ -24,10 +24,7 @@ export function confirmsFollowMutation(
     result.following !== expectedFollowing
   )
     return false;
-  if (
-    expectedNotifyComments !== undefined &&
-    result.notifyComments !== expectedNotifyComments
-  )
+  if (expectedNotifyComments !== undefined && result.notifyComments !== expectedNotifyComments)
     return false;
 
   return (

@@ -21,12 +21,7 @@ export const resourceQaService = {
       auditId: generateId("aud"),
       command,
     }),
-  answer: (
-    actor: User,
-    productId: string,
-    threadId: string,
-    command: ResourceQaAnswerCommand,
-  ) =>
+  answer: (actor: User, productId: string, threadId: string, command: ResourceQaAnswerCommand) =>
     resourceQaRepository.answer({
       actorId: actor.id,
       productId,
@@ -35,12 +30,7 @@ export const resourceQaService = {
       auditId: generateId("aud"),
       command,
     }),
-  resolve: (
-    actor: User,
-    productId: string,
-    threadId: string,
-    command: ResourceQaResolveCommand,
-  ) =>
+  resolve: (actor: User, productId: string, threadId: string, command: ResourceQaResolveCommand) =>
     resourceQaRepository.resolve({
       actorId: actor.id,
       productId,
@@ -48,12 +38,7 @@ export const resourceQaService = {
       auditId: generateId("aud"),
       command,
     }),
-  follow: (
-    actor: User,
-    productId: string,
-    threadId: string,
-    command: ResourceQaFollowCommand,
-  ) =>
+  follow: (actor: User, productId: string, threadId: string, command: ResourceQaFollowCommand) =>
     resourceQaRepository.follow({
       actorId: actor.id,
       productId,

@@ -80,6 +80,7 @@ const followRow = (id: string, title: string | null = "Team") => [
   id,
   "organization",
   "org",
+  true,
   stamp,
   stamp,
   title,
@@ -172,6 +173,7 @@ it("removes only the actor's exact key even after a target disappears, idempoten
   expect(await follows.setFollowing("actor", "server", "missing", false, "unused")).toEqual({
     following: false,
     created: false,
+    notifyComments: false,
   });
   expect(state.queries).toHaveLength(2);
   expect(state.queries[1].sql).toContain('delete from "follows"');

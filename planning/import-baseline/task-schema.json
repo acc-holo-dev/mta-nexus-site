@@ -2,12 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "MTA NEXUS development task specification v1",
   "type": "object",
-  "required": [
-    "schema_version",
-    "package_status",
-    "baseline_sha",
-    "tasks"
-  ],
+  "required": ["schema_version", "package_status", "baseline_sha", "tasks"],
   "properties": {
     "schema_version": {
       "const": 1
@@ -50,38 +45,16 @@
             "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"
           },
           "phase": {
-            "enum": [
-              "F0",
-              "F1",
-              "F2",
-              "F3",
-              "F4",
-              "F5",
-              "F6"
-            ]
+            "enum": ["F0", "F1", "F2", "F3", "F4", "F5", "F6"]
           },
           "decision_status": {
-            "enum": [
-              "existing_goal",
-              "accepted_direction",
-              "proposal",
-              "verification_required"
-            ]
+            "enum": ["existing_goal", "accepted_direction", "proposal", "verification_required"]
           },
           "queue_state": {
-            "enum": [
-              "specified",
-              "needs_decision",
-              "external_gate",
-              "deferred"
-            ]
+            "enum": ["specified", "needs_decision", "external_gate", "deferred"]
           },
           "priority": {
-            "enum": [
-              "P1",
-              "P2",
-              "P3"
-            ]
+            "enum": ["P1", "P2", "P3"]
           },
           "permission": {
             "enum": [
@@ -112,10 +85,7 @@
             "minItems": 1,
             "items": {
               "type": "object",
-              "required": [
-                "path",
-                "lines"
-              ]
+              "required": ["path", "lines"]
             }
           }
         }

@@ -30,66 +30,66 @@ DOC-01 проверяет baseline и всех потребителей. DOC-02 
 
 Все target paths — проект ответственности. Наличие короткого нового контракта в пакете ещё не означает, что в него уже перенесён весь текст перечисленных глав.
 
-| Исходный документ | Предлагаемый владелец содержания | Действие |
-|---|---|---|
-| [README.md](../README.md) | `README.md` | keep_update_navigation |
-| [AGENTS.md](../AGENTS.md) | `AGENTS.md`, `docs/AGENT.md` | shorten_and_delegate |
-| [docs/ARCHITECTURE.md](ARCHITECTURE.md) | `docs/ARCHITECTURE.md` | keep_consolidate_responsibility |
-| [docs/OPERATIONS.md](OPERATIONS.md) | `docs/OPERATIONS.md` | keep_path_and_operator_contract |
-| [docs/PROBLEMS.md](PROBLEMS.md) | `docs/PROBLEMS.md` | merge_active_residuals_and_new_audit |
-| [docs/PROJECT-MAP.md](PROJECT-MAP.md) | `docs/PROJECT-MAP.md` | keep_consolidate_responsibility |
-| [docs/handbook/00-README.md](handbook/00-README.md) | `docs/PROJECT-MAP.md`, `docs/AGENT.md` | merge_after_semantic_review |
-| [docs/handbook/01-PROJECT-CONCEPT.md](PRODUCT.md) | `docs/PRODUCT.md` | deleted_doc04; owner `docs/PRODUCT.md`; history Git |
-| [docs/handbook/02-ROLES-AND-PERMISSIONS.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md`, `docs/PRODUCT.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/03-FEATURES-AND-SURFACES.md](PROJECT-MAP.md) | `docs/PROJECT-MAP.md` | deleted_doc04; owner `docs/PROJECT-MAP.md`; history Git |
-| [docs/handbook/04-TRUST-SAFETY-SECURITY.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/05-UX-AND-DESIGN.md](UX-CONTRACT.md) | `docs/UX-CONTRACT.md` | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git |
-| [docs/handbook/06-BUSINESS-MODEL.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/08-DOMAIN-AND-DATA-MODEL.md](ARCHITECTURE.md) | `docs/ARCHITECTURE.md` | deleted_doc04; owner `docs/ARCHITECTURE.md`; history Git |
-| [docs/handbook/10-ROADMAP.md](ROADMAP.md) | `docs/ROADMAP.md`, `planning/tasks.json` | deleted_doc04; owner `docs/ROADMAP.md`; history Git |
-| [docs/handbook/13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md) | `docs/DECISIONS.md` | merge_after_semantic_review |
-| [docs/handbook/15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md) | `docs/PROJECT-MAP.md` | merge_after_semantic_review |
-| [docs/handbook/17-DRM-AND-LICENSING.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/18-COMMERCE-AND-PAYOUT-FLOWS.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/19-COMMUNITY-AND-RETENTION.md](COMMUNITY.md) | `docs/COMMUNITY.md`, `docs/RETENTION-PLAN.md` | deleted_doc04; owner `docs/COMMUNITY.md`; history Git |
-| [docs/handbook/20-ADMIN-MODERATION-AND-APPEALS.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/21-REPUTATION-VERIFICATION-AND-REVIEWS.md](COMMUNITY.md) | `docs/TRUST-STAFF.md`, `docs/COMMUNITY.md` | deleted_doc04; owner `docs/COMMUNITY.md`; history Git |
-| [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/23-MARKETPLACE-PRODUCT-LIFECYCLE.md](RESOURCES.md) | `docs/RESOURCES.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md](SERVERS-ORGS.md) | `docs/SERVERS-ORGS.md` | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git |
-| [docs/handbook/25-DEALS-SERVICES-AND-GUARANTEE.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md](UX-CONTRACT.md) | `docs/UX-CONTRACT.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git |
-| [docs/handbook/27-MESSAGING-GROUPS-AND-SOCIAL-SYSTEMS.md](COMMUNITY.md) | `docs/COMMUNITY.md`, `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/COMMUNITY.md`; history Git |
-| [docs/handbook/28-CART-LICENSES-AND-ACCESS-RIGHTS.md](RESOURCES.md) | `docs/RESOURCES.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/29-SUPPORT-TRIAL-WISHLIST-AND-BILLING-UX.md](FLOWS.md) | `docs/FLOWS.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/FLOWS.md`; history Git |
-| [docs/handbook/30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md](SERVERS-ORGS.md) | `docs/SERVERS-ORGS.md` | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git |
-| [docs/handbook/31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md](SERVERS-ORGS.md) | `docs/SERVERS-ORGS.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git |
-| [docs/handbook/32-LAUNCH-ONBOARDING-AND-PRODUCTION-GATES.md](PRODUCT.md) | `docs/PRODUCT.md`, `docs/OPERATIONS.md`, `docs/RELEASE-PLAN.md` | deleted_doc04; owner `docs/PRODUCT.md`; history Git |
-| [docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md](RESOURCES.md) | `docs/RESOURCES.md`, `docs/UX-CONTRACT.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md](RESOURCES.md) | `docs/RESOURCES.md`, `docs/FLOWS.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/35-SECURITY-CENTER-QUARANTINE-ADMIN-AND-API.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md`, `docs/ARCHITECTURE.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md](COMMUNITY.md) | `docs/COMMUNITY.md`, `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/COMMUNITY.md`; history Git |
-| [docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md](PRODUCT.md) | `docs/UX-CONTRACT.md`, `docs/PRODUCT.md` | deleted_doc04; owner `docs/PRODUCT.md`; history Git |
-| [docs/handbook/38-ACCOUNT-AUTH-AND-LIFECYCLE.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md`, `docs/FLOWS.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md](RESOURCES.md) | `docs/RESOURCES.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md](UX-CONTRACT.md) | `docs/UX-CONTRACT.md`, `docs/FLOWS.md` | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git |
-| [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md`, `docs/RETENTION-PLAN.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/43-ROLE-SURFACE-MAP.md](PROJECT-MAP.md) | `docs/PROJECT-MAP.md` | deleted_doc04; owner `docs/PROJECT-MAP.md`; history Git |
-| [docs/handbook/44-GUEST-HOME-DISCOVER-SCREENS.md](UX-CONTRACT.md) | `docs/UX-CONTRACT.md` | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git |
-| [docs/handbook/45-USER-PROFILE-COMMUNITY-SCREENS.md](COMMUNITY.md) | `docs/COMMUNITY.md`, `docs/FLOWS.md` | deleted_doc04; owner `docs/COMMUNITY.md`; history Git |
-| [docs/handbook/46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md](RESOURCES.md) | `docs/RESOURCES.md`, `docs/FLOWS.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/47-SELLER-CREATOR-SCREENS.md](RESOURCES.md) | `docs/RESOURCES.md` | deleted_doc04; owner `docs/RESOURCES.md`; history Git |
-| [docs/handbook/48-SERVER-OWNER-SCREENS.md](SERVERS-ORGS.md) | `docs/SERVERS-ORGS.md` | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git |
-| [docs/handbook/49-ORGANIZATION-SCREENS.md](SERVERS-ORGS.md) | `docs/SERVERS-ORGS.md` | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git |
-| [docs/handbook/50-STAFF-OPERATIONS-SCREENS.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/51-PRICING-SUBSCRIPTIONS-ERROR-OFFLINE-UX.md](COMMERCIAL-FUTURE.md) | `docs/UX-CONTRACT.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
-| [docs/handbook/55-PRODUCTION-STORAGE-SCANNERS-AND-OBSERVABILITY.md](ARCHITECTURE.md) | `docs/OPERATIONS.md`, `docs/ARCHITECTURE.md` | deleted_doc04; owner `docs/ARCHITECTURE.md`; history Git |
-| [docs/handbook/56-SUPPORT-SLA-AND-DISPUTE-TIMING.md](TRUST-STAFF.md) | `docs/TRUST-STAFF.md`, `docs/COMMERCIAL-FUTURE.md` | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git |
-| [docs/handbook/57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md`, `docs/TRUST-STAFF.md` | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| Исходный документ                                                                    | Предлагаемый владелец содержания                                | Действие                                                      |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------- |
+| [README.md](../README.md)                                                            | `README.md`                                                     | keep_update_navigation                                        |
+| [AGENTS.md](../AGENTS.md)                                                            | `AGENTS.md`, `docs/AGENT.md`                                    | shorten_and_delegate                                          |
+| [docs/ARCHITECTURE.md](ARCHITECTURE.md)                                              | `docs/ARCHITECTURE.md`                                          | keep_consolidate_responsibility                               |
+| [docs/OPERATIONS.md](OPERATIONS.md)                                                  | `docs/OPERATIONS.md`                                            | keep_path_and_operator_contract                               |
+| [docs/PROBLEMS.md](PROBLEMS.md)                                                      | `docs/PROBLEMS.md`                                              | merge_active_residuals_and_new_audit                          |
+| [docs/PROJECT-MAP.md](PROJECT-MAP.md)                                                | `docs/PROJECT-MAP.md`                                           | keep_consolidate_responsibility                               |
+| [docs/handbook/00-README.md](handbook/00-README.md)                                  | `docs/PROJECT-MAP.md`, `docs/AGENT.md`                          | merge_after_semantic_review                                   |
+| [docs/handbook/01-PROJECT-CONCEPT.md](PRODUCT.md)                                    | `docs/PRODUCT.md`                                               | deleted_doc04; owner `docs/PRODUCT.md`; history Git           |
+| [docs/handbook/02-ROLES-AND-PERMISSIONS.md](TRUST-STAFF.md)                          | `docs/TRUST-STAFF.md`, `docs/PRODUCT.md`                        | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/03-FEATURES-AND-SURFACES.md](PROJECT-MAP.md)                          | `docs/PROJECT-MAP.md`                                           | deleted_doc04; owner `docs/PROJECT-MAP.md`; history Git       |
+| [docs/handbook/04-TRUST-SAFETY-SECURITY.md](TRUST-STAFF.md)                          | `docs/TRUST-STAFF.md`                                           | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/05-UX-AND-DESIGN.md](UX-CONTRACT.md)                                  | `docs/UX-CONTRACT.md`                                           | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git       |
+| [docs/handbook/06-BUSINESS-MODEL.md](COMMERCIAL-FUTURE.md)                           | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/08-DOMAIN-AND-DATA-MODEL.md](ARCHITECTURE.md)                         | `docs/ARCHITECTURE.md`                                          | deleted_doc04; owner `docs/ARCHITECTURE.md`; history Git      |
+| [docs/handbook/10-ROADMAP.md](ROADMAP.md)                                            | `docs/ROADMAP.md`, `planning/tasks.json`                        | deleted_doc04; owner `docs/ROADMAP.md`; history Git           |
+| [docs/handbook/13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md)            | `docs/DECISIONS.md`                                             | merge_after_semantic_review                                   |
+| [docs/handbook/15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)              | `docs/PROJECT-MAP.md`                                           | merge_after_semantic_review                                   |
+| [docs/handbook/17-DRM-AND-LICENSING.md](COMMERCIAL-FUTURE.md)                        | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/18-COMMERCE-AND-PAYOUT-FLOWS.md](COMMERCIAL-FUTURE.md)                | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/19-COMMUNITY-AND-RETENTION.md](COMMUNITY.md)                          | `docs/COMMUNITY.md`, `docs/RETENTION-PLAN.md`                   | deleted_doc04; owner `docs/COMMUNITY.md`; history Git         |
+| [docs/handbook/20-ADMIN-MODERATION-AND-APPEALS.md](TRUST-STAFF.md)                   | `docs/TRUST-STAFF.md`                                           | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/21-REPUTATION-VERIFICATION-AND-REVIEWS.md](COMMUNITY.md)              | `docs/TRUST-STAFF.md`, `docs/COMMUNITY.md`                      | deleted_doc04; owner `docs/COMMUNITY.md`; history Git         |
+| [docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md](COMMERCIAL-FUTURE.md) | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/23-MARKETPLACE-PRODUCT-LIFECYCLE.md](RESOURCES.md)                    | `docs/RESOURCES.md`                                             | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md](SERVERS-ORGS.md)            | `docs/SERVERS-ORGS.md`                                          | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git      |
+| [docs/handbook/25-DEALS-SERVICES-AND-GUARANTEE.md](COMMERCIAL-FUTURE.md)             | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md](UX-CONTRACT.md)         | `docs/UX-CONTRACT.md`, `docs/COMMERCIAL-FUTURE.md`              | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git       |
+| [docs/handbook/27-MESSAGING-GROUPS-AND-SOCIAL-SYSTEMS.md](COMMUNITY.md)              | `docs/COMMUNITY.md`, `docs/TRUST-STAFF.md`                      | deleted_doc04; owner `docs/COMMUNITY.md`; history Git         |
+| [docs/handbook/28-CART-LICENSES-AND-ACCESS-RIGHTS.md](RESOURCES.md)                  | `docs/RESOURCES.md`, `docs/COMMERCIAL-FUTURE.md`                | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/29-SUPPORT-TRIAL-WISHLIST-AND-BILLING-UX.md](FLOWS.md)                | `docs/FLOWS.md`, `docs/COMMERCIAL-FUTURE.md`                    | deleted_doc04; owner `docs/FLOWS.md`; history Git             |
+| [docs/handbook/30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md](SERVERS-ORGS.md)              | `docs/SERVERS-ORGS.md`                                          | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git      |
+| [docs/handbook/31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md](SERVERS-ORGS.md)    | `docs/SERVERS-ORGS.md`, `docs/COMMERCIAL-FUTURE.md`             | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git      |
+| [docs/handbook/32-LAUNCH-ONBOARDING-AND-PRODUCTION-GATES.md](PRODUCT.md)             | `docs/PRODUCT.md`, `docs/OPERATIONS.md`, `docs/RELEASE-PLAN.md` | deleted_doc04; owner `docs/PRODUCT.md`; history Git           |
+| [docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md](RESOURCES.md)                 | `docs/RESOURCES.md`, `docs/UX-CONTRACT.md`                      | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md](RESOURCES.md)           | `docs/RESOURCES.md`, `docs/FLOWS.md`                            | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/35-SECURITY-CENTER-QUARANTINE-ADMIN-AND-API.md](TRUST-STAFF.md)       | `docs/TRUST-STAFF.md`, `docs/ARCHITECTURE.md`                   | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md](COMMUNITY.md)             | `docs/COMMUNITY.md`, `docs/TRUST-STAFF.md`                      | deleted_doc04; owner `docs/COMMUNITY.md`; history Git         |
+| [docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md](PRODUCT.md)                 | `docs/UX-CONTRACT.md`, `docs/PRODUCT.md`                        | deleted_doc04; owner `docs/PRODUCT.md`; history Git           |
+| [docs/handbook/38-ACCOUNT-AUTH-AND-LIFECYCLE.md](TRUST-STAFF.md)                     | `docs/TRUST-STAFF.md`, `docs/FLOWS.md`                          | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md](RESOURCES.md)         | `docs/RESOURCES.md`, `docs/COMMERCIAL-FUTURE.md`                | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md](TRUST-STAFF.md)           | `docs/TRUST-STAFF.md`                                           | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md](UX-CONTRACT.md)     | `docs/UX-CONTRACT.md`, `docs/FLOWS.md`                          | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git       |
+| [docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md](TRUST-STAFF.md)   | `docs/TRUST-STAFF.md`, `docs/RETENTION-PLAN.md`                 | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/43-ROLE-SURFACE-MAP.md](PROJECT-MAP.md)                               | `docs/PROJECT-MAP.md`                                           | deleted_doc04; owner `docs/PROJECT-MAP.md`; history Git       |
+| [docs/handbook/44-GUEST-HOME-DISCOVER-SCREENS.md](UX-CONTRACT.md)                    | `docs/UX-CONTRACT.md`                                           | deleted_doc04; owner `docs/UX-CONTRACT.md`; history Git       |
+| [docs/handbook/45-USER-PROFILE-COMMUNITY-SCREENS.md](COMMUNITY.md)                   | `docs/COMMUNITY.md`, `docs/FLOWS.md`                            | deleted_doc04; owner `docs/COMMUNITY.md`; history Git         |
+| [docs/handbook/46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md](RESOURCES.md)              | `docs/RESOURCES.md`, `docs/FLOWS.md`                            | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/47-SELLER-CREATOR-SCREENS.md](RESOURCES.md)                           | `docs/RESOURCES.md`                                             | deleted_doc04; owner `docs/RESOURCES.md`; history Git         |
+| [docs/handbook/48-SERVER-OWNER-SCREENS.md](SERVERS-ORGS.md)                          | `docs/SERVERS-ORGS.md`                                          | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git      |
+| [docs/handbook/49-ORGANIZATION-SCREENS.md](SERVERS-ORGS.md)                          | `docs/SERVERS-ORGS.md`                                          | deleted_doc04; owner `docs/SERVERS-ORGS.md`; history Git      |
+| [docs/handbook/50-STAFF-OPERATIONS-SCREENS.md](TRUST-STAFF.md)                       | `docs/TRUST-STAFF.md`                                           | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/51-PRICING-SUBSCRIPTIONS-ERROR-OFFLINE-UX.md](COMMERCIAL-FUTURE.md)   | `docs/UX-CONTRACT.md`, `docs/COMMERCIAL-FUTURE.md`              | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md](COMMERCIAL-FUTURE.md)      | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md](TRUST-STAFF.md)    | `docs/TRUST-STAFF.md`                                           | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md](COMMERCIAL-FUTURE.md)  | `docs/COMMERCIAL-FUTURE.md`                                     | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
+| [docs/handbook/55-PRODUCTION-STORAGE-SCANNERS-AND-OBSERVABILITY.md](ARCHITECTURE.md) | `docs/OPERATIONS.md`, `docs/ARCHITECTURE.md`                    | deleted_doc04; owner `docs/ARCHITECTURE.md`; history Git      |
+| [docs/handbook/56-SUPPORT-SLA-AND-DISPUTE-TIMING.md](TRUST-STAFF.md)                 | `docs/TRUST-STAFF.md`, `docs/COMMERCIAL-FUTURE.md`              | deleted_doc04; owner `docs/TRUST-STAFF.md`; history Git       |
+| [docs/handbook/57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md](COMMERCIAL-FUTURE.md)            | `docs/COMMERCIAL-FUTURE.md`, `docs/TRUST-STAFF.md`              | deleted_doc04; owner `docs/COMMERCIAL-FUTURE.md`; history Git |
 
 ## Приёмка переноса
 

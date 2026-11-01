@@ -86,6 +86,9 @@ function executeThemeScript(
             if (name === "dark") dark = enabled;
           },
         },
+        style: {
+          colorScheme: "light",
+        },
       },
     },
   });

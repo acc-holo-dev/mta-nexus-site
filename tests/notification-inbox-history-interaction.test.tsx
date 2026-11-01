@@ -8,6 +8,10 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
   announce: vi.fn(),
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction,
+}));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
   useState: (initial: unknown) => {
@@ -184,8 +188,7 @@ it("saves exactly the visible selected rows and supports unread state", async ()
   });
 });
 it("preserves explicit whole-inbox reading with a scope warning, cancellation and saved-state refresh", async () => {
-  const confirm = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
-  vi.stubGlobal("window", { confirm });
+  confirmAction.mockReset().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
   harness.fetch
     .mockReset()
     .mockResolvedValueOnce(response({ success: true, scope: "all" }))
@@ -194,7 +197,11 @@ it("preserves explicit whole-inbox reading with a scope warning, cancellation an
   expect(harness.fetch).not.toHaveBeenCalled();
   click(render(), "Mark entire inbox as read");
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
-  expect(confirm).toHaveBeenCalledWith(expect.stringContaining("outside this page"));
+  expect(confirmAction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      consequences: expect.stringContaining("outside this page"),
+    }),
+  );
   expect(harness.fetch.mock.calls[0][0]).toBe("/api/notifications/mark-read");
   expect(harness.fetch.mock.calls[0][1]).toMatchObject({ method: "POST" });
   expect(harness.fetch.mock.calls[0][1]).not.toHaveProperty("body");
@@ -219,9 +226,7 @@ it("hides empty copy while a refresh is in flight and restores it only after suc
   );
   click(render(), "Reload saved inbox");
   expect(render().some((node) => node.props.children === emptyFiltered)).toBe(false);
-  expect(
-    render().some((node) => node.props.children === "Refreshing notifications…"),
-  ).toBe(true);
+  expect(render().some((node) => node.props.children === "Refreshing notifications…")).toBe(true);
   complete(response(emptyPage));
   await vi.waitFor(() =>
     expect(render().some((node) => node.props.children === emptyFiltered)).toBe(true),
@@ -247,20 +252,10 @@ it("keeps the last confirmed unread count after a conflicting expectedIsRead wri
   harness.fetch
     .mockReset()
     .mockResolvedValueOnce(response({ code: "NOTIFICATION_STATE_CHANGED" }, 409));
-  expect(
-    render().some(
-      (node) =>
-        node.type === "strong" && node.props.children === 2,
-    ),
-  ).toBe(true);
+  expect(render().some((node) => node.type === "strong" && node.props.children === 2)).toBe(true);
   click(render(), "Mark as read");
   await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
-  expect(
-    render().some(
-      (node) =>
-        node.type === "strong" && node.props.children === 2,
-    ),
-  ).toBe(true);
+  expect(render().some((node) => node.type === "strong" && node.props.children === 2)).toBe(true);
   expect(harness.announce).not.toHaveBeenCalled();
 });
 it("coalesces rapid commands while a write or refresh is pending", async () => {

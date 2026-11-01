@@ -75,11 +75,13 @@ beforeEach(() => {
     { targetId: "publication", notifyComments: true, mutedUntil: null },
   ]);
   mocks.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
-  mocks.setFollowing.mockImplementation(async (_actor, _type, _id, value, _folId, options = {}) => ({
-    following: value,
-    created: value,
-    notifyComments: value ? (options.notifyComments ?? true) : false,
-  }));
+  mocks.setFollowing.mockImplementation(
+    async (_actor, _type, _id, value, _folId, options = {}) => ({
+      following: value,
+      created: value,
+      notifyComments: value ? (options.notifyComments ?? true) : false,
+    }),
+  );
 });
 afterEach(() => {
   vi.unstubAllEnvs();

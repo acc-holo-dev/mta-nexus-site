@@ -6,7 +6,7 @@ import { Copy, Gamepad2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
-import { type MtaMasterServer, mtaLiveStatus } from "../lib/services/mta-master-directory-service";
+import { type MtaMasterServer, mtaLiveStatus } from "../lib/mta-master-directory-shared";
 
 function playerCountLabel(
   players: number | undefined,

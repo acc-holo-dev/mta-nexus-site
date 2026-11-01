@@ -4,12 +4,12 @@
 
 Метки состояния:
 
-| Метка | Значение |
-|---|---|
+| Метка               | Значение                                                                  |
+| ------------------- | ------------------------------------------------------------------------- |
 | **current runtime** | Подтверждено кодом/миграциями на базе сверки; не значит production deploy |
-| **owner target** | Принятая цель владельца; внедрение может быть неполным |
-| **proposal** | Направление без разрешения на сборку без отдельной команды |
-| **live unknown** | Нужны свидетельства с целевой среды или ещё не установлена готовность |
+| **owner target**    | Принятая цель владельца; внедрение может быть неполным                    |
+| **proposal**        | Направление без разрешения на сборку без отдельной команды                |
+| **live unknown**    | Нужны свидетельства с целевой среды или ещё не установлена готовность     |
 
 Смежные контракты: коммерция организации — [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md); права, trust, staff и privacy — [TRUST-STAFF.md](TRUST-STAFF.md); пользовательские пути Join/Connect и отзывы — [FLOWS.md](FLOWS.md); каталог, карточка, метрики и empty/unknown — [UX-CONTRACT.md](UX-CONTRACT.md).
 
@@ -233,19 +233,19 @@ Customization target: avatar; banner; bio; links; portfolio; showcase resources/
 
 ## 12. Сводка границ
 
-| Тема | Состояние |
-|---|---|
-| Raw MTA directory vs managed profile | **Owner target** + инвариант; raw существует без claim |
+| Тема                                                       | Состояние                                                                         |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Raw MTA directory vs managed profile                       | **Owner target** + инвариант; raw существует без claim                            |
 | Workspace listings, filters, activity, org proof lifecycle | **Current runtime** (unit covered; PG/browser/prod acceptance — **live unknown**) |
-| Co-owners relation + audited transfer | **Owner target**; не current runtime |
-| Join/Connect/Copy intent ≠ participation | **Owner target** / runtime copy path в FLOWS; не доказательство игры |
-| Player names по умолчанию скрыты | **Owner target** |
-| Page builder, recruitment pipeline, Server Pro UI | **Owner target**; arbitrary HTML запрещён |
-| Org billing/seller/payouts | **Owner target**; активация — COMMERCIAL-FUTURE; не free beta |
-| Messaging policy (request / contextual) | **Owner target** policy |
-| Full groups/DM/calls product | **Proposal / out of native calls scope** |
-| Factions/clans / calendar events as product | **Proposal** |
-| Production behavior org claim / join conversion | **Live unknown** без свидетельств среды |
+| Co-owners relation + audited transfer                      | **Owner target**; не current runtime                                              |
+| Join/Connect/Copy intent ≠ participation                   | **Owner target** / runtime copy path в FLOWS; не доказательство игры              |
+| Player names по умолчанию скрыты                           | **Owner target**                                                                  |
+| Page builder, recruitment pipeline, Server Pro UI          | **Owner target**; arbitrary HTML запрещён                                         |
+| Org billing/seller/payouts                                 | **Owner target**; активация — COMMERCIAL-FUTURE; не free beta                     |
+| Messaging policy (request / contextual)                    | **Owner target** policy                                                           |
+| Full groups/DM/calls product                               | **Proposal / out of native calls scope**                                          |
+| Factions/clans / calendar events as product                | **Proposal**                                                                      |
+| Production behavior org claim / join conversion            | **Live unknown** без свидетельств среды                                           |
 
 ---
 

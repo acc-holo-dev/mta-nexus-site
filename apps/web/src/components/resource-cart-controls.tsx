@@ -246,7 +246,11 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         {receiptCopy.reviewNote}
       </p>
       {error ? (
-        <p role="alert" className="rounded-lg bg-danger-soft p-4 text-sm text-danger" data-cart-state="error">
+        <p
+          role="alert"
+          className="rounded-lg bg-danger-soft p-4 text-sm text-danger"
+          data-cart-state="error"
+        >
           {error}
         </p>
       ) : null}

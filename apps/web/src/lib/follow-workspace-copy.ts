@@ -28,7 +28,8 @@ const en = {
   mutedUntil: "Muted until",
   muteSuccess: "Mute updated.",
   quietSaveHint: "Saved quietly — comment notices stay off until you watch the discussion.",
-  watchingHint: "You will get follow notices for new comments. Mute pauses them without removing the save.",
+  watchingHint:
+    "You will get follow notices for new comments. Mute pauses them without removing the save.",
   notificationSettings: "Notification settings",
   search: "Search your follows",
   submit: "Search",
@@ -38,7 +39,8 @@ const en = {
   emptyFiltered: "Nothing matches this filter",
   emptyFilteredHint: "Clear the type or search filter to see all follows again.",
   toCollection: "Add to collection",
-  toCollectionHint: "Organizes this resource in a private collection. It does not turn on release-watch notifications.",
+  toCollectionHint:
+    "Organizes this resource in a private collection. It does not turn on release-watch notifications.",
   unavailableTarget: "This target is no longer available",
   removed: "Removed from your follows.",
   remove: "Remove",
@@ -94,7 +96,8 @@ const ru: Record<keyof typeof en, string> = {
   unmute: "Снять mute",
   mutedUntil: "Mute до",
   muteSuccess: "Mute обновлён.",
-  quietSaveHint: "Сохранено тихо — уведомления о комментариях выключены, пока не включите слежение.",
+  quietSaveHint:
+    "Сохранено тихо — уведомления о комментариях выключены, пока не включите слежение.",
   watchingHint:
     "Вы получаете follow-уведомления о новых комментариях. Mute ставит паузу без удаления сохранения.",
   notificationSettings: "Настройки уведомлений",

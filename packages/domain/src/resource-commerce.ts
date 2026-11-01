@@ -30,9 +30,7 @@ export function canTransitionResource(
 }
 
 /** Allowed author lifecycle actions for the current resource status. */
-export function resourceLifecycleActionsFor(
-  status: ProductStatus,
-): ResourceLifecycleAction[] {
+export function resourceLifecycleActionsFor(status: ProductStatus): ResourceLifecycleAction[] {
   return RESOURCE_LIFECYCLE_ACTIONS.filter((action) => canTransitionResource(status, action));
 }
 

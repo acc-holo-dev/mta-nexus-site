@@ -246,7 +246,11 @@ export function evaluateReleaseManifest(
   }
   const sha = manifest.repository?.sha ?? null;
   if (typeof sha !== "string" || !SHA_RE.test(sha)) {
-    return { ok: false, status: "blocked", reason: "Release manifest exact SHA is missing or invalid." };
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest exact SHA is missing or invalid.",
+    };
   }
   if (expectedSha && sha !== expectedSha) {
     return {
@@ -294,7 +298,11 @@ export function evaluateReleaseManifest(
     }
   }
   if (!Array.isArray(manifest.migrations) || manifest.migrations.length === 0) {
-    return { ok: false, status: "blocked", reason: "Release manifest migration hashes are missing." };
+    return {
+      ok: false,
+      status: "blocked",
+      reason: "Release manifest migration hashes are missing.",
+    };
   }
   const image = manifest.image ?? {};
   if (image.sourceSha && image.sourceSha !== sha) {

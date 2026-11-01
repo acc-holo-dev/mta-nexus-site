@@ -300,7 +300,9 @@ describe("discovery URL context and honest search failures", () => {
       language: "",
       contentType: "",
     });
-    expect(discoverHref({ type: "resources", query: "car" })).toBe("/discover?type=resources&q=car");
+    expect(discoverHref({ type: "resources", query: "car" })).toBe(
+      "/discover?type=resources&q=car",
+    );
     expect(
       discoverHref({
         type: "content",

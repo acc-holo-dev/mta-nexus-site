@@ -29,7 +29,11 @@ const MUTE_DURATIONS = {
 const validDiscussionId = (value: string) => /^[A-Za-z0-9_-]{1,128}$/u.test(value);
 const validAudienceTime = (value: string) =>
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/u.test(value);
-const notActivelyMuted = (userIdColumn: typeof follows.followerId, targetType: TargetType, targetId: string) =>
+const notActivelyMuted = (
+  userIdColumn: typeof follows.followerId,
+  targetType: TargetType,
+  targetId: string,
+) =>
   sql`not exists (
     select 1 from ${objectNotificationMutes}
     where ${objectNotificationMutes.userId} = ${userIdColumn}
@@ -495,8 +499,7 @@ class FollowWorkspaceRepository {
     if (targetType !== "content" && options.notifyComments !== undefined)
       throw new AppError("notifyComments applies only to content follows", 400, "VALIDATION_ERROR");
     // Quiet Save → false; discussion follow → true; non-content stays true.
-    const notifyComments =
-      targetType === "content" ? (options.notifyComments ?? true) : true;
+    const notifyComments = targetType === "content" ? (options.notifyComments ?? true) : true;
     return db.transaction(async (tx) => {
       // Serialize desired-state commands for one actor/target, including
       // deletion when a polymorphic target has already disappeared.
@@ -685,8 +688,7 @@ class FollowWorkspaceRepository {
         .returning({
           mutedUntil: sql<string>`to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
         });
-      if (!upserted)
-        throw new AppError("Mute could not be confirmed", 503, "UNCONFIRMED");
+      if (!upserted) throw new AppError("Mute could not be confirmed", 503, "UNCONFIRMED");
       return { muted: true, mutedUntil: upserted.mutedUntil };
     });
   }

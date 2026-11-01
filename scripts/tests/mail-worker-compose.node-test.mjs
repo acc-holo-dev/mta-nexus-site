@@ -30,7 +30,13 @@ assert.deepEqual(worker.command, [
 ]);
 
 // Optional mail overlay must keep the production-base writer inventory (OPS-04/12).
-for (const name of ["app", "push-worker", "license-worker", "resource-release-worker", "postgres"]) {
+for (const name of [
+  "app",
+  "push-worker",
+  "license-worker",
+  "resource-release-worker",
+  "postgres",
+]) {
   assert(config.services?.[name], `production-base role missing beside mail-worker: ${name}`);
 }
 
@@ -47,7 +53,10 @@ for (const name of ["license-worker", "resource-release-worker"]) {
   assert.equal(peer.read_only, true, `${name} read_only`);
   assert.equal(peer.pids_limit, 128, `${name} pids_limit`);
   assert.deepEqual(peer.cap_drop, ["ALL"], `${name} cap_drop`);
-  assert.ok(peer.tmpfs?.some((entry) => String(entry).startsWith("/tmp:")), `${name} tmpfs`);
+  assert.ok(
+    peer.tmpfs?.some((entry) => String(entry).startsWith("/tmp:")),
+    `${name} tmpfs`,
+  );
   assert.equal(peer.environment?.HOME, "/tmp", `${name} HOME`);
   assert.equal(peer.environment?.TMPDIR, "/tmp", `${name} TMPDIR`);
 }

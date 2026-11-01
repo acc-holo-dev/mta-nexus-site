@@ -137,10 +137,7 @@ async function readEffectivePushStatus(publicKeyHint?: string | null): Promise<{
   const state = await readPushState(localSubscription?.endpoint);
   const keyMatches =
     localSubscription && state.publicKey
-      ? matchesApplicationServerKey(
-          localSubscription.options.applicationServerKey,
-          state.publicKey,
-        )
+      ? matchesApplicationServerKey(localSubscription.options.applicationServerKey, state.publicKey)
       : localSubscription
         ? false
         : null;

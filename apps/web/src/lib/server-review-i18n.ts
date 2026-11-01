@@ -8,7 +8,8 @@ const en = {
   write: "Write or manage my review",
   access:
     "Follow this public server to leave a review. Follow confirms a saved interest, not that you joined or played. Operators cannot review their own server.",
-  followRequired: "Follow this server before publishing a review. Eligibility refreshes after Follow.",
+  followRequired:
+    "Follow this server before publishing a review. Eligibility refreshes after Follow.",
   ownerConflict: "Server operators and managers cannot review their own server.",
   moderated: "This review was removed by moderation and cannot be republished.",
   interaction: "Follow-based server review",

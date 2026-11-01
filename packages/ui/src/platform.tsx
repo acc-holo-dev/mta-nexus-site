@@ -63,9 +63,7 @@ export function SectionHeader({ title, description, action, className }: Section
     >
       <div className="min-w-0 max-w-full flex-1">
         <h2 className="break-words font-heading text-primary">{title}</h2>
-        {description && (
-          <p className="mt-0.5 break-words font-caption text-muted">{description}</p>
-        )}
+        {description && <p className="mt-0.5 break-words font-caption text-muted">{description}</p>}
       </div>
       {action && <div className="max-w-full shrink-0">{action}</div>}
     </div>
@@ -236,10 +234,8 @@ export function DataTable({
   label?: string;
 }) {
   return (
-    <div
-      role="region"
+    <section
       aria-label={label}
-      // biome-ignore lint/a11y/noNoninteractiveTabindex: Named overflow region needs keyboard focus for horizontal scrolling.
       tabIndex={label ? 0 : undefined}
       className={cn(
         "max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]",
@@ -247,7 +243,7 @@ export function DataTable({
       )}
     >
       <table className="w-full min-w-0 text-left text-xs">{children}</table>
-    </div>
+    </section>
   );
 }
 

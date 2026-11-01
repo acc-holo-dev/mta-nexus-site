@@ -275,9 +275,7 @@ function ContentFollowControl({
           disabled={pending || !ready}
           aria-pressed={ready ? notifyComments : undefined}
           aria-label={`${notifyComments ? copy.stopWatchingDiscussion : copy.watchDiscussion}: ${title}`}
-          onClick={() =>
-            void mutateFollow(true, !notifyComments)
-          }
+          onClick={() => void mutateFollow(true, !notifyComments)}
         >
           {pending || !ready ? (
             <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -296,7 +294,8 @@ function ContentFollowControl({
         <p className="text-xs text-muted">{copy.muteHelp}</p>
         {muted && mutedUntil && (
           <p role="status" className="text-xs text-secondary">
-            {copy.mutedUntil}: {new Date(mutedUntil).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
+            {copy.mutedUntil}:{" "}
+            {new Date(mutedUntil).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
           </p>
         )}
         <div className="flex flex-wrap gap-2">

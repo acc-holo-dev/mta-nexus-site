@@ -11,11 +11,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  evaluateInfraImagePins,
-  INFRA_IMAGE_REFS,
-  isImageDigest,
-} from "./infra-image-policy.mjs";
+import { evaluateInfraImagePins, INFRA_IMAGE_REFS, isImageDigest } from "./infra-image-policy.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const pinPath = join(root, "deploy/infra-image-pins.json");
@@ -35,11 +31,11 @@ function resolveDigest(ref) {
       "inspect",
       ref,
       "--format",
-      "{{range .Manifest.Manifests}}{{if and (eq .Platform.OS \"" +
+      '{{range .Manifest.Manifests}}{{if and (eq .Platform.OS "' +
         osName +
-        "\") (eq .Platform.Architecture \"" +
+        '") (eq .Platform.Architecture "' +
         arch +
-        "\")}}{{.Digest}}{{println}}{{end}}{{end}}",
+        '")}}{{.Digest}}{{println}}{{end}}{{end}}',
     ],
     { encoding: "utf8" },
   );
@@ -101,5 +97,7 @@ if (dryRun) {
   process.stdout.write(serialized);
 } else {
   writeFileSync(pinPath, serialized, { encoding: "utf8" });
-  process.stdout.write(`Updated ${pinPath} for ${platform} (productionAuthorized remains false).\n`);
+  process.stdout.write(
+    `Updated ${pinPath} for ${platform} (productionAuthorized remains false).\n`,
+  );
 }

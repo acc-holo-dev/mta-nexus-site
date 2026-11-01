@@ -392,18 +392,18 @@
 
 ## Правила разработки с ИИ
 
-| ID     | Статус    | Решение                                                                  | Комментарий                                                             |
-| ------ | --------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| AI-001 | CONFIRMED | AI читает current main перед изменением                                  | Handoff rule                                                            |
-| AI-002 | CONFIRMED | Code/migrations/tests выше legacy docs                                   | Source precedence                                                       |
-| AI-003 | CONFIRMED | Не заявлять pass без actual execution                                    | Evidence discipline                                                     |
-| AI-004 | CONFIRMED | Предпочитать coherent finished slices                                    | Owner previous preference                                               |
-| AI-005 | CONFIRMED | AI сам выбирает следующие development tasks                              | Owner answer #12                                                        |
-| AI-006 | CONFIRMED | AI может refactor/architecture/features/dependencies/migrations/CI       | Broad autonomy                                                          |
+| ID     | Статус    | Решение                                                                                                                                                 | Комментарий                                                                                        |
+| ------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| AI-001 | CONFIRMED | AI читает current main перед изменением                                                                                                                 | Handoff rule                                                                                       |
+| AI-002 | CONFIRMED | Code/migrations/tests выше legacy docs                                                                                                                  | Source precedence                                                                                  |
+| AI-003 | CONFIRMED | Не заявлять pass без actual execution                                                                                                                   | Evidence discipline                                                                                |
+| AI-004 | CONFIRMED | Предпочитать coherent finished slices                                                                                                                   | Owner previous preference                                                                          |
+| AI-005 | CONFIRMED | AI сам выбирает следующие development tasks                                                                                                             | Owner answer #12                                                                                   |
+| AI-006 | CONFIRMED | AI может refactor/architecture/features/dependencies/migrations/CI                                                                                      | Broad autonomy                                                                                     |
 | AI-007 | CONFIRMED | Local commit within an assigned task is allowed; GitHub push requires the owner's explicit instruction; push/release do not authorize production deploy | Reconciled with root AGENTS (DOC-02); prior "commit/push directly to main" wording retained in Git |
-| AI-008 | CONFIRMED | Destructive production data and production deployment remain human gates | High-risk boundary                                                      |
-| AI-009 | CONFIRMED | Реальные payment/legal activation changes remain human gate              | Development foundation allowed                                          |
-| AI-010 | CONFIRMED | AI may choose safe reversible unresolved details as PROVISIONAL          | Record decision and continue; high-risk/irreversible gates remain human |
+| AI-008 | CONFIRMED | Destructive production data and production deployment remain human gates                                                                                | High-risk boundary                                                                                 |
+| AI-009 | CONFIRMED | Реальные payment/legal activation changes remain human gate                                                                                             | Development foundation allowed                                                                     |
+| AI-010 | CONFIRMED | AI may choose safe reversible unresolved details as PROVISIONAL                                                                                         | Record decision and continue; high-risk/irreversible gates remain human                            |
 
 ## Оставшиеся продуктовые и эксплуатационные вопросы
 

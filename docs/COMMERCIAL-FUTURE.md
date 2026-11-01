@@ -6,12 +6,12 @@
 
 ## Метки состояний
 
-| Метка | Значение |
-|---|---|
-| **текущий runtime** | Подтверждено кодом/схемой на базе сверки; бесплатный контур, без live paid checkout |
-| **цель владельца** | Утверждённый target; отсрочка активации его не отменяет |
-| **предложение** | Нельзя строить как обязательство без нового указания владельца |
-| **живой неизвестно** | Нужны legal/provider/evidence/конфиг до production; числа OPEN |
+| Метка                | Значение                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| **текущий runtime**  | Подтверждено кодом/схемой на базе сверки; бесплатный контур, без live paid checkout |
+| **цель владельца**   | Утверждённый target; отсрочка активации его не отменяет                             |
+| **предложение**      | Нельзя строить как обязательство без нового указания владельца                      |
+| **живой неизвестно** | Нужны legal/provider/evidence/конфиг до production; числа OPEN                      |
 
 ---
 
@@ -75,12 +75,12 @@
 
 **цель владельца.** Одновременно допустимы специализированные plans по pillars (Creator/Developer, Server, Organization, …) и umbrella `NEXUS Pro`. Ladders могут различаться (SUB-010/011). Срок entitlement конфигурируем примерно **7 дней – 1 год**; prepaid и recurring сосуществуют (SUB-012). Exact prices/SKUs **OPEN**.
 
-| Семья | Free | Paid (ориентиры) |
-|---|---|---|
-| Creator | Реальная продажа, manual moderation, 10% commission, hold 7d | Pro/Business: auto-publish eligibility (без bypass safety), analytics/automation/promotion, квоты; целевые commission **8% / 6%**, hold **3d / 1d** при trust/risk/provider eligibility |
-| Server | Core claim/directory, правдивый status | Pro/Business: page/media/analytics/team/promotion/ops; exact names **OPEN** |
-| Organization | Identity, members, collaborative ownership | Pro/Business: team/assets/billing/audit; billing **per organization**, не per-seat по умолчанию |
-| NEXUS Pro | — | Максимальный cross-pillar bundle; включает benefits для **одной** выбранной Organization; без unlimited по умолчанию; discounts не stack ниже best eligible rate без явной admin policy |
+| Семья        | Free                                                         | Paid (ориентиры)                                                                                                                                                                        |
+| ------------ | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Creator      | Реальная продажа, manual moderation, 10% commission, hold 7d | Pro/Business: auto-publish eligibility (без bypass safety), analytics/automation/promotion, квоты; целевые commission **8% / 6%**, hold **3d / 1d** при trust/risk/provider eligibility |
+| Server       | Core claim/directory, правдивый status                       | Pro/Business: page/media/analytics/team/promotion/ops; exact names **OPEN**                                                                                                             |
+| Organization | Identity, members, collaborative ownership                   | Pro/Business: team/assets/billing/audit; billing **per organization**, не per-seat по умолчанию                                                                                         |
+| NEXUS Pro    | —                                                            | Максимальный cross-pillar bundle; включает benefits для **одной** выбранной Organization; без unlimited по умолчанию; discounts не stack ниже best eligible rate без явной admin policy |
 
 **One-time (SUB-013, ECON-005):** в первую очередь ads/promotion и publishing/operational services (ускоренная публикация и т.п.). Auto-publish остаётся **subscription-only**. Profile cosmetics — не главный one-time продукт.
 
@@ -150,12 +150,12 @@ Marketplace organic signals: relevance, sales, rating, freshness, update frequen
 
 **F5 vs F6 (критичное различение):**
 
-| | Staff-managed pilot (F5) | Self-service / commerce (F6) |
-|---|---|---|
-| Управление | Staff/оператор | Рекламодатель self-serve |
-| Оплата | Вне или без live self-checkout | Checkout, обязательства, биллинг |
-| Статус | Предложение/нужен продуктовый выбор слотов и lifecycle | Отдельная коммерческая программа |
-| Граница | Органика, trust, auth, download, support не превращаются в преграду ради показов | Выплаты, DRM, payouts — только после gate |
+|            | Staff-managed pilot (F5)                                                         | Self-service / commerce (F6)              |
+| ---------- | -------------------------------------------------------------------------------- | ----------------------------------------- |
+| Управление | Staff/оператор                                                                   | Рекламодатель self-serve                  |
+| Оплата     | Вне или без live self-checkout                                                   | Checkout, обязательства, биллинг          |
+| Статус     | Предложение/нужен продуктовый выбор слотов и lifecycle                           | Отдельная коммерческая программа          |
+| Граница    | Органика, trust, auth, download, support не превращаются в преграду ради показов | Выплаты, DRM, payouts — только после gate |
 
 **предложение.** Конкретный lifecycle placement, no-fill, hide/report rules, measurement units (impression/click/useful action) — UX-24/26; whitelist поверхностей — UX F5. Personalization inputs и full opt-out — owner-delegated target; explainability типов причин без anti-abuse weights. Детали organic search UX — [UX-CONTRACT.md](UX-CONTRACT.md).
 
@@ -207,4 +207,4 @@ Billing display: authoritative price/currency, approximate local (estimate), tax
 - [handbook/56-SUPPORT-SLA-AND-DISPUTE-TIMING.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/56-SUPPORT-SLA-AND-DISPUTE-TIMING.md) (история; актуальный контракт — этот файл)
 - [handbook/57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md) (история; актуальный контракт — этот файл)
 
-Стабильные ID (LIC-*, DRM-*, COM-*, ECON-*, SUB-*, ADS-*, PRICE-*, PAY-*, CART-*) остаются каноническими в Decision Register; этот файл — смысловой предметный контракт, не замена реестра. Удаление исходных handbook-глав — только DOC-04 после сверки.
+Стабильные ID (LIC-_, DRM-_, COM-_, ECON-_, SUB-_, ADS-_, PRICE-_, PAY-_, CART-*) остаются каноническими в Decision Register; этот файл — смысловой предметный контракт, не замена реестра. Удаление исходных handbook-глав — только DOC-04 после сверки.

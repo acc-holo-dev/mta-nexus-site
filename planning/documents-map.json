@@ -10,9 +10,7 @@
       "sha256": "afd31c91c47fe9c3890d49ac6cd964bb726a84a45ac9fb033b1ee9d5dad1b60f",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/README.md",
       "action": "keep_update_navigation",
-      "target_paths": [
-        "README.md"
-      ],
+      "target_paths": ["README.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -24,10 +22,7 @@
       "sha256": "babd6a1ccf3a2488cff64b84df1547e2af303f3120b7c932af9d0a165707f079",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/AGENTS.md",
       "action": "shorten_and_delegate",
-      "target_paths": [
-        "AGENTS.md",
-        "docs/AGENT.md"
-      ],
+      "target_paths": ["AGENTS.md", "docs/AGENT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -39,9 +34,7 @@
       "sha256": "2b73876c256a36dfc586d8f72dc0c7a817f3843207fb6f0b1d3237d9c9ccdcfe",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md",
       "action": "keep_consolidate_responsibility",
-      "target_paths": [
-        "docs/ARCHITECTURE.md"
-      ],
+      "target_paths": ["docs/ARCHITECTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -53,9 +46,7 @@
       "sha256": "978c796f81d3cf3fc0fc26cf788124f8177c94acfa69e48e7f667ef0320bd76e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/OPERATIONS.md",
       "action": "keep_path_and_operator_contract",
-      "target_paths": [
-        "docs/OPERATIONS.md"
-      ],
+      "target_paths": ["docs/OPERATIONS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -67,9 +58,7 @@
       "sha256": "b4a5e2ee05a26576d44dc577a7308ab12fb8b74e00e63a8c6715037fdb0d57f1",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PROBLEMS.md",
       "action": "merge_active_residuals_and_new_audit",
-      "target_paths": [
-        "docs/PROBLEMS.md"
-      ],
+      "target_paths": ["docs/PROBLEMS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -81,9 +70,7 @@
       "sha256": "818968ebac5362f4c15724b191da30249f33df2bef7d707dfa81e746e90ec618",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PROJECT-MAP.md",
       "action": "keep_consolidate_responsibility",
-      "target_paths": [
-        "docs/PROJECT-MAP.md"
-      ],
+      "target_paths": ["docs/PROJECT-MAP.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -95,10 +82,7 @@
       "sha256": "127da158c6396b483b29a44f37f7c737c869fd493befaab1e7ed6f53ef7b0849",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/00-README.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/PROJECT-MAP.md",
-        "docs/AGENT.md"
-      ],
+      "target_paths": ["docs/PROJECT-MAP.md", "docs/AGENT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -110,9 +94,7 @@
       "sha256": "e59ca98a97cae6de35e5f0bc9c64ce801665fcf718b3a2683927472c78087208",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PRODUCT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/PRODUCT.md"
-      ],
+      "target_paths": ["docs/PRODUCT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -124,10 +106,7 @@
       "sha256": "047a0cc7c40c926ea31df0c359fb90c3461aa007eeefbdbf1e3ccc464fef6ef9",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md",
-        "docs/PRODUCT.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md", "docs/PRODUCT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -139,9 +118,7 @@
       "sha256": "8126b0a506ebaf65a6af671bc7ec65b685b5243a4560decc0c0891718f9fcc6d",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PROJECT-MAP.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/PROJECT-MAP.md"
-      ],
+      "target_paths": ["docs/PROJECT-MAP.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -153,9 +130,7 @@
       "sha256": "415d11cfce3fb4861185f56037fc4fa4b1ed106926ded872e509779edb585938",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -167,9 +142,7 @@
       "sha256": "abb705b4da283c520cc2896fb8cc69b52af770370c866756931c7d3935f5dc6c",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/UX-CONTRACT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/UX-CONTRACT.md"
-      ],
+      "target_paths": ["docs/UX-CONTRACT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -181,9 +154,7 @@
       "sha256": "46dd7749b4a5cf1732984c951b24c19354689aedec4c28368a6665932c9b5df2",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -195,9 +166,7 @@
       "sha256": "f014d45430e971dabcc29f4726c8952b3c88e1d90321ad2e72d01f1bb6a7ddbf",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/ARCHITECTURE.md"
-      ],
+      "target_paths": ["docs/ARCHITECTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -209,10 +178,7 @@
       "sha256": "5e115676165b785718604e801c233e1a33cbd348b6b62b7833efd31db68fe61b",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ROADMAP.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/ROADMAP.md",
-        "planning/tasks.json"
-      ],
+      "target_paths": ["docs/ROADMAP.md", "planning/tasks.json"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -224,9 +190,7 @@
       "sha256": "36986ff663b2be1fb752402b512cfc270413c197c6f8ae1db6a656c97e3de37a",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/DECISIONS.md"
-      ],
+      "target_paths": ["docs/DECISIONS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -238,9 +202,7 @@
       "sha256": "f576eb010db3efaf2e6348ded4fe14c1067b21fb7b1e865e58e34c972ac33962",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/15-AI-CONTEXT-INDEX.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/PROJECT-MAP.md"
-      ],
+      "target_paths": ["docs/PROJECT-MAP.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -252,9 +214,7 @@
       "sha256": "f9bbe536a336bc14df9d357f0622a54bfb20db05373544730a76e1e95b47a00f",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -266,9 +226,7 @@
       "sha256": "824f2d6952c2afc23813cbf8760ee588c1418c70b8b1cf77b666c40db0d55e22",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -280,10 +238,7 @@
       "sha256": "9ab6fa52700f01953edcd314dcdadda23565e01a183a8ac18dffe768c8a117b2",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMUNITY.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMUNITY.md",
-        "docs/RETENTION-PLAN.md"
-      ],
+      "target_paths": ["docs/COMMUNITY.md", "docs/RETENTION-PLAN.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -295,9 +250,7 @@
       "sha256": "f38318241a4f25431facb933081605a5836a7d5b449b6ebef069bc0a1e4d04c6",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -309,10 +262,7 @@
       "sha256": "154dda5dd173749fdd1e11652615e9dd376da6cd498e84d8fcc0629b4a68e554",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMUNITY.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md",
-        "docs/COMMUNITY.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md", "docs/COMMUNITY.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -324,9 +274,7 @@
       "sha256": "56969f8244640c742fcbde3ebde048e439d143cc23177fc41b1499541571388b",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -338,9 +286,7 @@
       "sha256": "0cb2599475531fcf835f4111d00733da2b3ef591450ff8b8bcccbc187977d94e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -352,9 +298,7 @@
       "sha256": "cc618571c3333347cbe8b8d10008d857c7a6ec31e7501c8ede2cd619e95c6af8",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/SERVERS-ORGS.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/SERVERS-ORGS.md"
-      ],
+      "target_paths": ["docs/SERVERS-ORGS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -366,9 +310,7 @@
       "sha256": "f60711918ad043e427bef2d7ed25a38470788b8cd1721fa825c2035721a7d798",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -380,10 +322,7 @@
       "sha256": "970a56ddf315a94445e4b047a4aff7dec4e92a53eafbf082785a409c4c7ce71d",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/UX-CONTRACT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/UX-CONTRACT.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/UX-CONTRACT.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -395,10 +334,7 @@
       "sha256": "616336e62b4285a75ac72d9a83d39f5c748239602f1f204290afe325d54102f1",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMUNITY.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMUNITY.md",
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/COMMUNITY.md", "docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -410,10 +346,7 @@
       "sha256": "33b6de26e3d91099c061116a597eecb8a4b28a7f4bb86664d01489480605bc3d",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -425,10 +358,7 @@
       "sha256": "7ec22f69ad9d0f28f844514984f5711c648bd6f680c21ac723b8440c303d0866",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/FLOWS.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/FLOWS.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/FLOWS.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -440,9 +370,7 @@
       "sha256": "16415af303d429a25ec76ac82cf5bc1442d656332ed9da99d92231b45afc109e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/SERVERS-ORGS.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/SERVERS-ORGS.md"
-      ],
+      "target_paths": ["docs/SERVERS-ORGS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -454,10 +382,7 @@
       "sha256": "4d71ec70ab7a2abed0e17b7b7717efeabe7398dde2c080f1a8e94be898ef13b8",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/SERVERS-ORGS.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/SERVERS-ORGS.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/SERVERS-ORGS.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -469,11 +394,7 @@
       "sha256": "0a88b493a7f4cc2818d4faee9aacd019a2f909a1e5cea51fee0e7a3c2fa3bfd1",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PRODUCT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/PRODUCT.md",
-        "docs/OPERATIONS.md",
-        "docs/RELEASE-PLAN.md"
-      ],
+      "target_paths": ["docs/PRODUCT.md", "docs/OPERATIONS.md", "docs/RELEASE-PLAN.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -485,10 +406,7 @@
       "sha256": "2f4e3a30201c4740d6ec5d0ebd649c296a0832357fa8d0122f7dac17ba9a36ef",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md",
-        "docs/UX-CONTRACT.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md", "docs/UX-CONTRACT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -500,10 +418,7 @@
       "sha256": "c05ac3d0b1d3b9ff90bb739334be1acf433111bf1a099b471eba4d0f81dd7dbe",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md",
-        "docs/FLOWS.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md", "docs/FLOWS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -515,10 +430,7 @@
       "sha256": "45aa4b739ee288e66e566766d260759e2b06862a13214dc8168e129f4965955e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md",
-        "docs/ARCHITECTURE.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md", "docs/ARCHITECTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -530,10 +442,7 @@
       "sha256": "69344d675895877eee867bfe7839a8fe0a472bc62b378dddcb017ce47bdd5e4c",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMUNITY.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMUNITY.md",
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/COMMUNITY.md", "docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -545,10 +454,7 @@
       "sha256": "8f6165d67e399a10c547b6b3f0efce3b8bf8b5052ca6933fde46bee1781a4c5d",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PRODUCT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/UX-CONTRACT.md",
-        "docs/PRODUCT.md"
-      ],
+      "target_paths": ["docs/UX-CONTRACT.md", "docs/PRODUCT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -560,10 +466,7 @@
       "sha256": "76afa896f1b7008aa3ad18f71e65d4cd99df475bc277fa8e90f88e0cc90dced8",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md",
-        "docs/FLOWS.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md", "docs/FLOWS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -575,10 +478,7 @@
       "sha256": "71920dd81445eda3075e9520c2d4159462c890edacc7d313680f93d615a5be8e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -590,9 +490,7 @@
       "sha256": "34247367a06c7825724ef460eff0e5d0a4563cc3ad08f43b9dffa78a19193917",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -604,10 +502,7 @@
       "sha256": "b5bf549287ca3e4a5ae7cef923497a615df23fb23021caf7d53068a0be18fc92",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/UX-CONTRACT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/UX-CONTRACT.md",
-        "docs/FLOWS.md"
-      ],
+      "target_paths": ["docs/UX-CONTRACT.md", "docs/FLOWS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -619,10 +514,7 @@
       "sha256": "2873e3b7bc62b9486214eaf2cb721bc62093eac57de53b600ca16f8f9fd6b691",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md",
-        "docs/RETENTION-PLAN.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md", "docs/RETENTION-PLAN.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -634,9 +526,7 @@
       "sha256": "435d9513e80daaf64af57af4f0134e354b6b5658e00de2084848b19c91ea7bc5",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/PROJECT-MAP.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/PROJECT-MAP.md"
-      ],
+      "target_paths": ["docs/PROJECT-MAP.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -648,9 +538,7 @@
       "sha256": "2c80cf871c64e31285d2875e82849d5890f841a49c76ec07f945eabc80c6eedb",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/UX-CONTRACT.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/UX-CONTRACT.md"
-      ],
+      "target_paths": ["docs/UX-CONTRACT.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -662,10 +550,7 @@
       "sha256": "9efff63d6c860fb59e5fbd02ca0a7f9e033d7ea6ba5d9639d2e9db03043d3cdd",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMUNITY.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMUNITY.md",
-        "docs/FLOWS.md"
-      ],
+      "target_paths": ["docs/COMMUNITY.md", "docs/FLOWS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -677,10 +562,7 @@
       "sha256": "beec518d162fb33c9aab4b54fb6022e422c3ef078085656402c3a9ad71efca4d",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md",
-        "docs/FLOWS.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md", "docs/FLOWS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -692,9 +574,7 @@
       "sha256": "08029ba27b83b560105868c094f7ede9f443d04727ca6d050f85d9dd02670ed7",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/RESOURCES.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/RESOURCES.md"
-      ],
+      "target_paths": ["docs/RESOURCES.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -706,9 +586,7 @@
       "sha256": "a4b81948d9ef63736dedbcf073c0adb2538dc27fa6255df06be11377f1558a8e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/SERVERS-ORGS.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/SERVERS-ORGS.md"
-      ],
+      "target_paths": ["docs/SERVERS-ORGS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -720,9 +598,7 @@
       "sha256": "5eb70e8c7e3752d2bbae8cedff04f635d5c30cdd49e5753858d5186516f9d46b",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/SERVERS-ORGS.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/SERVERS-ORGS.md"
-      ],
+      "target_paths": ["docs/SERVERS-ORGS.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -734,9 +610,7 @@
       "sha256": "e3d6cd3a1db3f11f46b67b4a17ed4330d33e8a43d680f2d099428273c44c6043",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -748,10 +622,7 @@
       "sha256": "6e5b8ba2832abce037dd07d0999ea722517fcbb1165dd5a30b8c2f2c85162e3e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/UX-CONTRACT.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/UX-CONTRACT.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -763,9 +634,7 @@
       "sha256": "858dc001abaf30afa23f0096b1b557e4f6accc341311d0a7c8f13d734aa5f6e0",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -777,9 +646,7 @@
       "sha256": "a34386331f1bf5355fc17bc7636aeb1e96a3963ad8bbd172fcb1f75e30271ac9",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -791,9 +658,7 @@
       "sha256": "42757ce28db49eb7e7f0ab98af92f45f3324cdc953ab910b6582aa535e003ffc",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -805,10 +670,7 @@
       "sha256": "255e33d5a6fe325877f4ff47a820568349e367d3dac10352277046e8edcc47f8",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/ARCHITECTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/OPERATIONS.md",
-        "docs/ARCHITECTURE.md"
-      ],
+      "target_paths": ["docs/OPERATIONS.md", "docs/ARCHITECTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -820,10 +682,7 @@
       "sha256": "030196add4d23baabfb112ac271a80f39b07b0b800d0ad539a482610fba86f19",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/TRUST-STAFF.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/TRUST-STAFF.md",
-        "docs/COMMERCIAL-FUTURE.md"
-      ],
+      "target_paths": ["docs/TRUST-STAFF.md", "docs/COMMERCIAL-FUTURE.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."
@@ -835,10 +694,7 @@
       "sha256": "bddcd4fe7944f590093f559899532c3266be8ddb71f35b9d76c65dee6117e38e",
       "source_url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/COMMERCIAL-FUTURE.md",
       "action": "merge_after_semantic_review",
-      "target_paths": [
-        "docs/COMMERCIAL-FUTURE.md",
-        "docs/TRUST-STAFF.md"
-      ],
+      "target_paths": ["docs/COMMERCIAL-FUTURE.md", "docs/TRUST-STAFF.md"],
       "semantic_migration": "performed_doc05_subject_contract",
       "may_delete_now": false,
       "acceptance": "Unique rules and exceptions preserved; decision IDs retained; links and program consumers updated; relevant checks pass."

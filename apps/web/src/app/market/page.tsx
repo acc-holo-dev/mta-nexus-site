@@ -49,8 +49,12 @@ export default async function MarketPage({
   });
   const attributions = await productService.getPublicAttributions(products);
 
-  const buildHref = (nextType: typeof type, nextSort: typeof sort, nextQuery = query, nextPage = 1) =>
-    marketHref({ type: nextType, sort: nextSort, query: nextQuery, page: nextPage });
+  const buildHref = (
+    nextType: typeof type,
+    nextSort: typeof sort,
+    nextQuery = query,
+    nextPage = 1,
+  ) => marketHref({ type: nextType, sort: nextSort, query: nextQuery, page: nextPage });
   const filtersActive = type !== "all" || sort !== "popular" || Boolean(query) || page > 1;
 
   return (
@@ -189,25 +193,16 @@ export default async function MarketPage({
               </Link>
             ) : null}
             {query ? (
-              <Link
-                href={buildHref(type, sort, "")}
-                className="text-sm text-accent underline"
-              >
+              <Link href={buildHref(type, sort, "")} className="text-sm text-accent underline">
                 {dictionary.market.clearQuery}
               </Link>
             ) : null}
             {type !== "all" ? (
-              <Link
-                href={buildHref("all", sort, query)}
-                className="text-sm text-accent underline"
-              >
+              <Link href={buildHref("all", sort, query)} className="text-sm text-accent underline">
                 {dictionary.market.clearCategory}
               </Link>
             ) : null}
-            <Link
-              href="/market"
-              className="text-sm text-accent underline"
-            >
+            <Link href="/market" className="text-sm text-accent underline">
               {dictionary.market.clear}
             </Link>
           </div>

@@ -66,15 +66,20 @@ export function Dialog({
       event.preventDefault();
       targets[nextIndex]?.focus();
     };
+    const dismissOnBackdrop = (event: MouseEvent) => {
+      if (event.target === dialog) onClose();
+    };
     dialog.addEventListener("keydown", wrapFocus);
+    dialog.addEventListener("click", dismissOnBackdrop);
     return () => {
       dialog.removeEventListener("keydown", wrapFocus);
+      dialog.removeEventListener("click", dismissOnBackdrop);
       if (dialog.open) dialog.close();
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
         previousFocus.focus();
       }
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -86,9 +91,6 @@ export function Dialog({
       onCancel={(event) => {
         event.preventDefault();
         onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
       }}
       className="fixed inset-0 z-50 m-auto max-h-[min(100%,calc(100dvh-2rem))] w-[calc(100%-2rem)] max-w-lg open:flex flex-col overflow-hidden rounded-xl border border-base bg-elevated p-0 text-primary shadow-nexus-lg backdrop:bg-black/60"
     >

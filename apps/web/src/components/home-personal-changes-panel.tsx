@@ -1,6 +1,6 @@
 import { SectionHeader } from "@nexus/ui";
 import Link from "next/link";
-import type { PersonalChangesSummary } from "../lib/home-personal-changes";
+import type { PersonalChangesSummary } from "../lib/home-personal-changes-types";
 import type { HomePersonalPreference } from "../lib/home-personal-preference";
 import { HomePersonalOptOut } from "./home-personal-opt-out";
 
@@ -48,13 +48,9 @@ export function HomePersonalChangesPanel({
         }
       />
 
-      {summary.status === "hidden" ? (
-        <p className="text-sm text-muted">{copy.hidden}</p>
-      ) : null}
+      {summary.status === "hidden" ? <p className="text-sm text-muted">{copy.hidden}</p> : null}
 
-      {summary.status === "empty" ? (
-        <p className="text-sm text-muted">{copy.empty}</p>
-      ) : null}
+      {summary.status === "empty" ? <p className="text-sm text-muted">{copy.empty}</p> : null}
 
       {summary.status === "error" ? (
         <div className="space-y-2 text-sm text-muted">

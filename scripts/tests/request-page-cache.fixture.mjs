@@ -127,6 +127,16 @@ const mocks = {
   },
   "server-history-service": { serverHistoryService: { getHistoryForServer: async () => null } },
   "content-service": { contentService: { listServerUpdates: async () => [] } },
+  "product-service": {
+    productService: {
+      getPublicAttributions: async (products) => {
+        const map = new Map();
+        for (const product of products ?? [])
+          map.set(product.id, { organization: null, author: null });
+        return map;
+      },
+    },
+  },
   "@nexus/validation": { safeExternalWebUrl: (value) => value || undefined },
   "next/navigation": {
     notFound: () => {

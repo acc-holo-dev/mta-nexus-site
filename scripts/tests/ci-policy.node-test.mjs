@@ -21,7 +21,12 @@ test("documentation does not trigger builds; executable docs/configuration do", 
     { code: false, unitOnly: false, full: false },
   );
   assert.deepEqual(
-    classifyChanges(["AGENTS.md", "docs/AGENT.md", "planning/tasks.json", "planning/tools/check_package.py"]),
+    classifyChanges([
+      "AGENTS.md",
+      "docs/AGENT.md",
+      "planning/tasks.json",
+      "planning/tools/check_package.py",
+    ]),
     { code: false, unitOnly: false, full: false },
   );
   assert.deepEqual(classifyChanges(["docs/handbook/schema.sql", "docs/handbook/.config.yml"]), {

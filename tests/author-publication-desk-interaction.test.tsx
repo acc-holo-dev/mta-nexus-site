@@ -7,8 +7,11 @@ const harness = vi.hoisted(() => ({
   cleanups: [] as (() => void)[],
   fetch: vi.fn(),
   refresh: vi.fn(),
-  confirm: vi.fn(),
   reload: vi.fn(),
+}));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
@@ -18,7 +21,7 @@ vi.mock("react", async (original) => ({
     return [
       harness.slots[index],
       (value: unknown) => {
-        harness.slots[index] = value;
+        harness.slots[index] = typeof value === "function" ? value(harness.slots[index]) : value;
       },
     ];
   },
@@ -77,12 +80,12 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
-  harness.confirm.mockReturnValue(true);
+  confirmAction.mockReset().mockResolvedValue(true);
   harness.fetch
     .mockReset()
     .mockResolvedValue(response({ id: "article", status: "draft", revision: next }));
   vi.stubGlobal("fetch", harness.fetch);
-  vi.stubGlobal("window", { confirm: harness.confirm, location: { reload: harness.reload } });
+  vi.stubGlobal("window", { location: { reload: harness.reload } });
 });
 afterEach(() => {
   for (const cleanup of harness.cleanups) cleanup();
@@ -94,7 +97,9 @@ it.each(["en", "ru"] as const)(
     const copy = authorPublicationDeskCopy(locale);
     click(render(locale), copy.restore);
     await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
-    expect(harness.confirm).toHaveBeenCalledWith(copy.restoreConfirm);
+    expect(confirmAction).toHaveBeenCalledWith(
+      expect.objectContaining({ consequences: copy.restoreConfirm }),
+    );
     const [url, init] = harness.fetch.mock.calls[0];
     expect(url).toBe("/api/workspace/content/article/restore");
     expect(init).toMatchObject({ method: "POST", cache: "no-store", credentials: "same-origin" });
@@ -111,7 +116,7 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("allows cancellation without sending a command", () => {
-  harness.confirm.mockReturnValue(false);
+  confirmAction.mockResolvedValueOnce(false);
   click(render(), authorPublicationDeskCopy("en").restore);
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(button(render(), authorPublicationDeskCopy("en").restore).props.disabled).toBe(false);
@@ -125,6 +130,7 @@ it("coalesces rapid commands while the first exact-version write is pending", as
   );
   const nodes = render();
   click(nodes, authorPublicationDeskCopy("en").restore);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   click(nodes, authorPublicationDeskCopy("en").restore);
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   expect(render()[0].props["aria-busy"]).toBe(true);
@@ -174,6 +180,7 @@ it("aborts on navigation and ignores late confirmation", async () => {
     }),
   );
   click(render(), authorPublicationDeskCopy("en").restore);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   const signal = harness.fetch.mock.calls[0][1].signal;
   for (const cleanup of harness.cleanups.splice(0)) cleanup();
   expect(signal.aborted).toBe(true);
@@ -195,7 +202,9 @@ it.each(["ru", "en"] as const)(
     );
     click(render(locale, "org"), labels.restore);
     await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
-    expect(harness.confirm).toHaveBeenCalledWith(copy.restoreConfirm);
+    expect(confirmAction).toHaveBeenCalledWith(
+      expect.objectContaining({ consequences: copy.restoreConfirm }),
+    );
     expect(harness.fetch.mock.calls[0][0]).toBe(
       "/api/workspace/organizations/org/content/article/restore",
     );
@@ -243,7 +252,9 @@ it.each(["ru", "en"] as const)(
     expect(harness.fetch.mock.calls[0][0]).toBe(
       "/api/workspace/servers/srv/content/article/restore",
     );
-    expect(harness.confirm).toHaveBeenCalledWith(copy.restoreConfirm);
+    expect(confirmAction).toHaveBeenCalledWith(
+      expect.objectContaining({ consequences: copy.restoreConfirm }),
+    );
     expect(
       render(locale, undefined, "srv").some((node) => node.props.children === copy.restoredNotice),
     ).toBe(true);

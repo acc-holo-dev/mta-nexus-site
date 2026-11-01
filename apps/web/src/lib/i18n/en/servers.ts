@@ -13,9 +13,11 @@ export const servers = {
     openMedia: "Open media",
     livePlayerLoad: "Live player load",
     noObservation: "No current observation in the official MTA directory.",
-    staleSnapshot: "Showing the latest available directory snapshot. Player counts may be outdated.",
+    staleSnapshot:
+      "Showing the latest available directory snapshot. Player counts may be outdated.",
     connectionIp: "Connection IP",
-    selectHint: "If the protocol link does not open MTA, copy or select this address and paste it into MTA Quick Connect.",
+    selectHint:
+      "If the protocol link does not open MTA, copy or select this address and paste it into MTA Quick Connect.",
     runtime: "Runtime & directory",
     officialDirectory: "Official MTA directory",
     runtimeDescription:

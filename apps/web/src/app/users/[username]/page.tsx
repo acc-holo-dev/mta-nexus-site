@@ -73,8 +73,7 @@ export default async function UserProfilePage({
 
   const query = await searchParams;
   const previewRaw = query?.preview;
-  const wantsGuestPreview =
-    (Array.isArray(previewRaw) ? previewRaw[0] : previewRaw) === "guest";
+  const wantsGuestPreview = (Array.isArray(previewRaw) ? previewRaw[0] : previewRaw) === "guest";
   const sessionToken = wantsGuestPreview
     ? (await cookies()).get("nexus_session")?.value
     : undefined;

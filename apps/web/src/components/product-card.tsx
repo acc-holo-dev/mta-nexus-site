@@ -98,21 +98,19 @@ export function ProductCard({
               <span className="truncate font-medium text-muted">{market.noReviewsYet}</span>
             )}
           </div>
-          <div
-            className="flex shrink-0 items-center gap-1 text-muted"
-            title={libraryLabel}
-            aria-label={`${libraryLabel}: ${product.salesCount}`}
-          >
+          <span className="flex shrink-0 items-center gap-1 text-muted" title={libraryLabel}>
+            <span className="sr-only">
+              {libraryLabel}: {product.salesCount}
+            </span>
             <Library className="h-3 w-3" aria-hidden="true" />
-            <span className="font-numeric">{product.salesCount}</span>
-          </div>
+            <span className="font-numeric" aria-hidden="true">
+              {product.salesCount}
+            </span>
+          </span>
         </div>
 
         <h3 className="line-clamp-1 text-xs font-heading text-primary">
-          <Link
-            href={productHref}
-            className={`transition-colors hover:text-accent ${cardFocus}`}
-          >
+          <Link href={productHref} className={`transition-colors hover:text-accent ${cardFocus}`}>
             {product.title}
           </Link>
         </h3>

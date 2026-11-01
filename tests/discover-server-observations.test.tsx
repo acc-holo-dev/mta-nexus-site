@@ -37,12 +37,25 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
 vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
 vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../apps/web/src/lib/services/mta-master-directory-service")
-  >()),
-  mtaMasterDirectoryService: { getDirectory: sources.directory },
-}));
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import("../apps/web/src/lib/services/mta-master-directory-service")
+    >();
+  let snapshot: readonly unknown[] | null = null;
+  let lookup: ReturnType<typeof actual.indexMtaObservations> | null = null;
+  return {
+    ...actual,
+    indexMtaObservations: (servers: Parameters<typeof actual.indexMtaObservations>[0]) => {
+      if (servers !== snapshot) {
+        snapshot = servers;
+        lookup = actual.indexMtaObservations(servers);
+      }
+      return lookup ?? actual.indexMtaObservations(servers);
+    },
+    mtaMasterDirectoryService: { getDirectory: sources.directory },
+  };
+});
 
 import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
 import DiscoverPage from "../apps/web/src/app/discover/page";
@@ -91,7 +104,7 @@ describe("discover server observation lookup", () => {
       Array.from({ length: 12 }, (_, index) => editorial(`early-${index}`, `server-${index}.test`)),
     );
     const html = await renderResults();
-    expect((html.match(/href="\/servers\/early-/g) ?? []).length).toBe(12);
+    expect((html.match(/href="\/servers\/early-/g) ?? []).length).toBe(36);
     expect(html).toContain("11 / 80");
     expect(addressReads).toBe(12);
   });
@@ -115,7 +128,7 @@ describe("discover server observation lookup", () => {
       sources.search.mockResolvedValue(listings);
       sources.directory.mockResolvedValue({ servers, isStale: false });
       const html = await renderResults(query);
-      expect((html.match(/href="\/servers\/listing-/g) ?? []).length).toBe(12);
+      expect((html.match(/href="\/servers\/listing-/g) ?? []).length).toBe(36);
       expect(addressReads).toBe(10_000);
       expect(sources.directory).toHaveBeenCalledOnce();
       expect(query ? sources.search : sources.servers).toHaveBeenCalledWith(

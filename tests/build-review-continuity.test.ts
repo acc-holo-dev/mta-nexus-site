@@ -134,11 +134,11 @@ describe("build review continuity", () => {
 
   it("rejects lost live authority before build, publication or audit writes", async () => {
     state.rows = [[["product", "published", "other-author", null, false]], [["author", "user"]]];
-    await expect(
-      repository.submitForReview(pending, audit, initiatingToken),
-    ).rejects.toMatchObject({
-      code: "NOT_FOUND",
-    });
+    await expect(repository.submitForReview(pending, audit, initiatingToken)).rejects.toMatchObject(
+      {
+        code: "NOT_FOUND",
+      },
+    );
     expect(state.queries).toHaveLength(2);
     expect(state.queries.every((query) => query.sql.startsWith("select"))).toBe(true);
   });

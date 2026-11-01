@@ -73,10 +73,8 @@ export function evaluateToolchainPolicy({
   const actual = parseSemver(actualNode);
   const pin = parseSemver(exactNodePin);
   const requiredMajor = nodeMajorFromEngines(enginesNode);
-  const majorOk =
-    actual !== null && requiredMajor !== null && actual.major === requiredMajor;
-  const nodeExactMatch =
-    actual !== null && pin !== null && actual.text === pin.text;
+  const majorOk = actual !== null && requiredMajor !== null && actual.major === requiredMajor;
+  const nodeExactMatch = actual !== null && pin !== null && actual.text === pin.text;
   const pnpmExactMatch = Boolean(
     exactPnpmPin && actualPnpm && String(actualPnpm) === String(exactPnpmPin),
   );

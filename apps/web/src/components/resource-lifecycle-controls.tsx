@@ -71,7 +71,10 @@ export function ResourceLifecycleControls({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (lock.current || saved) return;
-    if (observedStatus.current !== product.status || observedRevision.current !== product.updatedAt) {
+    if (
+      observedStatus.current !== product.status ||
+      observedRevision.current !== product.updatedAt
+    ) {
       setError(copy.errors.PRODUCT_METADATA_CONFLICT ?? copy.errors.fallback);
       router.refresh();
       return;
@@ -174,7 +177,9 @@ export function ResourceLifecycleControls({
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }
           >
-            {locale === "ru" ? "Обратиться в поддержку с этим контекстом" : "Contact support with this context"}
+            {locale === "ru"
+              ? "Обратиться в поддержку с этим контекстом"
+              : "Contact support with this context"}
           </Link>
         </div>
       ) : null}

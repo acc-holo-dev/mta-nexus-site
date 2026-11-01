@@ -57,7 +57,8 @@ describe("ProductCard attribution and honest metrics", () => {
 
     expect(html).toContain(market.noReviewsYet);
     expect(html).not.toContain(">0.0<");
-    expect(html).toContain(`aria-label="${market.libraryAdditions}: 3"`);
+    expect(html).toContain(`class="sr-only"`);
+    expect(html).toContain(`${market.libraryAdditions}: 3`);
     expect(html).not.toMatch(/install/i);
   });
 

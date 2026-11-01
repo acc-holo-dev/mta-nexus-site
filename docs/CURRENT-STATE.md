@@ -20,14 +20,14 @@
 
 ## Свидетельства и ограничения
 
-| Область | Что установлено | Что из этого не следует |
-|---|---|---|
-| Исходники | DOC + P1/P2 в `main`; рабочая ветка интеграции удалена | Tip ≠ production |
-| CI | База `385e577e…`: [full acceptance 41247970713](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41247970713). Tip после merge имел TS failures в [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461); фикс уходит новым tip | PASS только на exact SHA |
-| Upgrade/restore | Retained artifacts базы: PASS disposable | Не production backup practice |
-| GitHub | Public; main protection на проверке базы отсутствовала | Не менять settings без поручения |
-| Tracker | 61 done / 22 open | `done` ≠ production enablement |
-| Архитектура | `pnpm analyze:architecture` PASS | Не заменяет unit/database/full_acceptance |
+| Область         | Что установлено                                                                                                                                                                                                                                                            | Что из этого не следует                   |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Исходники       | DOC + P1/P2 в `main`; рабочая ветка интеграции удалена                                                                                                                                                                                                                     | Tip ≠ production                          |
+| CI              | База `385e577e…`: [full acceptance 41247970713](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41247970713). Tip после merge имел TS failures в [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461); фикс уходит новым tip | PASS только на exact SHA                  |
+| Upgrade/restore | Retained artifacts базы: PASS disposable                                                                                                                                                                                                                                   | Не production backup practice             |
+| GitHub          | Public; main protection на проверке базы отсутствовала                                                                                                                                                                                                                     | Не менять settings без поручения          |
+| Tracker         | 61 done / 22 open                                                                                                                                                                                                                                                          | `done` ≠ production enablement            |
+| Архитектура     | `pnpm analyze:architecture` PASS                                                                                                                                                                                                                                           | Не заменяет unit/database/full_acceptance |
 
 ## Приоритетные остатки
 

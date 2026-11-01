@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import {
+  INTEGRATION_STAFF_PASSWORD,
+  assignIntegrationStaffPassword,
+} from "./integration-staff-password";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import {
@@ -41,6 +45,7 @@ function moderationRequest(
       targetId: buildId,
       action,
       ...(notes === undefined ? {} : { notes }),
+      currentPassword: INTEGRATION_STAFF_PASSWORD,
     }),
   });
 }
@@ -91,6 +96,7 @@ describe("build moderation route integration", () => {
       token: moderatorToken,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
+    await assignIntegrationStaffPassword(moderatorId);
     await sessionRepository.create({
       id: `ses_build_user_${suffix}`,
       userId,
@@ -313,6 +319,7 @@ describe("build moderation route integration", () => {
       token: moderatorToken,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
+    await assignIntegrationStaffPassword(moderatorId);
 
     await productRepository.create({
       id: productId,

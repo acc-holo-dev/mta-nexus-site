@@ -43,8 +43,7 @@ const en = {
   settings: "Notification preferences",
   suppressed:
     "Resource activity notifications are turned off in settings. Enabling a watch still saves the preference, but notices stay suppressed until that category is on. Turning the category back on does not deliver skipped releases.",
-  acquireRequired:
-    "Add this free resource to your library before enabling release notifications.",
+  acquireRequired: "Add this free resource to your library before enabling release notifications.",
   noSafeBuild: "A published safe build is required before release notifications can be enabled.",
   empty: "No resource watches match this filter.",
   busy: "Saving…",
@@ -112,8 +111,7 @@ const ru: typeof en = {
     "Уведомления о событиях ресурсов выключены в настройках. Подписка всё равно сохраняется, но уведомления подавляются, пока категория выключена. Включение категории не догоняет пропущенные выпуски.",
   acquireRequired:
     "Сначала добавьте этот бесплатный ресурс в библиотеку, чтобы включить уведомления о версиях.",
-  noSafeBuild:
-    "Для включения уведомлений о версиях нужна опубликованная безопасная сборка.",
+  noSafeBuild: "Для включения уведомлений о версиях нужна опубликованная безопасная сборка.",
   empty: "Нет подписок по выбранному фильтру.",
   busy: "Сохранение…",
   saved: "Настройка сохранена",

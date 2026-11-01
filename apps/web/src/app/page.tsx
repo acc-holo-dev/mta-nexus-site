@@ -7,10 +7,7 @@ import { HomePersonalChangesPanel } from "../components/home-personal-changes-pa
 import { ProductCard } from "../components/product-card";
 import { HomeNetworkServerCard } from "../components/server-card";
 import { loadPersonalChangesSummary } from "../lib/home-personal-changes";
-import {
-  HOME_PERSONAL_COOKIE,
-  parseHomePersonalPreference,
-} from "../lib/home-personal-preference";
+import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../lib/home-personal-preference";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
@@ -56,14 +53,14 @@ export default async function HomePage() {
     contentService.listArticles(4),
     serverService.listServers(200).catch(() => []),
     session
-      ? loadPersonalChangesSummary(
-          session.id,
-          locale,
-          personalPreference === "hide",
-        ).catch(() => ({
+      ? loadPersonalChangesSummary(session.id, locale, personalPreference === "hide").catch(() => ({
           status: "error" as const,
           items: [],
-          failedSources: ["releaseWatch" as const, "discussionFollow" as const, "replyToMe" as const],
+          failedSources: [
+            "releaseWatch" as const,
+            "discussionFollow" as const,
+            "replyToMe" as const,
+          ],
         }))
       : Promise.resolve(null),
   ]);
@@ -75,8 +72,9 @@ export default async function HomePage() {
     : directory
       ? dictionary.home.officialDirectory
       : dictionary.home.directoryUnavailable;
-  const playersPartial =
-    Boolean(directory && !directory.isStale && playerSummary && playerSummary.unknown > 0);
+  const playersPartial = Boolean(
+    directory && !directory.isStale && playerSummary && playerSummary.unknown > 0,
+  );
   const playersLabel =
     !directory || directory.isStale || !playerSummary
       ? "—"

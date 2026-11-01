@@ -31,10 +31,12 @@ function reviewsUnavailableCopy(locale: "en" | "ru") {
     ? {
         unavailable: "Отзывы временно недоступны. Это не означает, что отзывов нет.",
         retry: "Повторить загрузку",
-        reloadReason: "Состояние сохранено на сервере. Обновите страницу, чтобы снова изменить отзыв.",
+        reloadReason:
+          "Состояние сохранено на сервере. Обновите страницу, чтобы снова изменить отзыв.",
       }
     : {
-        unavailable: "Reviews are temporarily unavailable. This does not mean there are no reviews.",
+        unavailable:
+          "Reviews are temporarily unavailable. This does not mean there are no reviews.",
         retry: "Retry loading reviews",
         reloadReason: "Your review is saved on the server. Reload to edit it again.",
       };
@@ -120,7 +122,7 @@ export function ServerReviewPanel({
   useEffect(() => {
     if (!message && !unavailable) return;
     statusRef.current?.focus();
-  }, [message, unavailable, confirmed]);
+  }, [message, unavailable]);
 
   async function retryLoad() {
     if (retrying) return;

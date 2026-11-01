@@ -343,9 +343,7 @@ export class ProductRepository {
    * Batch public attribution for catalogue cards/detail.
    * Selects only public identity fields — never email or password material.
    */
-  async publicAttributionsFor(
-    productIds: readonly string[],
-  ): Promise<
+  async publicAttributionsFor(productIds: readonly string[]): Promise<
     Array<{
       productId: string;
       authorUsername: string | null;

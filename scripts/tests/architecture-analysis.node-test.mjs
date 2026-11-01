@@ -151,7 +151,11 @@ test("architecture analysis rejects a new API route → db import outside except
       ],
       { cwd: fixture, encoding: "utf8" },
     );
-    assert.equal(allowed.status, 0, `health exception must pass: ${allowed.stdout}${allowed.stderr}`);
+    assert.equal(
+      allowed.status,
+      0,
+      `health exception must pass: ${allowed.stdout}${allowed.stderr}`,
+    );
 
     const forbidden = spawnSync(
       process.execPath,

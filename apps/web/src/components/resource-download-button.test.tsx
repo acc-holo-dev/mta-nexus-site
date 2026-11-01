@@ -39,23 +39,24 @@ it.each(["en", "ru"] as const)("renders selected download intent with build id i
   expect(html).toContain("v1.0.0");
 });
 
-it.each(["en", "ru"] as const)("explains unavailable fixed selection without a download action in %s", (locale) => {
-  const reason =
-    locale === "ru"
-      ? "Выбранная сборка недоступна"
-      : "The selected build is unavailable";
-  const html = renderToStaticMarkup(
-    <LocaleProvider locale={locale}>
-      <ResourceDownloadButton
-        productId="product"
-        version="1.0.0"
-        buildId="bld_fixed"
-        intent="selected"
-        unavailableReason={reason}
-      />
-    </LocaleProvider>,
-  );
-  expect(html).toContain(reason);
-  expect(html).not.toContain('type="button"');
-  expect(html).not.toContain("data-download-intent");
-});
+it.each(["en", "ru"] as const)(
+  "explains unavailable fixed selection without a download action in %s",
+  (locale) => {
+    const reason =
+      locale === "ru" ? "Выбранная сборка недоступна" : "The selected build is unavailable";
+    const html = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        <ResourceDownloadButton
+          productId="product"
+          version="1.0.0"
+          buildId="bld_fixed"
+          intent="selected"
+          unavailableReason={reason}
+        />
+      </LocaleProvider>,
+    );
+    expect(html).toContain(reason);
+    expect(html).not.toContain('type="button"');
+    expect(html).not.toContain("data-download-intent");
+  },
+);

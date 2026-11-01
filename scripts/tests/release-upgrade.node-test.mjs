@@ -497,8 +497,10 @@ test("upgrade evidence validator accepts versioned and legacy full-format PASS a
 
 test("upgrade evidence validator rejects status-only PASS and identity failures", () => {
   assert.equal(
-    evaluateReleaseUpgradeEvidence({ status: "PASS", sha: evidenceSha }, { candidateSha: evidenceSha })
-      .ok,
+    evaluateReleaseUpgradeEvidence(
+      { status: "PASS", sha: evidenceSha },
+      { candidateSha: evidenceSha },
+    ).ok,
     false,
   );
   assert.equal(
@@ -508,10 +510,9 @@ test("upgrade evidence validator rejects status-only PASS and identity failures"
     false,
   );
   assert.match(
-    evaluateReleaseUpgradeEvidence(
-      createReleaseUpgradeEvidence({ sha: "f".repeat(40) }),
-      { candidateSha: evidenceSha },
-    ).reason ?? "",
+    evaluateReleaseUpgradeEvidence(createReleaseUpgradeEvidence({ sha: "f".repeat(40) }), {
+      candidateSha: evidenceSha,
+    }).reason ?? "",
     /does not match/u,
   );
   assert.match(
@@ -579,7 +580,10 @@ test("upgrade evidence validator rejects missing, false, and wrong-type required
   );
 
   assert.ok(RELEASE_UPGRADE_EVIDENCE_FLAGS.includes("resourceBuildWorkspaceSchemaPresent"));
-  assert.match(readFileSync(script, "utf8"), /schemaVersion: RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION/u);
+  assert.match(
+    readFileSync(script, "utf8"),
+    /schemaVersion: RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION/u,
+  );
   assert.match(readFileSync(script, "utf8"), /assertReleaseUpgradeEvidence\(/u);
 });
 
