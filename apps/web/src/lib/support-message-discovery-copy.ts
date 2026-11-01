@@ -18,7 +18,8 @@ const en = {
   older: "Earlier messages",
   newer: "Later messages",
   navigation: "Conversation pages",
-  empty: "No messages match these filters.",
+  empty: "No messages in this case yet.",
+  emptyFiltered: "No messages match these filters.",
   download: "Download this page (JSON)",
   exportHelp:
     "The download includes the private message text on this page. Share it only with people you trust.",
@@ -50,7 +51,8 @@ const ru: typeof en = {
   older: "Более ранние",
   newer: "Более поздние",
   navigation: "Страницы переписки",
-  empty: "По этим фильтрам сообщения не найдены.",
+  empty: "В этом обращении пока нет сообщений.",
+  emptyFiltered: "По этим фильтрам сообщения не найдены.",
   download: "Скачать эту страницу (JSON)",
   exportHelp:
     "Выгрузка содержит личный текст сообщений этой страницы. Передавайте её только людям, которым доверяете.",

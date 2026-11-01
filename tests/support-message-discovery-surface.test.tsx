@@ -97,9 +97,26 @@ it("shows a localized empty state and retains staff paths", () => {
     />,
   );
   expect(html).toContain(supportMessageCopy("ru").empty);
+  expect(html).not.toContain(supportMessageCopy("ru").emptyFiltered);
   expect(html).toContain(`/admin/support/${id}`);
   expect(html).not.toContain("?cursor=");
 });
+it.each(["en", "ru"] as const)(
+  "distinguishes an empty filtered conversation from an empty case in %s",
+  (locale) => {
+    const copy = supportMessageCopy(locale);
+    expect(copy.emptyFiltered).not.toBe(copy.empty);
+    const filtered = renderToStaticMarkup(
+      <SupportMessageBrowser
+        page={{ ...page, items: [], olderCursor: null, newerCursor: null }}
+        filters={{ group: "staff", query: "billing" }}
+        locale={locale}
+      />,
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).not.toContain(copy.empty);
+  },
+);
 it("gates anonymous reads and validates duplicate filters before loading data", async () => {
   mock.session.mockResolvedValue(null);
   expect(

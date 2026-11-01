@@ -21,7 +21,8 @@ export function SupportMessageBrowser({
 }) {
   const copy = supportMessageCopy(locale),
     base = `${staff ? "/admin/support" : "/support"}/${page.supportCase.id}`,
-    path = `${base}/messages`;
+    path = `${base}/messages`,
+    filtered = filters.group !== "all" || Boolean(filters.query.trim());
   const date = (value: string) =>
     new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" });
   return (
@@ -95,7 +96,7 @@ export function SupportMessageBrowser({
       </p>
       {page.items.length === 0 ? (
         <p role="status" className="nexus-panel p-5 text-muted">
-          {copy.empty}
+          {filtered ? copy.emptyFiltered : copy.empty}
         </p>
       ) : (
         <section aria-label={copy.title} className="space-y-3">
