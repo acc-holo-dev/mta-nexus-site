@@ -110,6 +110,9 @@ it("does not fetch private reviews while signed out", async () => {
   expect(renderToStaticMarkup(await Own({ searchParams: Promise.resolve({}) }))).toContain(
     "/auth/login",
   );
+  expect(
+    renderToStaticMarkup(await Editor({ params: Promise.resolve({ id: "prd_a" }) })),
+  ).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary%2Freview%2Fprd_a"');
   expect(state.ownPage).not.toHaveBeenCalled();
 });
 it("expired access allows withdrawal, with no publication form", async () => {

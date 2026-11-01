@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
@@ -22,7 +23,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
   if (!actor)
     return (
-      <Link href="/auth/login" className="text-accent underline">
+      <Link
+        href={authEntryHref("login", `/workspace/library/review/${target.id}`)}
+        className="text-accent underline"
+      >
         {copy.signIn}
       </Link>
     );

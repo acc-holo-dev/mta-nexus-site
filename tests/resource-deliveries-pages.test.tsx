@@ -131,7 +131,7 @@ it("authenticates before reading or validating account histories", async () => {
   state.user = null;
   expect(
     renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ owner: "other" }) })),
-  ).toContain("Sign in");
+  ).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary%2Fdownloads"');
   expect(renderToStaticMarkup(await Detail(context))).toContain("Sign in");
   expect(state.page).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();

@@ -4,6 +4,7 @@ import { Button, fieldClassBlock } from "@nexus/ui";
 import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { authEntryHref, currentBrowserReturnPath } from "../../components/auth-return-path";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { useNexusLocale } from "../../components/locale-context";
 import { ProfileChangeHistoryLink } from "../../components/private-change-history-controls";
@@ -94,7 +95,12 @@ export default function SettingsPage() {
   });
   const [recoveryEmail, setRecoveryEmail] = useState<RecoveryEmail | null>(null);
   const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [loginHref, setLoginHref] = useState("/auth/login");
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
+
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath() ?? "/settings"));
+  }, []);
 
   const preferenceLabels: Array<{
     key: keyof NotificationPreferences;
@@ -387,7 +393,7 @@ export default function SettingsPage() {
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <p className="text-sm text-muted">{copy.signInAgain}</p>
         <Link
-          href="/auth/login"
+          href={loginHref}
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {copy.signIn}
