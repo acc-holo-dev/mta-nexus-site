@@ -91,7 +91,7 @@ beforeEach(() => {
 it("does not discover private groups or requirements for a guest", async () => {
   state.user = null;
   for (const Page of [VariantsPage, CompatibilityPage])
-    expect(renderToStaticMarkup(await Page(context))).toContain('href="/auth/login"');
+    expect(renderToStaticMarkup(await Page(context))).toContain('href="/auth/login?next=');
   expect(state.product).not.toHaveBeenCalled();
   expect(state.managed).not.toHaveBeenCalled();
   expect(state.resolution).not.toHaveBeenCalled();

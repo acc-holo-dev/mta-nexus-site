@@ -2,6 +2,7 @@ import { resourceRequirementsCopy } from "../../../../../lib/resource-requiremen
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { ProductDependencyList } from "../../../../../components/product-dependency-list";
 import { ResourceCompatibilityForm } from "../../../../../components/resource-compatibility-form";
 import { getDictionary } from "../../../../../lib/i18n";
@@ -27,11 +28,12 @@ export default async function ResourceCompatibilityPage({
   ]);
   const copy = getResourceManagementCopy(locale),
     dictionary = getDictionary(locale);
+  const returnPath = `/workspace/resources/${encodeURIComponent(id)}/compatibility`;
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {dictionary.workspace.signIn}
         </Link>
       </section>

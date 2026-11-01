@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { NewResourceForm } from "../../../../components/new-resource-form";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -19,7 +20,10 @@ export default async function NewResourcePage() {
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link
+          href={authEntryHref("login", "/workspace/resources/new")}
+          className="text-accent underline"
+        >
           {dictionary.workspace.signIn}
         </Link>
       </section>
