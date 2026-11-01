@@ -6,6 +6,7 @@ import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from 
 import { confirmedServerReview } from "../lib/server-review-confirmation";
 import { serverReviewCopy, serverReviewError, serverReviewState } from "../lib/server-review-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 type Review = {
@@ -208,6 +209,26 @@ export function ServerReviewPanel({
     void submit("save");
   }
 
+  async function withdrawReview() {
+    if (busy || confirmed) return;
+    const source = (mine?.review?.text ?? text).trim();
+    const object =
+      source.length > 80 ? `${source.slice(0, 80)}…` : source.length > 0 ? source : copy.text;
+    if (
+      !(await confirmAction({
+        title: copy.withdrawConfirmTitle,
+        object,
+        consequences: copy.withdrawConfirm,
+        confirmLabel: copy.withdraw,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    void submit("withdraw");
+  }
+
   return (
     <section className="space-y-5" aria-labelledby="server-reviews-heading">
       <header className="space-y-2">
@@ -329,7 +350,7 @@ export function ServerReviewPanel({
                 variant="ghost"
                 className="h-auto px-0 text-sm text-danger underline"
                 disabled={busy || confirmed}
-                onClick={() => void submit("withdraw")}
+                onClick={() => void withdrawReview()}
               >
                 {copy.withdraw}
               </Button>

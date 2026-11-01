@@ -18,6 +18,10 @@ const en = {
   text: "Your review",
   save: "Publish review",
   withdraw: "Withdraw review",
+  withdrawConfirmTitle: "Withdraw this review?",
+  withdrawConfirm:
+    "Your review will no longer appear publicly. You can publish a new review later if you still have follow access.",
+  cancel: "Cancel",
   busy: "Saving…",
   saved: "Saved",
   published: "Published",
@@ -55,6 +59,10 @@ const ru: typeof en = {
   text: "Ваш отзыв",
   save: "Опубликовать отзыв",
   withdraw: "Отозвать отзыв",
+  withdrawConfirmTitle: "Отозвать этот отзыв?",
+  withdrawConfirm:
+    "Отзыв перестанет отображаться публично. При сохранённом follow-доступе вы сможете опубликовать новый отзыв позже.",
+  cancel: "Отмена",
   busy: "Сохранение…",
   saved: "Сохранено",
   published: "Опубликован",
