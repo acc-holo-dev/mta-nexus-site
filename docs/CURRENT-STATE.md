@@ -26,7 +26,7 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** guest-return paths across guest surfaces; empty-honesty loading shells and distinct empty hints (library watches, filters, workspace/settings/resources); CURRENT-STATE синхронизирован с verified baseline `ded09fe1…` / CI 41356180883.
+**Последняя локальная волна:** guest-return paths across guest surfaces (incl. first-paint auth href seed on high-traffic widgets); empty-honesty loading shells and distinct empty hints (library watches, filters, workspace/settings/resources, discover stream); CURRENT-STATE синхронизирован с verified baseline `ded09fe1…` / CI 41356180883.
 
 ## Свидетельства и ограничения
 
