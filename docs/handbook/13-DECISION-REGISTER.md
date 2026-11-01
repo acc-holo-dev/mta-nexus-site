@@ -2,6 +2,9 @@
 
 > Утверждённые решения и открытые вопросы. Текущее поведение проверяйте в коде и миграциях.
 > Этот файл нужен людям и AI-агентам: он отделяет решения от current implementation, legacy и ещё открытых деталей.
+>
+> NX-дополнения, открытые выборы и пояснение согласования AI-007: [docs/DECISIONS.md](../DECISIONS.md).
+> Рабочий вход агента: [docs/AGENT.md](../AGENT.md). Индекс baseline ID: `planning/decision-baseline.json`.
 
 ## Статусы
 
@@ -16,7 +19,7 @@
 
 Действующие указания владельца имеют приоритет. Реестр фиксирует утверждённую цель; текущую реализацию подтверждают код, миграции и выполненные проверки. Legacy не является разрешением на перенос функционала. Если цель и runtime различаются, сохраняйте это различие явно и выполняйте безопасный план реализации.
 
-Порядок направлений Community, Marketplace, Server и DRM не зафиксирован владельцем: выбирайте задачи по зависимостям, риску и пользе. Рабочий порядок и условия завершения находятся в [плане разработки](10-ROADMAP.md). Новое решение получает статус и стабильный уникальный ID; связанные предметные контракты обновляются вместе с ним. История обсуждений остаётся в Git.
+Порядок направлений Community, Marketplace, Server и DRM не зафиксирован владельцем: выбирайте задачи по зависимостям, риску и пользе. Рабочий порядок и условия завершения находятся в [плане разработки](../ROADMAP.md). Новое решение получает статус и стабильный уникальный ID; связанные предметные контракты обновляются вместе с ним. История обсуждений остаётся в Git.
 
 ## Продукт
 
@@ -397,7 +400,7 @@
 | AI-004 | CONFIRMED | Предпочитать coherent finished slices                                    | Owner previous preference                                               |
 | AI-005 | CONFIRMED | AI сам выбирает следующие development tasks                              | Owner answer #12                                                        |
 | AI-006 | CONFIRMED | AI может refactor/architecture/features/dependencies/migrations/CI       | Broad autonomy                                                          |
-| AI-007 | CONFIRMED | AI может commit/push directly to `main`                                  | Existing workflow + owner answer                                        |
+| AI-007 | CONFIRMED | Local commit within an assigned task is allowed; GitHub push requires the owner's explicit instruction; push/release do not authorize production deploy | Reconciled with root AGENTS (DOC-02); prior "commit/push directly to main" wording retained in Git |
 | AI-008 | CONFIRMED | Destructive production data and production deployment remain human gates | High-risk boundary                                                      |
 | AI-009 | CONFIRMED | Реальные payment/legal activation changes remain human gate              | Development foundation allowed                                          |
 | AI-010 | CONFIRMED | AI may choose safe reversible unresolved details as PROVISIONAL          | Record decision and continue; high-risk/irreversible gates remain human |

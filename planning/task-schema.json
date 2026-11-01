@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MTA NEXUS development task specification v1 (active JSON-in-repo tracker)",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "package_status",
+    "baseline_sha",
+    "as_of",
+    "canonical_status",
+    "tracker",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "package_status": {
+      "const": "active_tracker"
+    },
+    "baseline_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "as_of": {
+      "type": "string"
+    },
+    "canonical_status": {
+      "type": "string"
+    },
+    "tracker": {
+      "type": "object",
+      "required": [
+        "mode",
+        "activated_by",
+        "activated_on",
+        "import_baseline",
+        "issues_import"
+      ],
+      "properties": {
+        "mode": {
+          "const": "json_in_repo"
+        },
+        "activated_by": {
+          "const": "DOC-03"
+        },
+        "activated_on": {
+          "type": "string"
+        },
+        "import_baseline": {
+          "type": "string"
+        },
+        "issues_import": {
+          "type": "object",
+          "required": ["status", "permission_required"],
+          "properties": {
+            "status": {
+              "enum": ["not_started", "prepared", "completed"]
+            },
+            "permission_required": {
+              "const": "github_settings"
+            }
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "track",
+          "phase",
+          "decision_status",
+          "queue_state",
+          "priority",
+          "source_ids",
+          "current",
+          "goal",
+          "scope_files",
+          "acceptance",
+          "verification",
+          "dependencies",
+          "dependency_notes",
+          "permission",
+          "evidence",
+          "limits",
+          "execution_state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"
+          },
+          "phase": {
+            "enum": ["F0", "F1", "F2", "F3", "F4", "F5", "F6"]
+          },
+          "decision_status": {
+            "enum": [
+              "existing_goal",
+              "accepted_direction",
+              "proposal",
+              "verification_required"
+            ]
+          },
+          "queue_state": {
+            "enum": [
+              "specified",
+              "needs_decision",
+              "external_gate",
+              "deferred"
+            ]
+          },
+          "priority": {
+            "enum": ["P1", "P2", "P3"]
+          },
+          "permission": {
+            "enum": [
+              "local_development",
+              "github_settings",
+              "external_live",
+              "commercial_activation"
+            ]
+          },
+          "execution_state": {
+            "enum": [
+              "not_started",
+              "in_progress",
+              "blocked",
+              "done",
+              "cancelled"
+            ]
+          },
+          "execution_notes": {
+            "type": "string"
+          },
+          "execution_updated_on": {
+            "type": "string"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptance": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["path", "lines"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

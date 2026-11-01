@@ -1,6 +1,8 @@
 # Архитектура MTA NEXUS
 
-Навигация по путям и командам: [карта проекта](PROJECT-MAP.md).
+Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
+
+**DOC-05:** смысловые правила доменной модели и storage/scanner сохранены здесь и в указанных контрактах; полный текст [08-DOMAIN…](ARCHITECTURE.md) и [55-PRODUCTION-STORAGE…](ARCHITECTURE.md) не удалён (DOC-04).
 
 ## Форма системы
 
@@ -22,6 +24,19 @@
 
 Пакеты не импортируют приложение; domain не зависит от остальных пакетов. `dependency-cruiser` проверяет границы и циклы: SWC разбирает исходники, а отдельный TypeScript 6 выявляет зависимости типов. Проект компилируется TypeScript 7; поддержку его новых синтаксических конструкций анализатором нужно проверять при их использовании. HTTP-обработчик не должен становиться вторым репозиторием или обходить общие проверки.
 
+### HTTP → service → repository
+
+Составные изменяющие пользовательские операции идут через именованную service-команду в `apps/web/src/lib/services` (общие правила для UI, worker и API). Пустые service-обёртки вокруг одного вызова репозитория не требуются. Авторизация и browser/mutation-адаптеры остаются на границе HTTP.
+
+`dependency-cruiser` правило `http-handlers-use-services-for-db` запрещает новым `apps/web/src/app/api/**` маршрутам импортировать `packages/db`, кроме явного списка исключений в `.dependency-cruiser.exceptions.cjs`:
+
+| Категория | Смысл | Примеры |
+| --------- | ----- | ------- |
+| Allowed read/health | Простое чтение или health без оркестрации сценария | `api/health`, GET inbox `api/notifications/route.ts`, finance statements/scopes, support activity history, workspace server-organizations, admin commerce reconciliation GET, license check/check-release |
+| Service-required | Изменение состояния или сложная выдача; при правке переносить в service | `api/admin/actions`, mark-read/preferences/push, content/follow/reports/support/verification POST, auth context switch, product/admin build download, workspace content create |
+
+Новый прямой импорт `@nexus/db` в API-маршруте вне этих списков должен падать на `pnpm analyze:architecture`. RSC-страницы (`app/**/page.tsx`) этим правилом не покрываются; для них сохраняется тот же смысловой контракт при появлении составных команд.
+
 ## Безопасность и данные
 
 - Права проверяются по действующей сессии, текущему владельцу и членству организации. Историческое авторство не даёт постоянного доступа. Действия, требующие свежей авторизации, повторно проверяют её внутри транзакции.
@@ -41,9 +56,15 @@
 
 Используйте `@nexus/ui`, семантические токены `globals.css` и существующую локализацию. RU/EN, светлая и тёмная темы, мобильная ширина и клавиатура — части контракта. Показывайте loading, empty, error и подтверждённый success; не изображайте успешную операцию до ответа сервера.
 
+## Доменная модель (указатель)
+
+Ключевые сущности и связи (детали и исключения — [08-DOMAIN…](ARCHITECTURE.md)): Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `packages/db`; факты runtime — код.
+
+Storage/scanner/observability цели и границы production mounts — [55…](ARCHITECTURE.md) + [OPERATIONS](OPERATIONS.md); Security Center / quarantine admin — также [TRUST-STAFF](TRUST-STAFF.md) и [35…](TRUST-STAFF.md).
+
 ## Граница продукта
 
-Закрытая бета поддерживает распространение бесплатных ресурсов. Платные покупки, реальные выплаты и production DRM не включены. Для будущих коммерческих файлов утверждены приватное объектное хранилище и подписанная доставка через CDN; текущая локальная реализация не является этим целевым решением. Утверждённые будущие решения — в [реестре](handbook/13-DECISION-REGISTER.md); текущую реализацию проверяйте в коде.
+Закрытая бета поддерживает распространение бесплатных ресурсов. Платные покупки, реальные выплаты и production DRM не включены. Для будущих коммерческих файлов утверждены приватное объектное хранилище и подписанная доставка через CDN; текущая локальная реализация не является этим целевым решением. Утверждённые будущие решения — в [реестре](handbook/13-DECISION-REGISTER.md) и [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md); текущую реализацию проверяйте в коде.
 
 ## Проверка изменений
 

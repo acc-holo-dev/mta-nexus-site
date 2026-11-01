@@ -1,0 +1,3100 @@
+{
+  "baseline_sha": "385e577e7443cf7d7b817419ce5c3b8afe87b690",
+  "source_path": "docs/handbook/13-DECISION-REGISTER.md",
+  "source_sha256": "dd9530abae932dc3e942793d809efc07bb5b8e54c17052377746316e7ea192a4",
+  "decisions": [
+    {
+      "id": "P-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 25,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L25",
+      "line_sha256": "0a04705ec7a4c56db086f89a072860ec7feee646470de76a2e3a89e44e2dcefd",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 26,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L26",
+      "line_sha256": "4938b928fbd1bd7a6ab1eed3aa15f133705e8afa92861b6ad4c5ab52e786bb2b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 27,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L27",
+      "line_sha256": "8e781dffa93cddb75b24b3a1aa7b5e2552eda870696c9f4ba159f20181c11a80",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 28,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L28",
+      "line_sha256": "1a2b2b52d0747dc0acc1065d6d9d88a487852279542b0023ddf5d65d562660a8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 29,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L29",
+      "line_sha256": "1de2d4dfadccfe40dc8768ede173b482ee02aefcb3422cf763fa284485471d49",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 30,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L30",
+      "line_sha256": "de6d424cdc7d955809648b77c327bf80a62f6114bbbc0c3b600815947a937fda",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 31,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L31",
+      "line_sha256": "e775a8c9c0340a3f9758a04dd6f381dfd525ef35c9650e58f6da7ce0d5e96006",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Продукт",
+      "line": 32,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L32",
+      "line_sha256": "4fa5bb683e22711505f6bb5cd48833a1cdc6e93acbb4688b2bec51e7ff9e8ce8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-009",
+      "baseline_status": "OPEN",
+      "section": "Продукт",
+      "line": 33,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L33",
+      "line_sha256": "c8670c3d5af0fc91c1b930f96a203f135a0690da38c444ad3f3ed6694b4570db",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "P-010",
+      "baseline_status": "OPEN",
+      "section": "Продукт",
+      "line": 34,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L34",
+      "line_sha256": "9034798937394ffef9fb88967a39ee678fce35ab0997c61620eb94f5b90a5d1a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 40,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L40",
+      "line_sha256": "9213c683e1a0e306477320b184e29d5ade874970f41bea00ef4a2c492ea0d2b8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-002",
+      "baseline_status": "CURRENT",
+      "section": "Архитектура и эксплуатация",
+      "line": 41,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L41",
+      "line_sha256": "42c8f39271b03a3815a3b9bdf05f9e2297d6a889d13688602a6393df2cbf136b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-003",
+      "baseline_status": "CURRENT",
+      "section": "Архитектура и эксплуатация",
+      "line": 42,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L42",
+      "line_sha256": "b7cdb18a4fd2945b864621eb125b319f7846f9a3de34b6c44cf5b73e86255034",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-004",
+      "baseline_status": "CURRENT",
+      "section": "Архитектура и эксплуатация",
+      "line": 43,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L43",
+      "line_sha256": "df291170337bcec90c8d4a65ece9721d44ae837128ad7e5f0ee3814e5f42b643",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 44,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L44",
+      "line_sha256": "ab93fdaf2d6267c0558fcd9f816a98852cbb61fbf18f07b4b8db8685a264f3a3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 45,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L45",
+      "line_sha256": "b4eb4b20bee3d7e2bfb4192a5140a29fc7e6c53752e0ba39d02e707f65db5989",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 46,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L46",
+      "line_sha256": "40338783c7fe999ebec903346a484ad2f836932b7ec58024db011d91274e2dce",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 47,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L47",
+      "line_sha256": "9f2ecfc0dada6eb576b3b9ee4299182cbd7a9661d24fbde48f36f89b25e464ef",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-009",
+      "baseline_status": "OPEN",
+      "section": "Архитектура и эксплуатация",
+      "line": 48,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L48",
+      "line_sha256": "f2a571d8704f8f76c1139814a08b0f0fde7ee2661b2840ae054dd36fb5c6b9a5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 49,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L49",
+      "line_sha256": "0e398fd19dc2618080e9ddefca2c7a7b065d9f7d80aae28460f178fcf69ff734",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 50,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L50",
+      "line_sha256": "e2a60a2398a4900bb07d71b89198f755fac851bb53a1d97ccb127e5b04d0413e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "E-012",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 51,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L51",
+      "line_sha256": "69c84487cfac173009a14ca6543ae06d8b2f79f4f419f1fb19e4991b19712650",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "OPS-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 52,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L52",
+      "line_sha256": "fc01e82ef7d1fb34a3fb82584a2afc6865babf2ce2540e47711af0e5200f7b6b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DATA-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 53,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L53",
+      "line_sha256": "0cf03f7824a18ef3488dbed08c1532829965a69b4d5f28b7c1372e2f8a794b7b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "STOR-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 54,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L54",
+      "line_sha256": "43a067b03eccddbd44c2049037ef95c80e3624902cf5bd1ee5146eb07528d9da",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SCAN-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 55,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L55",
+      "line_sha256": "5311a5fd942b1e8adf1ee62457b922fa8d94de521430b0d9f38c4654f4a34fe3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "OBS-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 56,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L56",
+      "line_sha256": "4df60bcc7fc5885da58674c6e8da579c461f32baf63c58401ccfbd0751e30aff",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "API-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 57,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L57",
+      "line_sha256": "5f65ab52d507cb3b4327bd3cf7705ad48eec36b1795f9321f7df7b43a3c41959",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "API-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 58,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L58",
+      "line_sha256": "1e941fcf3c5f6f4f6cbd1d2dca21a365854070054d1af07ed80dce2a03763a27",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ANA-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 59,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L59",
+      "line_sha256": "4c26f1d9aa3e722afbcef2f8df9d3827eaebf5b95db1e7b19fb7f8143e47682f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ANA-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Архитектура и эксплуатация",
+      "line": 60,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L60",
+      "line_sha256": "880a9b3b26acccf36dc086771c2263660336c1fa6c3909006a037990a3885905",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-001",
+      "baseline_status": "CURRENT",
+      "section": "Безопасность ресурсов",
+      "line": 66,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L66",
+      "line_sha256": "301da7b0d90bdbb4bd99f4ae912bb12fb2d155d31353cf873d2ec0cb39aeb4b5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-002",
+      "baseline_status": "CURRENT",
+      "section": "Безопасность ресурсов",
+      "line": 67,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L67",
+      "line_sha256": "7a59ebcc2f429b1ee61629749959b2ca2449f2bece35347500927e06252fb44f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-003",
+      "baseline_status": "CURRENT",
+      "section": "Безопасность ресурсов",
+      "line": 68,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L68",
+      "line_sha256": "9accc34895341f3b5dda4f4a22d5df1a9bb2da0db0b074ea9bf0a63a1b547520",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-004",
+      "baseline_status": "CURRENT",
+      "section": "Безопасность ресурсов",
+      "line": 69,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L69",
+      "line_sha256": "32615614462df5e65278ec0ff880d69e1c8fa039266b94a506827511120a2836",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-005",
+      "baseline_status": "CURRENT",
+      "section": "Безопасность ресурсов",
+      "line": 70,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L70",
+      "line_sha256": "01d4d8f549c710616556a110a951815950734e8ef512f38aa19c2b1a36bc9a08",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Безопасность ресурсов",
+      "line": 71,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L71",
+      "line_sha256": "e312f37e9515d3a2f87eacf13628b3011f8fd88a5a3041c8226599f133d42705",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-007",
+      "baseline_status": "OPEN",
+      "section": "Безопасность ресурсов",
+      "line": 72,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L72",
+      "line_sha256": "556580c08185e7c5e8af61ee987ce207f87bf8dfa3af958515b3ed3750eaa979",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "S-008",
+      "baseline_status": "OPEN",
+      "section": "Безопасность ресурсов",
+      "line": 73,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L73",
+      "line_sha256": "7c6086595be1e018147ea9c1f8c1be9c58ab62b2d66b17292dda45efade60a2e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 79,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L79",
+      "line_sha256": "937b7668f6ffd9ddf2e458b8dcdeab08463abbaf0698be6939db693b8d647205",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-002",
+      "baseline_status": "CURRENT",
+      "section": "Аккаунт и идентичность",
+      "line": 80,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L80",
+      "line_sha256": "5043aaaf4c22f6d0c8a308c8f906bcc3aca3af1c1731e2d78d636d2fb906950e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-003",
+      "baseline_status": "CURRENT",
+      "section": "Аккаунт и идентичность",
+      "line": 81,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L81",
+      "line_sha256": "b17e6c58dabd2eddc883651cab78ebd3dac5a4eb7c5e5b395c09b33a0d7a0365",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 82,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L82",
+      "line_sha256": "cae20033d5455e6ccd6089995442edd07d81d05f3dfa9f5cfa06486259c3a4e5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 83,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L83",
+      "line_sha256": "175f2e341caf945407509ad246735ffac0eff5e71788ac854bcd8431904adfd2",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 84,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L84",
+      "line_sha256": "aba3a3ffc05707947c6e1ec1567b9b9aafb8a43ea8caa323e9d9fe33f852871a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 85,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L85",
+      "line_sha256": "98315491671cec2a482e53c6237ea304ebb5e0cee6efb9a433fe7d496453d832",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "I-008",
+      "baseline_status": "OPEN",
+      "section": "Аккаунт и идентичность",
+      "line": 86,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L86",
+      "line_sha256": "af6f73f38fede1f24388a27ee7468e2279966aee91061b2a9c993a9a7e1e1104",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ID-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 87,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L87",
+      "line_sha256": "85f8c48da009f642a7a682098b15a2be392f82a976cf5ae8ff362964b6a97c8d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ID-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 88,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L88",
+      "line_sha256": "6c52ccaad11cc1e686bf4cd70a06fc576592974839ed5fcfca5594fce736b1b6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ID-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 89,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L89",
+      "line_sha256": "abb8ae26b31958a73abde01454bfe315bebb400a0b2df23747ba40ddaea7d0a1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ID-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 90,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L90",
+      "line_sha256": "8380606216de19def026c110276ad77b3fcc9f7994204d4a512e8091866b98b1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ID-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 91,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L91",
+      "line_sha256": "f9cccaa86d160ab88ced77e049141b8b987e64677faebaccd65652a43a65141d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ID-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 92,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L92",
+      "line_sha256": "a560dbf1780bdb19dbb706e809338602a22f94b57663b163c17976790c39750d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ACC-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 93,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L93",
+      "line_sha256": "47baeb334bcd9641886b1a52fad2ffed57a73274cb8b0c0de28cb6459aab4d15",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ACC-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 94,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L94",
+      "line_sha256": "67545b68baca2a4c0e9f3690fce14a34811cab13f68248172465756e33d27e1e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ACC-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 95,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L95",
+      "line_sha256": "23c739b0fde549da12a965cd236787622ce6b57640b4536d844d3a7a14c261b9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ACC-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 96,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L96",
+      "line_sha256": "6e85b45f3f9400157a39f38b81950aeafad9d400b9f02eb9137e495ae059fc6f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ACC-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 97,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L97",
+      "line_sha256": "1c34badf9fdb4b9043866f0ff14925762630fe0a84dea01dc8f9b18fdbc9f6c8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AUTHZ-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 98,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L98",
+      "line_sha256": "5f8d0c6689f8431ddaeb7574764ccdea82de1ba2f80c4fd2b5c4e986538ea1d1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEC-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 99,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L99",
+      "line_sha256": "dbe254af96d3bbe480eeeaf9f25f687de1ea7f6949262ee0f579a6ffad470f1e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEC-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 100,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L100",
+      "line_sha256": "3d6a657caa98b827ff9a5b376a4eb22516528b084bbf7d2bf1dcc9fd84120b19",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEC-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 101,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L101",
+      "line_sha256": "8ade3060d76334531b9dc19c391cfb06d3f9beec78e957e3ab94e43ac3c977c4",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEC-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 102,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L102",
+      "line_sha256": "bb954ea2c686903f43587bc54664777e88f714756ad19f1d1f37f5677ec4d531",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEC-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Аккаунт и идентичность",
+      "line": 103,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L103",
+      "line_sha256": "f996a364d21b63a749cf4db1a9bbe96b174b423e9cf7f00a6c3cf21a74a13120",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-001",
+      "baseline_status": "CURRENT",
+      "section": "Серверы",
+      "line": 109,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L109",
+      "line_sha256": "e684bb2e628c23c4840d205b96b1dedb06ca1238cb19e8f0cab2b88d7e97ed57",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-002",
+      "baseline_status": "CURRENT",
+      "section": "Серверы",
+      "line": 110,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L110",
+      "line_sha256": "3eec62a9efca553894b26fabbdcf2edf27872e0b5468539be5970cbb4570d0ce",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-003",
+      "baseline_status": "CURRENT",
+      "section": "Серверы",
+      "line": 111,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L111",
+      "line_sha256": "8d3fb36587d3a856593b2034b228cb540809796956547f33e72d8a4a31ba3810",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-004",
+      "baseline_status": "CURRENT",
+      "section": "Серверы",
+      "line": 112,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L112",
+      "line_sha256": "64c79ccee1dbcd7578b43c3e204514864e2c73a72ffa62102f5c699b9f5e47e0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 113,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L113",
+      "line_sha256": "69f2cae31f5307c83d8ac6bfdc8a0da1129f002171a412ebb29488542c102e81",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 114,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L114",
+      "line_sha256": "30b19dfe50df0f88422d60064c5d2c85c12c410b579ca848991a74f5f2d899dc",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 115,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L115",
+      "line_sha256": "cbd58c8687cab2259eaec27cb2d8ba0f1cfb9e7a21589df0e4041102403d9ef8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 116,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L116",
+      "line_sha256": "23c30c7926d3f17ecaed69509753fc16376c74288b3208039ad5ec73c352dbd6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-009",
+      "baseline_status": "OPEN",
+      "section": "Серверы",
+      "line": 117,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L117",
+      "line_sha256": "7f249e0d28bd8281f48e1c348815265e9c07a648b19c71afa926e808e56aef1e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SV-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 118,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L118",
+      "line_sha256": "e8f67dec3053da7d98b7f3085991cb0cf71736fb99c2bb1f062e4a43d9f05ddb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 119,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L119",
+      "line_sha256": "1993f8992b53499679a064b2fc0a7fc93cf011a3a4b16fac68a502b19249f43a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 120,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L120",
+      "line_sha256": "d579c220dddbd973848cf0aedd8b32b815d11acba6c6e01039a3bc87d36ef01e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 121,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L121",
+      "line_sha256": "e4b2d7e8cf5b2f09f4d90f90694ff5a66184b48624bf7aefeba609a0c2f4c2de",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-004",
+      "baseline_status": "CONFIRMED-DELEGATED",
+      "section": "Серверы",
+      "line": 122,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L122",
+      "line_sha256": "30c5b5f6ad7d21a0b5f8399e6d57d767030072097c15e73950790f04a8ef5948",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 123,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L123",
+      "line_sha256": "c5fcd9a8eb24bd9976f66cdc1498a7cac4fe068eb19537b3c29812a265bf92df",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 124,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L124",
+      "line_sha256": "ec4d08132fd7a0dec682cc81268d09e462428a25fc385ae863312f2c5dd6f135",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 125,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L125",
+      "line_sha256": "721103bbaf5656848845610e0a75a50dbb0b7e46682ef28da75a8ea4f23bb9cf",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 126,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L126",
+      "line_sha256": "196c2c93b40596d41a553f52c2dd3f3be761c02756097319ff9afb75421f29fb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SO-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 127,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L127",
+      "line_sha256": "3cb7e0b1aaf32c78f6a8f9ff87f11684e449e80ab675f9b6bec0c899f1c8af4f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 128,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L128",
+      "line_sha256": "2e7ef47f822a6ec0769fd1869be27ce33f57a7e1e26c2b9291a8ec6b42eee93f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 129,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L129",
+      "line_sha256": "331f6a23cca94957ca9cc1a0e048e67ce7e061618415957ed7d9f7e48e29d93b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 130,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L130",
+      "line_sha256": "4ac7376142908a8aba54ae1230d77e54c33dc07e3f66608b98090abfa44479eb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 131,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L131",
+      "line_sha256": "94f59209ce0df1d402e0597176426d9c34588b17f42e76e25725e1702b3ee419",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 132,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L132",
+      "line_sha256": "2a2c799628d2e57782b7332049d287018c3b5af14bad0d36672348640ae571ce",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 133,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L133",
+      "line_sha256": "86ae8cb559f55ea09489fa488359aefa7ec3b3660e0f38ba0fa2ca9e440d2a9e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SRV-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Серверы",
+      "line": 134,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L134",
+      "line_sha256": "d62a77ae5728f0d87fd9acf11ba518df741f59dfd0d425b9bc2c313a38aa17e6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 140,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L140",
+      "line_sha256": "24d6a70cae80c6a01ef28da3467f2af70a4642593c6e1dffc89b3a17478e0178",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 141,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L141",
+      "line_sha256": "ef4747e9608075ef4b7f1af23357e110394d76e1d1919fab3c57a4e30fbf0b85",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 142,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L142",
+      "line_sha256": "dcee245d178c8f6be578266c212a8c0b858828891adf28469369fda945ad4b24",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 143,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L143",
+      "line_sha256": "ff7a0b6b2e7673fd263cf39fde6936ab836dabe50a074f609d8be71cc70973e8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 144,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L144",
+      "line_sha256": "da8247ccbc79c7b91eee1cb334f20d985285cde5d6e4e5ee8c037c8b02139162",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 145,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L145",
+      "line_sha256": "7bb62145aec8a1d85b51f8571aa17895416b10c4813eb9c337d602c09afbcf44",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 146,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L146",
+      "line_sha256": "d9fc9725ee5b6be4144be5d35eb6fabb35dd1fa02bd2ac99002155941d7e955b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ORG-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Организации",
+      "line": 147,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L147",
+      "line_sha256": "8d3a50361a40d4827564982c6dfc7995e616f6d6c2d652edb4b76a7eb67f9472",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 153,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L153",
+      "line_sha256": "3b8157a81d97ceaa3a5c5d3d2e2f6928ec439888886c3900910abe99164fc6ad",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 154,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L154",
+      "line_sha256": "e33c87603d68c1b09e4b700c193de7ee833ab5cc33adf83e0f95e35aaa65a751",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 155,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L155",
+      "line_sha256": "048dad8645f74d73ffcb23e054269d55222427c220b19068382461c36ae22b74",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 156,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L156",
+      "line_sha256": "b4554149da2d22596eb639cc016dbc9b8b6eeb79891885b1386db895f01f6d57",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 157,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L157",
+      "line_sha256": "7fa999ed429e1288faa6d837390f772a6369236e9133845329f42aa4fee9ebc4",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 158,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L158",
+      "line_sha256": "cf2f86b6c960570e2cb1efd61db004a91a61f5e890fad8edea4732c4735a3d8c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 159,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L159",
+      "line_sha256": "fd13275724ae71027021e92b91b5d0bf710ed2632880223b8aa7f6ccc0560aba",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 160,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L160",
+      "line_sha256": "3bc16a6eb24e5ee191c283c3ba3c1a2f80cf07cd8d77540f478a88d96791df2c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 161,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L161",
+      "line_sha256": "475c2781bbd614251039d91314c1a3683ed5dbe9f5efe80d41d35dcedd509efb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 162,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L162",
+      "line_sha256": "4c94422e7df507f57c972fb128ef76fdd2e26434cc02d7bd34149832a8b3c823",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 163,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L163",
+      "line_sha256": "18bb3a0811580e6ca2a5b58b80e4280b14e8929324150b8a4ba6f4c33f4f8bda",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-012",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 164,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L164",
+      "line_sha256": "cbb0de99440529982d2972d7931212c67b00d39b87b3d36ece750bab0843bae3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-013",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 165,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L165",
+      "line_sha256": "00913a960cb307f1ace180c40801b4f1c971d91478f9dd3ec1757811d2592894",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-014",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 166,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L166",
+      "line_sha256": "0fca983b60261877b1b130da3ab16222684c8eb3c4b5d5f193dff6b83530836e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-015",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 167,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L167",
+      "line_sha256": "ad3a2a0a8139f7942d567bdb83fcfc05d3fec3bd5de1492635acf276aceb2d15",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-016",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 168,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L168",
+      "line_sha256": "09a4c9fe36941ad34379272a84420a1f26220522ad95fa10f792e4f168148092",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MP-017",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 169,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L169",
+      "line_sha256": "e90d4971a95db4bd19819be15afd9ddb81bbf79f6aa596bd48a0ab233cc6323f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "RES-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 170,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L170",
+      "line_sha256": "2ed3743f82c17f4b2213d9bbbb8f872ebd8ce9a615102d217948e084d94f3d9b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PRD-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 171,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L171",
+      "line_sha256": "de464df394d5591752a7596f605da63310e88b120f4548210c7908bae9861da4",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PRD-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 172,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L172",
+      "line_sha256": "99f87170350b824c21b18227d017e1d82a965e96ec6086877e8cba755874444d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PRD-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 173,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L173",
+      "line_sha256": "13b34f4f1953c39bd168d25f2896058515ddaddca6598aec0d67d72845ac4b5a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "COMP-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 174,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L174",
+      "line_sha256": "d550c1b6fdddac9360a1b9c5cae8ea982dda0bddfdf15d93dc8eb49226c2bac1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "COMP-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 175,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L175",
+      "line_sha256": "154d412de72936cc4f98b35b399a40d3a23e8057717a069119220f555e0f73a4",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "COMP-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 176,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L176",
+      "line_sha256": "483308337e3c1fd4127f01dfa2b12cb1f1c014f75c804a2ba78c29ea7f290e0a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DEL-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 177,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L177",
+      "line_sha256": "b72493feae7096ecd52d75aa8f4f293ec71d819417cf01944fe07b4d7249c179",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PUB-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 178,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L178",
+      "line_sha256": "cc0eaf66126f084b37f661e76656e60c883bd4bbfeb0086c0405954403f208a0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PUB-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 179,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L179",
+      "line_sha256": "2d68cdb2a786922625caa1bc16a540f34285c726264f180bb9bf81caebee2967",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PUB-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 180,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L180",
+      "line_sha256": "72258054b0431b3dbcd1eab6976c071e0c87b6e9092c4ba1ed8337ededb449d8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PUB-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 181,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L181",
+      "line_sha256": "5c3191c5b153fd9a81ff697d89e6a10c376136941732d57859e6c12445892e78",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PUB-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 182,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L182",
+      "line_sha256": "850c2e7e2d8c276d1de13e77d3c2f869760ef744c28767f3e9c03464e2b2c4c0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "FREE-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 183,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L183",
+      "line_sha256": "ded9105a65b6b21cba0d0d99b4b5e6f8130645bace0d41f25cea6c20197cb786",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "KYC-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 184,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L184",
+      "line_sha256": "239be593dce4765eba46df9118f7f9b85602f84a2ecd89e76379905e09bf0a26",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEL-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 185,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L185",
+      "line_sha256": "cb83ad08068aaed221a617645653c66cc1a8f9fd35a9cf19e3b7ed0c82618789",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SEL-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Ресурсы и публикация",
+      "line": 186,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L186",
+      "line_sha256": "62ad6ca023e7e5ea37b7d4bc75d087c4841d1b9f98b8a9e4cb5937cf8f0dc429",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "BUY-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 192,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L192",
+      "line_sha256": "451cff05590d85073da41df32c67c3f440faa287bc3df086e9145879587b1813",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "BUY-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 193,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L193",
+      "line_sha256": "a3b66a90572989ff936801746e0bd708fd244f44197fc0580d49c301a92aa57c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "BUY-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 194,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L194",
+      "line_sha256": "70d9ef52e78c4c8f32f90e5edd58e7bdad2add3fde7e29c862d2eae93d6f4e6b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CART-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 195,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L195",
+      "line_sha256": "29b14ba0cbd6dc7ff2b5c63af58f7a45d5bb89d1352602947930eee8f5093122",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PUR-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 196,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L196",
+      "line_sha256": "1aeff075b26a0ed605cbde05b2536ba1460b7957fb7667747ab4c533d59cad14",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIB-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 197,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L197",
+      "line_sha256": "cb21a28cd09ab1146b06448bdb8e2d09538c831bd3329ac2f652e229b0e9df07",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIC-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 198,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L198",
+      "line_sha256": "54947e68fd3c395f6e24040b01afda4470caf702cb5ab08f2e4ba6c4d3e055e9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIC-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 199,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L199",
+      "line_sha256": "557cbabd04c856cca36d77641d39618b16ce26f405c898281934eb1b5340f44a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIC-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 200,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L200",
+      "line_sha256": "3eefebe1068cd286ba90339481784aca96c5e1c13c95f95ae3875a38a648cae1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIC-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 201,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L201",
+      "line_sha256": "c2ffba4188ab400a32caf3f2e421f775086cd3d3249310b83262d40388c17bad",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIC-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 202,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L202",
+      "line_sha256": "e1799a51344bc08b7116a343fb5e82bad197e2779842e9ed0be72d2ee2f57a76",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "LIC-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 203,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L203",
+      "line_sha256": "f1adeaa9327912fe70bb130bcecd1525effc2cc3d81a622e78e413d6176a41df",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DL-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Приобретение, библиотека и лицензии",
+      "line": 204,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L204",
+      "line_sha256": "30ab223ca444276d9ee732a5c56c2020ce8a52d948fa980182dc1194001aa47e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-001",
+      "baseline_status": "CURRENT",
+      "section": "Коммерция и финансы",
+      "line": 210,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L210",
+      "line_sha256": "1a0ccb2286317572e5b614d82fbc592e76c3103fb6ad1e43a2f6fb78fb897548",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-002",
+      "baseline_status": "CURRENT",
+      "section": "Коммерция и финансы",
+      "line": 211,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L211",
+      "line_sha256": "6b34986ff876804110298ead65cd1fea231a631f664bfaedeb4d2aacdb5e2783",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 212,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L212",
+      "line_sha256": "70af9ea21d0e160d039c2cc62b5b14db98e7034fa8244e840d796068be7f72b7",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 213,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L213",
+      "line_sha256": "351e85b00e1ceca07f85594fd65825493a26dd28a308b36b7e59d7dce2846d05",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 214,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L214",
+      "line_sha256": "5fb8638288f003683bd4162aea073903f7bbb4230fac672145e88744d8051b1a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 215,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L215",
+      "line_sha256": "238783aee5217848573ce15534605507aa94aecdd0f4ee9cadc0aa114fc84196",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 216,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L216",
+      "line_sha256": "53373c91edd32e5d62ee2099ee05dd2eb9a337eae345f97c18964e334a88d759",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 217,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L217",
+      "line_sha256": "a79e996f5bbf6bccb2bb5c8452d97bb24ba37b9b3402e12a9565a07ab22b62fd",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-009",
+      "baseline_status": "OPEN",
+      "section": "Коммерция и финансы",
+      "line": 218,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L218",
+      "line_sha256": "cc50d5a3c2740606393a320afda8788c548243c1b4274c838e20747ba2e89ea9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 219,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L219",
+      "line_sha256": "b6fe830104eecdcc9502fd1c90046213b9123487578b4c8b66ccb9d9032d9d96",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 220,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L220",
+      "line_sha256": "dedf5bc1ea74b878e08e4ad9b0dff215a626f09e9ee8dba736e143e63501d217",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-012",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 221,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L221",
+      "line_sha256": "1769cb3a8c7c39b82ee4bf171ae04657b8cdeb32ad263a95d204da60df4b1bba",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "C-013",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 222,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L222",
+      "line_sha256": "3d9502fa44de2d0325ba47c12fb8a2ed1f70fe4e731da9a7fbb2c3e340d65133",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "COM-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 223,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L223",
+      "line_sha256": "4f6c998936712eeb6900dc24c1d65f709839dc1db78e62ed6e381f0ff6ddbe43",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "COM-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 224,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L224",
+      "line_sha256": "4424bba6468a6b40c6636fe6ecb38e2001c0016dedfd0c80df1e7cdb07a8c39d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "COM-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 225,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L225",
+      "line_sha256": "2a80b7bb4570e8ec5c03896606889b1ef1ff32656f73023a04b23353359e84fb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "FIN-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 226,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L226",
+      "line_sha256": "5f0a6d04ecf55fc432416860646aab6dddd5d2d1578fd224ddd3d6f54a96ec1b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "FIN-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 227,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L227",
+      "line_sha256": "381cdcbbb97c93c207c0f77529eb5b21479f39366ff91c843f43c79d1995edd2",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PAY-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 228,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L228",
+      "line_sha256": "54a8b88cd2b577a9df4f76dede9dc4c50472e75bfb03c525a4f6c4f060e2386c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 229,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L229",
+      "line_sha256": "8700247454110e1d9d3aa78ff57a062fb5f233dd9a4ce03e567d6f067b1c2b69",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 230,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L230",
+      "line_sha256": "f1db05554f02c31aa27fec1c38a1d13d19506022b0a81e0c1d0ec690dbea2c88",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 231,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L231",
+      "line_sha256": "701340edf894c0beec538831663aecda708105f1cf23a6a4c0a0c847c922ab66",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 232,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L232",
+      "line_sha256": "c279e70be0a35b18f0b828e4887592d6f3946cdd82568edde6158e5b9344f8e7",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 233,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L233",
+      "line_sha256": "3b40a1465105bf0f69c6086ecd28dd68ba0f104e3632db9990fdb6658104289d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 234,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L234",
+      "line_sha256": "23f13a7171b0008e4654daa4eb598993aced19793c280849eb395cca76590371",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 235,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L235",
+      "line_sha256": "5f9f8658836aa0a567b528ec1c52a5b432ae883c524b2696ad86b6ce2d405f82",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 236,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L236",
+      "line_sha256": "f86fbe3dc19ce3c6905a37162ba978eb788b40f3f954f0f9e6888acfc318cfb5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ECON-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 237,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L237",
+      "line_sha256": "3834558f0512d4afb53d2ff2f4bd3cc49feea51230bc471adf0ef26abe495d75",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DSP-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Коммерция и финансы",
+      "line": 238,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L238",
+      "line_sha256": "00adafb1d3a2c2b2ee39d67285734c3d9221ce6d4a3a17b56558e33d8df302a0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-001",
+      "baseline_status": "CURRENT",
+      "section": "Подписки, реклама и цены",
+      "line": 244,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L244",
+      "line_sha256": "7e41fd48cc34acdebe9679ac6558d988d51b9a3ba37805703630c23be6f60f84",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 245,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L245",
+      "line_sha256": "062ff47271065dc9b5b55235617bb4d2aa610eb026e7866e85cd959d4cb9a2db",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 246,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L246",
+      "line_sha256": "7a06f6375c9db30042a4e7893cb9475d487cf8ac95f63f5bbfdcbfe7c50b66e9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 247,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L247",
+      "line_sha256": "7ccfc170ab41f640f4a7144ba311714e229d0c73e74bce2d6e016dc0b73ef988",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 248,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L248",
+      "line_sha256": "a48927d308e7d5175a74ae30c5206401ee1224c7edf397de1e8b9372132e45b0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 249,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L249",
+      "line_sha256": "8cb90c952f8e40d96e269af0963f324375fe9dbfd7fd92d144c1e558c1619c15",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 250,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L250",
+      "line_sha256": "fddf7780701b07bb9adb978aea2982972263ebd3e7fc8828782e010a17e0c381",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 251,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L251",
+      "line_sha256": "be4f0248bfac42f116e7f9ad3a1a42f57226de2a03ba6233db877359da9100de",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 252,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L252",
+      "line_sha256": "c61413b1304bf6be89d9d645d1082ff5dc9be812085bf4c85e4e2fcdeb48234f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 253,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L253",
+      "line_sha256": "2550b11ea00a4844905345de2843aa426111500283b876b4135466eeee7832e8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 254,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L254",
+      "line_sha256": "3e42935e3a383c427ad802f6a325a118281d50f2b7b5213405a64d22498b56a5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-012",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 255,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L255",
+      "line_sha256": "a6b0674309384e124f7f15e7327247df863ffdd98f455af4d5268cf78da27427",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-013",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 256,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L256",
+      "line_sha256": "5a116183337216d60da7d08eb04c5b0d3be47ac119baa429e2689b22b7200709",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUB-014",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 257,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L257",
+      "line_sha256": "5a65abb4354fc21968b65030fe956c9ffbb4bf52d91adb7e9656e696d9f9d51a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADS-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 258,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L258",
+      "line_sha256": "eaf329655725128791cbd18be5f8640b40bc2f8c70873ffe106d150d13b95bf4",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADS-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 259,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L259",
+      "line_sha256": "c72db590f29302de24c24697bbbe852092985efefd72c3d82bc506769c2ce130",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PRICE-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 260,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L260",
+      "line_sha256": "bc30dd1e0ff185732099aa03f45e12bc9512bcdf1e7f466cde82c58f0498bc87",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PRICE-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Подписки, реклама и цены",
+      "line": 261,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L261",
+      "line_sha256": "8fa566109c808ad91e7a8824db5659eee56dbc783d1effcf23bd9554ab973c36",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-001",
+      "baseline_status": "CURRENT",
+      "section": "Сообщество и уведомления",
+      "line": 267,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L267",
+      "line_sha256": "e7ea53ccc4bf45740155f573cd27973105a57c56e3c24968262744be62dc4947",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 268,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L268",
+      "line_sha256": "cb1e2311bf519bdedea54c54470993780dac1cc82d07a04f4c4f70d3bafcfe17",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 269,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L269",
+      "line_sha256": "87446d0e441e4d02d1310521ed722fb60c8d9bfa182a97525d637de1120d5ee0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 270,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L270",
+      "line_sha256": "ff0460ee0d8964cf1ded54029548fa58c3cd6dd13a35d091fd35b062c04910a6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 271,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L271",
+      "line_sha256": "b837eb5d8b879f8385f174616dd9669318b3e09c65103a36d4e239899c406efc",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 272,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L272",
+      "line_sha256": "37dc2d9a52e58b6d6f2e4fb599ff98787958fe9a9a6e2bbae4dc8c56eb21266b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 273,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L273",
+      "line_sha256": "5e26138f74183bd341ecf55f2397d11f45aad22b825910a21f56c1a18f8ebf26",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 274,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L274",
+      "line_sha256": "5ac8df7f3736a7303f6ae6859f33aeec7f3215c5531071f448310b7e0b173786",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 275,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L275",
+      "line_sha256": "85b56f82e906fb5c1ee4e1a0d088bbf15c95be21bfc463c11cd95ca6178bf5ab",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CT-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 276,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L276",
+      "line_sha256": "6827a038c42a285f0f99ab1a13de08a139e989f6e85db4afb866d35553cae81f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 277,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L277",
+      "line_sha256": "450550655a5c26fca381137229efc4df7bebdad6190e749be2ebce3174b57229",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 278,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L278",
+      "line_sha256": "1097867f31b1a818d4d67149d7a6f8febe75558ef1bb887ca6c65c17eecb34b5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 279,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L279",
+      "line_sha256": "541ff94f289bf1c90c7551a63392d904431e17e994c06a220bbdd3ad747103b9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 280,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L280",
+      "line_sha256": "2203f88183aace151f429e3427ab9f4ed4b3bc0f2483e9d892232e494aec1fe0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 281,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L281",
+      "line_sha256": "8b51aedf3a265bd2def20b17957862a258919b5a07ccc310601ebac785ddea52",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 282,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L282",
+      "line_sha256": "cf5fcb02bc445153526d2dab521e02c1d903df0e5c40441e4adbbdc487858183",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 283,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L283",
+      "line_sha256": "97ed424d9b19415f839384fa4c8bfa191cb5ffe204614eee5492ab98cba7e9c6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-008",
+      "baseline_status": "CONFIRMED-DELEGATED",
+      "section": "Сообщество и уведомления",
+      "line": 284,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L284",
+      "line_sha256": "472a1fcdf82db6d88b2fd06799f5f5ac35f876ecc31eab623b3467b0a84da6bc",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 285,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L285",
+      "line_sha256": "146ffeba5cdd45e48539bf1dd37d226fe2154a5a93ba41cc8514100492057bf2",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-010",
+      "baseline_status": "CONFIRMED-DELEGATED",
+      "section": "Сообщество и уведомления",
+      "line": 286,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L286",
+      "line_sha256": "159ff7f40d4021d6448071aa6a52ed1ef0269e134c6a23f4514275924ea959dc",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 287,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L287",
+      "line_sha256": "7de72d749652051c1f5740b26da64800c6a15c211738ddf4068fb1cf3b64dded",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "CD-012",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 288,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L288",
+      "line_sha256": "88172cf54c5fa471190d39f26bbffa98cfbb12ac5edf2af7cf6a9783b9e81a41",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "FEED-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 289,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L289",
+      "line_sha256": "d2d1ad4b13f1fb6bbe745502e7a973842afa817929e4e63ed2cd0b4560a8d191",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "FEED-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 290,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L290",
+      "line_sha256": "c59abe63a2e8c3f21d2f4b3d3f41fcf0d193934deef028ddee4826b648f1b3bb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DISC-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 291,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L291",
+      "line_sha256": "a47600f63be12883a5c5029d2cdfe3f15c883d74bc8d01c87cf9bce260a0d17c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DISC-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 292,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L292",
+      "line_sha256": "6c24ec446791dec959430f4a9d207750170e17e6c43fead4ecaf28c8cac26295",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MSG-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 293,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L293",
+      "line_sha256": "2464b3cce9cee9ad194f5ed54eb8e025ea0eba9dd15f2457541e4345a07f9131",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "NOTIF-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 294,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L294",
+      "line_sha256": "0c50263194f24b63cdf3b8134e210fc7113e06736f37b143d4bbde232a421c20",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "NOTIF-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 295,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L295",
+      "line_sha256": "5da64c58c0e50a78f5768230b0aad02a80e29c474d553d319da1eb50a47e74ee",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "NT-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Сообщество и уведомления",
+      "line": 296,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L296",
+      "line_sha256": "3f5baff4d11b4c09c40fae2dffec7286ac2969e19b10a707951957610a2e3025",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 302,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L302",
+      "line_sha256": "4849a98e4a97bb3fe2050c4dbdaf28dd2735ae688d3c5a91b6f402056570cea8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 303,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L303",
+      "line_sha256": "562b726738bc28dd45b5903ef60fd93e26f9ae19f3fe84296788717593e658a2",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 304,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L304",
+      "line_sha256": "5736e2a3c7eb0619c2437efc849fa412bf8f4bb360542f7f150bb9878880988c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 305,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L305",
+      "line_sha256": "086bda58ba455a2832848410c85a56be08fdf470a1dee82d88738af4fde24936",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 306,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L306",
+      "line_sha256": "ea4d98836134f6887c4a83cca9701dde6b666274545647d44fa20caa724b330e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 307,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L307",
+      "line_sha256": "93e6e699a368197e7de75301a116edb795e2a278431ae3d1560bcd36bf3a65f1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 308,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L308",
+      "line_sha256": "62feb243c458ba331e1a237b74f6b8b7d610191f1647b1a0300cc30efeebfc5c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ADM-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 309,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L309",
+      "line_sha256": "d1a0c668e7798d1327bfe91762f7de57ff29de3e2d1ade87921ab1557c1e2a6e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 310,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L310",
+      "line_sha256": "e763d3a70ae203b94b83cc0dfbf1bfa7f1f948c48b8fad10a5be2e16cf63b3c1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 311,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L311",
+      "line_sha256": "12b131a2553d5d8e4d719b7d47af3b486a40834858a489f75f63998bb8dc3c53",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 312,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L312",
+      "line_sha256": "8b570e81aa8c457772eeac91a4d0c9272546dc68cf7ff32823cee9081ae11598",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 313,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L313",
+      "line_sha256": "ccf9a27d8077441819b04f4d0c342a3273475a40a593fb33277a6de4a39928c3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 314,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L314",
+      "line_sha256": "8f17c36437c9f045972f0d1d080c3fc2f85cd5e387e8b0f56ee43b15c12cbcdc",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 315,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L315",
+      "line_sha256": "2f75692044c6e83c6b7c61272ba11cfb90337f75b8e0378c3df4c52ee4fd34cb",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 316,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L316",
+      "line_sha256": "e013704b48b899a11196e8b5ef2a7c55af633ac98394dc1dba75d02b31a52e59",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 317,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L317",
+      "line_sha256": "4ee07bddea7ee78332a8ad14a564bd726dd33d03ac4529dd0fc2772854bff275",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "MOD-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 318,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L318",
+      "line_sha256": "a573d3ce84f1047e377ba4ffbbc9a9f3b75134e8b14f1d144aa5e624c6c370c1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "REP-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 319,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L319",
+      "line_sha256": "6d134b76da0c41efad82797fd1592e5be36bac43a007fe22ef9122c86072c906",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "REP-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 320,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L320",
+      "line_sha256": "cc839de024ca1cd61bdfa24a6fbc37a2c628b1b21e3b8880e7444025ad332222",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "REP-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 321,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L321",
+      "line_sha256": "0eef648d1bc5e65b8468af56a668e64930c3989629b9b33455cc19d0195285a9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "REP-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 322,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L322",
+      "line_sha256": "25d054f99e4a98f9863c5f16a26210eadf32ebbe4a3a91f5a4b9b8ece31a067b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "REP-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 323,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L323",
+      "line_sha256": "d042d2a118e2ed095e90c28484b6667fc1f9b3afb810a0e05279bc953bc7f7c3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "REP-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 324,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L324",
+      "line_sha256": "33585b1730261f44677d0f19880fff624cc9fde2f8fe6b6f12183287e18ff486",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "TRUST-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 325,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L325",
+      "line_sha256": "97b626d63815a8c1beeadd961b7a62c4f6fd66068784ea96ddf6805b40473e12",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "TRUST-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 326,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L326",
+      "line_sha256": "a74f88e76743cedd402087fc4082149bd2952410958b05270643c74d435b7438",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "TRUST-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 327,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L327",
+      "line_sha256": "56ce49ff55425b5a866423f7121ba9cf5b3deddd3a16b5f3eec93f673c9343f8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ENF-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 328,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L328",
+      "line_sha256": "ec7d482170763e6de1e9fe5615baf20ef77b4f2a23e5bf5b3eba45928ebde5d2",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ENF-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 329,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L329",
+      "line_sha256": "b3c8b2c92df9c433b14b176452b928de2c4fc7bee7ee776ef962344a21b36a0b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "STAFF-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 330,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L330",
+      "line_sha256": "9ff77b2d5b733625f7e061ae50ea7815e5036157b45a452463f0885f22ce80c3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "STAFF-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 331,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L331",
+      "line_sha256": "3f6056b28e84292bbab48d5afc37d14fb689a0a8b7e0664c45eff7a325e875fa",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "STAFF-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 332,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L332",
+      "line_sha256": "50d61f36597b2972281789d1785245429dbba1363163ad0a8ca1c70b50e09280",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "STAFF-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 333,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L333",
+      "line_sha256": "c1dd43d4d4ffcd82cf3135befba8001f67a276b898dea2cd6ed8b51cd36213ed",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "STAFF-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 334,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L334",
+      "line_sha256": "c89a9828b7a47a020135d26df3458a50824f2e962fad9f796bc30adbd61ccbef",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SYS-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 335,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L335",
+      "line_sha256": "14713a50690b13a4c4f8ab1d6ee50db3953a805ebf146b4af3902e4056fddb2e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ABUSE-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 336,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L336",
+      "line_sha256": "4ca42b8c8344aebc40256ea0517c0e09d196ad6623f14333f671a90e174add4f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUP-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 337,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L337",
+      "line_sha256": "e4dd57703b95c1410150567eba087723d7c10d8b7dc3ac36b05a727cdb97712d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUP-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 338,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L338",
+      "line_sha256": "7992465eea5dbbb24b6bea36da787e689002e2b3474d1e639b1cb6cd2bb6aeed",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUP-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 339,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L339",
+      "line_sha256": "42b87a442cb753c5519fff17711d85da25972d133bff96aa27412080d19bdadd",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUP-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 340,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L340",
+      "line_sha256": "91b6c097a57b4d44710128c9df240a56d1940002a660af86c3c8c4574efde040",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUP-011",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 341,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L341",
+      "line_sha256": "ce45abdce6a0aeb7974fcc279dd95e5cca530b579dc68a00e7e366284422cda6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "SUP-012",
+      "baseline_status": "CONFIRMED",
+      "section": "Доверие, модерация и поддержка",
+      "line": 342,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L342",
+      "line_sha256": "e2a9f0c52e58c5db6cb52f4e7c482d0cc686d1e8925d66b5fa1cbe2c3e66d13d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "UX-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 348,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L348",
+      "line_sha256": "8516f4f2627d00e4564dd2d5cd2a20dafc3c65b04c14e84c70fcc9571fb50b9c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "UX-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 349,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L349",
+      "line_sha256": "2ab40a4f248852b6f153c2806c2eb1794f41ae752b15149bb406d5b850a70f28",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "UX-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 350,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L350",
+      "line_sha256": "1a18750b0ffb80c5cbb52f1b5a2be4d57b00e44b15002272b8eacf158ee58da3",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "UX-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 351,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L351",
+      "line_sha256": "5b8560c366439c5fd945d9d10889ee8934d3ab0c64aa887455266fb4e8678333",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "UX-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 352,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L352",
+      "line_sha256": "24d0379456aad013ae3ec30ecd5b5d8b1d9f3efc85958559974371dd583921b9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "UX-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 353,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L353",
+      "line_sha256": "6f96e8d396a9b7b189a8538ae6aa7ef910c26df6db6693d3187f1bf53a25fd88",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "WS-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 354,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L354",
+      "line_sha256": "0190aa52dc2d0ed04cb24d4ff2b035c7878958cc7a5566528045ddb04fd183fa",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "WS-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 355,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L355",
+      "line_sha256": "f013c704955cf1814cd929b5874e2503a8de6bac1ed07a05c2a6ee5bc1cd3583",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "WS-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 356,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L356",
+      "line_sha256": "22690de3e7b73551694d438eb1574c109dc493d78d6586e52429e655951323f9",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "WS-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 357,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L357",
+      "line_sha256": "9f1a5d924e920702675142ba9171a912e2d1d4cd5c0c50c89b2832b187f27021",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "NAV-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 358,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L358",
+      "line_sha256": "68d68374a6fb136422e5384ada6785805804a71f3fd6358da937b1a71d686c26",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "HOME-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 359,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L359",
+      "line_sha256": "175151fe79f844a9bbd8eb96d6b2436785ae6bc75bd5704fd4aa1a57f60f2fe7",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "HOME-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 360,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L360",
+      "line_sha256": "daa7a2d9d37ba947b62abb6853fe4cbb2b9ce76ca7b0f79ba4521adb28726b9a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "HOME-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 361,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L361",
+      "line_sha256": "63833aa17f55f74f1137cf1a1efa9d12b732f5a81bbe0675b4d5a04d7ba4c5b5",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PROF-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 362,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L362",
+      "line_sha256": "4beb63743a6e0a650f2b033897ada2140c3c5c22b9f81188a3834c8e00fc714c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PROF-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 363,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L363",
+      "line_sha256": "1d0933b71b7e049321a1aa37d45054d612b613241762b4ff5dd7ad54eacffc3d",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PROF-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 364,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L364",
+      "line_sha256": "3ab4afc26eaaae4759342dfed8db3d7ba4e1a743fd64572660182756ac0919bd",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PWA-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 365,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L365",
+      "line_sha256": "4aa8d6d2591fcf6cd67628c9e4a19d3b0e57c1c94a13969887d98a9718e08e3c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "PWA-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 366,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L366",
+      "line_sha256": "c123bed37402a717a2bec934be6f57dbe78f1f0c3f54e1d3bf51e84dd6e19494",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "ERR-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Интерфейс и пользовательские поверхности",
+      "line": 367,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L367",
+      "line_sha256": "70a860b7830c8fecd6b336ac1269ff6d0437a81f91b481ae193de599b610a3f6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-001",
+      "baseline_status": "CURRENT",
+      "section": "DRM",
+      "line": 373,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L373",
+      "line_sha256": "d88564749684206047f393219b4a4efaa8840a8f3a16e3c4b30a46e522fba03f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-002",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 374,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L374",
+      "line_sha256": "306b0cc1d80fc32231a950c397d422d5a15a52fef8ca1afb77783a7a44aceb94",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-003",
+      "baseline_status": "LEGACY",
+      "section": "DRM",
+      "line": 375,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L375",
+      "line_sha256": "13280ffd4a8eafad1c3e38a603e2e784ddb43300277e4955462d307b470f89b0",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-004",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 376,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L376",
+      "line_sha256": "7d65907e16c44f500bee9f6b318816b6ece488f74ac91f33b252ae70b3df8963",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-005",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 377,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L377",
+      "line_sha256": "790affbc10cdfaac84b7b5de3373e40565c44f5f44e71f3b4f93caef6976b2c8",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-006",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 378,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L378",
+      "line_sha256": "90a6da7e066495758ad70c4c826cb9532f9f7963a636a67a40b4f9a5208aa732",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-007",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 379,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L379",
+      "line_sha256": "1a3fc5464c152293fdc588509510cbdb12a38bef8a9583fd3c696000a325c491",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-008",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 380,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L380",
+      "line_sha256": "6b4298645f7420279b044abef3fe54a4384f10885bbc75423387a0c6f1b05be1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-009",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 381,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L381",
+      "line_sha256": "9f24d87f4c552d71702acfc02e3ca335ac37ab3abc66b388148e13907e7c351e",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-010",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 382,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L382",
+      "line_sha256": "f44a7eaa8e13cdd3b1ceb0a20ba888397a51f764c591963e452d4158c428b90f",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-011",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 383,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L383",
+      "line_sha256": "5ce68ebca6f87d376a06d2542cd576a458e5b55fb739eb0ee63fea11a2ffde8b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-012",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 384,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L384",
+      "line_sha256": "a0f193815d7333ef77811fa831ab7b1fe89c57d93f5437e24e9754b921d688b7",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-013",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 385,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L385",
+      "line_sha256": "93d7879147205f7c23c0049efe5701359cc229b54961001a2ea684c57626feb6",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-014",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 386,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L386",
+      "line_sha256": "b38044183e977b658fa749a9e3974b40b9200b7bf0e85f70181faf0c2cb931e1",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-015",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 387,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L387",
+      "line_sha256": "fb8b46b8ff95741e96b51d4700e982b53aff4795eb7fbac76ad662b39edefcc7",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "DRM-016",
+      "baseline_status": "CONFIRMED",
+      "section": "DRM",
+      "line": 388,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L388",
+      "line_sha256": "1307239b53e638ffc8407ca5edff30655b12df3685aaaab093aedabfaa5fc0e4",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-001",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 394,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L394",
+      "line_sha256": "4b1cf25d3e26a7434f746bc4d8dd3b3946a056463fedc20e0121493d9e1b1531",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-002",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 395,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L395",
+      "line_sha256": "904803a0702e5eee7e597f230a4ae5c1e73d10761f838e5602867c3cb6d8a758",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-003",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 396,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L396",
+      "line_sha256": "e6825cdeac4e7d0046ca05e5622c5196c3bd08c6e95b698bed40d90755fa8bad",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-004",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 397,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L397",
+      "line_sha256": "58e4464cb01d59727a31ff6ac8dff9f36be0521282a00b0f2a029c87786f1acc",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-005",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 398,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L398",
+      "line_sha256": "d70d50da959124458281a3b4d12a47d7d38440b6782c4494251fea86c29c211c",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-006",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 399,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L399",
+      "line_sha256": "42b5f9c3576788def89520204a22d8fcfe3e6d7603e4161ade94aedf139acf8b",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-007",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 403,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L400",
+      "line_sha256": "d023224504d82ff4990996ebe8ba97806ace7aac917803ab7cd942480978efba",
+      "migration_state": "reconciled_doc02_norm_aligned_with_agents",
+      "proposed_target": "docs/DECISIONS.md",
+      "reconciled_note": "DOC-02 updated operative wording to require explicit owner instruction for GitHub push; stable ID retained; prior package-baseline wording remains in Git history."
+    },
+    {
+      "id": "AI-008",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 401,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L401",
+      "line_sha256": "c255dae6b90f17f7e15962f8a2cda03f4eabe58e2c0df40b4fc02668d971202a",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-009",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 402,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L402",
+      "line_sha256": "1b07548acbc97932f355b4e64562fbc3a2b3e31e830f9da64b65d8afd9413393",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    },
+    {
+      "id": "AI-010",
+      "baseline_status": "CONFIRMED",
+      "section": "Правила разработки с ИИ",
+      "line": 403,
+      "url": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/13-DECISION-REGISTER.md#L403",
+      "line_sha256": "ab96adba611073a45762b1b6faf8269bc1ca637947fd655e18341d9bd9e21f11",
+      "migration_state": "preserve_semantics_review_required",
+      "proposed_target": "docs/DECISIONS.md"
+    }
+  ],
+  "warning": "This is an identity/status index, not a replacement of decision text. Preserve exact active semantics during DOC-02. DOC-02 reconciled AI-007 text in source_path; source_sha256 refreshed after that edit. Historical package snapshot hash differed; ID set and row inventory remain the baseline of 309 decisions.",
+  "doc02_reconciled_ai007": true
+}

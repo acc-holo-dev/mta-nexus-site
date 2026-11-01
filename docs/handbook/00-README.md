@@ -1,9 +1,12 @@
-# Продуктовые решения MTA NEXUS
+# Handbook MTA NEXUS
 
-Начните с [README](../../README.md), [правил разработки](../../AGENTS.md) и [карты проекта](../PROJECT-MAP.md). Этот каталог содержит решения владельца и предметные спецификации. [Decision Register](13-DECISION-REGISTER.md) — основной реестр решений; [карта областей](15-AI-CONTEXT-INDEX.md) помогает найти нужную главу.
+После DOC-04 предметные главы перенесены в сводные контракты. Актуальный вход:
 
-MTA NEXUS объединяет серверы, ресурсы, сообщество, контент, marketplace, доверие и идентичность. Закрытая бета поддерживает бесплатные ресурсы. Платный marketplace, подписки и DRM — утверждённое направление; наличие модели или документа не означает, что они работают в production.
+- [AGENT](../AGENT.md) · [PROJECT-MAP](../PROJECT-MAP.md) · [PRODUCT](../PRODUCT.md)
+- [RESOURCES](../RESOURCES.md) · [COMMUNITY](../COMMUNITY.md) · [SERVERS-ORGS](../SERVERS-ORGS.md)
+- [TRUST-STAFF](../TRUST-STAFF.md) · [COMMERCIAL-FUTURE](../COMMERCIAL-FUTURE.md)
+- [FLOWS](../FLOWS.md) · [UX-CONTRACT](../UX-CONTRACT.md) · [OPERATIONS](../OPERATIONS.md)
+- Полный реестр decision ID: [13-DECISION-REGISTER.md](13-DECISION-REGISTER.md) (+ [DECISIONS](../DECISIONS.md))
+- Карта код→контракт: [15-AI-CONTEXT-INDEX.md](15-AI-CONTEXT-INDEX.md)
 
-Текущие ограничения: [архитектура](../ARCHITECTURE.md), [эксплуатация](../OPERATIONS.md), [открытые проблемы](../PROBLEMS.md). При конфликте уточняйте последние указания владельца и действующие решения; фактическое поведение проверяйте в коде и миграциях. Исторические обсуждения доступны через Git.
-
-Порядок работы и критерии завершения: [план разработки](10-ROADMAP.md). Данные и связи: [карта данных](08-DOMAIN-AND-DATA-MODEL.md). Инструкции агенту поддерживаются только в `AGENTS.md`; отдельные handoff-журналы не создаются.
+Исторические редакции удалённых глав доступны в Git (baseline `385e577e7443cf7d7b817419ce5c3b8afe87b690`). Manifest удалений: [`planning/deletion-manifest.json`](../../planning/deletion-manifest.json).

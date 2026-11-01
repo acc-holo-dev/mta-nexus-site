@@ -1,0 +1,21 @@
+{
+  "purpose": "Frozen import baseline from development package v1; do not edit for live status.",
+  "created_on": "2026-11-01",
+  "baseline_sha": "385e577e7443cf7d7b817419ce5c3b8afe87b690",
+  "tracker_choice": "json_in_repo",
+  "transition": "DOC-03 activated JSON-in-repo as the single working tracker. GitHub Issues import is deferred until an explicit owner permission for github_settings.",
+  "files": {
+    "tasks.json": {
+      "bytes": 362795,
+      "sha256": "866c81fe798662c6401898be800f1420993467b775e8bffb1782d0319790729d"
+    },
+    "task-schema.json": {
+      "bytes": 2765,
+      "sha256": "661d3b0239a2df1cbd342a2ce3b3013de97ec15c1b65ac883217b0256e107761"
+    },
+    "source-register.json": {
+      "bytes": 373458,
+      "sha256": "e8b6c71f4acc2ed66ee752634ccecc1444cadf4d630f969152757c9e4df97c55"
+    }
+  }
+}

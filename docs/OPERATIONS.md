@@ -3,7 +3,7 @@
 This document covers development startup, verification and production boundaries.  
 Документ описывает запуск разработки, проверки и эксплуатационные ограничения.
 
-Компактная карта репозитория: [PROJECT-MAP.md](PROJECT-MAP.md).
+Компактная карта репозитория: [PROJECT-MAP.md](PROJECT-MAP.md). Предметные контракты DOC-05 (ресурсы/trust/commerce/…) — рядом в `docs/`; **этот файл остаётся authoritative runbook** команд и markers. Storage/scanner цели дополнительно: [ARCHITECTURE](ARCHITECTURE.md), [55…](ARCHITECTURE.md).
 
 ### Contents / Содержание
 
@@ -14,9 +14,16 @@ This document covers development startup, verification and production boundaries
 5. [Resource safety operations](#5-resource-safety-operations)
 6. [Branch and release operations](#6-branch-and-release-operations)
 
+- [Compose overlay matrix](#compose-overlay-matrix)
+- [Same-digest promotion across runtime origins](#same-digest-promotion-across-runtime-origins)
+- [Forward-only migration authoring](#forward-only-migration-authoring)
+- [Base and infra image digests](#base-and-infra-image-digests)
+- [Release manifest and retention](#release-manifest-and-retention)
+- [Trusted GHCR publish prep](#trusted-ghcr-publish-prep)
 - [Resource integrity rollout and seed recovery](#resource-integrity-rollout-and-seed-recovery)
 - [Production compilation in restricted build environments](#production-compilation-in-restricted-build-environments)
 - [Existing-installation release and recovery](#existing-installation-release-and-recovery)
+- [Worker container limits](#worker-container-limits)
 
 ## 1. Supported DEV startup
 
@@ -26,7 +33,7 @@ Use the root `compose.yaml` directly when you want a Docker-only startup:
 docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600
 ```
 
-When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is shown below. Host tooling is explicit: `.nvmrc` and `.node-version` pin Node 26.10.0, and `package.json#packageManager` pins pnpm 12.4.2. Use the repository version files before running host-side commands:
+When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is shown below. Host tooling distinguishes **major-ok** (`package.json#engines.node`: `>=26.0.0 <27`) from the **exact** host/CI pin (`.nvmrc` and `.node-version`: `26.10.0`) and exact pnpm (`package.json#packageManager`: `pnpm@12.4.2`). `pnpm nexus:doctor` passes major-ok and warns on exact drift; release evidence requires exact matches. Docker images use `node:26-alpine` for the same major branch. Use the repository version files before running host-side commands:
 
 ```bash
 pnpm dev
@@ -289,6 +296,99 @@ Required properties include:
 - explicit recovery/email configuration before claiming email delivery is operational.
 
 Paid commerce remains disabled.
+
+### Compose overlay matrix
+
+Compose merge order is significant. Do not combine the development base with the
+production base. Supported scenarios (OPS-04 / ARC09):
+
+| Scenario | Files (left → right merge order) | Expected roles |
+| --- | --- | --- |
+| Dev | `compose.yaml` | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker` (host source mounts + loopback app port) |
+| Dev + local mail capture | `compose.yaml` + `compose.mailpit.yaml` | Dev roles + Mailpit + durable account-mail worker (capture only) |
+| Isolated verify | `compose.verify.yaml` | Disposable `postgres` + `verify` (no production ports; not a deploy) |
+| Production | `compose.production.yaml` | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker`, `caddy` |
+| Production + recovery mail | `compose.production.yaml` + `compose.recovery.yaml` + `compose.mail-worker.yaml` | Production roles + optional `mail-worker`; recovery env on `app` |
+| Production + recovery mail + file secrets | …previous… + `compose.recovery-file-secrets.yaml` (and optional auth/CA/rotation file overlays) | Same roles; secrets via `/run/secrets` — do not mix conflicting env+file values for the same key |
+| Production CI | `compose.production.yaml` + `compose.production-ci.yaml` | Same production service set; Compose ≥ 2.24.4 for `!override`; Caddy published only on loopback `127.0.0.1:8080` / `127.0.0.1:8443` |
+
+**Inventory (production base writers and edge):**
+
+| Role | Service | Notes |
+| --- | --- | --- |
+| HTTP + migration phase | `app` | Entrypoint migrates before HTTP (`scripts/start-production.sh`) |
+| Web Push | `push-worker` | Always in production base |
+| License maintenance | `license-worker` | Always in production base |
+| Resource release notices | `resource-release-worker` | Always in production base |
+| Optional account mail | `mail-worker` | Only when mail overlays are enabled |
+| Ingress | `caddy` | Stop during maintenance; not a DB writer |
+| Database | `postgres` | Keep running for `pg_dump` |
+| Scanner | `clamav` | Keep available; not an application writer |
+
+Production rendered config must not carry development source bind-mounts
+(`./apps/...`, `./packages/...`). CI must not publish non-loopback host ports.
+Static `docker compose config` with synthetic values confirms shape; it does not
+prove live readiness. Contract tests: `scripts/tests/compose-overlay-matrix.node-test.mjs`
+plus recovery/mail fixtures under `scripts/tests/*compose*`.
+
+### Same-digest promotion across runtime origins
+
+OPS-05 / ARC10: one prebuilt `runtime` app image is promoted under different
+allowed HTTPS origins **without rebuild**. Build-stage `NEXT_PUBLIC_APP_URL`,
+`AUTH_SECRET` and `DATABASE_URL` in the Dockerfile are compile placeholders only;
+`@nexus/config` rejects those build-placeholder secrets if they reach a production
+process. Prefer canonical runtime `APP_URL`; Compose may still set the historical
+server name `NEXT_PUBLIC_APP_URL` (entrypoint keeps them aligned). Client bundles
+must not read `NEXT_PUBLIC_APP_URL` for links or CSRF. Caddy uses runtime
+`{$DOMAIN}`; production Compose templates
+`NEXT_PUBLIC_APP_URL=https://${DOMAIN}` while the disposable CI overlay uses
+`https://nexus-ci.test:8443` against `${NEXUS_CI_IMAGE}` (prebuilt).
+
+**Local contract (does not claim production PASS):**
+
+```bash
+node --test scripts/tests/production-entrypoint.node-test.mjs
+pnpm test:focus tests/config.test.ts tests/production-runtime-readiness.test.ts \
+  tests/production-tracing-bounds.test.ts tests/production-edge-security.test.ts
+```
+
+Full disposable image rehearse remains `scripts/check-production-startup.sh` on a
+GitHub-hosted runner with its existing guards (`NEXUS_CI_PREBUILT_IMAGE` when
+reusing one digest). That check is external to local development and is not
+asserted PASS here.
+
+### Forward-only migration authoring
+
+Schema history is forward-only ([ARCHITECTURE](ARCHITECTURE.md)): new changes are
+new SQL migrations; rolling back an image does not roll back the database. Applied
+SQL files and `packages/db/migrations/meta/_journal.json` are not rewritten.
+
+**Current generator risk (OPS-06 / ARC14):** the journal contains migrations through
+the latest `0087_*` tag, while Drizzle meta snapshots still stop at `0000` /
+`0001`. Plain `pnpm db:generate` / `drizzle-kit generate` against that lag is
+unsafe in the main checkout and is refused by
+`packages/db/scripts/guard-db-generate.mjs`.
+
+**Supported authoring path (manual/custom + guards):**
+
+1. Work only in a disposable checkout or temporary branch. Do not run generate
+   against the live main working tree as a “fix”.
+2. Create an empty custom migration:
+   `NEXUS_ALLOW_DB_GENERATE=1 pnpm --filter @nexus/db generate:custom -- --name <descriptive_tag>`
+3. Hand-author only the expected forward-only delta in the new SQL file. Keep
+   retries/idempotency compatible with existing upgrade rehearsal.
+4. Update the release-upgrade contract target when the journal advances
+   (`packages/db/scripts/release-upgrade-contract.mjs` and
+   `scripts/tests/release-upgrade.node-test.mjs`).
+5. On hosted CI, run the existing disposable upgrade path
+   (`packages/db/scripts/check-release-upgrade.mjs`). Do not point tooling at a
+   working production database.
+
+Plain generate remains unsupported while snapshots lag. A disposable experiment
+requires the explicit double opt-in `NEXUS_ALLOW_UNSAFE_DB_GENERATE=1` and must
+never be used to “align” applied history by rewriting journal/SQL. Domain/data
+model context for schema work lives in [ARCHITECTURE](ARCHITECTURE.md) (handbook
+`08-DOMAIN…` was removed; do not revive that path).
 
 ### Recovering report inbox delivery
 
@@ -748,6 +848,65 @@ A release is not accepted merely because code exists on `main`. Acceptance requi
 
 Current package version: `1.2.0-beta.3`. Confirm the candidate version in `package.json`; a version string alone does not demonstrate production acceptance.
 
+### Base and infra image digests
+
+OPS-03 keeps Dockerfile/Compose on mutable tags (`node:26-alpine`,
+`postgres:18-alpine`, `caddy:2-alpine`, `clamav/clamav:1.5`) so Dependabot docker
+updates remain reviewable security PRs. The three Node stages
+(`development` / `build` / `runtime`) all follow that major-branch Node policy;
+the exact host/CI pin stays in `.nvmrc` / `.node-version`.
+
+PostgreSQL stays on major **18** with volume mount `/var/lib/postgresql`. An
+engine major upgrade is a separate operator procedure from application schema
+migrations.
+
+Release candidates record exact digests and platform in
+[`deploy/infra-image-pins.json`](../deploy/infra-image-pins.json). Resolve them
+when preparing a candidate (does not publish images or authorize production):
+
+```bash
+node scripts/resolve-infra-image-digests.mjs --platform linux/amd64
+# dry-run only:
+node scripts/resolve-infra-image-digests.mjs --dry-run
+```
+
+Updating digests is a reviewable file change. Unresolved pins are honest
+`status: "unresolved"` entries — do not invent production locks from tag strings
+alone. Mutable tags are never production deploy inputs; the approved digest from
+the release manifest is.
+
+### Release manifest and retention
+
+OPS-08 extends core release evidence with a versioned `releaseManifest`
+(`scripts/release-evidence-lib.mjs`). Required fields include:
+
+- `appVersion`, exact repository SHA, lockfile hash, toolchain evaluation;
+- app image digest/platform (may stay `unresolved` until trusted GHCR publish);
+- selected infra image pins, PostgreSQL major 18, schema baseline/target, migration hashes;
+- redacted role/overlay inventory and links to CI / upgrade / restore evidence;
+- `productionAuthorized: false` and `openBetaLive: false` always from the builder.
+
+Missing or mismatched digest/SHA/schema, or an unknown `schemaVersion`, blocks
+technical acceptance. CI artifact retention remains **14 days** and is not the
+durable release archive. Durable release-bundle/image retention stays
+`owner_decision_required` until the owner approves duration and store (OPS-16).
+Do not place secrets or working backups in release assets.
+
+### Trusted GHCR publish prep
+
+OPS-10 prepares a `ghcr-publish` job in `.github/workflows/ci.yml` that:
+
+- never runs on `pull_request`;
+- requires `plan.outputs.full == true` and a successful summary for the exact SHA;
+- restores the already-built `production.tar` (`fail-on-cache-miss: true`) and
+  validates `org.opencontainers.image.revision` — no rebuild under the same identity;
+- elevates `packages: write` only on that job (workflow default stays `contents: read`).
+
+Actual push stays gated on repository variable `NEXUS_GHCR_PUBLISH_ENABLED=true`
+after OPS-11 visibility/access acceptance. Until then the job is skipped and no
+GHCR package is published. Mutable tags such as `:latest` are not production
+inputs; consumers use the recorded digest.
+
 ## Resource integrity rollout and seed recovery
 
 Before applying migration `0024_product_type_invariant`, inspect the type inventory
@@ -978,8 +1137,18 @@ to be true in the upgrade and restore reports. A downloaded report alone is not
 success. These reports extend the core release evidence; they are separate required
 workflow steps, not additional gates silently inferred by the core JSON summary.
 
-The upgrade fixture pins its baseline and latest target in [`release-upgrade-contract.mjs`](../packages/db/scripts/release-upgrade-contract.mjs) and fails when another migration
-is added without updating that contract. It verifies the Support tables, Web Push subscriptions, durable outbox
+Upgrade evidence is versioned (`schemaVersion: 1` on newly written artifacts). The
+strict validator in [`release-upgrade-contract.mjs`](../packages/db/scripts/release-upgrade-contract.mjs)
+rejects missing/mismatched SHA, wrong `baseline`/`target`, incomplete `phase`
+(must be `complete`), and missing/false/wrong-type required boolean flags.
+Retained full-format CI artifacts that omit `schemaVersion` remain accepted when
+identity, phase, baseline/target and flags are otherwise complete; status-only
+`PASS` JSON is not enough. Technical upgrade PASS never sets
+`productionAuthorized` — deploy authorization stays a separate owner decision.
+Beta-candidate evaluation uses the same upgrade validator.
+
+The upgrade fixture pins its baseline and latest target in that contract and fails when another migration
+is added without updating it. It verifies the Support tables, Web Push subscriptions, durable outbox
 tables/indexes, queue-gate seed, legacy-row preservation, rollback/retry and
 idempotent rerun. Review and extend it with the next release's old-schema fixtures
 and data-changing effects. Its injected failure is synthetic and is appended to
@@ -1014,15 +1183,34 @@ topology; rehearse separately against a protected copy of the target dataset.
 
 ### Consistent backup and update
 
-Schedule a maintenance window. Stop public ingress, the app, and every enabled
-writer (including the optional account-mail worker and external jobs). Keep
-PostgreSQL running for the dump. Capture the app container ID before stopping it;
-the stopped container must remain available for its uploads mount.
+Schedule a maintenance window. Stop public ingress and every enabled application
+writer, then keep PostgreSQL running for the dump (OPS-12 / F05). The production
+base always includes `app`, `push-worker`, `license-worker`, and
+`resource-release-worker`. When recovery/mail overlays are enabled, also stop
+`mail-worker`. Stop any separately declared external writer jobs by their real
+service or host names. Leave `postgres` (and normally `clamav`) up. Capture the
+app container ID before stopping it; the stopped container must remain available
+for its uploads mount.
+
+**Writer stop/resume inventory (must match the enabled Compose set):**
+
+| Stop before dump / migration | Resume after candidate readiness | Keep up |
+| --- | --- | --- |
+| `caddy` (ingress) | last, after HTTPS checks | — |
+| `app` | first (`up … app`; single migration phase) | — |
+| `push-worker` | with approved image + VAPID | — |
+| `license-worker` | with approved image | — |
+| `resource-release-worker` | with approved image | — |
+| `mail-worker` (if overlay enabled) | with approved image + retained mail secrets | — |
+| external writers (if any) | same inventory / version | — |
+| — | — | `postgres` (required for dump) |
 
 Example backup commands below require operator-selected values. `PRODUCTION_ENV`
 is an absolute protected environment-file path; `RELEASE_DIR` is the existing
 deployment checkout; `PROJECT` is its unchanged Compose project name.
 `BACKUP_DIR` must be a new private directory outside the upload/database volumes.
+When mail overlays are in use, pass the same `-f` overlay files to every `dc`
+invocation (see [Compose overlay matrix](#compose-overlay-matrix)).
 
 ```bash
 set -eu
@@ -1038,10 +1226,12 @@ test -n "$postgres_id"
 old_image=$(docker inspect --format '{{.Image}}' "$app_id")
 postgres_image=$(docker inspect --format '{{.Image}}' "$postgres_id")
 mkdir -m 700 "$BACKUP_DIR"
-dc stop caddy push-worker app
-# Stop any additional enabled writer services/jobs (for example the optional
-# account-mail worker override) using their actual configured names too.
-# Proceed only after every writer is stopped.
+# Full production-base writer set + ingress. PostgreSQL stays up for pg_dump.
+dc stop caddy push-worker license-worker resource-release-worker app
+# If compose.mail-worker.yaml (or another writer overlay) is enabled:
+#   dc stop mail-worker
+# Stop any additional external writer jobs by their configured names too.
+# Proceed only after every application writer is stopped; do not stop postgres.
 docker exec "$postgres_id" sh -eu -c \
   'exec pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom --no-owner --no-privileges' \
   > "$BACKUP_DIR/database.dump"
@@ -1064,24 +1254,29 @@ immutable image. Start it with `up --detach --no-build --pull never --wait
 --wait-timeout 300 app` while ingress stays stopped. Include the same override in
 every command. The image entrypoint applies migrations before starting HTTP;
 an app restart can retry migrations, so stop a repeatedly failing candidate before
-investigating. Do not use `down --volumes`, `volume prune` or `db:seed` on this host.
+investigating. Do not open HTTP/ingress after a failed migration. Do not use
+`down --volumes`, `volume prune` or `db:seed` on this host.
 
 After app readiness succeeds, check `node scripts/check-local-readiness.mjs`
 inside the app, compare the migration ledger to the candidate journal, and verify
 the expected resource/build/entitlement/notification counts and upload checksums.
-Start the production push worker with the same candidate and retained VAPID
-configuration, then require its liveness probe to pass. If Web Push is configured,
-also run the queue probe and resolve any alert before restoring ingress:
+Resume the same writer inventory with the approved candidate image (and retained
+secrets). Start push, license, and resource-release workers, require their
+liveness probes, and only then restore ingress:
 
 ```bash
-dc up --detach --no-build --pull never --wait --wait-timeout 300 push-worker
+dc up --detach --no-build --pull never --wait --wait-timeout 300 \
+  push-worker license-worker resource-release-worker
 dc exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs
 dc exec -T push-worker node /app/scripts/check-web-push-worker-queue.mjs
+dc exec -T license-worker node /app/scripts/check-license-worker-health.mjs
+dc exec -T resource-release-worker node /app/scripts/check-resource-release-worker-health.mjs
+# If mail-worker was enabled before maintenance, start it with the same candidate
+# image and retained mail/recovery secrets, then check its health probe.
+# dc up --detach --no-build --pull never --wait --wait-timeout 300 mail-worker
 ```
 
-Start any additional enabled workers (for example account mail) with the same
-candidate and retained secrets. Restore ingress only after these checks, then
-verify through HTTPS:
+Restore ingress (`caddy`) only after these checks, then verify through HTTPS:
 
 - login, session revocation and the configured recovery-mail path;
 - catalog, existing free acquisition and a downloaded file's length/SHA-256;
@@ -1090,6 +1285,8 @@ verify through HTTPS:
 
 An unconfigured email provider is not successful delivery. If a critical flow
 fails, return to maintenance and select recovery before allowing new writes.
+Old application images are not a data rollback: see [Recovery decision](#recovery-decision)
+for schema compatibility versus paired dump/uploads restore.
 
 ### Recovery decision
 
@@ -1162,3 +1359,20 @@ capabilities dropped, no-new-privileges, a bounded PID limit, SIGTERM and a
 configuration, pins the push worker to the exact prebuilt commit image, disables
 restart only for the disposable test project, and asserts these runtime
 isolation properties before acceptance continues.
+
+### Worker container limits
+
+OPS-15 aligns production delivery workers to the same writable-path profile
+without changing batch/retry/SIGTERM delivery semantics:
+
+| Service | Writable paths | Notes |
+| --- | --- | --- |
+| `push-worker` | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Health + queue probes under `/tmp` |
+| `license-worker` | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Heartbeat JSON under `/tmp`; same read_only/cap_drop/pids/SIGTERM/75s |
+| `resource-release-worker` | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Same profile; durable queue/cursors stay in PostgreSQL |
+| `mail-worker` (optional overlay) | tmpfs `/tmp` (`HOME`/`TMPDIR`) | Already matched this profile |
+
+Do not extend `read_only` to `app`/PostgreSQL without a separate writable-path
+analysis. Structural Compose tests are necessary but not sufficient: rehearse a
+real batch, restart/stop, and health progress under the disposable production
+Compose acceptance before treating constraints as launch-proven.

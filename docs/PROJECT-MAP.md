@@ -1,6 +1,6 @@
 # Карта проекта MTA NEXUS
 
-Компактная навигация по репозиторию для людей и агентов. Политика слоёв — в [архитектуре](ARCHITECTURE.md); команды — в [эксплуатации](OPERATIONS.md); предметные главы — в [карте областей](handbook/15-AI-CONTEXT-INDEX.md). При расхождении со спецификацией доверяйте коду, миграциям и выполненным проверкам.
+Компактная навигация по репозиторию для людей и агентов. Рабочий вход: [AGENT.md](AGENT.md). Политика слоёв — в [архитектуре](ARCHITECTURE.md); команды — в [эксплуатации](OPERATIONS.md); предметные главы — в [карте областей](handbook/15-AI-CONTEXT-INDEX.md). При расхождении со спецификацией доверяйте коду, миграциям и выполненным проверкам.
 
 ## Стек (факт кода)
 
@@ -87,12 +87,23 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 
 ## Документы по роли
 
-| Нужно                | Открыть                                                     |
-| -------------------- | ----------------------------------------------------------- |
-| Правила агента       | [AGENTS.md](../AGENTS.md)                                   |
-| Слои и безопасность  | [ARCHITECTURE.md](ARCHITECTURE.md)                          |
-| Команды и ops        | [OPERATIONS.md](OPERATIONS.md)                              |
-| Открытые ограничения | [PROBLEMS.md](PROBLEMS.md)                                  |
-| Решения владельца    | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md) |
-| Очередь beta         | [10-ROADMAP.md](handbook/10-ROADMAP.md)                     |
-| Предметная глава     | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)   |
+| Нужно | Открыть |
+| --- | --- |
+| Как начать и выбрать задачу | [AGENT.md](AGENT.md), [AGENTS.md](../AGENTS.md) |
+| Что подтверждено сейчас | [CURRENT-STATE.md](CURRENT-STATE.md) |
+| Что строим / ближайший выпуск | [PRODUCT.md](PRODUCT.md) |
+| Ресурсы / библиотека / публикация | [RESOURCES.md](RESOURCES.md) |
+| Сообщество / identity | [COMMUNITY.md](COMMUNITY.md) |
+| Серверы / организации | [SERVERS-ORGS.md](SERVERS-ORGS.md) |
+| Доверие / staff / аккаунт | [TRUST-STAFF.md](TRUST-STAFF.md) |
+| Коммерция / DRM (будущее) | [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md) |
+| Решения (NX + указатель baseline) | [DECISIONS.md](DECISIONS.md) |
+| Полный реестр decision ID | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md), `planning/decision-baseline.json` |
+| Очередь и карточки | [ROADMAP.md](ROADMAP.md), [TASKS.md](TASKS.md), `planning/tasks.json`, [TRACKER.md](../planning/TRACKER.md) |
+| Проблемы и ограничения | [PROBLEMS.md](PROBLEMS.md) |
+| UI / сценарии | [UX-CONTRACT.md](UX-CONTRACT.md), [FLOWS.md](FLOWS.md) |
+| Выпуск / удержание / миграция docs | [RELEASE-PLAN.md](RELEASE-PLAN.md), [RETENTION-PLAN.md](RETENTION-PLAN.md), [DOCS-MIGRATION.md](DOCS-MIGRATION.md) |
+| Слои и безопасность | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Команды и ops | [OPERATIONS.md](OPERATIONS.md) |
+| Предметная глава (handbook, до DOC-04) | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md) |
+| Историческая очередь handbook | [10-ROADMAP.md](ROADMAP.md) |

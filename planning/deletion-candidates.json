@@ -1,0 +1,647 @@
+{
+  "as_of": "2026-11-01",
+  "task": "DOC-04",
+  "policy": "Delete only after retargeting consumers; keep 13-DECISION-REGISTER.md; history in Git",
+  "candidates": [
+    {
+      "file": "00-README.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "README.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/tasks.json",
+        "tests/mainline-repository-policy.test.ts"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "01-PROJECT-CONCEPT.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/PRODUCT.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "02-ROLES-AND-PERMISSIONS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/PRODUCT.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "03-FEATURES-AND-SURFACES.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/PRODUCT.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 5"
+    },
+    {
+      "file": "04-TRUST-SAFETY-SECURITY.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "05-UX-AND-DESIGN.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "docs/UX-CONTRACT.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 5"
+    },
+    {
+      "file": "06-BUSINESS-MODEL.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "08-DOMAIN-AND-DATA-MODEL.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/ARCHITECTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/source-register.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "10-ROADMAP.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/PROBLEMS.md",
+        "docs/PROJECT-MAP.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/tasks.json",
+        "tests/mainline-repository-policy.test.ts"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 7"
+    },
+    {
+      "file": "13-DECISION-REGISTER.md",
+      "action": "keep_required",
+      "outside": [
+        "AGENTS.md",
+        "README.md",
+        "docs/AGENT.md",
+        "docs/ARCHITECTURE.md",
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/COMMUNITY.md",
+        "docs/DECISIONS.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/PROBLEMS.md",
+        "docs/PROJECT-MAP.md",
+        "docs/RESOURCES.md",
+        "docs/TASKS.md",
+        "docs/TRUST-STAFF.md",
+        "planning/decision-baseline.json",
+        "planning/documents-map.json",
+        "planning/tasks.json",
+        "scripts/tests/ci-policy.node-test.mjs",
+        "tests/mainline-repository-policy.test.ts"
+      ],
+      "inside_count": 9,
+      "reason": "Canonical decision register / policy & decision-baseline source"
+    },
+    {
+      "file": "15-AI-CONTEXT-INDEX.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/OPERATIONS.md",
+        "docs/PROJECT-MAP.md",
+        "planning/documents-map.json",
+        "tests/mainline-repository-policy.test.ts"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 5"
+    },
+    {
+      "file": "17-DRM-AND-LICENSING.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "18-COMMERCE-AND-PAYOUT-FLOWS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "19-COMMUNITY-AND-RETENTION.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMUNITY.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/RETENTION-PLAN.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "20-ADMIN-MODERATION-AND-APPEALS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "21-REPUTATION-VERIFICATION-AND-REVIEWS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMUNITY.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/source-register.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "23-MARKETPLACE-PRODUCT-LIFECYCLE.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "24-SERVERS-ORGANIZATIONS-AND-PROFILES.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/SERVERS-ORGS.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 5"
+    },
+    {
+      "file": "25-DEALS-SERVICES-AND-GUARANTEE.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "docs/UX-CONTRACT.md",
+        "planning/documents-map.json",
+        "planning/source-register.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 7"
+    },
+    {
+      "file": "27-MESSAGING-GROUPS-AND-SOCIAL-SYSTEMS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMUNITY.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "28-CART-LICENSES-AND-ACCESS-RIGHTS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "29-SUPPORT-TRIAL-WISHLIST-AND-BILLING-UX.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/SERVERS-ORGS.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/SERVERS-ORGS.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "32-LAUNCH-ONBOARDING-AND-PRODUCTION-GATES.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/PRODUCT.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "docs/TASKS.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 5"
+    },
+    {
+      "file": "34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "docs/TASKS.md",
+        "docs/UX-CONTRACT.md",
+        "planning/documents-map.json",
+        "planning/source-register.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 4,
+      "reason": "Outside consumers: 7"
+    },
+    {
+      "file": "35-SECURITY-CENTER-QUARANTINE-ADMIN-AND-API.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/ARCHITECTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMUNITY.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TASKS.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 0,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/PRODUCT.md",
+        "docs/RETENTION-PLAN.md",
+        "docs/TASKS.md",
+        "docs/UX-CONTRACT.md",
+        "planning/documents-map.json",
+        "planning/source-register.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 8"
+    },
+    {
+      "file": "38-ACCOUNT-AUTH-AND-LIFECYCLE.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 4,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 2"
+    },
+    {
+      "file": "42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RETENTION-PLAN.md",
+        "docs/TASKS.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json",
+        "planning/tasks.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 6"
+    },
+    {
+      "file": "43-ROLE-SURFACE-MAP.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "44-GUEST-HOME-DISCOVER-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 2"
+    },
+    {
+      "file": "45-USER-PROFILE-COMMUNITY-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMUNITY.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "47-SELLER-CREATOR-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/RESOURCES.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "48-SERVER-OWNER-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/SERVERS-ORGS.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "49-ORGANIZATION-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/SERVERS-ORGS.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 4,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "50-STAFF-OPERATIONS-SCREENS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "51-PRICING-SUBSCRIPTIONS-ERROR-OFFLINE-UX.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 5,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 3,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 4,
+      "reason": "Outside consumers: 3"
+    },
+    {
+      "file": "55-PRODUCTION-STORAGE-SCANNERS-AND-OBSERVABILITY.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/ARCHITECTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/OPERATIONS.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "56-SUPPORT-SLA-AND-DISPUTE-TIMING.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "docs/TRUST-STAFF.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 1,
+      "reason": "Outside consumers: 4"
+    },
+    {
+      "file": "57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md",
+      "action": "retarget_then_delete",
+      "outside": [
+        "docs/COMMERCIAL-FUTURE.md",
+        "docs/DOCS-MIGRATION.md",
+        "planning/documents-map.json"
+      ],
+      "inside_count": 2,
+      "reason": "Outside consumers: 3"
+    }
+  ]
+}

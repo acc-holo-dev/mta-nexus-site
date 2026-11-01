@@ -4,7 +4,7 @@
 
 **Active development branch:** `main` only. Production-развёртывание требует отдельного решения.
 
-Быстрая ориентация по репозиторию: [карта проекта](docs/PROJECT-MAP.md).
+Быстрая ориентация: [контракт агента](docs/AGENT.md) · [карта проекта](docs/PROJECT-MAP.md) · [текущее состояние](docs/CURRENT-STATE.md).
 
 ## Запуск
 
@@ -52,6 +52,6 @@ docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-
 
 ## Документация
 
-[Правила для разработчика](AGENTS.md) · [Карта проекта](docs/PROJECT-MAP.md) · [Архитектура](docs/ARCHITECTURE.md) · [Эксплуатация](docs/OPERATIONS.md) · [Открытые проблемы](docs/PROBLEMS.md) · [Продуктовые решения](docs/handbook/13-DECISION-REGISTER.md) · [Карта предметных областей](docs/handbook/00-README.md).
+[Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Карта](docs/PROJECT-MAP.md) · [Состояние](docs/CURRENT-STATE.md) · [Продукт](docs/PRODUCT.md) · [Ресурсы](docs/RESOURCES.md) · [Сообщество](docs/COMMUNITY.md) · [Серверы/org](docs/SERVERS-ORGS.md) · [Trust/staff](docs/TRUST-STAFF.md) · [Коммерция](docs/COMMERCIAL-FUTURE.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Архитектура](docs/ARCHITECTURE.md) · [Эксплуатация](docs/OPERATIONS.md) · [Проблемы](docs/PROBLEMS.md) · [Handbook](docs/handbook/00-README.md).
 
-Фактическое поведение определяется кодом, миграциями и выполненными проверками. Утверждённые цели и текущая реализация могут отличаться. Старые сведения доступны в истории Git.
+Единственный рабочий tracker: [`planning/tasks.json`](planning/tasks.json) ([контракт](planning/TRACKER.md); Markdown — ROADMAP/TASKS/TRACEABILITY). Замороженный import baseline для будущего Issues: `planning/import-baseline/`. Миграция handbook: [DOCS-MIGRATION](docs/DOCS-MIGRATION.md). Фактическое поведение определяется кодом, миграциями и выполненными проверками. Утверждённые цели и текущая реализация могут отличаться. Старые сведения доступны в истории Git.

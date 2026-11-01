@@ -1,0 +1,410 @@
+{
+  "task": "DOC-04",
+  "as_of": "2026-11-01",
+  "kept": [
+    "docs/handbook/00-README.md",
+    "docs/handbook/13-DECISION-REGISTER.md",
+    "docs/handbook/15-AI-CONTEXT-INDEX.md"
+  ],
+  "deleted_count": 49,
+  "deleted": [
+    {
+      "path": "docs/handbook/01-PROJECT-CONCEPT.md",
+      "owner": "docs/PRODUCT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/01-PROJECT-CONCEPT.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/02-ROLES-AND-PERMISSIONS.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/02-ROLES-AND-PERMISSIONS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/03-FEATURES-AND-SURFACES.md",
+      "owner": "docs/PROJECT-MAP.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/03-FEATURES-AND-SURFACES.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/04-TRUST-SAFETY-SECURITY.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/04-TRUST-SAFETY-SECURITY.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/05-UX-AND-DESIGN.md",
+      "owner": "docs/UX-CONTRACT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/05-UX-AND-DESIGN.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/06-BUSINESS-MODEL.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/06-BUSINESS-MODEL.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/08-DOMAIN-AND-DATA-MODEL.md",
+      "owner": "docs/ARCHITECTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/08-DOMAIN-AND-DATA-MODEL.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/10-ROADMAP.md",
+      "owner": "docs/ROADMAP.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/10-ROADMAP.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/17-DRM-AND-LICENSING.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/17-DRM-AND-LICENSING.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/18-COMMERCE-AND-PAYOUT-FLOWS.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/18-COMMERCE-AND-PAYOUT-FLOWS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/19-COMMUNITY-AND-RETENTION.md",
+      "owner": "docs/COMMUNITY.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/19-COMMUNITY-AND-RETENTION.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/20-ADMIN-MODERATION-AND-APPEALS.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/20-ADMIN-MODERATION-AND-APPEALS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/21-REPUTATION-VERIFICATION-AND-REVIEWS.md",
+      "owner": "docs/COMMUNITY.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/21-REPUTATION-VERIFICATION-AND-REVIEWS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/22-SUBSCRIPTIONS-PROMOTION-AND-MONETIZATION.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/23-MARKETPLACE-PRODUCT-LIFECYCLE.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/23-MARKETPLACE-PRODUCT-LIFECYCLE.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md",
+      "owner": "docs/SERVERS-ORGS.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/24-SERVERS-ORGANIZATIONS-AND-PROFILES.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/25-DEALS-SERVICES-AND-GUARANTEE.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/25-DEALS-SERVICES-AND-GUARANTEE.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md",
+      "owner": "docs/UX-CONTRACT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/26-SEARCH-RANKING-ADS-AND-PERSONALIZATION.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/27-MESSAGING-GROUPS-AND-SOCIAL-SYSTEMS.md",
+      "owner": "docs/COMMUNITY.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/27-MESSAGING-GROUPS-AND-SOCIAL-SYSTEMS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/28-CART-LICENSES-AND-ACCESS-RIGHTS.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/28-CART-LICENSES-AND-ACCESS-RIGHTS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/29-SUPPORT-TRIAL-WISHLIST-AND-BILLING-UX.md",
+      "owner": "docs/FLOWS.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/29-SUPPORT-TRIAL-WISHLIST-AND-BILLING-UX.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md",
+      "owner": "docs/SERVERS-ORGS.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md",
+      "owner": "docs/SERVERS-ORGS.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/32-LAUNCH-ONBOARDING-AND-PRODUCTION-GATES.md",
+      "owner": "docs/PRODUCT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/32-LAUNCH-ONBOARDING-AND-PRODUCTION-GATES.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/35-SECURITY-CENTER-QUARANTINE-ADMIN-AND-API.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/35-SECURITY-CENTER-QUARANTINE-ADMIN-AND-API.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md",
+      "owner": "docs/COMMUNITY.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/36-IDENTITY-PROFILES-AND-VERIFIED-LINKS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md",
+      "owner": "docs/PRODUCT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/37-HOME-DISCOVER-NAVIGATION-AND-FEEDS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/38-ACCOUNT-AUTH-AND-LIFECYCLE.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/38-ACCOUNT-AUTH-AND-LIFECYCLE.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md",
+      "owner": "docs/UX-CONTRACT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/42-ANALYTICS-PRIVACY-RETENTION-AND-ACTIVITY-LOG.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/43-ROLE-SURFACE-MAP.md",
+      "owner": "docs/PROJECT-MAP.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/43-ROLE-SURFACE-MAP.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/44-GUEST-HOME-DISCOVER-SCREENS.md",
+      "owner": "docs/UX-CONTRACT.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/44-GUEST-HOME-DISCOVER-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/45-USER-PROFILE-COMMUNITY-SCREENS.md",
+      "owner": "docs/COMMUNITY.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/45-USER-PROFILE-COMMUNITY-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/47-SELLER-CREATOR-SCREENS.md",
+      "owner": "docs/RESOURCES.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/47-SELLER-CREATOR-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/48-SERVER-OWNER-SCREENS.md",
+      "owner": "docs/SERVERS-ORGS.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/48-SERVER-OWNER-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/49-ORGANIZATION-SCREENS.md",
+      "owner": "docs/SERVERS-ORGS.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/49-ORGANIZATION-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/50-STAFF-OPERATIONS-SCREENS.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/50-STAFF-OPERATIONS-SCREENS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/51-PRICING-SUBSCRIPTIONS-ERROR-OFFLINE-UX.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/51-PRICING-SUBSCRIPTIONS-ERROR-OFFLINE-UX.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/55-PRODUCTION-STORAGE-SCANNERS-AND-OBSERVABILITY.md",
+      "owner": "docs/ARCHITECTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/55-PRODUCTION-STORAGE-SCANNERS-AND-OBSERVABILITY.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/56-SUPPORT-SLA-AND-DISPUTE-TIMING.md",
+      "owner": "docs/TRUST-STAFF.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/56-SUPPORT-SLA-AND-DISPUTE-TIMING.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    },
+    {
+      "path": "docs/handbook/57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md",
+      "owner": "docs/COMMERCIAL-FUTURE.md",
+      "reason": "Superseded by DOC-05 subject contract; unique rules transferred; consumers retargeted",
+      "history": "https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/57-PLANS-QUOTAS-AND-ADMIN-CONFIG.md",
+      "deleted_on": "2026-11-01",
+      "task": "DOC-04"
+    }
+  ],
+  "notes": [
+    "13-DECISION-REGISTER.md kept as full decision text source for policy tests and decision-baseline.",
+    "00-README.md and 15-AI-CONTEXT-INDEX.md kept as thin navigation.",
+    "import-baseline/ and tasks.json evidence paths left as historical package snapshot (GitHub URLs remain valid).",
+    "Applied migrations, lockfiles, fixtures, and scripts were not deletion candidates."
+  ]
+}
