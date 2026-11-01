@@ -86,7 +86,9 @@ it("authenticates before any private query", async () => {
       searchParams: Promise.resolve({}),
     }),
   );
-  expect(html).toContain("/auth/login");
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fresources%2Fprd_a%2Fbuilds%2Fbld_a%2Fpackage"',
+  );
   expect(state.page).not.toHaveBeenCalled();
   expect(html).not.toContain("Private title");
 });

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
@@ -42,7 +43,11 @@ export default async function Page({
         if (error instanceof AppError && error.statusCode === 404) notFound();
         throw error;
       }),
-    copy = resourceReviewCopy(locale);
+    copy = resourceReviewCopy(locale),
+    reviewsPath =
+      result.page > 1
+        ? `/market/${encodeURIComponent(product.slug)}/reviews?page=${result.page}`
+        : `/market/${encodeURIComponent(product.slug)}/reviews`;
   return (
     <section className="mx-auto max-w-4xl space-y-5 py-8">
       <Link href={`/market/${encodeURIComponent(product.slug)}`} className="text-accent underline">
@@ -53,7 +58,11 @@ export default async function Page({
       </h1>
       <p className="text-sm text-secondary">{copy.subtitle}</p>
       <Link
-        href={actor ? `/workspace/library/review/${encodeURIComponent(product.id)}` : "/auth/login"}
+        href={
+          actor
+            ? `/workspace/library/review/${encodeURIComponent(product.id)}`
+            : authEntryHref("login", reviewsPath)
+        }
         className="text-accent underline"
       >
         {actor ? copy.write : copy.signIn}

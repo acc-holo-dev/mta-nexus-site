@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { buildRepository } from "@nexus/db";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { BuildProvenanceDetails } from "../../../../components/build-provenance-details";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { BuildPackageSummaryPanel } from "../../../../components/build-package-evidence";
@@ -68,6 +69,7 @@ export default async function PublicResourceVersionsPage({
   ]);
   const copy = getReleaseHistoryCopy(locale);
   const back = `/market/${encodeURIComponent(product.slug)}`;
+  const returnPath = releaseHistoryHref(product.slug, history.page);
 
   return (
     <div className="mx-auto max-w-5xl space-y-7 py-8">
@@ -194,7 +196,7 @@ export default async function PublicResourceVersionsPage({
               {copy.acquire}
             </Link>
           ) : (
-            <Link href="/auth/login" className="text-accent underline">
+            <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
               {copy.signIn}
             </Link>
           )}

@@ -152,6 +152,21 @@ describe("public safely published version archive", () => {
     expect(html).not.toContain('data-build="bld_clean_1"');
     expect(html).toContain(locale === "ru" ? "История версий" : "Release history");
     expect(state.checkRight).not.toHaveBeenCalled();
+    expect(html).toContain('href="/auth/login?next=%2Fmarket%2Fsafe-release%2Fversions"');
+  });
+
+  it("preserves release-history pagination in guest sign-in return paths", async () => {
+    state.history.mockResolvedValueOnce({
+      releases: [release],
+      page: 2,
+      pageSize: 12,
+      totalPages: 3,
+      total: 25,
+    });
+    const html = renderToStaticMarkup(await page("2"));
+    expect(html).toContain(
+      'href="/auth/login?next=%2Fmarket%2Fsafe-release%2Fversions%3Fpage%3D2"',
+    );
   });
 
   it("escapes hostile release notes and never renders executable HTML", async () => {

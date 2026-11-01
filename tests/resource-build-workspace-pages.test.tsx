@@ -63,7 +63,9 @@ it("does not query private versions without a session", async () => {
   const html = renderToStaticMarkup(
     await ResourceBuildScreen({ productId: "prd_a", buildId: "bld_a" }),
   );
-  expect(html).toContain("/auth/login");
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fresources%2Fprd_a%2Fbuilds%2Fbld_a"',
+  );
   expect(state.detail).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(

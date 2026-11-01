@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "./auth-return-path";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../lib/build-package-query";
 import { getDictionary } from "../lib/i18n";
@@ -24,17 +25,25 @@ export async function BuildPackageScreen({
     copy = buildPackageCopy(locale),
     dictionary = getDictionary(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  const rawSearchParams = await searchParams;
+  const returnQuery = new URLSearchParams();
+  for (const [key, value] of Object.entries(rawSearchParams)) {
+    if (Array.isArray(value)) for (const item of value) returnQuery.append(key, item);
+    else if (value !== undefined) returnQuery.append(key, value);
+  }
+  const packageBase = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`;
+  const returnPath = returnQuery.size ? `${packageBase}?${returnQuery}` : packageBase;
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {dictionary.workspace.signIn}
         </Link>
       </section>
     );
   const queryParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(await searchParams)) {
+  for (const [key, value] of Object.entries(rawSearchParams)) {
     if (Array.isArray(value)) for (const item of value) queryParams.append(key, item);
     else if (value !== undefined) queryParams.append(key, value);
   }

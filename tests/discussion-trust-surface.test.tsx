@@ -130,7 +130,9 @@ it("does not load private data for guests", async () => {
   expect(renderToStaticMarkup(await OwnPage({}))).toContain(
     'href="/auth/login?next=%2Fworkspace%2Fdiscussions"',
   );
-  expect(renderToStaticMarkup(await DetailPage(detail))).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await DetailPage(detail))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fdiscussions%2Fcomment"',
+  );
   expect(mocks.page).not.toHaveBeenCalled();
   expect(mocks.own).not.toHaveBeenCalled();
 });

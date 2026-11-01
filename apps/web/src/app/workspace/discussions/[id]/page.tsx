@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { authService } from "../../../../lib/services/auth-service";
 import { discussionWorkspaceService } from "../../../../lib/services/discussion-workspace-service";
 import { ownDiscussionCopy } from "../../../../lib/discussion-workspace-copy";
@@ -63,7 +64,7 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
             </>
           ) : (
             <Link
-              href="/auth/login"
+              href={authEntryHref("login", `/workspace/discussions/${encodeURIComponent(id)}`)}
               className="inline-flex min-h-11 items-center text-sm text-accent underline"
             >
               {copy.signIn}

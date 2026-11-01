@@ -170,6 +170,7 @@ it.each(["en", "ru"] as const)(
     expect(html).not.toContain("<textarea");
     expect(html).not.toContain("verified purchase");
     expect(html).not.toContain("<script>");
+    expect(html).toContain('href="/auth/login?next=%2Fmarket%2Fresource%2Freviews%3Fpage%3D2"');
   },
 );
 it("authenticated resource readers can report reviews and reach their review editor", async () => {

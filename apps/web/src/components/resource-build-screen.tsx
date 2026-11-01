@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "./auth-return-path";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -28,11 +29,12 @@ export async function ResourceBuildScreen({
     copy = getResourceBuildWorkspaceCopy(locale),
     dictionary = getDictionary(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  const returnPath = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}`;
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{dictionary.workspace.signInRequired}</h1>
-        <Link href="/auth/login" className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
           {dictionary.workspace.signIn}
         </Link>
       </section>
