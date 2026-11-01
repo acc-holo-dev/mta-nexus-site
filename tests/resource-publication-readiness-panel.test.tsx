@@ -81,7 +81,9 @@ describe("ResourcePublicationReadinessPanel", () => {
       },
     });
     const scanItem = summary.items.find((item) => item.id === "scan");
-    expect(scanItem?.detailKey).toBe("malicious");
+    expect(scanItem).toBeDefined();
+    if (!scanItem) throw new Error("expected scan readiness item");
+    expect(scanItem.detailKey).toBe("malicious");
 
     const enHtml = renderToStaticMarkup(
       createElement(ResourcePublicationReadinessPanel, {
@@ -98,8 +100,8 @@ describe("ResourcePublicationReadinessPanel", () => {
       }),
     );
 
-    const enDetail = publicationReadinessDetail("en", scanItem!);
-    const ruDetail = publicationReadinessDetail("ru", scanItem!);
+    const enDetail = publicationReadinessDetail("en", scanItem);
+    const ruDetail = publicationReadinessDetail("ru", scanItem);
     expect(enDetail).not.toBe(ruDetail);
     expect(enHtml).toContain(enDetail);
     expect(ruHtml).toContain(ruDetail);
