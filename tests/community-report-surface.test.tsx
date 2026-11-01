@@ -91,7 +91,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   const empty = renderToStaticMarkup(
     <CommunityReportList
       initial={{ items: [], hasMore: false, page: 1, view: "pending" }}
-      filters={{ view: "pending", page: 1 }}
+      filters={{ view: "pending", page: 1, target: undefined, type: undefined }}
       locale="en"
     />,
   );

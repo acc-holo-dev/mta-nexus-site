@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
+
 const en = {
   title: "My community reports",
   description:
