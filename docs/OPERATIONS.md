@@ -1095,11 +1095,11 @@ Operator observability readiness (alert thresholds + in-repo probes/runbooks):
 Configure queue alert thresholds before `observability:ready` (values must be positive
 numbers; `.env` is read for missing keys only):
 
-| Env key | Role |
-| --- | --- |
-| `WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT` | Pending jobs as % of queue capacity |
-| `WEB_PUSH_QUEUE_ALERT_DUE_JOBS` | Due (ready) job count |
-| `WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS` | Oldest pending job age |
+| Env key                                   | Role                                |
+| ----------------------------------------- | ----------------------------------- |
+| `WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT`    | Pending jobs as % of queue capacity |
+| `WEB_PUSH_QUEUE_ALERT_DUE_JOBS`           | Due (ready) job count               |
+| `WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS` | Oldest pending job age              |
 
 ```bash
 NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready

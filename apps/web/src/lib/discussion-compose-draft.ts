@@ -30,7 +30,7 @@ const fallbackStore: DiscussionComposeDraftStore = {
   },
 };
 
-export function discussionComposeDraftSlot(contentId: string): string {
+function discussionComposeDraftSlot(contentId: string): string {
   return `${PREFIX}${contentId}`;
 }
 

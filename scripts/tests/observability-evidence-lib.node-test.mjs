@@ -99,7 +99,9 @@ test("buildObservabilityReadinessEvidence fails when OPERATIONS omits a required
     });
     const evidence = buildObservabilityReadinessEvidence({ repoRoot: dir, env: alertEnv });
     assert.equal(evidence.verdict.passed, false);
-    assert.ok(evidence.verdict.failures.some((f) => f === "runbook:build_incident_delivery_failed"));
+    assert.ok(
+      evidence.verdict.failures.some((f) => f === "runbook:build_incident_delivery_failed"),
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -6,8 +6,11 @@ const harness = vi.hoisted(() => ({
   cleanups: [] as (() => void)[],
   refresh: vi.fn(),
   fetch: vi.fn(),
-  confirm: vi.fn(),
   reload: vi.fn(),
+}));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
@@ -39,6 +42,7 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
 import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
 const previous = "2026-10-11T00:00:00.000Z";
 const ack = {
@@ -107,14 +111,27 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
-  harness.confirm.mockReturnValue(true);
+  confirmAction.mockReset().mockResolvedValue(true);
   harness.fetch.mockResolvedValue(response(ack));
   vi.stubGlobal("fetch", harness.fetch);
-  vi.stubGlobal("window", { confirm: harness.confirm, location: { reload: harness.reload } });
+  vi.stubGlobal("window", { location: { reload: harness.reload } });
 });
 it("submits only observed publication fields, saves a confirmed revision and blocks a second decision", async () => {
   click(ready(), "Publish");
   await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
+  const copy = getDictionary("en").admin;
+  const general = moderationCopy("en");
+  expect(confirmAction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      title: copy.publish,
+      object: "post",
+      consequences: copy.publishContentConfirm,
+      confirmLabel: copy.publish,
+      cancelLabel: general.back,
+      closeLabel: general.back,
+      danger: false,
+    }),
+  );
   const [url, init] = harness.fetch.mock.calls[0];
   expect(url).toBe("/api/admin/community/post");
   expect(JSON.parse(init.body)).toEqual({
@@ -131,9 +148,10 @@ it("submits only observed publication fields, saves a confirmed revision and blo
   expect(harness.fetch).toHaveBeenCalledTimes(1);
 });
 it("guards duplicate clicks while the request is pending and lets cancellation leave the controls ready", async () => {
-  harness.confirm.mockReturnValueOnce(false);
+  confirmAction.mockResolvedValueOnce(false);
   const nodes = ready();
   click(nodes, "Publish");
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
   expect(harness.fetch).not.toHaveBeenCalled();
   let complete!: (value: Response) => void;
   harness.fetch.mockReturnValueOnce(
@@ -142,6 +160,7 @@ it("guards duplicate clicks while the request is pending and lets cancellation l
     }),
   );
   click(nodes, "Publish");
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   click(nodes, "Publish");
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   expect(render()[0].props["aria-busy"]).toBe(true);
@@ -181,6 +200,7 @@ it("aborts an unmounted request and ignores its eventual acknowledgement", async
     }),
   );
   click(ready(), "Publish");
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   for (const cleanup of harness.cleanups) cleanup();
   expect(harness.fetch.mock.calls[0][1].signal.aborted).toBe(true);
   const json = vi.fn().mockResolvedValue(ack);

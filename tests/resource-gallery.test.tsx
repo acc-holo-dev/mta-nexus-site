@@ -12,7 +12,8 @@ import { resourceMediaCopy } from "../apps/web/src/lib/resource-media-i18n";
 import { clickedDialogBackdrop } from "../apps/web/src/components/use-modal-dialog";
 
 vi.mock("../apps/web/src/components/use-modal-dialog", async (importOriginal) => {
-  const original = await importOriginal<typeof import("../apps/web/src/components/use-modal-dialog")>();
+  const original =
+    await importOriginal<typeof import("../apps/web/src/components/use-modal-dialog")>();
   return {
     ...original,
     useModalDialog: () => createRef<HTMLDialogElement>(),
@@ -141,7 +142,7 @@ describe("resource gallery lightbox interaction", () => {
         currentTarget,
         clientX: 50,
         clientY: 150,
-      } as MouseEvent<HTMLDialogElement>),
+      } as unknown as MouseEvent<HTMLDialogElement>),
     ).toBe(true);
     expect(
       clickedDialogBackdrop({
@@ -149,7 +150,7 @@ describe("resource gallery lightbox interaction", () => {
         currentTarget,
         clientX: 150,
         clientY: 150,
-      } as MouseEvent<HTMLDialogElement>),
+      } as unknown as MouseEvent<HTMLDialogElement>),
     ).toBe(false);
   });
 });
@@ -169,28 +170,31 @@ describe("resource gallery markup", () => {
 });
 
 describe("ResourceGalleryLightbox", () => {
-  it.each(["en", "ru"] as const)("exposes modal dialog controls and navigation labels in %s", (locale) => {
-    const copy = resourceMediaCopy(locale);
-    const html = renderToStaticMarkup(
-      createElement(ResourceGalleryLightbox, {
-        items,
-        activeIndex: 0,
-        title: "Product",
-        locale,
-        onClose: () => undefined,
-        onActiveIndexChange: () => undefined,
-      }),
-    );
+  it.each(["en", "ru"] as const)(
+    "exposes modal dialog controls and navigation labels in %s",
+    (locale) => {
+      const copy = resourceMediaCopy(locale);
+      const html = renderToStaticMarkup(
+        createElement(ResourceGalleryLightbox, {
+          items,
+          activeIndex: 0,
+          title: "Product",
+          locale,
+          onClose: () => undefined,
+          onActiveIndexChange: () => undefined,
+        }),
+      );
 
-    expect(html).toContain("<dialog");
-    expect(html).toContain('aria-modal="true"');
-    expect(html).toContain(`aria-label="${copy.lightboxTitle}"`);
-    expect(html).toContain(`aria-label="${copy.lightboxClose}"`);
-    expect(html).toContain(`aria-label="${copy.lightboxNext}"`);
-    expect(html).toContain(`aria-label="${copy.lightboxPrevious}"`);
-    expect(html).toContain('alt="First"');
-    expect(html).toContain('href="/api/resource-media/rmi_a"');
-    expect(html).toContain(copy.lightboxOpenOriginal);
-    expect(html).toContain("disabled");
-  });
+      expect(html).toContain("<dialog");
+      expect(html).toContain('aria-modal="true"');
+      expect(html).toContain(`aria-label="${copy.lightboxTitle}"`);
+      expect(html).toContain(`aria-label="${copy.lightboxClose}"`);
+      expect(html).toContain(`aria-label="${copy.lightboxNext}"`);
+      expect(html).toContain(`aria-label="${copy.lightboxPrevious}"`);
+      expect(html).toContain('alt="First"');
+      expect(html).toContain('href="/api/resource-media/rmi_a"');
+      expect(html).toContain(copy.lightboxOpenOriginal);
+      expect(html).toContain("disabled");
+    },
+  );
 });

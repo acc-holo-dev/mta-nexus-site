@@ -46,7 +46,9 @@ describe("ResourcePublicationReadinessPanel", () => {
       );
 
       expect(html).toContain(panelCopy.title);
-      expect(html).toContain(`${panelCopy.overview}: ${publisherCopy.readiness[summary.inventoryReadiness]}`);
+      expect(html).toContain(
+        `${panelCopy.overview}: ${publisherCopy.readiness[summary.inventoryReadiness]}`,
+      );
 
       for (const item of summary.items) {
         const detail = publicationReadinessDetail(locale, item);

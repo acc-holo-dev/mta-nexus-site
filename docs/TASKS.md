@@ -3366,7 +3366,7 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
- Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
+Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 

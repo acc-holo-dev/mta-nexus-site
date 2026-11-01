@@ -67,6 +67,7 @@ describe("mainline repository policy", () => {
       "RESOURCES.md",
       "RETENTION-PLAN.md",
       "ROADMAP.md",
+      "SERVER-PACK-SPEC.md",
       "SERVERS-ORGS.md",
       "TASKS.md",
       "TRACEABILITY.md",

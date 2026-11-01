@@ -237,7 +237,11 @@ describe("resource version help projection", () => {
         buildId,
       });
       const markup = renderToStaticMarkup(
-        <ResourceVersionHelpSection projection={projection} locale={locale} qaAnchorId="resource-qa-panel" />,
+        <ResourceVersionHelpSection
+          projection={projection}
+          locale={locale}
+          qaAnchorId="resource-qa-panel"
+        />,
       );
 
       expect(markup).toContain(copy.title.replace("{version}", "2.2.0"));

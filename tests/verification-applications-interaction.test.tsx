@@ -7,8 +7,11 @@ const harness = vi.hoisted(() => ({
   cleanups: [] as (() => void)[],
   fetch: vi.fn(),
   refresh: vi.fn(),
-  confirm: vi.fn(),
   reload: vi.fn(),
+}));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
@@ -86,12 +89,12 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
-  harness.confirm.mockReturnValue(true);
+  confirmAction.mockReset().mockResolvedValue(true);
   harness.fetch
     .mockReset()
     .mockResolvedValue(response({ id: "request", status: "pending", revision: next }));
   vi.stubGlobal("fetch", harness.fetch);
-  vi.stubGlobal("window", { confirm: harness.confirm, location: { reload: harness.reload } });
+  vi.stubGlobal("window", { location: { reload: harness.reload } });
 });
 afterEach(() => {
   for (const cleanup of harness.cleanups) cleanup();
@@ -107,7 +110,18 @@ it.each(["en", "ru"] as const)(
     });
     submit(render(locale));
     await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
-    expect(harness.confirm).toHaveBeenCalledWith(verificationApplicationsCopy(locale).confirm);
+    const copy = verificationApplicationsCopy(locale);
+    const labels = verificationCopy(locale);
+    expect(confirmAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: copy.amend,
+        object: "request",
+        consequences: copy.confirm,
+        confirmLabel: copy.amend,
+        cancelLabel: labels.cancel,
+        closeLabel: labels.cancel,
+      }),
+    );
     const [url, init] = harness.fetch.mock.calls[0];
     expect(url).toBe("/api/workspace/verification/request");
     expect(init).toMatchObject({ method: "PATCH", cache: "no-store", credentials: "same-origin" });
@@ -127,7 +141,7 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("cancels without sending a command", () => {
-  harness.confirm.mockReturnValue(false);
+  confirmAction.mockResolvedValueOnce(false);
   submit();
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(render().find((node) => node.type === "fieldset")?.props.disabled).toBe(false);
@@ -141,6 +155,7 @@ it("coalesces rapid writes while the first command is pending", async () => {
   );
   const nodes = render();
   submit(nodes);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   submit(nodes);
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   expect(render()[0].props["aria-busy"]).toBe(true);
@@ -190,6 +205,7 @@ it("aborts on navigation and ignores late acknowledgements", async () => {
     }),
   );
   submit();
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   const signal = harness.fetch.mock.calls[0][1].signal;
   for (const cleanup of harness.cleanups.splice(0)) cleanup();
   expect(signal.aborted).toBe(true);
@@ -232,6 +248,7 @@ it("sends the observed evidence revision when deciding and blocks reusing that m
     ),
   ).toBe(true);
   decide(nodes);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
   decide(nodes);
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
