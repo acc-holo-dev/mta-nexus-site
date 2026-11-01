@@ -1,6 +1,6 @@
 # Проверенный срез проекта
 
-**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **База пакета:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`. **Рабочая ветка handoff:** `docs/doc-01-02-core-integration`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 1 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **База пакета:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`. **Рабочая ветка handoff:** `docs/doc-01-02-core-integration` @ `ce6cf8eab394689b8eac9d14f2ec6203a4b65fd2`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
 ## Оценка стадии
 
