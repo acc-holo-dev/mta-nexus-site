@@ -1,20 +1,21 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import type { Metadata } from "next";
 import { AppError, type Product } from "@nexus/domain";
-import { authService } from "../../../lib/services/auth-service";
-import { resourcePublisherService } from "../../../lib/services/resource-publisher-service";
-import { ResourcePublisherFilters } from "../../../components/resource-publisher-filters";
-import {
-  resourcePublisherQuery,
-  resourcePublisherUrl,
-  publisherSearchParams,
-} from "../../../lib/resource-publisher-query";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ResourcePublisherFilters } from "../../../components/resource-publisher-filters";
+import { getCommercialCopy } from "../../../lib/commercial-i18n";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { getCommercialCopy } from "../../../lib/commercial-i18n";
+import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import {
+  publisherInventoryTotal,
+  publisherSearchParams,
+  resourcePublisherQuery,
+  resourcePublisherUrl,
+} from "../../../lib/resource-publisher-query";
+import { authService } from "../../../lib/services/auth-service";
+import { resourcePublisherService } from "../../../lib/services/resource-publisher-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -50,6 +51,8 @@ export default async function AuthorResourcesPage({
   const result = await resourcePublisherService.inventory(user, query);
   const publisherCopy = getResourcePublisherCopy(locale);
   const href = (page: number) => resourcePublisherUrl({ ...query, page });
+  const inventoryTotal = publisherInventoryTotal(result.statusCounts);
+  const emptyMessage = inventoryTotal === 0 ? copy.empty : copy.emptyFilter;
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
@@ -69,7 +72,7 @@ export default async function AuthorResourcesPage({
       </Link>
       <ResourcePublisherFilters query={query} statusCounts={result.statusCounts} locale={locale} />
       {result.items.length === 0 ? (
-        <p className="py-10 text-secondary">{copy.empty}</p>
+        <p className="py-10 text-secondary">{emptyMessage}</p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {result.items.map((product) => (

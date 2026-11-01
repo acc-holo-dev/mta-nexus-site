@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "developer" } as { id: string; role: "developer" } | null,
   locale: "en" as "en" | "ru",
@@ -20,8 +21,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-publisher-service", () => ({
   resourcePublisherService: { inventory: state.inventory, history: state.history },
 }));
-import InventoryPage from "../apps/web/src/app/workspace/resources/page";
+
 import HistoryPage from "../apps/web/src/app/workspace/resources/[id]/history/page";
+import InventoryPage from "../apps/web/src/app/workspace/resources/page";
+
 const context = {
   params: Promise.resolve({ id: "prd_a" }),
   searchParams: Promise.resolve({ kind: "changes", page: "2" }),
@@ -108,6 +111,47 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(
       locale === "ru" ? "Изменения ресурса и публикация" : "Resource changes and publication",
     );
+  },
+);
+it.each([
+  {
+    locale: "en" as const,
+    statusCounts: {},
+    searchParams: {},
+    expectText: "You have not created any resources yet.",
+  },
+  {
+    locale: "ru" as const,
+    statusCounts: {},
+    searchParams: {},
+    expectText: "Вы ещё не создали ни одного ресурса.",
+  },
+  {
+    locale: "en" as const,
+    statusCounts: { draft: 2, published: 1 },
+    searchParams: { status: "archived" },
+    expectText: "No resources match these filters.",
+  },
+  {
+    locale: "ru" as const,
+    statusCounts: { draft: 2 },
+    searchParams: { q: "missing" },
+    expectText: "Нет ресурсов по выбранным фильтрам.",
+  },
+])(
+  "shows an honest inventory empty state (%s)",
+  async ({ locale, statusCounts, searchParams, expectText }) => {
+    state.locale = locale;
+    state.inventory.mockResolvedValue({
+      items: [],
+      statusCounts,
+      page: 1,
+      totalPages: 1,
+    });
+    const html = renderToStaticMarkup(
+      await InventoryPage({ searchParams: Promise.resolve(searchParams) }),
+    );
+    expect(html).toContain(expectText);
   },
 );
 it("checks authentication before parsing private queries or querying repositories", async () => {

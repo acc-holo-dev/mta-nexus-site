@@ -1,10 +1,16 @@
 import { expect, it } from "vitest";
 import {
+  publisherInventoryTotal,
+  publisherSearchParams,
+  resourcePublisherHistoryQuery,
   resourcePublisherQuery,
   resourcePublisherUrl,
-  resourcePublisherHistoryQuery,
-  publisherSearchParams,
 } from "../apps/web/src/lib/resource-publisher-query";
+
+it("derives inventory totals for empty versus filtered empty-state copy", () => {
+  expect(publisherInventoryTotal({ draft: 2, published: 3 })).toBe(5);
+  expect(publisherInventoryTotal({})).toBe(0);
+});
 it("roundtrips every publisher criterion without arbitrary owner identifiers", () => {
   const query = resourcePublisherQuery(
     new URLSearchParams(

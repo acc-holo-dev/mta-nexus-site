@@ -1,10 +1,11 @@
 import {
   AppError,
   PRODUCT_TYPES,
-  RESOURCE_READINESS,
-  type PublisherResourceQuery,
   type PublisherHistoryKind,
+  type PublisherResourceQuery,
+  RESOURCE_READINESS,
 } from "@nexus/domain";
+
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
 function invalid(): never {
   throw new AppError("Invalid publisher query", 400, "RESOURCE_PUBLISHER_QUERY_INVALID");
@@ -45,6 +46,9 @@ export function resourcePublisherQuery(
     sort: sort as PublisherResourceQuery["sort"],
     q,
   };
+}
+export function publisherInventoryTotal(statusCounts: Record<string, number>) {
+  return Object.values(statusCounts).reduce((sum, value) => sum + value, 0);
 }
 export function resourcePublisherUrl(query: PublisherResourceQuery & { page: number }) {
   const params = new URLSearchParams();
