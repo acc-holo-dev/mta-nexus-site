@@ -563,7 +563,8 @@ The queue probe reports `discussionPending`, `discussionFailed`,
 `discussionOldestAgeSeconds`, and alerts `discussion_delivery_failed` or
 `discussion_delivery_backlog`. Server-linked publishes likewise enqueue
 `publication_notification_deliveries` (newest followers first, capped at 100) with
-`publicationPending` / `publicationFailed` probe fields. After resolving the cause,
+`publicationPending` / `publicationFailed` probe fields and alerts
+`publication_delivery_failed` or `publication_delivery_backlog`. After resolving the cause,
 reset one verified failed comment or publication content id:
 
 ```sh
@@ -583,8 +584,10 @@ Do not reset all jobs or delete inbox records.
 Quarantine alone stops new downloads. Moderators may also opt in to notify users
 who already have a **served** `resource_delivery_receipts` row for that build.
 The durable source is `build_incident_notification_deliveries` (migration 0085);
-historical quarantines are not backfilled. Notices are generic security inbox
-items linking to `/security` and never invent malware details.
+historical quarantines are not backfilled. The queue probe reports
+`buildIncidentPending`, `buildIncidentFailed`, `buildIncidentOldestAgeSeconds`, and
+alerts `build_incident_delivery_failed` or `build_incident_delivery_backlog`. Notices
+are generic security inbox items linking to `/security` and never invent malware details.
 
 ```sh
 pnpm notifications:delivery list --channel build_incident
@@ -1089,9 +1092,37 @@ counsel approval.
 
 Operator observability readiness (alert thresholds + in-repo probes/runbooks):
 
+Configure queue alert thresholds before `observability:ready` (values must be positive
+numbers; `.env` is read for missing keys only):
+
+| Env key | Role |
+| --- | --- |
+| `WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT` | Pending jobs as % of queue capacity |
+| `WEB_PUSH_QUEUE_ALERT_DUE_JOBS` | Due (ready) job count |
+| `WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS` | Oldest pending job age |
+
 ```bash
 NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready
 pnpm observability:verify
+```
+
+`observability:ready` and `observability:verify` prove in-repo probe scripts, threshold
+env keys, and OPERATIONS runbook needles—including delivery-failure alert names such as
+`publication_delivery_failed` and `build_incident_delivery_failed`. They do **not** prove
+production host alert routing to humans or any third-party monitoring vendor contract.
+
+Offline queue-probe drill (disposable fixture; exit code 2 means alert, same pattern as
+[`scripts/tests/web-push-worker-queue.node-test.mjs`](../scripts/tests/web-push-worker-queue.node-test.mjs)):
+
+```bash
+DRILL_DIR="$(mktemp -d)"
+trap 'rm -rf "$DRILL_DIR"' EXIT
+HEALTH_FILE="$DRILL_DIR/web-push-health.json"
+cat >"$HEALTH_FILE" <<'EOF'
+{"status":"ready","configured":true,"pid":1,"batch":8,"heartbeatAt":"2099-01-01T00:00:00.000Z","staleAfterMs":60000,"progressAt":"2099-01-01T00:00:00.000Z","progressStaleAfterMs":180000,"queuePending":0,"queueDue":0,"queueLeased":0,"queueCapacity":10000,"queueOldestAgeSeconds":0,"reportPending":0,"reportFailed":0,"reportOldestAgeSeconds":0,"supportPending":0,"supportFailed":0,"supportOldestAgeSeconds":0,"verificationPending":0,"verificationFailed":0,"verificationOldestAgeSeconds":0,"discussionPending":0,"discussionFailed":0,"discussionOldestAgeSeconds":0,"publicationPending":1,"publicationFailed":1,"publicationOldestAgeSeconds":0,"buildIncidentPending":0,"buildIncidentFailed":0,"buildIncidentOldestAgeSeconds":0,"admissionPending":0,"admissionFailed":0,"admissionOldestAgeSeconds":0,"queueAlert":"alert","queueAlertReasons":["publication_delivery_failed"],"queueAlertThresholds":{"pendingPercent":80,"dueJobs":100,"oldestAgeSeconds":900}}
+EOF
+NEXUS_WEB_PUSH_HEALTH_FILE="$HEALTH_FILE" node scripts/check-web-push-worker-queue.mjs
+echo "expect exit code 2 (alert); got $?"
 ```
 
 Optional Web Push residual (both artifacts required; never invent PASS). Soak uses

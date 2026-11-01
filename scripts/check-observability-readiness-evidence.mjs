@@ -11,7 +11,9 @@ const path = resolve(
   process.argv[2] || "artifacts/observability-readiness-evidence.json",
 );
 const evidence = readObservabilityEvidenceFile(path);
-const result = validateObservabilityReadinessEvidence(evidence);
+const result = validateObservabilityReadinessEvidence(evidence, {
+  repoRoot: process.cwd(),
+});
 
 if (!result.ok) {
   process.stderr.write(`observability-readiness-evidence: ${result.reason}\n`);

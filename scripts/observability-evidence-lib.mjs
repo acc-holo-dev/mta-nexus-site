@@ -23,6 +23,17 @@ export const OBSERVABILITY_ALERT_ENV_KEYS = Object.freeze([
   "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS",
 ]);
 
+/** Literal strings that must appear in docs/OPERATIONS.md (match probe alert names). */
+export const OBSERVABILITY_RUNBOOK_MENTIONS = Object.freeze([
+  "report_delivery_failed",
+  "support_delivery_failed",
+  "verification_delivery_failed",
+  "discussion_delivery_failed",
+  "publication_delivery_failed",
+  "build_incident_delivery_failed",
+  "check-web-push-worker-queue",
+]);
+
 function readJson(path) {
   try {
     return JSON.parse(readFileSync(path, "utf8"));
@@ -72,15 +83,8 @@ export function buildObservabilityReadinessEvidence({
   }
 
   const operations = readFileSync(resolve(repoRoot, "docs/OPERATIONS.md"), "utf8");
-  const runbookMentions = [
-    "report_delivery_failed",
-    "support_delivery_failed",
-    "verification_delivery_failed",
-    "discussion_delivery_failed",
-    "check-web-push-worker-queue",
-  ];
   const runbook = {};
-  for (const needle of runbookMentions) {
+  for (const needle of OBSERVABILITY_RUNBOOK_MENTIONS) {
     const ok = operations.includes(needle);
     runbook[needle] = ok;
     if (!ok) failures.push(`runbook:${needle}`);
@@ -112,7 +116,29 @@ export function buildObservabilityReadinessEvidence({
   });
 }
 
-export function validateObservabilityReadinessEvidence(evidence) {
+function validateObservabilityCheckout(repoRoot) {
+  const root = resolve(repoRoot);
+  for (const relative of OBSERVABILITY_REQUIRED_SCRIPTS) {
+    if (!existsSync(resolve(root, relative))) {
+      return { ok: false, reason: `checkout missing required path ${relative}` };
+    }
+  }
+  const operationsPath = resolve(root, "docs/OPERATIONS.md");
+  let operations;
+  try {
+    operations = readFileSync(operationsPath, "utf8");
+  } catch {
+    return { ok: false, reason: "checkout missing docs/OPERATIONS.md" };
+  }
+  for (const needle of OBSERVABILITY_RUNBOOK_MENTIONS) {
+    if (!operations.includes(needle)) {
+      return { ok: false, reason: `runbook needle missing in checkout: ${needle}` };
+    }
+  }
+  return { ok: true, reason: null };
+}
+
+export function validateObservabilityReadinessEvidence(evidence, options = {}) {
   if (!evidence || typeof evidence !== "object") {
     return { ok: false, reason: "missing or invalid evidence JSON" };
   }
@@ -137,6 +163,15 @@ export function validateObservabilityReadinessEvidence(evidence) {
     if (evidence?.alerts?.[key] !== "configured") {
       return { ok: false, reason: `alert env not proven configured: ${key}` };
     }
+  }
+  for (const needle of OBSERVABILITY_RUNBOOK_MENTIONS) {
+    if (evidence?.runbook?.[needle] !== true) {
+      return { ok: false, reason: `runbook proof missing for ${needle}` };
+    }
+  }
+  if (options.repoRoot) {
+    const checkout = validateObservabilityCheckout(options.repoRoot);
+    if (!checkout.ok) return checkout;
   }
   return { ok: true, reason: null };
 }
