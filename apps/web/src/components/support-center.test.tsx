@@ -5,6 +5,8 @@ import { getDictionary } from "../lib/i18n";
 import { LocaleProvider } from "./locale-context";
 import { SupportCenter } from "./support-center";
 
+vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
+
 vi.mock("next/link", async () => {
   const ReactModule = await import("react");
   return {

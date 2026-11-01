@@ -1,7 +1,9 @@
 "use client";
 import { Button } from "@nexus/ui";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { z } from "zod";
 import { communityReportCreateSchema, REPORT_TYPES } from "../lib/community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../lib/community-report-copy";
@@ -18,7 +20,9 @@ export function CommunityReportForm({
   locale: Locale;
   authenticated: boolean;
 }) {
+  const pathname = usePathname();
   const copy = communityReportCopy(locale);
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [open, setOpen] = useState(false),
     [pending, setPending] = useState(false);
   const [type, setType] = useState<(typeof REPORT_TYPES)[number]>("abuse");
@@ -29,6 +33,10 @@ export function CommunityReportForm({
   const guard = useRef(false);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  useEffect(() => {
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (guard.current) return;
@@ -107,7 +115,7 @@ export function CommunityReportForm({
         </Button>
       </div>
       {!authenticated ? (
-        <Link className="text-sm text-accent underline" href="/auth/login">
+        <Link className="text-sm text-accent underline" href={loginHref}>
           {copy.signIn}
         </Link>
       ) : result ? (

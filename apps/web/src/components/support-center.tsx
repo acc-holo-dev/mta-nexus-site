@@ -3,6 +3,7 @@ import { Button, Input } from "@nexus/ui";
 
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
   confirmSupportCaseCreated,
@@ -92,6 +93,7 @@ export function SupportCenter({
   initialFilters?: SupportQuery;
   initialContext?: SupportFormObjectContext | null;
 }) {
+  const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
     workspaceCopy = supportWorkspaceCopy(locale);
@@ -105,7 +107,7 @@ export function SupportCenter({
   const pendingCreate = useRef<{ payload: string; key: string } | null>(null);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState(initialFilters.category ?? "account");
   const [subject, setSubject] = useState("");
@@ -119,9 +121,10 @@ export function SupportCenter({
   const [staffCategory, setStaffCategory] = useState(initialFilters.category ?? "");
   const loadSequence = useRef(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (initialContext) {

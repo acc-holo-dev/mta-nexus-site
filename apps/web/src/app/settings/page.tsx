@@ -3,6 +3,7 @@
 import { Button, fieldClassBlock } from "@nexus/ui";
 import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "../../components/auth-return-path";
 import { ContextSwitcher } from "../../components/context-switcher";
@@ -78,6 +79,7 @@ async function request<T>(
 }
 
 export default function SettingsPage() {
+  const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
@@ -95,12 +97,13 @@ export default function SettingsPage() {
   });
   const [recoveryEmail, setRecoveryEmail] = useState<RecoveryEmail | null>(null);
   const [recoveryPassword, setRecoveryPassword] = useState("");
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath() ?? "/settings"));
-  }, []);
+    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+  }, [pathname]);
 
   const preferenceLabels: Array<{
     key: keyof NotificationPreferences;
