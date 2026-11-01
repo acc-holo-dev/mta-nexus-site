@@ -59,7 +59,9 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
   };
 });
 
+import LibraryLoading from "../apps/web/src/app/workspace/library/loading";
 import LibraryPage, { metadata } from "../apps/web/src/app/workspace/library/page";
+import { getLibraryCopy } from "../apps/web/src/lib/library-view";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
 const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) => ({
@@ -96,6 +98,20 @@ describe("private resource library", () => {
       totalPages: 1,
     });
   });
+
+  it.each(["en", "ru"] as const)(
+    "renders an honest loading shell with localized library copy in %s",
+    async (locale) => {
+      state.locale = locale;
+      const copy = getLibraryCopy(locale);
+      const html = renderToStaticMarkup(await LibraryLoading());
+      expect(html).toContain('aria-busy="true"');
+      expect(html).toContain('id="library-loading-heading"');
+      expect(html).toContain('aria-labelledby="library-loading-heading"');
+      expect(html).toContain(`>${copy.title}<`);
+      expect(html).toContain(copy.loading);
+    },
+  );
 
   it("requires login before any rights or library lookup", async () => {
     state.user = null;

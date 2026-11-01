@@ -12,6 +12,7 @@ export function parseLibraryPage(value: string | string[] | undefined): number {
 export const libraryCopy = {
   en: {
     title: "Resource library",
+    loading: "Loading your resource library…",
     subtitle: "Resources granted to your account, including legacy licenses.",
     signInRequired: "Sign in to view your resource library",
     signIn: "Sign in",
@@ -37,6 +38,7 @@ export const libraryCopy = {
   },
   ru: {
     title: "Библиотека ресурсов",
+    loading: "Загрузка библиотеки ресурсов…",
     subtitle: "Ресурсы, доступные вашему аккаунту, включая ранее выданные лицензии.",
     signInRequired: "Войдите, чтобы посмотреть библиотеку ресурсов",
     signIn: "Войти",

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { AuthorPublicationRestore } from "../../../../../components/author-publication-restore";
 import { parseAuthorPublicationHistoryQuery } from "../../../../../lib/author-publication-desk-contract";
 import {
@@ -36,6 +37,8 @@ export default async function PublicationHistoryPage({
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
       for (const part of Array.isArray(value) ? value : [value]) query.append(key, part);
+  const returnQuery = query.toString();
+  const returnPath = returnQuery ? `${path}?${returnQuery}` : path;
   const filters = parseAuthorPublicationHistoryQuery(query);
   let error = filters ? "" : copy.invalid,
     signIn = false;
@@ -90,7 +93,7 @@ export default async function PublicationHistoryPage({
       </header>
       {signIn && (
         <Link
-          href="/auth/login"
+          href={authEntryHref("login", returnPath)}
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >
           {labels.signIn}
