@@ -196,7 +196,9 @@ export default async function ReleaseWatchesPage({
           ))}
         </ul>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <p role="status" className="text-secondary">
+          {result.counts.all === 0 ? copy.empty : copy.emptyFiltered}
+        </p>
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">

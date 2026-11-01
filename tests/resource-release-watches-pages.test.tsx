@@ -17,6 +17,7 @@ vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => (
   resourceReleaseWatchesService: { page: state.page },
 }));
 import Page, { generateMetadata } from "../apps/web/src/app/workspace/library/watches/page";
+import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
 beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a" };
@@ -98,6 +99,43 @@ it("authenticates early and invalid duplicate filters never reach the repository
   ).toContain("Invalid watch filters");
   expect(state.page).not.toHaveBeenCalled();
 });
+
+it.each(["en", "ru"] as const)(
+  "distinguishes lifetime-empty watches from filtered-empty results in %s",
+  async (locale) => {
+    const copy = resourceReleaseWatchesCopy(locale);
+    expect(copy.emptyFiltered).not.toBe(copy.empty);
+    state.locale = locale;
+    state.page.mockResolvedValueOnce({
+      items: [],
+      counts: { all: 0, enabled: 0, disabled: 0, unavailable: 0 },
+      page: 1,
+      totalPages: 1,
+      activeWatchCount: 0,
+    });
+    const lifetime = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        {await Page({ searchParams: Promise.resolve({}) })}
+      </LocaleProvider>,
+    );
+    expect(lifetime).toContain(copy.empty);
+    expect(lifetime).not.toContain(copy.emptyFiltered);
+    state.page.mockResolvedValueOnce({
+      items: [],
+      counts: { all: 3, enabled: 0, disabled: 3, unavailable: 0 },
+      page: 1,
+      totalPages: 1,
+      activeWatchCount: 0,
+    });
+    const filtered = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        {await Page({ searchParams: Promise.resolve({ filter: "enabled", query: "Core" }) })}
+      </LocaleProvider>,
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).not.toContain(copy.empty);
+  },
+);
 
 it("preserves search in filters, pagination and export, and masks unavailable upstream titles", async () => {
   const result = await state.page();
