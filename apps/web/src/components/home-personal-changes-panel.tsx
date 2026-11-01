@@ -26,6 +26,9 @@ const reasonKey = {
   replyToMe: "reasonReplyToMe",
 } as const;
 
+export const HOME_PERSONAL_CHANGES_HEADING_ID = "home-personal-changes-heading";
+export const HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID = "home-personal-changes-scope-note";
+
 export function HomePersonalChangesPanel({
   summary,
   preference,
@@ -36,19 +39,23 @@ export function HomePersonalChangesPanel({
   copy: HomePersonalCopy;
 }) {
   return (
-    <section>
+    <section aria-labelledby={HOME_PERSONAL_CHANGES_HEADING_ID}>
       <SectionHeader
         title={copy.title}
         description={copy.description}
+        titleId={HOME_PERSONAL_CHANGES_HEADING_ID}
         action={
           <HomePersonalOptOut
             preference={preference}
             hideLabel={copy.hidePreference}
             showLabel={copy.showPreference}
+            describedBy={HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID}
           />
         }
       />
-      <p className="text-xs text-muted">{copy.scopeNote}</p>
+      <p id={HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID} className="text-xs text-muted">
+        {copy.scopeNote}
+      </p>
 
       {summary.status === "hidden" ? <p className="text-sm text-muted">{copy.hidden}</p> : null}
 

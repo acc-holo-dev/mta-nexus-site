@@ -159,10 +159,11 @@ export default async function HomePage() {
         />
       ) : null}
 
-      <section>
+      <section aria-labelledby="home-network-heading">
         <SectionHeader
           title={dictionary.home.networkTitle}
           description={dictionary.home.networkDescription}
+          titleId="home-network-heading"
           action={
             <Link
               href="/servers"
@@ -202,10 +203,11 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section>
+      <section aria-labelledby="home-free-resources-heading">
         <SectionHeader
           title={dictionary.home.resourcesTitle}
           description={dictionary.home.resourcesDescription}
+          titleId="home-free-resources-heading"
           action={
             <Link
               href="/market?maxPrice=0"
@@ -234,10 +236,11 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section>
+      <section aria-labelledby="home-community-updates-heading">
         <SectionHeader
           title={dictionary.home.updatesTitle}
           description={dictionary.home.updatesDescription}
+          titleId="home-community-updates-heading"
           action={
             <Link
               href="/articles"

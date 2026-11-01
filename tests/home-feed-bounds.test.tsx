@@ -23,9 +23,17 @@ vi.mock("@nexus/ui", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@nexus/ui")>();
   return {
     ...actual,
-    SectionHeader: ({ title, action }: { title: string; action?: React.ReactNode }) => (
+    SectionHeader: ({
+      title,
+      action,
+      titleId,
+    }: {
+      title: string;
+      action?: React.ReactNode;
+      titleId?: string;
+    }) => (
       <header>
-        <h2>{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         {action}
       </header>
     ),
@@ -148,5 +156,16 @@ describe("bounded home feed reads", () => {
     expect(mocks.loadPersonal).toHaveBeenCalledOnce();
     expect(html).toContain(copy.personalScopeNote);
     expect(html).toContain(copy.personalTitle);
+  });
+
+  it("names public home feed sections for assistive landmarks", async () => {
+    const html = renderToStaticMarkup(await HomePage());
+
+    expect(html).toContain('aria-labelledby="home-network-heading"');
+    expect(html).toContain('id="home-network-heading"');
+    expect(html).toContain('aria-labelledby="home-free-resources-heading"');
+    expect(html).toContain('id="home-free-resources-heading"');
+    expect(html).toContain('aria-labelledby="home-community-updates-heading"');
+    expect(html).toContain('id="home-community-updates-heading"');
   });
 });
