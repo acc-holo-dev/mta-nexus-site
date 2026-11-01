@@ -19,6 +19,7 @@ vi.mock("../apps/web/src/lib/services/notification-inbox-service", () => ({
 import Loading from "../apps/web/src/app/notifications/loading";
 import Page, { generateMetadata } from "../apps/web/src/app/notifications/page";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
+import { notificationInboxCopy } from "../apps/web/src/lib/notification-inbox-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -38,6 +39,7 @@ it.each(["en", "ru"] as const)(
   async (locale) => {
     state.locale = locale;
     const html = await render({ q: "needle", state: "unread", category: "content" });
+    expect(html).toContain(notificationInboxCopy(locale).openBetaNote);
     expect(html).toContain('action="/notifications"');
     expect(html).toContain('name="q"');
     expect(html).toContain('name="category"');

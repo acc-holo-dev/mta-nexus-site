@@ -67,6 +67,7 @@ export default async function NotificationCenterPage({
         </Link>
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
+        <p className="text-xs text-muted">{copy.openBetaNote}</p>
         <Link
           href="/settings#notification-heading"
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
