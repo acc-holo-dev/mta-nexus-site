@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/resource" }));
+
 import { LocaleProvider } from "./locale-context";
 import { ResourceDownloadButton } from "./resource-download-button";
 
@@ -12,7 +13,7 @@ it.each(["en", "ru"] as const)("renders latest download intent in %s", (locale) 
     </LocaleProvider>,
   );
   expect(html).toContain('type="button"');
-  expect(html).toContain('aria-busy="false"');
+  expect(html).not.toContain("aria-busy=");
   expect(html).toContain('data-download-intent="latest"');
   expect(html).toContain("rounded-lg");
   expect(html).toContain("bg-success-solid");

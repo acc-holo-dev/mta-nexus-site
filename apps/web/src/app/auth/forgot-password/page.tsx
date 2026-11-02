@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
 
         <p className="text-sm leading-relaxed text-muted">{copy.forgotDescription}</p>
 
-        <form onSubmit={submit} aria-busy={pending} className="space-y-4">
+        <form onSubmit={submit} aria-busy={pending ? true : undefined} className="space-y-4">
           <Input
             id="reset-email"
             name="email"

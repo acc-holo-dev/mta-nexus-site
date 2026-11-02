@@ -52,7 +52,7 @@ describe("admin content moderation controls", () => {
       expect(html).toContain("bg-success-soft");
       expect(html).toContain("rounded-lg");
       expect((html.match(/disabled=""/gu) ?? []).length).toBe(2);
-      expect(html).toContain('aria-busy="false"');
+      expect(html).not.toContain("aria-busy=");
     },
   );
 

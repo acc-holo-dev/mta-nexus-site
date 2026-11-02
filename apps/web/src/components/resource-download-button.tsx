@@ -142,7 +142,7 @@ export function ResourceDownloadButton({
         type="button"
         onClick={download}
         disabled={busy}
-        aria-busy={busy}
+        isLoading={busy}
         data-download-intent={resolvedIntent}
         data-build-id={buildId ?? ""}
         className="h-auto w-full gap-2 bg-success-solid py-3 text-sm font-bold shadow-nexus hover:opacity-90"

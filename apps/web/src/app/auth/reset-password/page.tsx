@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
           <form
             onSubmit={submit}
             aria-label={copy.resetTitle}
-            aria-busy={state.kind === "submitting"}
+            aria-busy={state.kind === "submitting" ? true : undefined}
             className="space-y-4"
           >
             <p className="text-sm leading-relaxed text-muted">{copy.resetDescription}</p>

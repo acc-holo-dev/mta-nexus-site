@@ -256,7 +256,7 @@ export function LibraryCollectionItemCopyForm({
           disabled={
             busy || (!frozen && (!confirmed || !ids.length || !destination || overCapacity))
           }
-          aria-busy={busy}
+          isLoading={busy}
           variant="outline"
         >
           {busy ? c.busy : frozen ? c.retryAction : c[action]}

@@ -196,7 +196,7 @@ export function ResourceReleaseWatchControl({
           variant="outline"
           onClick={save}
           disabled={busy || saved || (!canToggle && !watch.enabled)}
-          aria-busy={busy}
+          isLoading={busy}
           className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {busy ? copy.busy : watch.enabled ? copy.unwatch : copy.watch}
@@ -213,7 +213,7 @@ export function ResourceReleaseWatchControl({
               variant="outline"
               onClick={save}
               disabled={busy}
-              aria-busy={busy}
+              isLoading={busy}
               className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {busy ? copy.busy : copy.retrySame}

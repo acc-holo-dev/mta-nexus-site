@@ -86,7 +86,7 @@ it("disabled watches cannot be enabled from an unavailable projection", () => {
   );
   expect(html).toContain('disabled=""');
   expect(html).toContain('type="button"');
-  expect(html).toContain('aria-busy="false"');
+  expect(html).not.toContain("aria-busy=");
 });
 it("authenticates early and invalid duplicate filters never reach the repository", async () => {
   state.user = null;

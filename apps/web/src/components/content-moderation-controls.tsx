@@ -129,7 +129,10 @@ export function ContentModerationControls({
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div
+      className="w-full max-w-sm space-y-2 md:w-80"
+      aria-busy={pending !== null ? true : undefined}
+    >
       <label className="block space-y-1">
         <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
         <textarea
