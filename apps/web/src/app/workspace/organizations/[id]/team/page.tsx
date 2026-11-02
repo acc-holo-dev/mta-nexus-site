@@ -54,7 +54,7 @@ export default async function TeamPage({
             </p>
             <a
               href={organizationTeamHref(id, { query: "" })}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {team.reload}
             </a>
@@ -62,7 +62,7 @@ export default async function TeamPage({
         ) : (
           <Link
             href={authEntryHref("login", organizationTeamHref(id, { query: "" }))}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {locale === "ru" ? "Войти" : "Sign in"}
           </Link>

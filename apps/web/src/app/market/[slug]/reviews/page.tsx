@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../components/auth-return-path";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { productService } from "../../../../lib/services/product-service";
-import { resourceReviewService } from "../../../../lib/services/resource-review-service";
-import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../../../../lib/resource-review-query";
 import {
   ResourceReviewList,
   ResourceReviewPager,
 } from "../../../../components/resource-review-list";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
+import { resourceReviewPageQuery } from "../../../../lib/resource-review-query";
+import { authService } from "../../../../lib/services/auth-service";
+import { productService } from "../../../../lib/services/product-service";
+import { resourceReviewService } from "../../../../lib/services/resource-review-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
@@ -50,7 +50,10 @@ export default async function Page({
         : `/market/${encodeURIComponent(product.slug)}/reviews`;
   return (
     <section className="mx-auto max-w-4xl space-y-5 py-8">
-      <Link href={`/market/${encodeURIComponent(product.slug)}`} className="text-accent underline">
+      <Link
+        href={`/market/${encodeURIComponent(product.slug)}`}
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display">
@@ -63,7 +66,7 @@ export default async function Page({
             ? `/workspace/library/review/${encodeURIComponent(product.id)}`
             : authEntryHref("login", reviewsPath)
         }
-        className="text-accent underline"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {actor ? copy.write : copy.signIn}
       </Link>

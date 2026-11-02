@@ -1,14 +1,14 @@
-import { BookOpen } from "lucide-react";
 import { EmptyState } from "@nexus/ui";
-import { ArticleCard } from "../../components/article-card";
-import { contentService } from "../../lib/services/content-service";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
+import { BookOpen } from "lucide-react";
 import Link from "next/link";
+import { ArticleCard } from "../../components/article-card";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
 } from "../../components/content-catalog-controls";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n-server";
+import { contentService } from "../../lib/services/content-service";
 import { editorialTypes, parseContentPage } from "../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
@@ -44,10 +44,16 @@ export default async function ArticlesPage({
       </div>
 
       <div className="flex flex-wrap gap-4 text-sm">
-        <Link href="/workspace/content/new" className="text-accent underline">
+        <Link
+          href="/workspace/content/new"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {platformCopy.create}
         </Link>
-        <Link href="/workspace/content" className="text-accent underline">
+        <Link
+          href="/workspace/content"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {platformCopy.studio}
         </Link>
       </div>
