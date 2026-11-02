@@ -5,24 +5,9 @@ const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 import type { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
-import { authEntryHref } from "./auth-return-path";
 
 export type HistoryArea = "purchases" | "licenses" | "sales";
 export type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;
-
-export function HistorySignIn({ copy, returnPath }: { copy: HistoryCopy; returnPath: string }) {
-  return (
-    <section className="mx-auto max-w-xl space-y-4 py-16 text-center">
-      <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-      <Link
-        href={authEntryHref("login", returnPath)}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
-        {copy.signIn}
-      </Link>
-    </section>
-  );
-}
 
 export function HistoryShell({
   copy,

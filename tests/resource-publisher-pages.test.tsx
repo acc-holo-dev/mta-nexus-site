@@ -156,6 +156,9 @@ it.each([
       await InventoryPage({ searchParams: Promise.resolve(searchParams) }),
     );
     expect(html).toContain(expectText);
+    if (Object.keys(statusCounts).length === 0 && Object.keys(searchParams).length === 0) {
+      expect(html).toContain("/workspace/resources/new");
+    }
   },
 );
 it("checks authentication before parsing private queries or querying repositories", async () => {

@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_current", role: "user" } as { id: string; role: "user" } | null,
@@ -12,6 +12,9 @@ const state = vi.hoisted(() => ({
 
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => ({ value: "session" }) }),
+}));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/purchases",
 }));
 vi.mock("@nexus/db", () => ({
   orderRepository: {
@@ -41,8 +44,8 @@ vi.mock("next/link", async () => {
   };
 });
 
-import Purchases, { metadata as purchasesMeta } from "../apps/web/src/app/workspace/purchases/page";
 import Licenses, { metadata as licensesMeta } from "../apps/web/src/app/workspace/licenses/page";
+import Purchases, { metadata as purchasesMeta } from "../apps/web/src/app/workspace/purchases/page";
 import Sales, { metadata as salesMeta } from "../apps/web/src/app/workspace/sales/page";
 
 const date = new Date("2026-10-09T10:00:00.000Z");

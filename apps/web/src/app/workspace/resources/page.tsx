@@ -66,7 +66,7 @@ export default async function AuthorResourcesPage({
         </div>
         <Link
           href="/workspace/resources/new"
-          className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {dictionary.workspace.publishResource}
         </Link>
@@ -88,7 +88,14 @@ export default async function AuthorResourcesPage({
             >
               {publisherCopy.reset}
             </Link>
-          ) : null}
+          ) : (
+            <Link
+              href="/workspace/resources/new"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.workspace.publishResource}
+            </Link>
+          )}
         </div>
       ) : (
         <ul aria-label={copy.title} className="grid gap-4 sm:grid-cols-2">
@@ -96,7 +103,7 @@ export default async function AuthorResourcesPage({
             <li key={product.id} className="min-w-0 rounded-lg border border-base bg-surface p-5">
               <Link
                 href={`/workspace/resources/${product.id}#publication-readiness`}
-                className="break-words text-lg font-semibold text-primary hover:text-accent"
+                className="break-words text-lg font-semibold text-primary hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {product.title}
               </Link>

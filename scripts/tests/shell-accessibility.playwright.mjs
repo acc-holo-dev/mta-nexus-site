@@ -565,7 +565,7 @@ for (const locale of ["en", "ru"]) {
       "/discover": dictionary.discover.title,
       "/workspace": dictionary.workspace.signInRequired,
       "/workspace/resources": dictionary.workspace.signInRequired,
-      "/notifications": dictionary.notifications.title,
+      "/notifications": dictionary.workspace.signInRequired,
       "/settings": dictionary.settings.signInRequired,
       "/support": dictionary.support.title,
       "/auth/login": dictionary.auth.loginTitle,
@@ -628,6 +628,7 @@ for (const locale of ["en", "ru"]) {
         `${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`,
       );
     }
+    await loginFixture(page);
     await page.goto("/notifications");
     await waitForReadyCapture(page);
     const notificationFilters = page.getByRole("navigation", {
@@ -655,7 +656,7 @@ for (const locale of ["en", "ru"]) {
     await expect(unreadNotificationsLink).toHaveAttribute("aria-current", "page");
     await expect(allNotificationsLink).not.toHaveAttribute("aria-current", "page");
     // List composition follows the same URL state as the select/service (no second local filter).
-    // Without a session the inbox rows are absent; assert the filter links alone compose that state.
+    // Signed-in inbox filter links compose URL state without a second local filter.
     const stateLinks = await notificationFilters.evaluate((nav) =>
       [...nav.querySelectorAll("a")].map((link) => ({
         href: link.getAttribute("href"),

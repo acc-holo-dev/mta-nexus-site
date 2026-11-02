@@ -2,11 +2,8 @@ import { orderRepository } from "@nexus/db";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import {
-  HistoryPagination,
-  HistoryShell,
-  HistorySignIn,
-} from "../../../components/commerce-history-ui";
+import { HistoryPagination, HistoryShell } from "../../../components/commerce-history-ui";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -38,7 +35,7 @@ export default async function SalesHistoryPage({
       page && page !== "1"
         ? `/workspace/sales?page=${encodeURIComponent(page)}`
         : "/workspace/sales";
-    return <HistorySignIn copy={copy} returnPath={returnPath} />;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
 
   const result = await orderRepository.pageSellerHistory(user.id, parseHistoryPage(query.page));

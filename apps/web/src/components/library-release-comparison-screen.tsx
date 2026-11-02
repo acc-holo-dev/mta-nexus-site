@@ -6,10 +6,9 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
 import { libraryReleaseComparisonQuery } from "../lib/library-release-comparison-query";
-import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
 export async function LibraryReleaseComparisonScreen({
   params,
@@ -25,7 +24,6 @@ export async function LibraryReleaseComparisonScreen({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  const authCopy = getResourceReleaseControlCopy(locale);
   const compareBase = `/workspace/library/${encodeURIComponent(path.id)}/versions/compare`;
   if (!actor) {
     let returnPath = compareBase;
@@ -39,17 +37,7 @@ export async function LibraryReleaseComparisonScreen({
     } catch {
       // Keep the compare route when query params are invalid for guests.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {authCopy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof libraryReleaseComparisonQuery>;
   try {

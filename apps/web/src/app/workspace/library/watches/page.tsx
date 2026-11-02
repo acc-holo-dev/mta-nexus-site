@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -201,17 +201,27 @@ export default async function ReleaseWatchesPage({
           ))}
         </ul>
       ) : (
-        <div className="nexus-panel space-y-3 p-6 text-sm text-muted" role="status">
-          <p>{result.counts.all === 0 ? copy.empty : copy.emptyFiltered}</p>
-          {result.counts.all !== 0 ? (
-            <Link
-              href={resourceReleaseWatchesUrl("all", 1, "")}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={result.counts.all === 0 ? copy.empty : copy.emptyFiltered}
+          description={copy.note}
+          action={
+            result.counts.all === 0 ? (
+              <Link
+                href="/workspace/library"
+                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.library}
+              </Link>
+            ) : (
+              <Link
+                href={resourceReleaseWatchesUrl("all", 1, "")}
+                className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            )
+          }
+        />
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">

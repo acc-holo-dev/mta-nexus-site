@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/order-cases",
   useRouter: () => ({ push: vi.fn() }),
   notFound: () => {
     throw Error("NOT_FOUND");

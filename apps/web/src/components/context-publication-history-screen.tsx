@@ -18,9 +18,8 @@ import {
   serverPublicationHistoryError,
 } from "../lib/server-publication-history-copy";
 import { authService } from "../lib/services/auth-service";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { authEntryHref } from "./auth-return-path";
 import { AuthorPublicationRestore } from "./author-publication-restore";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
@@ -47,7 +46,6 @@ export async function ContextPublicationHistoryScreen({
     workspaceTitle =
       kind === "servers" ? serverContentCopy(locale).title : organizationContentCopy(locale).title,
     history = authorPublicationDeskCopy(locale),
-    labels = getUserPlatformCopy(locale),
     path = `/workspace/${kind}/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}/history`;
   let failure = "";
   const actor = await authService
@@ -56,24 +54,19 @@ export async function ContextPublicationHistoryScreen({
       failure = copy.unavailable;
       return null;
     });
-  if (!actor)
-    return (
-      <section className="nexus-panel space-y-3 p-5">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        {failure ? (
+  if (!actor) {
+    if (failure) {
+      return (
+        <section className="nexus-panel space-y-3 p-5">
+          <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
           <p role="alert" className="text-danger">
             {failure}
           </p>
-        ) : (
-          <Link
-            href={authEntryHref("login", path)}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {labels.signIn}
-          </Link>
-        )}
-      </section>
-    );
+        </section>
+      );
+    }
+    return <PlatformSignIn locale={locale} returnPath={path} />;
+  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)

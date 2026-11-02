@@ -15,7 +15,7 @@ import { serverWorkspaceCopy, serverWorkspaceError } from "../lib/server-workspa
 import { authService } from "../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../lib/services/server-workspace-history-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function ServerWorkspaceHistoryScreen({
   id,
   searchParams,
@@ -34,24 +34,20 @@ export async function ServerWorkspaceHistoryScreen({
       failure = copy.historyUnavailable;
       return null;
     });
-  if (!actor)
-    return (
-      <section className="nexus-panel space-y-3 p-5">
-        <h1 className="text-xl font-bold text-primary">{history.title}</h1>
-        {failure ? (
+  if (!actor) {
+    const returnPath = `/workspace/servers/${encodeURIComponent(id)}/history`;
+    if (failure) {
+      return (
+        <section className="nexus-panel space-y-3 p-5">
+          <h1 className="text-xl font-bold text-primary">{history.title}</h1>
           <p role="alert" className="text-danger">
             {failure}
           </p>
-        ) : (
-          <Link
-            href={authEntryHref("login", `/workspace/servers/${encodeURIComponent(id)}/history`)}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {labels.signIn}
-          </Link>
-        )}
-      </section>
-    );
+        </section>
+      );
+    }
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
   const rawParams = (await searchParams) ?? {},
     params = new URLSearchParams();
   for (const [key, value] of Object.entries(rawParams))

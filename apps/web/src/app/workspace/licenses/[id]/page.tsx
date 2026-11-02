@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HistorySignIn } from "../../../../components/commerce-history-ui";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { LicenseControlPanel } from "../../../../components/license-control-panel";
 import { LicenseDetailView } from "../../../../components/license-detail-view";
-import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../../lib/license-control-i18n";
 import { authService } from "../../../../lib/services/auth-service";
@@ -21,8 +20,8 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
-      <HistorySignIn
-        copy={getCommerceHistoryCopy(locale)}
+      <PlatformSignIn
+        locale={locale}
         returnPath={`/workspace/licenses/${encodeURIComponent(id)}`}
       />
     );

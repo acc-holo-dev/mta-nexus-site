@@ -9,6 +9,7 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/prd_a/versions/compare",
   useRouter: () => ({ refresh: vi.fn() }),
   notFound: () => {
     throw new Error("NOT_FOUND");
@@ -88,7 +89,7 @@ it("retains reference pair and return page in export and swaps the direction exp
 it("requires current actor, unambiguous query and current release authorization", async () => {
   h.actor = null;
   const guest = await screen();
-  expect(guest).toContain("Sign in to manage your library");
+  expect(guest).toContain("Sign in required");
   expect(guest).toContain("/auth/login?next=");
   expect(guest).toContain("%2Fworkspace%2Flibrary%2Fprd_a%2Fversions%2Fcompare");
   expect(h.compare).not.toHaveBeenCalled();

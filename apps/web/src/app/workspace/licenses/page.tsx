@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HistoryShell, HistorySignIn } from "../../../components/commerce-history-ui";
+import { HistoryShell } from "../../../components/commerce-history-ui";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
 import {
   effectiveLicenseStatus,
@@ -50,7 +51,7 @@ export default async function LicensesHistoryPage({
       page && page !== "1"
         ? `/workspace/licenses?page=${encodeURIComponent(page)}`
         : "/workspace/licenses";
-    return <HistorySignIn copy={copy} returnPath={returnPath} />;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
 
   const params = new URLSearchParams();

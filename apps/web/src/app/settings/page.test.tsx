@@ -1,5 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { PlatformSignIn } from "../../components/content-catalog-controls";
+import { getDictionary } from "../../lib/i18n";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -55,22 +58,7 @@ vi.mock("../../components/private-change-history-controls", () => ({
 vi.mock("../../components/public-profile-form", () => ({ PublicProfileForm: () => null }));
 vi.mock("../../components/web-push-settings", () => ({ WebPushSettings: () => null }));
 
-import { getDictionary } from "../../lib/i18n";
 import SettingsPage from "./page";
-
-type Element = ReactElement<Record<string, unknown>>;
-
-function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  return [element, ...descendants(element.props.children as ReactNode)];
-}
-
-function renderSignedOutGate() {
-  harness.cursor = 0;
-  return descendants(SettingsPage());
-}
 
 beforeEach(() => {
   harness.slots = [
@@ -97,10 +85,13 @@ afterEach(() => {
 });
 
 it("seeds signed-out sign-in with the current pathname return target", () => {
-  const copy = getDictionary("en").settings;
-  const signIn = renderSignedOutGate().find(
-    (node) => node.props.href === "/auth/login?next=%2Fsettings",
-  );
-  expect(signIn).toBeTruthy();
-  expect(String(signIn?.props.children)).toContain(copy.signIn);
+  harness.cursor = 0;
+  const gate = SettingsPage() as ReactElement<{ locale: string; returnPath?: string | null }>;
+  expect(gate.type).toBe(PlatformSignIn);
+  expect(gate.props.returnPath).toBe("/settings");
+  const html = renderToStaticMarkup(gate);
+  const copy = getDictionary("en").workspace;
+  expect(html).toContain('href="/auth/login?next=%2Fsettings"');
+  expect(html).toContain(copy.signInRequired);
+  expect(html).toContain(copy.signIn);
 });

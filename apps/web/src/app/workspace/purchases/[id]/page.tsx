@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HistorySignIn } from "../../../../components/commerce-history-ui";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -41,7 +41,10 @@ export default async function OrderDetailsPage({
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
-      <HistorySignIn copy={copy} returnPath={`/workspace/purchases/${encodeURIComponent(id)}`} />
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/purchases/${encodeURIComponent(id)}`}
+      />
     );
   const result = await commerceService.getBuyerOrderDetails(
     actor,

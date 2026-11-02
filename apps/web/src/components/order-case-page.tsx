@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatHistoryAmount, formatHistoryDate } from "../lib/commerce-history-format";
-import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
 import { financialOrderLabel, financialPaymentLabel } from "../lib/financial-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
@@ -17,7 +16,6 @@ import {
 import { orderCasePageQuery } from "../lib/order-case-query";
 import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
-import { HistorySignIn } from "./commerce-history-ui";
 import { PlatformSignIn } from "./content-catalog-controls";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
 import { SupportCaseThread } from "./support-case-thread";
@@ -135,8 +133,8 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
-      <HistorySignIn
-        copy={getCommerceHistoryCopy(locale)}
+      <PlatformSignIn
+        locale={locale}
         returnPath={`/workspace/purchases/${encodeURIComponent(orderId)}/support`}
       />
     );
@@ -190,10 +188,7 @@ export async function OrderCaseListPage({
       if (typeof value === "string") pageParams.set(key, value);
     }
     const returnPath = `${base}${pageParams.size ? `?${pageParams}` : ""}`;
-    if (staff) {
-      return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-    }
-    return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let filters: ReturnType<typeof orderCasePageQuery>;
   try {
@@ -333,10 +328,7 @@ export async function OrderCaseDetailPage({
       if (typeof value === "string") pageParams.set(key, value);
     }
     const returnPath = `${detailBase}${pageParams.size ? `?${pageParams}` : ""}`;
-    if (staff) {
-      return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-    }
-    return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let page = 1;
   try {

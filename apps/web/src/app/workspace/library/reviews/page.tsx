@@ -1,8 +1,10 @@
+import { EmptyState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ResourceReviewPager } from "../../../../components/resource-review-list";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceReviewCopy, resourceReviewState } from "../../../../lib/resource-review-i18n";
 import { resourceReviewPageQuery } from "../../../../lib/resource-review-query";
@@ -27,6 +29,7 @@ export default async function Page({
     searchParams,
   ]);
   const copy = resourceReviewCopy(locale),
+    workspace = getDictionary(locale).workspace,
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -73,7 +76,26 @@ export default async function Page({
           </article>
         ))
       ) : (
-        <p>{copy.empty}</p>
+        <EmptyState
+          title={copy.empty}
+          description={copy.subtitle}
+          action={
+            <>
+              <Link
+                href="/market?maxPrice=0"
+                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {workspace.browseResources}
+              </Link>
+              <Link
+                href="/workspace/review-reports"
+                className="mt-3 block text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reports}
+              </Link>
+            </>
+          }
+        />
       )}
       <ResourceReviewPager
         base="/workspace/library/reviews"

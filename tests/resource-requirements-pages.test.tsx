@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/prd_a/requirements",
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
@@ -107,7 +108,7 @@ it("does not inspect resources for signed-out visitors", async () => {
   const guest = renderToStaticMarkup(
     await screen({ productId: "prd_a", scope: "library", raw: {} }),
   );
-  expect(guest).toContain("Sign in to manage your library");
+  expect(guest).toContain("Sign in required");
   expect(guest).toContain("/auth/login?next=");
   expect(guest).toContain("%2Fworkspace%2Flibrary%2Fprd_a%2Frequirements");
   expect(state.report).not.toHaveBeenCalled();

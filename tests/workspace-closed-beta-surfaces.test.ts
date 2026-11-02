@@ -20,6 +20,7 @@ const repos = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/purchases",
   redirect: (target: string) => {
     state.redirects.push(target);
   },
@@ -126,7 +127,7 @@ describe("open free-beta workspace behavior", () => {
     const input = { searchParams: Promise.resolve({}) };
     for (const page of [LicensesPage, PurchasesPage, SalesPage]) {
       const html = renderToStaticMarkup(await page(input));
-      expect(html).toContain("Sign in to view your private history");
+      expect(html).toContain(getDictionary("en").workspace.signInRequired);
       expect(html).toMatch(/href="\/auth\/login\?next=%2Fworkspace%2F(purchases|licenses|sales)/);
     }
     expect(state.redirects).toEqual([]);

@@ -4,13 +4,11 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatHistoryDate } from "../lib/commerce-history-format";
-import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { getLicenseControlCopy, licenseActionLabel } from "../lib/license-control-i18n";
 import { licenseRuntimePage } from "../lib/license-runtime-query";
 import { authService } from "../lib/services/auth-service";
 import { licenseControlService } from "../lib/services/license-control-service";
-import { HistorySignIn } from "./commerce-history-ui";
 import { PlatformSignIn } from "./content-catalog-controls";
 
 export async function licenseHistoryMetadata(): Promise<Metadata> {
@@ -41,10 +39,7 @@ export async function LicenseHistoryPage({
       ? `/admin/licenses/${encodeURIComponent(licenseId)}/history`
       : `/workspace/licenses/${encodeURIComponent(licenseId)}/history`;
     const returnPath = `${base}${params.size ? `?${params}` : ""}`;
-    if (moderation) {
-      return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-    }
-    return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let page = 1;
   try {
