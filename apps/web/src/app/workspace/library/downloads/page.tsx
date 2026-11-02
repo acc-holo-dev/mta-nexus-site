@@ -57,8 +57,7 @@ export default async function ResourceDownloadsPage({
     );
   }
   const result = await resourceDeliveriesService.page(user, query),
-    href = (page: number) => resourceDeliveriesUrl({ ...query, page }),
-    filtered = query.status !== "all" || query.days !== "all" || Boolean(query.resourceId);
+    href = (page: number) => resourceDeliveriesUrl({ ...query, page });
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
@@ -167,7 +166,7 @@ export default async function ResourceDownloadsPage({
       ) : (
         <div className="space-y-3 text-secondary">
           <p>{result.counts.all === 0 ? copy.emptyNever : copy.emptyFiltered}</p>
-          {filtered && result.counts.all > 0 ? (
+          {result.counts.all > 0 ? (
             <Link
               href={resourceDeliveriesUrl({
                 page: 1,

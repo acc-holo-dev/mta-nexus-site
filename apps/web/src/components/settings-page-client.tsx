@@ -262,8 +262,20 @@ export function SettingsPageClient() {
     });
   }
 
-  function changePassword(event: FormEvent<HTMLFormElement>) {
+  async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (
+      !(await confirmAction({
+        title: copy.changePasswordConfirmTitle,
+        object: copy.changePassword,
+        consequences: copy.changePasswordConfirm,
+        confirmLabel: copy.updatePassword,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
     void perform(async () => {
       const data = await requestSettings<{
         success: boolean;

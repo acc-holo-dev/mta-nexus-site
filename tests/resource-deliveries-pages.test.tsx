@@ -155,6 +155,19 @@ it("distinguishes empty inventory from filtered download history", async () => {
   expect(filtered).toContain(resourceDeliveriesCopy("en").emptyFiltered);
   expect(filtered).toContain(resourceDeliveriesCopy("en").clearFilters);
   expect(filtered).not.toContain(resourceDeliveriesCopy("en").emptyNever);
+
+  state.page.mockResolvedValueOnce({
+    items: [],
+    counts: { all: 4, started: 1, served: 2, cancelled: 1, failed: 0 },
+    page: 3,
+    totalPages: 3,
+  });
+  const emptyPage = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ page: "3" }) }),
+  );
+  expect(emptyPage).toContain(resourceDeliveriesCopy("en").emptyFiltered);
+  expect(emptyPage).toContain(resourceDeliveriesCopy("en").clearFilters);
+  expect(emptyPage).not.toContain(resourceDeliveriesCopy("en").emptyNever);
 });
 it("distinguishes empty publisher inventory from filtered version summary", async () => {
   state.publisher.mockResolvedValueOnce({

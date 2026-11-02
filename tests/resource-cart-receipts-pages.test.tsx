@@ -33,6 +33,7 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 
 import Detail from "../apps/web/src/app/workspace/acquisitions/receipts/[id]/page";
 import Page, { generateMetadata } from "../apps/web/src/app/workspace/acquisitions/receipts/page";
+import { resourceCartReceiptsCopy } from "../apps/web/src/lib/resource-cart-receipts-i18n";
 
 const requestId = "11111111-1111-4111-8111-111111111111";
 beforeEach(() => {
@@ -96,6 +97,30 @@ it.each(["ru", "en"] as const)(
     expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
+it("distinguishes never-empty receipts from filtered or paginated empty pages", async () => {
+  const copy = resourceCartReceiptsCopy("en");
+  state.page.mockResolvedValueOnce({ items: [], page: 1, totalPages: 1, total: 0 });
+  const never = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
+  expect(never).toContain(copy.emptyNever);
+  expect(never).not.toContain(copy.emptyFiltered);
+  expect(never.split(copy.clear).length).toBe(2);
+
+  state.page.mockResolvedValueOnce({ items: [], page: 1, totalPages: 1, total: 0 });
+  const filtered = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ days: "7" }) }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered.split(copy.clear).length).toBe(3);
+  expect(filtered).not.toContain(copy.emptyNever);
+
+  state.page.mockResolvedValueOnce({ items: [], page: 3, totalPages: 3, total: 42 });
+  const emptyPage = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ page: "3" }) }),
+  );
+  expect(emptyPage).toContain(copy.emptyFiltered);
+  expect(emptyPage.split(copy.clear).length).toBe(3);
+  expect(emptyPage).not.toContain(copy.emptyNever);
+});
 it("authenticates and rejects repeated filters before querying receipts", async () => {
   state.user = null;
   const html = renderToStaticMarkup(

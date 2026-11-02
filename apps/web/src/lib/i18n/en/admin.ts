@@ -286,6 +286,9 @@ export const admin = {
     newPassword: "New password",
     passwordHint: "8 to 128 characters; different from your current password.",
     updatePassword: "Update password",
+    changePasswordConfirmTitle: "Change password?",
+    changePasswordConfirm:
+      "Changing your password ends all other sessions and renews this browser's sign-in token.",
     unconfirmedPasswordChange: "Unconfirmed password change",
     activeSessions: "Active sessions",
     reloadSettings: "Reload settings",

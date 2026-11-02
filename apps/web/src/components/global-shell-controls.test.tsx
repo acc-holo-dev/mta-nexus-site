@@ -66,6 +66,7 @@ describe("global shell controls behavior", () => {
       expect(html).toContain(
         `<span role="status" class="sr-only sm:hidden">${dictionary.accountControls.checking}</span>`,
       );
+      expect(html).toContain('aria-busy="true"');
     },
   );
 

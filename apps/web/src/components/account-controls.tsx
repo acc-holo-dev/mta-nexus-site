@@ -133,6 +133,7 @@ export function AccountControls() {
     <div
       aria-label={copy.groupLabel}
       role="group"
+      aria-busy={checking || signingOut ? true : undefined}
       className="relative flex min-w-0 items-center gap-1.5 sm:gap-2"
     >
       {checking ? (

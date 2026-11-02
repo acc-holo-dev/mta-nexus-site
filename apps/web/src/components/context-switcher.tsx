@@ -115,7 +115,7 @@ export function ContextSwitcher() {
   if (contexts.length <= 1 && !error) return null;
 
   return (
-    <section aria-busy={saving} className="nexus-panel space-y-3 p-5">
+    <section aria-busy={saving ? true : undefined} className="nexus-panel space-y-3 p-5">
       <div>
         <h2 className="text-sm font-semibold text-primary">{copy.title}</h2>
         <p className="mt-1 text-xs text-muted">{copy.description}</p>

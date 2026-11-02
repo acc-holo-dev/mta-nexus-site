@@ -138,7 +138,7 @@ export function ProfilePrivacyEditor({
   return (
     <section
       className="nexus-panel space-y-5 p-5 sm:p-6"
-      aria-busy={pending}
+      aria-busy={pending ? true : undefined}
       aria-label={copy.title}
     >
       <form onSubmit={save} className="space-y-5">

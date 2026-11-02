@@ -291,6 +291,9 @@ export const admin = {
     newPassword: "Новый пароль",
     passwordHint: "От 8 до 128 символов; новый пароль должен отличаться от текущего.",
     updatePassword: "Обновить пароль",
+    changePasswordConfirmTitle: "Изменить пароль?",
+    changePasswordConfirm:
+      "После изменения пароля остальные сессии завершатся, а токен этого браузера будет обновлён.",
     unconfirmedPasswordChange: "Изменение пароля не подтверждено",
     activeSessions: "Активные сессии",
     reloadSettings: "Обновить настройки",

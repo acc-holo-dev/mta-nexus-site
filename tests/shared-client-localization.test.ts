@@ -40,6 +40,16 @@ describe("shared client localization and request hardening", () => {
     expect(en.publicServersLabel).not.toBe(ru.publicServersLabel);
   });
 
+  it("confirms password changes before ending other sessions", () => {
+    const source = read("apps/web/src/components/settings-page-client.tsx");
+
+    expect(source).toContain("changePasswordConfirmTitle");
+    expect(source).toContain("await confirmAction({");
+    expect(source.indexOf("changePasswordConfirmTitle")).toBeLessThan(
+      source.indexOf('"/api/auth/password"'),
+    );
+  });
+
   it("uses the hardened request contract for login and registration", () => {
     const source = read("apps/web/src/components/auth-form.tsx");
 

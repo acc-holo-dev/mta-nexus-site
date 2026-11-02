@@ -136,7 +136,7 @@ export default async function ResourceCartReceiptsPage({
           <p className="text-secondary">
             {result.total === 0 && !receiptsFiltered ? copy.emptyNever : copy.emptyFiltered}
           </p>
-          {receiptsFiltered && result.total === 0 ? (
+          {!result.items.length && (receiptsFiltered || result.total > 0) ? (
             <Link
               href="/workspace/acquisitions/receipts"
               className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

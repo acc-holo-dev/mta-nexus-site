@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { ShellAuthSession } from "../apps/web/src/components/shell-destination-policy";
@@ -89,6 +91,17 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
     }),
   ).toBe(true);
   expect(adminDestinationAccessibleName("Admin", "Staff only")).toBe("Admin (Staff only)");
+});
+
+it("keeps mobile More menu session checking and staff admin labels in source", () => {
+  const source = readFileSync(
+    resolve(process.cwd(), "apps/web/src/components/mobile-nav.tsx"),
+    "utf8",
+  );
+  expect(source).toContain("dictionary.nav.checkingSession");
+  expect(source).toContain("adminAccessibleName");
+  expect(source).toContain('aria-busy="true"');
+  expect(source).toContain("aria-label={adminAccessibleName}");
 });
 
 it("shows session checking chrome without workspace, sign-in, or admin while loading", () => {
