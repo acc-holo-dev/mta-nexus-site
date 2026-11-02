@@ -1,23 +1,23 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { orderRepository } from "@nexus/db";
-import { authService } from "../../../lib/services/auth-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
-import { getCommercialCopy } from "../../../lib/commercial-i18n";
-import { orderCaseCopy } from "../../../lib/order-case-i18n";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import {
+  HistoryPagination,
+  HistoryShell,
+  HistorySignIn,
+} from "../../../components/commerce-history-ui";
 import {
   formatHistoryAmount,
   formatHistoryDate,
   orderStatusLabel,
   parseHistoryPage,
 } from "../../../lib/commerce-history-format";
-import {
-  HistoryPagination,
-  HistoryShell,
-  HistorySignIn,
-} from "../../../components/commerce-history-ui";
+import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getCommercialCopy } from "../../../lib/commercial-i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { orderCaseCopy } from "../../../lib/order-case-i18n";
+import { authService } from "../../../lib/services/auth-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -46,10 +46,16 @@ export default async function PurchasesHistoryPage({
 
   return (
     <HistoryShell copy={copy} area="purchases">
-      <Link href="/subscriptions" className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
+      <Link
+        href="/subscriptions"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {getCommercialCopy(locale).catalog}
       </Link>
-      <Link href="/workspace/order-cases" className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
+      <Link
+        href="/workspace/order-cases"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {orderCaseCopy(locale).buyerCases}
       </Link>
       {result.orders.length === 0 ? (

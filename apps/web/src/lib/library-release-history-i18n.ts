@@ -1,5 +1,6 @@
 const en = {
   title: "My version selection history",
+  loading: "Loading version selection history…",
   note: "Recorded choices from individual and group operations. Resource names are current labels; release labels require current access and safe publication. Lost access preserves your own recorded IDs. History does not restore versions or grant files.",
   individual: "Individual selection",
   batch: "Group selection",
@@ -25,6 +26,7 @@ const en = {
 };
 const ru: typeof en = {
   title: "Моя история выбора версий",
+  loading: "Загрузка истории выбора версий…",
   note: "Выборы, записанные при одиночных и групповых операциях. Названия ресурсов показаны в текущем виде; подписи выпусков требуют действующего доступа и безопасной публикации. При потере доступа сохраняются идентификаторы ваших действий. История не восстанавливает версии и не выдаёт файлы.",
   individual: "Одиночный выбор",
   batch: "Групповой выбор",

@@ -3,13 +3,13 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { SellerSalesReportView } from "../../../../components/seller-sales-report";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
 import { sellerSalesPageQuery } from "../../../../lib/seller-sales-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
-import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sales report | MTA NEXUS",
@@ -32,7 +32,10 @@ export default async function SellerSalesPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display">{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -55,7 +58,10 @@ export default async function SellerSalesPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.invalid}</p>
-          <Link href="/workspace/sales/report" className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
+          <Link
+            href="/workspace/sales/report"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.reset}
           </Link>
         </section>
