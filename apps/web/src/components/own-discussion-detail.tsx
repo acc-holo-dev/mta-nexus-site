@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import type { OwnDiscussion } from "../lib/discussion-workspace-contract";
-import type { Locale } from "../lib/i18n";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
+import type { Locale } from "../lib/i18n";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 export function OwnDiscussionDetail({
   initial,
@@ -25,7 +25,7 @@ export function OwnDiscussionDetail({
         </p>
         <Link
           href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>
@@ -49,7 +49,7 @@ export function OwnDiscussionDetail({
         <Link
           prefetch={false}
           href={`/articles/${encodeURIComponent(comment.slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.discussion}
         </Link>

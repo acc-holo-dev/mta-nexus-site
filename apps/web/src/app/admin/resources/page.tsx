@@ -44,7 +44,10 @@ export default async function ResourceModerationPage({
     `?${new URLSearchParams({ ...(status ? { status } : {}), ...(search ? { query: search } : {}), page: String(page) })}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/admin" className="text-sm text-accent underline">
+      <Link
+        href="/admin"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.moderation}</h1>
@@ -84,7 +87,7 @@ export default async function ResourceModerationPage({
             <li key={product.id} className="nexus-panel space-y-2 p-5">
               <Link
                 href={`/admin/resources/${encodeURIComponent(product.id)}`}
-                className="break-words font-semibold text-accent underline"
+                className="break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {product.title}
               </Link>

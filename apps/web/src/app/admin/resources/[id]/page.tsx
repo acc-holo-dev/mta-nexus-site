@@ -46,7 +46,10 @@ export default async function ResourceModerationDetail({
   const product = result.product;
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/admin/resources" className="text-sm text-accent underline">
+      <Link
+        href="/admin/resources"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.moderation}
       </Link>
       <h1 className="break-words font-display text-primary">{product.title}</h1>

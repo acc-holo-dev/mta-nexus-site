@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 import type { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
 import { authEntryHref } from "./auth-return-path";
 
@@ -13,7 +14,10 @@ export function HistorySignIn({ copy, returnPath }: { copy: HistoryCopy; returnP
   return (
     <section className="mx-auto max-w-xl space-y-4 py-16 text-center">
       <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-      <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+      <Link
+        href={authEntryHref("login", returnPath)}
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.signIn}
       </Link>
     </section>
@@ -83,7 +87,10 @@ export function HistoryPagination({
   return (
     <nav aria-label={copy.page} className="flex items-center justify-between gap-4 text-sm">
       {page > 1 ? (
-        <Link href={`/workspace/${area}?page=${page - 1}`} className="text-accent underline">
+        <Link
+          href={`/workspace/${area}?page=${page - 1}`}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.previous}
         </Link>
       ) : (
@@ -93,7 +100,10 @@ export function HistoryPagination({
         {copy.page} {page} {copy.of} {totalPages}
       </span>
       {page < totalPages ? (
-        <Link href={`/workspace/${area}?page=${page + 1}`} className="text-accent underline">
+        <Link
+          href={`/workspace/${area}?page=${page + 1}`}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.next}
         </Link>
       ) : (

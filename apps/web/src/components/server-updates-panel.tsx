@@ -1,9 +1,9 @@
 import type { Content } from "@nexus/domain";
 import { Newspaper } from "lucide-react";
-import { ArticleCard } from "./article-card";
-import { getDictionary, type Locale } from "../lib/i18n";
 import Link from "next/link";
+import { getDictionary, type Locale } from "../lib/i18n";
 import { publicationCopy } from "../lib/publication-feed-copy";
+import { ArticleCard } from "./article-card";
 
 export function ServerUpdatesPanel({
   updates,
@@ -34,7 +34,7 @@ export function ServerUpdatesPanel({
       {serverSlug && (
         <Link
           href={`/servers/${encodeURIComponent(serverSlug)}/updates`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {publicationCopy(locale).allUpdates}
         </Link>

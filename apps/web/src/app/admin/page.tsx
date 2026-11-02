@@ -276,7 +276,7 @@ export default async function AdminPage({
                   {request.targetUsername && (
                     <Link
                       href={`/users/${encodeURIComponent(request.targetUsername)}`}
-                      className="block text-xs text-accent underline"
+                      className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {verificationCopy(locale).publicProfile} · @{request.targetUsername}
                     </Link>
@@ -284,7 +284,7 @@ export default async function AdminPage({
                   {request.organizationSlug && (
                     <Link
                       href={`/organizations/${encodeURIComponent(request.organizationSlug)}`}
-                      className="block text-xs text-accent underline"
+                      className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {verificationCopy(locale).organization}
                     </Link>
@@ -299,7 +299,7 @@ export default async function AdminPage({
                       href={safeExternalWebUrl(request.currentGithubUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-xs text-accent underline"
+                      className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {verificationCopy(locale).github}
                     </a>
@@ -309,7 +309,7 @@ export default async function AdminPage({
                       href={safeExternalWebUrl(request.proofUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block break-all font-caption text-accent underline"
+                      className="block break-all font-caption text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.verificationProof}
                     </a>
@@ -449,7 +449,7 @@ export default async function AdminPage({
                   />
                   <Link
                     href={`/admin/resources/${build.productId}/builds/${build.id}`}
-                    className="text-accent underline text-xs"
+                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] text-xs"
                   >
                     {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
                   </Link>
@@ -556,7 +556,7 @@ export default async function AdminPage({
                   {build.scanStatus === "clean" && build.scanner?.trim() && build.scannedAt && (
                     <a
                       href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
-                      className="inline-block text-xs font-semibold text-accent underline"
+                      className="inline-block text-xs font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.reviewArtifact}
                     </a>
@@ -605,7 +605,7 @@ export default async function AdminPage({
           description={`${pendingContentCount} ${copy.draftsAwaitingModeration}`}
           action={
             <Link
-              className="inline-flex min-h-11 items-center text-xs text-accent underline"
+              className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href="/admin/community"
             >
               {moderationCopy(locale).title}
@@ -682,13 +682,13 @@ export default async function AdminPage({
         <SectionHeader title={copy.reports} description={copy.caseHistory} />
         <Link
           href="/admin/storage"
-          className="mb-3 mr-4 inline-block text-sm text-accent underline"
+          className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {storageMaintenanceCopy(locale).title}
         </Link>
         <Link
           href="/admin/commerce/order-cases"
-          className="mb-3 mr-4 inline-block text-sm text-accent underline"
+          className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {orderCaseCopy(locale).queue}
         </Link>
@@ -763,7 +763,7 @@ export default async function AdminPage({
                     (report.targetType === "review" ? (
                       <Link
                         href={`/admin/commerce/reviews/${encodeURIComponent(report.id)}`}
-                        className="text-sm text-accent underline"
+                        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {resourceReviewCopy(locale).detail}
                       </Link>

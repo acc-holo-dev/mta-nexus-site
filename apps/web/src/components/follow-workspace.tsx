@@ -184,7 +184,7 @@ export function FollowWorkspace({
         </Button>
         <Link
           href={href(type, "")}
-          className="min-h-11 content-center text-sm text-accent underline"
+          className="min-h-11 content-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.clear}
         </Link>
@@ -217,11 +217,17 @@ export function FollowWorkspace({
             {type || query ? copy.emptyFilteredHint : copy.emptyHint}
           </p>
           {type || query ? (
-            <Link href={href(undefined, "")} className="text-sm text-accent underline">
+            <Link
+              href={href(undefined, "")}
+              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.clear}
             </Link>
           ) : (
-            <Link href="/discover" className="text-sm text-accent underline">
+            <Link
+              href="/discover"
+              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.discover}
             </Link>
           )}
@@ -270,7 +276,7 @@ export function FollowWorkspace({
                   <Link
                     prefetch={false}
                     href={`${item.href}?comment=${encodeURIComponent(item.discussion.latestId)}#comment-${encodeURIComponent(item.discussion.latestId)}`}
-                    className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                    className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {copy.latestReply}
                   </Link>
@@ -283,7 +289,7 @@ export function FollowWorkspace({
                   <Link
                     prefetch={false}
                     href={`/workspace/library/${encodeURIComponent(item.targetId)}/collections`}
-                    className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                    className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     title={copy.toCollectionHint}
                   >
                     {copy.toCollection}
@@ -300,7 +306,7 @@ export function FollowWorkspace({
                     target: item.targetId,
                     cursor: undefined,
                   })}
-                  className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                  className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {publicationCopy(locale).targetFeed}
                 </Link>

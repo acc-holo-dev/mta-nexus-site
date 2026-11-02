@@ -1,18 +1,18 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
 import { financialReviewRepository } from "@nexus/db";
-import { authService } from "../../../../lib/services/auth-service";
-import { getRequestLocale } from "../../../../lib/i18n-server";
+import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { parseHistoryPage } from "../../../../lib/commerce-history-format";
 import {
-  getFinancialCopy,
-  formatFinancialMinor,
   financialFlags,
   financialOrderLabel,
+  formatFinancialMinor,
+  getFinancialCopy,
 } from "../../../../lib/financial-i18n";
-import { parseHistoryPage } from "../../../../lib/commerce-history-format";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { authService } from "../../../../lib/services/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Financial reconciliation | MTA NEXUS",
@@ -37,7 +37,10 @@ export default async function Reconciliation({
   const href = (page: number) => `?${new URLSearchParams({ filter, page: String(page) })}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/admin" className="text-sm text-accent underline">
+      <Link
+        href="/admin"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.review}</h1>
@@ -45,10 +48,16 @@ export default async function Reconciliation({
         {copy.reviewNote}
       </p>
       <nav className="flex gap-4 text-sm" aria-label={copy.review}>
-        <Link href="?filter=review" className="text-accent underline">
+        <Link
+          href="?filter=review"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.reviewOnly}
         </Link>
-        <Link href="?filter=all" className="text-accent underline">
+        <Link
+          href="?filter=all"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.allOrders}
         </Link>
       </nav>
@@ -58,7 +67,7 @@ export default async function Reconciliation({
             <li key={order.id} className="nexus-panel space-y-3 p-5">
               <Link
                 href={`/admin/commerce/reconciliation/${encodeURIComponent(order.id)}`}
-                className="break-words font-semibold text-accent underline"
+                className="break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {order.orderNumber}
               </Link>
@@ -85,7 +94,10 @@ export default async function Reconciliation({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className="text-accent underline">
+            <Link
+              href={href(result.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -93,7 +105,10 @@ export default async function Reconciliation({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className="text-accent underline">
+            <Link
+              href={href(result.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.next}
             </Link>
           ) : null}

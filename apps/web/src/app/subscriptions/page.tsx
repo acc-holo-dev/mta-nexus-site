@@ -34,10 +34,16 @@ export default async function SubscriptionCatalog({
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <h1 className="font-display text-primary">{copy.catalog}</h1>
-      <Link href="/workspace/subscriptions" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/subscriptions"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {subscriptionsCopy(locale).title}
       </Link>
-      <Link href="/workspace/subscriptions/reviews" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/subscriptions/reviews"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {planReviewsCopy(locale).history}
       </Link>
       <p
@@ -81,7 +87,7 @@ export default async function SubscriptionCatalog({
               {plan.price === 0 ? (
                 <Link
                   href={`/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`}
-                  className="block text-accent underline"
+                  className="block text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {subscriptionsCopy(locale).activate}
                 </Link>
@@ -92,7 +98,7 @@ export default async function SubscriptionCatalog({
               )}
               <Link
                 href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`}
-                className="block text-sm text-accent underline"
+                className="block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {planReviewsCopy(locale).newReview}
               </Link>
@@ -105,7 +111,10 @@ export default async function SubscriptionCatalog({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className="text-accent underline">
+            <Link
+              href={href(result.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -113,7 +122,10 @@ export default async function SubscriptionCatalog({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className="text-accent underline">
+            <Link
+              href={href(result.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.next}
             </Link>
           ) : null}

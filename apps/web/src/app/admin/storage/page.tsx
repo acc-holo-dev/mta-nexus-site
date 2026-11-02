@@ -70,7 +70,7 @@ export default async function Page({
             <li key={item.id} className="nexus-panel space-y-2 p-4">
               <Link
                 href={`/admin/storage/objects/${item.id}`}
-                className="break-all text-accent underline"
+                className="break-all text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {item.storageKey}
               </Link>

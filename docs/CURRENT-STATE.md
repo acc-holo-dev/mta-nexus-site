@@ -4,10 +4,11 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `9c56ae641be96b5db3f9916c3052b60beb5b4412` (`fix(web): restore saved loader heading id for unit contract`).
-- **Verified CI green on that tip:** [CI 41398920739](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41398920739) (selected scope without resource-browser; claim-focus harden still needs a browser-scoped tip).
-- **Prior full selected-scope green (incl. resource-browser):** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
-- **Failed tip (not baseline):** `53badf5a…` / [CI 41395863320](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395863320) — resource-browser RU claim-button focus flake after hydration.
+- **Tip SHA:** `0a034c84f3a8f8144afb72530e5d4e3ccd380fcf` (`test(a11y): keep claim focus poll under resource-browser scope`).
+- **Verified CI green on that tip:** [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125) (full selected scope, incl. resource-browser).
+- **Prior full selected-scope green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
+- **Earlier selected green (no resource-browser):** `9c56ae64…` / [CI 41398920739](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41398920739).
+- **Failed tip (not baseline):** `53badf5a…` / [CI 41395863320](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395863320) — resource-browser RU claim-button focus flake (fixed by focus poll on `0a034c84`).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path, QA/follow first-paint.
 - **Honesty/a11y wave (tip series):** clear-filter CTAs (support/discussion/publication target/inbox), confirmAction on destructive clients, honest loading shells across public directories and workspace hubs, filter `focus-visible` outlines, market/main overflow clip, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.
@@ -32,11 +33,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `9c56ae64…` green on selected scope (CI 41398920739); next force resource-browser to verify claim-focus poll.
+**Последняя локальная волна:** tip sync to `0a034c84…` full green; org/server new + subscription history + acquisition receipts loaders; more focus rings.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `9c56ae64…` selected green without resource-browser; last full selected green `a27e55a5…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `0a034c84…` full selected green. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

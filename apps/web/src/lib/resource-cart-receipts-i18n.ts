@@ -1,7 +1,9 @@
 import type { Locale } from "./i18n";
+
 const copy = {
   en: {
     title: "Free acquisition receipts",
+    loading: "Loading acquisition receipts…",
     receipts: "Receipts",
     apply: "Apply filters",
     evidence: "Version evidence",
@@ -57,6 +59,7 @@ const copy = {
   },
   ru: {
     title: "Квитанции бесплатного получения",
+    loading: "Загрузка квитанций получения…",
     receipts: "Квитанции",
     apply: "Применить фильтры",
     evidence: "Сведения о версиях",
