@@ -4,7 +4,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** pending next push (commerce history loaders + shell claim focus retry); do not treat as green until CI confirms.
+- **Tip SHA:** `e7468237…` (`fix(web): add commerce history loaders and harden claim focus`); awaiting CI — do not treat as green yet.
 - **Last verified green tip:** `59326c30a91c009310d1ee314a024a4ebd4b6c10` / [CI 41395566631](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395566631) (lint/unit selected).
 - **Failed tip (not baseline):** `53badf5a…` / [CI 41395863320](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395863320) — resource-browser RU claim-button focus flake after hydration.
 - **Prior full selected-scope green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
