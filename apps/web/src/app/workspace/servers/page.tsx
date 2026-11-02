@@ -166,7 +166,10 @@ export default async function ManagedServersPage({
             {copy.apply}
           </Button>
           {filtered && (
-            <Link href="/workspace/servers" className="py-2 text-sm text-accent underline">
+            <Link
+              href="/workspace/servers"
+              className="py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.reset}
             </Link>
           )}
@@ -184,7 +187,10 @@ export default async function ManagedServersPage({
         <div className="nexus-panel space-y-3 p-8 text-center text-sm text-muted">
           <p>{filtered ? copy.emptyFilter : copy.empty}</p>
           {filtered ? (
-            <Link href="/workspace/servers" className="text-accent underline">
+            <Link
+              href="/workspace/servers"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.reset}
             </Link>
           ) : null}
@@ -213,7 +219,7 @@ export default async function ManagedServersPage({
           {result.page > 1 && (
             <Link
               href={managedServerHref(filters, result.page - 1)}
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -224,7 +230,7 @@ export default async function ManagedServersPage({
           {result.page < result.totalPages && (
             <Link
               href={managedServerHref(filters, result.page + 1)}
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>

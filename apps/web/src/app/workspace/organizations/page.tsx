@@ -92,7 +92,10 @@ export default async function OrganizationsPage({
           {!result.items.length && <p className="nexus-panel p-5 text-muted">{copy.empty}</p>}
           <nav className="flex justify-between text-sm" aria-label={copy.title}>
             {result.page > 1 ? (
-              <Link className="text-accent underline" href={href(result.page - 1)}>
+              <Link
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={href(result.page - 1)}
+              >
                 {copy.previous}
               </Link>
             ) : (
@@ -102,7 +105,10 @@ export default async function OrganizationsPage({
               {copy.page} {result.page}
             </span>
             {result.hasMore && (
-              <Link className="text-accent underline" href={href(result.page + 1)}>
+              <Link
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={href(result.page + 1)}
+              >
                 {copy.next}
               </Link>
             )}

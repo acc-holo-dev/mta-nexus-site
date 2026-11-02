@@ -95,4 +95,37 @@ describe("confirmAction", () => {
     expect(dialog.unmount).toHaveBeenCalledTimes(1);
     expect(document.querySelector("[data-nexus-confirm='true']")).toBeNull();
   });
+
+  it("resolves false when document is unavailable", async () => {
+    vi.unstubAllGlobals();
+    const { confirmAction } = await import("./confirm-action");
+    await expect(
+      confirmAction({
+        title: "Unavailable",
+        object: "x",
+        consequences: "noop",
+        confirmLabel: "Ok",
+        cancelLabel: "Cancel",
+        closeLabel: "Close",
+      }),
+    ).resolves.toBe(false);
+  });
+
+  it("ignores a second confirm after settle", async () => {
+    const { confirmAction } = await import("./confirm-action");
+    const pending = confirmAction({
+      title: "Once",
+      object: "x",
+      consequences: "once",
+      confirmLabel: "Ok",
+      cancelLabel: "Cancel",
+      closeLabel: "Close",
+    });
+    const first = dialog.props;
+    first?.onConfirm();
+    first?.onConfirm();
+    first?.onCancel();
+    await expect(pending).resolves.toBe(true);
+    expect(dialog.unmount).toHaveBeenCalledTimes(1);
+  });
 });

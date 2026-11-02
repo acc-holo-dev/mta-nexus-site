@@ -4,9 +4,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `f6ef5754e65bdd6532beefafe1f44233b4a8466e` (`fix(web): reset history empties and label nested loading shells`).
-- **Verified CI green on that tip:** [CI 41383584322](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41383584322) (lint/unit, DB, image build, production browser smoke; selected scope).
-- **Later tip `0e6ef1ea` not green:** [CI 41384259234](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41384259234) failed typecheck on confirmAction test `consequences` typing — fixed forward-only.
+- **Tip SHA:** `15740799d5be4503e762b80efdefbe2ac3273bef` (`fix(web): pass guest return paths and type confirmAction tests`).
+- **Verified CI green on that tip:** [CI 41384881702](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41384881702) (lint/unit, DB, image build, production browser smoke; selected scope).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path, QA/follow first-paint.
 - **Honesty/a11y wave (tip series):** clear-filter CTAs (support/discussion/publication target/inbox), confirmAction on destructive clients, honest loading shells across public directories and workspace hubs, filter `focus-visible` outlines, market/main overflow clip, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.
@@ -31,11 +30,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** history/downloads clear-filters; labelled nested loading shells; tip docs sync to `f6ef5754…` / CI 41383584322.
+**Последняя локальная волна:** PlatformSignIn explicit `returnPath` on workspace/admin guest gates; confirmAction unit coverage; tip docs sync to `15740799…` / CI 41384881702.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `f6ef5754…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `15740799…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
