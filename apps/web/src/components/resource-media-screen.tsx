@@ -23,8 +23,13 @@ export async function ResourceMediaScreen({
   if (!actor)
     return (
       <section className="space-y-4 py-16 text-center">
-        <h1>{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)}>{copy.signIn}</Link>
+        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {copy.signIn}
+        </Link>
       </section>
     );
   let gallery: Awaited<ReturnType<typeof resourceMediaService.managed>>;

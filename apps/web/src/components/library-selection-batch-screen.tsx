@@ -170,12 +170,24 @@ export async function LibrarySelectionBatchScreen({
           />
         )}
         <nav aria-label={cc.page} className="flex gap-4">
-          {result.page > 1 && <Link href={pageHref(result.page - 1)}>{cc.previous}</Link>}
+          {result.page > 1 && (
+            <Link
+              href={pageHref(result.page - 1)}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              {cc.previous}
+            </Link>
+          )}
           <span>
             {cc.page} {result.page} {cc.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={pageHref(result.page + 1)}>{cc.next}</Link>
+            <Link
+              href={pageHref(result.page + 1)}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              {cc.next}
+            </Link>
           )}
         </nav>
       </div>
