@@ -5,6 +5,10 @@ export const chrome = {
     workspaceFor: "Workspace for",
     signingOut: "Signing out...",
     signOut: "Sign out",
+    cancel: "Cancel",
+    signOutConfirmTitle: "Sign out",
+    signOutConfirm:
+      "You will need to sign in again to access your workspace, library, and saved settings.",
     retry: "Retry account",
     signIn: "Sign in",
     checkError: "Could not check your account. Try again.",

@@ -68,6 +68,7 @@ export default async function PublisherDeliveriesPage({
   });
   const href = (page: number) =>
     `?${new URLSearchParams({ days: query.days, page: String(page) })}`;
+  const filtered = query.days !== "all";
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
@@ -145,7 +146,17 @@ export default async function PublisherDeliveriesPage({
           </table>
         </div>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <div className="space-y-3 text-secondary">
+          <p>{result.counts.all === 0 ? copy.publisherEmptyNever : copy.emptyFiltered}</p>
+          {filtered && result.counts.all > 0 ? (
+            <Link
+              href={`?${new URLSearchParams({ days: "all", page: "1" })}`}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.clearFilters}
+            </Link>
+          ) : null}
+        </div>
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">

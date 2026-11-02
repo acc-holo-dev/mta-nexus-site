@@ -6,6 +6,10 @@ const harness = vi.hoisted(() => ({
   cursor: 0,
   cleanups: [] as Array<undefined | (() => void)>,
   fetch: vi.fn(),
+  confirm: vi.fn(),
+}));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
@@ -80,11 +84,28 @@ beforeEach(() => {
   harness.cursor = 0;
   harness.cleanups = [];
   harness.fetch.mockReset();
+  harness.confirm.mockReset().mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
 });
 afterEach(() => {
   for (const cleanup of harness.cleanups) cleanup?.();
   vi.unstubAllGlobals();
+});
+it("does not sign out when the confirmation dialog is cancelled", async () => {
+  harness.confirm.mockResolvedValueOnce(false);
+  const copy = getDictionary("en").accountControls;
+  const nodes = render();
+  const control = nodes.find(
+    (node) => node.type === "button" && node.props["aria-label"] === copy.signOut,
+  );
+  if (!control) throw new Error("Missing sign-out control");
+  await (control.props.onClick as () => Promise<void>)();
+  expect(harness.confirm).toHaveBeenCalledOnce();
+  expect(
+    harness.fetch.mock.calls.some(
+      ([, init]) => (init as RequestInit | undefined)?.method === "DELETE",
+    ),
+  ).toBe(false);
 });
 it("renders signed-in sign-out control on shared Button chrome", () => {
   const copy = getDictionary("en").accountControls;

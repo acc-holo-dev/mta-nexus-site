@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 type Account = { username: string };
@@ -84,7 +85,19 @@ export function AccountControls() {
   }, []);
 
   async function signOut() {
-    if (signingOut) return;
+    if (signingOut || !account) return;
+    if (
+      !(await confirmAction({
+        title: copy.signOutConfirmTitle,
+        object: `@${account.username}`,
+        consequences: copy.signOutConfirm,
+        confirmLabel: copy.signOut,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
 
     setSigningOut(true);
     setError(null);

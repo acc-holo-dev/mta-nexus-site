@@ -123,7 +123,8 @@ it.each([401, 404, 409])("requires reload after a definitive error %s", async (s
     render().some((n) => n.type === "button" && n.props.children === "Retry the same request"),
   ).toBe(false);
   await click("Reload current state");
-  expect(h.reload).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
+  expect(h.reload).not.toHaveBeenCalled();
 });
 it.each([
   { ...ack, productId: "prd_other" },

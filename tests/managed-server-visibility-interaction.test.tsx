@@ -79,13 +79,16 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
-  const type = element.type as { displayName?: string; name?: string } | string;
-  const componentName =
-    typeof type === "function"
-      ? type.name
-      : typeof type === "object" && type
-        ? type.displayName
-        : undefined;
+  const rawType = element.type;
+  let componentName: string | undefined;
+  if (typeof rawType === "string") {
+    componentName = rawType;
+  } else if (typeof rawType === "function") {
+    const fn = rawType as { displayName?: string; name?: string };
+    componentName = fn.displayName ?? fn.name;
+  } else if (typeof rawType === "object" && rawType !== null) {
+    componentName = (rawType as { displayName?: string }).displayName;
+  }
   if (componentName === "Button") {
     return [
       { ...element, type: "button" } as Element,
@@ -111,7 +114,7 @@ function descendants(node: ReactNode): Element[] {
           onChange: (event: { target: { checked: boolean } }) =>
             props.onCheckedChange(event.target.checked),
         },
-      } as Element,
+      } as unknown as Element,
       ...descendants(props.children),
     ];
   }
@@ -299,7 +302,7 @@ it.each(["foreign", "duplicate", "extra", "changed"])(
   },
 );
 it.each(["revision", "scope", "network"])(
-  "requires full reload after an unconfirmed write and blocks retained handlers (%s)",
+  "requires refresh after an unconfirmed write and blocks retained handlers (%s)",
   async (kind) => {
     await review();
     if (kind === "network") harness.fetch.mockRejectedValueOnce(Error("Private transport details"));
@@ -330,7 +333,8 @@ it.each(["revision", "scope", "network"])(
       false,
     );
     click(render(), serverWorkspaceCopy("en").reload);
-    expect(harness.reload).toHaveBeenCalledOnce();
+    expect(harness.refresh).toHaveBeenCalledOnce();
+    expect(harness.reload).not.toHaveBeenCalled();
   },
 );
 it("shows a safe stale-review error and does not retry it automatically", async () => {

@@ -222,7 +222,7 @@ export function ResourceReleaseWatchControl({
           <Button
             type="button"
             variant="outline"
-            onClick={() => window.location.reload()}
+            onClick={() => router.refresh()}
             disabled={busy}
             className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >

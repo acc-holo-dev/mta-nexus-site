@@ -35,6 +35,10 @@ export function PublicationFeed({
     types = getUserPlatformCopy(locale);
   const page = initial,
     error = initial ? "" : errorCode ? publicationError(locale, errorCode) : copy.error;
+  const filtered = Boolean(
+    filters.query || filters.type || filters.source || filters.author || filters.tag,
+  );
+  const emptyFollowingHonest = following && !filters.target && !filters.cursor && !filtered;
   const linkControl =
     "min-h-11 rounded-lg border border-base px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) => types[type];
@@ -224,9 +228,11 @@ export function PublicationFeed({
                 ? copy.emptyTarget
                 : filters.cursor
                   ? copy.emptyPage
-                  : filters.query || filters.type || filters.source || filters.author || filters.tag
-                    ? copy.emptyFiltered
-                    : copy.empty}
+                  : emptyFollowingHonest
+                    ? copy.emptyFollowing
+                    : filtered
+                      ? copy.emptyFiltered
+                      : copy.empty}
             </p>
             {filters.target && !filters.cursor && (
               <Link
@@ -241,24 +247,23 @@ export function PublicationFeed({
                 {copy.clearTarget}
               </Link>
             )}
-            {(filters.query || filters.type || filters.source || filters.author || filters.tag) &&
-              !filters.cursor && (
-                <Link
-                  prefetch={false}
-                  href={publicationHref(path, {
-                    ...filters,
-                    query: "",
-                    type: undefined,
-                    source: undefined,
-                    author: undefined,
-                    tag: undefined,
-                    cursor: undefined,
-                  })}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.reset}
-                </Link>
-              )}
+            {filtered && !filters.cursor && (
+              <Link
+                prefetch={false}
+                href={publicationHref(path, {
+                  ...filters,
+                  query: "",
+                  type: undefined,
+                  source: undefined,
+                  author: undefined,
+                  tag: undefined,
+                  cursor: undefined,
+                })}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            )}
             {filters.cursor && (
               <Link
                 prefetch={false}
@@ -268,16 +273,13 @@ export function PublicationFeed({
                 {copy.latest}
               </Link>
             )}
-            {following && (
-              <>
-                <p>{copy.emptyFollowing}</p>
-                <Link
-                  href="/discover"
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.discover}
-                </Link>
-              </>
+            {emptyFollowingHonest && (
+              <Link
+                href="/discover"
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.discover}
+              </Link>
             )}
           </div>
         )}

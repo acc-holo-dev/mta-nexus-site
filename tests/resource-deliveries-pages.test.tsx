@@ -156,6 +156,41 @@ it("distinguishes empty inventory from filtered download history", async () => {
   expect(filtered).toContain(resourceDeliveriesCopy("en").clearFilters);
   expect(filtered).not.toContain(resourceDeliveriesCopy("en").emptyNever);
 });
+it("distinguishes empty publisher inventory from filtered version summary", async () => {
+  state.publisher.mockResolvedValueOnce({
+    product: { id: "prd_a", title: "Archive" },
+    counts: { all: 0, started: 0, served: 0, cancelled: 0, failed: 0 },
+    items: [],
+    page: 1,
+    totalPages: 1,
+  });
+  const never = renderToStaticMarkup(
+    await Publisher({
+      params: Promise.resolve({ id: "prd_a" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(never).toContain(resourceDeliveriesCopy("en").publisherEmptyNever);
+  expect(never).not.toContain(resourceDeliveriesCopy("en").clearFilters);
+
+  state.publisher.mockResolvedValueOnce({
+    product: { id: "prd_a", title: "Archive" },
+    counts: { all: 4, started: 1, served: 2, cancelled: 1, failed: 0 },
+    items: [],
+    page: 1,
+    totalPages: 1,
+  });
+  const filtered = renderToStaticMarkup(
+    await Publisher({
+      params: Promise.resolve({ id: "prd_a" }),
+      searchParams: Promise.resolve({ days: "7" }),
+    }),
+  );
+  expect(filtered).toContain(resourceDeliveriesCopy("en").emptyFiltered);
+  expect(filtered).toContain(resourceDeliveriesCopy("en").clearFilters);
+  expect(filtered).toContain("days=all");
+  expect(filtered).not.toContain(resourceDeliveriesCopy("en").publisherEmptyNever);
+});
 it("authenticates before reading or validating account histories", async () => {
   state.user = null;
   expect(

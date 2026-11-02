@@ -15,6 +15,7 @@ import {
   profilePrivacyMutationError,
 } from "../lib/profile-privacy-copy";
 import { platformRequest } from "../lib/user-platform-client";
+import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 
 export function ProfilePrivacyEditor({
   initial,
@@ -150,7 +151,7 @@ export function ProfilePrivacyEditor({
               checked={activity}
               onChange={(event) => setActivity(event.target.checked)}
               aria-describedby="privacy-activity-description"
-              className="mt-1 h-5 w-5 shrink-0 accent-[var(--nexus-accent)]"
+              className={`mt-1 h-5 w-5 shrink-0 accent-[var(--nexus-accent)] ${actionConfirmCheckboxFocusClass}`}
             />
             <span className="space-y-1">
               <span className="block text-sm font-semibold text-primary">{copy.activity}</span>
@@ -166,7 +167,7 @@ export function ProfilePrivacyEditor({
               checked={contacts}
               onChange={(event) => setContacts(event.target.checked)}
               aria-describedby="privacy-contacts-description"
-              className="mt-1 h-5 w-5 shrink-0 accent-[var(--nexus-accent)]"
+              className={`mt-1 h-5 w-5 shrink-0 accent-[var(--nexus-accent)] ${actionConfirmCheckboxFocusClass}`}
             />
             <span className="space-y-1">
               <span className="block text-sm font-semibold text-primary">{copy.contacts}</span>
@@ -178,7 +179,12 @@ export function ProfilePrivacyEditor({
         </fieldset>
         <p className="text-sm text-muted">{copy.scope}</p>
         <div className="flex flex-wrap gap-3">
-          <Button type="submit" isLoading={pending} disabled={pending || !profile}>
+          <Button
+            type="submit"
+            isLoading={pending}
+            disabled={pending || !profile}
+            className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.save}
           </Button>
           <Button

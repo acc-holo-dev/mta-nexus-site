@@ -29,11 +29,11 @@ vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
 
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import PrivacyPage, { generateMetadata } from "../apps/web/src/app/settings/privacy/page";
 import UserActivity, {
   generateMetadata as activityMetadata,
 } from "../apps/web/src/app/users/[username]/activity/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const saved = {
   id: "actor",
@@ -62,6 +62,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.guestPreviewAlways);
     expect(html).toContain('name="showActivity"');
     expect(html).toContain('name="showProfessionalContacts"');
+    expect(html).toContain("focus-visible:ring-[color:var(--nexus-accent)]");
+    expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
     expect(html).not.toContain('checked=""');
     expect(html).toContain('aria-describedby="privacy-contacts-description"');
     expect(html).toContain('href="/users/member"');

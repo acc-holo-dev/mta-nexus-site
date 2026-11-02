@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { ReactElement, ReactNode } from "react";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -41,9 +42,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh
 vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
+
 import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
+import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const previous = "2026-10-11T00:00:00.000Z";
 const ack = {
   id: "post",
@@ -183,7 +186,8 @@ it.each([
   click(nodes, "Archive");
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   click(nodes, "Reload saved version");
-  expect(harness.reload).toHaveBeenCalledTimes(1);
+  expect(harness.refresh).toHaveBeenCalledTimes(1);
+  expect(harness.reload).not.toHaveBeenCalled();
 });
 it("blocks network failures without success or refresh", async () => {
   harness.fetch.mockRejectedValueOnce(new Error("offline"));
