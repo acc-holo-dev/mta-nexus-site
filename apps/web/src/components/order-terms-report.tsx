@@ -26,7 +26,10 @@ export function OrderTermsReportView({
   ).filter((key) => report.summary[key]);
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href={base} className="text-sm text-accent underline">
+      <Link
+        href={base}
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.back}
       </Link>
       <header className="space-y-3">
@@ -83,7 +86,10 @@ export function OrderTermsReportView({
           ))}
         </ul>
       </section>
-      <a href={`${api}/export?page=${report.page}`} className="text-sm text-accent underline">
+      <a
+        href={`${api}/export?page=${report.page}`}
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.export}
       </a>
       {report.lines.length ? (

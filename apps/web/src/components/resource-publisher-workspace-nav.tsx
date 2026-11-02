@@ -102,7 +102,7 @@ export function ResourcePublisherWorkspaceNav({
                     className={
                       current
                         ? "font-semibold text-primary underline decoration-accent underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        : "text-accent underline underline-offset-2 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        : "text-accent underline-offset-2 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     }
                   >
                     {copy[item.key]}

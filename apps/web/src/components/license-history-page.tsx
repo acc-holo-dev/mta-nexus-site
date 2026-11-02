@@ -60,7 +60,7 @@ export async function LicenseHistoryPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`${base}/${encodeURIComponent(licenseId)}`}
-        className="text-sm text-accent underline"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.manage}
       </Link>

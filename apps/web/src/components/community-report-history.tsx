@@ -29,7 +29,10 @@ export function CommunityReportHistory({
     path = `${base}/history`;
   return (
     <div className="mx-auto max-w-4xl space-y-5">
-      <Link href={base} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <Link
+        href={base}
+        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -69,7 +72,7 @@ export function CommunityReportHistory({
         </Button>
         <Link
           href={path}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.reset}
         </Link>
@@ -133,7 +136,7 @@ export function CommunityReportHistory({
       {page.nextCursor && (
         <Link
           href={changeHistoryHref(path, filters, { cursor: page.nextCursor, until: page.until })}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.older}
         </Link>

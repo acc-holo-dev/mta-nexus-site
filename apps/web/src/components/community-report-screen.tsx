@@ -63,7 +63,7 @@ export async function CommunityReportScreen({
       {staff && !id && (
         <Link
           href="/admin/reports/targets"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {reportGroupsCopy(locale).open}
         </Link>

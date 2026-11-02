@@ -201,7 +201,7 @@ export function OrderCaseCreateForm({
         variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="h-auto min-h-11 px-0 text-sm text-accent underline"
+        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.reload}
       </Button>
@@ -349,7 +349,7 @@ export function OrderCaseReviewForm({
         variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="h-auto min-h-11 px-0 text-sm text-accent underline"
+        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.reload}
       </Button>

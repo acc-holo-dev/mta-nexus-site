@@ -105,14 +105,14 @@ export function DirectoryFilters({
                     })
                   : discoverHref({ ...state, query: "", page: 1 }, path)
               }
-              className="min-h-11 content-center text-sm text-accent underline"
+              className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.clearQuery}
             </Link>
           ) : null}
           <Link
             href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
-            className="min-h-11 content-center text-sm text-accent underline"
+            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.reset}
           </Link>

@@ -75,7 +75,10 @@ export async function BuildPackageScreen({
       : detail.candidates;
   return (
     <div className="space-y-6">
-      <Link href={base} className="text-sm text-accent underline">
+      <Link
+        href={base}
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -129,7 +132,10 @@ export async function BuildPackageScreen({
         <Button type="submit" disabled={options.length === 0} variant="outline">
           {copy.apply}
         </Button>
-        <Link href={pageBase} className="text-sm text-accent underline">
+        <Link
+          href={pageBase}
+          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.reset}
         </Link>
       </form>

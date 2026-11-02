@@ -50,7 +50,7 @@ export function PublicationFeed({
           <Link
             prefetch={false}
             href={publicationHref(path, { ...filters, target: undefined, cursor: undefined })}
-            className="inline-flex min-h-11 items-center text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.clearTarget}
           </Link>
@@ -125,7 +125,10 @@ export function PublicationFeed({
         <Button type="submit" variant="outline" className="min-h-11 font-semibold text-accent">
           {copy.search}
         </Button>
-        <Link href={path} className="min-h-11 content-center text-sm text-accent underline">
+        <Link
+          href={path}
+          className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.reset}
         </Link>
       </form>
@@ -152,7 +155,7 @@ export function PublicationFeed({
               </Link>
               <Link
                 href={publicationHref(path, { ...filters, author: item.author.username })}
-                className="text-xs text-accent underline"
+                className="rounded text-xs text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 prefetch={false}
               >
                 {copy.onlyAuthor}
@@ -173,7 +176,7 @@ export function PublicationFeed({
                       key={context.href}
                       href={context.href}
                       prefetch={false}
-                      className="break-words text-accent underline"
+                      className="break-words rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       {context.name}
                     </Link>
@@ -208,7 +211,7 @@ export function PublicationFeed({
             <Link
               href={`/articles/${encodeURIComponent(item.slug)}#discussion`}
               prefetch={false}
-              className="text-xs text-accent underline"
+              className="rounded text-xs text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.comments}: {item.commentCount}
             </Link>
@@ -310,7 +313,7 @@ export function PublicationFeed({
         {following && (
           <Link
             href="/workspace/saved"
-            className="min-h-11 content-center text-sm text-accent underline"
+            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.manage}
           </Link>

@@ -204,14 +204,17 @@ export function VerificationWorkspace({
           {pending ? copy.loading : copy.reload}
         </Button>
         {developer && (
-          <Link href="/settings/developer" className="min-h-10 py-2 text-sm text-accent underline">
+          <Link
+            href="/settings/developer"
+            className="min-h-10 rounded py-2 rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {copy.editProfile}
           </Link>
         )}
         {profile && (
           <Link
             href={`/users/${encodeURIComponent(profile.username)}`}
-            className="min-h-10 py-2 text-sm text-accent underline"
+            className="min-h-10 rounded py-2 rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.publicProfile}
           </Link>
@@ -304,7 +307,7 @@ export function VerificationWorkspace({
             >
               <div className="space-y-1">
                 <Link
-                  className="text-sm text-accent underline"
+                  className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   href={`/organizations/${encodeURIComponent(team.slug)}`}
                 >
                   {team.name}
@@ -362,7 +365,7 @@ export function VerificationWorkspace({
                 {copy.submitted}
               </p>
               <Link
-                className="text-sm text-accent underline"
+                className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 href={`/workspace/verification/${encodeURIComponent(savedId)}`}
               >
                 {copy.title}
@@ -423,7 +426,10 @@ export function VerificationWorkspace({
       )}
       <section className="nexus-panel space-y-3 p-5">
         <p className="text-sm text-muted">{copy.serverHint}</p>
-        <Link href="/workspace/servers" className="text-sm text-accent underline">
+        <Link
+          href="/workspace/servers"
+          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.servers}
         </Link>
       </section>
@@ -485,7 +491,7 @@ export function VerificationWorkspace({
             <Link
               prefetch={false}
               href={`/workspace/verification/${encodeURIComponent(application.id)}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {verificationApplicationsCopy(locale).open}
             </Link>
@@ -494,7 +500,7 @@ export function VerificationWorkspace({
             </p>
             {safeExternalWebUrl(application.proofUrl) && (
               <a
-                className="text-sm text-accent underline"
+                className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 href={safeExternalWebUrl(application.proofUrl)}
                 target="_blank"
                 rel="noopener noreferrer"

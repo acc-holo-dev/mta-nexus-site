@@ -25,7 +25,10 @@ export function SellerSalesReportView({
   );
   return (
     <div className="mx-auto max-w-6xl space-y-6 py-8">
-      <Link href="/workspace/sales" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/sales"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.back}
       </Link>
       <header className="space-y-2">
@@ -46,7 +49,7 @@ export function SellerSalesReportView({
       </p>
       <Link
         href={`/workspace/finance${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
-        className="text-sm text-accent underline"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {c.finance}
       </Link>
@@ -148,7 +151,7 @@ export function SellerSalesReportView({
               organizationId: query.organizationId,
               attribution: query.attribution,
             })}
-            className="text-sm text-accent underline"
+            className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {c.reset}
           </Link>
@@ -190,7 +193,10 @@ export function SellerSalesReportView({
           ))}
         </ul>
       ) : null}
-      <a href={exportUrl} className="inline-block text-sm text-accent underline">
+      <a
+        href={exportUrl}
+        className="inline-block rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.export}
       </a>
       {report.sales.length ? (
@@ -212,7 +218,7 @@ export function SellerSalesReportView({
               </p>
               <Link
                 href={sellerSaleUrl(sale.id, query.organizationId, query.attribution)}
-                className="text-sm text-accent underline"
+                className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {c.details}
               </Link>

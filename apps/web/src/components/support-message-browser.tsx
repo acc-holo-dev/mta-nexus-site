@@ -73,7 +73,10 @@ export function SupportMessageBrowser({
         <Button type="submit" className="min-h-10" variant="primary">
           {copy.apply}
         </Button>
-        <Link href={path} className="text-sm text-accent underline">
+        <Link
+          href={path}
+          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.reset}
         </Link>
       </form>
@@ -136,7 +139,7 @@ export function SupportMessageBrowser({
               {message.truncated && <p className="mt-2 text-xs text-muted">{copy.truncated}</p>}
               <Link
                 href={`${path}?focus=${message.id}#message-${message.id}`}
-                className="mt-2 inline-flex min-h-9 items-center text-xs text-accent underline"
+                className="mt-2 inline-flex min-h-9 items-center rounded text-xs text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {copy.link}
               </Link>

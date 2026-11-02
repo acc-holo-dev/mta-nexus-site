@@ -274,7 +274,7 @@ export function LibraryCollectionItemCopyForm({
             type="button"
             disabled={busy}
             onClick={() => window.location.reload()}
-            className="h-auto px-0 text-accent underline"
+            className="h-auto rounded px-0 text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             variant="ghost"
           >
             {c.reload}

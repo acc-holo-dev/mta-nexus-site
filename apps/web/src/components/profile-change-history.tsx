@@ -41,7 +41,7 @@ export function ProfileChangeHistoryView({
       </header>
       <Link
         href="/settings"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.back}
       </Link>
@@ -63,7 +63,7 @@ export function ProfileChangeHistoryView({
               href={changeHistoryHref("/api/account/profile/history/export", filters, {
                 until: data.until,
               })}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.export}
             </a>
@@ -119,7 +119,7 @@ export function ProfileChangeHistoryView({
       <nav aria-label={copy.profileTitle} className="flex flex-wrap gap-4 text-sm">
         {(filters.cursor || filters.until || !data) && (
           <Link
-            className="inline-flex min-h-11 items-center text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             href={changeHistoryHref(path, filters, { fresh: true })}
           >
             {copy.latest}
@@ -127,7 +127,7 @@ export function ProfileChangeHistoryView({
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
-            className="inline-flex min-h-11 items-center text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             href={changeHistoryHref(path, filters, { cursor: data.nextCursor })}
           >
             {copy.older}

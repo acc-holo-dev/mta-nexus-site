@@ -61,13 +61,13 @@ export async function PublicationReportsPage({
         <div className="flex flex-wrap gap-4">
           <Link
             href="/admin/reports/targets"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.title}
           </Link>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.context}
           </Link>
@@ -156,7 +156,7 @@ export async function PublicationReportsPage({
         </p>
         <Link
           href={path}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {labels.reload}
         </Link>

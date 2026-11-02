@@ -68,7 +68,7 @@ export function LicenseArchiveFilters({
           <Button
             type="submit"
             variant="ghost"
-            className="h-auto px-0 text-sm text-accent underline"
+            className="h-auto rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.apply}
           </Button>
@@ -83,7 +83,7 @@ export function LicenseArchiveFilters({
       <p className="text-sm text-muted">{copy.archiveNote}</p>
       <a
         href={licenseArchiveUrl({ ...query, page }, "/api/licenses/export")}
-        className="text-sm text-accent underline"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.export}
       </a>
