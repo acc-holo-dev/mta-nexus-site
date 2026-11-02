@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommercialPlanForm } from "../../../../../components/commercial-plan-form";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -34,7 +35,14 @@ export default async function CommercialPlanAdmin({
   ]);
   const copy = getCommercialCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
-  if (user?.role !== "admin") notFound();
+  if (!user)
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/admin/commerce/plans/${encodeURIComponent(id)}`}
+      />
+    );
+  if (user.role !== "admin") notFound();
   const result = await commercialPlanService
     .adminDetail(user, id, Math.min(parseHistoryPage(query.page), 1000))
     .catch((error) => {

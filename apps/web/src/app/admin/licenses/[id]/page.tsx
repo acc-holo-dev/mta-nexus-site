@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { LicenseControlPanel } from "../../../../components/license-control-panel";
 import { LicenseDetailView } from "../../../../components/license-detail-view";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -18,7 +19,11 @@ export const metadata: Metadata = {
 export default async function ModerateLicensePage({ params }: { params: Promise<{ id: string }> }) {
   const [store, locale, { id }] = await Promise.all([cookies(), getRequestLocale(), params]);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user || !can(user, "admin.moderation")) notFound();
+  if (!user)
+    return (
+      <PlatformSignIn locale={locale} returnPath={`/admin/licenses/${encodeURIComponent(id)}`} />
+    );
+  if (!can(user, "admin.moderation")) notFound();
   const license = await licenseControlService.moderationDetail(user, id);
   if (!license) notFound();
   return (

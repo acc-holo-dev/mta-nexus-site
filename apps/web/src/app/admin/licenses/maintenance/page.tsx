@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { formatHistoryDate, licenseStatusLabel } from "../../../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -24,7 +25,8 @@ export default async function Page({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (actor?.role !== "admin") notFound();
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/admin/licenses/maintenance" />;
+  if (actor.role !== "admin") notFound();
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {
     if (Array.isArray(value)) for (const item of value) params.append(key, item);

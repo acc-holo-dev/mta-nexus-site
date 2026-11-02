@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { parseHistoryPage } from "../../../../lib/commerce-history-format";
 import {
   financialFlags,
@@ -26,7 +27,8 @@ export default async function Reconciliation({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getFinancialCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
-  if (user?.role !== "admin") notFound();
+  if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/commerce/reconciliation" />;
+  if (user.role !== "admin") notFound();
   const filter = query.filter === "all" ? "all" : "review";
   const result = await financialReviewRepository
     .page(user.id, Math.min(parseHistoryPage(query.page), 1000), filter)

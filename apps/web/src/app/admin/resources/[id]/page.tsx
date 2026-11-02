@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ResourceModerationControls } from "../../../../components/resource-moderation-controls";
 import { formatHistoryDate, parseHistoryPage } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -36,7 +37,11 @@ export default async function ResourceModerationDetail({
   ]);
   const copy = getResourceReleaseControlCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user || (user.role !== "admin" && user.role !== "moderator")) notFound();
+  if (!user)
+    return (
+      <PlatformSignIn locale={locale} returnPath={`/admin/resources/${encodeURIComponent(id)}`} />
+    );
+  if (user.role !== "admin" && user.role !== "moderator") notFound();
   const result = await resourceModerationService
     .detail(user, id, Math.min(parseHistoryPage(query.page), 1000))
     .catch((error) => {

@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { StorageCleanupControls } from "../../../../../components/storage-maintenance-controls";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -12,7 +13,14 @@ export const metadata = { robots: { index: false, follow: false } };
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (actor?.role !== "admin") notFound();
+  if (!actor)
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/admin/storage/objects/${encodeURIComponent(id)}`}
+      />
+    );
+  if (actor.role !== "admin") notFound();
   const item = await storageMaintenanceService.detail(actor.id, id).catch((error: unknown) => {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     throw error;

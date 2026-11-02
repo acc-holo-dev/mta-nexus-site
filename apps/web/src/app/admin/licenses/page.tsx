@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -29,7 +30,8 @@ export default async function LicensesModerationPage({
 }) {
   const [store, locale, query] = await Promise.all([cookies(), getRequestLocale(), searchParams]);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user || !can(user, "admin.moderation")) notFound();
+  if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/licenses" />;
+  if (!can(user, "admin.moderation")) notFound();
   const copy = getLicenseControlCopy(locale);
   const history = getCommerceHistoryCopy(locale);
   const status =

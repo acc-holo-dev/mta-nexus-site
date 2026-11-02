@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommercialPlanForm } from "../../../../../components/commercial-plan-form";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -15,7 +16,8 @@ export default async function NewCommercialPlan() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const user = await authService.getSession(store.get("nexus_session")?.value),
     copy = getCommercialCopy(locale);
-  if (user?.role !== "admin") notFound();
+  if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/commerce/plans/new" />;
+  if (user.role !== "admin") notFound();
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link href="/admin/commerce/plans" className="text-sm text-accent underline">

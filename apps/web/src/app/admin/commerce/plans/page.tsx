@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { formatHistoryAmount, parseHistoryPage } from "../../../../lib/commerce-history-format";
 import { getCommercialCopy } from "../../../../lib/commercial-i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -21,7 +22,8 @@ export default async function CommercialPlansAdmin({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getCommercialCopy(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
-  if (user?.role !== "admin") notFound();
+  if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/commerce/plans" />;
+  if (user.role !== "admin") notFound();
   const status = (["draft", "published", "archived"] as const).find(
     (value) => value === query.status,
   );

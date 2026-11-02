@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { StorageDiscoveryControls } from "../../../components/storage-maintenance-controls";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -17,7 +18,8 @@ export default async function Page({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (actor?.role !== "admin") notFound();
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/admin/storage" />;
+  if (actor.role !== "admin") notFound();
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {
     if (Array.isArray(value)) for (const item of value) params.append(key, item);

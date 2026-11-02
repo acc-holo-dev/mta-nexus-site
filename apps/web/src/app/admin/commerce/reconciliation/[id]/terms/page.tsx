@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PlatformSignIn } from "../../../../../../components/content-catalog-controls";
 import { OrderTermsReportView } from "../../../../../../components/order-terms-report";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../../lib/order-terms-i18n";
@@ -29,7 +30,14 @@ export default async function TermsPage({
     ]),
     c = orderTermsCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (actor?.role !== "admin") notFound();
+  if (!actor)
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`}
+      />
+    );
+  if (actor.role !== "admin") notFound();
   try {
     const values = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
