@@ -88,7 +88,7 @@ describe("pre-release shell accessibility behavior", () => {
     },
   );
 
-  it("hides app chrome on auth routes while keeping the focusable main landmark", () => {
+  it("keeps full app chrome on auth routes so theme and banner sign-in stay available", () => {
     nav.pathname = "/auth/login";
     const dictionary = getDictionary("en");
     const html = renderToStaticMarkup(
@@ -102,8 +102,8 @@ describe("pre-release shell accessibility behavior", () => {
     );
     expect(html).toMatch(/<main[^>]*id="main-content"[^>]*tabindex="-1"/u);
     expect(html).toContain("<h1>Sign in</h1>");
-    expect(html).not.toContain('href="/discover"');
-    expect(html).not.toContain(`aria-label="${dictionary.nav.ecosystem}"`);
+    expect(html).toContain('href="/discover"');
+    expect(html).toContain(`aria-label="${dictionary.nav.ecosystem}"`);
   });
 
   it("marks the active mobile destination and keeps the More dialog relation closed until opened", () => {

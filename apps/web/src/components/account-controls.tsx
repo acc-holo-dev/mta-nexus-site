@@ -100,7 +100,8 @@ export function AccountControls() {
         throw new Error(copy.signOutError);
       }
 
-      window.location.replace(authEntryHref("login", currentBrowserReturnPath()));
+      // Bare login after sign-out: return-path next= is for gated actions, not logout.
+      window.location.replace("/auth/login");
     } catch {
       setError(copy.signOutError);
       setSigningOut(false);

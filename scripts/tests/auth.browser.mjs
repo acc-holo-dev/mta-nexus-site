@@ -493,7 +493,7 @@ check("J2-06 logout clears cookie, revokes replay and leaves the other account v
     const replay = { page };
     assert((await request(replay, "/api/auth/session")).data.authenticated === true);
     await alice.page.getByRole("button", { name: "Sign out", exact: true }).click();
-    await alice.page.waitForURL("**/auth/login");
+    await alice.page.waitForURL(/\/auth\/login(?:\?|$)/);
     assert(
       !(await alice.context.cookies()).some((item) => item.name === "nexus_session"),
       "Logout must clear the cookie",
@@ -550,7 +550,7 @@ check(
       "Login must not reactivate the revoked token",
     );
     await alice.page.getByRole("button", { name: "Sign out", exact: true }).click();
-    await alice.page.waitForURL("**/auth/login");
+    await alice.page.waitForURL(/\/auth\/login(?:\?|$)/);
     await alice.page.getByLabel("Email address", { exact: true }).fill(people[1].email);
     await alice.page.getByLabel("Password", { exact: true }).fill(password);
     await alice.page.getByRole("button", { name: "Sign In", exact: true }).click();
