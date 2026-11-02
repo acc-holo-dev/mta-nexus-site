@@ -24,7 +24,7 @@ import {
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
-import { PlatformSignIn } from "../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../components/platform-sign-in";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { ReportEvidenceLinks } from "../../components/report-evidence-links";
 import { ReportModerationControls } from "../../components/report-moderation-controls";

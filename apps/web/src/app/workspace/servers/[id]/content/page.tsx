@@ -4,8 +4,8 @@ import Link from "next/link";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
-  PlatformSignIn,
 } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { serverContentId } from "../../../../../lib/server-content-api";
 import { serverContentCopy } from "../../../../../lib/server-content-copy";

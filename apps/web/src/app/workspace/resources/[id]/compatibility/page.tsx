@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ProductDependencyList } from "../../../../../components/product-dependency-list";
 import { ResourceCompatibilityForm } from "../../../../../components/resource-compatibility-form";
 import { getRequestLocale } from "../../../../../lib/i18n-server";

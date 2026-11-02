@@ -15,7 +15,7 @@ import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
 import { CommunityReportDetailView } from "./community-report-detail";
 import { CommunityReportList } from "./community-report-list";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function CommunityReportScreen({
   staff = false,
   id,

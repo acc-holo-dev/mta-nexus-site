@@ -52,7 +52,7 @@ vi.mock("./locale-context", async () => {
 });
 
 import { getDictionary } from "../lib/i18n";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { SupportCenter } from "./support-center";
 
 beforeEach(() => {

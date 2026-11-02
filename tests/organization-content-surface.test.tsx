@@ -74,9 +74,9 @@ it.each(["en", "ru"] as const)(
 );
 it("does not load private organization data without a session", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }))).toContain(
-    'href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"',
-  );
+  const guest = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }));
+  expect(guest).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"');
+  expect(guest).toContain('href="/auth/register?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"');
   expect(mocks.page).not.toHaveBeenCalled();
 });
 

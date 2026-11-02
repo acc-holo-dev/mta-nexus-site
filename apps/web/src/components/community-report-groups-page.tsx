@@ -8,7 +8,7 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportGroupsService } from "../lib/services/community-report-groups-service";
 import { CommunityReportGroups } from "./community-report-groups";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function reportGroupsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).title,

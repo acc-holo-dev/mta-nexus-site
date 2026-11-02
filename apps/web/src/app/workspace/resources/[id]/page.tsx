@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../../../components/resource-publication-readiness-panel";
 import { getDictionary } from "../../../../lib/i18n";

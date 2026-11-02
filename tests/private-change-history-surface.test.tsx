@@ -121,12 +121,16 @@ it.each(["en", "ru"] as const)(
 );
 it("requires sign in before loading either private journal", async () => {
   mock.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await ProfilePage({}))).toContain(
-    'href="/auth/login?next=%2Fsettings%2Fhistory"',
+  const profileGuest = renderToStaticMarkup(await ProfilePage({}));
+  expect(profileGuest).toContain('href="/auth/login?next=%2Fsettings%2Fhistory"');
+  expect(profileGuest).toContain('href="/auth/register?next=%2Fsettings%2Fhistory"');
+  const orgGuest = renderToStaticMarkup(
+    await OrganizationPage({ params: Promise.resolve({ id: "org" }) }),
   );
-  expect(
-    renderToStaticMarkup(await OrganizationPage({ params: Promise.resolve({ id: "org" }) })),
-  ).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"');
+  expect(orgGuest).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"');
+  expect(orgGuest).toContain(
+    'href="/auth/register?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"',
+  );
   expect(mock.profile).not.toHaveBeenCalled();
   expect(mock.organization).not.toHaveBeenCalled();
 });
@@ -137,6 +141,9 @@ it("preserves profile history filters in the guest login return path", async () 
   );
   expect(html).toContain(
     'href="/auth/login?next=%2Fsettings%2Fhistory%3Fperiod%3D30%26group%3Dprofessional"',
+  );
+  expect(html).toContain(
+    'href="/auth/register?next=%2Fsettings%2Fhistory%3Fperiod%3D30%26group%3Dprofessional"',
   );
   expect(mock.profile).not.toHaveBeenCalled();
 });

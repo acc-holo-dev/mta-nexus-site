@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { ProfilePrivacyEditor } from "../../../components/profile-privacy-editor";
 import { getRequestLocale } from "../../../lib/i18n-server";

@@ -10,7 +10,7 @@ import { serverContentService } from "../lib/services/server-content-service";
 import { parseEditableContent } from "../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
 import { AuthorContentForm } from "./author-content-form";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function ServerContentEditorPage({
   id,
   contentId,

@@ -9,7 +9,7 @@ import { libraryReleaseHistoryCopy } from "../lib/library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../lib/library-release-history-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {

@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HistoryShell } from "../../../components/commerce-history-ui";
-import { PlatformSignIn } from "../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
 import {
   effectiveLicenseStatus,

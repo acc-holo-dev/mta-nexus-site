@@ -8,7 +8,7 @@ import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-
 import { libraryReleaseComparisonQuery } from "../lib/library-release-comparison-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
 export async function LibraryReleaseComparisonScreen({
   params,

@@ -15,7 +15,7 @@ import {
   type ServerStatisticsResult,
   serverStatisticsService,
 } from "../lib/services/server-statistics-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
 export async function serverStatisticsMetadata(): Promise<Metadata> {

@@ -21,10 +21,8 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
 import ArticlesPage from "../apps/web/src/app/articles/page";
 import CommunityPage from "../apps/web/src/app/community/page";
 import { AuthorContentForm } from "../apps/web/src/components/author-content-form";
-import {
-  ContentPageNavigation,
-  PlatformSignIn,
-} from "../apps/web/src/components/content-catalog-controls";
+import { ContentPageNavigation } from "../apps/web/src/components/content-catalog-controls";
+import { PlatformSignIn } from "../apps/web/src/components/platform-sign-in";
 
 beforeEach(() => {
   vi.clearAllMocks();

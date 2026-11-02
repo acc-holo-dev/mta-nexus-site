@@ -44,31 +44,10 @@ vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { FollowButton } from "../apps/web/src/components/follow-button";
 import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
 
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlattenedElement;
 const initial = { authenticated: true, following: false };
-function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as
-    | { displayName?: string }
-    | (((props: unknown) => ReactNode) & { displayName?: string; name?: string })
-    | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  if (
-    typeof type === "function" &&
-    (type.displayName === "GuestAuthLinks" || type.name === "GuestAuthLinks")
-  ) {
-    return descendants(type(element.props));
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
-}
 function render(locale: "ru" | "en" = "en") {
   harness.cursor = 0;
   const wrapper = FollowButton({
@@ -79,7 +58,7 @@ function render(locale: "ru" | "en" = "en") {
     locale,
   });
   const control = wrapper.props.children as ReactElement;
-  return descendants((control.type as (props: unknown) => ReactNode)(control.props));
+  return flattenReactTestTree((control.type as (props: unknown) => ReactNode)(control.props));
 }
 function toggle(nodes: Element[]) {
   const element = nodes.find((node) => node.type === "button" && node.props["aria-label"]);

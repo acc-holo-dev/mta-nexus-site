@@ -10,7 +10,7 @@ import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
 import { authService } from "../lib/services/auth-service";
 import { resourceRequirementsService } from "../lib/services/resource-requirements-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceRequirementsReportBody } from "./resource-requirements-report-body";
 
 export async function CollectionRequirementsScreen({

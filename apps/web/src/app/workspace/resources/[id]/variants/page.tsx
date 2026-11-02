@@ -2,7 +2,7 @@ import { NotFoundError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceVariantsForm } from "../../../../../components/resource-variants-form";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";

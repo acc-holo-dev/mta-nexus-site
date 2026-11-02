@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { OrganizationProfileForm } from "../../../../components/organization-profile-form";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getOrganizationCopy } from "../../../../lib/organization-workspace-copy";

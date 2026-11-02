@@ -10,7 +10,7 @@ import { organizationContentService } from "../lib/services/organization-content
 import { parseEditableContent } from "../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
 import { AuthorContentForm } from "./author-content-form";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function OrganizationContentEditorPage({
   id,
   contentId,

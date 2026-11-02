@@ -1,7 +1,7 @@
 import type { User } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { PublicationFeed } from "../../../components/publication-feed";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { publicationCopy } from "../../../lib/publication-feed-copy";

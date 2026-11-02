@@ -16,7 +16,7 @@ import {
 import { orderCasePageQuery } from "../lib/order-case-query";
 import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
 import { SupportCaseThread } from "./support-case-thread";
 

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { LibraryCollectionItemCopyForm } from "../../../../../../components/library-collection-item-copy";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionComparisonCopy } from "../../../../../../lib/library-collection-comparison-i18n";

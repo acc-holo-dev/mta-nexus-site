@@ -23,7 +23,7 @@ import {
   serverStatisticsService,
 } from "../lib/services/server-statistics-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ServerObservationPeriodControls } from "./server-observation-period-controls";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
 export async function serverObservationBrowserMetadata() {

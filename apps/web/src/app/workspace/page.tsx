@@ -4,7 +4,7 @@ import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../components/platform-sign-in";
 import { ManagedServerCard } from "../../components/managed-server-card";
 import { formatHistoryDate } from "../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";

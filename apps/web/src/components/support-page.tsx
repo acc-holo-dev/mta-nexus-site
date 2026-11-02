@@ -7,7 +7,7 @@ import { authService } from "../lib/services/auth-service";
 import { supportQuery } from "../lib/support-workspace-contract";
 import { supportWorkspaceCopy } from "../lib/support-workspace-copy";
 import { authEntryHref } from "./auth-return-path";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { GuestAuthLinks } from "./guest-auth-links";
 import { SupportCaseThread } from "./support-case-thread";
 import { SupportCenter } from "./support-center";

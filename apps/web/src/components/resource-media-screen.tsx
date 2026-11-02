@@ -6,7 +6,7 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceMediaService } from "../lib/services/resource-media-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceGallery } from "./resource-gallery";
 import { ResourceMediaEditor } from "./resource-media-editor";
 export async function ResourceMediaScreen({

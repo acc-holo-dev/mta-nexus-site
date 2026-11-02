@@ -13,7 +13,7 @@ import { resourceBuildWorkspaceService } from "../lib/services/resource-build-wo
 import { BuildModerationControls } from "./build-moderation-controls";
 import { BuildPackageEvidencePanel } from "./build-package-evidence";
 import { BuildProvenanceDetails } from "./build-provenance-details";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceBuildControls } from "./resource-build-controls";
 export async function ResourceBuildScreen({
   productId,

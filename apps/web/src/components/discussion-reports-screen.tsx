@@ -19,7 +19,7 @@ import { moderatedDiscussionError } from "../lib/moderated-discussion-copy";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { DiscussionReportBatch } from "./discussion-report-batch";
 export async function DiscussionReportsScreen({
   id,

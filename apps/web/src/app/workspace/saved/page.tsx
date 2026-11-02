@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { PlatformSignIn } from "../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { FollowWorkspace } from "../../../components/follow-workspace";
 import { FOLLOW_TYPES, type FollowTargetType } from "../../../lib/follow-workspace-contract";
 import { followCopy } from "../../../lib/follow-workspace-copy";

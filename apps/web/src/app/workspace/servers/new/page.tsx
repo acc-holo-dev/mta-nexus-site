@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { RegisterServerForm } from "../../../../components/register-server-form";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";

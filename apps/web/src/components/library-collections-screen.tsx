@@ -28,7 +28,7 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";

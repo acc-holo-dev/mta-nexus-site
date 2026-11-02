@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../components/confirm-action";
-import { PlatformSignIn } from "../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../components/platform-sign-in";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { useNexusLocale } from "../../components/locale-context";
 import { ProfileChangeHistoryLink } from "../../components/private-change-history-controls";

@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { OwnDiscussionDetail } from "../../../../components/own-discussion-detail";
 import { ownDiscussionCopy } from "../../../../lib/discussion-workspace-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";

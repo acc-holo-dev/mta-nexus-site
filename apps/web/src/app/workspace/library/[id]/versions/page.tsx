@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BuildProvenanceDetails } from "../../../../../components/build-provenance-details";
-import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";

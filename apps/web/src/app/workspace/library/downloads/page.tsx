@@ -3,7 +3,7 @@ import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceDeliveryEvidence } from "../../../../components/resource-delivery-evidence";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { getRequestLocale } from "../../../../lib/i18n-server";

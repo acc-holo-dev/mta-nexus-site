@@ -8,7 +8,7 @@ import { buildPackageQueryHref, parseBuildPackageQuery } from "../lib/build-pack
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { buildPackageService } from "../lib/services/build-package-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function BuildPackageScreen({
   productId,
   buildId,

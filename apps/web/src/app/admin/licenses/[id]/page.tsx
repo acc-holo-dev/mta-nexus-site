@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { LicenseControlPanel } from "../../../../components/license-control-panel";
 import { LicenseDetailView } from "../../../../components/license-detail-view";
 import { getRequestLocale } from "../../../../lib/i18n-server";

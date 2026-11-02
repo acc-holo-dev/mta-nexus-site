@@ -115,6 +115,7 @@ it("gates server-rendered support pages before showing private controls", async 
   expect(filtered).toContain(getDictionary("en").workspace.signInMessage);
   const caseGuest = renderToStaticMarkup(await SupportPageSurface({ id: `sup_${"a".repeat(24)}` }));
   expect(caseGuest).toContain(`href="/auth/login?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
+  expect(caseGuest).toContain(`href="/auth/register?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
   expect(renderToStaticMarkup(await SupportPageSurface({ staff: true }))).toContain(
     supportWorkspaceCopy("en").forbidden,

@@ -19,7 +19,7 @@ import {
 } from "../lib/library-membership-history-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
 export async function LibraryMembershipHistoryScreen({
   params,

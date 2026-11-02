@@ -9,7 +9,7 @@ import { getLicenseControlCopy, licenseActionLabel } from "../lib/license-contro
 import { licenseRuntimePage } from "../lib/license-runtime-query";
 import { authService } from "../lib/services/auth-service";
 import { licenseControlService } from "../lib/services/license-control-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 
 export async function licenseHistoryMetadata(): Promise<Metadata> {
   return {

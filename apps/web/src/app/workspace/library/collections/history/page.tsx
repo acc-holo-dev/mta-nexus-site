@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import {

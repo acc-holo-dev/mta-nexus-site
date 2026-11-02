@@ -34,23 +34,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) })
 import type { LibraryCollectionReconcilePreview } from "@nexus/domain";
 import { LibraryCollectionReconcileForm } from "../apps/web/src/components/library-collection-reconcile";
 import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
+import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
 
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlattenedElement;
 function nodes(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(nodes);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const e = node as Element;
-  const type = e.type as
-    | string
-    | { displayName?: string }
-    | (((props: unknown) => ReactNode) & { displayName?: string });
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
-  }
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return nodes(type(e.props));
-  }
-  return [e, ...nodes(e.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 const date = "2026-10-13T00:00:00.000Z",
   collection = { id: "lcol_a", name: "Reviewed", status: "active" as const, revision: 7 },

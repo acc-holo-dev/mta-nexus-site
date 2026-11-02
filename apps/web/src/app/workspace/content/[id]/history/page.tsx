@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AuthorPublicationRestore } from "../../../../../components/author-publication-restore";
-import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { parseAuthorPublicationHistoryQuery } from "../../../../../lib/author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,

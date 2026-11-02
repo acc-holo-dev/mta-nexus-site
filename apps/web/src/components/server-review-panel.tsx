@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, fieldClassBlock } from "@nexus/ui";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { getDictionary } from "../lib/i18n";
 import { confirmedServerReview } from "../lib/server-review-confirmation";
@@ -45,6 +45,7 @@ export function ServerReviewPanel({
 }) {
   const { locale } = useNexusLocale();
   const pathname = usePathname();
+  const router = useRouter();
   const workspace = getDictionary(locale).workspace;
   const copy = serverReviewCopy(locale);
   const loadCopy = serverReviewLoadCopy(locale);
@@ -374,7 +375,7 @@ export function ServerReviewPanel({
             type="button"
             variant="ghost"
             className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            onClick={() => window.location.reload()}
+            onClick={() => router.refresh()}
           >
             {copy.reload}
           </Button>

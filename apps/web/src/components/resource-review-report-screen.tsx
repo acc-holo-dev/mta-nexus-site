@@ -7,7 +7,7 @@ import { resourceReviewCopy, resourceReviewState } from "../lib/resource-review-
 import { resourceReviewPageQuery } from "../lib/resource-review-query";
 import { authService } from "../lib/services/auth-service";
 import { resourceReviewService } from "../lib/services/resource-review-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceReviewDecisionForm } from "./resource-review-controls";
 import { ResourceReviewPager } from "./resource-review-list";
 

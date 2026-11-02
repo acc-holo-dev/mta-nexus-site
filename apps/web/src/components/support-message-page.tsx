@@ -7,7 +7,7 @@ import { authService } from "../lib/services/auth-service";
 import { supportMessageDiscoveryService } from "../lib/services/support-message-discovery-service";
 import { parseSupportMessageQuery } from "../lib/support-message-discovery-contract";
 import { supportMessageCopy, supportMessageError } from "../lib/support-message-discovery-copy";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { SupportMessageBrowser } from "./support-message-browser";
 
 export async function supportMessageMetadata() {

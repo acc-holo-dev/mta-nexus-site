@@ -3,7 +3,7 @@ import { AppError } from "@nexus/domain";
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../components/platform-sign-in";
 import { NotificationCenterTabs } from "../../components/notification-center-tabs";
 import { NotificationInbox } from "../../components/notification-inbox";
 import { getRequestLocale } from "../../lib/i18n-server";

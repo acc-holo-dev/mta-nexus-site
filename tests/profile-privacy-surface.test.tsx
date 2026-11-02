@@ -80,7 +80,9 @@ it.each(["en", "ru"] as const)(
     state.session.mockResolvedValue(null);
     const html = renderToStaticMarkup(await PrivacyPage());
     expect(html).toContain('href="/auth/login?next=%2Fsettings%2Fprivacy"');
+    expect(html).toContain('href="/auth/register?next=%2Fsettings%2Fprivacy"');
     expect(html).toContain(getDictionary(locale).workspace.signInRequired);
+    expect(html).toContain(getDictionary(locale).workspace.createAccount);
     expect(state.own).not.toHaveBeenCalled();
     expect(await generateMetadata()).toEqual({
       title: profilePrivacyCopy(locale).title,

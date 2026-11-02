@@ -15,7 +15,7 @@ import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceDownloadButton } from "./resource-download-button";
 export async function CollectionReleasesScreen({
   params,

@@ -15,7 +15,7 @@ import { serverWorkspaceCopy, serverWorkspaceError } from "../lib/server-workspa
 import { authService } from "../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../lib/services/server-workspace-history-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function ServerWorkspaceHistoryScreen({
   id,
   searchParams,

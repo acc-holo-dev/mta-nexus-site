@@ -47,26 +47,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh
 import { ModeratedDiscussionRemoval } from "../apps/web/src/components/moderated-discussion-removal";
 import { OrganizationTeamBatch } from "../apps/web/src/components/organization-team-batch";
 import type { OrganizationTeamPage } from "../apps/web/src/lib/organization-team-contract";
+import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
 
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlattenedElement;
 function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as
-    | { displayName?: string }
-    | (((props: unknown) => ReactNode) & { displayName?: string })
-    | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return descendants(type(element.props));
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z",

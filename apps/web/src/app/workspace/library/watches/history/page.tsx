@@ -7,7 +7,7 @@ import { Button, EmptyState, Input } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../lib/library-collections-query";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../lib/resource-release-watch-history-i18n";

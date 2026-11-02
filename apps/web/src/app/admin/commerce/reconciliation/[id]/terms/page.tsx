@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { OrderTermsReportView } from "../../../../../../components/order-terms-report";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../../lib/order-terms-i18n";

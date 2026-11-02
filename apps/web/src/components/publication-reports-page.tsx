@@ -14,7 +14,7 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { DiscussionReportBatch } from "./discussion-report-batch";
 export async function publicationReportsMetadata() {
   return {

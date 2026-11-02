@@ -198,12 +198,16 @@ it("rejects unknown and duplicate private filters before reading publication dat
 });
 it("requires a session on the desk and history without exposing target titles", async () => {
   state.actor = null;
-  expect(renderToStaticMarkup(await Desk({}))).toContain(
-    'href="/auth/login?next=%2Fworkspace%2Fcontent"',
+  const deskGuest = renderToStaticMarkup(await Desk({}));
+  expect(deskGuest).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent"');
+  expect(deskGuest).toContain('href="/auth/register?next=%2Fworkspace%2Fcontent"');
+  const historyGuest = renderToStaticMarkup(
+    await History({ params: Promise.resolve({ id: "article" }) }),
   );
-  expect(
-    renderToStaticMarkup(await History({ params: Promise.resolve({ id: "article" }) })),
-  ).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent%2Farticle%2Fhistory"');
+  expect(historyGuest).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent%2Farticle%2Fhistory"');
+  expect(historyGuest).toContain(
+    'href="/auth/register?next=%2Fworkspace%2Fcontent%2Farticle%2Fhistory"',
+  );
   for (const page of [
     await Desk({}),
     await History({ params: Promise.resolve({ id: "article" }) }),

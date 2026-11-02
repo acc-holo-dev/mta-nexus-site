@@ -3,7 +3,7 @@ import { Button, EmptyState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceReleaseWatchBatchControls } from "../../../../components/resource-release-watch-batch-controls";
 import { ResourceReleaseWatchControl } from "../../../../components/resource-release-watch-control";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";

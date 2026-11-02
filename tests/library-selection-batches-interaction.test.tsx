@@ -26,22 +26,10 @@ vi.mock("react", async (original) => ({
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 import { LibrarySelectionBatchControls } from "../apps/web/src/components/library-selection-batch-controls";
-type Element = ReactElement<Record<string, unknown>>;
+import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
+type Element = FlattenedElement;
 function nodes(n: ReactNode): Element[] {
-  if (Array.isArray(n)) return n.flatMap(nodes);
-  if (!n || typeof n !== "object" || !("props" in n)) return [];
-  const e = n as Element;
-  const type = e.type as
-    | string
-    | { displayName?: string }
-    | (((props: unknown) => ReactNode) & { displayName?: string });
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
-  }
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return nodes(type(e.props));
-  }
-  return [e, ...nodes(e.props.children as ReactNode)];
+  return flattenReactTestTree(n);
 }
 const items = [
   { productId: "prd_a", title: "Core", downloadable: true, hasAccess: true },

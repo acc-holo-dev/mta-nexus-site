@@ -22,7 +22,7 @@ import {
   supportWorkspaceError,
 } from "../lib/support-workspace-copy";
 import { currentBrowserReturnPath } from "./auth-return-path";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { useNexusLocale } from "./locale-context";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";

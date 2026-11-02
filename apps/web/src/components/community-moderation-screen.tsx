@@ -20,7 +20,7 @@ import { PUBLICATION_TYPES } from "../lib/publication-feed-contract";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ContentModerationControls } from "./content-moderation-controls";
 export async function CommunityModerationScreen({
   id,

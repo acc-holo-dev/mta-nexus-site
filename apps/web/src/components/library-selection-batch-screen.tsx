@@ -13,7 +13,7 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { librarySelectionBatchesService } from "../lib/services/library-selection-batches-service";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { LibrarySelectionBatchControls } from "./library-selection-batch-controls";
 export async function LibrarySelectionBatchScreen({
   params,

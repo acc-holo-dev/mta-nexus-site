@@ -22,7 +22,7 @@ import {
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 import { ModeratedDiscussionRemoval } from "./moderated-discussion-removal";
 export async function ModeratedDiscussionScreen({
   id,

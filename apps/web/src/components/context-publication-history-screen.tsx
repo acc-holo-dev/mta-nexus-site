@@ -20,7 +20,7 @@ import {
 import { authService } from "../lib/services/auth-service";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { AuthorPublicationRestore } from "./author-publication-restore";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
