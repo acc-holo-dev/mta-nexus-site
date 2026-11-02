@@ -7,43 +7,24 @@ import {
   DataTableEmpty,
   DataTableHeader,
   SectionHeader,
-  StatCard,
-  StatusBadge,
 } from "@nexus/ui";
-import { safeExternalWebUrl } from "@nexus/validation";
-import {
-  AlertTriangle,
-  BadgeCheck,
-  BookOpen,
-  Box,
-  PackageCheck,
-  Server,
-  ShieldAlert,
-  Users,
-} from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
-import { PlatformSignIn } from "../../components/platform-sign-in";
+import { AdminBuildsQuarantineSection } from "../../components/admin/admin-builds-quarantine-section";
+import { AdminHealthStats } from "../../components/admin/admin-health-stats";
+import { AdminReportsSection } from "../../components/admin/admin-reports-section";
+import { AdminVerificationQueueSection } from "../../components/admin/admin-verification-queue-section";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
-import { ReportEvidenceLinks } from "../../components/report-evidence-links";
-import { ReportModerationControls } from "../../components/report-moderation-controls";
-import { VerificationModerationControls } from "../../components/verification-moderation-controls";
+import { PlatformSignIn } from "../../components/platform-sign-in";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { moderationCopy } from "../../lib/community-moderation-copy";
-import { communityReportCopy } from "../../lib/community-report-copy";
 import { getFinancialCopy } from "../../lib/financial-i18n";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { orderCaseCopy } from "../../lib/order-case-i18n";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
-import { resourceReviewCopy } from "../../lib/resource-review-i18n";
 import { adminService } from "../../lib/services/admin-service";
 import { authService } from "../../lib/services/auth-service";
-import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
-import { verificationApplicationsCopy } from "../../lib/verification-applications-copy";
-import { verificationCopy } from "../../lib/verification-workspace-copy";
-import { adminStatusLabel, adminStatusTone } from "./status-labels";
 
 export const dynamic = "force-dynamic";
 
@@ -196,411 +177,34 @@ export default async function AdminPage({
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-        <StatCard
-          label={copy.users}
-          value={health.counts.users}
-          icon={<Users className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.servers}
-          value={health.counts.servers}
-          tone="success"
-          icon={<Server className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.products}
-          value={health.counts.products}
-          tone="accent"
-          icon={<Box className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.publishedContent}
-          value={health.counts.publishedContent}
-          tone="purple"
-          icon={<BookOpen className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.openReports}
-          value={health.counts.reportsOpen}
-          tone="warning"
-          icon={<AlertTriangle className="h-4 w-4" />}
-        />
-      </div>
+      <AdminHealthStats copy={copy} counts={health.counts} />
 
-      <section>
-        <SectionHeader
-          title={copy.verificationQueue}
-          description={`${pendingVerificationCount} ${copy.pendingRequests}`}
-          action={<BadgeCheck className="h-4 w-4 text-accent" />}
-        />
-        <nav aria-label={copy.verificationQueue} className="mb-3 flex gap-2">
-          <Link
-            href={verificationHref("pending", 1)}
-            aria-current={verificationView === "pending" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.verificationPending} ({pendingVerificationCount})
-          </Link>
-          <Link
-            href={verificationHref("history", 1)}
-            aria-current={verificationView === "history" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.verificationHistory}
-          </Link>
-        </nav>
-        <div className="space-y-2.5">
-          {verificationRequests.length > 0 ? (
-            verificationRequests.map((request) => (
-              <div
-                key={request.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-                      {request.targetType}
-                    </span>
-                    <span className="truncate font-code text-xs font-heading text-primary">
-                      {request.targetId}
-                    </span>
-                  </div>
-                  <p className="font-caption text-muted">
-                    {copy.requester} {request.requesterId} •{" "}
-                    {new Date(request.createdAt).toLocaleDateString(dateLocale)}
-                  </p>
-                  {request.notes && <p className="font-caption text-faint">{request.notes}</p>}
-                  {request.evidenceUpdated && (
-                    <p className="text-xs text-secondary">
-                      {verificationApplicationsCopy(locale).updated}
-                    </p>
-                  )}
-                  {request.targetUsername && (
-                    <Link
-                      href={`/users/${encodeURIComponent(request.targetUsername)}`}
-                      className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
-                      {verificationCopy(locale).publicProfile} · @{request.targetUsername}
-                    </Link>
-                  )}
-                  {request.organizationSlug && (
-                    <Link
-                      href={`/organizations/${encodeURIComponent(request.organizationSlug)}`}
-                      className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
-                      {verificationCopy(locale).organization}
-                    </Link>
-                  )}
-                  {request.currentSpecialties && request.currentSpecialties.length > 0 && (
-                    <p className="break-words text-xs text-secondary">
-                      {request.currentSpecialties.slice(0, 12).join(" · ")}
-                    </p>
-                  )}
-                  {safeExternalWebUrl(request.currentGithubUrl) && (
-                    <a
-                      href={safeExternalWebUrl(request.currentGithubUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
-                      {verificationCopy(locale).github}
-                    </a>
-                  )}
-                  {safeExternalWebUrl(request.proofUrl) && (
-                    <a
-                      href={safeExternalWebUrl(request.proofUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block break-all font-caption text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
-                      {copy.verificationProof}
-                    </a>
-                  )}
-                  {request.reviewNotes && (
-                    <p className="font-code font-caption text-faint">
-                      {copy.review}: {request.reviewNotes}
-                    </p>
-                  )}
-                  {request.resolvedAt && (
-                    <p className="font-caption text-faint">
-                      {copy.reportDecidedAt}:{" "}
-                      {new Date(request.resolvedAt).toLocaleString(dateLocale)}
-                    </p>
-                  )}
-                </div>
+      <AdminVerificationQueueSection
+        locale={locale}
+        copy={copy}
+        dateLocale={dateLocale}
+        verificationView={verificationView}
+        verificationPage={verificationPage}
+        pendingVerificationCount={pendingVerificationCount}
+        verificationRequests={verificationRequests}
+        moreVerifications={moreVerifications}
+        verificationHref={verificationHref}
+      />
 
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
-                  <StatusBadge
-                    status={adminStatusLabel(locale, request.status)}
-                    tone={adminStatusTone(request.status)}
-                  />
-                  {request.status === "pending" && (
-                    <VerificationModerationControls
-                      key={`${request.id}:${request.applicationRevision}`}
-                      requestId={request.id}
-                      applicationRevision={request.applicationRevision}
-                    />
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">
-                {verificationView === "pending"
-                  ? copy.noVerificationRequests
-                  : copy.noVerificationHistory}
-              </p>
-            </div>
-          )}
-        </div>
-        {(verificationPage > 1 || moreVerifications) && (
-          <nav aria-label={copy.verificationPages} className="mt-3 flex items-center gap-3 text-xs">
-            {verificationPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={verificationHref(verificationView, verificationPage - 1)}
-              >
-                {copy.previous}
-              </Link>
-            )}
-            <span className="text-muted">
-              {copy.reportPage} {verificationPage}
-            </span>
-            {moreVerifications && verificationPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={verificationHref(verificationView, verificationPage + 1)}
-              >
-                {copy.next}
-              </Link>
-            )}
-          </nav>
-        )}
-      </section>
-
-      <section>
-        <SectionHeader
-          title={copy.resourceBuildQueue}
-          description={`${pendingBuildCount} ${copy.buildsAwaitingReview}`}
-          action={<PackageCheck className="h-4 w-4 text-warning" />}
-        />
-        <div className="space-y-2.5">
-          {pendingBuilds.length > 0 ? (
-            pendingBuilds.map((build) => (
-              <div
-                key={build.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-                      {copy.pendingReview}
-                    </span>
-                    <span className="truncate font-code text-xs font-heading text-primary">
-                      {build.fileName} · v{build.version}
-                    </span>
-                  </div>
-                  <p className="font-caption text-muted">
-                    {copy.resource} {build.productId} •{" "}
-                    {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
-                  </p>
-                  <p className="font-caption text-secondary">
-                    {build.productStatus === "published" ? (
-                      <Link
-                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        href={`/market/${encodeURIComponent(build.productSlug)}`}
-                      >
-                        {build.productTitle}
-                      </Link>
-                    ) : (
-                      <>
-                        {build.productTitle} · {copy.resourceNotPublished}
-                      </>
-                    )}
-                  </p>
-                  <p className="font-caption text-muted">
-                    {copy.resourcePublisher}:{" "}
-                    <Link
-                      className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                      href={`/users/${encodeURIComponent(build.publisherUsername)}`}
-                    >
-                      @{build.publisherUsername}
-                    </Link>
-                  </p>
-                  <p className="font-caption text-faint">
-                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · SHA-256
-                  </p>
-                  <code className="block break-all font-code text-[10px] text-faint">
-                    {build.sha256Hash}
-                  </code>
-                  {build.scanner && build.scannedAt && (
-                    <p className="font-caption text-faint">
-                      {copy.scanProvenance}: {build.scanner} ·{" "}
-                      {new Date(build.scannedAt).toLocaleString(dateLocale)}
-                    </p>
-                  )}
-                  {build.releaseNotes && (
-                    <p className="font-caption text-faint">{build.releaseNotes}</p>
-                  )}
-                </div>
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
-                  <StatusBadge
-                    status={adminStatusLabel(locale, build.scanStatus)}
-                    tone={adminStatusTone(build.scanStatus)}
-                  />
-                  <Link
-                    href={`/admin/resources/${build.productId}/builds/${build.id}`}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] text-xs"
-                  >
-                    {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
-                  </Link>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noBuilds}</p>
-            </div>
-          )}
-        </div>
-        {(buildPage > 1 || moreBuilds) && (
-          <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
-            {buildPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ buildPage: buildPage - 1 })}
-              >
-                {copy.previous}
-              </Link>
-            )}
-            <span className="text-muted">
-              {copy.reportPage} {buildPage}
-            </span>
-            {moreBuilds && buildPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ buildPage: buildPage + 1 })}
-              >
-                {copy.next}
-              </Link>
-            )}
-          </nav>
-        )}
-      </section>
-
-      <section>
-        <SectionHeader
-          title={copy.quarantineQueue}
-          description={`${quarantinedBuildCount} ${copy.buildsQuarantined}`}
-          action={<ShieldAlert className="h-4 w-4 text-danger" />}
-        />
-        <p className="mb-3 max-w-3xl font-caption text-muted">{copy.quarantineQueueDescription}</p>
-        <div className="space-y-2.5">
-          {riskBuilds.length > 0 ? (
-            riskBuilds.map((build) => (
-              <div
-                key={build.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <StatusBadge
-                      status={adminStatusLabel(locale, build.status)}
-                      tone={adminStatusTone(build.status)}
-                    />
-                    <span className="truncate font-code text-xs font-heading text-primary">
-                      {build.fileName} · v{build.version}
-                    </span>
-                  </div>
-                  <p className="font-caption text-secondary">
-                    {build.productStatus === "published" ? (
-                      <Link
-                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        href={`/market/${encodeURIComponent(build.productSlug)}`}
-                      >
-                        {build.productTitle}
-                      </Link>
-                    ) : (
-                      <>
-                        {build.productTitle} · {copy.resourceNotPublished}
-                      </>
-                    )}
-                  </p>
-                  <p className="font-caption text-muted">
-                    {copy.resourcePublisher}:{" "}
-                    <Link
-                      className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                      href={`/users/${encodeURIComponent(build.publisherUsername)}`}
-                    >
-                      @{build.publisherUsername}
-                    </Link>
-                  </p>
-                  <p className="font-caption text-faint">
-                    {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · SHA-256
-                  </p>
-                  <code className="block break-all font-code text-[10px] text-faint">
-                    {build.sha256Hash}
-                  </code>
-                  {build.status === "quarantined" && (
-                    <>
-                      <p className="whitespace-pre-wrap font-caption text-danger">
-                        {copy.quarantineReason}: {build.quarantineReason}
-                      </p>
-                      {build.quarantinedAt && (
-                        <p className="font-caption text-faint">
-                          {copy.quarantinedAt}:{" "}
-                          {new Date(build.quarantinedAt).toLocaleString(dateLocale)}
-                        </p>
-                      )}
-                    </>
-                  )}
-                  {build.scanStatus === "clean" && build.scanner?.trim() && build.scannedAt && (
-                    <a
-                      href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
-                      className="inline-block text-xs font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
-                      {copy.reviewArtifact}
-                    </a>
-                  )}
-                </div>
-                <BuildQuarantineControls
-                  buildId={build.id}
-                  status={build.status as "published" | "quarantined"}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noRiskBuilds}</p>
-            </div>
-          )}
-        </div>
-        {(riskBuildPage > 1 || moreRiskBuilds) && (
-          <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
-            {riskBuildPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ riskBuildPage: riskBuildPage - 1 })}
-              >
-                {copy.previous}
-              </Link>
-            )}
-            <span className="text-muted">
-              {copy.reportPage} {riskBuildPage}
-            </span>
-            {moreRiskBuilds && riskBuildPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ riskBuildPage: riskBuildPage + 1 })}
-              >
-                {copy.next}
-              </Link>
-            )}
-          </nav>
-        )}
-      </section>
+      <AdminBuildsQuarantineSection
+        locale={locale}
+        copy={copy}
+        dateLocale={dateLocale}
+        buildPage={buildPage}
+        pendingBuildCount={pendingBuildCount}
+        pendingBuilds={pendingBuilds}
+        moreBuilds={moreBuilds}
+        riskBuildPage={riskBuildPage}
+        quarantinedBuildCount={quarantinedBuildCount}
+        riskBuilds={riskBuilds}
+        moreRiskBuilds={moreRiskBuilds}
+        adminHref={adminHref}
+      />
 
       <section>
         <SectionHeader
@@ -681,133 +285,17 @@ export default async function AdminPage({
         )}
       </section>
 
-      <section>
-        <SectionHeader title={copy.reports} description={copy.caseHistory} />
-        <Link
-          href="/admin/storage"
-          className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {storageMaintenanceCopy(locale).title}
-        </Link>
-        <Link
-          href="/admin/commerce/order-cases"
-          className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {orderCaseCopy(locale).queue}
-        </Link>
-        <Link
-          href="/admin/commerce/reviews"
-          className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {resourceReviewCopy(locale).queue}
-        </Link>
-        <Link
-          href="/admin/reports"
-          className="mb-3 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {communityReportCopy(locale).queue}
-        </Link>
-        <nav aria-label={copy.reports} className="mb-3 flex gap-2">
-          <Link
-            href={reportHref("pending", 1)}
-            aria-current={reportView === "pending" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.reportQueue} ({health.counts.reportsOpen})
-          </Link>
-          <Link
-            href={reportHref("history", 1)}
-            aria-current={reportView === "history" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.reportHistory}
-          </Link>
-        </nav>
-        <div className="space-y-2.5">
-          {reports.length > 0 ? (
-            reports.map((report) => (
-              <div
-                key={report.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-                      {report.type}
-                    </span>
-                    <span className="font-code text-xs font-heading text-primary">
-                      {report.targetId}
-                    </span>
-                  </div>
-                  <p className="font-caption text-secondary">{report.reason}</p>
-                  <p className="font-caption text-faint">
-                    {copy.reporter}: {report.reporterId} · {report.targetType} ·{" "}
-                    {new Date(report.createdAt).toLocaleDateString(dateLocale)}
-                  </p>
-                  <ReportEvidenceLinks urls={report.evidenceUrls} label={copy.reportEvidence} />
-                  {report.moderatorNotes && (
-                    <p className="font-code font-caption text-faint">
-                      {copy.notes}: {report.moderatorNotes}
-                    </p>
-                  )}
-                  {report.resolvedAt && (
-                    <p className="font-caption text-faint">
-                      {copy.reportDecidedAt}:{" "}
-                      {new Date(report.resolvedAt).toLocaleString(dateLocale)}
-                    </p>
-                  )}
-                </div>
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
-                  <StatusBadge
-                    status={adminStatusLabel(locale, report.status)}
-                    tone={adminStatusTone(report.status)}
-                  />
-                  {(report.status === "open" || report.status === "under_review") &&
-                    (report.targetType === "review" ? (
-                      <Link
-                        href={`/admin/commerce/reviews/${encodeURIComponent(report.id)}`}
-                        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                      >
-                        {resourceReviewCopy(locale).detail}
-                      </Link>
-                    ) : (
-                      <ReportModerationControls reportId={report.id} />
-                    ))}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">
-                {reportView === "pending" ? copy.noReports : copy.noReportHistory}
-              </p>
-            </div>
-          )}
-        </div>
-        {(reportPage > 1 || moreReports) && (
-          <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
-            {reportPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={reportHref(reportView, reportPage - 1)}
-              >
-                {copy.previous}
-              </Link>
-            )}
-            <span className="text-muted">
-              {copy.reportPage} {reportPage}
-            </span>
-            {moreReports && reportPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={reportHref(reportView, reportPage + 1)}
-              >
-                {copy.next}
-              </Link>
-            )}
-          </nav>
-        )}
-      </section>
+      <AdminReportsSection
+        locale={locale}
+        copy={copy}
+        dateLocale={dateLocale}
+        reportView={reportView}
+        reportPage={reportPage}
+        reportsOpenCount={health.counts.reportsOpen}
+        reports={reports}
+        moreReports={moreReports}
+        reportHref={reportHref}
+      />
 
       {canViewAudit && (
         <section>

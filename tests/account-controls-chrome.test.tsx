@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -49,20 +49,11 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
 
 import { AccountControls } from "../apps/web/src/components/account-controls";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlatTestElement;
 function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 function render() {
   harness.cursor = 0;

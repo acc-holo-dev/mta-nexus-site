@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -46,6 +46,7 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
 import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
 import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 const previous = "2026-10-11T00:00:00.000Z";
 const ack = {
@@ -60,19 +61,9 @@ function response(body: unknown, status = 200) {
     headers: { "Content-Type": "application/json" },
   });
 }
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlatTestElement;
 function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 function render(workspace = true) {
   harness.cursor = 0;
