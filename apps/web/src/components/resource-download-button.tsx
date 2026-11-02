@@ -5,6 +5,7 @@ import { Download } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { getDictionary } from "../lib/i18n";
 import { resourceDeliveriesCopy } from "../lib/resource-deliveries-i18n";
 import {
   type DownloadFailure,
@@ -12,6 +13,7 @@ import {
   ResourceDownloadError,
 } from "../lib/resource-download-client";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
 
 export function ResourceDownloadButton({
@@ -39,7 +41,9 @@ export function ResourceDownloadButton({
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<DownloadFailure | null>(null);
   const [notice, setNotice] = useState<"cancelled" | "saved" | null>(null);
+  const workspaceCopy = getDictionary(locale).workspace;
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const [receipt, setReceipt] = useState<{
     id: string;
     productId: string;
@@ -48,7 +52,9 @@ export function ResourceDownloadButton({
   } | null>(null);
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const path = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
   useEffect(() => {
     return () => {
@@ -168,14 +174,14 @@ export function ResourceDownloadButton({
           {copy.downloadErrors[failure]}
         </p>
       )}
-      {failure === "signIn" && (
-        <Link
-          href={loginHref}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.downloadSignIn}
-        </Link>
-      )}
+      {failure === "signIn" ? (
+        <GuestAuthLinks
+          loginHref={loginHref}
+          registerHref={registerHref}
+          signInLabel={copy.downloadSignIn}
+          createAccountLabel={workspaceCopy.createAccount}
+        />
+      ) : null}
       {notice && (
         <p role="status" className="text-sm text-secondary">
           {notice === "cancelled" ? copy.downloadCancelled : copy.downloadHandedOff}

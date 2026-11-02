@@ -9,6 +9,8 @@ const STATES = ["all", "unread", "read"] as const;
 
 const filterLinkFocusClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const activeTabFocusClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 export function NotificationCenterTabs({
   children,
@@ -42,9 +44,9 @@ export function NotificationCenterTabs({
               key={item}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-lg px-3 py-1.5 text-xs font-semibold ${filterLinkFocusClass} ${
-                active ? "bg-accent text-white" : "border border-base text-muted"
-              }`}
+              className={`inline-flex min-h-11 items-center rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                active ? activeTabFocusClass : filterLinkFocusClass
+              } ${active ? "bg-accent text-white" : "border border-base text-muted"}`}
             >
               {labels[item]}
             </Link>

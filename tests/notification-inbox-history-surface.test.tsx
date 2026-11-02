@@ -47,7 +47,9 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(`>${copy.reset}<`);
     expect(html).toContain('name="q"');
     expect(html).toContain('name="category"');
+    expect(html).toContain('type="hidden"');
     expect(html).toContain('name="state"');
+    expect(html).toContain('value="unread"');
     expect(html).toContain('name="period"');
     expect(html).toContain("needle");
     expect(html).toContain(locale === "ru" ? "Выбрать эту страницу" : "Select this page");

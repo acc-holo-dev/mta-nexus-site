@@ -171,7 +171,7 @@ function AcquireContent() {
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">
             <Link
               href={`/market/${product?.slug ?? ""}`}
-              className="rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+              className="rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               {copy.openResource}
             </Link>

@@ -85,6 +85,7 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
 });
 
 import ReleasePage, { metadata } from "../apps/web/src/app/market/[slug]/versions/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const release = {
   id: "bld_clean_1",
@@ -153,6 +154,8 @@ describe("public safely published version archive", () => {
     expect(html).toContain(locale === "ru" ? "История версий" : "Release history");
     expect(state.checkRight).not.toHaveBeenCalled();
     expect(html).toContain('href="/auth/login?next=%2Fmarket%2Fsafe-release%2Fversions"');
+    expect(html).toContain('href="/auth/register?next=%2Fmarket%2Fsafe-release%2Fversions"');
+    expect(html).toContain(getDictionary(locale).workspace.createAccount);
   });
 
   it("preserves release-history pagination in guest sign-in return paths", async () => {
@@ -166,6 +169,9 @@ describe("public safely published version archive", () => {
     const html = renderToStaticMarkup(await page("2"));
     expect(html).toContain(
       'href="/auth/login?next=%2Fmarket%2Fsafe-release%2Fversions%3Fpage%3D2"',
+    );
+    expect(html).toContain(
+      'href="/auth/register?next=%2Fmarket%2Fsafe-release%2Fversions%3Fpage%3D2"',
     );
   });
 

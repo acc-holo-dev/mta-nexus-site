@@ -4,6 +4,7 @@ import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { getDictionary } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceCartReceiptsCopy } from "../lib/resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../lib/resource-cart-receipts-query";
@@ -15,6 +16,7 @@ import {
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
@@ -38,18 +40,25 @@ export function AddResourceToCart({
   const [busy, setBusy] = useState(false);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
+  const workspaceCopy = getDictionary(locale).workspace;
   const [loginHref, setLoginHref] = useState(authEntryHref("login", returnPath ?? null));
+  const [registerHref, setRegisterHref] = useState(authEntryHref("register", returnPath ?? null));
   const lock = useRef(false);
   useEffect(() => {
-    setLoginHref(authEntryHref("login", returnPath ?? currentBrowserReturnPath()));
+    const path = returnPath ?? currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [returnPath]);
   if (!signedIn)
     return (
       <div className="space-y-2">
         <p className="text-xs text-muted">{copy.batchIntent}</p>
-        <Link href={loginHref} className={buttonClass}>
-          {copy.signIn}
-        </Link>
+        <GuestAuthLinks
+          loginHref={loginHref}
+          registerHref={registerHref}
+          signInLabel={copy.signIn}
+          createAccountLabel={workspaceCopy.createAccount}
+        />
         <p className="text-xs text-muted">{copy.guestReturnNote}</p>
       </div>
     );

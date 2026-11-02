@@ -256,7 +256,11 @@ export function ResourceQaPanel({
   }
 
   return (
-    <section className="nexus-panel space-y-4 p-6" data-testid="resource-qa-panel">
+    <section
+      className="nexus-panel space-y-4 p-6"
+      data-testid="resource-qa-panel"
+      aria-busy={loadingDetail || undefined}
+    >
       <div className="space-y-1 border-b border-base pb-3">
         <h2 className="text-base font-bold text-primary">{copy.title}</h2>
         <p className="text-xs text-muted">{copy.help}</p>
@@ -420,7 +424,11 @@ export function ResourceQaPanel({
             </form>
           ) : null}
 
-          {loadingDetail ? <p className="text-xs text-faint">…</p> : null}
+          {loadingDetail ? (
+            <p role="status" className="text-xs text-faint">
+              {copy.loadingThread}
+            </p>
+          ) : null}
 
           {!page || page.threads.length === 0 ? (
             <p className="text-xs text-faint">{copy.empty}</p>

@@ -117,20 +117,7 @@ export default async function NotificationCenterPage({
               className={`${fieldClass} block min-h-11 w-full`}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
-            {copy.state}
-            <select
-              name="state"
-              defaultValue={filters?.state ?? "all"}
-              className={`${fieldClass} block min-h-11`}
-            >
-              {(["all", "unread", "read"] as const).map((value) => (
-                <option key={value} value={value}>
-                  {copy[value]}
-                </option>
-              ))}
-            </select>
-          </label>
+          <input type="hidden" name="state" value={filters?.state ?? "all"} />
           <label className="space-y-1 text-xs text-muted">
             {copy.category}
             <select

@@ -4,10 +4,12 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../components/auth-return-path";
+import { GuestAuthLinks } from "../../../../components/guest-auth-links";
 import {
   ResourceReviewList,
   ResourceReviewPager,
 } from "../../../../components/resource-review-list";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
 import { resourceReviewPageQuery } from "../../../../lib/resource-review-query";
@@ -44,6 +46,7 @@ export default async function Page({
         throw error;
       }),
     copy = resourceReviewCopy(locale),
+    workspace = getDictionary(locale).workspace,
     reviewsPath =
       result.page > 1
         ? `/market/${encodeURIComponent(product.slug)}/reviews?page=${result.page}`
@@ -60,16 +63,21 @@ export default async function Page({
         {copy.title} · {product.title}
       </h1>
       <p className="text-sm text-secondary">{copy.subtitle}</p>
-      <Link
-        href={
-          actor
-            ? `/workspace/library/review/${encodeURIComponent(product.id)}`
-            : authEntryHref("login", reviewsPath)
-        }
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
-        {actor ? copy.write : copy.signIn}
-      </Link>
+      {actor ? (
+        <Link
+          href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.write}
+        </Link>
+      ) : (
+        <GuestAuthLinks
+          loginHref={authEntryHref("login", reviewsPath)}
+          registerHref={authEntryHref("register", reviewsPath)}
+          signInLabel={copy.signIn}
+          createAccountLabel={workspace.createAccount}
+        />
+      )}
       <ResourceReviewList
         reviews={result.reviews}
         productId={product.id}

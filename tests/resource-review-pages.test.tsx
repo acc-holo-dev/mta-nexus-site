@@ -54,6 +54,7 @@ import Editor from "../apps/web/src/app/workspace/library/review/[id]/page";
 import Own from "../apps/web/src/app/workspace/library/reviews/page";
 import { ResourceReviewEditor } from "../apps/web/src/components/resource-review-controls";
 import { ResourceReviewReportScreen } from "../apps/web/src/components/resource-review-report-screen";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };
@@ -175,6 +176,8 @@ it.each(["en", "ru"] as const)(
     expect(html).not.toContain("verified purchase");
     expect(html).not.toContain("<script>");
     expect(html).toContain('href="/auth/login?next=%2Fmarket%2Fresource%2Freviews%3Fpage%3D2"');
+    expect(html).toContain('href="/auth/register?next=%2Fmarket%2Fresource%2Freviews%3Fpage%3D2"');
+    expect(html).toContain(getDictionary(locale).workspace.createAccount);
   },
 );
 it("authenticated resource readers can report reviews and reach their review editor", async () => {

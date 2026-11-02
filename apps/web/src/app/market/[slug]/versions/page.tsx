@@ -6,8 +6,10 @@ import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../components/auth-return-path";
 import { BuildPackageSummaryPanel } from "../../../../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../../../../components/build-provenance-details";
+import { GuestAuthLinks } from "../../../../components/guest-auth-links";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import {
   getReleaseHistoryCopy,
@@ -68,6 +70,7 @@ export default async function PublicResourceVersionsPage({
       : Promise.resolve(false),
   ]);
   const copy = getReleaseHistoryCopy(locale);
+  const workspace = getDictionary(locale).workspace;
   const back = `/market/${encodeURIComponent(product.slug)}`;
   const returnPath = releaseHistoryHref(product.slug, history.page);
 
@@ -199,12 +202,12 @@ export default async function PublicResourceVersionsPage({
               {copy.acquire}
             </Link>
           ) : (
-            <Link
-              href={authEntryHref("login", returnPath)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.signIn}
-            </Link>
+            <GuestAuthLinks
+              loginHref={authEntryHref("login", returnPath)}
+              registerHref={authEntryHref("register", returnPath)}
+              signInLabel={copy.signIn}
+              createAccountLabel={workspace.createAccount}
+            />
           )}
         </div>
       )}

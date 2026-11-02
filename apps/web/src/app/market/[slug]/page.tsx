@@ -579,7 +579,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     </p>
                     <Link
                       href={`/acquire?productId=${product.id}`}
-                      className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)]"
+                      className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
                       {copy.addToLibrary}
                     </Link>

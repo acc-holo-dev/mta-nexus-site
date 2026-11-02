@@ -4,9 +4,11 @@ import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { getDictionary } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
 
 export function ResourceReleaseWatchControl({
@@ -47,10 +49,14 @@ export function ResourceReleaseWatchControl({
     [saved, setSaved] = useState(false),
     [pending, setPending] = useState(false),
     [blocked, setBlocked] = useState(false),
-    [loginHref, setLoginHref] = useState(authEntryHref("login", returnPath ?? null));
+    [loginHref, setLoginHref] = useState(authEntryHref("login", returnPath ?? null)),
+    [registerHref, setRegisterHref] = useState(authEntryHref("register", returnPath ?? null));
+  const workspaceCopy = getDictionary(locale).workspace;
   const active = useRef<AbortController | null>(null);
   useEffect(() => {
-    setLoginHref(authEntryHref("login", returnPath ?? currentBrowserReturnPath()));
+    const path = returnPath ?? currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
     return () => {
       active.current?.abort();
       active.current = null;
@@ -147,12 +153,12 @@ export function ResourceReleaseWatchControl({
       <div className="space-y-2">
         <p className="text-sm text-secondary">{copy.signInRequired}</p>
         <p className="text-xs text-muted">{copy.note}</p>
-        <Link
-          href={loginHref}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
+        <GuestAuthLinks
+          loginHref={loginHref}
+          registerHref={registerHref}
+          signInLabel={copy.signIn}
+          createAccountLabel={workspaceCopy.createAccount}
+        />
       </div>
     );
   }

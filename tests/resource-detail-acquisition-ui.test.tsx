@@ -426,6 +426,7 @@ describe("resource detail acquisition behavior", () => {
       expect(html).toContain(copy.latestBuildNotice);
       expect(html).toContain('href="/market/detail-resource/versions"');
       expect(html).toContain('data-acquire-intent="single"');
+      expect(html).toContain("focus-visible:outline-white");
       expect(html).toContain('data-testid="resource-release-watch"');
       expect(html).toContain('data-guest="true"');
       expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(2);
