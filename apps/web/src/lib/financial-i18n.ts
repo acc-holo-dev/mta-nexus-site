@@ -1,8 +1,10 @@
-import { getCommercialCopy } from "./commercial-i18n";
 import { getCommerceHistoryCopy } from "./commerce-history-i18n";
+import { getCommercialCopy } from "./commercial-i18n";
+
 const copy = {
   en: {
     title: "Financial statements",
+    loading: "Loading financial statements…",
     personal: "Personal account",
     organization: "Organization account",
     organizations: "Organization statements",
@@ -45,6 +47,7 @@ const copy = {
   },
   ru: {
     title: "Финансовые выписки",
+    loading: "Загрузка финансовых выписок…",
     personal: "Личный счёт",
     organization: "Счёт организации",
     organizations: "Выписки организаций",

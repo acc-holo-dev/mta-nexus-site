@@ -4,9 +4,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `e7468237…` (`fix(web): add commerce history loaders and harden claim focus`); awaiting CI — do not treat as green yet.
+- **Tip SHA:** awaiting next push (subscriptions/finance/saved loaders + claim-focus harden from `e7468237`); do not treat as green yet.
 - **Last verified green tip:** `59326c30a91c009310d1ee314a024a4ebd4b6c10` / [CI 41395566631](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395566631) (lint/unit selected).
 - **Failed tip (not baseline):** `53badf5a…` / [CI 41395863320](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395863320) — resource-browser RU claim-button focus flake after hydration.
+- **Cancelled unverified tip:** `e7468237…` / [CI 41397169120](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41397169120) — superseded by docs tip concurrency before gates finished.
 - **Prior full selected-scope green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path, QA/follow first-paint.
@@ -32,7 +33,7 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** commerce/acquisitions/sales/licenses/review-report loading shells; discussion/support/collection focus rings; shell claim focus poll after `53badf5a` RU flake.
+**Последняя локальная волна:** subscriptions/finance/saved loading shells on top of commerce loaders + claim focus poll (`e7468237`).
 
 ## Свидетельства и ограничения
 
