@@ -29,6 +29,7 @@ vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
 
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import PrivacyPage, { generateMetadata } from "../apps/web/src/app/settings/privacy/page";
 import UserActivity, {
   generateMetadata as activityMetadata,
@@ -72,13 +73,21 @@ it.each(["en", "ru"] as const)(
     });
   },
 );
-it("offers sign in without fetching private preferences for an anonymous visitor", async () => {
-  state.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await PrivacyPage())).toContain(
-    'href="/auth/login?next=%2Fsettings%2Fprivacy"',
-  );
-  expect(state.own).not.toHaveBeenCalled();
-});
+it.each(["en", "ru"] as const)(
+  "offers sign in without fetching private preferences for an anonymous visitor in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.session.mockResolvedValue(null);
+    const html = renderToStaticMarkup(await PrivacyPage());
+    expect(html).toContain('href="/auth/login?next=%2Fsettings%2Fprivacy"');
+    expect(html).toContain(getDictionary(locale).workspace.signInRequired);
+    expect(state.own).not.toHaveBeenCalled();
+    expect(await generateMetadata()).toEqual({
+      title: profilePrivacyCopy(locale).title,
+      robots: { index: false, follow: false },
+    });
+  },
+);
 it("lets ordinary users edit privacy without advertising role-restricted developer editing", async () => {
   state.session.mockResolvedValue({ id: "actor", role: "user" });
   const html = renderToStaticMarkup(await PrivacyPage());

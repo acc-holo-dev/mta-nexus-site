@@ -88,15 +88,20 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/notifications?period=7"');
   },
 );
-it("shows sign-in when the session is absent without reading another inbox", async () => {
-  state.session.mockResolvedValue(null);
-  const html = await render();
-  expect(html).toContain(getDictionary("en").workspace.signInRequired);
-  expect(html).toContain('href="/auth/login?next=%2Fnotifications"');
-  expect(html).not.toContain('action="/notifications"');
-  expect(html).not.toContain("No notifications yet");
-  expect(state.page).not.toHaveBeenCalled();
-});
+it.each(["en", "ru"] as const)(
+  "shows localized sign-in when the session is absent without reading the inbox in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.session.mockResolvedValue(null);
+    const html = await render();
+    expect(html).toContain(getDictionary(locale).workspace.signInRequired);
+    expect(html).toContain('href="/auth/login?next=%2Fnotifications"');
+    expect(html).not.toContain('action="/notifications"');
+    expect(html).not.toContain(locale === "ru" ? "Уведомлений пока нет" : "No notifications yet");
+    expect(state.page).not.toHaveBeenCalled();
+    expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
+  },
+);
 it("preserves notification filters in the guest login return path", async () => {
   state.session.mockResolvedValue(null);
   const html = await render({ q: "needle", state: "unread", category: "content" });

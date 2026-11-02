@@ -199,7 +199,7 @@ function AcquireContent() {
         )}
         <Link
           href="/market"
-          className="inline-block rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+          className="inline-block rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
         >
           {copy.browse}
         </Link>
@@ -220,7 +220,12 @@ function AcquireContent() {
 
   if (!product || product.id !== productId) {
     return (
-      <div role="status" className="mx-auto max-w-2xl py-12 text-center text-sm text-muted">
+      <div
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+        className="mx-auto max-w-2xl py-12 text-center text-sm text-muted"
+      >
         {copy.loadingProduct}
       </div>
     );
@@ -343,7 +348,12 @@ export default function AcquirePage() {
   return (
     <Suspense
       fallback={
-        <div role="status" className="mx-auto max-w-2xl py-12 text-center text-sm text-muted">
+        <div
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="mx-auto max-w-2xl py-12 text-center text-sm text-muted"
+        >
           {dictionary.checkout.loadingSession}
         </div>
       }
