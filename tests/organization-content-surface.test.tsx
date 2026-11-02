@@ -110,3 +110,17 @@ it("loads only organization context when opening a new publication and handles e
     getUserPlatformCopy("en").empty,
   );
 });
+it("distinguishes an empty catalog from an empty filtered result", async () => {
+  const copy = getUserPlatformCopy("en");
+  mocks.page.mockResolvedValue({ organization, items: [], page: 1, hasMore: false });
+  const filtered = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ id: "org" }),
+      searchParams: Promise.resolve({ status: "draft", q: "Lua" }),
+    }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain('href="/workspace/organizations/org/content"');
+  expect(filtered).toContain(copy.reset);
+  expect(filtered).not.toContain(copy.empty);
+});

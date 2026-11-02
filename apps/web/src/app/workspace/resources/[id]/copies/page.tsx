@@ -87,7 +87,17 @@ export default async function ResourceCopiesPage({
           {c.total}: {result.total}
         </p>
         {result.copies.length === 0 ? (
-          <p>{c.empty}</p>
+          <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+            <p>{query.days === "all" ? c.empty : c.emptyFiltered}</p>
+            {query.days !== "all" && (
+              <Link
+                href={base}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {c.clearPeriod}
+              </Link>
+            )}
+          </div>
         ) : (
           <ul className="space-y-4">
             {result.copies.map((row) => (

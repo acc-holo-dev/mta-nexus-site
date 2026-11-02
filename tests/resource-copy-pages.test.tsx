@@ -131,7 +131,27 @@ it("renders empty history with valid filters", async () => {
     totalPages: 1,
     total: 0,
   });
+  const copy = resourceCopyCopy("en");
   const html = renderToStaticMarkup(await History(context));
-  expect(html).toContain(resourceCopyCopy("en").empty);
+  expect(html).toContain(copy.empty);
+  expect(html).not.toContain(copy.emptyFiltered);
+  expect(html).not.toContain(copy.clearPeriod);
   expect(html).not.toContain("Manage new resource");
+});
+it("explains an empty period filter and offers to show all time", async () => {
+  state.page.mockResolvedValue({
+    source: preview.source,
+    copies: [],
+    page: 1,
+    totalPages: 1,
+    total: 0,
+  });
+  const copy = resourceCopyCopy("en");
+  const html = renderToStaticMarkup(
+    await History({ ...context, searchParams: Promise.resolve({ days: "30" }) }),
+  );
+  expect(html).toContain(copy.emptyFiltered);
+  expect(html).toContain(`href="/workspace/resources/${sourceId}/copies"`);
+  expect(html).toContain(copy.clearPeriod);
+  expect(html).not.toContain(copy.empty);
 });

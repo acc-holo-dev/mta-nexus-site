@@ -76,6 +76,10 @@ export function parseContentPage(
   };
 }
 
+export function contentPageFiltered(filters: ReturnType<typeof parseContentPage>) {
+  return Boolean(filters.query || filters.type || filters.status);
+}
+
 export function contentPageHref(
   path: string,
   filters: ReturnType<typeof parseContentPage>,

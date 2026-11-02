@@ -70,30 +70,33 @@ export function ManagedServerCard({
         <div className="flex flex-wrap gap-3 text-xs font-semibold text-accent">
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/content`}
-            className="hover:underline"
+            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {serverContentCopy(locale).title}
           </Link>
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}`}
-            className="hover:underline"
+            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.manage}
           </Link>
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/activity`}
-            className="hover:underline"
+            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {getServerActivityCopy(locale).open}
           </Link>
           {(server.visibility === "public" || server.visibility === "unlisted") && (
-            <Link href={`/servers/${encodeURIComponent(server.slug)}`} className="hover:underline">
+            <Link
+              href={`/servers/${encodeURIComponent(server.slug)}`}
+              className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.view}
             </Link>
           )}
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/statistics`}
-            className="hover:underline"
+            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {serverStatisticsCopy(locale).open}
           </Link>

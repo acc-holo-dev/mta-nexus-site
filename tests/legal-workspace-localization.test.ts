@@ -77,6 +77,7 @@ describe("localized legal and workspace shell", () => {
         );
         expect(html).toContain(copy[status]);
         expect(html).toContain(copy.maintenance);
+        expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
         if (stale) expect(html).not.toContain("99");
         expect(html).not.toContain("bg-blue-600");
         expect(html).not.toContain("bg-emerald-600");

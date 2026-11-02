@@ -12,7 +12,11 @@ import { organizationContentCopy } from "../../../../../lib/organization-content
 import { organizationPublicationHistoryCopy } from "../../../../../lib/organization-publication-history-copy";
 import { authService } from "../../../../../lib/services/auth-service";
 import { organizationContentService } from "../../../../../lib/services/organization-content-service";
-import { parseContentPage, writerTypes } from "../../../../../lib/user-platform-contract";
+import {
+  contentPageFiltered,
+  parseContentPage,
+  writerTypes,
+} from "../../../../../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
@@ -99,7 +103,7 @@ export default async function OrganizationPublications({
                     <h2 className="break-words font-heading text-primary">
                       <Link
                         href={`${path}/${encodeURIComponent(item.id)}`}
-                        className="hover:underline"
+                        className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {item.title}
                       </Link>
@@ -145,7 +149,17 @@ export default async function OrganizationPublications({
               ))}
             </div>
           ) : (
-            <p className="nexus-panel p-6 text-sm text-muted">{copy.empty}</p>
+            <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+              <p>{contentPageFiltered(filters) ? copy.emptyFiltered : copy.empty}</p>
+              {contentPageFiltered(filters) && (
+                <Link
+                  href={path}
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {copy.reset}
+                </Link>
+              )}
+            </div>
           )}
           <ContentPageNavigation
             path={path}

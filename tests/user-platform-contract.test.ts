@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import {
+  contentPageFiltered,
   parseContentPage,
   contentPageHref,
   writerCreateSchema,
@@ -39,6 +40,14 @@ it("preserves valid filters across pages and caps search text", () => {
   expect(url.searchParams.get("page")).toBe("2");
   expect(parseContentPage({ q: "x".repeat(150) }).query).toHaveLength(120);
 });
+it("detects active catalog filters for empty-state messaging", () => {
+  expect(contentPageFiltered(parseContentPage({}))).toBe(false);
+  expect(contentPageFiltered(parseContentPage({ q: "lua" }))).toBe(true);
+  expect(contentPageFiltered(parseContentPage({ type: "news" }))).toBe(true);
+  expect(contentPageFiltered(parseContentPage({ status: "draft" }))).toBe(true);
+  expect(contentPageFiltered(parseContentPage({ page: "2" }))).toBe(false);
+});
+
 it("uses the same duplicate-parameter policy in API and server-rendered pages", () => {
   expect(parseContentPage(new URLSearchParams("page=2&page=3&type=news&type=post&q=lua"))).toEqual(
     parseContentPage({ page: ["2", "3"], type: ["news", "post"], q: "lua" }),

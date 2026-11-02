@@ -7,7 +7,7 @@ export const actionConfirmCheckboxFocusClass =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const defaultCheckboxClass = `mt-1 ${actionConfirmCheckboxFocusClass}`;
 
-export type ActionConfirmCheckboxProps = {
+type ActionConfirmCheckboxProps = {
   id: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
