@@ -296,7 +296,16 @@ export function VerificationWorkspace({
             {copy.search}
           </Button>
         </form>
-        {teams?.items.length === 0 && <p className="text-sm text-muted">{copy.noTeams}</p>}
+        {teams?.items.length === 0 && (
+          <>
+            <p className="text-sm text-muted">{copy.noTeams}</p>
+            {teamFilters.query.trim() ? (
+              <Link href={href({ teamsPage: 1, teamsQ: "" })} className={accentLinkClass}>
+                {copy.clearTeamSearch}
+              </Link>
+            ) : null}
+          </>
+        )}
         <div className="space-y-3">
           {teams?.items.map((team) => (
             <div

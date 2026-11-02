@@ -63,6 +63,7 @@ export function ContentDiscussion({
   const [search, setSearch] = useState(initialQuery);
   const [focusedId, setFocusedId] = useState(initialFocus);
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const activeQuery = useRef(initialQuery);
   const readController = useRef<AbortController | null>(null);
   const alive = useRef(true);
@@ -115,7 +116,9 @@ export function ContentDiscussion({
   }
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const returnPath = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", returnPath));
+    setRegisterHref(authEntryHref("register", returnPath));
   }, [pathname]);
   useEffect(() => {
     alive.current = true;
@@ -425,6 +428,8 @@ export function ContentDiscussion({
           needsSignIn={writeNeedsSignIn}
           loginHref={loginHref}
           signInLabel={copy.signIn}
+          registerHref={registerHref}
+          registerLabel={workspaceCopy.createAccount}
           onPersistDraft={() => persistComposeDraft()}
         />
         {published && (

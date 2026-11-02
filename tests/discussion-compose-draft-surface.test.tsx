@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+import { DiscussionComposeWriteFeedback } from "../apps/web/src/components/content-discussion-compose-feedback";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
@@ -33,4 +34,22 @@ it("announces a session draft restore in the compose form", () => {
   expect(html).toContain('role="status"');
   expect(html).toContain('aria-live="polite"');
   expect(html).toContain("Stored draft");
+});
+
+it("shows login and register links when compose write needs sign-in", () => {
+  const workspace = getDictionary("en").workspace;
+  const html = renderToStaticMarkup(
+    <DiscussionComposeWriteFeedback
+      error="Sign in to publish"
+      needsSignIn
+      loginHref="/auth/login?next=%2Farticles%2Fdemo"
+      signInLabel={workspace.signIn}
+      registerHref="/auth/register?next=%2Farticles%2Fdemo"
+      registerLabel={workspace.createAccount}
+      onPersistDraft={() => {}}
+    />,
+  );
+  expect(html).toContain('href="/auth/login?next=%2Farticles%2Fdemo"');
+  expect(html).toContain('href="/auth/register?next=%2Farticles%2Fdemo"');
+  expect(html).toContain(workspace.createAccount);
 });

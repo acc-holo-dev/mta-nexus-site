@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ session: vi.fn(), locale: "en" as "ru" | "en" }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 vi.mock("next/link", () => ({ default: "a" }));
@@ -8,12 +9,14 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () =
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-import { SupportPageSurface, supportMetadata } from "../apps/web/src/components/support-page";
+
+import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { SupportCaseActions } from "../apps/web/src/components/support-case-actions";
 import { SupportCenter } from "../apps/web/src/components/support-center";
-import { LocaleProvider } from "../apps/web/src/components/locale-context";
-import { supportWorkspaceCopy } from "../apps/web/src/lib/support-workspace-copy";
+import { SupportPageSurface, supportMetadata } from "../apps/web/src/components/support-page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { supportWorkspaceCopy } from "../apps/web/src/lib/support-workspace-copy";
+
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,
   category: "account",
@@ -95,7 +98,9 @@ it("gates server-rendered support pages before showing private controls", async 
     `<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`,
   );
   expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
+  expect(guest).toContain('href="/auth/register?next=%2Fsupport"');
   expect(guest).toContain(getDictionary("en").workspace.signInRequired);
+  expect(guest).toContain(getDictionary("en").workspace.signInMessage);
   const filtered = renderToStaticMarkup(
     await SupportPageSurface({
       searchParams: Promise.resolve({ q: "billing", status: "open", category: "account" }),
@@ -104,6 +109,10 @@ it("gates server-rendered support pages before showing private controls", async 
   expect(filtered).toContain(
     'href="/auth/login?next=%2Fsupport%3Fq%3Dbilling%26status%3Dopen%26category%3Daccount"',
   );
+  expect(filtered).toContain(
+    'href="/auth/register?next=%2Fsupport%3Fq%3Dbilling%26status%3Dopen%26category%3Daccount"',
+  );
+  expect(filtered).toContain(getDictionary("en").workspace.signInMessage);
   const caseGuest = renderToStaticMarkup(await SupportPageSurface({ id: `sup_${"a".repeat(24)}` }));
   expect(caseGuest).toContain(`href="/auth/login?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });

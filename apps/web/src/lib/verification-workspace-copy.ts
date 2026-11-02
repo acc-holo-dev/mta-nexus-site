@@ -40,6 +40,7 @@ const en = {
   choose: "Choose organization",
   manage: "Organizations you manage",
   noTeams: "No organizations you manage match this search.",
+  clearTeamSearch: "Clear organization search",
   requiresProfile:
     "Save at least one specialty in your professional profile before applying for experience verification.",
   teamPending: "This organization already has a pending application.",
@@ -119,6 +120,7 @@ const ru: Record<keyof typeof en, string> = {
   choose: "Выбрать организацию",
   manage: "Организации под вашим управлением",
   noTeams: "Организаций под вашим управлением по этому запросу нет.",
+  clearTeamSearch: "Сбросить поиск организаций",
   requiresProfile:
     "Сохраните хотя бы одну специализацию в профессиональном профиле перед заявкой на подтверждение опыта.",
   teamPending: "Для этой организации уже есть заявка на рассмотрении.",

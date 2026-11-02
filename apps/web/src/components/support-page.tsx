@@ -49,12 +49,23 @@ export async function SupportPageSurface({
         </header>
         <div className="nexus-panel space-y-3 p-5">
           <p className="text-sm text-secondary">{workspace.signInRequired}</p>
-          <Link
-            href={authEntryHref("login", listReturnPath)}
-            className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {workspace.signIn}
-          </Link>
+          {workspace.signInMessage ? (
+            <p className="text-sm text-secondary">{workspace.signInMessage}</p>
+          ) : null}
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              href={authEntryHref("login", listReturnPath)}
+              className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {workspace.signIn}
+            </Link>
+            <Link
+              href={authEntryHref("register", listReturnPath)}
+              className="inline-flex min-h-11 items-center text-sm text-secondary underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {workspace.createAccount}
+            </Link>
+          </div>
         </div>
       </div>
     );

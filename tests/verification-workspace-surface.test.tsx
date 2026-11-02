@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   overview: vi.fn(),
@@ -18,15 +19,17 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/verification-workspace-service", () => ({
   verificationWorkspaceService: mocks,
 }));
-import { VerificationWorkspace } from "../apps/web/src/components/verification-workspace";
-import { DeveloperProfileEditor } from "../apps/web/src/components/developer-profile-editor";
-import { DeveloperExperience } from "../apps/web/src/components/developer-experience";
+
+import DeveloperSettingsPage from "../apps/web/src/app/settings/developer/page";
 import VerificationPage, {
   generateMetadata,
 } from "../apps/web/src/app/workspace/verification/page";
-import DeveloperSettingsPage from "../apps/web/src/app/settings/developer/page";
-import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
+import { DeveloperExperience } from "../apps/web/src/components/developer-experience";
+import { DeveloperProfileEditor } from "../apps/web/src/components/developer-profile-editor";
+import { VerificationWorkspace } from "../apps/web/src/components/verification-workspace";
 import type { VerificationOverview } from "../apps/web/src/lib/verification-workspace-contract";
+import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
+
 const filters = { page: 2, view: "history" as const, type: "developer", query: "" };
 const overview: VerificationOverview = {
   profile: {
@@ -94,6 +97,21 @@ it.each(["ru", "en"] as const)(
     expect(html).not.toContain("<script>");
   },
 );
+it("offers clear organization search when managed teams are empty", () => {
+  const html = renderToStaticMarkup(
+    <VerificationWorkspace
+      initial={overview}
+      initialTeams={{ items: [], page: 1, hasMore: false }}
+      filters={filters}
+      teamFilters={{ page: 1, view: "history", type: undefined, query: "missing" }}
+      locale="en"
+    />,
+  );
+  expect(html).toContain(verificationCopy("en").noTeams);
+  expect(html).toContain(verificationCopy("en").clearTeamSearch);
+  expect(html).toContain("teamsQ=");
+});
+
 it("offers a clear filter or alternate view when history is empty", () => {
   const emptyOverview: VerificationOverview = {
     ...overview,

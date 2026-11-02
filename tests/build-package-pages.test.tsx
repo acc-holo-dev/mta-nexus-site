@@ -110,6 +110,28 @@ it("fails closed on duplicate queries and current authority errors", async () =>
     BuildPackageScreen({ productId: "prd_a", buildId: "bld_a", searchParams: Promise.resolve({}) }),
   ).rejects.toThrow("NOT_FOUND");
 });
+it("offers reset when a filtered inventory page has no files", async () => {
+  state.page.mockResolvedValue({
+    ...detail,
+    files: [],
+    filter: "changed",
+    page: 1,
+    totalPages: 1,
+  });
+  const html = renderToStaticMarkup(
+    await BuildPackageScreen({
+      productId: "prd_a",
+      buildId: "bld_a",
+      searchParams: Promise.resolve({ filter: "changed", baseline: "bld_b" }),
+    }),
+  );
+  expect(html).toContain(buildPackageCopy("en").noFiles);
+  expect(html).toContain(
+    'href="/workspace/resources/prd_a/builds/bld_a/package?baseline=bld_b">Reset</a></div></div>',
+  );
+  expect(html).not.toContain("filter=changed");
+});
+
 it("makes legacy evidence uncertainty explicit and does not invent a delta", async () => {
   state.page.mockResolvedValue({
     ...detail,

@@ -164,7 +164,22 @@ export async function BuildPackageScreen({
         ))}
       </ol>
       {detail.files.length === 0 && detail.build.hasInventory && (
-        <p className="text-muted">{copy.noFiles}</p>
+        <div className="space-y-2">
+          <p className="text-muted">{copy.noFiles}</p>
+          {detail.filter !== "all" && (
+            <Link
+              href={buildPackageQueryHref(pageBase, {
+                ...query,
+                baselineId: detail.baseline?.id,
+                filter: "all",
+                page: 1,
+              })}
+              className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          )}
+        </div>
       )}
       {detail.totalPages > 1 && (
         <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
