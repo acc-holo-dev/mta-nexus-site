@@ -1,7 +1,7 @@
 "use client";
 import {
-  LIBRARY_COLLECTION_BATCH_LIMIT,
   collectionCommandItemResults,
+  LIBRARY_COLLECTION_BATCH_LIMIT,
   type LibraryCollectionCommand,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
@@ -315,16 +315,22 @@ export function LibraryCollectionBatchForm({
           <code className="block break-all text-xs">
             {c.receipt}: {receiptId}
           </code>
-          <a href={collectionReceiptHref(receiptId)} className="text-accent underline">
+          <a
+            href={collectionReceiptHref(receiptId)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
           <a
             href={collectionHref(pending.current.collection.id, "history")}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.history}
           </a>
-          <a href={pending.current.reloadHref} className="text-accent underline">
+          <a
+            href={pending.current.reloadHref}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.reload}
           </a>
         </div>
