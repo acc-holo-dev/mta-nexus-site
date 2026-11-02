@@ -110,6 +110,7 @@ export const publishing = {
     title: "MTA Engineering Hub & Articles",
     description:
       "Technical guides, server administration tutorials, Lua architecture patterns, and release devlogs.",
+    loading: "Loading articles…",
     write: "Write article",
     empty: "No articles have been published yet.",
     read: "Read",
@@ -130,6 +131,7 @@ export const publishing = {
   developers: {
     title: "MTA Developer & Studio Network",
     description: "Discover MTA:SA scripters, 3D modelers, UI designers, and systems architects.",
+    loading: "Loading creator directory…",
     bioFallback: "MTA community contributor and resource author.",
     verifiedIdentity: "Verified identity",
     creatorProfile: "Creator profile",

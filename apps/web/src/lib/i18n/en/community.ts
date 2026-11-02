@@ -2,6 +2,7 @@ export const community = {
   community: {
     title: "Community",
     description: "Questions and discussions from the MTA ecosystem.",
+    loading: "Loading community topics…",
     newTopic: "New topic",
     noTopics: "No topics yet. Start the first useful discussion.",
     replies: "replies",
@@ -54,8 +55,10 @@ export const community = {
     openProfile: "Open profile",
   },
   profiles: {
+    title: "Profile",
     userNotFound: "User not found",
     profileDescription: "MTA Nexus profile of",
+    loading: "Loading profile…",
     verifiedMember: "Verified member",
     memberFallback: "MTA community member and platform explorer.",
     joined: "Joined",
@@ -65,8 +68,10 @@ export const community = {
     operatedServers: "Operated servers",
   },
   organizations: {
+    title: "Organization",
     verified: "Verified organization",
     community: "Community",
+    loading: "Loading organization…",
     fallback: "MTA community, creator collective, or resource publisher.",
     releases: "Releases",
     marketplaceReleases: "Marketplace releases",

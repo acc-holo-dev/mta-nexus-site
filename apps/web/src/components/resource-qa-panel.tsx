@@ -7,6 +7,7 @@ import type {
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
@@ -59,13 +60,15 @@ export function ResourceQaPanel({
   const [answer, setAnswer] = useState("");
   const [writeError, setWriteError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const pathname = usePathname();
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const writeGuard = useRef(false);
   const base = `/api/products/${encodeURIComponent(productId)}/qa`;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
-  }, []);
+  }, [pathname]);
 
   const capabilities = detail?.capabilities ?? page?.capabilities;
   const canAsk = Boolean(capabilities?.canAsk);

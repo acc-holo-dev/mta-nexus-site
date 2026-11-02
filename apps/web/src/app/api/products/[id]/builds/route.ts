@@ -1,28 +1,28 @@
 import path from "node:path";
+import { AppError, MAX_BUILD_MULTIPART_OVERHEAD_BYTES } from "@nexus/domain";
+import { consumeRateLimit } from "@nexus/security";
+import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
+import { mtaVersionSchema, resourceVersionSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { productService } from "../../../../../lib/services/product-service";
-import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
-import { inspectBuildPackage } from "../../../../../lib/services/build-package-inspection";
-import { authService } from "../../../../../lib/services/auth-service";
-import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
-import { consumeRateLimit } from "@nexus/security";
-import { AppError, MAX_BUILD_MULTIPART_OVERHEAD_BYTES } from "@nexus/domain";
-import {
-  createRequestLogContext,
-  jsonWithRequestId,
-  logRequestEvent,
-} from "../../../../../lib/observability";
-import {
-  getSupportedBuildExtension,
-  hasExpectedBuildFileFormat,
-} from "../../../../../lib/build-file-validation";
-import { mtaVersionSchema, resourceVersionSchema } from "@nexus/validation";
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
 } from "../../../../../lib/bounded-multipart";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import {
+  getSupportedBuildExtension,
+  hasExpectedBuildFileFormat,
+} from "../../../../../lib/build-file-validation";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../../../../../lib/observability";
+import { authService } from "../../../../../lib/services/auth-service";
+import { inspectBuildPackage } from "../../../../../lib/services/build-package-inspection";
+import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
+import { productService } from "../../../../../lib/services/product-service";
 
 const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const BUILD_MIME_TYPES: Record<string, string> = {
@@ -92,7 +92,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
+            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB free-beta limit`,
             code: "BUILD_UPLOAD_TOO_LARGE",
           },
           { status: 413 },
@@ -122,7 +122,7 @@ export const POST = withBrowserMutation(
           return privateJson(
             context,
             {
-              error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
+              error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB free-beta limit`,
               code: "BUILD_UPLOAD_TOO_LARGE",
             },
             { status: 413 },
@@ -168,7 +168,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
+            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB free-beta limit`,
             code: "BUILD_UPLOAD_TOO_LARGE",
           },
           { status: 413 },

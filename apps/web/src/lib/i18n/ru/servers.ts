@@ -2,6 +2,7 @@ export const servers = {
   serverDetail: {
     notFound: "Сервер не найден",
     breadcrumb: "Серверы",
+    loading: "Загрузка сервера…",
     verifiedIdentity: "Подтверждённая принадлежность",
     connect: "Открыть в MTA",
     connectHint:

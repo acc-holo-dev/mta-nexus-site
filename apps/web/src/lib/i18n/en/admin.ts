@@ -132,6 +132,7 @@ export const admin = {
     title: "Security Center",
     description:
       "Review active sessions, recovery readiness, and important account security activity from server-confirmed records.",
+    loading: "Loading security center…",
     signInRequired: "Sign in to review account security",
     signIn: "Sign in",
     manageSettings: "Manage security settings",

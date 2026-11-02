@@ -1,4 +1,5 @@
 import type { Locale } from "./i18n";
+
 const en = {
   filter: "Search and filter",
   verified: "Verified profiles only",
@@ -36,6 +37,7 @@ const en = {
   master: "Official MTA directory",
   organizationsTitle: "Organizations",
   organizationsDescription: "Find teams, communities and their public releases.",
+  organizationsLoading: "Loading organizations…",
 };
 const ru: Record<keyof typeof en, string> = {
   filter: "Поиск и фильтры",
@@ -74,5 +76,6 @@ const ru: Record<keyof typeof en, string> = {
   master: "Официальный каталог MTA",
   organizationsTitle: "Организации",
   organizationsDescription: "Находите команды, сообщества и их публичные релизы.",
+  organizationsLoading: "Загрузка организаций…",
 };
 export const discoveryCopy = (locale: Locale) => (locale === "ru" ? ru : en);

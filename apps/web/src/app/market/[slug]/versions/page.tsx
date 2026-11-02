@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { buildRepository } from "@nexus/db";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../components/auth-return-path";
+import { BuildPackageSummaryPanel } from "../../../../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../../../../components/build-provenance-details";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
-import { BuildPackageSummaryPanel } from "../../../../components/build-package-evidence";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import {
@@ -44,7 +44,7 @@ export default async function PublicResourceVersionsPage({
     cookies(),
   ]);
   // Unlike private publisher history, this selector rejects unpublished,
-  // paid closed-beta and missing resources *before* querying build rows.
+  // paid, and missing resources *before* querying build rows.
   const product = await productService.getProductBySlug(slug);
   if (!product) notFound();
 

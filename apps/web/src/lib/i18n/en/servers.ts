@@ -2,6 +2,7 @@ export const servers = {
   serverDetail: {
     notFound: "Server not found",
     breadcrumb: "Servers",
+    loading: "Loading server…",
     verifiedIdentity: "Verified identity",
     connect: "Open in MTA",
     connectHint:

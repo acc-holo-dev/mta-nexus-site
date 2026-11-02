@@ -2,6 +2,7 @@
 import { Button } from "@nexus/ui";
 import { Bell, BellOff, Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import type { ObjectMuteDuration } from "../lib/follow-workspace-contract";
@@ -44,10 +45,12 @@ function ContentFollowControl({
   const { locale: appLocale } = useNexusLocale();
   const locale = providedLocale ?? appLocale;
   const copy = followCopy(locale);
-  const [loginHref, setLoginHref] = useState("/auth/login");
+  const pathname = usePathname();
+  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
-  }, []);
+  }, [pathname]);
   const [authenticated, setAuthenticated] = useState(initial?.authenticated ?? false);
   const [following, setFollowing] = useState(initial?.following ?? false);
   const [notifyComments, setNotifyComments] = useState(initial?.notifyComments ?? false);
