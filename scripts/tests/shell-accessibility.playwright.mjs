@@ -1099,6 +1099,7 @@ for (const locale of ["en", "ru"]) {
     await claimButton.scrollIntoViewIfNeeded();
     // Client panels on this route can remount once after hydration; retry focus
     // until the live button keeps document focus instead of failing the locale once.
+    // Kept in scripts/tests so selected CI includes resource-browser coverage.
     await expect
       .poll(async () => {
         await claimButton.focus();
