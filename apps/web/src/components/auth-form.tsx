@@ -188,14 +188,20 @@ export function AuthForm({
       <div className="space-y-2 text-sm text-muted">
         {!registering && (
           <p>
-            <Link href="/auth/forgot-password" className="font-semibold text-accent underline">
+            <Link
+              href="/auth/forgot-password"
+              className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.forgot}
             </Link>
           </p>
         )}
         <p>
           {registering ? `${copy.already} ` : `${copy.newUser} `}
-          <Link href={alternateHref} className="font-semibold text-accent underline">
+          <Link
+            href={alternateHref}
+            className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {registering ? copy.signIn : copy.create}
           </Link>
         </p>

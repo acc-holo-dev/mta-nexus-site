@@ -4,9 +4,15 @@ import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 export default async function Loading() {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return (
-    <div className="nexus-panel space-y-4 p-6" aria-busy="true">
-      <h1 className="text-xl font-semibold text-fg">{copy.title}</h1>
-      <p role="status" className="text-sm text-muted">
+    <section
+      className="nexus-panel space-y-4 p-6"
+      aria-busy="true"
+      aria-labelledby="content-history-loading-heading"
+    >
+      <h1 id="content-history-loading-heading" className="text-xl font-semibold text-primary">
+        {copy.title}
+      </h1>
+      <p role="status" aria-live="polite" className="text-sm text-muted">
         {copy.loading}
       </p>
       <div className="animate-pulse space-y-4" aria-hidden="true">
@@ -15,6 +21,6 @@ export default async function Loading() {
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

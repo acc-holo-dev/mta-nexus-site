@@ -1,14 +1,14 @@
-import Link from "next/link";
-import { publicationCopy } from "../../lib/publication-feed-copy";
-import { MessageSquare, Plus } from "lucide-react";
 import { EmptyState } from "@nexus/ui";
-import { contentService } from "../../lib/services/content-service";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
+import { MessageSquare, Plus } from "lucide-react";
+import Link from "next/link";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
 } from "../../components/content-catalog-controls";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n-server";
+import { publicationCopy } from "../../lib/publication-feed-copy";
+import { contentService } from "../../lib/services/content-service";
 import { communityTypes, parseContentPage } from "../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
@@ -52,10 +52,16 @@ export default async function CommunityPage({
       </header>
 
       <div className="flex flex-wrap gap-4">
-        <Link href="/workspace/content" className="inline-block text-sm text-accent underline">
+        <Link
+          href="/workspace/content"
+          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {platformCopy.studio}
         </Link>
-        <Link href="/workspace/feed" className="inline-block text-sm text-accent underline">
+        <Link
+          href="/workspace/feed"
+          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {publicationCopy(locale).title}
         </Link>
       </div>

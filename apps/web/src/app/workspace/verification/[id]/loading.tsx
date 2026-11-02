@@ -13,7 +13,7 @@ export default async function Loading() {
         <h1 id="verification-detail-loading-heading" className="text-xl font-semibold text-primary">
           {copy.detail}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}
         </p>
       </header>

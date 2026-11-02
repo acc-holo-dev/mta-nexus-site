@@ -14,7 +14,7 @@ export default async function Loading() {
         <h1 id="reactions-loading-heading" className="text-2xl font-extrabold text-primary">
           {copy.my}
         </h1>
-        <p role="status" className="mt-2 text-sm text-muted">
+        <p role="status" aria-live="polite" className="mt-2 text-sm text-muted">
           {copy.loading}
         </p>
       </header>
