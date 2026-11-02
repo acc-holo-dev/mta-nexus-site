@@ -10,6 +10,10 @@ import { resourceReviewPageQuery } from "../lib/resource-review-query";
 import { ResourceReviewPager } from "./resource-review-list";
 import { ResourceReviewDecisionForm } from "./resource-review-controls";
 import { authEntryHref } from "./auth-return-path";
+
+const filterNavLinkClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function ResourceReviewReportScreen({
   staff,
   id,
@@ -88,7 +92,7 @@ export async function ResourceReviewReportScreen({
             key={view}
             href={`${base}?view=${view}`}
             aria-current={view === result.view ? "page" : undefined}
-            className="text-accent underline"
+            className={`text-accent underline ${filterNavLinkClass}`}
           >
             {copy[view]}
           </Link>

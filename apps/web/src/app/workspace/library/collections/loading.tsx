@@ -1,17 +1,29 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../lib/library-collections-i18n";
 
+// Honest loading shell for /workspace/library/collections.
 export default async function Loading() {
   const copy = libraryCollectionsCopy(await getRequestLocale());
   return (
-    <div
-      role="status"
-      aria-live="polite"
+    <section
+      className="mx-auto max-w-4xl space-y-6"
       aria-busy="true"
-      className="nexus-panel mx-auto min-h-40 max-w-4xl space-y-3 p-6 text-sm text-muted"
+      aria-labelledby="library-collections-loading-heading"
     >
-      <p className="font-medium text-foreground">{copy.title}</p>
-      <p>{copy.loading}</p>
-    </div>
+      <header className="space-y-2">
+        <h1 id="library-collections-loading-heading" className="font-display text-primary">
+          {copy.title}
+        </h1>
+        <p role="status" className="text-sm text-muted">
+          {copy.loading}
+        </p>
+      </header>
+      <div className="animate-pulse space-y-4" aria-hidden="true">
+        <div className="h-28 rounded bg-inset" />
+        {[1, 2, 3].map((key) => (
+          <div key={key} className="h-20 rounded bg-inset" />
+        ))}
+      </div>
+    </section>
   );
 }

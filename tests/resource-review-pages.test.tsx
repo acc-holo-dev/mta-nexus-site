@@ -202,6 +202,7 @@ it("report history keeps its filters while paging", async () => {
     await ResourceReviewReportScreen({ staff: false, query: { view: "history", page: "2" } }),
   );
   expect(html).toContain("page=3&amp;view=history");
+  expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
   expect(state.reportsPage).toHaveBeenCalledWith({ actorId: "usr_a", staff: false }, 2, "history");
 });
 it("current staff get removal only with an existing published revision", async () => {

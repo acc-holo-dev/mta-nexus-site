@@ -5,6 +5,10 @@ import { type ServerHistoryWindow, serverHistoryWindows } from "../lib/server-hi
 import { serverStatisticsHref } from "../lib/server-statistics-contract";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
+
+const filterNavLinkClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function ServerObservationPeriodControls({
   path,
   window,
@@ -45,7 +49,7 @@ export function ServerObservationPeriodControls({
             prefetch={false}
             href={href(period, end)}
             aria-current={window === period ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-lg border border-base px-3 text-sm ${window === period ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`inline-flex min-h-11 items-center rounded-lg border border-base px-3 text-sm ${filterNavLinkClass} ${window === period ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {label}
           </Link>

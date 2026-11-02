@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+
+const filterNavLinkClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 import type { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
 import { authEntryHref } from "./auth-return-path";
 
@@ -51,7 +54,7 @@ export function HistoryShell({
             key={key}
             href={`/workspace/${key}`}
             aria-current={key === area ? "page" : undefined}
-            className="rounded-md border border-base px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary aria-[current=page]:bg-accent aria-[current=page]:text-white"
+            className={`rounded-md border border-base px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary aria-[current=page]:bg-accent aria-[current=page]:text-white ${filterNavLinkClass}`}
           >
             {copy.tabs[key]}
           </Link>

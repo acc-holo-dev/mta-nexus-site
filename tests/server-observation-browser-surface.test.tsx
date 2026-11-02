@@ -101,6 +101,7 @@ it("keeps duration tabs and adjacent periods anchored to the selected UTC end wh
   expect(html).toContain('href="/observations?window=7d&amp;q=Lua&amp;players=zero"');
   expect(html).toContain("rounded-lg");
   expect(html).toContain("bg-accent");
+  expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
   expect(html).not.toContain("cursor=");
   expect(html).not.toContain("before=");
 });
