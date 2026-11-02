@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { ResourceCartReviewEvidence } from "../../../../../components/resource-cart-review-evidence";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
@@ -29,18 +29,10 @@ export default async function ResourceCartReceiptPage({
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref(
-            "login",
-            `/workspace/acquisitions/receipts/${encodeURIComponent(id)}`,
-          )}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/acquisitions/receipts/${encodeURIComponent(id)}`}
+      />
     );
   let requestId: string;
   try {

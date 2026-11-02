@@ -1,6 +1,6 @@
+import { NotFoundError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { NotFoundError } from "@nexus/domain";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
@@ -14,6 +14,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/acquisitions",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");

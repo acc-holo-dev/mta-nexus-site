@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceActivityCopy } from "../../../../../lib/resource-activity-i18n";
@@ -40,18 +40,7 @@ export default async function ResourceActivityPage({
   const returnQuery = returnParams.toString();
   const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
   const actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const result = await resourceActivityService
     .publisherReport(actor, id, resourceActivityDays(query.days))
     .catch((error) => {

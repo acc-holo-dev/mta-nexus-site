@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/resources/prd_a/variants",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");

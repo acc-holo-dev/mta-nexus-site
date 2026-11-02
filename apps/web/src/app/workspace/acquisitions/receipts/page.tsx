@@ -3,7 +3,7 @@ import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../lib/resource-cart-receipts-i18n";
@@ -35,17 +35,7 @@ export default async function ResourceCartReceiptsPage({
       if (typeof value === "string") pageParams.set(key, value);
     }
     const returnPath = `/workspace/acquisitions/receipts${pageParams.size ? `?${pageParams}` : ""}`;
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof resourceCartReceiptQuery>;
   try {

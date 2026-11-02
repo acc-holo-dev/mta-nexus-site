@@ -13,6 +13,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => "/workspace/resources/prd_a/copy",
   notFound: () => {
     throw new Error("NOT_FOUND");
   },

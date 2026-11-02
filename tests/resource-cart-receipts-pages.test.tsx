@@ -1,7 +1,8 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { ResourceCartControls } from "../apps/web/src/components/resource-cart-controls";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   locale: "en" as "en" | "ru",
@@ -13,6 +14,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/acquisitions/receipts",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -28,8 +30,10 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
     </button>
   ),
 }));
-import Page, { generateMetadata } from "../apps/web/src/app/workspace/acquisitions/receipts/page";
+
 import Detail from "../apps/web/src/app/workspace/acquisitions/receipts/[id]/page";
+import Page, { generateMetadata } from "../apps/web/src/app/workspace/acquisitions/receipts/page";
+
 const requestId = "11111111-1111-4111-8111-111111111111";
 beforeEach(() => {
   vi.clearAllMocks();

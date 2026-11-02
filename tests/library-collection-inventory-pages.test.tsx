@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -9,6 +10,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/collections/resources",
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
@@ -48,6 +50,7 @@ import Page, {
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/resources/page";
 import { libraryCollectionInventoryCopy } from "../apps/web/src/lib/library-collection-inventory-i18n";
+
 const date = "2026-10-13T00:00:00.000Z",
   a = { id: "lcol_a", name: "Own <active>", status: "active", revision: 4, itemCount: 2 },
   b = { id: "lcol_b", name: "Own archived", status: "archived", revision: 7, itemCount: 1 };

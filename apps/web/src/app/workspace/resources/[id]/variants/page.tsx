@@ -2,9 +2,8 @@ import { NotFoundError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { ResourceVariantsForm } from "../../../../../components/resource-variants-form";
-import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -26,21 +25,9 @@ export default async function ResourceVariantsPage({
     cookies().then((store) => authService.getSession(store.get("nexus_session")?.value)),
     params,
   ]);
-  const copy = getResourceManagementCopy(locale),
-    dictionary = getDictionary(locale);
+  const copy = getResourceManagementCopy(locale);
   const returnPath = `/workspace/resources/${encodeURIComponent(id)}/variants`;
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
   const managed = await resourceManagementService.managedVariants(id, actor).catch((error) => {

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { ResourceCopyForm } from "../../../../../components/resource-copy-form";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCopyCopy, resourceCopyError } from "../../../../../lib/resource-copy-i18n";
@@ -35,13 +35,7 @@ export default async function ResourceCopyPage({
     c = resourceCopyCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const returnPath = `/workspace/resources/${encodeURIComponent(path.id)}/copy`;
-  if (!actor)
-    return (
-      <section className="space-y-4 py-8">
-        <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)}>{c.signIn}</Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
     resourceCopiesQuery(resourceCopiesPageParams(query));
     const id = resourceCopyId(path.id),

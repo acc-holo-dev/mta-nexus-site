@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { NewResourceForm } from "../../../../components/new-resource-form";
-import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 
@@ -14,20 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function NewResourcePage() {
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor) {
-    const dictionary = getDictionary(await getRequestLocale());
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", "/workspace/resources/new")}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </section>
-    );
-  }
+  const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
+  const actor = await authService.getSession(store.get("nexus_session")?.value).catch(() => null);
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/resources/new" />;
   return <NewResourceForm key={actor.id} actorId={actor.id} />;
 }

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -14,6 +15,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/finance",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -30,9 +32,11 @@ vi.mock("@nexus/db", () => ({
   financialStatementsRepository: { statement: state.statement, scopes: state.scopes },
   financialReviewRepository: { page: state.page, detail: state.detail },
 }));
-import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
-import Review from "../apps/web/src/app/admin/commerce/reconciliation/page";
+
 import Detail from "../apps/web/src/app/admin/commerce/reconciliation/[id]/page";
+import Review from "../apps/web/src/app/admin/commerce/reconciliation/page";
+import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
+
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };
 const input = {

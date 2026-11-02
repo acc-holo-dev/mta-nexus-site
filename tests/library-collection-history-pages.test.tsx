@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -9,6 +10,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/collections/history",
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
@@ -27,11 +29,13 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () =
 vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { accountHistory: state.history },
 }));
+
 import Page, {
   dynamic,
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/history/page";
 import { libraryCollectionHistoryCopy } from "../apps/web/src/lib/library-collection-history-i18n";
+
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
   collection = { id: "lcol_dest", name: "Recorded & name", status: "active", revision: 2 };

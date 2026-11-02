@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDictionary } from "../../../../lib/i18n";
+import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -8,6 +8,9 @@ const mocks = vi.hoisted(() => ({
   forms: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/resources/new",
+}));
 vi.mock("../../../../lib/services/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
@@ -34,7 +37,7 @@ it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s",
   mocks.actor = null;
   mocks.locale = locale;
   const html = renderToStaticMarkup(await Page());
-  expect(html).toContain(getDictionary(locale).workspace.signInRequired);
+  expect(html).toContain(getUserPlatformCopy(locale).signInRequired);
   expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fresources%2Fnew"');
   expect(mocks.forms).not.toHaveBeenCalled();
 });

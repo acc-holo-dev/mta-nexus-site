@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   locale: "en" as "en" | "ru",
@@ -13,6 +14,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/resources/prd_a/deliveries",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -28,9 +30,11 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
     </button>
   ),
 }));
-import Page from "../apps/web/src/app/workspace/library/downloads/page";
+
 import Detail from "../apps/web/src/app/workspace/library/downloads/[id]/page";
+import Page from "../apps/web/src/app/workspace/library/downloads/page";
 import Publisher from "../apps/web/src/app/workspace/resources/[id]/deliveries/page";
+
 const context = { params: Promise.resolve({ id: "dlv_a" }) };
 beforeEach(() => {
   vi.clearAllMocks();

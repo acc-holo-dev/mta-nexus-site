@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
 import {
   financialReferenceLabel,
@@ -38,17 +38,7 @@ export default async function FinancialStatements({
       if (typeof value === "string") returnQuery.set(key, value);
     }
     const returnPath = `/workspace/finance${returnQuery.size ? `?${returnQuery}` : ""}`;
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const currency = ["USD", "EUR", "RUB"].find((value) => value === query.currency),
     organizationId =
