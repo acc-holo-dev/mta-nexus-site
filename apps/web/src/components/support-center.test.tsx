@@ -53,6 +53,7 @@ describe("staff support queue UI", () => {
     expect(customer).toContain(copy.removeContext);
     expect(customer).toContain(copy.allStatuses);
     expect(customer).toContain(copy.allCategories);
+    expect(customer).toContain("focus-visible:ring-2");
     expect(customer).toContain('action="/support"');
     expect(staff).toContain('action="/admin/support"');
   });
