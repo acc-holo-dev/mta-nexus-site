@@ -69,6 +69,7 @@ it("does not query private resources when signed out", async () => {
   const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
   expect(mocks.list).not.toHaveBeenCalled();
   expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fresources"');
+  expect(html).toContain('href="/auth/register?next=%2Fworkspace%2Fresources"');
 });
 it("preserves publisher filters in the guest login return path", async () => {
   mocks.actor = null;
@@ -78,6 +79,9 @@ it("preserves publisher filters in the guest login return path", async () => {
   expect(mocks.list).not.toHaveBeenCalled();
   expect(html).toContain(
     'href="/auth/login?next=%2Fworkspace%2Fresources%3Fstatus%3Dpending_review%26page%3D2"',
+  );
+  expect(html).toContain(
+    'href="/auth/register?next=%2Fworkspace%2Fresources%3Fstatus%3Dpending_review%26page%3D2"',
   );
 });
 it("rejects invalid status filters before querying", async () => {

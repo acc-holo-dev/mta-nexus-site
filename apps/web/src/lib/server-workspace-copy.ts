@@ -11,6 +11,9 @@ const en = {
   preview: "Review selection",
   previewTitle: "Confirm server visibility",
   confirm: "Save reviewed visibility",
+  commitConfirm: "I confirm the reviewed visibility changes shown above.",
+  confirmWrite:
+    "The selected servers will use the reviewed visibility. Public discovery may change for affected servers.",
   cancel: "Cancel",
   busy: "Checking and saving…",
   saved: "The reviewed visibility has been saved.",
@@ -63,6 +66,9 @@ const ru: typeof en = {
   preview: "Проверить выбор",
   previewTitle: "Подтвердите видимость серверов",
   confirm: "Сохранить проверенную видимость",
+  commitConfirm: "Подтверждаю показанные выше проверенные изменения видимости.",
+  confirmWrite:
+    "Выбранные серверы получат проверенную видимость. Публичное отображение затронутых серверов может измениться.",
   cancel: "Отмена",
   busy: "Проверяем и сохраняем…",
   saved: "Проверенная видимость сохранена.",

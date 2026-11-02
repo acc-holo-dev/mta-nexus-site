@@ -36,6 +36,9 @@ vi.mock("react", async (original) => ({
   },
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction: (...args: unknown[]) => harness.confirm(...args),
+}));
 
 import { ManagedServerVisibilityBatch } from "../apps/web/src/components/managed-server-visibility-batch";
 import { serverWorkspaceCopy } from "../apps/web/src/lib/server-workspace-copy";
@@ -76,11 +79,40 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
+  const type = element.type as { displayName?: string; name?: string } | string;
+  const componentName =
+    typeof type === "function"
+      ? type.name
+      : typeof type === "object" && type
+        ? type.displayName
+        : undefined;
+  if (componentName === "Button") {
     return [
       { ...element, type: "button" } as Element,
       ...descendants(element.props.children as ReactNode),
+    ];
+  }
+  if (componentName === "ActionConfirmCheckbox") {
+    const props = element.props as {
+      id: string;
+      checked: boolean;
+      disabled?: boolean;
+      onCheckedChange: (checked: boolean) => void;
+      children: ReactNode;
+    };
+    return [
+      {
+        type: "input",
+        props: {
+          type: "checkbox",
+          id: props.id,
+          checked: props.checked,
+          disabled: props.disabled,
+          onChange: (event: { target: { checked: boolean } }) =>
+            props.onCheckedChange(event.target.checked),
+        },
+      } as Element,
+      ...descendants(props.children),
     ];
   }
   return [element, ...descendants(element.props.children as ReactNode)];
@@ -96,6 +128,24 @@ function button(nodes: Element[], label: string) {
 }
 function click(nodes: Element[], label: string) {
   return (button(nodes, label).props.onClick as () => void)();
+}
+function acknowledgeBatchCommit(nodes: Element[]) {
+  const checkbox = nodes.find(
+    (node) =>
+      node.type === "input" &&
+      node.props.type === "checkbox" &&
+      typeof node.props.id === "string" &&
+      (node.props.id.includes("batch-commit") ||
+        node.props.id === "managed-server-visibility-batch-commit"),
+  );
+  if (!checkbox) throw Error("Missing batch commit acknowledgement");
+  (checkbox.props.onChange as (event: { target: { checked: boolean } }) => void)({
+    target: { checked: true },
+  });
+}
+async function commitBatch(renderFn: () => Element[], label: string) {
+  acknowledgeBatchCommit(renderFn());
+  await (button(renderFn(), label).props.onClick as () => Promise<void>)();
 }
 const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -116,6 +166,7 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
+  harness.confirm.mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
   vi.stubGlobal("window", { location: { reload: harness.reload } });
   harness.fetch.mockResolvedValue(response(preview));
@@ -133,16 +184,21 @@ it.each(["en", "ru"] as const)(
     const nodes = render(locale),
       copy = serverWorkspaceCopy(locale);
     expect(nodes.find((node) => node.type === "fieldset")?.props.disabled).toBe(true);
-    expect(nodes.filter((node) => node.type === "input").every((node) => node.props.disabled)).toBe(
-      true,
-    );
+    expect(
+      nodes
+        .filter(
+          (node) =>
+            node.type === "input" && node.props.id !== "managed-server-visibility-batch-commit",
+        )
+        .every((node) => node.props.disabled),
+    ).toBe(true);
     expect(harness.fetch.mock.calls[0][0]).toBe("/api/workspace/servers/visibility/preview");
     expect(JSON.parse(harness.fetch.mock.calls[0][1].body)).toEqual({
       serverIds: ["a", "b"],
       visibility: "private",
     });
     harness.fetch.mockResolvedValue(response(ack));
-    click(nodes, copy.confirm);
+    await commitBatch(() => render(locale), copy.confirm);
     await vi.waitFor(() =>
       expect(render(locale).some((node) => node.props.children === copy.saved)).toBe(true),
     );
@@ -211,9 +267,10 @@ it("coalesces repeated preview and confirmation clicks and blocks replay after c
     ),
   );
   harness.fetch.mockResolvedValue(response(ack));
+  acknowledgeBatchCommit(render());
   const commit = button(render(), serverWorkspaceCopy("en").confirm);
-  (commit.props.onClick as () => void)();
-  (commit.props.onClick as () => void)();
+  await (commit.props.onClick as () => Promise<void>)();
+  await (commit.props.onClick as () => Promise<void>)();
   await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledOnce());
   (commit.props.onClick as () => void)();
   expect(harness.fetch).toHaveBeenCalledTimes(2);
@@ -245,7 +302,6 @@ it.each(["revision", "scope", "network"])(
   "requires full reload after an unconfirmed write and blocks retained handlers (%s)",
   async (kind) => {
     await review();
-    const commit = button(render(), serverWorkspaceCopy("en").confirm);
     if (kind === "network") harness.fetch.mockRejectedValueOnce(Error("Private transport details"));
     else
       harness.fetch.mockResolvedValueOnce(
@@ -257,13 +313,17 @@ it.each(["revision", "scope", "network"])(
           })),
         }),
       );
-    (commit.props.onClick as () => void)();
+    const retainedCommit = button(render(), serverWorkspaceCopy("en").confirm);
+    acknowledgeBatchCommit(render());
+    await (
+      button(render(), serverWorkspaceCopy("en").confirm).props.onClick as () => Promise<void>
+    )();
     await vi.waitFor(() =>
       expect(
         render().some((node) => node.props.children === serverWorkspaceCopy("en").uncertain),
       ).toBe(true),
     );
-    (commit.props.onClick as () => void)();
+    await (retainedCommit.props.onClick as () => Promise<void>)();
     expect(harness.fetch).toHaveBeenCalledTimes(2);
     expect(harness.refresh).not.toHaveBeenCalled();
     expect(render().some((node) => String(node.props.children).includes("Private transport"))).toBe(
@@ -278,7 +338,7 @@ it("shows a safe stale-review error and does not retry it automatically", async 
   harness.fetch.mockResolvedValueOnce(
     response({ code: "SERVER_BATCH_CHANGED", error: "Sensitive server information" }, 409),
   );
-  click(render(), serverWorkspaceCopy("en").confirm);
+  await commitBatch(() => render(), serverWorkspaceCopy("en").confirm);
   await vi.waitFor(() =>
     expect(render().some((node) => node.props.children === serverWorkspaceCopy("en").changed)).toBe(
       true,
@@ -301,7 +361,7 @@ it.each(["preview", "write"])(
     if (stage === "preview") {
       selected();
       click(render(), serverWorkspaceCopy("en").preview);
-    } else click(render(), serverWorkspaceCopy("en").confirm);
+    } else await commitBatch(() => render(), serverWorkspaceCopy("en").confirm);
     const signal = harness.fetch.mock.calls.at(-1)?.[1].signal as AbortSignal;
     harness.cleanups.forEach((cleanup) => {
       cleanup?.();
@@ -321,7 +381,7 @@ it("retains confirmed success if refreshing the page fails", async () => {
     throw Error("Refresh failed");
   });
   harness.fetch.mockResolvedValueOnce(response(ack));
-  click(render(), serverWorkspaceCopy("en").confirm);
+  await commitBatch(() => render(), serverWorkspaceCopy("en").confirm);
   await vi.waitFor(() =>
     expect(render().some((node) => node.props.children === serverWorkspaceCopy("en").saved)).toBe(
       true,

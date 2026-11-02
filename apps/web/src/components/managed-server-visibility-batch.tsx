@@ -13,6 +13,8 @@ import {
 import { serverWorkspaceCopy, serverWorkspaceError } from "../lib/server-workspace-copy";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+import { confirmAction } from "./confirm-action";
 export function ManagedServerVisibilityBatch({
   items,
   locale,
@@ -26,6 +28,7 @@ export function ManagedServerVisibilityBatch({
   const [selected, setSelected] = useState<string[]>([]),
     [visibility, setVisibility] = useState<"public" | "unlisted" | "private">("private"),
     [preview, setPreview] = useState<ServerVisibilityPreview | null>(null),
+    [commitAcknowledged, setCommitAcknowledged] = useState(false),
     [busy, setBusy] = useState(false),
     [blocked, setBlocked] = useState(false),
     [saved, setSaved] = useState(false),
@@ -89,6 +92,7 @@ export function ManagedServerVisibilityBatch({
       const result = confirmsServerVisibilityPreview(raw, input);
       if (!result) throw Error(copy.unavailable);
       setPreview(result);
+      setCommitAcknowledged(false);
     } catch (failure) {
       if (mounted.current) {
         const result = message(failure, copy.unavailable);
@@ -108,10 +112,24 @@ export function ManagedServerVisibilityBatch({
       pending.current ||
       locked.current ||
       !preview ||
-      !preview.items.some((item) => item.changed)
+      !preview.items.some((item) => item.changed) ||
+      !commitAcknowledged
     )
       return;
     const reviewed = preview;
+    if (
+      reviewed.items.some((item) => item.changed) &&
+      !(await confirmAction({
+        title: copy.previewTitle,
+        object: `${reviewed.items.filter((item) => item.changed).length}`,
+        scope: labels[reviewed.visibility],
+        consequences: copy.confirmWrite,
+        confirmLabel: copy.confirm,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+      }))
+    )
+      return;
     pending.current = true;
     locked.current = true;
     setBlocked(true);
@@ -278,11 +296,26 @@ export function ManagedServerVisibilityBatch({
               {copy.noChanges}
             </p>
           )}
+          <ActionConfirmCheckbox
+            id="managed-server-visibility-batch-commit"
+            checked={commitAcknowledged}
+            required
+            disabled={busy || blocked || !preview.items.some((item) => item.changed)}
+            checkboxClassName={actionConfirmCheckboxFocusClass}
+            onCheckedChange={setCommitAcknowledged}
+          >
+            {copy.commitConfirm}
+          </ActionConfirmCheckbox>
           <div className="flex flex-wrap gap-3">
             <Button
               type="button"
               variant="outline"
-              disabled={busy || blocked || !preview.items.some((item) => item.changed)}
+              disabled={
+                busy ||
+                blocked ||
+                !preview.items.some((item) => item.changed) ||
+                !commitAcknowledged
+              }
               className="min-h-11 font-semibold text-accent"
               onClick={() => void commit()}
             >
@@ -293,7 +326,10 @@ export function ManagedServerVisibilityBatch({
               variant="ghost"
               disabled={busy || blocked}
               className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              onClick={() => setPreview(null)}
+              onClick={() => {
+                setPreview(null);
+                setCommitAcknowledged(false);
+              }}
             >
               {copy.cancel}
             </Button>

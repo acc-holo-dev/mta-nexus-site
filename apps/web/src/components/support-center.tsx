@@ -21,9 +21,10 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../lib/support-workspace-copy";
+import { platformFieldClass } from "../lib/user-platform-client";
 import { currentBrowserReturnPath } from "./auth-return-path";
-import { PlatformSignIn } from "./platform-sign-in";
 import { useNexusLocale } from "./locale-context";
+import { PlatformSignIn } from "./platform-sign-in";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
 
@@ -450,7 +451,7 @@ export function SupportCenter({
               onChange={(event) => {
                 setStaffCategory(event.target.value);
               }}
-              className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+              className={platformFieldClass}
             >
               <option value="">{copy.allCategories}</option>
               {categories.map(([value, label]) => (

@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { platformSignInFocusClass } from "../../../components/guest-auth-links";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import {
   authorPublicationDeskHref,
@@ -69,7 +70,7 @@ export default async function AuthorContentPage({
         </div>
         <Link
           href="/workspace/content/new"
-          className="inline-flex min-h-11 items-center rounded-lg bg-accent px-4 text-sm font-semibold text-white"
+          className={`inline-flex min-h-11 items-center rounded-lg bg-accent px-4 text-sm font-semibold text-white ${platformSignInFocusClass}`}
         >
           {labels.create}
         </Link>

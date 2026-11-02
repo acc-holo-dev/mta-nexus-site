@@ -78,6 +78,7 @@ it("seeds guest sign-in with the current pathname return target", () => {
   expect(gate.props.returnPath).toBeUndefined();
   const html = renderToStaticMarkup(createElement(gate.type, gate.props));
   expect(html).toContain('href="/auth/login?next=%2Fsupport"');
+  expect(html).toContain('href="/auth/register?next=%2Fsupport"');
   expect(html).toContain(getDictionary("en").workspace.signInRequired);
   expect(html).toContain(getDictionary("en").workspace.signIn);
 });

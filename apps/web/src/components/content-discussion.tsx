@@ -454,9 +454,9 @@ export function ContentDiscussion({
           {managementSuccess}
         </p>
       )}
-      <div className="space-y-3" aria-busy={loading}>
-        {loading && !page?.items.length ? (
-          <p role="status" aria-live="polite" className="text-sm text-muted">
+      <div className="space-y-3">
+        {loading ? (
+          <p role="status" aria-live="polite" aria-busy="true" className="text-sm text-muted">
             {copy.loading}
           </p>
         ) : null}

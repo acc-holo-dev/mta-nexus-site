@@ -39,5 +39,6 @@ it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s",
   const html = renderToStaticMarkup(await Page());
   expect(html).toContain(getDictionary(locale).workspace.signInRequired);
   expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fresources%2Fnew"');
+  expect(html).toContain('href="/auth/register?next=%2Fworkspace%2Fresources%2Fnew"');
   expect(mocks.forms).not.toHaveBeenCalled();
 });

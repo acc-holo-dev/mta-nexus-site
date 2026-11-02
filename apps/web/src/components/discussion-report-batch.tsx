@@ -18,6 +18,8 @@ import {
 import { reportBatchCopy, reportBatchError } from "../lib/report-batch-copy";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+import { confirmAction } from "./confirm-action";
 
 type Input = z.infer<typeof reportBatchPreviewInput>;
 export function DiscussionReportBatch({
@@ -41,6 +43,7 @@ export function DiscussionReportBatch({
     [notes, setNotes] = useState(""),
     [busy, setBusy] = useState(false),
     [preview, setPreview] = useState<ReportBatchPreview | null>(null),
+    [commitAcknowledged, setCommitAcknowledged] = useState(false),
     [error, setError] = useState(""),
     [saved, setSaved] = useState(false),
     [blocked, setBlocked] = useState(false);
@@ -72,6 +75,7 @@ export function DiscussionReportBatch({
   }
   function resetReview() {
     setPreview(null);
+    setCommitAcknowledged(false);
     setError("");
   }
   function toggle(id: string) {
@@ -116,6 +120,7 @@ export function DiscussionReportBatch({
       const result = confirmsReportBatchPreview(raw, contentId, commentId, payload);
       if (!result) throw Error(copy.unavailable);
       setPreview(result);
+      setCommitAcknowledged(false);
     } catch (failure) {
       if (mounted.current) {
         const message = safeMessage(failure, copy.unavailable);
@@ -131,8 +136,22 @@ export function DiscussionReportBatch({
     }
   }
   async function commit() {
-    if (pending.current || locked.current || blocked || !preview) return;
+    if (pending.current || locked.current || blocked || !preview || !commitAcknowledged) return;
     const reviewed = preview;
+    if (
+      reviewed.action !== "review" &&
+      !(await confirmAction({
+        title: copy.previewTitle,
+        object: reviewed.publication.title,
+        scope: `${reviewed.items.length}`,
+        consequences: `${copy.notes}: ${reviewed.notes}`,
+        confirmLabel: copy.confirm,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: reviewed.action === "dismiss",
+      }))
+    )
+      return;
     pending.current = true;
     setBusy(true);
     setBlocked(true);
@@ -330,10 +349,20 @@ export function DiscussionReportBatch({
               </li>
             ))}
           </ol>
+          <ActionConfirmCheckbox
+            id={`discussion-report-batch-commit-${contentId}-${commentId ?? "publication"}`}
+            checked={commitAcknowledged}
+            required
+            disabled={busy || blocked}
+            checkboxClassName={actionConfirmCheckboxFocusClass}
+            onCheckedChange={setCommitAcknowledged}
+          >
+            {copy.commitConfirm}
+          </ActionConfirmCheckbox>
           <div className="flex flex-wrap gap-3">
             <Button
               type="button"
-              disabled={busy || blocked}
+              disabled={busy || blocked || !commitAcknowledged}
               className="min-h-11"
               onClick={() => void commit()}
               variant="outline"
@@ -344,7 +373,7 @@ export function DiscussionReportBatch({
               type="button"
               disabled={busy || blocked}
               className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              onClick={() => setPreview(null)}
+              onClick={() => resetReview()}
               variant="ghost"
             >
               {copy.cancel}

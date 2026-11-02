@@ -6,9 +6,8 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { supportQuery } from "../lib/support-workspace-contract";
 import { supportWorkspaceCopy } from "../lib/support-workspace-copy";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformGuestAuthPanel } from "./platform-guest-auth-panel";
 import { PlatformSignIn } from "./platform-sign-in";
-import { GuestAuthLinks } from "./guest-auth-links";
 import { SupportCaseThread } from "./support-case-thread";
 import { SupportCenter } from "./support-center";
 export async function supportMetadata(staff = false) {
@@ -27,8 +26,7 @@ export async function SupportPageSurface({
   const locale = await getRequestLocale(),
     copy = supportWorkspaceCopy(locale),
     dictionary = getDictionary(locale),
-    support = dictionary.support,
-    workspace = dictionary.workspace;
+    support = dictionary.support;
   const base = staff ? "/admin/support" : "/support";
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {})) {
@@ -48,18 +46,7 @@ export async function SupportPageSurface({
           <p className="max-w-3xl text-sm text-muted">{support.description}</p>
           <p className="text-xs text-warning">{support.noGuaranteedSla}</p>
         </header>
-        <div className="nexus-panel space-y-3 p-5">
-          <p className="text-sm text-secondary">{workspace.signInRequired}</p>
-          {workspace.signInMessage ? (
-            <p className="text-sm text-secondary">{workspace.signInMessage}</p>
-          ) : null}
-          <GuestAuthLinks
-            loginHref={authEntryHref("login", listReturnPath)}
-            registerHref={authEntryHref("register", listReturnPath)}
-            signInLabel={workspace.signIn}
-            createAccountLabel={workspace.createAccount}
-          />
-        </div>
+        <PlatformGuestAuthPanel locale={locale} returnPath={listReturnPath} />
       </div>
     );
   }

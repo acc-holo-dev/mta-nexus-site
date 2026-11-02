@@ -36,6 +36,9 @@ vi.mock("react", async (original) => ({
   },
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({
+  confirmAction: (...args: unknown[]) => harness.confirm(...args),
+}));
 
 import { DiscussionReportBatch } from "../apps/web/src/components/discussion-report-batch";
 import { reportBatchCopy } from "../apps/web/src/lib/report-batch-copy";
@@ -89,11 +92,40 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
+  const type = element.type as { displayName?: string; name?: string } | string;
+  const componentName =
+    typeof type === "function"
+      ? type.name
+      : typeof type === "object" && type
+        ? type.displayName
+        : undefined;
+  if (componentName === "Button") {
     return [
       { ...element, type: "button" } as Element,
       ...descendants(element.props.children as ReactNode),
+    ];
+  }
+  if (componentName === "ActionConfirmCheckbox") {
+    const props = element.props as {
+      id: string;
+      checked: boolean;
+      disabled?: boolean;
+      onCheckedChange: (checked: boolean) => void;
+      children: ReactNode;
+    };
+    return [
+      {
+        type: "input",
+        props: {
+          type: "checkbox",
+          id: props.id,
+          checked: props.checked,
+          disabled: props.disabled,
+          onChange: (event: { target: { checked: boolean } }) =>
+            props.onCheckedChange(event.target.checked),
+        },
+      } as Element,
+      ...descendants(props.children),
     ];
   }
   return [element, ...descendants(element.props.children as ReactNode)];
@@ -118,6 +150,24 @@ function button(nodes: Element[], label: string) {
 function click(nodes: Element[], label: string) {
   return (button(nodes, label).props.onClick as () => void)();
 }
+function acknowledgeBatchCommit(nodes: Element[]) {
+  const checkbox = nodes.find(
+    (node) =>
+      node.type === "input" &&
+      node.props.type === "checkbox" &&
+      typeof node.props.id === "string" &&
+      (node.props.id.includes("batch-commit") ||
+        node.props.id.startsWith("discussion-report-batch-commit-")),
+  );
+  if (!checkbox) throw Error("Missing batch commit acknowledgement");
+  (checkbox.props.onChange as (event: { target: { checked: boolean } }) => void)({
+    target: { checked: true },
+  });
+}
+async function commitBatch(renderFn: () => Element[], label: string) {
+  acknowledgeBatchCommit(renderFn());
+  await (button(renderFn(), label).props.onClick as () => Promise<void>)();
+}
 const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 function select(locale: "ru" | "en" = "en", publication = false) {
@@ -141,6 +191,7 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
+  harness.confirm.mockResolvedValue(true);
   harness.fetch
     .mockReset()
     .mockImplementation((url: string) =>
@@ -170,7 +221,7 @@ it.each(["ru", "en"] as const)(
       notes: "Recorded reason",
     });
     expect(render(locale).some((node) => node.props.children === "Reviewed full text")).toBe(true);
-    click(render(locale), copy.confirm);
+    await commitBatch(() => render(locale), copy.confirm);
     await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
     expect(harness.fetch).toHaveBeenCalledTimes(2);
     expect(harness.fetch.mock.calls[1][0]).toBe(
@@ -222,8 +273,8 @@ it("coalesces rapid preview/decision commands and blocks stale handler retries a
     }),
   );
   const confirmed = render();
-  click(confirmed, reportBatchCopy("en").confirm);
-  click(confirmed, reportBatchCopy("en").confirm);
+  await commitBatch(() => render(), reportBatchCopy("en").confirm);
+  click(render(), reportBatchCopy("en").confirm);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
   finish(response(ack));
   await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
@@ -263,7 +314,7 @@ it.each([
   await review();
   harness.fetch.mockResolvedValue(response(reply));
   const before = render();
-  click(before, reportBatchCopy("en").confirm);
+  await commitBatch(() => render(), reportBatchCopy("en").confirm);
   await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
   expect(harness.refresh).not.toHaveBeenCalled();
   click(before, reportBatchCopy("en").confirm);
@@ -276,7 +327,7 @@ it("shows a localized stale-review failure without exposing server detail", asyn
   harness.fetch.mockResolvedValue(
     response({ code: "REPORT_BATCH_CHANGED", error: "PRIVATE_SQL" }, 409),
   );
-  click(render("ru"), reportBatchCopy("ru").confirm);
+  await commitBatch(() => render("ru"), reportBatchCopy("ru").confirm);
   await vi.waitFor(() =>
     expect(render("ru").some((node) => node.props.role === "alert")).toBe(true),
   );
@@ -313,7 +364,7 @@ it("retains confirmed saved decisions if refreshing the page fails", async () =>
   harness.refresh.mockImplementationOnce(() => {
     throw Error("PRIVATE_REFRESH");
   });
-  click(render(), reportBatchCopy("en").confirm);
+  await commitBatch(() => render(), reportBatchCopy("en").confirm);
   await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
   expect(
     render().some(
@@ -367,7 +418,7 @@ it.each(["ru", "en"] as const)(
       ),
     ).toBe(true);
     const reviewed = render(locale, true, true);
-    click(reviewed, reportBatchCopy(locale).confirm);
+    await commitBatch(() => render(locale, true, true), reportBatchCopy(locale).confirm);
     await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
     expect(harness.fetch.mock.calls[1][0]).toBe("/api/admin/community/post/reports/batch");
     expect(JSON.parse(harness.fetch.mock.calls[1][1].body).previewRevision).toBe(token);

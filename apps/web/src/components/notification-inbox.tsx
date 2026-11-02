@@ -237,7 +237,7 @@ export function NotificationInbox({
       timeZone: "UTC",
     }).format(new Date(value));
   return (
-    <section className="space-y-4" aria-busy={busy} aria-label={copy.title}>
+    <section className="space-y-4" aria-label={copy.title}>
       <p className="text-sm text-muted">
         {copy.totalUnread}: <strong className="text-primary">{page.unreadCount}</strong>
       </p>
@@ -274,7 +274,7 @@ export function NotificationInbox({
         <p className="text-xs text-muted">{copy.exportHelp}</p>
       </div>
       {busy && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" aria-busy="true" className="text-sm text-muted">
           {exporting ? copy.exportLoading : copy.loading}
         </p>
       )}
