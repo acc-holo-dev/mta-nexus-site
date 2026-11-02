@@ -205,7 +205,17 @@ export default async function Page({
           {v.export}
         </a>
         <p className="text-sm text-secondary">{v.snapshotNote}</p>
-        {!report.items.length && <p>{v.empty}</p>}
+        {!report.items.length && (
+          <div className="space-y-3">
+            <p>{v.empty}</p>
+            <Link
+              href={collectionInventoryHref()}
+              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              {v.clear}
+            </Link>
+          </div>
+        )}
         <ol className="space-y-4">
           {report.items.map((item) => {
             const first = item.memberships[0],

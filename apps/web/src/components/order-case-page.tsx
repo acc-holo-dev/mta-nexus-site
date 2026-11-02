@@ -298,7 +298,15 @@ export async function OrderCaseListPage({
           ))}
         </ol>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <div className="space-y-3">
+          <p className="text-secondary">{copy.empty}</p>
+          <Link
+            href={base}
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            {copy.clear}
+          </Link>
+        </div>
       )}
       <Pagination page={result.page} totalPages={result.totalPages} locale={locale} query={query} />
     </div>
