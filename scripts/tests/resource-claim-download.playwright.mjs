@@ -466,7 +466,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
 });
 
 test("J5 paid resource stays fail-closed and accessibly explained", async ({ page }) => {
-  const name = "paid resource closed-beta accessibility without payment mutation";
+  const name = "paid resource free-beta accessibility without payment mutation";
   let status = "FAIL";
   const mutationRequests = [];
 
@@ -555,7 +555,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({ pag
     assert.deepEqual(
       mutationRequests,
       [],
-      "Paid closed-beta screen must not create checkout or free-claim mutations",
+      "Paid free-beta screen must not create checkout or free-claim mutations",
     );
 
     results.push({

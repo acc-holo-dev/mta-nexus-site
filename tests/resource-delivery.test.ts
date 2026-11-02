@@ -1,11 +1,11 @@
 import type { Readable } from "node:stream";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildRepository, sessionRepository, userRepository } from "@nexus/db";
-import { assignIntegrationStaffPassword } from "./integration-staff-password";
+import type { Product, User } from "@nexus/domain";
 import { storageService } from "@nexus/storage";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import { productService } from "../apps/web/src/lib/services/product-service";
-import type { Product, User } from "@nexus/domain";
+import { assignIntegrationStaffPassword } from "./integration-staff-password";
 
 describe("free resource delivery lifecycle", () => {
   const suffix = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -124,7 +124,7 @@ describe("free resource delivery lifecycle", () => {
         buildId: build.id,
         expectedRevision: Number(build.revision),
         decision: "approve",
-        notes: "Archive verified for closed beta",
+        notes: "Archive verified for open free beta",
         expectedPasswordHash: moderatorPasswordHash,
       },
       moderator,

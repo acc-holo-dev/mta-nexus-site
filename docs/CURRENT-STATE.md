@@ -4,8 +4,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `b8cb990567c8b7cfa2c05a383fbd7b5047b71a14` (`fix(web): announce support case status updates with aria-live`).
-- **Verified CI green on that tip:** [CI 41395228352](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395228352) (lint/unit selected scope).
+- **Tip SHA:** `59326c30a91c009310d1ee314a024a4ebd4b6c10` (`fix(web): announce discussion and collection save status with aria-live`).
+- **Verified CI green on that tip:** [CI 41395566631](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395566631) (lint/unit selected scope).
 - **Prior full selected-scope green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path, QA/follow first-paint.
@@ -31,11 +31,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** support case aria-live; tip docs sync to `b8cb9905…` / CI 41395228352 (lint/unit selected).
+**Последняя локальная волна:** discussion/collection aria-live; tip docs sync to `59326c30…` / CI 41395566631 (lint/unit selected).
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `b8cb9905…` (lint/unit selected); last full selected green `a27e55a5…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `59326c30…` (lint/unit selected); last full selected green `a27e55a5…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
