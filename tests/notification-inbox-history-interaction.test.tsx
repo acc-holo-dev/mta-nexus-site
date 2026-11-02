@@ -273,7 +273,11 @@ it("coalesces rapid commands while a write or refresh is pending", async () => {
   click(nodes, "Mark as read");
   click(nodes, "Reload saved inbox");
   expect(harness.fetch).toHaveBeenCalledTimes(1);
-  expect(render()[0].props["aria-busy"]).toBe(true);
+  expect(
+    render().some(
+      (node) => node.props.role === "status" && node.props["aria-busy"] === "true",
+    ),
+  ).toBe(true);
   complete(response({ isRead: true, ids: ["owned"] }));
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
 });
