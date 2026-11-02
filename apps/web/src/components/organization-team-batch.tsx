@@ -170,6 +170,7 @@ export function OrganizationTeamBatch({
               <label className="flex min-h-11 items-center gap-3 rounded border border-base p-2 text-sm text-primary">
                 <input
                   type="checkbox"
+                  className={actionConfirmCheckboxFocusClass}
                   checked={selected.includes(member.id)}
                   onChange={(event) =>
                     setSelected(
@@ -222,6 +223,7 @@ export function OrganizationTeamBatch({
           <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
             <input
               type="checkbox"
+              className={actionConfirmCheckboxFocusClass}
               checked={enabled}
               onChange={(event) => setEnabled(event.target.checked)}
             />

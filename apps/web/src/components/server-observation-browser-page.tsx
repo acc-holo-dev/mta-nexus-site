@@ -232,18 +232,20 @@ function ServerObservationBrowserPanel({
         <Button type="submit" className="min-h-11 font-semibold">
           {copy.apply}
         </Button>
-        <Link
-          href={serverObservationBrowserHref(path, {
-            ...state,
-            query: "",
-            players: "all",
-            password: "all",
-            responding: "all",
-          })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
+        {observationFiltersActive ? (
+          <Link
+            href={serverObservationBrowserHref(path, {
+              ...state,
+              query: "",
+              players: "all",
+              password: "all",
+              responding: "all",
+            })}
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.reset}
+          </Link>
+        ) : null}
       </form>
       <p className="text-sm text-muted">{copy.scope}</p>
       {report.observations.length === 0 ? (

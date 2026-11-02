@@ -9,6 +9,7 @@ import { communityReportCopy, communityReportMutationError } from "../lib/commun
 import { getDictionary, type Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { GuestAuthLinks } from "./guest-auth-links";
 export function CommunityReportForm({
   targetType,
   targetId,
@@ -119,20 +120,12 @@ export function CommunityReportForm({
         </Button>
       </div>
       {!authenticated ? (
-        <div className="flex flex-wrap items-center gap-4">
-          <Link
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href={loginHref}
-          >
-            {copy.signIn}
-          </Link>
-          <Link
-            className="inline-flex min-h-11 items-center text-sm text-secondary underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href={registerHref}
-          >
-            {workspace.createAccount}
-          </Link>
-        </div>
+        <GuestAuthLinks
+          loginHref={loginHref}
+          registerHref={registerHref}
+          signInLabel={copy.signIn}
+          createAccountLabel={workspace.createAccount}
+        />
       ) : result ? (
         <div className="space-y-2">
           <p

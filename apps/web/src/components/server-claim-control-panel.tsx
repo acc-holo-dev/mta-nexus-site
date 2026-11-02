@@ -2,7 +2,6 @@
 
 import { Button } from "@nexus/ui";
 import { KeyRound, ShieldCheck } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
@@ -13,6 +12,7 @@ import {
 } from "../lib/server-claim-confirmation";
 import { serverClaimErrorMessage } from "../lib/server-claim-status-view";
 import { authEntryHref } from "./auth-return-path";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
 
 export function ServerClaimControlPanel({
@@ -192,15 +192,15 @@ export function ServerClaimControlPanel({
       )}
 
       {requiresLogin && (
-        <p className="text-xs text-secondary">
-          <Link
-            href={authEntryHref("login", pathname)}
-            className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.signIn}
-          </Link>{" "}
-          {copy.signInHint}
-        </p>
+        <div className="space-y-2 text-xs text-secondary">
+          <GuestAuthLinks
+            loginHref={authEntryHref("login", pathname)}
+            registerHref={authEntryHref("register", pathname)}
+            signInLabel={copy.signIn}
+            createAccountLabel={dictionary.workspace.createAccount}
+          />
+          <p>{copy.signInHint}</p>
+        </div>
       )}
 
       {error && (

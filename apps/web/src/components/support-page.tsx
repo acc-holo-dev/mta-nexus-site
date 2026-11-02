@@ -8,6 +8,7 @@ import { supportQuery } from "../lib/support-workspace-contract";
 import { supportWorkspaceCopy } from "../lib/support-workspace-copy";
 import { authEntryHref } from "./auth-return-path";
 import { PlatformSignIn } from "./content-catalog-controls";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { SupportCaseThread } from "./support-case-thread";
 import { SupportCenter } from "./support-center";
 export async function supportMetadata(staff = false) {
@@ -52,20 +53,12 @@ export async function SupportPageSurface({
           {workspace.signInMessage ? (
             <p className="text-sm text-secondary">{workspace.signInMessage}</p>
           ) : null}
-          <div className="flex flex-wrap items-center gap-4">
-            <Link
-              href={authEntryHref("login", listReturnPath)}
-              className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {workspace.signIn}
-            </Link>
-            <Link
-              href={authEntryHref("register", listReturnPath)}
-              className="inline-flex min-h-11 items-center text-sm text-secondary underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {workspace.createAccount}
-            </Link>
-          </div>
+          <GuestAuthLinks
+            loginHref={authEntryHref("login", listReturnPath)}
+            registerHref={authEntryHref("register", listReturnPath)}
+            signInLabel={workspace.signIn}
+            createAccountLabel={workspace.createAccount}
+          />
         </div>
       </div>
     );

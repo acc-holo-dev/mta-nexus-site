@@ -11,6 +11,7 @@ import {
 } from "../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { authEntryHref } from "./auth-return-path";
+import { GuestAuthLinks } from "./guest-auth-links";
 
 type Filters = ReturnType<typeof parseContentPage>;
 export function ContentCatalogControls({
@@ -126,9 +127,6 @@ export function ContentPageNavigation({
     </nav>
   );
 }
-const platformSignInFocusClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
 export function PlatformSignIn({
   locale,
   returnPath,
@@ -145,20 +143,13 @@ export function PlatformSignIn({
       {copy.signInMessage ? (
         <p className="mx-auto max-w-md text-sm text-secondary">{copy.signInMessage}</p>
       ) : null}
-      <div className="flex flex-wrap items-center justify-center gap-4">
-        <Link
-          href={authEntryHref("login", nextPath)}
-          className={`inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white underline-offset-4 hover:underline ${platformSignInFocusClass}`}
-        >
-          {copy.signIn}
-        </Link>
-        <Link
-          href={authEntryHref("register", nextPath)}
-          className={`inline-flex min-h-11 items-center text-sm text-secondary underline ${platformSignInFocusClass}`}
-        >
-          {copy.createAccount}
-        </Link>
-      </div>
+      <GuestAuthLinks
+        loginHref={authEntryHref("login", nextPath)}
+        registerHref={authEntryHref("register", nextPath)}
+        signInLabel={copy.signIn}
+        createAccountLabel={copy.createAccount}
+        className="justify-center"
+      />
     </section>
   );
 }

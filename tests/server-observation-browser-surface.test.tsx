@@ -158,6 +158,7 @@ it("keeps invalid, unavailable, revoked and genuinely empty results distinct", a
   state.read.mockResolvedValueOnce(empty);
   const html = renderToStaticMarkup(await page());
   expect(html).toContain("В этом периоде сохранённых наблюдений нет.");
+  expect(html).not.toContain("Сбросить фильтры");
   expect(html).toContain('disabled=""');
   state.read.mockResolvedValueOnce(empty);
   const filtered = renderToStaticMarkup(await page({ q: "Lua" }));

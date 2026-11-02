@@ -30,6 +30,7 @@ import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
+import { GuestAuthLinks } from "./guest-auth-links";
 
 export function ContentDiscussion({
   slug,
@@ -414,13 +415,15 @@ export function ContentDiscussion({
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
           {!viewer && (
-            <Link
-              className="text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={loginHref}
-              onClick={() => persistComposeDraft()}
-            >
-              {copy.signIn}
-            </Link>
+            <GuestAuthLinks
+              loginHref={loginHref}
+              registerHref={registerHref}
+              signInLabel={copy.signIn}
+              createAccountLabel={workspaceCopy.createAccount}
+              className="gap-3"
+              onLoginClick={() => persistComposeDraft()}
+              onRegisterClick={() => persistComposeDraft()}
+            />
           )}
         </div>
         <DiscussionComposeWriteFeedback

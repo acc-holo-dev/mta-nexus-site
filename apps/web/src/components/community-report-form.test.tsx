@@ -44,8 +44,8 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { CommunityReportForm } from "./community-report-form";
 import { communityReportCopy } from "../lib/community-report-copy";
+import { CommunityReportForm } from "./community-report-form";
 
 type Element = ReactElement<Record<string, unknown>>;
 
@@ -53,6 +53,16 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
+  const type = element.type as
+    | { displayName?: string }
+    | (((props: unknown) => ReactNode) & { displayName?: string })
+    | string;
+  if (
+    typeof type === "function" &&
+    (type.displayName === "GuestAuthLinks" || type.name === "GuestAuthLinks")
+  ) {
+    return descendants(type(element.props));
+  }
   return [element, ...descendants(element.props.children as ReactNode)];
 }
 
@@ -70,9 +80,8 @@ function renderGuestForm() {
 
 beforeEach(() => {
   harness.slots = [];
-  harness.slots[1] = true;
-  harness.slots[8] = true;
-  harness.slots[9] = true;
+  // useState order: loginHref, registerHref, open, pending, type, reason, evidence, error, result
+  harness.slots[2] = true; // open
   harness.cursor = 0;
   harness.cleanups = [];
 });
@@ -82,9 +91,12 @@ afterEach(() => {
 });
 
 it("seeds guest sign-in with the current pathname return target", () => {
-  const signIn = renderGuestForm().find(
-    (node) => node.props.href === "/auth/login?next=%2Farticles%2Fguide",
+  const nodes = renderGuestForm();
+  const signIn = nodes.find((node) => node.props.href === "/auth/login?next=%2Farticles%2Fguide");
+  const register = nodes.find(
+    (node) => node.props.href === "/auth/register?next=%2Farticles%2Fguide",
   );
   expect(signIn).toBeTruthy();
+  expect(register).toBeTruthy();
   expect(String(signIn?.props.children)).toContain(communityReportCopy("en").signIn);
 });

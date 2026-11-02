@@ -8,7 +8,7 @@ import {
 const STATES = ["all", "unread", "read"] as const;
 
 const filterLinkFocusClass =
-  "focus:outline-2 focus:outline-offset-2 focus:outline-[var(--nexus-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function NotificationCenterTabs({
   children,

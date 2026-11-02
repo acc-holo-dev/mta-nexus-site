@@ -17,6 +17,7 @@ import {
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
 } from "../lib/notification-inbox-export-client";
+import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 export function NotificationInbox({
@@ -302,6 +303,7 @@ export function NotificationInbox({
         <label className="inline-flex min-h-11 items-center gap-2 text-sm text-secondary">
           <input
             type="checkbox"
+            className={actionConfirmCheckboxFocusClass}
             checked={page.items.length > 0 && selected.length === page.items.length}
             disabled={disabled || !page.items.length}
             onChange={(event) =>
@@ -374,6 +376,7 @@ export function NotificationInbox({
                   </span>
                   <input
                     type="checkbox"
+                    className={actionConfirmCheckboxFocusClass}
                     checked={selected.includes(item.id)}
                     disabled={disabled}
                     onChange={(event) =>

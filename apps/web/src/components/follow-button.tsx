@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@nexus/ui";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
@@ -11,6 +10,7 @@ import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 type InitialFollowState = {
@@ -48,8 +48,6 @@ function FollowControl({
   const copy = followActionCopy(locale, targetType);
   const workspace = getDictionary(locale).workspace;
   const pathname = usePathname();
-  const authLinkFocus =
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh auth return paths after client navigation.
@@ -190,24 +188,18 @@ function FollowControl({
       if (alive.current) setPending(false);
     }
   }
-  const linkStyle = `inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary ${authLinkFocus}`;
   const loading = pending || state === "checking";
   const showHint =
     state === "following" || state === "not-following" || state === "anonymous" || state === "self";
   return (
     <div className="space-y-2" aria-busy={loading}>
       {state === "anonymous" ? (
-        <div className="flex flex-wrap items-center gap-4">
-          <Link href={loginHref} className={linkStyle}>
-            {copy.signIn}
-          </Link>
-          <Link
-            href={registerHref}
-            className={`inline-flex min-h-11 items-center text-sm text-secondary underline ${authLinkFocus}`}
-          >
-            {workspace.createAccount}
-          </Link>
-        </div>
+        <GuestAuthLinks
+          loginHref={loginHref}
+          registerHref={registerHref}
+          signInLabel={copy.signIn}
+          createAccountLabel={workspace.createAccount}
+        />
       ) : state === "self" ? (
         <p className="text-sm text-muted">{copy.self}</p>
       ) : state === "error" ? (

@@ -161,6 +161,7 @@ it("distinguishes never-empty history from filtered-empty results", async () => 
   const copy = verificationApplicationsCopy("en");
   expect(never).toContain(copy.emptyNever);
   expect(never).not.toContain(copy.emptyFiltered);
+  expect(never).not.toContain(copy.clear);
   const filtered = renderToStaticMarkup(
     await History({ searchParams: Promise.resolve({ status: "pending" }) }),
   );

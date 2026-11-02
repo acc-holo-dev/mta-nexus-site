@@ -87,6 +87,15 @@ it("allows setup-cleanup-setup without retaining the first request", () => {
   expect(second.aborted).toBe(false);
 });
 
+it("marks the bell trigger busy until the preview load completes", () => {
+  const html = renderToStaticMarkup(
+    <LocaleProvider locale="en">
+      <NotificationBell />
+    </LocaleProvider>,
+  );
+  expect(html).toContain('aria-busy="true"');
+});
+
 it("leaves a hidden initial page without requests or polling timers", async () => {
   visibility.visibilityState = "hidden";
   startEffects();

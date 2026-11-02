@@ -54,6 +54,13 @@ export default async function NotificationCenterPage({
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const filters = parseNotificationInboxQuery(params);
+  const filtersActive = Boolean(
+    filters &&
+      (filters.query ||
+        filters.state !== "all" ||
+        filters.category !== "all" ||
+        (filters.period && filters.period !== "all")),
+  );
   let error = filters ? "" : copy.invalid;
   const page = await (async () => {
     try {
@@ -156,12 +163,14 @@ export default async function NotificationCenterPage({
           <Button type="submit" className="min-h-11 font-semibold">
             {copy.search}
           </Button>
-          <Link
-            href="/notifications"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reset}
-          </Link>
+          {filtersActive ? (
+            <Link
+              href="/notifications"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
         </form>
         <Link
           prefetch={false}

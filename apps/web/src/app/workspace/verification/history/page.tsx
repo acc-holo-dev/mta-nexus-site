@@ -122,13 +122,15 @@ export default async function VerificationHistoryPage({
           </select>
         </label>
         <Button type="submit">{copy.search}</Button>
-        <Link
-          prefetch={false}
-          href="/workspace/verification/history"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.clear}
-        </Link>
+        {historyFiltered ? (
+          <Link
+            prefetch={false}
+            href="/workspace/verification/history"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.clear}
+          </Link>
+        ) : null}
       </form>
       <p className="text-xs text-muted">{copy.live}</p>
       <Link

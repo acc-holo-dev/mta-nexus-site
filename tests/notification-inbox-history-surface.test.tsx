@@ -40,9 +40,11 @@ it.each(["en", "ru"] as const)(
   "renders private localized filters, history and loading states in %s",
   async (locale) => {
     state.locale = locale;
+    const copy = notificationInboxCopy(locale);
     const html = await render({ q: "needle", state: "unread", category: "content" });
-    expect(html).toContain(notificationInboxCopy(locale).openBetaNote);
+    expect(html).toContain(copy.openBetaNote);
     expect(html).toContain('action="/notifications"');
+    expect(html).toContain(`>${copy.reset}<`);
     expect(html).toContain('name="q"');
     expect(html).toContain('name="category"');
     expect(html).toContain('name="state"');
@@ -53,7 +55,6 @@ it.each(["en", "ru"] as const)(
       locale === "ru" ? "нет подходящих уведомлений" : "No matching notifications",
     );
     expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
-    const copy = notificationInboxCopy(locale);
     const loadingHtml = renderToStaticMarkup(await Loading());
     expect(loadingHtml).toContain('aria-busy="true"');
     expect(loadingHtml).toContain('id="notification-inbox-loading-heading"');
@@ -62,6 +63,11 @@ it.each(["en", "ru"] as const)(
     expect(loadingHtml).toContain(copy.loading);
   },
 );
+it("omits the inbox reset control until filters are active", async () => {
+  const copy = notificationInboxCopy("en");
+  const html = await render();
+  expect(html).not.toContain(`>${copy.reset}<`);
+});
 it.each(["en", "ru"] as const)(
   "shows a human UTC period and an anchored bounded export in %s",
   async (locale) => {

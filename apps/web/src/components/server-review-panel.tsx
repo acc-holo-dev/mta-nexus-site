@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, fieldClassBlock } from "@nexus/ui";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { confirmedServerReview } from "../lib/server-review-confirmation";
@@ -13,6 +12,7 @@ import {
 } from "../lib/server-review-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
+import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
 
 type Review = {
@@ -42,7 +42,7 @@ export function ServerReviewPanel({
   initialPage?: PublicPage;
   loadState?: "ready" | "unavailable";
 }) {
-  const { locale } = useNexusLocale();
+  const { locale, dictionary } = useNexusLocale();
   const pathname = usePathname();
   const copy = serverReviewCopy(locale);
   const loadCopy = serverReviewLoadCopy(locale);
@@ -65,6 +65,7 @@ export function ServerReviewPanel({
   const [message, setMessage] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
 
   const refreshMine = useCallback(async () => {
     const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
@@ -92,7 +93,9 @@ export function ServerReviewPanel({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const path = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
 
   useEffect(() => {
@@ -276,12 +279,12 @@ export function ServerReviewPanel({
       <div className="nexus-panel space-y-4 p-5">
         <h3 className="text-sm font-semibold text-primary">{copy.write}</h3>
         {!signedIn ? (
-          <Link
-            href={loginHref}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.signIn}
-          </Link>
+          <GuestAuthLinks
+            loginHref={loginHref}
+            registerHref={registerHref}
+            signInLabel={copy.signIn}
+            createAccountLabel={dictionary.workspace.createAccount}
+          />
         ) : (
           <>
             <p className="text-xs text-secondary">{copy.access}</p>

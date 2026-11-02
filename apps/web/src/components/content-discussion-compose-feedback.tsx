@@ -1,7 +1,4 @@
-import Link from "next/link";
-
-const platformSignInFocusClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { GuestAuthLinks } from "./guest-auth-links";
 
 export function DiscussionComposeWriteFeedback({
   error,
@@ -26,25 +23,15 @@ export function DiscussionComposeWriteFeedback({
       <p role="alert" className="text-sm text-danger">
         {error}
       </p>
-      {needsSignIn ? (
-        <div className="flex flex-wrap items-center gap-4">
-          <Link
-            href={loginHref}
-            className={`inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white underline-offset-4 hover:underline ${platformSignInFocusClass}`}
-            onClick={onPersistDraft}
-          >
-            {signInLabel}
-          </Link>
-          {registerHref && registerLabel ? (
-            <Link
-              href={registerHref}
-              className={`inline-flex min-h-11 items-center text-sm text-secondary underline ${platformSignInFocusClass}`}
-              onClick={onPersistDraft}
-            >
-              {registerLabel}
-            </Link>
-          ) : null}
-        </div>
+      {needsSignIn && registerHref && registerLabel ? (
+        <GuestAuthLinks
+          loginHref={loginHref}
+          registerHref={registerHref}
+          signInLabel={signInLabel}
+          createAccountLabel={registerLabel}
+          onLoginClick={onPersistDraft}
+          onRegisterClick={onPersistDraft}
+        />
       ) : null}
     </div>
   );

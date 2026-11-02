@@ -141,6 +141,7 @@ export function NotificationBell() {
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-controls={isOpen ? "notification-popover" : undefined}
+        aria-busy={!loaded || marking || undefined}
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
         {confirmedUnread !== null && confirmedUnread > 0 && (

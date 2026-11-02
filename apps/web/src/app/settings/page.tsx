@@ -446,7 +446,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="max-w-3xl space-y-8" aria-busy={pending || undefined}>
       <div>
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="mt-1 font-caption text-muted">{copy.description}</p>
@@ -509,7 +509,7 @@ export default function SettingsPage() {
                   checked={preferences[key]}
                   disabled={pending}
                   onChange={(event) => updatePreference(key, event.target.checked)}
-                  className="h-4 w-4 accent-[var(--nexus-accent)]"
+                  className={`h-4 w-4 accent-[var(--nexus-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]`}
                 />
               </label>
             ))}
