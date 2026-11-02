@@ -46,6 +46,14 @@ async function post(url: string, body: unknown) {
   const value = await response.json().catch(() => null);
   return { response, value };
 }
+function reviewConfirmObject(source: string, fallback: string) {
+  const trimmed = source.trim();
+  return trimmed.length > 80 ? `${trimmed.slice(0, 80)}…` : trimmed.length > 0 ? trimmed : fallback;
+}
+type ResourceReviewDecisionAction = "review" | "resolve" | "dismiss" | "remove_review";
+function isDestructiveResourceReviewDecision(action: string): action is "remove_review" {
+  return action === "remove_review";
+}
 export function ResourceReviewEditor({
   productId,
   review,
@@ -92,9 +100,7 @@ export function ResourceReviewEditor({
   }
   async function withdrawReview() {
     if (busy || confirmed) return;
-    const source = (review?.text ?? text).trim();
-    const object =
-      source.length > 80 ? `${source.slice(0, 80)}…` : source.length > 0 ? source : copy.text;
+    const object = reviewConfirmObject(review?.text ?? text, copy.text);
     if (
       !(await confirmAction({
         title: copy.withdrawConfirmTitle,
@@ -280,55 +286,75 @@ export function ResourceReviewDecisionForm({
   id,
   status,
   revision,
+  reviewText,
   locale,
 }: {
   id: string;
   status: string;
   revision: number | null;
+  reviewText?: string | null;
   locale: Locale;
 }) {
   const copy = resourceReviewCopy(locale),
     [notes, setNotes] = useState(""),
-    [action, setAction] = useState("review"),
+    [action, setAction] = useState<ResourceReviewDecisionAction>("review"),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [confirmed, setConfirmed] = useState(false);
+  async function submitDecision() {
+    if (busy || confirmed) return;
+    if (isDestructiveResourceReviewDecision(action)) {
+      const object = reviewConfirmObject(reviewText ?? "", copy.text);
+      if (
+        !(await confirmAction({
+          title: copy.removeReviewConfirmTitle,
+          object,
+          consequences: copy.removeReviewConfirm,
+          confirmLabel: copy.remove_review,
+          cancelLabel: copy.cancel,
+          closeLabel: copy.cancel,
+          danger: true,
+        }))
+      )
+        return;
+    }
+    setBusy(true);
+    setMessage("");
+    try {
+      const result = await post(`/api/admin/commerce/reviews/${encodeURIComponent(id)}`, {
+        action,
+        expectedStatus: status,
+        notes,
+        ...(action === "remove_review" ? { expectedRevision: revision } : {}),
+      });
+      if (!result.response.ok) {
+        setMessage(resourceReviewError(locale, result.value?.code));
+        return;
+      }
+      if (!confirmedReviewDecision(result.value, id, action))
+        throw new Error("Unconfirmed decision");
+      setConfirmed(true);
+      setMessage(copy.saved);
+    } catch {
+      setMessage(copy.unknown);
+    } finally {
+      setBusy(false);
+    }
+  }
   if (status !== "open" && status !== "under_review") return null;
   return (
     <form
       className="nexus-panel space-y-3 p-5"
-      onSubmit={async (event) => {
+      onSubmit={(event) => {
         event.preventDefault();
-        if (busy || confirmed) return;
-        setBusy(true);
-        setMessage("");
-        try {
-          const result = await post(`/api/admin/commerce/reviews/${encodeURIComponent(id)}`, {
-            action,
-            expectedStatus: status,
-            notes,
-            ...(action === "remove_review" ? { expectedRevision: revision } : {}),
-          });
-          if (!result.response.ok) {
-            setMessage(resourceReviewError(locale, result.value?.code));
-            return;
-          }
-          if (!confirmedReviewDecision(result.value, id, action))
-            throw new Error("Unconfirmed decision");
-          setConfirmed(true);
-          setMessage(copy.saved);
-        } catch {
-          setMessage(copy.unknown);
-        } finally {
-          setBusy(false);
-        }
+        void submitDecision();
       }}
     >
       <label className="block text-sm">
         {copy.decide}
         <select
           value={action}
-          onChange={(event) => setAction(event.target.value)}
+          onChange={(event) => setAction(event.target.value as ResourceReviewDecisionAction)}
           disabled={busy || confirmed}
           className="ml-3 rounded border border-base bg-surface p-2"
         >

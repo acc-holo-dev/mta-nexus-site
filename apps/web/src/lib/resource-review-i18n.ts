@@ -52,6 +52,9 @@ const en = {
   resolve: "Resolve",
   dismiss: "Dismiss",
   remove_review: "Remove review and resolve",
+  removeReviewConfirmTitle: "Remove this review and resolve the report?",
+  removeReviewConfirm:
+    "The review will be removed by moderation. The author will see your moderation reason and cannot republish the removed review.",
   decide: "Save decision",
   back: "Back",
   previous: "Previous",
@@ -123,6 +126,9 @@ const ru: typeof en = {
   resolve: "Решить",
   dismiss: "Отклонить",
   remove_review: "Удалить отзыв и решить жалобу",
+  removeReviewConfirmTitle: "Удалить этот отзыв и решить жалобу?",
+  removeReviewConfirm:
+    "Отзыв будет удалён модерацией. Автор увидит указанную причину и не сможет снова опубликовать удалённый отзыв.",
   decide: "Сохранить решение",
   back: "Назад",
   previous: "Назад",

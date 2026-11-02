@@ -72,6 +72,7 @@ export async function ResourceReviewReportScreen({
             id={report.id}
             status={report.status}
             revision={report.review?.status === "published" ? report.review.revision : null}
+            reviewText={report.review?.text}
             locale={locale}
           />
         )}
