@@ -74,7 +74,9 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               </Button>
             </>
           ) : !data ? (
-            <p className="text-sm text-muted">{dictionary.support.loading}</p>
+            <p role="status" className="text-sm text-muted">
+              {dictionary.support.loading}
+            </p>
           ) : data.items.length === 0 ? (
             <p className="text-sm text-muted">{copy.historyEmpty}</p>
           ) : (

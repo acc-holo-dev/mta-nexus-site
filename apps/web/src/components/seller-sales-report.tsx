@@ -19,6 +19,20 @@ export function SellerSalesReportView({
   locale: "en" | "ru";
 }) {
   const c = sellerSalesCopy(locale);
+  const resetHref = sellerSalesUrl({
+    page: 1,
+    days: "all",
+    status: "completed",
+    evidence: "all",
+    organizationId: query.organizationId,
+    attribution: query.attribution,
+  });
+  const filtered =
+    query.page !== 1 ||
+    query.days !== "all" ||
+    query.status !== "completed" ||
+    query.evidence !== "all" ||
+    Boolean(query.currency || query.productId);
   const exportUrl = sellerSalesUrl(query, report.page).replace(
     "/workspace/sales/report",
     "/api/sales/export",
@@ -143,14 +157,7 @@ export function SellerSalesReportView({
         <div className="flex items-end gap-4">
           <Button type="submit">{c.apply}</Button>
           <Link
-            href={sellerSalesUrl({
-              page: 1,
-              days: "all",
-              status: "completed",
-              evidence: "all",
-              organizationId: query.organizationId,
-              attribution: query.attribution,
-            })}
+            href={resetHref}
             className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.reset}
@@ -226,7 +233,17 @@ export function SellerSalesReportView({
           ))}
         </ol>
       ) : (
-        <p className="py-8 text-secondary">{c.empty}</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-8">
+          <p className="text-secondary">{c.empty}</p>
+          {filtered ? (
+            <Link
+              href={resetHref}
+              className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.reset}
+            </Link>
+          ) : null}
+        </div>
       )}
       {report.totalPages > 1 ? (
         <nav aria-label={c.page} className="flex gap-4 text-sm">

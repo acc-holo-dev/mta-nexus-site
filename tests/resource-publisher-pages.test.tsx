@@ -25,6 +25,7 @@ vi.mock("../apps/web/src/lib/services/resource-publisher-service", () => ({
 
 import HistoryPage from "../apps/web/src/app/workspace/resources/[id]/history/page";
 import InventoryPage from "../apps/web/src/app/workspace/resources/page";
+import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
 
 const context = {
   params: Promise.resolve({ id: "prd_a" }),
@@ -159,6 +160,38 @@ it.each([
     if (Object.keys(statusCounts).length === 0 && Object.keys(searchParams).length === 0) {
       expect(html).toContain("/workspace/resources/new");
     }
+  },
+);
+it.each(["en", "ru"] as const)(
+  "distinguishes lifetime-empty resource history from kind-filtered empty results in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = getResourcePublisherCopy(locale);
+    state.history.mockResolvedValue({
+      product: { id: "prd_a", title: "<Private>", authorId: "DO_NOT_RENDER" },
+      items: [],
+      page: 1,
+      totalPages: 1,
+    });
+    const lifetime = renderToStaticMarkup(
+      await HistoryPage({
+        params: Promise.resolve({ id: "prd_a" }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(lifetime).toContain(copy.empty);
+    expect(lifetime).not.toContain(copy.emptyFiltered);
+    expect(lifetime).not.toContain(copy.reset);
+    const filtered = renderToStaticMarkup(
+      await HistoryPage({
+        params: Promise.resolve({ id: "prd_a" }),
+        searchParams: Promise.resolve({ kind: "changes" }),
+      }),
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).not.toContain(`>${copy.empty}<`);
+    expect(filtered).toContain(copy.reset);
+    expect(filtered).toContain("focus-visible:outline-[var(--nexus-accent)]");
   },
 );
 it("checks authentication before parsing private queries or querying repositories", async () => {

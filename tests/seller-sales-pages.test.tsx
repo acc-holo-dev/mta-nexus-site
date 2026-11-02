@@ -176,6 +176,35 @@ it("detail refuses unknown, repeated and unavailable account selectors", async (
   ).rejects.toThrow("NEXT_NOT_FOUND");
 });
 
+it.each(["en", "ru"] as const)(
+  "offers a filter reset beside empty sales only when filters differ from defaults in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = sellerSalesCopy(locale),
+      emptyReport = {
+        scope: { id: "usr_a", name: null },
+        product: null,
+        observedAt: date,
+        sales: [],
+        totals: [],
+        periods: [],
+        periodUnit: "month" as const,
+        periodStart: date,
+        page: 1,
+        pageSize: 20,
+        total: 0,
+        totalPages: 1,
+      };
+    state.report.mockResolvedValue(emptyReport);
+    const defaultHtml = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
+    expect(defaultHtml).toContain(copy.empty);
+    expect(defaultHtml.match(new RegExp(copy.reset, "gu"))?.length).toBe(1);
+    const filteredHtml = renderToStaticMarkup(await Page(input));
+    expect(filteredHtml).toContain(copy.empty);
+    expect(filteredHtml).toContain("days=all&amp;status=completed&amp;evidence=all");
+    expect(filteredHtml.match(new RegExp(copy.reset, "gu"))?.length).toBe(2);
+  },
+);
 it("recorded attribution stays in exports/details and hides management for former owners", async () => {
   const html = renderToStaticMarkup(
     await Page({

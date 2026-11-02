@@ -35,7 +35,10 @@ function nodes(n: ReactNode): Element[] {
   if (Array.isArray(n)) return n.flatMap(nodes);
   if (!n || typeof n !== "object" || !("props" in n)) return [];
   const e = n as Element;
-  const type = e.type as { displayName?: string } | string | ((props: unknown) => ReactNode);
+  const type = e.type as
+    | string
+    | { displayName?: string }
+    | (((props: unknown) => ReactNode) & { displayName?: string });
   if (typeof type === "object" && type?.displayName === "Button") {
     return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
   }

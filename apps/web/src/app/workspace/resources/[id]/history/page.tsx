@@ -78,7 +78,7 @@ export default async function Page({
             key={kind}
             href={href(1, kind)}
             aria-current={query.kind === kind ? "page" : undefined}
-            className="underline"
+            className="rounded underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy[kind]}
           </Link>
@@ -111,7 +111,17 @@ export default async function Page({
           ))}
         </ol>
       ) : (
-        <p>{copy.empty}</p>
+        <div role="status" className="space-y-3 text-secondary">
+          <p>{query.kind !== "all" ? copy.emptyFiltered : copy.empty}</p>
+          {query.kind !== "all" ? (
+            <Link
+              href={href(1, "all")}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       )}
       {result.totalPages > 1 && (
         <nav className="flex gap-4 text-sm" aria-label={copy.page}>
