@@ -35,18 +35,12 @@ export async function ServerWorkspaceHistoryScreen({
       return null;
     });
   if (!actor) {
-    const returnPath = `/workspace/servers/${encodeURIComponent(id)}/history`;
-    if (failure) {
-      return (
-        <section className="nexus-panel space-y-3 p-5">
-          <h1 className="text-xl font-bold text-primary">{history.title}</h1>
-          <p role="alert" className="text-danger">
-            {failure}
-          </p>
-        </section>
-      );
-    }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/servers/${encodeURIComponent(id)}/history`}
+      />
+    );
   }
   const rawParams = (await searchParams) ?? {},
     params = new URLSearchParams();

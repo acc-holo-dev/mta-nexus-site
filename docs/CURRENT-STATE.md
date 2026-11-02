@@ -4,10 +4,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `01a3a5bed28f35c189c8812568b61dbc8d1613ac` (`fix(web): clear knip export and context content empty filters`).
-- **Verified CI green on that tip:** [CI 41471055599](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41471055599) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `a80545ffa15d2d793c4aa51f30cd25cef512212b` (`fix(web): finish ActionConfirmCheckbox sweep and loading honesty`).
+- **Verified CI green on that tip:** [CI 41472797954](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41472797954) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `01a3a5be…` / [CI 41471055599](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41471055599).
 - **Prior selected green:** `4ac85dbf…` / [CI 41466196762](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41466196762).
-- **Prior selected green:** `425b7549…` / [CI 41463079309](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41463079309).
 - **Failed tip (not baseline):** `0ae6747a…` knip unused ActionConfirmCheckboxProps; `71b7191b…` displayName typecheck; `dc035b0c…` support-center lint/auth-entry.
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
 - **Failed tip (not baseline):** `7cd137da…` format; `4565dd8f…` compare base; `c32a4ef6…` admin guest unit contracts (fixed on `e7892ceb`).
@@ -37,11 +37,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `01a3a5be…` selected green (CI 41471055599); knip/export + context empty filters; continue confirm migrations and settings loading honesty.
+**Последняя локальная волна:** tip `a80545ff…` selected green (CI 41472797954); ActionConfirmCheckbox sweep + loading honesty; continue residual empty/focus/guest polish.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `01a3a5be…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `a80545ff…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

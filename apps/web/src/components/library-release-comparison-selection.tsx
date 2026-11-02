@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import { useRef, useState } from "react";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseComparisonSelection({
   productId,
@@ -63,18 +64,16 @@ export function LibraryReleaseComparisonSelection({
         <p role="status">{copy.alreadySelected}</p>
       ) : (
         <>
-          <label className="flex items-start gap-3 text-sm">
-            <input
-              type="checkbox"
-              checked={confirmed}
-              disabled={disabled}
-              onChange={(event) => {
-                if (current.current === fingerprint)
-                  setAcknowledged(event.target.checked ? fingerprint : null);
-              }}
-            />
-            <span>{copy.confirmChoice}</span>
-          </label>
+          <ActionConfirmCheckbox
+            id={`${productId}-${target.id}-confirm`}
+            checked={confirmed}
+            disabled={disabled}
+            onCheckedChange={(checked) => {
+              if (current.current === fingerprint) setAcknowledged(checked ? fingerprint : null);
+            }}
+          >
+            {copy.confirmChoice}
+          </ActionConfirmCheckbox>
           <Button type="button" disabled={disabled || !confirmed} onClick={apply} variant="outline">
             {state.busy ? control.saving : copy.chooseCompared}
           </Button>

@@ -156,8 +156,26 @@ it.each([
   expect(state.history).not.toHaveBeenCalled();
 });
 it("renders empty account history and maps an absent account to a missing page", async () => {
+  const historyHref = 'href="/workspace/library/collections/history"';
+  const clearLinks = (html: string) => (html.match(new RegExp(historyHref, "g")) ?? []).length;
   state.history.mockResolvedValue({ ...report(), items: [], total: 0, totalPages: 1, page: 1 });
-  expect(await screen()).toContain(libraryCollectionHistoryCopy("en").empty);
+  const filteredEmpty = await screen();
+  expect(filteredEmpty).toContain(libraryCollectionHistoryCopy("en").empty);
+  expect(clearLinks(filteredEmpty)).toBe(2);
+  state.history.mockResolvedValue({
+    ...report(),
+    items: [],
+    total: 0,
+    totalPages: 1,
+    page: 1,
+    days: 30,
+    action: "all",
+    collectionId: undefined,
+    productId: undefined,
+  });
+  const defaultEmpty = await screen({});
+  expect(defaultEmpty).toContain(libraryCollectionHistoryCopy("en").empty);
+  expect(clearLinks(defaultEmpty)).toBe(1);
   state.history.mockRejectedValue(new AppError("private detail", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
 });

@@ -161,6 +161,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(`${followCopy(locale).remove}: Team`);
     expect(html).toContain(followCopy(locale).older);
     expect(html).not.toContain("private-target-marker");
+    expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
   },
 );
 it("keeps failed follow reads separate from true empty states", () => {

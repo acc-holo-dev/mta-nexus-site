@@ -318,7 +318,7 @@ export function NotificationInbox({
           variant="outline"
           disabled={disabled || !selected.length}
           onClick={() => void mark(true)}
-          className="min-h-11 text-accent"
+          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.markRead}
         </Button>
@@ -327,7 +327,7 @@ export function NotificationInbox({
           variant="outline"
           disabled={disabled || !selected.length}
           onClick={() => void mark(false)}
-          className="min-h-11 text-accent"
+          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.markUnread}
         </Button>

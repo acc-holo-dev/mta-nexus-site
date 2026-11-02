@@ -63,6 +63,11 @@ export default async function Page({
     const query = libraryCollectionHistoryQuery(collectionPageParams(raw));
     const result = await libraryCollectionsService.accountHistory(actor, query);
     const suffix = (page: number) => libraryCollectionHistorySuffix({ ...query, page });
+    const filtered =
+      result.action !== "all" ||
+      Boolean(result.collectionId) ||
+      Boolean(result.productId) ||
+      result.days !== 30;
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
@@ -155,12 +160,14 @@ export default async function Page({
             title={h.empty}
             description={h.note}
             action={
-              <Link
-                href="/workspace/library/collections/history"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {h.clear}
-              </Link>
+              filtered ? (
+                <Link
+                  href="/workspace/library/collections/history"
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {h.clear}
+                </Link>
+              ) : undefined
             }
           />
         )}

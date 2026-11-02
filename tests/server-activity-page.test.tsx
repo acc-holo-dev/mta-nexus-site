@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   user: { id: "actor", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
   page: vi.fn(),
+  session: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -15,7 +16,7 @@ vi.mock("next/navigation", () => ({
   },
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: async () => state.user },
+  authService: { getSession: state.session },
 }));
 vi.mock("../apps/web/src/lib/services/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.page },
@@ -50,6 +51,7 @@ beforeEach(() => {
   state.user = { id: "actor", role: "user" };
   state.locale = "en";
   state.page.mockResolvedValue(data);
+  state.session.mockImplementation(async () => state.user);
 });
 const render = async (query: Record<string, string | string[] | undefined> = {}) =>
   renderToStaticMarkup(
@@ -85,6 +87,13 @@ it.each(["en", "ru"] as const)(
 it("does not read server activity for an anonymous visitor", async () => {
   state.user = null;
   expect(await render()).toContain("Sign in");
+  expect(state.page).not.toHaveBeenCalled();
+});
+it("routes session lookup failures to sign-in instead of an orphan error panel", async () => {
+  state.session.mockRejectedValueOnce(new Error("private session"));
+  const html = await render();
+  expect(html).toContain("Sign in");
+  expect(html).not.toContain("private session");
   expect(state.page).not.toHaveBeenCalled();
 });
 it("uses the same not-found boundary for missing or unavailable current server grants", async () => {

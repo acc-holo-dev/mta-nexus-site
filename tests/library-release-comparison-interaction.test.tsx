@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -38,9 +39,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) })
 vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
+
 import { LibraryReleaseComparisonSelection } from "../apps/web/src/components/library-release-comparison-selection";
 import { libraryReleaseComparisonCopy } from "../apps/web/src/lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {
   if (Array.isArray(n)) return n.flatMap(nodes);
@@ -102,6 +105,9 @@ it.each(["en", "ru"])(
     await click(copy.chooseCompared);
     expect(h.fetch).not.toHaveBeenCalled();
     confirm();
+    expect(render().find((n) => n.type === "input")?.props.className).toContain(
+      "focus-visible:ring-[color:var(--nexus-accent)]",
+    );
     h.fetch.mockRejectedValueOnce(new Error("lost"));
     await click(copy.chooseCompared);
     const init = h.fetch.mock.calls[0][1] as RequestInit;

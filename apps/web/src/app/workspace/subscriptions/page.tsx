@@ -92,7 +92,11 @@ export default async function SubscriptionAccountPage({
               ))}
             </select>
           </label>
-          <Button type="submit" variant="ghost" className="h-auto px-0 text-accent underline">
+          <Button
+            type="submit"
+            variant="ghost"
+            className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.open}
           </Button>
         </form>

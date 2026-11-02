@@ -56,19 +56,7 @@ export async function ContextPublicationHistoryScreen({
       failure = copy.unavailable;
       return null;
     });
-  if (!actor) {
-    if (failure) {
-      return (
-        <section className="nexus-panel space-y-3 p-5">
-          <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-          <p role="alert" className="text-danger">
-            {failure}
-          </p>
-        </section>
-      );
-    }
-    return <PlatformSignIn locale={locale} returnPath={path} />;
-  }
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
