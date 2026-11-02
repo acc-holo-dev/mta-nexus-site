@@ -22,7 +22,7 @@ import {
 } from "../lib/discussion-compose-draft";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { followCopy } from "../lib/follow-workspace-copy";
-import type { Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
@@ -55,6 +55,7 @@ export function ContentDiscussion({
   initialError?: string;
 }) {
   const copy = getDiscussionCopy(locale);
+  const workspaceCopy = getDictionary(locale).workspace;
   const pathname = usePathname();
   const [page, setPage] = useState<DiscussionPage | null>(initial);
   const [loading, setLoading] = useState(false);
@@ -69,8 +70,22 @@ export function ContentDiscussion({
   const [writeNeedsSignIn, setWriteNeedsSignIn] = useState(false);
   const [published, setPublished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [text, setText] = useState("");
-  const [reply, setReply] = useState<{ id: string; name: string } | null>(null);
+  const [composeBootstrap] = useState(() => {
+    const stored = readDiscussionComposeDraft(contentId);
+    if (!stored)
+      return { text: "", reply: null as { id: string; name: string } | null, restored: false };
+    return {
+      text: stored.text,
+      reply: stored.parentId
+        ? { id: stored.parentId, name: stored.parentName ?? getDiscussionCopy(locale).anonymous }
+        : null,
+      restored: true,
+    };
+  });
+  const [text, setText] = useState(composeBootstrap.text);
+  const [reply, setReply] = useState<{ id: string; name: string } | null>(composeBootstrap.reply);
+  const [draftRestoreNotice, setDraftRestoreNotice] = useState(composeBootstrap.restored);
+  const loadedComposeFor = useRef(contentId);
   const [displayCount, setDisplayCount] = useState(count);
   const [managingId, setManagingId] = useState<string | null>(null);
   const [managementSuccess, setManagementSuccess] = useState("");
@@ -83,7 +98,6 @@ export function ContentDiscussion({
     parentId?: string;
   } | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
-  const draftRestored = useRef(false);
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
   function persistComposeDraft(nextText = text, nextReply = reply) {
     const normalized = nextText.trimEnd();
@@ -105,22 +119,26 @@ export function ContentDiscussion({
   }, [pathname]);
   useEffect(() => {
     alive.current = true;
-    if (!draftRestored.current) {
-      draftRestored.current = true;
-      const stored = readDiscussionComposeDraft(contentId);
-      if (stored) {
-        setText(stored.text);
-        setReply(
-          stored.parentId
-            ? { id: stored.parentId, name: stored.parentName ?? copy.anonymous }
-            : null,
-        );
-      }
-    }
     return () => {
       alive.current = false;
       readController.current?.abort();
     };
+  }, []);
+  useEffect(() => {
+    if (loadedComposeFor.current === contentId) return;
+    loadedComposeFor.current = contentId;
+    const stored = readDiscussionComposeDraft(contentId);
+    if (stored) {
+      setText(stored.text);
+      setReply(
+        stored.parentId ? { id: stored.parentId, name: stored.parentName ?? copy.anonymous } : null,
+      );
+      setDraftRestoreNotice(true);
+      return;
+    }
+    setText("");
+    setReply(null);
+    setDraftRestoreNotice(false);
   }, [contentId, copy.anonymous]);
   useEffect(() => {
     if (focusedId)
@@ -340,6 +358,11 @@ export function ContentDiscussion({
         )}
       </search>
       <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
+        {draftRestoreNotice ? (
+          <p role="status" aria-live="polite" className="text-sm text-secondary">
+            {workspaceCopy.draftRestored}
+          </p>
+        ) : null}
         {reply && (
           <div className="flex flex-wrap items-center gap-3 rounded-lg bg-accent-soft p-3 text-sm text-secondary">
             <span>

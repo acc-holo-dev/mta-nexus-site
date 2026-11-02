@@ -123,6 +123,31 @@ describe("private legacy commerce pages", () => {
     expect(state.seller).not.toHaveBeenCalled();
   });
 
+  it("preserves license archive filters in guest return paths", async () => {
+    state.user = null;
+    const html = renderToStaticMarkup(
+      await Licenses({
+        searchParams: Promise.resolve({
+          q: "100%_",
+          status: "expiring",
+          binding: "bound",
+          term: "finite",
+          sort: "expires_soon",
+          page: "2",
+        }),
+      }),
+    );
+    expect(html).toContain("q%3D100%2525_");
+    expect(html).toContain("status%3Dexpiring");
+    expect(html).toContain("binding%3Dbound");
+    expect(html).toContain("term%3Dfinite");
+    expect(html).toContain("sort%3Dexpires_soon");
+    expect(html).toContain("page%3D2");
+    expect(html).toContain("/auth/login?next=%2Fworkspace%2Flicenses%3F");
+    expect(html).toContain("/auth/register?next=%2Fworkspace%2Flicenses%3F");
+    expect(state.licenses).not.toHaveBeenCalled();
+  });
+
   it.each(["en", "ru"] as const)(
     "localizes purchases and escapes order IDs in %s",
     async (locale) => {

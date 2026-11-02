@@ -81,6 +81,8 @@ export const workspace = {
     signInRequired: "Требуется вход",
     signInMessage: "Войдите, чтобы управлять библиотекой ресурсов и MTA-серверами.",
     signIn: "Войти",
+    createAccount: "Создать аккаунт",
+    draftRestored: "Незавершённый текст восстановлен в этой вкладке.",
     title: "Рабочая зона",
     loading: "Загрузка рабочей зоны…",
     subtitle: "ваши ресурсы и серверы",

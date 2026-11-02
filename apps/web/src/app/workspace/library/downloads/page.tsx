@@ -166,8 +166,8 @@ export default async function ResourceDownloadsPage({
         </ol>
       ) : (
         <div className="space-y-3 text-secondary">
-          <p>{copy.empty}</p>
-          {filtered ? (
+          <p>{result.counts.all === 0 ? copy.emptyNever : copy.emptyFiltered}</p>
+          {filtered && result.counts.all > 0 ? (
             <Link
               href={resourceDeliveriesUrl({
                 page: 1,
@@ -177,7 +177,7 @@ export default async function ResourceDownloadsPage({
               })}
               className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
-              {copy.all}
+              {copy.clearFilters}
             </Link>
           ) : null}
         </div>

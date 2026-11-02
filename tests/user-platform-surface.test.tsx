@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import type { Locale } from "../apps/web/src/lib/i18n";
+import { getDictionary, type Locale } from "../apps/web/src/lib/i18n";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
 
 const state = vi.hoisted(() => ({
@@ -96,7 +96,11 @@ it("renders service failure separately from an empty feed and hides internal tex
 });
 it("adds login next from pathname when PlatformSignIn has no returnPath", () => {
   const html = renderToStaticMarkup(<PlatformSignIn locale="en" />);
+  const copy = getDictionary("en").workspace;
   expect(html).toContain("/auth/login?next=%2Fworkspace%2Fcontent");
+  expect(html).toContain("/auth/register?next=%2Fworkspace%2Fcontent");
+  expect(html).toContain(copy.signInMessage);
+  expect(html).toContain(copy.createAccount);
   expect(html).toContain("min-h-11");
   expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
 });
@@ -104,6 +108,7 @@ it("adds login next from pathname when PlatformSignIn has no returnPath", () => 
 it("prefers explicit returnPath over pathname for PlatformSignIn login href", () => {
   const html = renderToStaticMarkup(<PlatformSignIn locale="en" returnPath="/settings/history" />);
   expect(html).toContain("/auth/login?next=%2Fsettings%2Fhistory");
+  expect(html).toContain("/auth/register?next=%2Fsettings%2Fhistory");
   expect(html).not.toContain("%2Fworkspace%2Fcontent");
 });
 

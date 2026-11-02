@@ -46,11 +46,14 @@ export default async function LicensesHistoryPage({
   const copy = getCommerceHistoryCopy(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user) {
-    const page = typeof query.page === "string" ? query.page : undefined;
-    const returnPath =
-      page && page !== "1"
-        ? `/workspace/licenses?page=${encodeURIComponent(page)}`
-        : "/workspace/licenses";
+    const returnParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (Array.isArray(value)) for (const item of value) returnParams.append(key, item);
+      else if (value !== undefined) returnParams.append(key, value);
+    }
+    const returnPath = returnParams.size
+      ? `/workspace/licenses?${returnParams}`
+      : "/workspace/licenses";
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
 

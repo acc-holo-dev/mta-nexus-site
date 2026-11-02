@@ -101,8 +101,8 @@ export default async function LibraryUpdatesPage({
         </ul>
       ) : (
         <div className="space-y-3 text-secondary">
-          <p>{copy.empty}</p>
-          {filter !== "all" ? (
+          <p>{result.counts.all === 0 ? copy.emptyInventory : copy.emptyFiltered}</p>
+          {filter !== "all" && result.counts.all > 0 ? (
             <Link
               href={href(1, "all")}
               className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

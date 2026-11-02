@@ -81,6 +81,8 @@ export const workspace = {
     signInRequired: "Sign in required",
     signInMessage: "Sign in to manage your resource library and MTA servers.",
     signIn: "Sign in",
+    createAccount: "Create account",
+    draftRestored: "Your unfinished text has been restored in this tab.",
     title: "Workspace",
     loading: "Loading workspace…",
     subtitle: "your resources and servers",

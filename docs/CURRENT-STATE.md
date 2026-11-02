@@ -4,10 +4,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `decb480c1836284868364d6b7ad4ef3b1d538210` (`fix(web): residual empty clear, confirms, and accent focus`).
-- **Verified CI green on that tip:** [CI 41474749992](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41474749992) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `a09da42502ad7d539ff430e767ccee319993418f` (`fix(web): settings and account loading a11y for SR`).
+- **Verified CI green on that tip:** [CI 41476458351](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41476458351) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `decb480c…` / [CI 41474749992](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41474749992).
 - **Prior selected green:** `a80545ff…` / [CI 41472797954](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41472797954).
-- **Prior selected green:** `01a3a5be…` / [CI 41471055599](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41471055599).
 - **Failed tip (not baseline):** `0ae6747a…` knip unused ActionConfirmCheckboxProps; `71b7191b…` displayName typecheck; `dc035b0c…` support-center lint/auth-entry.
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
 - **Failed tip (not baseline):** `7cd137da…` format; `4565dd8f…` compare base; `c32a4ef6…` admin guest unit contracts (fixed on `e7892ceb`).
@@ -37,11 +37,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `decb480c…` selected green (CI 41474749992); residual empty/confirm/focus polish; continue settings/account loading a11y.
+**Последняя локальная волна:** tip `a09da425…` selected green (CI 41476458351); settings/account SR loading; continue PlatformSignIn/register + library empty honesty.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `decb480c…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `a09da425…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

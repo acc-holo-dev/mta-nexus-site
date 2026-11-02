@@ -34,6 +34,7 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 import Detail from "../apps/web/src/app/workspace/library/downloads/[id]/page";
 import Page from "../apps/web/src/app/workspace/library/downloads/page";
 import Publisher from "../apps/web/src/app/workspace/resources/[id]/deliveries/page";
+import { resourceDeliveriesCopy } from "../apps/web/src/lib/resource-deliveries-i18n";
 
 const context = { params: Promise.resolve({ id: "dlv_a" }) };
 beforeEach(() => {
@@ -130,6 +131,30 @@ it("publisher summary contains aggregate states and preserves the chosen period"
   expect(html).toContain("1.0.0");
   expect(html).not.toContain("DO_NOT_RENDER");
   expect(html).toContain('scope="col"');
+});
+it("distinguishes empty inventory from filtered download history", async () => {
+  state.page.mockResolvedValueOnce({
+    items: [],
+    counts: { all: 0, started: 0, served: 0, cancelled: 0, failed: 0 },
+    page: 1,
+    totalPages: 1,
+  });
+  const never = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
+  expect(never).toContain(resourceDeliveriesCopy("en").emptyNever);
+  expect(never).not.toContain(resourceDeliveriesCopy("en").clearFilters);
+
+  state.page.mockResolvedValueOnce({
+    items: [],
+    counts: { all: 4, started: 1, served: 2, cancelled: 1, failed: 0 },
+    page: 1,
+    totalPages: 1,
+  });
+  const filtered = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ status: "failed" }) }),
+  );
+  expect(filtered).toContain(resourceDeliveriesCopy("en").emptyFiltered);
+  expect(filtered).toContain(resourceDeliveriesCopy("en").clearFilters);
+  expect(filtered).not.toContain(resourceDeliveriesCopy("en").emptyNever);
 });
 it("authenticates before reading or validating account histories", async () => {
   state.user = null;

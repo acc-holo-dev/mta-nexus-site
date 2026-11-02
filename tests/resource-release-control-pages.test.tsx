@@ -80,6 +80,7 @@ vi.mock("../apps/web/src/components/resource-moderation-controls", () => ({
   ),
 }));
 import Updates, { metadata } from "../apps/web/src/app/workspace/library/updates/page";
+import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
 import Versions from "../apps/web/src/app/workspace/library/[id]/versions/page";
 import Staff from "../apps/web/src/app/admin/resources/page";
 import StaffDetail from "../apps/web/src/app/admin/resources/[id]/page";
@@ -196,6 +197,37 @@ beforeEach(() => {
     internalNotes: "PRIVATE-STAFF-NOTES",
     ...bounds,
   });
+});
+it("distinguishes empty library inventory from filtered updates", async () => {
+  const copy = getResourceReleaseControlCopy("en");
+  state.updates.mockResolvedValueOnce({
+    items: [],
+    counts: { all: 0, updates: 0, pinned: 0, unavailable: 0 },
+    page: 1,
+    totalPages: 1,
+    pageSize: 20,
+    total: 0,
+  });
+  const never = renderToStaticMarkup(
+    await Updates({ searchParams: Promise.resolve({ filter: "all", page: "1" }) }),
+  );
+  expect(never).toContain(copy.emptyInventory);
+  expect(never).not.toContain(copy.emptyFiltered);
+
+  state.updates.mockResolvedValueOnce({
+    items: [],
+    counts: { all: 3, updates: 1, pinned: 1, unavailable: 1 },
+    page: 1,
+    totalPages: 1,
+    pageSize: 20,
+    total: 3,
+  });
+  const filtered = renderToStaticMarkup(
+    await Updates({ searchParams: Promise.resolve({ filter: "updates", page: "1" }) }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.all);
+  expect(filtered).not.toContain(copy.emptyInventory);
 });
 it("requires sign-in before reading the buyer library", async () => {
   state.user = null;

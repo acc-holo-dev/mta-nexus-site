@@ -126,6 +126,9 @@ export function ContentPageNavigation({
     </nav>
   );
 }
+const platformSignInFocusClass =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function PlatformSignIn({
   locale,
   returnPath,
@@ -139,12 +142,23 @@ export function PlatformSignIn({
   return (
     <section className="space-y-4 py-16 text-center">
       <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-      <Link
-        href={authEntryHref("login", nextPath)}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
-        {copy.signIn}
-      </Link>
+      {copy.signInMessage ? (
+        <p className="mx-auto max-w-md text-sm text-secondary">{copy.signInMessage}</p>
+      ) : null}
+      <div className="flex flex-wrap items-center justify-center gap-4">
+        <Link
+          href={authEntryHref("login", nextPath)}
+          className={`inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white underline-offset-4 hover:underline ${platformSignInFocusClass}`}
+        >
+          {copy.signIn}
+        </Link>
+        <Link
+          href={authEntryHref("register", nextPath)}
+          className={`inline-flex min-h-11 items-center text-sm text-secondary underline ${platformSignInFocusClass}`}
+        >
+          {copy.createAccount}
+        </Link>
+      </div>
     </section>
   );
 }
