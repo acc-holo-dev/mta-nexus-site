@@ -1,19 +1,21 @@
-import { expect, it } from "vitest";
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
-import {
-  supportQuery,
-  supportHref,
-  supportActivitySchema,
-} from "../apps/web/src/lib/support-workspace-contract";
-import {
-  supportWorkspaceCopy,
-  supportWorkspaceError,
-} from "../apps/web/src/lib/support-workspace-copy";
+import { expect, it } from "vitest";
 import { formatNotification } from "../apps/web/src/lib/notification-copy";
 import {
   confirmSupportStatusChanged,
   parseSupportThread,
 } from "../apps/web/src/lib/support-response";
+import {
+  publicationSupportHref,
+  supportActivitySchema,
+  supportHref,
+  supportQuery,
+} from "../apps/web/src/lib/support-workspace-contract";
+import {
+  supportWorkspaceCopy,
+  supportWorkspaceError,
+} from "../apps/web/src/lib/support-workspace-copy";
+
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z";
 it("normalizes supported search filters and preserves them in page links", () => {
@@ -22,11 +24,25 @@ it("normalizes supported search filters and preserves them in page links", () =>
   );
   if (!filters) throw new Error("Valid filters rejected");
   expect(filters).toEqual({ q: "Access", status: "resolved", category: "account", page: 2 });
+  expect(publicationSupportHref("  Gate  will  not  open  ")).toBe(
+    "/support?draft=publication&subject=Gate+will+not+open",
+  );
+  expect(publicationSupportHref("No")).toBe("/support");
   expect(supportHref("/support", filters, 3)).toBe(
     "/support?page=3&q=Access&status=resolved&category=account",
   );
   expect(supportQuery(new URLSearchParams("status=&category="))).toEqual({ page: 1, q: "" });
   expect(supportQuery(new URLSearchParams("scope=staff&q=Access"), true)?.q).toBe("Access");
+  expect(
+    supportQuery(new URLSearchParams("draft=publication&subject=%20Broken%20gate%20")),
+  ).toEqual({
+    page: 1,
+    q: "",
+    draft: "publication",
+    subject: "Broken gate",
+  });
+  expect(supportQuery(new URLSearchParams("draft=ad&subject=Broken%20gate"))).toBeNull();
+  expect(supportQuery(new URLSearchParams("subject=tiny"))).toBeNull();
 });
 it.each([
   "page=0",

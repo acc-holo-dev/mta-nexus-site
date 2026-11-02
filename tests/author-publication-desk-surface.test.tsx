@@ -178,7 +178,8 @@ it("never offers restoration for an unproven archive", async () => {
   });
   const html = renderToStaticMarkup(await History({ params: Promise.resolve({ id: "article" }) }));
   expect(html).not.toContain("aria-busy=");
-  expect(html).toContain('href="/support"');
+  expect(html).toContain("draft=publication");
+  expect(html).toContain("subject=Title");
   expect(html).toContain(authorPublicationDeskCopy("en").historyEmpty);
 });
 it("rejects unknown and duplicate private filters before reading publication data", async () => {

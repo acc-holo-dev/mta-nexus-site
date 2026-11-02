@@ -10,6 +10,7 @@ import {
   organizationContentMutationError,
 } from "../lib/organization-content-copy";
 import { serverContentCopy, serverContentMutationError } from "../lib/server-content-copy";
+import { publicationSupportHref } from "../lib/support-workspace-contract";
 import {
   type EditableContent,
   parseEditableContent,
@@ -236,7 +237,7 @@ export function AuthorContentForm({
           )}
           {archived && (
             <Link
-              href="/support"
+              href={publicationSupportHref(saved.title)}
               className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.archivedNote}

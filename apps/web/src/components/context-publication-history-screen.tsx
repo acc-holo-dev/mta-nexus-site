@@ -18,6 +18,7 @@ import {
   serverPublicationHistoryError,
 } from "../lib/server-publication-history-copy";
 import { authService } from "../lib/services/auth-service";
+import { publicationSupportHref } from "../lib/support-workspace-contract";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { AuthorPublicationRestore } from "./author-publication-restore";
 import { PlatformSignIn } from "./platform-sign-in";
@@ -133,7 +134,7 @@ export async function ContextPublicationHistoryScreen({
             <section className="nexus-panel space-y-2 p-4">
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
               <Link
-                href="/support"
+                href={publicationSupportHref(data.item.title)}
                 className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {history.support}

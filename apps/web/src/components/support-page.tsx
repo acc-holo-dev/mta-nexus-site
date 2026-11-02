@@ -79,5 +79,16 @@ export async function SupportPageSurface({
         </Link>
       </div>
     );
-  return <SupportCenter staffMode={staff} initialFilters={filters} key={params.toString()} />;
+  return (
+    <SupportCenter
+      staffMode={staff}
+      initialFilters={filters}
+      initialDraft={
+        filters.draft === "publication" && filters.subject
+          ? { category: "other", subject: filters.subject }
+          : null
+      }
+      key={params.toString()}
+    />
+  );
 }

@@ -11,6 +11,7 @@ import {
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { authorContentService } from "../../../../../lib/services/author-content-service";
+import { publicationSupportHref } from "../../../../../lib/support-workspace-contract";
 import { getUserPlatformCopy } from "../../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
@@ -120,7 +121,7 @@ export default async function PublicationHistoryPage({
             <div className="nexus-panel space-y-2 p-4">
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
               <Link
-                href="/support"
+                href={publicationSupportHref(report.item.title)}
                 className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.support}

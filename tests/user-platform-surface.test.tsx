@@ -62,7 +62,8 @@ it.each(["ru", "en"] as Locale[])("renders new and archived publication forms in
   );
   expect(archived).toContain("<fieldset disabled");
   expect(archived).toContain(copy.archivedNote);
-  expect(archived).toContain('href="/support"');
+  expect(archived).toContain("draft=publication");
+  expect(archived).toContain("subject=Archived+title");
   expect(archived).not.toContain('href="/articles/archived-title"');
 });
 it.each(["ru", "en"] as Locale[])(

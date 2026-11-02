@@ -89,10 +89,12 @@ export function SupportCenter({
   staffMode = false,
   initialFilters = { page: 1, q: "" },
   initialContext = null,
+  initialDraft = null,
 }: {
   staffMode?: boolean;
   initialFilters?: SupportQuery;
   initialContext?: SupportFormObjectContext | null;
+  initialDraft?: { category: "other"; subject: string } | null;
 }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
@@ -108,8 +110,10 @@ export function SupportCenter({
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [category, setCategory] = useState(initialFilters.category ?? "account");
-  const [subject, setSubject] = useState("");
+  const [category, setCategory] = useState(
+    initialDraft?.category ?? initialFilters.category ?? "account",
+  );
+  const [subject, setSubject] = useState(initialDraft?.subject ?? "");
   const [message, setMessage] = useState("");
   const [objectContext, setObjectContext] = useState<SupportFormObjectContext | null>(
     initialContext,

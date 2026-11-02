@@ -1,11 +1,14 @@
 import { SUPPORT_CASE_CATEGORIES, SUPPORT_CASE_STATUSES } from "@nexus/domain";
 import { z } from "zod";
+
 const supportQuerySchema = z
   .object({
     page: z.coerce.number().int().min(1).max(9999).default(1),
     q: z.string().trim().max(120).default(""),
     status: z.enum(SUPPORT_CASE_STATUSES).optional(),
     category: z.enum(SUPPORT_CASE_CATEGORIES).optional(),
+    draft: z.literal("publication").optional(),
+    subject: z.string().trim().min(5).max(120).optional(),
   })
   .strict();
 export type SupportQuery = z.infer<typeof supportQuerySchema>;
@@ -13,7 +16,10 @@ export function supportQuery(params: URLSearchParams, api = false) {
   const fields: Record<string, string> = {};
   for (const [key, value] of params) {
     if (api && key === "scope" && value === "staff" && params.getAll(key).length === 1) continue;
-    if (!["page", "q", "status", "category"].includes(key) || params.getAll(key).length !== 1)
+    if (
+      !["page", "q", "status", "category", "draft", "subject"].includes(key) ||
+      params.getAll(key).length !== 1
+    )
       return null;
     if ((key === "status" || key === "category") && value === "") continue;
     fields[key] = value;
@@ -28,6 +34,13 @@ export function supportHref(base: string, filters: SupportQuery, page = filters.
   if (filters.status) params.set("status", filters.status);
   if (filters.category) params.set("category", filters.category);
   return `${base}${params.size ? `?${params}` : ""}`;
+}
+
+/** Prefills a new case from a publication title. Does not store a content id. */
+export function publicationSupportHref(title: string) {
+  const subject = title.trim().replace(/\s+/gu, " ").slice(0, 120);
+  if (subject.length < 5) return "/support";
+  return `/support?${new URLSearchParams({ draft: "publication", subject })}`;
 }
 export const supportActivitySchema = z
   .object({
