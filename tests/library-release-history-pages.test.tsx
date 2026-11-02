@@ -94,5 +94,9 @@ it("rejects ambiguous scope and requires authentication before history calls", a
   await expect(screen({ days: ["7", "30"] })).rejects.toThrow("NOT_FOUND");
   expect(h.history).not.toHaveBeenCalled();
   h.actor = null;
-  await expect(screen()).rejects.toThrow("NOT_FOUND");
+  const html = await screen();
+  expect(html).toContain("Sign in to manage your library");
+  expect(html).toContain("/auth/login?next=");
+  expect(html).toContain("%2Fworkspace%2Flibrary%2Fversion-history");
+  expect(h.history).not.toHaveBeenCalled();
 });

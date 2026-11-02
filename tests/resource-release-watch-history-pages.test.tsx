@@ -88,7 +88,10 @@ it("shows a current accessible title and management link without rewriting histo
 });
 it("requires sign-in and rejects duplicate filters before reading audit records", async () => {
   h.user = null;
-  await expect(screen()).rejects.toThrow("NOT_FOUND");
+  const html = await screen();
+  expect(html).toContain("Sign in to manage release notifications");
+  expect(html).toContain("/auth/login?next=");
+  expect(html).toContain("%2Fworkspace%2Flibrary%2Fwatches%2Fhistory");
   expect(h.history).not.toHaveBeenCalled();
   h.user = { id: "usr_a" };
   await expect(

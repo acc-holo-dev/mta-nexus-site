@@ -87,7 +87,10 @@ it("retains reference pair and return page in export and swaps the direction exp
 });
 it("requires current actor, unambiguous query and current release authorization", async () => {
   h.actor = null;
-  await expect(screen()).rejects.toThrow("NOT_FOUND");
+  const guest = await screen();
+  expect(guest).toContain("Sign in to manage your library");
+  expect(guest).toContain("/auth/login?next=");
+  expect(guest).toContain("%2Fworkspace%2Flibrary%2Fprd_a%2Fversions%2Fcompare");
   expect(h.compare).not.toHaveBeenCalled();
   h.actor = { id: "usr_a", role: "user" };
   await expect(screen({ ...query, from: ["bld_a", "bld_c"] })).rejects.toThrow("NOT_FOUND");

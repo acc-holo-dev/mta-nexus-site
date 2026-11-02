@@ -26,12 +26,12 @@ export async function LibraryReleaseComparisonScreen({
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const authCopy = getResourceReleaseControlCopy(locale);
-  const base = `/workspace/library/${encodeURIComponent(path.id)}/versions/compare`;
+  const compareBase = `/workspace/library/${encodeURIComponent(path.id)}/versions/compare`;
   if (!actor) {
-    let returnPath = base;
+    let returnPath = compareBase;
     try {
       const preview = libraryReleaseComparisonQuery(collectionPageParams(raw));
-      returnPath = `${base}?${new URLSearchParams({
+      returnPath = `${compareBase}?${new URLSearchParams({
         from: preview.from,
         to: preview.to,
         returnPage: String(preview.returnPage),

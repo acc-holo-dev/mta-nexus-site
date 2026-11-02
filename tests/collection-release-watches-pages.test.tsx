@@ -70,6 +70,9 @@ it("leaves archived collections inspectable without enrollment controls", async 
 });
 it("requires sign-in before reading a private collection", async () => {
   h.user = null;
-  await expect(screen()).rejects.toThrow("NOT_FOUND");
+  const html = await screen();
+  expect(html).toContain("Sign in to manage release notifications");
+  expect(html).toContain("/auth/login?next=");
+  expect(html).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fwatches");
   expect(h.page).not.toHaveBeenCalled();
 });
