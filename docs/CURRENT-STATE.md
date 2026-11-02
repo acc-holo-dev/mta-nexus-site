@@ -4,12 +4,12 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `425b7549f4ffd94d5c7aa1eb238fe00c49940a50` (`fix(web): tighten residual guest gates and empty CTAs`).
-- **Verified CI green on that tip:** [CI 41463079309](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41463079309) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `4ac85dbf3fd3324f7947a0a92d989de5d2991f64` (`fix(web): filtered empty CTAs and support PlatformSignIn CI`).
+- **Verified CI green on that tip:** [CI 41466196762](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41466196762) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `425b7549…` / [CI 41463079309](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41463079309).
 - **Prior selected green:** `6387f3b0…` / [CI 41460783639](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41460783639).
 - **Prior selected green:** `adc7a459…` / [CI 41459069936](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41459069936).
-- **Prior selected green:** `449f35e9…` / [CI 41454707659](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41454707659).
-- **Failed tip (not baseline):** `8a06c6ce…` settings guest unit; `1b6dce50…` history labels/Pathname (fixed on `adc7a459`).
+- **Failed tip (not baseline):** `dc035b0c…` support-center lint/auth-entry (fixed on `4ac85dbf`); `8a06c6ce…` settings guest unit; `1b6dce50…` history labels/Pathname.
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
 - **Failed tip (not baseline):** `7cd137da…` format; `4565dd8f…` compare base; `c32a4ef6…` admin guest unit contracts (fixed on `e7892ceb`).
 - **Earlier full selected green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
@@ -38,11 +38,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `425b7549…` selected green (CI 41463079309); residual guest/empty polish shipped; continue ActionConfirmCheckbox + library/support guest honesty.
+**Последняя локальная волна:** tip `4ac85dbf…` selected green (CI 41466196762); filtered empty CTAs + support PlatformSignIn CI fix; continue confirm-checkbox migration and report empty honesty.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `425b7549…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `4ac85dbf…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

@@ -97,11 +97,23 @@ it("renders escaped staff notes, batch context and staff-only export paths", () 
   expect(own).not.toContain(reportHistoryCopy("ru").batch);
 });
 it("shows explicit empty or unknown evidence without inventing a status transition", () => {
-  const empty = renderToStaticMarkup(
-    <CommunityReportHistory page={{ ...page, items: [] }} filters={filters} locale="en" />,
-  );
-  expect(empty).toContain(reportHistoryCopy("en").empty);
+  const copy = reportHistoryCopy("en"),
+    empty = renderToStaticMarkup(
+      <CommunityReportHistory page={{ ...page, items: [] }} filters={filters} locale="en" />,
+    );
+  expect(empty).toContain(copy.empty);
+  expect(empty).not.toContain(copy.emptyFiltered);
   expect(empty).toContain('role="status"');
+  const filtered = renderToStaticMarkup(
+    <CommunityReportHistory
+      page={{ ...page, items: [] }}
+      filters={{ ...filters, period: "30", group: "review" }}
+      locale="en"
+    />,
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.reset);
+  expect(filtered).toContain("/workspace/reports/report/history");
   const unknown = renderToStaticMarkup(
     <CommunityReportHistory
       page={{ ...page, items: [{ ...event, from: null, to: null, by: "unknown" }] }}

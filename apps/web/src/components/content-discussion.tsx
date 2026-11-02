@@ -424,6 +424,11 @@ export function ContentDiscussion({
         </p>
       )}
       <div className="space-y-3" aria-busy={loading}>
+        {loading && !page?.items.length ? (
+          <p role="status" aria-live="polite" className="text-sm text-muted">
+            {copy.loading}
+          </p>
+        ) : null}
         {page?.items.map((comment) => (
           <article
             id={`comment-${comment.id}`}

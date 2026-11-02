@@ -36,9 +36,12 @@ function nodes(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const e = node as Element;
-  const type = e.type as { displayName?: string } | string;
+  const type = e.type as { displayName?: string } | string | ((props: unknown) => ReactNode);
   if (typeof type === "object" && type?.displayName === "Button") {
     return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
+  }
+  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
+    return nodes(type(e.props));
   }
   return [e, ...nodes(e.props.children as ReactNode)];
 }

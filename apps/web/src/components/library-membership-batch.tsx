@@ -9,6 +9,7 @@ import { Button } from "@nexus/ui";
 import { libraryMembershipBatchCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { confirmedMembershipBatch } from "../lib/library-membership-batch-confirmation";
@@ -240,18 +241,17 @@ export function LibraryMembershipBatchForm({
             );
           })}
         </ul>
-        <label className="flex items-start gap-3 text-sm">
-          <input
-            type="checkbox"
-            checked={checked}
-            required
-            onChange={(event) => {
-              if (!pending.current && !lock.current && !settled.current)
-                setAcknowledged(event.target.checked ? fingerprint : "");
-            }}
-          />
+        <ActionConfirmCheckbox
+          id={`${report.resource.productId}-membership-batch-confirm`}
+          checked={checked}
+          required
+          onCheckedChange={(value) => {
+            if (!pending.current && !lock.current && !settled.current)
+              setAcknowledged(value ? fingerprint : "");
+          }}
+        >
           {h.confirm}
-        </label>
+        </ActionConfirmCheckbox>
       </fieldset>
       <Button
         type="submit"

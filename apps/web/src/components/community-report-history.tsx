@@ -26,7 +26,13 @@ export function CommunityReportHistory({
   const copy = reportHistoryCopy(locale),
     reportCopy = communityReportCopy(locale),
     base = `${page.audience === "staff" ? "/admin/reports" : "/workspace/reports"}/${encodeURIComponent(page.report.id)}`,
-    path = `${base}/history`;
+    path = `${base}/history`,
+    filtered =
+      filters.period !== "all" ||
+      filters.group !== "all" ||
+      !!filters.query?.trim() ||
+      !!filters.cursor ||
+      !!filters.until;
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <Link
@@ -94,9 +100,17 @@ export function CommunityReportHistory({
       <p className="text-xs text-muted">{copy.exportHint}</p>
       <PrivateChangeHistoryCutoff until={page.until} locale={locale} />
       {page.items.length === 0 ? (
-        <p role="status" className="nexus-panel p-5 text-muted">
-          {copy.empty}
-        </p>
+        <div role="status" className="nexus-panel space-y-3 p-5 text-muted">
+          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
+          {filtered ? (
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <ol className="space-y-3" aria-label={copy.title}>
           {page.items.map((event) => (

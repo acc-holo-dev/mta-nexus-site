@@ -4,6 +4,7 @@ import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@
 import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
@@ -236,18 +237,16 @@ export function LibraryCollectionItemCopyForm({
           </p>
         )}
         {overCapacity && <p role="alert">{c.quota}</p>}
-        <label className="flex items-start gap-3 text-sm">
-          <input
-            type="checkbox"
-            checked={confirmed}
-            onChange={(event) => {
-              if (!pending.current && !lock.current && !settled.current)
-                setConfirmed(event.target.checked);
-            }}
-            required
-          />
+        <ActionConfirmCheckbox
+          id={`${source.id}-${action}-confirm`}
+          checked={confirmed}
+          required
+          onCheckedChange={(value) => {
+            if (!pending.current && !lock.current && !settled.current) setConfirmed(value);
+          }}
+        >
           {shownMove ? c.moveItemsConfirm : c.copyItemsConfirm}
-        </label>
+        </ActionConfirmCheckbox>
       </fieldset>
       {!blocked && !saved && (
         <Button

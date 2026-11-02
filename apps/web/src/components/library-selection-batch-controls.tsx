@@ -3,6 +3,7 @@ import type { LibrarySelectionBatchCommand, LibrarySelectionBatchPreview } from 
 import { Button } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
@@ -193,15 +194,16 @@ export function LibrarySelectionBatchControls({
               </li>
             ))}
           </ol>
-          <label className="flex gap-2">
-            <input
-              type="checkbox"
-              checked={confirmed}
-              disabled={busy || frozen || saved}
-              onChange={(e) => setConfirmed(e.target.checked)}
-            />
+          <ActionConfirmCheckbox
+            id={`${collectionId}-selection-batch-confirm`}
+            checked={confirmed}
+            onCheckedChange={setConfirmed}
+            disabled={busy || frozen || saved}
+            labelClassName="flex gap-2"
+            checkboxClassName={actionConfirmCheckboxFocusClass}
+          >
             {c.confirm}
-          </label>
+          </ActionConfirmCheckbox>
           <Button
             type="button"
             disabled={busy || saved || !confirmed || !preview.changedCount}

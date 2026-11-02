@@ -9,6 +9,7 @@ import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -236,20 +237,21 @@ export function LibraryCollectionBatchForm({
             </li>
           ))}
         </ul>
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={acknowledged}
-            onChange={(e) => {
-              if (active.current && !pending.current && !lock.current && !settled.current) {
-                reviewed.current = e.target.checked ? fingerprint : null;
-                setChecked(e.target.checked);
-              }
-            }}
-            required
-          />
+        <ActionConfirmCheckbox
+          id={`${collection.id}-${action}-batch-confirm`}
+          checked={acknowledged}
+          required
+          labelClassName="flex items-start gap-2 text-sm"
+          checkboxClassName={actionConfirmCheckboxFocusClass}
+          onCheckedChange={(value) => {
+            if (active.current && !pending.current && !lock.current && !settled.current) {
+              reviewed.current = value ? fingerprint : null;
+              setChecked(value);
+            }
+          }}
+        >
           {c.batchConfirm}
-        </label>
+        </ActionConfirmCheckbox>
       </fieldset>
       <Button
         type="submit"

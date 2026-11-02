@@ -23,7 +23,8 @@ const en = {
   },
   by: { requester: "Requester", staff: "Moderation team", unknown: "Actor not recorded" },
   back: "Back to report",
-  empty: "No recorded events match these filters.",
+  empty: "No recorded events for this report yet.",
+  emptyFiltered: "No recorded events match these filters.",
   download: "Download this page (JSON)",
   exportHint:
     "This download contains the displayed page. Staff exports also include private decision notes.",
@@ -60,7 +61,8 @@ const ru: typeof en = {
   },
   by: { requester: "Заявитель", staff: "Команда модерации", unknown: "Автор действия не записан" },
   back: "Вернуться к жалобе",
-  empty: "По этим фильтрам записанных событий нет.",
+  empty: "Для этой жалобы записанных событий пока нет.",
+  emptyFiltered: "По этим фильтрам записанных событий нет.",
   download: "Скачать эту страницу (JSON)",
   exportHint:
     "Выгрузка содержит отображаемую страницу. Выгрузка модератора также включает приватные заметки к решениям.",

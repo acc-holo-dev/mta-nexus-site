@@ -9,6 +9,7 @@ import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedSubscriptionReceipt } from "../lib/subscription-confirmation";
 import { subscriptionError, subscriptionsCopy } from "../lib/subscriptions-i18n";
 import { subscriptionAccountHref, subscriptionReceiptHref } from "../lib/subscriptions-query";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { useNexusLocale } from "./locale-context";
 
 type Props = {
@@ -129,16 +130,16 @@ export function SubscriptionControls(props: Props) {
             </select>
           </label>
         ) : props.action === "cancel" ? (
-          <label htmlFor={`${field}-confirm`} className="flex items-center gap-3">
-            <input
-              id={`${field}-confirm`}
-              type="checkbox"
-              required
-              checked={confirmed}
-              onChange={(e) => setConfirmed(e.target.checked)}
-            />
+          <ActionConfirmCheckbox
+            id={`${field}-confirm`}
+            checked={confirmed}
+            onCheckedChange={setConfirmed}
+            required
+            labelClassName="flex items-center gap-3"
+            checkboxClassName={actionConfirmCheckboxFocusClass}
+          >
             {c.confirmCancel}
-          </label>
+          </ActionConfirmCheckbox>
         ) : (
           <p>{c.personal}</p>
         )}

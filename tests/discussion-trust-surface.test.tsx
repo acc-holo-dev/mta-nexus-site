@@ -192,9 +192,29 @@ it("does not interpret empty history or failed reads as verification decisions",
     hasMore: false,
     nextCursor: null,
   });
-  const empty = renderToStaticMarkup(await HistoryPage(profile));
-  expect(empty).toContain(approvalCopy("en").empty);
-  expect(empty).toContain(approvalCopy("en").verified);
+  const copy = approvalCopy("en"),
+    subject = {
+      username: "writer",
+      name: "Writer",
+      identityVerified: true,
+      developerVerified: false,
+    },
+    empty = renderToStaticMarkup(await HistoryPage(profile));
+  expect(empty).toContain(copy.empty);
+  expect(empty).not.toContain(copy.emptyFiltered);
+  expect(empty).toContain(copy.verified);
+  mocks.approvals.mockResolvedValueOnce({
+    subject,
+    items: [],
+    hasMore: false,
+    nextCursor: null,
+  });
+  const filtered = renderToStaticMarkup(
+    await HistoryPage({ ...profile, searchParams: Promise.resolve({ type: "developer" }) }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.reset);
+  expect(filtered).toContain("/users/writer/trust/history");
   mocks.approvals.mockRejectedValueOnce(new Error("secret proof"));
   const failed = renderToStaticMarkup(await HistoryPage(profile));
   expect(failed).toContain(approvalCopy("en").unavailable);

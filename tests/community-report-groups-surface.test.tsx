@@ -146,11 +146,23 @@ it("keeps unavailable targets actionable only through an individual report and d
   expect(html).toContain(reportGroupsCopy("ru").unknown);
   expect(html).toContain("/admin/reports/report");
   expect(html).not.toContain("/admin/community/");
-  const empty = renderToStaticMarkup(
-    <CommunityReportGroups page={{ ...page, items: [] }} filters={filters} locale="ru" />,
-  );
-  expect(empty).toContain(reportGroupsCopy("ru").empty);
+  const copy = reportGroupsCopy("ru"),
+    empty = renderToStaticMarkup(
+      <CommunityReportGroups page={{ ...page, items: [] }} filters={filters} locale="ru" />,
+    );
+  expect(empty).toContain(copy.emptyFiltered);
+  expect(empty).toContain(copy.reset);
+  expect(empty).toContain("/admin/reports/targets");
   expect(empty).toContain('role="status"');
+  const lifetime = renderToStaticMarkup(
+    <CommunityReportGroups
+      page={{ ...page, items: [] }}
+      filters={{ period: "all", view: "pending", group: "all", query: "" }}
+      locale="ru"
+    />,
+  );
+  expect(lifetime).toContain(copy.empty);
+  expect(lifetime).not.toContain(copy.emptyFiltered);
 });
 it.each(["en", "ru"] as const)(
   "renders publication context, working batch controls and retained report filters in %s",

@@ -13,7 +13,8 @@ const en = {
   latest: "Latest records",
   older: "Older records",
   loading: "Loading approval records…",
-  empty: "No dated approvals are recorded for this page and filter.",
+  empty: "No dated approval records are published for this profile yet.",
+  emptyFiltered: "No dated approvals are recorded for this page and filter.",
   approved: "Approval recorded",
   scope:
     "These are retained approval records, not a full verification lifecycle. Pending and rejected applications, evidence and staff notes are private. An old approval does not establish current verification; a missing record does not imply rejection or misconduct.",
@@ -38,7 +39,8 @@ const ru: Record<keyof typeof en, string> = {
   latest: "Новые записи",
   older: "Старые записи",
   loading: "Загрузка записей одобрений…",
-  empty: "На этой странице нет записанных одобрений по выбранному фильтру.",
+  empty: "Для этого профиля пока нет опубликованных записей одобрений.",
+  emptyFiltered: "На этой странице нет записанных одобрений по выбранному фильтру.",
   approved: "Одобрение записано",
   scope:
     "Это сохранённые записи одобрений, а не полный жизненный цикл верификации. Ожидающие и отклонённые заявки, доказательства и внутренние заметки приватны. Прошлое одобрение не подтверждает текущий статус; отсутствие записи не означает отказ или нарушение.",

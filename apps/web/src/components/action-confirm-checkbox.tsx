@@ -20,7 +20,7 @@ export type ActionConfirmCheckboxProps = {
   describedBy?: string;
 };
 
-export function ActionConfirmCheckbox({
+function ActionConfirmCheckbox({
   id,
   checked,
   onCheckedChange,
@@ -47,3 +47,7 @@ export function ActionConfirmCheckbox({
     </label>
   );
 }
+
+ActionConfirmCheckbox.displayName = "ActionConfirmCheckbox";
+
+export { ActionConfirmCheckbox };

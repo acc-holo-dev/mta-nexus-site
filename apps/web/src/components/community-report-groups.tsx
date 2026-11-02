@@ -20,7 +20,15 @@ export function CommunityReportGroups({
 }) {
   const copy = reportGroupsCopy(locale),
     labels = communityReportCopy(locale),
-    path = "/admin/reports/targets";
+    path = "/admin/reports/targets",
+    filtered =
+      filters.period !== "all" ||
+      filters.view !== "pending" ||
+      !!filters.query?.trim() ||
+      !!filters.target ||
+      !!filters.type ||
+      !!filters.cursor ||
+      !!filters.until;
   const date = (time: string) =>
     new Date(time).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" });
   const contextQuery = new URLSearchParams({ view: filters.view });
@@ -100,9 +108,17 @@ export function CommunityReportGroups({
       </form>
       <PrivateChangeHistoryCutoff until={page.until} locale={locale} />
       {page.items.length === 0 ? (
-        <p role="status" className="nexus-panel p-5 text-muted">
-          {copy.empty}
-        </p>
+        <div role="status" className="nexus-panel space-y-3 p-5 text-muted">
+          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
+          {filtered ? (
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <ol className="space-y-3">
           {page.items.map((item) => (

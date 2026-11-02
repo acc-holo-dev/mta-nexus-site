@@ -8,6 +8,7 @@ import {
 import { Button } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedResourceReleaseWatchBatch } from "../lib/resource-release-watch-batch-confirmation";
@@ -62,6 +63,7 @@ export function ResourceReleaseWatchBatchControls({
       )
     : RESOURCE_RELEASE_WATCH_BATCH_LIMIT;
   const copy = resourceReleaseWatchesCopy(locale),
+    confirmFieldId = `${collection?.id ?? (resume ? "resume" : "account")}-watch-batch-confirm`,
     router = useRouter(),
     lock = useRef(false),
     settled = useRef(false),
@@ -212,14 +214,13 @@ export function ResourceReleaseWatchBatchControls({
             <span className="break-words">{item.title ?? copy.privateResource}</span>
           </label>
         ))}
-        <label className="flex items-start gap-3 text-sm">
-          <input
-            type="checkbox"
-            checked={confirmed}
-            onChange={(event) => setConfirmed(event.target.checked)}
-          />
-          <span>{confirm}</span>
-        </label>
+        <ActionConfirmCheckbox
+          id={confirmFieldId}
+          checked={confirmed}
+          onCheckedChange={setConfirmed}
+        >
+          {confirm}
+        </ActionConfirmCheckbox>
       </fieldset>
       {!pending && (
         <Button

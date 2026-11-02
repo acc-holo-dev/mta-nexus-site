@@ -35,7 +35,8 @@ export default async function ApprovalHistoryPage({
     else if (value !== undefined) query.append(key, value);
   }
   const filters = parseApprovalQuery(query),
-    latest = approvalPageHref(username, filters ?? {});
+    latest = approvalPageHref(username, filters ?? {}),
+    filtered = Boolean(filters?.type);
   let error = filters ? "" : copy.invalid;
   const page = filters
     ? await publicVerificationHistoryService.page(username, filters).catch((failure: unknown) => {
@@ -127,7 +128,17 @@ export default async function ApprovalHistoryPage({
         </p>
       )}
       {page && !page.items.length && (
-        <p className="nexus-panel p-6 text-sm text-muted">{copy.empty}</p>
+        <div role="status" className="nexus-panel space-y-3 p-6 text-sm text-muted">
+          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
+          {filtered ? (
+            <Link
+              href={approvalPageHref(username)}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       )}
       {page && (
         <ol className="space-y-3">
