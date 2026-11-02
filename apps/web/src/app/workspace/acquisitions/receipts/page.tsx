@@ -133,9 +133,23 @@ export default async function ResourceCartReceiptsPage({
         <Button type="submit" variant="outline" className="text-sm">
           {copy.apply}
         </Button>
+        <Link
+          href="/workspace/acquisitions/receipts"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {copy.clear}
+        </Link>
       </form>
       {!result.items.length ? (
-        <p className="nexus-panel p-6 text-secondary">{copy.empty}</p>
+        <div className="nexus-panel space-y-3 p-6">
+          <p className="text-secondary">{copy.empty}</p>
+          <Link
+            href="/workspace/acquisitions/receipts"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            {copy.clear}
+          </Link>
+        </div>
       ) : (
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.items.map((item) => (

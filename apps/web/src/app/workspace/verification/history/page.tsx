@@ -126,6 +126,13 @@ export default async function VerificationHistoryPage({
               </select>
             </label>
             <Button type="submit">{copy.search}</Button>
+            <Link
+              prefetch={false}
+              href="/workspace/verification/history"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.clear}
+            </Link>
           </form>
           <p className="text-xs text-muted">{copy.live}</p>
           <Link
@@ -133,7 +140,7 @@ export default async function VerificationHistoryPage({
             href={
               filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"
             }
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.latest}
           </Link>
@@ -143,7 +150,16 @@ export default async function VerificationHistoryPage({
             </p>
           )}
           {report && !report.items.length && (
-            <p className="nexus-panel p-6 text-sm text-muted">{copy.empty}</p>
+            <div className="nexus-panel space-y-3 p-6">
+              <p className="text-sm text-muted">{copy.empty}</p>
+              <Link
+                prefetch={false}
+                href="/workspace/verification/history"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.clear}
+              </Link>
+            </div>
           )}
           <ul className="space-y-3">
             {report?.items.map((item) => (

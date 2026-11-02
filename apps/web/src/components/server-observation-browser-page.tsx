@@ -343,9 +343,20 @@ function ServerObservationBrowserPanel({
 export async function ServerObservationBrowserLoading() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return (
-    <div role="status" aria-busy="true" className="mx-auto max-w-6xl space-y-4 py-8">
-      <p className="text-lg font-bold text-primary">{copy.loading}</p>
+    <section
+      className="mx-auto max-w-6xl space-y-4 py-8"
+      aria-busy="true"
+      aria-labelledby="server-observations-loading-heading"
+    >
+      <header className="space-y-2">
+        <h1 id="server-observations-loading-heading" className="font-display text-primary">
+          {copy.title}
+        </h1>
+        <p role="status" aria-live="polite" className="text-sm text-muted">
+          {copy.loading}
+        </p>
+      </header>
       <div className="h-40 animate-pulse rounded-lg bg-inset" aria-hidden="true" />
-    </div>
+    </section>
   );
 }
