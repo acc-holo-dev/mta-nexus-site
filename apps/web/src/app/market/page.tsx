@@ -68,12 +68,12 @@ export default async function MarketPage({
   const activeQueryLabel = query ? `${dictionary.market.searchLabel}: ${query}` : null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
-        <div>
-          <h1 className="flex items-center gap-2.5 font-display text-primary">
-            <ShoppingBag className="h-6 w-6 text-accent" />
-            <span>{dictionary.market.title}</span>
+    <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className="flex min-w-0 flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
+        <div className="min-w-0">
+          <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
+            <ShoppingBag className="h-6 w-6 shrink-0 text-accent" />
+            <span className="min-w-0 break-words">{dictionary.market.title}</span>
           </h1>
           <p className="mt-0.5 font-caption text-muted">
             {dictionary.market.showing} {products.length}
@@ -137,7 +137,7 @@ export default async function MarketPage({
 
       <nav
         aria-label={dictionary.market.categoryLabel}
-        className="flex flex-wrap items-center gap-1.5"
+        className="flex max-w-full items-center gap-1.5 overflow-x-auto pb-1"
       >
         {CATEGORIES.map((category) => {
           const isActive = type === category.id;

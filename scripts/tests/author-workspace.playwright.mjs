@@ -858,6 +858,10 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const markAll = page.getByRole("button", { name: inboxCopy.markAllRead, exact: true });
   await expect(markAll).toBeVisible();
   await markAll.click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: inboxCopy.markAllRead, exact: true })
+    .click();
   await expect
     .poll(async () =>
       page.evaluate(async () => (await (await fetch("/api/notifications")).json()).unreadCount),
