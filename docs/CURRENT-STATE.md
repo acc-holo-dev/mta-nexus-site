@@ -4,12 +4,12 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `359faea86e457a5edbfdc53902216051690caffd` (`fix(web): market guest register and notification tab honesty`).
-- **Verified CI green on that tip:** [CI 41485628226](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41485628226) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `748df327af9311d29162ac54fd587933add444df` (`fix(web): dialog accessible names, CTA focus rings, and receipts empty honesty`).
+- **Verified CI green on that tip:** [CI 41503267385](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41503267385) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `359faea8…` / [CI 41485628226](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41485628226).
 - **Prior selected green:** `bed43fc1…` / [CI 41484238459](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41484238459).
 - **Prior selected green:** `9e1245ab…` / [CI 41480166414](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41480166414).
-- **Prior selected green:** `7cc7304b…` / [CI 41478298167](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41478298167).
-- **Failed tip (not baseline):** `6324ea0e…` GuestAuthLinks blast (compose feedback register props, follow GuestAuthLinks walk, server-review dictionary); `b7a8dd10…` team-discussion displayName + community-report slots; `0ae6747a…` knip unused ActionConfirmCheckboxProps; `71b7191b…` displayName typecheck; `dc035b0c…` support-center lint/auth-entry.
+- **Failed tip (not baseline):** `cb76dbba…` production smoke sign-out without confirm dialog (fixed on `d444db71`); `3cf4d33e…` soft-refresh unit mocks; `2519b7a4…` inbox aria-busy + batch typecheck; `cb065352…` server-review useRouter mock / unused ReactElement / format; `6324ea0e…` GuestAuthLinks blast; `b7a8dd10…` displayName/community-report slots.
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
 - **Failed tip (not baseline):** `7cd137da…` format; `4565dd8f…` compare base; `c32a4ef6…` admin guest unit contracts (fixed on `e7892ceb`).
 - **Earlier full selected green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
@@ -38,11 +38,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `359faea8…` selected green (CI 41485628226); market/cart guest register + notification tabs; next: PlatformSignIn extract + surface register assertions.
+**Последняя локальная волна:** tip `748df327…` selected green (CI 41503267385); PlatformSignIn extract, INT13 intentKey drafts, confirm batches, soft-refresh recovery, admin/settings/library splits, sign-out confirm + smoke dialog a11y; next: residual F07 nav polish and tip-SHA regression evidence.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `359faea8…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `748df327…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
