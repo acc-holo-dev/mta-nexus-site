@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ServerClaimStatusPanel } from "../../../../components/server-claim-status-panel";
 import { ServerDetailsForm } from "../../../../components/server-details-form";
 import { getDictionary } from "../../../../lib/i18n";
@@ -33,16 +33,7 @@ export default async function ServerManagementPage({
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <p className="font-caption text-muted">{copy.signInMessage}</p>
-        <Link
-          href={authEntryHref("login", `/workspace/servers/${encodeURIComponent(id)}`)}
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white"
-        >
-          {copy.signIn}
-        </Link>
-      </div>
+      <PlatformSignIn locale={locale} returnPath={`/workspace/servers/${encodeURIComponent(id)}`} />
     );
   }
 

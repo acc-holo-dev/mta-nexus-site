@@ -121,7 +121,7 @@ describe("server management page behavior", () => {
       }),
     );
 
-    expect(html).toContain(dictionary.signInRequired);
+    expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fservers%2Fsrv_managed"');
     expect(serverService.getServerById).not.toHaveBeenCalled();
     expect(serverService.canManageServer).not.toHaveBeenCalled();
   });

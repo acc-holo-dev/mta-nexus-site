@@ -14,6 +14,7 @@ vi.mock("../../../lib/services/resource-publisher-service", () => ({
   resourcePublisherService: { inventory: mocks.list },
 }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/resources",
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },

@@ -3,7 +3,7 @@ import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ResourceReleaseWatchBatchControls } from "../../../../components/resource-release-watch-batch-controls";
 import { ResourceReleaseWatchControl } from "../../../../components/resource-release-watch-control";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
@@ -44,17 +44,7 @@ export default async function ReleaseWatchesPage({
     } catch {
       // Keep the list route when filters are invalid for unsigned visitors.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof resourceReleaseWatchesQuery>;
   try {
@@ -71,7 +61,7 @@ export default async function ReleaseWatchesPage({
         <p role="alert">{copy.invalid}</p>
         <Link
           href="/workspace/library/watches"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.title}
         </Link>
@@ -95,7 +85,7 @@ export default async function ReleaseWatchesPage({
       <h1 className="font-display text-primary">{copy.title}</h1>
       <Link
         href="/workspace/library/watches/history"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
@@ -127,7 +117,7 @@ export default async function ReleaseWatchesPage({
         </Button>
       </form>
       <a
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         href={`/api/library/watches/export?${new URLSearchParams({ filter: query.filter, page: String(result.page), query: query.query })}`}
       >
         {copy.export}

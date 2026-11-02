@@ -201,6 +201,22 @@ it("denies nonstaff report screens before querying the queue", async () => {
   await expect(ResourceReviewReportScreen({ staff: true })).rejects.toThrow("NEXT_NOT_FOUND");
   expect(state.reportsPage).not.toHaveBeenCalled();
 });
+it("suggests the alternate report view when the current queue is empty", async () => {
+  state.reportsPage.mockResolvedValueOnce({
+    items: [],
+    view: "history",
+    page: 1,
+    totalPages: 1,
+    total: 0,
+  });
+  const html = renderToStaticMarkup(
+    await ResourceReviewReportScreen({ staff: false, query: { view: "history" } }),
+  );
+  expect(html).toContain("No reports in this view.");
+  expect(html).toContain("Pending");
+  expect(html).toContain('href="/workspace/review-reports?view=pending"');
+});
+
 it("report history keeps its filters while paging", async () => {
   const html = renderToStaticMarkup(
     await ResourceReviewReportScreen({ staff: false, query: { view: "history", page: "2" } }),

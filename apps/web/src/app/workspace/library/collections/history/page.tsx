@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import {
@@ -57,17 +57,7 @@ export default async function Page({
     } catch {
       // Keep the list route when filters are invalid for unsigned visitors.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   try {
     const query = libraryCollectionHistoryQuery(collectionPageParams(raw));

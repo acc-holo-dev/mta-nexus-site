@@ -8,7 +8,10 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh() {} }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh() {} }),
+  usePathname: () => "/workspace/library/watches",
+}));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
@@ -89,7 +92,7 @@ it("authenticates early and invalid duplicate filters never reach the repository
   state.user = null;
   expect(
     renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ owner: "other" }) })),
-  ).toContain("Sign in");
+  ).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary%2Fwatches"');
   expect(state.page).not.toHaveBeenCalled();
   state.user = { id: "usr_a" };
   expect(

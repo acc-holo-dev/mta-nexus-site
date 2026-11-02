@@ -104,13 +104,13 @@ export default async function LibraryVersionsPage({
       ) : null}
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/requirements`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/collections`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {libraryCollectionsCopy(locale).resourceCollections}
       </Link>
@@ -157,7 +157,7 @@ export default async function LibraryVersionsPage({
               {current && current.id !== version.id && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(id)}/versions/compare?${new URLSearchParams({ from: current.id, to: version.id, returnPage: String(result.page) })}`}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {libraryReleaseComparisonCopy(locale).title}
                 </Link>
@@ -195,7 +195,7 @@ export default async function LibraryVersionsPage({
           {result.page > 1 ? (
             <Link
               href={`?page=${result.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -206,7 +206,7 @@ export default async function LibraryVersionsPage({
           {result.page < result.totalPages ? (
             <Link
               href={`?page=${result.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>

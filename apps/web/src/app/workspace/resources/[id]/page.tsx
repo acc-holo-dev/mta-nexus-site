@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../components/auth-return-path";
 import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../../../components/resource-publication-readiness-panel";
 import { getDictionary } from "../../../../lib/i18n";
@@ -37,18 +37,7 @@ export default async function ManageResourcePage({
   const resourcePath = `/workspace/resources/${encodeURIComponent(id)}`;
   const returnPath = returnQuery ? `${resourcePath}?${returnQuery}` : resourcePath;
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
   const [history, lifecycleHistory, publicationReadiness] = await Promise.all([
@@ -210,7 +199,7 @@ export default async function ManageResourcePage({
             {history.page > 1 && (
               <Link
                 href={`?page=${history.page - 1}`}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.previous}
               </Link>
@@ -221,7 +210,7 @@ export default async function ManageResourcePage({
             {history.page < history.totalPages && (
               <Link
                 href={`?page=${history.page + 1}`}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.next}
               </Link>

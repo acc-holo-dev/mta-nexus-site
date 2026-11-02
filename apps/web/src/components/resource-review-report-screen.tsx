@@ -120,7 +120,15 @@ export async function ResourceReviewReportScreen({
           </article>
         ))
       ) : (
-        <p>{copy.reportEmpty}</p>
+        <div className="space-y-3">
+          <p>{copy.reportEmpty}</p>
+          <Link
+            href={`${base}?view=${result.view === "history" ? "pending" : "history"}`}
+            className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+          >
+            {copy[result.view === "history" ? "pending" : "history"]}
+          </Link>
+        </div>
       )}
       <ResourceReviewPager
         base={base}

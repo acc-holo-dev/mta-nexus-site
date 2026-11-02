@@ -26,6 +26,7 @@ type Target = { type: "user" | "developer" | "organization"; id: string; name: s
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const accentLinkClass = `rounded text-sm text-accent underline ${filterNavLinkClass}`;
 
 export function VerificationWorkspace({
   initial,
@@ -204,17 +205,14 @@ export function VerificationWorkspace({
           {pending ? copy.loading : copy.reload}
         </Button>
         {developer && (
-          <Link
-            href="/settings/developer"
-            className="min-h-10 rounded py-2 rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
+          <Link href="/settings/developer" className={`min-h-10 py-2 ${accentLinkClass}`}>
             {copy.editProfile}
           </Link>
         )}
         {profile && (
           <Link
             href={`/users/${encodeURIComponent(profile.username)}`}
-            className="min-h-10 rounded py-2 rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className={`min-h-10 py-2 ${accentLinkClass}`}
           >
             {copy.publicProfile}
           </Link>
@@ -307,7 +305,7 @@ export function VerificationWorkspace({
             >
               <div className="space-y-1">
                 <Link
-                  className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className={accentLinkClass}
                   href={`/organizations/${encodeURIComponent(team.slug)}`}
                 >
                   {team.name}
@@ -365,7 +363,7 @@ export function VerificationWorkspace({
                 {copy.submitted}
               </p>
               <Link
-                className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className={accentLinkClass}
                 href={`/workspace/verification/${encodeURIComponent(savedId)}`}
               >
                 {copy.title}
@@ -426,10 +424,7 @@ export function VerificationWorkspace({
       )}
       <section className="nexus-panel space-y-3 p-5">
         <p className="text-sm text-muted">{copy.serverHint}</p>
-        <Link
-          href="/workspace/servers"
-          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
+        <Link href="/workspace/servers" className={accentLinkClass}>
           {copy.servers}
         </Link>
       </section>
@@ -475,7 +470,32 @@ export function VerificationWorkspace({
           </Button>
         </form>
         {overview?.history.items.length === 0 && (
-          <p className="nexus-panel p-8 text-sm text-muted">{copy.noApplications}</p>
+          <div className="nexus-panel space-y-3 p-8">
+            <p className="text-sm text-muted">{copy.noApplications}</p>
+            {filters.type ? (
+              <Link
+                href={`/workspace/verification?${new URLSearchParams({
+                  page: "1",
+                  view: filters.view,
+                  teamsPage: String(teamFilters.page),
+                  teamsQ: teamFilters.query,
+                })}`}
+                className={`inline-flex min-h-11 items-center ${accentLinkClass}`}
+              >
+                {copy.all}
+              </Link>
+            ) : (
+              <Link
+                href={href({
+                  view: filters.view === "history" ? "pending" : "history",
+                  page: 1,
+                })}
+                className={`inline-flex min-h-11 items-center ${accentLinkClass}`}
+              >
+                {copy[filters.view === "history" ? "pending" : "history"]}
+              </Link>
+            )}
+          </div>
         )}
         {overview?.history.items.map((application) => (
           <article
@@ -491,7 +511,7 @@ export function VerificationWorkspace({
             <Link
               prefetch={false}
               href={`/workspace/verification/${encodeURIComponent(application.id)}`}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className={`inline-flex min-h-11 items-center ${accentLinkClass}`}
             >
               {verificationApplicationsCopy(locale).open}
             </Link>
@@ -500,7 +520,7 @@ export function VerificationWorkspace({
             </p>
             {safeExternalWebUrl(application.proofUrl) && (
               <a
-                className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className={accentLinkClass}
                 href={safeExternalWebUrl(application.proofUrl)}
                 target="_blank"
                 rel="noopener noreferrer"

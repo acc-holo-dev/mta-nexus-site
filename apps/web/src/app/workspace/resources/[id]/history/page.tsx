@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -45,28 +45,7 @@ export default async function Page({
   const returnQuery = returnParams.toString();
   const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <div className="mx-auto max-w-4xl space-y-6 py-8">
-        <Link
-          href={`/workspace/resources/${encodeURIComponent(id)}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.back}
-        </Link>
-        <h1 className="font-display text-primary">{copy.history}</h1>
-        <p className="text-sm text-muted">{copy.historyNote}</p>
-        <section className="space-y-4 py-8 text-center">
-          <h2 className="font-display text-primary">{dictionary.workspace.signInRequired}</h2>
-          <Link
-            href={authEntryHref("login", returnPath)}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            {dictionary.workspace.signIn}
-          </Link>
-        </section>
-      </div>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let query: ReturnType<typeof resourcePublisherHistoryQuery>;
   try {
     query = resourcePublisherHistoryQuery(publisherSearchParams(raw));
@@ -86,7 +65,7 @@ export default async function Page({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>

@@ -94,6 +94,38 @@ it.each(["ru", "en"] as const)(
     expect(html).not.toContain("<script>");
   },
 );
+it("offers a clear filter or alternate view when history is empty", () => {
+  const emptyOverview: VerificationOverview = {
+    ...overview,
+    history: { ...overview.history, items: [], hasMore: false },
+  };
+  const filtered = renderToStaticMarkup(
+    <VerificationWorkspace
+      initial={emptyOverview}
+      initialTeams={{ items: [], page: 1, hasMore: false }}
+      filters={filters}
+      teamFilters={{ page: 1, view: "history", type: undefined, query: "" }}
+      locale="en"
+    />,
+  );
+  expect(filtered).toContain(verificationCopy("en").noApplications);
+  expect(filtered).toContain(verificationCopy("en").all);
+  expect(filtered).toContain(
+    'href="/workspace/verification?page=1&amp;view=history&amp;teamsPage=1&amp;teamsQ="',
+  );
+  const alternate = renderToStaticMarkup(
+    <VerificationWorkspace
+      initial={emptyOverview}
+      initialTeams={{ items: [], page: 1, hasMore: false }}
+      filters={{ page: 1, view: "pending", type: undefined, query: "" }}
+      teamFilters={{ page: 1, view: "pending", type: undefined, query: "" }}
+      locale="en"
+    />,
+  );
+  expect(alternate).toContain(verificationCopy("en").history);
+  expect(alternate).toContain("view=history");
+});
+
 it("shows errors without presenting a failed read as empty history or editable default data", () => {
   const html = renderToStaticMarkup(
     <VerificationWorkspace
