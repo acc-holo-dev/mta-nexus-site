@@ -22,6 +22,8 @@ export const shell = {
     support: "Поддержка",
     securityCenter: "Безопасность",
     admin: "Админ",
+    adminStaffHint: "Только для staff (admin или moderator)",
+    checkingSession: "Проверка сессии...",
     devTools: "Статус разработки",
     home: "Главная",
     mobileResources: "Ресурсы",

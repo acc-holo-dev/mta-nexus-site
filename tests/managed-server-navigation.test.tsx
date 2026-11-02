@@ -15,12 +15,16 @@ vi.mock("../apps/web/src/components/use-auth-session", () => ({
   useAuthSession: () => state.session,
 }));
 
-import { Sidebar } from "../apps/web/src/components/sidebar";
 import {
+  adminDestinationAccessibleName,
+  isShellSessionLoading,
   isStaffRole,
   showAdminDestination,
+  showGuestSignInCta,
   showWorkspaceTools,
 } from "../apps/web/src/components/shell-destination-policy";
+import { Sidebar } from "../apps/web/src/components/sidebar";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 beforeEach(() => {
   state.path = "/workspace/servers";
@@ -69,6 +73,9 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
   expect(isStaffRole("user")).toBe(false);
   expect(showWorkspaceTools({ status: "loading", user: null })).toBe(false);
   expect(showWorkspaceTools({ status: "anonymous", user: null })).toBe(false);
+  expect(isShellSessionLoading({ status: "loading", user: null })).toBe(true);
+  expect(showGuestSignInCta({ status: "loading", user: null })).toBe(false);
+  expect(showGuestSignInCta({ status: "anonymous", user: null })).toBe(true);
   expect(
     showAdminDestination({
       status: "authenticated",
@@ -81,4 +88,19 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
       user: { username: "a", role: "admin" },
     }),
   ).toBe(true);
+  expect(adminDestinationAccessibleName("Admin", "Staff only")).toBe("Admin (Staff only)");
+});
+
+it("shows session checking chrome without workspace, sign-in, or admin while loading", () => {
+  state.session = { status: "loading", user: null };
+  const dictionary = getDictionary("en");
+  const html = renderToStaticMarkup(
+    <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
+  );
+  expect(html).toContain('role="status"');
+  expect(html).toContain(dictionary.nav.checkingSession);
+  expect(html).toContain('aria-busy="true"');
+  expect(html).not.toContain('href="/workspace"');
+  expect(html).not.toContain('href="/auth/login');
+  expect(html).not.toContain('href="/admin"');
 });

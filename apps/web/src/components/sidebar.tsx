@@ -35,6 +35,8 @@ import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
+  adminDestinationAccessibleName,
+  isShellSessionLoading,
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
@@ -68,7 +70,12 @@ export function Sidebar({
   const session = useAuthSession();
   const workspaceTools = showWorkspaceTools(session);
   const guestSignIn = showGuestSignInCta(session);
+  const sessionLoading = isShellSessionLoading(session);
   const adminVisible = showAdminDestination(session);
+  const adminAccessibleName = adminDestinationAccessibleName(
+    dictionary.nav.admin,
+    dictionary.nav.adminStaffHint,
+  );
 
   const primaryNav: NavItem[] = [
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
@@ -240,12 +247,20 @@ export function Sidebar({
           </div>
         ) : null}
 
+        {sessionLoading ? (
+          <div className="space-y-0.5 border-t border-base pt-3" aria-busy="true">
+            <p role="status" className={isCollapsed ? "sr-only" : "px-2.5 text-xs text-muted"}>
+              {dictionary.nav.checkingSession}
+            </p>
+          </div>
+        ) : null}
+
         {adminVisible && (
           <div className="space-y-0.5 border-t border-base pt-3">
             <Link
               href="/admin"
-              title={isCollapsed ? dictionary.nav.admin : undefined}
-              aria-label={isCollapsed ? dictionary.nav.admin : undefined}
+              title={dictionary.nav.adminStaffHint}
+              aria-label={isCollapsed ? adminAccessibleName : undefined}
               aria-current={pathname.startsWith("/admin") ? "page" : undefined}
               className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
                 pathname.startsWith("/admin")

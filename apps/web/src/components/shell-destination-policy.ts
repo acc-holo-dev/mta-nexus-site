@@ -34,3 +34,12 @@ export function showWorkspaceTools(session: ShellAuthSession): boolean {
 export function showGuestSignInCta(session: ShellAuthSession): boolean {
   return session.status === "anonymous";
 }
+
+/** Session probe in flight — hide Workspace and Sign in until resolved (fail closed). */
+export function isShellSessionLoading(session: ShellAuthSession): boolean {
+  return session.status === "loading";
+}
+
+export function adminDestinationAccessibleName(adminLabel: string, staffHint: string): string {
+  return `${adminLabel} (${staffHint})`;
+}

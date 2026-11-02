@@ -1,8 +1,8 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import type { ShellAuthSession } from "../apps/web/src/components/shell-destination-policy";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const nav = vi.hoisted(() => ({ pathname: "/market" }));
 const auth = vi.hoisted(() => ({
@@ -160,9 +160,9 @@ describe("pre-release shell accessibility behavior", () => {
       }),
     );
 
-    expect(html).toMatch(
-      new RegExp(`<a[^>]*href="/admin"[^>]*aria-label="${dictionary.nav.admin}"`, "u"),
-    );
+    const staffAdminLabel = `${dictionary.nav.admin} (${dictionary.nav.adminStaffHint})`;
+    expect(html).toContain(`href="/admin"`);
+    expect(html).toContain(`aria-label="${staffAdminLabel}"`);
     expect(html).toContain('href="/workspace/servers"');
   });
 });

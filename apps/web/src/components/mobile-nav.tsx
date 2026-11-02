@@ -34,6 +34,8 @@ import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
+  adminDestinationAccessibleName,
+  isShellSessionLoading,
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
@@ -53,7 +55,12 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const session = useAuthSession();
   const workspaceTools = showWorkspaceTools(session);
   const guestSignIn = showGuestSignInCta(session);
+  const sessionLoading = isShellSessionLoading(session);
   const adminVisible = showAdminDestination(session);
+  const adminAccessibleName = adminDestinationAccessibleName(
+    dictionary.nav.admin,
+    dictionary.nav.adminStaffHint,
+  );
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dialogRef = useModalDialog(isMoreOpen);
@@ -76,6 +83,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
 
   const publicMoreItems: NavItem[] = [
     { href: "/discover", label: dictionary.nav.explore, icon: Compass },
+    { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },
+    { href: "/developers", label: dictionary.nav.creators, icon: Code2 },
     { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
   ];
 
@@ -211,6 +220,16 @@ export function MobileNav({ locale }: { locale: Locale }) {
               </Link>
             ) : null}
 
+            {sessionLoading ? (
+              <p
+                role="status"
+                aria-busy="true"
+                className="mb-3 rounded-lg border border-base bg-surface px-3 py-2 text-xs text-muted"
+              >
+                {dictionary.nav.checkingSession}
+              </p>
+            ) : null}
+
             <div className="grid grid-cols-2 gap-2">
               {moreItems.map((item) => {
                 const Icon = item.icon;
@@ -238,6 +257,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
                 <Link
                   href="/admin"
                   onClick={() => setIsMoreOpen(false)}
+                  title={dictionary.nav.adminStaffHint}
+                  aria-label={adminAccessibleName}
                   aria-current={pathname.startsWith("/admin") ? "page" : undefined}
                   className={`flex min-h-12 items-center gap-2 rounded-lg border border-base px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
                     pathname.startsWith("/admin")
