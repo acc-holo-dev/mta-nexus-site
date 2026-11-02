@@ -8,8 +8,10 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
+import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceRequirementsService } from "../lib/services/resource-requirements-service";
+import { authEntryHref } from "./auth-return-path";
 import { ResourceRequirementsReportBody } from "./resource-requirements-report-body";
 
 export async function CollectionRequirementsScreen({
@@ -26,7 +28,30 @@ export async function CollectionRequirementsScreen({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const authCopy = libraryCollectionsCopy(locale);
+  const requirementsBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/requirements`;
+  if (!actor) {
+    let returnPath = requirementsBase;
+    try {
+      const preview = resourceRequirementsQuery(collectionPageParams(raw), "library");
+      if (preview.targetMta) {
+        returnPath = `${requirementsBase}?${new URLSearchParams({ targetMta: preview.targetMta })}`;
+      }
+    } catch {
+      // Keep the requirements route when query params are invalid for guests.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {authCopy.signIn}
+        </Link>
+      </section>
+    );
+  }
   let query: ReturnType<typeof resourceRequirementsQuery>;
   try {
     query = resourceRequirementsQuery(collectionPageParams(raw), "library");

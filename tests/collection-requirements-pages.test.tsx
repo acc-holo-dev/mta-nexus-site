@@ -139,6 +139,9 @@ it("rejects invalid or duplicate query fields before loading metadata", async ()
 });
 it("requires an authenticated user before querying the collection", async () => {
   state.actor = null;
-  await expect(screen(props)).rejects.toThrow("NOT_FOUND");
+  const guest = renderToStaticMarkup(await screen(props));
+  expect(guest).toContain("Sign in to manage your collections");
+  expect(guest).toContain("/auth/login?next=");
+  expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Frequirements");
   expect(state.report).not.toHaveBeenCalled();
 });

@@ -13,6 +13,7 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { librarySelectionBatchesService } from "../lib/services/library-selection-batches-service";
+import { authEntryHref } from "./auth-return-path";
 import { LibrarySelectionBatchControls } from "./library-selection-batch-controls";
 export async function LibrarySelectionBatchScreen({
   params,
@@ -30,9 +31,30 @@ export async function LibrarySelectionBatchScreen({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
   const c = librarySelectionBatchesCopy(locale),
     cc = libraryCollectionsCopy(locale);
+  const idForGuest = encodeURIComponent(path.id);
+  const versionsBase = `/workspace/library/collections/${idForGuest}/versions${history ? "/history" : ""}`;
+  if (!actor) {
+    let returnPath = versionsBase;
+    try {
+      const preview = collectionsQuery(collectionPageParams(raw), history ? "history" : "detail");
+      returnPath = `${versionsBase}?${new URLSearchParams({ page: String(preview.page) })}`;
+    } catch {
+      // Keep the versions route when pagination is invalid for guests.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{cc.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {cc.signIn}
+        </Link>
+      </section>
+    );
+  }
   try {
     const id = collectionId(path.id),
       query = collectionsQuery(collectionPageParams(raw), history ? "history" : "detail"),

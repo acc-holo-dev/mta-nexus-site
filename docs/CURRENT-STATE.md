@@ -4,10 +4,11 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `046c687c481ea319f9a85b4a1ad7eced79904d17` (`fix(web): add collection compare and content history loaders`).
-- **Verified CI green on that tip:** [CI 41403085034](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41403085034) (lint/unit/db/image selected; browsers skipped).
-- **Prior selected green:** `2ac8e24a…` / [CI 41402245187](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41402245187).
+- **Tip SHA:** `aeead39a9769e6826b303fc30d6fe99b15d07b8a` (`fix(web): resolve compare base clash and guest library test contracts`).
+- **Verified CI green on that tip:** [CI 41420661452](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41420661452) (lint/unit/db/image + production browser smoke selected; resource-browser skipped).
+- **Prior selected green:** `046c687c…` / [CI 41403085034](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41403085034).
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
+- **Failed tip (not baseline):** `7cd137da…` / [CI 41404734366](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41404734366) — format:check; `4565dd8f…` / [CI 41419738198](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41419738198) — guest compare `base` clash.
 - **Earlier full selected green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
 - **Failed tip (not baseline):** `53badf5a…` / [CI 41395863320](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395863320) — resource-browser RU claim-button focus flake (fixed by focus poll on `0a034c84`).
 - PASS только на exact SHA; green CI ≠ deploy.
@@ -34,11 +35,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `046c687c…` selected green (CI 41403085034). Tip `7cd137da…` nested loaders failed format:check ([CI 41404734366](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41404734366)); fix + guest returnPath honesty shipping next.
+**Последняя локальная волна:** tip `aeead39a…` selected green (CI 41420661452); continue collection releases/batch/requirements guest honesty.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `046c687c…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `aeead39a…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

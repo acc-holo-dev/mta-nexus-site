@@ -103,7 +103,10 @@ it("keeps history navigation available when no operations exist", async () => {
 });
 it("requires authentication before either read", async () => {
   state.actor = null;
-  await expect(screen(props)).rejects.toThrow("NOT_FOUND");
+  const guest = renderToStaticMarkup(await screen(props));
+  expect(guest).toContain("Sign in to manage your collections");
+  expect(guest).toContain("/auth/login?next=");
+  expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fversions");
   expect(state.detail).not.toHaveBeenCalled();
   expect(state.history).not.toHaveBeenCalled();
 });

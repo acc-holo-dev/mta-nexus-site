@@ -126,7 +126,10 @@ it("keeps archived collections inspectable without batch mutation navigation", a
 });
 it("requires authentication, strict query controls and current ownership", async () => {
   h.actor = null;
-  await expect(screen()).rejects.toThrow("NOT_FOUND");
+  const guest = await screen();
+  expect(guest).toContain("Sign in to manage your collections");
+  expect(guest).toContain("/auth/login?next=");
+  expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Freleases");
   expect(h.releases).not.toHaveBeenCalled();
   h.actor = { id: "usr_a", role: "user" };
   for (const values of [{ userId: "other" }, { filter: ["all", "pinned"] }, { filter: "invalid" }])

@@ -104,9 +104,12 @@ it.each(["en", "ru"])(
 );
 it("does not inspect resources for signed-out visitors", async () => {
   state.actor = null;
-  await expect(screen({ productId: "prd_a", scope: "library", raw: {} })).rejects.toThrow(
-    "NOT_FOUND",
+  const guest = renderToStaticMarkup(
+    await screen({ productId: "prd_a", scope: "library", raw: {} }),
   );
+  expect(guest).toContain("Sign in to manage your library");
+  expect(guest).toContain("/auth/login?next=");
+  expect(guest).toContain("%2Fworkspace%2Flibrary%2Fprd_a%2Frequirements");
   expect(state.report).not.toHaveBeenCalled();
 });
 it("blocks ordinary users from the moderator screen before reading the resource", async () => {

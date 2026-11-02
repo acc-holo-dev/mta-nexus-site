@@ -6,8 +6,10 @@ import { notFound } from "next/navigation";
 import { getRequestLocale } from "../lib/i18n-server";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
+import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceRequirementsService } from "../lib/services/resource-requirements-service";
+import { authEntryHref } from "./auth-return-path";
 import { ResourceRequirementsReportBody } from "./resource-requirements-report-body";
 export async function ResourceRequirementsScreen({
   productId,
@@ -20,7 +22,33 @@ export async function ResourceRequirementsScreen({
 }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const authCopy = getResourceReleaseControlCopy(locale);
+  const requirementsBase =
+    scope === "library"
+      ? `/workspace/library/${encodeURIComponent(productId)}/requirements`
+      : scope === "publisher"
+        ? `/workspace/resources/${encodeURIComponent(productId)}/requirements`
+        : `/admin/resources/${encodeURIComponent(productId)}/requirements`;
+  if (!actor) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(raw)) {
+      if (Array.isArray(value)) for (const entry of value) params.append(key, entry);
+      else if (value !== undefined) params.append(key, value);
+    }
+    const query = params.toString();
+    const returnPath = query ? `${requirementsBase}?${query}` : requirementsBase;
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {authCopy.signIn}
+        </Link>
+      </section>
+    );
+  }
   if (scope === "moderator" && !["admin", "moderator"].includes(actor.role)) notFound();
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {

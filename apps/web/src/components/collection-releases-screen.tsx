@@ -15,6 +15,7 @@ import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
+import { authEntryHref } from "./auth-return-path";
 import { ResourceDownloadButton } from "./resource-download-button";
 export async function CollectionReleasesScreen({
   params,
@@ -30,7 +31,32 @@ export async function CollectionReleasesScreen({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const cc = libraryCollectionsCopy(locale);
+  const releasesBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/releases`;
+  if (!actor) {
+    let returnPath = releasesBase;
+    try {
+      const preview = collectionReleasesQuery(collectionPageParams(raw));
+      returnPath = `${releasesBase}?${new URLSearchParams({
+        page: String(preview.page),
+        filter: preview.filter,
+        ...(preview.q ? { q: preview.q } : {}),
+      })}`;
+    } catch {
+      // Keep the releases route when filters are invalid for guests.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{cc.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {cc.signIn}
+        </Link>
+      </section>
+    );
+  }
   let query: ReturnType<typeof collectionReleasesQuery>;
   try {
     query = collectionReleasesQuery(collectionPageParams(raw));
@@ -44,7 +70,6 @@ export async function CollectionReleasesScreen({
       throw error;
     });
   const c = collectionReleasesCopy(locale),
-    cc = libraryCollectionsCopy(locale),
     copy = getResourceReleaseControlCopy(locale);
   const suffix = (page = result.page, filter = result.filter) =>
     new URLSearchParams({
