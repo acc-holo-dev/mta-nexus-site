@@ -33,6 +33,7 @@ export const community = {
     title: "Discover MTA NEXUS",
     description:
       "Browse one part of the ecosystem at a time. Servers, resources, creators, organizations, and content stay in separate result sets.",
+    loading: "Loading discovery…",
     searchLabel: "Search discovery",
     searchPlaceholder: "Search this section",
     searchButton: "Search",

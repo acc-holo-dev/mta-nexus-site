@@ -33,6 +33,7 @@ export const community = {
     title: "Обзор MTA NEXUS",
     description:
       "Изучайте экосистему по одному типу сущностей. Серверы, ресурсы, авторы, организации и материалы не смешиваются в одной выдаче.",
+    loading: "Загрузка обзора…",
     searchLabel: "Поиск в обзоре",
     searchPlaceholder: "Искать в этом разделе",
     searchButton: "Найти",
