@@ -230,11 +230,17 @@ export function ResourceReleaseWatchControl({
       ) : null}
       {surface === "detail" || !commerceEnabled ? (
         <div className="flex flex-wrap gap-3 text-sm">
-          <Link href={settingsHref} className="text-accent underline">
+          <Link
+            href={settingsHref}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.settings}
           </Link>
           {surface === "detail" ? (
-            <Link href="/workspace/library/watches" className="text-accent underline">
+            <Link
+              href="/workspace/library/watches"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.watchCenter}
             </Link>
           ) : null}

@@ -394,7 +394,7 @@ export function OrganizationWorkspacePanel({
         >
           {data.page > 1 ? (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={teamHref(data.organization.id, data.page - 1, query)}
             >
               {copy.previous}
@@ -407,7 +407,7 @@ export function OrganizationWorkspacePanel({
           </span>
           {data.hasMore && (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={teamHref(data.organization.id, data.page + 1, query)}
             >
               {copy.next}

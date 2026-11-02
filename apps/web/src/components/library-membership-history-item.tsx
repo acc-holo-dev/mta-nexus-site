@@ -1,9 +1,9 @@
 import type { LibraryMembershipHistoryItem } from "@nexus/domain";
 import Link from "next/link";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../lib/library-membership-history-query";
 export function LibraryMembershipHistoryEntry({
   item,
@@ -20,7 +20,10 @@ export function LibraryMembershipHistoryEntry({
   return (
     <article className="nexus-panel space-y-4 p-5">
       <h2>
-        <Link href={membershipHistoryHref(item.id)} className="text-accent underline">
+        <Link
+          href={membershipHistoryHref(item.id)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {m.detail}
         </Link>
       </h2>
@@ -48,7 +51,7 @@ export function LibraryMembershipHistoryEntry({
               {resource.currentAvailable && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
-                  className="text-accent underline"
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {c.resourceCollections}
                 </Link>
@@ -77,7 +80,7 @@ export function LibraryMembershipHistoryEntry({
                         {h.current}:{" "}
                         <Link
                           href={collectionHref(now.current.id)}
-                          className="text-accent underline"
+                          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         >
                           {now.current.name}
                         </Link>{" "}
@@ -97,7 +100,7 @@ export function LibraryMembershipHistoryEntry({
                   )}
                   <Link
                     href={collectionHref(child.collection.id, "history")}
-                    className="text-accent underline"
+                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {c.history}
                   </Link>

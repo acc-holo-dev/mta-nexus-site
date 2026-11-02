@@ -46,7 +46,7 @@ export async function CollectionRequirementsScreen({
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className="text-accent underline"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>

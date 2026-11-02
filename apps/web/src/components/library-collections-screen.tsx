@@ -3,7 +3,6 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { authEntryHref } from "./auth-return-path";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -29,6 +28,7 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
+import { authEntryHref } from "./auth-return-path";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
@@ -66,7 +66,10 @@ function Pagination({
   return (
     <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
       {bounds.page > 1 && (
-        <Link href={href(bounds.page - 1)} className="text-accent underline">
+        <Link
+          href={href(bounds.page - 1)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {c.previous}
         </Link>
       )}
@@ -74,7 +77,10 @@ function Pagination({
         {c.page} {bounds.page} {c.of} {bounds.totalPages}
       </span>
       {bounds.page < bounds.totalPages && (
-        <Link href={href(bounds.page + 1)} className="text-accent underline">
+        <Link
+          href={href(bounds.page + 1)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {c.next}
         </Link>
       )}
@@ -108,7 +114,7 @@ export async function LibraryCollectionsScreen({
             "login",
             guestCollectionsReturnPath(view, queryValues, routeCollectionId),
           )}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.signIn}
         </Link>
@@ -125,17 +131,29 @@ export async function LibraryCollectionsScreen({
       const result = await service.page(actor, query);
       return (
         <div className="mx-auto max-w-4xl space-y-6 py-8">
-          <Link href="/workspace/library" className="text-accent underline">
+          <Link
+            href="/workspace/library"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.library}
           </Link>
           <h1 className="font-display text-primary">{c.title}</h1>
-          <Link href={membershipHistoryHref()} className="text-accent underline">
+          <Link
+            href={membershipHistoryHref()}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
-          <Link href={collectionInventoryHref()} className="text-accent underline">
+          <Link
+            href={collectionInventoryHref()}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionInventoryCopy(locale).inventory}
           </Link>
-          <Link href="/workspace/library/collections/history" className="text-accent underline">
+          <Link
+            href="/workspace/library/collections/history"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionHistoryCopy(locale).title}
           </Link>
           <p className="text-sm text-secondary">{c.subtitle}</p>
@@ -175,7 +193,10 @@ export async function LibraryCollectionsScreen({
             {result.items.map((item) => (
               <li key={item.id} className="nexus-panel space-y-2 p-5">
                 <h2 className="break-words font-semibold">
-                  <Link href={collectionHref(item.id)} className="text-accent underline">
+                  <Link
+                    href={collectionHref(item.id)}
+                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
                     {item.name}
                   </Link>
                 </h2>
@@ -206,7 +227,10 @@ export async function LibraryCollectionsScreen({
       const result = await service.copyItemsPage(actor, id, query);
       return (
         <div className="mx-auto max-w-4xl space-y-6 py-8">
-          <Link href={collectionHref(id)} className="text-accent underline">
+          <Link
+            href={collectionHref(id)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.back}
           </Link>
           <h1 className="font-display">{c[view]}</h1>
@@ -253,7 +277,7 @@ export async function LibraryCollectionsScreen({
           />
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/${view}?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.json}
           </a>
@@ -264,7 +288,10 @@ export async function LibraryCollectionsScreen({
       const preview = await service.copyPreview(actor, id);
       return (
         <div className="mx-auto max-w-2xl space-y-6 py-8">
-          <Link href={collectionHref(id)} className="text-accent underline">
+          <Link
+            href={collectionHref(id)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.back}
           </Link>
           <h1 className="font-display">{c.duplicate}</h1>
@@ -299,7 +326,10 @@ export async function LibraryCollectionsScreen({
       const result = await service.history(actor, id, query.page);
       return (
         <div className="mx-auto max-w-4xl space-y-6 py-8">
-          <Link href={collectionHref(id)} className="text-accent underline">
+          <Link
+            href={collectionHref(id)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.back}
           </Link>
           <h1 className="font-display text-primary">
@@ -307,14 +337,17 @@ export async function LibraryCollectionsScreen({
           </h1>
           <Link
             href={`/workspace/library/collections/history?${new URLSearchParams({ collectionId: id })}`}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {libraryCollectionHistoryCopy(locale).title}
           </Link>
           <ol className="space-y-4">
             {result.items.map((item) => (
               <li key={item.id} className="nexus-panel space-y-2 p-4">
-                <Link href={collectionReceiptHref(item.id)} className="text-accent underline">
+                <Link
+                  href={collectionReceiptHref(item.id)}
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
                   {libraryCollectionReceiptsCopy(locale).open}
                 </Link>
                 <h2 className="font-semibold">
@@ -436,7 +469,7 @@ export async function LibraryCollectionsScreen({
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <Link
           href={adding ? collectionHref(id) : collectionHref()}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {adding ? c.back : c.title}
         </Link>
@@ -462,22 +495,31 @@ export async function LibraryCollectionsScreen({
             </p>
             <Link
               href={`/workspace/library/collections/${encodeURIComponent(id)}/watches`}
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {resourceReleaseWatchesCopy(locale).collectionTitle}
             </Link>
-            <Link href={collectionHref(id, "releases")} className="text-accent underline">
+            <Link
+              href={collectionHref(id, "releases")}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {collectionReleasesCopy(locale).title}
             </Link>
           </>
         )}
         {!adding && (
-          <Link href={`${collectionHref(id)}/versions`} className="text-accent underline">
+          <Link
+            href={`${collectionHref(id)}/versions`}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {librarySelectionBatchesCopy(locale).title}
           </Link>
         )}
         {!adding && (
-          <Link href={`${collectionHref(id)}/requirements`} className="text-accent underline">
+          <Link
+            href={`${collectionHref(id)}/requirements`}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {collectionRequirementsCopy(locale).title}
           </Link>
         )}
@@ -511,39 +553,66 @@ export async function LibraryCollectionsScreen({
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.title}>
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/export`}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {libraryCollectionManifestsCopy(locale).export}
           </a>
-          <Link href={collectionHref(id, "reconcile")} className="text-accent underline">
+          <Link
+            href={collectionHref(id, "reconcile")}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionManifestsCopy(locale).reconcileTitle}
           </Link>
-          <Link href={collectionHref(id, "import")} className="text-accent underline">
+          <Link
+            href={collectionHref(id, "import")}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionManifestsCopy(locale).title}
           </Link>
-          <Link href={collectionInventoryHref(id)} className="text-accent underline">
+          <Link
+            href={collectionInventoryHref(id)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionInventoryCopy(locale).inventory}
           </Link>
-          <Link href={collectionHref(id, "compare")} className="text-accent underline">
+          <Link
+            href={collectionHref(id, "compare")}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionComparisonCopy(locale).title}
           </Link>
           {!adding && collection.status === "active" && (
-            <Link href={collectionHref(id, "add")} className="text-accent underline">
+            <Link
+              href={collectionHref(id, "add")}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {c.candidates}
             </Link>
           )}
-          <Link href={collectionHref(id, "copy")} className="text-accent underline">
+          <Link
+            href={collectionHref(id, "copy")}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.duplicate}
           </Link>
           {collection.status === "active" && (
-            <Link href={collectionHref(id, "move-items")} className="text-accent underline">
+            <Link
+              href={collectionHref(id, "move-items")}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {c["move-items"]}
             </Link>
           )}
-          <Link href={collectionHref(id, "copy-items")} className="text-accent underline">
+          <Link
+            href={collectionHref(id, "copy-items")}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c["copy-items"]}
           </Link>
-          <Link href={collectionHref(id, "history")} className="text-accent underline">
+          <Link
+            href={collectionHref(id, "history")}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.history}
           </Link>
         </nav>
@@ -614,14 +683,14 @@ export async function LibraryCollectionsScreen({
               <div className="flex flex-wrap gap-4 text-sm">
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/collections`}
-                  className="text-accent underline"
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {c.toCollection}
                 </Link>
                 {item.slug && (
                   <Link
                     href={`/market/${encodeURIComponent(item.slug)}`}
-                    className="text-accent underline"
+                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {c.open}
                   </Link>
@@ -629,7 +698,7 @@ export async function LibraryCollectionsScreen({
                 {item.hasAccess && (
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                    className="text-accent underline"
+                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {c.versions}
                   </Link>
@@ -669,19 +738,25 @@ export async function LibraryCollectionsScreen({
       <section className="mx-auto max-w-xl space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         {error.code === "COLLECTION_ITEM_LIMIT" && path?.id && (
-          <Link href={collectionHref(path.id)} className="text-accent underline">
+          <Link
+            href={collectionHref(path.id)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.itemLimitNext}
           </Link>
         )}
         {error.code === "COLLECTION_LIMIT" && (
           <Link
             href={collectionHref(undefined, "", { status: "archived" })}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.archived}
           </Link>
         )}
-        <Link href={collectionHref()} className="text-accent underline">
+        <Link
+          href={collectionHref()}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {c.title}
         </Link>
       </section>

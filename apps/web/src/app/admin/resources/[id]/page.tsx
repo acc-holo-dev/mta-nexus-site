@@ -58,13 +58,13 @@ export default async function ResourceModerationDetail({
       </p>
       <Link
         href={`/admin/resources/${encodeURIComponent(id)}/media`}
-        className="text-accent underline"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {resourceMediaCopy(locale).title}
       </Link>
       <Link
         href={`/admin/resources/${encodeURIComponent(id)}/requirements`}
-        className="text-accent underline"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {resourceRequirementsCopy(locale).title}
       </Link>

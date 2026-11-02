@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ResourceReviewView } from "@nexus/domain";
+import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import { resourceReviewCopy } from "../lib/resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
@@ -85,7 +85,10 @@ export function ResourceReviewPager({
   return (
     <nav aria-label={copy.title} className="flex items-center gap-4 text-sm">
       {page > 1 && (
-        <Link href={href(page - 1)} className="text-accent underline">
+        <Link
+          href={href(page - 1)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.previous}
         </Link>
       )}
@@ -93,7 +96,10 @@ export function ResourceReviewPager({
         {page}/{totalPages}
       </span>
       {page < totalPages && (
-        <Link href={href(page + 1)} className="text-accent underline">
+        <Link
+          href={href(page + 1)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.next}
         </Link>
       )}
