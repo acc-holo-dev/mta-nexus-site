@@ -4,10 +4,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `65b0afcdce0a3fafe45936d73edcb0a521b5cff9` (`fix(web): add clear-filter CTAs on report and watch empties`).
-- **Verified CI green on that tip:** [CI 41435049421](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41435049421) (lint/unit/db/image + production browser smoke selected; resource-browser skipped).
+- **Tip SHA:** `89738363924336775eea040eeccbf51d3b5d77f5` (`fix(web): harden observation loader and more clear-filter CTAs`).
+- **Verified CI green on that tip:** [CI 41436177810](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41436177810) (lint/unit/db/image + production browser smoke selected; resource-browser skipped).
+- **Prior selected green:** `65b0afcd…` / [CI 41435049421](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41435049421).
 - **Prior selected green:** `723a8f92…` / [CI 41433940428](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41433940428).
-- **Prior selected green:** `b4fe7145…` / [CI 41431808483](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41431808483).
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
 - **Failed tip (not baseline):** `7cd137da…` format; `4565dd8f…` compare base; `c32a4ef6…` admin guest unit contracts (fixed on `e7892ceb`).
 - **Earlier full selected green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
@@ -36,11 +36,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `65b0afcd…` selected green (CI 41435049421); observation loader a11y + receipts/verification clear filters next.
+**Последняя локальная волна:** tip `89738363…` selected green (CI 41436177810); statistics/discover loader aria-live next.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `65b0afcd…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `89738363…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

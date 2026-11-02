@@ -1,20 +1,20 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { AppError, type User } from "@nexus/domain";
 import type { ServerStatisticsTarget } from "@nexus/db";
-import { authService } from "../lib/services/auth-service";
-import {
-  serverStatisticsService,
-  type ServerStatisticsResult,
-} from "../lib/services/server-statistics-service";
+import { AppError, type User } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
   parseServerStatisticsQuery,
   serverStatisticsHref,
 } from "../lib/server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../lib/server-statistics-copy";
+import { authService } from "../lib/services/auth-service";
+import {
+  type ServerStatisticsResult,
+  serverStatisticsService,
+} from "../lib/services/server-statistics-service";
 import { authEntryHref } from "./auth-return-path";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
@@ -143,12 +143,20 @@ export async function ServerStatisticsPage({
 export async function ServerStatisticsLoading() {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return (
-    <div className="mx-auto max-w-6xl space-y-4 py-8" aria-busy="true">
-      <h1 className="text-lg font-bold text-primary">{copy.title}</h1>
-      <p role="status" className="text-sm text-muted">
-        {copy.loading}
-      </p>
+    <section
+      className="mx-auto max-w-6xl space-y-4 py-8"
+      aria-busy="true"
+      aria-labelledby="server-statistics-loading-heading"
+    >
+      <header className="space-y-2">
+        <h1 id="server-statistics-loading-heading" className="font-display text-primary">
+          {copy.title}
+        </h1>
+        <p role="status" aria-live="polite" className="text-sm text-muted">
+          {copy.loading}
+        </p>
+      </header>
       <div className="h-40 animate-pulse rounded-lg bg-inset" aria-hidden="true" />
-    </div>
+    </section>
   );
 }

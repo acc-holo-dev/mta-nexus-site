@@ -16,7 +16,7 @@ export default function GlobalLoading() {
       <h1 id="global-loading-heading" className="sr-only">
         {dictionary.errors.loading}
       </h1>
-      <p role="status" className="sr-only">
+      <p role="status" aria-live="polite" className="sr-only">
         {dictionary.errors.loading}
       </p>
       <div className="animate-pulse space-y-4" aria-hidden="true">

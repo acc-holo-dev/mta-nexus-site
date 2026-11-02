@@ -17,7 +17,7 @@ export default async function Loading() {
         <h1 id="edit-publication-loading-heading" className="font-display text-primary">
           {copy.edit}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {desk.loading}
         </p>
       </header>

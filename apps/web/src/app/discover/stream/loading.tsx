@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { discoveryStreamCopy } from "../../../lib/discovery-stream-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /discover/stream.
 export default async function Loading() {
@@ -14,7 +14,7 @@ export default async function Loading() {
         <h1 id="discover-stream-loading-heading" className="text-2xl font-extrabold text-primary">
           {copy.title}
         </h1>
-        <p role="status" className="mt-2 text-sm text-muted">
+        <p role="status" aria-live="polite" className="mt-2 text-sm text-muted">
           {copy.loading}
         </p>
       </header>
