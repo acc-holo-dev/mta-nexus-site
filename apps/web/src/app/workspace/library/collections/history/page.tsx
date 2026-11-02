@@ -145,7 +145,7 @@ export default async function Page({
           </Button>
           <Link
             href="/workspace/library/collections/history"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {h.clear}
           </Link>
@@ -160,7 +160,17 @@ export default async function Page({
         >
           {h.export}
         </a>
-        {!result.items.length && <EmptyState title={h.empty} description={h.note} />}
+        {!result.items.length && (
+          <div className="space-y-3">
+            <EmptyState title={h.empty} description={h.note} />
+            <Link
+              href="/workspace/library/collections/history"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              {h.clear}
+            </Link>
+          </div>
+        )}
         <ol className="space-y-4">
           {result.items.map((item) => {
             const receipt = item.receipt,
