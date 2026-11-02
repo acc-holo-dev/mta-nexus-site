@@ -195,11 +195,25 @@ export async function CollectionReleasesScreen({
         })}
       </ol>
       <nav aria-label={cc.page} className="flex gap-4">
-        {result.page > 1 && <Link href={href(result.page - 1)}>{cc.previous}</Link>}
+        {result.page > 1 && (
+          <Link
+            href={href(result.page - 1)}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            {cc.previous}
+          </Link>
+        )}
         <span>
           {cc.page} {result.page} {cc.of} {result.totalPages}
         </span>
-        {result.page < result.totalPages && <Link href={href(result.page + 1)}>{cc.next}</Link>}
+        {result.page < result.totalPages && (
+          <Link
+            href={href(result.page + 1)}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            {cc.next}
+          </Link>
+        )}
       </nav>
       <p className="text-sm">
         {c.generated}: <time dateTime={result.generatedAt}>{result.generatedAt}</time>

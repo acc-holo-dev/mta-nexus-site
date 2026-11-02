@@ -46,7 +46,10 @@ export function HistoryShell({
   return (
     <div className="mx-auto max-w-5xl space-y-7 py-8">
       <header className="space-y-3 border-b border-base pb-6">
-        <Link href="/workspace" className="text-sm text-accent hover:underline">
+        <Link
+          href="/workspace"
+          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">{titles[area]}</h1>

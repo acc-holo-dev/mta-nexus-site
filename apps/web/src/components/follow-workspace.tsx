@@ -247,7 +247,10 @@ export function FollowWorkspace({
                 <p className="text-xs text-muted">{copy[item.targetType]}</p>
                 <h2 className="flex gap-2 text-sm font-bold text-primary">
                   {item.href ? (
-                    <Link className="truncate hover:text-accent" href={item.href}>
+                    <Link
+                      className="truncate rounded hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      href={item.href}
+                    >
                       {item.title}
                     </Link>
                   ) : (
