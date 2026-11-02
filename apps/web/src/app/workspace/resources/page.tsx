@@ -83,7 +83,17 @@ export default async function AuthorResourcesPage({
       </Link>
       <ResourcePublisherFilters query={query} statusCounts={result.statusCounts} locale={locale} />
       {result.items.length === 0 ? (
-        <p className="py-10 text-secondary">{emptyMessage}</p>
+        <div className="space-y-3 py-10">
+          <p className="text-secondary">{emptyMessage}</p>
+          {inventoryTotal > 0 ? (
+            <Link
+              href="/workspace/resources"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {publisherCopy.reset}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <ul aria-label={copy.title} className="grid gap-4 sm:grid-cols-2">
           {result.items.map((product) => (

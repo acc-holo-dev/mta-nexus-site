@@ -83,7 +83,7 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 
 - Нет корневого Turbo/`turbo.json`: оркестрация — pnpm scripts + Compose + CI policy.
 - Database Vitest: `maxWorkers: 1`, `isolate: true` — намеренно из‑за Proxy-моков клиента БД; ускорять только после замеров ([PROBLEMS](PROBLEMS.md)).
-- Платежи/payout/DRM: утверждённая цель, не runtime closed beta.
+- Платежи/payout/DRM: утверждённая цель, не runtime open free beta.
 
 ## Документы по роли
 

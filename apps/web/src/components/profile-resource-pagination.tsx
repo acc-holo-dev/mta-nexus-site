@@ -44,7 +44,11 @@ export function ProfileResourcePagination({
   return (
     <nav aria-label={labels[section]} className="flex items-center justify-between gap-3">
       {page > 1 ? (
-        <Link href={href(page - 1)} rel="prev" className="text-sm text-accent underline">
+        <Link
+          href={href(page - 1)}
+          rel="prev"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.previousPage}
         </Link>
       ) : (
@@ -54,7 +58,11 @@ export function ProfileResourcePagination({
         {copy.pageLabel} {page} / {totalPages}
       </span>
       {page < totalPages ? (
-        <Link href={href(page + 1)} rel="next" className="text-sm text-accent underline">
+        <Link
+          href={href(page + 1)}
+          rel="next"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.nextPage}
         </Link>
       ) : (

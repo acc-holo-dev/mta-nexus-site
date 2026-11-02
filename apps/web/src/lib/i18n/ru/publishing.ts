@@ -113,6 +113,8 @@ export const publishing = {
     loading: "Загрузка статей…",
     write: "Написать статью",
     empty: "Опубликованных статей пока нет.",
+    emptyFiltered: "Нет статей по выбранным фильтрам.",
+    clearFilters: "Сбросить фильтры",
     read: "Читать",
     views: "просмотров",
     notFound: "Статья не найдена",

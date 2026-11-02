@@ -199,37 +199,39 @@ export default async function Page({
               {comparison.totalPages}
             </p>
             {!comparison.items.length && <p>{c.emptyItems}</p>}
-            <table className="w-full table-fixed text-left">
-              <thead>
-                <tr>
-                  <th scope="col" className="p-2">
-                    {c.items}
-                  </th>
-                  <th scope="col" className="p-2">
-                    {c.source}
-                  </th>
-                  <th scope="col" className="p-2">
-                    {c.destination}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.items.map((item) => (
-                  <tr key={item.productId} className="border-t border-base">
-                    <th scope="row" className="break-words p-2 font-normal">
-                      {item.available ? (item.title ?? c.unavailable) : c.unavailable}
-                      <code className="block break-all text-xs text-muted">{item.productId}</code>
+            <div className="min-w-0 overflow-x-auto">
+              <table className="w-full table-fixed text-left">
+                <thead>
+                  <tr>
+                    <th scope="col" className="p-2">
+                      {c.items}
                     </th>
-                    <td className="p-2 text-sm">
-                      {item.inSource ? c.inCollection : c.notInCollection}
-                    </td>
-                    <td className="p-2 text-sm">
-                      {item.inDestination ? c.inCollection : c.notInCollection}
-                    </td>
+                    <th scope="col" className="p-2">
+                      {c.source}
+                    </th>
+                    <th scope="col" className="p-2">
+                      {c.destination}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {comparison.items.map((item) => (
+                    <tr key={item.productId} className="border-t border-base">
+                      <th scope="row" className="break-words p-2 font-normal">
+                        {item.available ? (item.title ?? c.unavailable) : c.unavailable}
+                        <code className="block break-all text-xs text-muted">{item.productId}</code>
+                      </th>
+                      <td className="p-2 text-sm">
+                        {item.inSource ? c.inCollection : c.notInCollection}
+                      </td>
+                      <td className="p-2 text-sm">
+                        {item.inDestination ? c.inCollection : c.notInCollection}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <p role="note" className="text-sm text-muted">
               {h.referenceNote}
             </p>

@@ -113,6 +113,8 @@ export const publishing = {
     loading: "Loading articles…",
     write: "Write article",
     empty: "No articles have been published yet.",
+    emptyFiltered: "No articles match these filters.",
+    clearFilters: "Clear filters",
     read: "Read",
     views: "views",
     notFound: "Article not found",

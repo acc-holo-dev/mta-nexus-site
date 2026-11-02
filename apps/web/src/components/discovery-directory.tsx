@@ -10,6 +10,7 @@ import { discoveryCopy } from "../lib/discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../lib/discovery-stream-contract";
 import { discoveryStreamCopy, discoveryStreamError } from "../lib/discovery-stream-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
+import type { PublicResourceAttribution } from "../lib/public-resource-attribution";
 import { authService } from "../lib/services/auth-service";
 import { discoveryService } from "../lib/services/discovery-service";
 import {
@@ -18,7 +19,6 @@ import {
   mtaMasterDirectoryService,
 } from "../lib/services/mta-master-directory-service";
 import { productService } from "../lib/services/product-service";
-import type { PublicResourceAttribution } from "../lib/public-resource-attribution";
 import { ArticleCard } from "./article-card";
 import { FollowButton } from "./follow-button";
 import { ProductCard } from "./product-card";
@@ -366,7 +366,7 @@ export async function DirectoryResults({
         <nav aria-label={copy.pages} className="flex flex-wrap gap-4 border-t border-base pt-4">
           <a
             href={discoveryStreamHref(stream)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {discoveryStreamCopy(locale).latest}
           </a>
@@ -374,7 +374,7 @@ export async function DirectoryResults({
             <Link
               prefetch={false}
               href={discoveryStreamHref(stream, result.previousCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {discoveryStreamCopy(locale).newer}
             </Link>
@@ -383,7 +383,7 @@ export async function DirectoryResults({
             <Link
               prefetch={false}
               href={discoveryStreamHref(stream, result.nextCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {discoveryStreamCopy(locale).older}
             </Link>
@@ -397,7 +397,7 @@ export async function DirectoryResults({
           >
             {result.page > 1 ? (
               <Link
-                className="min-h-11 content-center text-sm text-accent"
+                className="min-h-11 content-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={discoverHref({ ...state, page: result.page - 1 }, path)}
               >
                 {copy.previous}
@@ -410,7 +410,7 @@ export async function DirectoryResults({
             </span>
             {result.hasMore ? (
               <Link
-                className="min-h-11 content-center text-sm text-accent"
+                className="min-h-11 content-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={discoverHref({ ...state, page: result.page + 1 }, path)}
               >
                 {copy.next}

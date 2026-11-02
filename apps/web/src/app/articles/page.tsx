@@ -30,6 +30,7 @@ export default async function ArticlesPage({
   const { status: _status, ...filters } = parseContentPage((await searchParams) ?? {});
   const result = await contentService.pageArticles(filters).catch(() => null);
   const articles = result?.items ?? [];
+  const filtersActive = Boolean(filters.query || filters.type);
 
   return (
     <div className="space-y-8">
@@ -75,11 +76,23 @@ export default async function ArticlesPage({
           ))}
         </div>
       ) : (
-        <EmptyState
-          title={dictionary.articles.empty}
-          description={dictionary.home.updatesDescription}
-          icon={<BookOpen className="h-6 w-6" />}
-        />
+        <div className="space-y-4">
+          <EmptyState
+            title={filtersActive ? dictionary.articles.emptyFiltered : dictionary.articles.empty}
+            description={
+              filtersActive ? dictionary.articles.clearFilters : dictionary.home.updatesDescription
+            }
+            icon={<BookOpen className="h-6 w-6" />}
+          />
+          {filtersActive ? (
+            <Link
+              href="/articles"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.articles.clearFilters}
+            </Link>
+          ) : null}
+        </div>
       )}
       {result && (
         <ContentPageNavigation
