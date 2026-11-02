@@ -12,6 +12,7 @@ import { useNexusLocale } from "./locale-context";
 
 function communityTopicErrorMessage(
   payload: unknown,
+  status: number,
   fallback: string,
   locale: "ru" | "en",
 ): string {
@@ -38,23 +39,21 @@ function communityTopicErrorMessage(
     },
   };
 
-  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-    return fallback;
+  const record =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : null;
+  const code = typeof record?.code === "string" ? record.code : "";
+  if (code && codes[code]) return codes[code][locale];
+  if (status === 401) {
+    return locale === "ru" ? "Войдите, чтобы опубликовать тему." : "Sign in to publish a topic.";
   }
-  const record = payload as Record<string, unknown>;
-  const code = typeof record.code === "string" ? record.code : "";
-  if (code && codes[code]) {
-    return codes[code][locale];
+  if (status === 403) return codes.FORBIDDEN[locale];
+  if (status === 404) {
+    return locale === "ru" ? "Связанный сервер не найден." : "The linked server was not found.";
   }
-  const error = record.error;
-  if (
-    typeof error === "string" &&
-    error.length > 0 &&
-    error.length <= 300 &&
-    !Array.from(error).some((character) => character.charCodeAt(0) < 32)
-  ) {
-    return error;
-  }
+  if (status === 400) return codes.VALIDATION_ERROR[locale];
+  if (status === 429) return codes.RATE_LIMITED[locale];
   return fallback;
 }
 
@@ -92,18 +91,18 @@ export function CommunityTopicForm() {
       const payload = await response.json().catch(() => null);
       const path = confirmedCommunityTopicPath(response.status, payload);
       if (!path) {
-        throw new Error(communityTopicErrorMessage(payload, copy.createError, locale));
+        setError(communityTopicErrorMessage(payload, response.status, copy.createError, locale));
+        setBusy(false);
+        return;
       }
       router.push(path);
       router.refresh();
     } catch (caught) {
       const timedOut =
         caught instanceof DOMException && caught.name === "TimeoutError"
-          ? communityTopicErrorMessage({ code: "REQUEST_TIMEOUT" }, copy.createError, locale)
+          ? communityTopicErrorMessage({ code: "REQUEST_TIMEOUT" }, 0, copy.createError, locale)
           : null;
-      setError(
-        timedOut ?? (caught instanceof Error && caught.message ? caught.message : copy.createError),
-      );
+      setError(timedOut ?? copy.createError);
       setBusy(false);
     }
   }
@@ -117,9 +116,7 @@ export function CommunityTopicForm() {
     >
       {busy && (
         <p role="status" className="text-xs text-muted">
-          {locale === "ru"
-            ? "Публикация выполняется. Поля временно недоступны."
-            : "Publishing. Fields are temporarily locked."}
+          {copy.publishing}
         </p>
       )}
 

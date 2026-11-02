@@ -88,7 +88,14 @@ export function SupportCaseThread({
         const data = await response.json().catch(() => null);
         if (!isCurrent()) return false;
         const validated = parseSupportThread(data, caseId);
-        if (!response.ok || !validated) throw new Error(copy.loadError);
+        if (response.status === 404) {
+          setSupportCase(null);
+          setRelatedContext(null);
+          setMessages([]);
+          setError(workspaceCopy.notFound);
+          return false;
+        }
+        if (!response.ok || !validated) throw new Error(copy.caseLoadError);
 
         setSupportCase(validated.supportCase);
         const related = data?.supportCase;
@@ -116,13 +123,13 @@ export function SupportCaseThread({
         setSupportCase(null);
         setRelatedContext(null);
         setMessages([]);
-        setError(copy.loadError);
+        setError(copy.caseLoadError);
         return false;
       } finally {
         if (isCurrent()) setLoading(false);
       }
     },
-    [caseId, copy.loadError, messagePage],
+    [caseId, copy.caseLoadError, messagePage, workspaceCopy.notFound],
   );
 
   useEffect(() => {
@@ -287,7 +294,7 @@ export function SupportCaseThread({
             {copy.title}
           </h1>
           <p role="status" aria-live="polite" className="text-sm text-muted">
-            {copy.loading}
+            {copy.caseLoading}
           </p>
         </header>
         <div className="animate-pulse space-y-3" aria-hidden="true">
@@ -310,7 +317,7 @@ export function SupportCaseThread({
           {copy.back}
         </Link>
         <div role="alert" className="nexus-panel p-5 text-sm text-danger">
-          {error ?? copy.loadError}
+          {error ?? copy.caseLoadError}
         </div>
         {success && (
           <p role="status" aria-live="polite" className="text-sm text-success">
@@ -346,6 +353,15 @@ export function SupportCaseThread({
               {categories[supportCase.category] ?? supportCase.category}
             </p>
             <h1 className="mt-1 font-display text-primary">{supportCase.subject}</h1>
+            {relatedContext ? (
+              <p className="mt-2 break-all text-sm text-secondary">
+                {copy.contextResource}: {relatedContext.productId}
+                {relatedContext.buildId ? ` · ${copy.contextBuild}: ${relatedContext.buildId}` : ""}
+                {relatedContext.receiptId
+                  ? ` · ${copy.contextReceipt}: ${relatedContext.receiptId}`
+                  : ""}
+              </p>
+            ) : null}
           </div>
           <span className="rounded-full border border-base bg-inset px-3 py-1 font-label text-muted">
             {supportCase.status === "open"
@@ -497,14 +513,12 @@ export function SupportCaseThread({
           <p>{copy.closedReply}</p>
           {!staffMode && capabilities.requester ? (
             <p>
-              {locale === "ru"
-                ? "Закрытое обращение нельзя переоткрыть самостоятельно. Откройте новое связанное обращение, если проблема осталась."
-                : "You cannot reopen a staff-closed case yourself. Open a new related case if you still need help."}
+              {copy.closedNeedNewCase}{" "}
               <Link
                 href={supportObjectContextHref(relatedContext)}
-                className="ml-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
-                {locale === "ru" ? "Новое связанное обращение" : "Open a related case"}
+                {copy.openRelatedCase}
               </Link>
             </p>
           ) : null}

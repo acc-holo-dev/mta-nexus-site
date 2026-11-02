@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDeliveryEvidence } from "../../../../../components/resource-delivery-evidence";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { SupportDownloadHelpLink } from "../../../../../components/support-download-help-link";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";
 import {
@@ -70,6 +72,12 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
       ) : (
         <p>{copy.unavailable}</p>
       )}
+      <SupportDownloadHelpLink
+        productId={receipt.resourceId}
+        buildId={receipt.buildId}
+        receiptId={receiptId}
+        label={getDictionary(locale).support.askAboutDownload}
+      />
       <Link
         href={resourceDeliveriesUrl({
           page: 1,
