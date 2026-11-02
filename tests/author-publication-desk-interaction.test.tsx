@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -47,12 +46,9 @@ import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-re
 const revision = "2026-10-11T00:00:00.123456Z",
   next = "2026-10-11T00:00:00.123457Z";
 type Element = FlatTestElement;
-function descendants(node: ReactNode): Element[] {
-  return flattenReactTestTree(node);
-}
 function render(locale: "en" | "ru" = "en", organizationId?: string, serverId?: string) {
   harness.cursor = 0;
-  return descendants(
+  return flattenReactTestTree(
     AuthorPublicationRestore({ id: "article", revision, locale, organizationId, serverId }),
   );
 }

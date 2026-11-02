@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -48,17 +47,13 @@ import { VerificationApplicationAmend } from "../apps/web/src/components/verific
 import { VerificationModerationControls } from "../apps/web/src/components/verification-moderation-controls";
 import { verificationApplicationsCopy } from "../apps/web/src/lib/verification-applications-copy";
 import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
-import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
+import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 const revision = "a".repeat(64),
   next = "b".repeat(64);
-type Element = FlatTestElement;
-function descendants(node: ReactNode): Element[] {
-  return flattenReactTestTree(node);
-}
 function render(locale: "en" | "ru" = "en") {
   harness.cursor = 0;
-  return descendants(
+  return flattenReactTestTree(
     VerificationApplicationAmend({
       id: "request",
       revision,
@@ -206,7 +201,7 @@ it("aborts on navigation and ignores late acknowledgements", async () => {
 });
 function moderation() {
   harness.cursor = 0;
-  return descendants(
+  return flattenReactTestTree(
     VerificationModerationControls({ requestId: "request", applicationRevision: revision }),
   );
 }

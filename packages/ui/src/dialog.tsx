@@ -1,5 +1,5 @@
-import * as React from "react";
 import { X } from "lucide-react";
+import * as React from "react";
 import { Button } from "./button";
 
 const FOCUSABLE_SELECTOR =
@@ -86,6 +86,7 @@ export function Dialog({
   return (
     <dialog
       ref={dialogRef}
+      aria-label={title}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       onCancel={(event) => {

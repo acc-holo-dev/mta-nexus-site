@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -62,12 +61,9 @@ function response(body: unknown, status = 200) {
   });
 }
 type Element = FlatTestElement;
-function descendants(node: ReactNode): Element[] {
-  return flattenReactTestTree(node);
-}
 function render(workspace = true) {
   harness.cursor = 0;
-  return descendants(
+  return flattenReactTestTree(
     ContentModerationControls({
       contentId: "post",
       expectedUpdatedAt: previous,

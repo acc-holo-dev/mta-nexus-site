@@ -61,6 +61,7 @@ export default async function ResourceCartReceiptsPage({
   }
   const result = await resourceCartReceiptsService.page(user, query);
   const current = { ...query, page: result.page };
+  const receiptsFiltered = query.days !== "all" || query.evidence !== "all";
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <nav className="flex flex-wrap gap-4 text-sm">
@@ -132,13 +133,17 @@ export default async function ResourceCartReceiptsPage({
       </form>
       {!result.items.length ? (
         <div className="nexus-panel space-y-3 p-6">
-          <p className="text-secondary">{copy.empty}</p>
-          <Link
-            href="/workspace/acquisitions/receipts"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.clear}
-          </Link>
+          <p className="text-secondary">
+            {result.total === 0 && !receiptsFiltered ? copy.emptyNever : copy.emptyFiltered}
+          </p>
+          {receiptsFiltered && result.total === 0 ? (
+            <Link
+              href="/workspace/acquisitions/receipts"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.clear}
+            </Link>
+          ) : null}
         </div>
       ) : (
         <ol className="grid gap-4 sm:grid-cols-2">

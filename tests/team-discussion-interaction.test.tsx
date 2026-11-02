@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -47,12 +46,9 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh
 import { ModeratedDiscussionRemoval } from "../apps/web/src/components/moderated-discussion-removal";
 import { OrganizationTeamBatch } from "../apps/web/src/components/organization-team-batch";
 import type { OrganizationTeamPage } from "../apps/web/src/lib/organization-team-contract";
-import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
-type Element = FlattenedElement;
-function descendants(node: ReactNode): Element[] {
-  return flattenReactTestTree(node);
-}
+type Element = FlatTestElement;
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z",
   version = "a".repeat(64);
@@ -115,7 +111,7 @@ const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 function render(kind: "team" | "comment") {
   harness.cursor = 0;
-  return descendants(
+  return flattenReactTestTree(
     kind === "team"
       ? OrganizationTeamBatch({
           data,

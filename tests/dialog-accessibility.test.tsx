@@ -56,6 +56,24 @@ describe("Dialog accessibility identity", () => {
     expect(attributeValues(markup, "aria-describedby")).toHaveLength(0);
   });
 
+  it("exposes the title as the dialog accessible name for smoke queries", () => {
+    const markup = renderToStaticMarkup(
+      <ConfirmDialog
+        isOpen
+        title="Sign out"
+        object="@writer"
+        consequences="You will need to sign in again."
+        confirmLabel="Sign out"
+        cancelLabel="Cancel"
+        onConfirm={() => undefined}
+        onCancel={() => undefined}
+      />,
+    );
+
+    expect(markup).toContain('aria-label="Sign out"');
+    expect(markup).toContain("Sign out");
+  });
+
   it("shows object, scope and consequences in ConfirmDialog without submitting on cancel", () => {
     const markup = renderToStaticMarkup(
       <ConfirmDialog

@@ -1,6 +1,7 @@
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { platformSignInFocusClass } from "../../../components/guest-auth-links";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
@@ -42,7 +43,7 @@ export default async function OrganizationsPage({
           <p className="mt-2 text-sm text-muted">{copy.description}</p>
         </div>
         <Link
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
+          className={`rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white ${platformSignInFocusClass}`}
           href="/workspace/organizations/new"
         >
           {copy.create}

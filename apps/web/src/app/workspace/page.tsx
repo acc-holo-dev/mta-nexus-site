@@ -4,8 +4,9 @@ import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../components/platform-sign-in";
+import { platformSignInFocusClass } from "../../components/guest-auth-links";
 import { ManagedServerCard } from "../../components/managed-server-card";
+import { PlatformSignIn } from "../../components/platform-sign-in";
 import { formatHistoryDate } from "../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
 import { reactionCopy } from "../../lib/content-reaction-copy";
@@ -91,7 +92,7 @@ export default async function WorkspacePage() {
             </Link>
             <Link
               href="/workspace/resources/new"
-              className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+              className={`flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] ${platformSignInFocusClass}`}
             >
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               {dictionary.workspace.publishResource}

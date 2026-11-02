@@ -3,9 +3,10 @@ import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { platformSignInFocusClass } from "../../../components/guest-auth-links";
 import { ManagedServerCard } from "../../../components/managed-server-card";
 import { ManagedServerVisibilityBatch } from "../../../components/managed-server-visibility-batch";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   getManagedServerCopy,
@@ -101,7 +102,7 @@ export default async function ManagedServersPage({
         </div>
         <Link
           href="/workspace/servers/new"
-          className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white"
+          className={`rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white ${platformSignInFocusClass}`}
         >
           {copy.register}
         </Link>

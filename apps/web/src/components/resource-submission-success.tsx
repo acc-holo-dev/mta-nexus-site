@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { platformSignInFocusClass } from "./guest-auth-links";
 
 export function ResourceSubmissionSuccess({
   resultId,
@@ -21,7 +22,7 @@ export function ResourceSubmissionSuccess({
         <p className="text-sm leading-relaxed text-muted">{copy.submittedDescription}</p>
         <Link
           href={`/workspace/resources/${encodeURIComponent(resultId)}#publication-readiness`}
-          className="inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+          className={`inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] ${platformSignInFocusClass}`}
         >
           {copy.openStatus}
         </Link>

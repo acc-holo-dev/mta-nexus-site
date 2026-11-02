@@ -197,7 +197,7 @@ export default async function MarketPage({
             {page > 1 ? (
               <Link
                 href={buildHref(type, sort, query)}
-                className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+                className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {dictionary.market.firstPageSameFilters}
               </Link>
