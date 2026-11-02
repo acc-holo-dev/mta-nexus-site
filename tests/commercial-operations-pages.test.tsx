@@ -15,6 +15,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NEXT_NOT_FOUND");
   },
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+  usePathname: () => "/admin/commerce/plans/ord_a",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -174,7 +175,9 @@ it("provides reason and confirmation controls only for a currently cancellable u
 it("does not load private order or admin history before login", async () => {
   state.user = null;
   expect(markup(await Operations(input))).toContain("/auth/login");
-  await expect(Admin(input)).rejects.toThrow("NEXT_NOT_FOUND");
+  expect(markup(await Admin(input))).toContain(
+    'href="/auth/login?next=%2Fadmin%2Fcommerce%2Fplans%2Ford_a"',
+  );
   expect(state.detail).not.toHaveBeenCalled();
   expect(state.adminDetail).not.toHaveBeenCalled();
 });

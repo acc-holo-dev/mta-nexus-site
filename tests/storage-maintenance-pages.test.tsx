@@ -13,6 +13,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
   useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/admin/storage",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -60,10 +61,12 @@ it.each(["en", "ru"])("renders discovery, private journal and inspection in %s",
   expect(html).toContain("view=all&amp;page=2");
 });
 it("does not load journal data for moderators or signed-out visitors", async () => {
-  for (const actor of [null, { id: "usr_mod", role: "moderator" }]) {
-    state.actor = actor;
-    await expect(Page({ searchParams: Promise.resolve({}) })).rejects.toThrow("NOT_FOUND");
-  }
+  state.actor = null;
+  expect(renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }))).toContain(
+    'href="/auth/login?next=%2Fadmin%2Fstorage"',
+  );
+  state.actor = { id: "usr_mod", role: "moderator" };
+  await expect(Page({ searchParams: Promise.resolve({}) })).rejects.toThrow("NOT_FOUND");
   expect(state.list).not.toHaveBeenCalled();
 });
 it("requires an initially unchecked confirmation before cleanup", () => {
