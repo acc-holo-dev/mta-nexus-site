@@ -244,7 +244,21 @@ function ServerObservationBrowserPanel({
       </form>
       <p className="text-sm text-muted">{copy.scope}</p>
       {report.observations.length === 0 ? (
-        <p className="nexus-panel p-5 text-sm text-muted">{copy.empty}</p>
+        <div className="nexus-panel space-y-3 p-5">
+          <p className="text-sm text-muted">{copy.empty}</p>
+          <Link
+            href={serverObservationBrowserHref(path, {
+              ...state,
+              query: "",
+              players: "all",
+              password: "all",
+              responding: "all",
+            })}
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            {copy.reset}
+          </Link>
+        </div>
       ) : (
         <section
           aria-labelledby="observation-browser-table"

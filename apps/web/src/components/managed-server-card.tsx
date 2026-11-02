@@ -3,10 +3,10 @@ import { StatusBadge } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
+import { type MtaMasterServer, mtaLiveStatus } from "../lib/mta-master-directory-shared";
 import { getServerActivityCopy } from "../lib/server-activity-view";
 import { serverContentCopy } from "../lib/server-content-copy";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";
-import { type MtaMasterServer, mtaLiveStatus } from "../lib/mta-master-directory-shared";
 
 export function ManagedServerCard({
   server,
@@ -31,7 +31,7 @@ export function ManagedServerCard({
       <div className="min-w-0 space-y-2">
         <Link
           href={`/workspace/servers/${encodeURIComponent(server.id)}`}
-          className="break-words text-sm font-semibold text-primary hover:text-accent"
+          className="break-words text-sm font-semibold text-primary hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {server.name}
         </Link>

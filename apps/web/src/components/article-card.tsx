@@ -21,7 +21,7 @@ export function ArticleCard({ article, locale = "en" }: { article: Content; loca
   return (
     <Link
       href={`/articles/${article.slug}`}
-      className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
+      className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
     >
       {coverImageUrl && (
         <div className="relative aspect-[16/9] w-full overflow-hidden bg-inset">

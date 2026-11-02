@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import {
   authorPublicationDeskHref,
   parseAuthorPublicationDeskQuery,
@@ -41,15 +41,16 @@ export default async function AuthorContentPage({
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseAuthorPublicationDeskQuery(params);
   const returnPath = params.size ? `/workspace/content?${params}` : "/workspace/content";
-  let error = filters ? "" : copy.invalid,
-    signIn = false;
+  const sessionActor = await authService
+    .getSession((await cookies()).get("nexus_session")?.value)
+    .catch(() => null);
+  if (!sessionActor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
+  let error = filters ? "" : copy.invalid;
   const report = await (async () => {
     try {
-      const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-      if (!actor) {
-        signIn = true;
-        return null;
-      }
+      const actor = sessionActor;
       return filters ? await authorContentService.desk(actor, filters) : null;
     } catch (failure) {
       error =
@@ -73,241 +74,229 @@ export default async function AuthorContentPage({
           {labels.create}
         </Link>
       </header>
-      {signIn ? (
+      <form
+        action="/workspace/content"
+        method="get"
+        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+      >
+        <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          {copy.query}
+          <input
+            type="search"
+            name="q"
+            maxLength={100}
+            defaultValue={filters?.query ?? ""}
+            className={`${platformFieldClass} block min-h-11`}
+          />
+        </label>
+        <label className="space-y-1 text-xs text-muted">
+          {labels.status}
+          <select
+            name="status"
+            defaultValue={filters?.status ?? "all"}
+            className={`${platformFieldClass} block min-h-11`}
+          >
+            {(["all", "draft", "published", "archived"] as const).map((value) => (
+              <option key={value} value={value}>
+                {labels[value]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="space-y-1 text-xs text-muted">
+          {labels.type}
+          <select
+            name="type"
+            defaultValue={filters?.type ?? "all"}
+            className={`${platformFieldClass} block min-h-11`}
+          >
+            <option value="all">{copy.all}</option>
+            {writerTypes.map((value) => (
+              <option key={value} value={value}>
+                {labels[value]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="space-y-1 text-xs text-muted">
+          {copy.source}
+          <select
+            name="source"
+            defaultValue={filters?.source ?? "all"}
+            className={`${platformFieldClass} block min-h-11`}
+          >
+            {(["all", "personal", "organization", "server"] as const).map((value) => (
+              <option key={value} value={value}>
+                {copy[value]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="space-y-1 text-xs text-muted">
+          {copy.tag}
+          <input
+            name="tag"
+            maxLength={30}
+            defaultValue={filters?.tag ?? ""}
+            className={`${platformFieldClass} block min-h-11`}
+          />
+        </label>
+        <Button type="submit" className="min-h-11 font-semibold">
+          {copy.search}
+        </Button>
         <Link
-          href={authEntryHref("login", returnPath)}
+          href="/workspace/content"
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          {labels.signIn}
+          {copy.reset}
         </Link>
-      ) : (
-        <>
-          <form
-            action="/workspace/content"
-            method="get"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-          >
-            <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-              {copy.query}
-              <input
-                type="search"
-                name="q"
-                maxLength={100}
-                defaultValue={filters?.query ?? ""}
-                className={`${platformFieldClass} block min-h-11`}
-              />
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {labels.status}
-              <select
-                name="status"
-                defaultValue={filters?.status ?? "all"}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                {(["all", "draft", "published", "archived"] as const).map((value) => (
-                  <option key={value} value={value}>
-                    {labels[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {labels.type}
-              <select
-                name="type"
-                defaultValue={filters?.type ?? "all"}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                <option value="all">{copy.all}</option>
-                {writerTypes.map((value) => (
-                  <option key={value} value={value}>
-                    {labels[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.source}
-              <select
-                name="source"
-                defaultValue={filters?.source ?? "all"}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                {(["all", "personal", "organization", "server"] as const).map((value) => (
-                  <option key={value} value={value}>
-                    {copy[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.tag}
-              <input
-                name="tag"
-                maxLength={30}
-                defaultValue={filters?.tag ?? ""}
-                className={`${platformFieldClass} block min-h-11`}
-              />
-            </label>
-            <Button type="submit" className="min-h-11 font-semibold">
-              {copy.search}
-            </Button>
+      </form>
+      <p className="text-xs text-muted">{copy.live}</p>
+      <Link
+        prefetch={false}
+        href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
+        {copy.latest}
+      </Link>
+      {error && (
+        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
+          {error}
+        </p>
+      )}
+      {report && !report.items.length && (
+        <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+          <p>
+            {filters?.cursor ||
+            filters?.query ||
+            filters?.tag ||
+            filters?.status !== "all" ||
+            filters?.type !== "all" ||
+            filters?.source !== "all"
+              ? copy.emptyFiltered
+              : copy.empty}
+          </p>
+          {(filters?.cursor ||
+            filters?.query ||
+            filters?.tag ||
+            filters?.status !== "all" ||
+            filters?.type !== "all" ||
+            filters?.source !== "all") && (
             <Link
               href="/workspace/content"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
-          </form>
-          <p className="text-xs text-muted">{copy.live}</p>
-          <Link
-            prefetch={false}
-            href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.latest}
-          </Link>
-          {error && (
-            <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-              {error}
-            </p>
           )}
-          {report && !report.items.length && (
-            <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
-              <p>
-                {filters?.cursor ||
-                filters?.query ||
-                filters?.tag ||
-                filters?.status !== "all" ||
-                filters?.type !== "all" ||
-                filters?.source !== "all"
-                  ? copy.emptyFiltered
-                  : copy.empty}
-              </p>
-              {(filters?.cursor ||
-                filters?.query ||
-                filters?.tag ||
-                filters?.status !== "all" ||
-                filters?.type !== "all" ||
-                filters?.source !== "all") && (
-                <Link
-                  href="/workspace/content"
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.reset}
-                </Link>
-              )}
-            </div>
-          )}
-          <ul className="space-y-3">
-            {filters &&
-              report?.items.map((item) => (
-                <li key={item.id}>
-                  <article className="nexus-panel space-y-3 p-5">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <h2 className="min-w-0 break-words font-semibold text-primary">
-                        <Link
-                          prefetch={false}
-                          href={`/workspace/content/${encodeURIComponent(item.id)}`}
-                        >
-                          {item.title}
-                        </Link>
-                      </h2>
-                      <span className="text-xs text-muted">{labels[item.status]}</span>
-                    </div>
-                    <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                      {item.excerpt}
-                    </p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
-                      <span>{labels[item.type]}</span>
-                      <span>{copy[item.source]}</span>
-                      <time dateTime={item.updatedAt}>
-                        {new Date(item.updatedAt).toLocaleString(
-                          locale === "ru" ? "ru-RU" : "en-US",
-                          { timeZone: "UTC" },
-                        )}{" "}
-                        UTC
-                      </time>
-                      <span>
-                        {labels.comments}: {item.commentCount}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                      {[item.organization, item.server].map((context) =>
-                        context ? (
-                          <Link
-                            key={context.href}
-                            prefetch={false}
-                            href={context.href}
-                            className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                          >
-                            {context.name}
-                          </Link>
-                        ) : null,
-                      )}
-                      {Array.from(new Set(item.tags)).map((tag) => (
-                        <Link
-                          key={tag}
-                          prefetch={false}
-                          href={authorPublicationDeskHref({ ...filters, tag, cursor: undefined })}
-                          className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
-                          #{tag}
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-4">
+        </div>
+      )}
+      <ul className="space-y-3">
+        {filters &&
+          report?.items.map((item) => (
+            <li key={item.id}>
+              <article className="nexus-panel space-y-3 p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <h2 className="min-w-0 break-words font-semibold text-primary">
+                    <Link
+                      prefetch={false}
+                      href={`/workspace/content/${encodeURIComponent(item.id)}`}
+                    >
+                      {item.title}
+                    </Link>
+                  </h2>
+                  <span className="text-xs text-muted">{labels[item.status]}</span>
+                </div>
+                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                  {item.excerpt}
+                </p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                  <span>{labels[item.type]}</span>
+                  <span>{copy[item.source]}</span>
+                  <time dateTime={item.updatedAt}>
+                    {new Date(item.updatedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
+                      timeZone: "UTC",
+                    })}{" "}
+                    UTC
+                  </time>
+                  <span>
+                    {labels.comments}: {item.commentCount}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  {[item.organization, item.server].map((context) =>
+                    context ? (
                       <Link
+                        key={context.href}
                         prefetch={false}
-                        href={`/workspace/content/${encodeURIComponent(item.id)}`}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        href={context.href}
+                        className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
-                        {labels.edit}
+                        {context.name}
                       </Link>
-                      <Link
-                        prefetch={false}
-                        href={`/workspace/content/${encodeURIComponent(item.id)}/history`}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                      >
-                        {copy.history}
-                      </Link>
-                      {item.status === "published" && (
-                        <Link
-                          prefetch={false}
-                          href={`/articles/${encodeURIComponent(item.slug)}`}
-                          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
-                          {labels.publicView}
-                        </Link>
-                      )}
-                    </div>
-                  </article>
-                </li>
-              ))}
-          </ul>
-          {report && filters && (
-            <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-              {report.newerCursor && (
-                <Link
-                  prefetch={false}
-                  href={authorPublicationDeskHref(filters, report.newerCursor)}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.newer}
-                </Link>
-              )}
-              {report.olderCursor && (
-                <Link
-                  prefetch={false}
-                  href={authorPublicationDeskHref(filters, report.olderCursor)}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.older}
-                </Link>
-              )}
-            </nav>
+                    ) : null,
+                  )}
+                  {Array.from(new Set(item.tags)).map((tag) => (
+                    <Link
+                      key={tag}
+                      prefetch={false}
+                      href={authorPublicationDeskHref({ ...filters, tag, cursor: undefined })}
+                      className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    >
+                      #{tag}
+                    </Link>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    prefetch={false}
+                    href={`/workspace/content/${encodeURIComponent(item.id)}`}
+                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {labels.edit}
+                  </Link>
+                  <Link
+                    prefetch={false}
+                    href={`/workspace/content/${encodeURIComponent(item.id)}/history`}
+                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.history}
+                  </Link>
+                  {item.status === "published" && (
+                    <Link
+                      prefetch={false}
+                      href={`/articles/${encodeURIComponent(item.slug)}`}
+                      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    >
+                      {labels.publicView}
+                    </Link>
+                  )}
+                </div>
+              </article>
+            </li>
+          ))}
+      </ul>
+      {report && filters && (
+        <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+          {report.newerCursor && (
+            <Link
+              prefetch={false}
+              href={authorPublicationDeskHref(filters, report.newerCursor)}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.newer}
+            </Link>
           )}
-        </>
+          {report.olderCursor && (
+            <Link
+              prefetch={false}
+              href={authorPublicationDeskHref(filters, report.olderCursor)}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.older}
+            </Link>
+          )}
+        </nav>
       )}
     </div>
   );

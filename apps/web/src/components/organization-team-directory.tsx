@@ -239,7 +239,15 @@ export function OrganizationTeamDirectory({
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted">{copy.empty}</p>
+        <div className="space-y-3">
+          <p className="text-sm text-muted">{copy.empty}</p>
+          <Link
+            href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.reset}
+          </Link>
+        </div>
       )}
       {error && (
         <p role="alert" className="text-sm text-danger">
