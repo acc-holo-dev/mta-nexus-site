@@ -42,8 +42,21 @@ export function ServerConnectControls({
       await navigator.clipboard.writeText(address);
       setCopyMessage(`${copy.copied}: ${address}`);
     } catch {
-      addressInput.current?.focus();
-      addressInput.current?.select();
+      if (showAddressField) {
+        addressInput.current?.focus();
+        addressInput.current?.select();
+      } else {
+        // Fallback select without a permanently focusable/aria-hidden input in the tree.
+        const scratch = document.createElement("textarea");
+        scratch.value = address;
+        scratch.setAttribute("readonly", "");
+        scratch.style.position = "fixed";
+        scratch.style.left = "-9999px";
+        document.body.appendChild(scratch);
+        scratch.focus();
+        scratch.select();
+        scratch.remove();
+      }
       setCopyMessage(copy.copyUnavailable);
     } finally {
       setCopying(false);
@@ -87,17 +100,7 @@ export function ServerConnectControls({
             className="mt-1 w-full select-all rounded border border-base bg-inset p-2.5 font-mono text-base text-primary"
           />
         </label>
-      ) : (
-        <input
-          ref={addressInput}
-          aria-label={`${copy.serverAddress}: ${name}`}
-          aria-hidden="true"
-          readOnly
-          tabIndex={-1}
-          value={address}
-          className="sr-only"
-        />
-      )}
+      ) : null}
       {connectHint ? (
         <p id={connectHintId} className="text-[11px] text-faint">
           {connectHint}
