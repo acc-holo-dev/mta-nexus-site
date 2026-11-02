@@ -1,16 +1,16 @@
-import type { NextRequest } from "next/server";
 import { organizationRepository, verificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { z } from "zod";
 import { externalWebUrlSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
+import { z } from "zod";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { authService } from "../../../lib/services/auth-service";
 
 const privateHeaders = {

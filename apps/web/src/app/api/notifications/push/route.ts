@@ -1,18 +1,18 @@
 import { createHash } from "node:crypto";
 import { readWebPushVapidConfig } from "@nexus/config";
-import type { NextRequest } from "next/server";
 import { webPushSubscriptionRepository } from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
-import { parseWebPushEndpoint } from "../../../../lib/services/web-push-endpoint-policy";
-import { authService } from "../../../../lib/services/auth-service";
+import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { authService } from "../../../../lib/services/auth-service";
+import { parseWebPushEndpoint } from "../../../../lib/services/web-push-endpoint-policy";
+import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

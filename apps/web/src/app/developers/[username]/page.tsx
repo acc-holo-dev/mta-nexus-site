@@ -1,23 +1,23 @@
-import { FollowButton } from "../../../components/follow-button";
-import { DeveloperExperience } from "../../../components/developer-experience";
-import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
-import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
-import Link from "next/link";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { trustCopy } from "../../../lib/public-user-trust-copy";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
-import { parseProfilePage } from "../../../lib/profile-pagination";
-import { notFound } from "next/navigation";
-import { ShieldCheck } from "lucide-react";
-import { Avatar, EmptyState, StatCard } from "@nexus/ui";
-import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
 import { productRepository } from "@nexus/db";
+import { Avatar, EmptyState, StatCard } from "@nexus/ui";
+import { ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { DeveloperExperience } from "../../../components/developer-experience";
+import { FollowButton } from "../../../components/follow-button";
 import { ProductCard } from "../../../components/product-card";
+import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { cache } from "react";
+import { parseProfilePage } from "../../../lib/profile-pagination";
+import { trustCopy } from "../../../lib/public-user-trust-copy";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { authService } from "../../../lib/services/auth-service";
+import { productService } from "../../../lib/services/product-service";
+import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
+import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
 
 export const dynamic = "force-dynamic";
 

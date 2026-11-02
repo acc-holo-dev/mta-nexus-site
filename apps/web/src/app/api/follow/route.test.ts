@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -69,9 +69,9 @@ vi.mock("@nexus/db", async () => ({
   },
 }));
 
-import { DELETE as unfollow, GET as followState, POST as follow } from "./route";
 import { POST as markRead } from "../notifications/mark-read/route";
 import { GET as listNotifications } from "../notifications/route";
+import { POST as follow, GET as followState, DELETE as unfollow } from "./route";
 
 function expectPrivate(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");

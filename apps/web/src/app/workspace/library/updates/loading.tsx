@@ -14,7 +14,7 @@ export default async function Loading() {
         <h1 id="library-updates-loading-heading" className="font-display text-primary">
           {copy.updates}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.updatesLoading}
         </p>
       </header>

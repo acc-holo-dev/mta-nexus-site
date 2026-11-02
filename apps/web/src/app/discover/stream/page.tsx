@@ -1,15 +1,15 @@
+import { AppError } from "@nexus/domain";
 import Link from "next/link";
 import { DirectoryFilters, DirectoryResults } from "../../../components/discovery-directory";
+import { discoverHref } from "../../../lib/discover-query";
 import {
-  parseDiscoveryStreamQuery,
   discoveryStreamHref,
+  parseDiscoveryStreamQuery,
   STREAM_TYPES,
 } from "../../../lib/discovery-stream-contract";
 import { discoveryStreamCopy, discoveryStreamError } from "../../../lib/discovery-stream-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { discoverHref } from "../../../lib/discover-query";
-import { AppError } from "@nexus/domain";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const copy = discoveryStreamCopy(await getRequestLocale());

@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -84,11 +84,11 @@ vi.mock("../../../lib/web-push-subscription", () => ({
   })),
 }));
 
-import { GET as inboxGET } from "./route";
 import { authService } from "../../../lib/services/auth-service";
 import { POST as markReadPOST } from "./mark-read/route";
 import { GET as preferencesGET, PATCH as preferencesPATCH } from "./preferences/route";
 import { DELETE as pushDELETE, GET as pushGET, POST as pushPOST } from "./push/route";
+import { GET as inboxGET } from "./route";
 
 function request(path: string, method = "GET", body?: unknown) {
   return new NextRequest(`https://nexus.test${path}`, {

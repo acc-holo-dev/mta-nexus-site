@@ -1,5 +1,5 @@
-import { approvalCopy } from "../../../../../lib/public-verification-history-copy";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { approvalCopy } from "../../../../../lib/public-verification-history-copy";
 
 // Honest loading shell for /users/[username]/trust/history.
 export default async function Loading() {
@@ -14,7 +14,7 @@ export default async function Loading() {
         <h1 id="user-trust-history-loading-heading" className="text-xl font-bold text-primary">
           {copy.title}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}
         </p>
       </header>

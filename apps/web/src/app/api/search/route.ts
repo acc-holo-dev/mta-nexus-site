@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
 import {
   createRequestLogContext,
   jsonWithRequestId,

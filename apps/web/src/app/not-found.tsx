@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Compass, Home, SearchX } from "lucide-react";
+import Link from "next/link";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 

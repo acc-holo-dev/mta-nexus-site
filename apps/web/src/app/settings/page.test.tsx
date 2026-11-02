@@ -55,8 +55,8 @@ vi.mock("../../components/private-change-history-controls", () => ({
 vi.mock("../../components/public-profile-form", () => ({ PublicProfileForm: () => null }));
 vi.mock("../../components/web-push-settings", () => ({ WebPushSettings: () => null }));
 
-import SettingsPage from "./page";
 import { getDictionary } from "../../lib/i18n";
+import SettingsPage from "./page";
 
 type Element = ReactElement<Record<string, unknown>>;
 

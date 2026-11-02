@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -50,8 +50,8 @@ vi.mock("@nexus/security", () => ({
   getClientIp: vi.fn(() => "127.0.0.1"),
 }));
 
-import { POST } from "./route";
 import { commerceService } from "../../../../lib/services/commerce-service";
+import { POST } from "./route";
 
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/resources/claim", {

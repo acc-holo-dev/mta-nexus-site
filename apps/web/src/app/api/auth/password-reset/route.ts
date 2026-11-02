@@ -1,23 +1,24 @@
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { randomInt } from "node:crypto";
-import type { NextRequest } from "next/server";
-import { authService } from "../../../../lib/services/auth-service";
-import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
-import {
-  createRequestLogContext,
-  jsonWithRequestId,
-  logRequestEvent,
-  type RequestLogContext,
-} from "../../../../lib/observability";
+import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
 import {
   PASSWORD_RESET_NEUTRAL_RESPONSE,
   PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
   passwordResetTargetMs,
   waitForPasswordResetFloor,
 } from "../../../../lib/account-recovery-request-policy";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
+import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
+import { authService } from "../../../../lib/services/auth-service";
+
 const headers = {
   "Cache-Control": "private, no-store",
   Pragma: "no-cache",

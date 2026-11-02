@@ -1,11 +1,11 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
 import { publicPlatformApi } from "../../../../../../lib/public-platform-api";
-import { getTrustedRequestIp } from "../../../../../../lib/request-client-ip";
-import { publicVerificationHistoryService } from "../../../../../../lib/services/public-verification-history-service";
 import { parseApprovalQuery } from "../../../../../../lib/public-verification-history-contract";
 import { approvalError } from "../../../../../../lib/public-verification-history-copy";
+import { getTrustedRequestIp } from "../../../../../../lib/request-client-ip";
+import { publicVerificationHistoryService } from "../../../../../../lib/services/public-verification-history-service";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ username: string }> },

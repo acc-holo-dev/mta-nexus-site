@@ -1,13 +1,13 @@
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import type { NextRequest } from "next/server";
-import { authService } from "../../../../lib/services/auth-service";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
+import { authService } from "../../../../lib/services/auth-service";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

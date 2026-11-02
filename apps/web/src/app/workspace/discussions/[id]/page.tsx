@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../components/auth-return-path";
-import { authService } from "../../../../lib/services/auth-service";
-import { discussionWorkspaceService } from "../../../../lib/services/discussion-workspace-service";
+import { OwnDiscussionDetail } from "../../../../components/own-discussion-detail";
 import { ownDiscussionCopy } from "../../../../lib/discussion-workspace-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { OwnDiscussionDetail } from "../../../../components/own-discussion-detail";
+import { authService } from "../../../../lib/services/auth-service";
+import { discussionWorkspaceService } from "../../../../lib/services/discussion-workspace-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

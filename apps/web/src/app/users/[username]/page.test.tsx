@@ -1,6 +1,7 @@
 vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -68,9 +69,11 @@ vi.mock("../../../lib/services/auth-service", () => ({
     getSession: async () => ({ id: "user", role: "user" }),
   },
 }));
-import Page, { generateMetadata } from "./page";
+
 import { getDictionary } from "../../../lib/i18n";
 import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import Page, { generateMetadata } from "./page";
+
 const input = (page?: string | string[]) => ({
   params: Promise.resolve({ username: "member" }),
   searchParams: Promise.resolve({ page }),

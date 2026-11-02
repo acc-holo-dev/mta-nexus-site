@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceCopiesQuery } from "../../../../../lib/resource-copy-query";
 import { resourceCopyService } from "../../../../../lib/services/resource-copy-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, { params }: Context) {

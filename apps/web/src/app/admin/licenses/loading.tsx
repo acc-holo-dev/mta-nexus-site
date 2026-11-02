@@ -1,6 +1,6 @@
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
-import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 
 // Honest loading shell for /admin/licenses.
 export default async function Loading() {

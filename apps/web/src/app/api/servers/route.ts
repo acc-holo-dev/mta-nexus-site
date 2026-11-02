@@ -1,8 +1,10 @@
-import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { createServerSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { mtaDirectoryHttpCacheControl } from "../../../lib/mta-directory-cache";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -18,8 +20,6 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
 import { serverService } from "../../../lib/services/server-service";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { mtaDirectoryHttpCacheControl } from "../../../lib/mta-directory-cache";
 
 // Reject unexpected authority fields instead of silently stripping them.
 const serverRegistrationSchema = createServerSchema.strict();

@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { checkDatabaseConnection } from "@nexus/db";
+import type { NextRequest } from "next/server";
 import {
   createRequestLogContext,
   jsonWithRequestId,

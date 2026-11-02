@@ -1,7 +1,7 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { resourceQaAskSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {

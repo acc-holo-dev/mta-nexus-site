@@ -4,11 +4,11 @@ import {
   readBoundedJson,
   requireServerJsonContentType,
 } from "../../../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
 import { serverContentId, serverContentRate } from "../../../../../../../../lib/server-content-api";
 import { serverPublicationHistoryError } from "../../../../../../../../lib/server-publication-history-copy";
 import { serverContentService } from "../../../../../../../../lib/services/server-content-service";
 import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
-import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string; contentId: string }> }) => {
     return userPlatformApi(

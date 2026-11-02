@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
-import { communityReportError } from "../../../../lib/community-report-copy";
 import { reportFilters, reportRateLimit } from "../../../../lib/community-report-api";
+import { communityReportError } from "../../../../lib/community-report-copy";
 import { communityReportService } from "../../../../lib/services/community-report-service";
+import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

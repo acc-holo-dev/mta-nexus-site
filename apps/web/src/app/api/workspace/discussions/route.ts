@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
-import { discussionWorkspaceService } from "../../../../lib/services/discussion-workspace-service";
-import { ownDiscussionError } from "../../../../lib/discussion-workspace-copy";
+import type { NextRequest } from "next/server";
 import { parseOwnDiscussionQuery } from "../../../../lib/discussion-workspace-contract";
+import { ownDiscussionError } from "../../../../lib/discussion-workspace-copy";
+import { discussionWorkspaceService } from "../../../../lib/services/discussion-workspace-service";
+import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

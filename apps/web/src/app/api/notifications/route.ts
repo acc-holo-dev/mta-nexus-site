@@ -1,12 +1,12 @@
-import type { NextRequest } from "next/server";
-import { authService } from "../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
+import type { NextRequest } from "next/server";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
+import { authService } from "../../../lib/services/auth-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

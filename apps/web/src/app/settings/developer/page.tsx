@@ -1,14 +1,14 @@
-import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { authEntryHref } from "../../../components/auth-return-path";
 import { DeveloperProfileEditor } from "../../../components/developer-profile-editor";
+import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
 import { editableDeveloperSchema } from "../../../lib/verification-workspace-contract";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import { verificationCopy } from "../../../lib/verification-workspace-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

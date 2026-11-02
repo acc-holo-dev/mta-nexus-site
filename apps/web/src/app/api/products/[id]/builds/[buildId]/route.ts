@@ -1,10 +1,11 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { resourceBuildCommandSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { resourceBuildWorkspaceService } from "../../../../../../lib/services/resource-build-workspace-service";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+
 type Context = { params: Promise<{ id: string; buildId: string }> };
 export function GET(request: NextRequest, { params }: Context) {
   return resourceCommerceRequest(request, false, async (actor) => {

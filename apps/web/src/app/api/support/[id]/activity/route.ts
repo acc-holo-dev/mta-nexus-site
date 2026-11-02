@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import { supportActivityRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
-import { supportWorkspaceError } from "../../../../../lib/support-workspace-copy";
+import type { NextRequest } from "next/server";
 import { supportActivitySchema } from "../../../../../lib/support-workspace-contract";
+import { supportWorkspaceError } from "../../../../../lib/support-workspace-copy";
+import { userPlatformApi } from "../../../../../lib/user-platform-api";
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
     request,

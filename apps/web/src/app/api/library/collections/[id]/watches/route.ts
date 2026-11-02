@@ -1,11 +1,11 @@
-import type { NextRequest } from "next/server";
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import { resourceReleaseWatchEnableCommandSchema } from "@nexus/validation";
-import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
 import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const query = resourceReleaseWatchesQuery(request.nextUrl.searchParams);

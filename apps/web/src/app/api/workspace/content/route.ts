@@ -1,12 +1,12 @@
-import type { NextRequest } from "next/server";
 import { authorContentRepository } from "@nexus/db";
-import { consumeRateLimit } from "@nexus/security";
 import { RateLimitExceededError } from "@nexus/domain";
+import { consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { authorContentService } from "../../../../lib/services/author-content-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 import { parseContentPage } from "../../../../lib/user-platform-contract";
-import { authorContentService } from "../../../../lib/services/author-content-service";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 
 export function GET(request: NextRequest) {
   return userPlatformApi(request, (user) =>

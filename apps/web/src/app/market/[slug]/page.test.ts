@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({ thumbnail: "", missing: false, locale: "en" as "en" | "ru" }));
 vi.mock("../../../lib/services/product-service", () => ({
   productService: {
@@ -17,7 +18,9 @@ vi.mock("../../../lib/services/content-service", () => ({ contentService: {} }))
 vi.mock("../../../lib/services/auth-service", () => ({ authService: {} }));
 vi.mock("../../../lib/services/commerce-service", () => ({ commerceService: {} }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+
 import { generateMetadata } from "./page";
+
 const input = () => ({ params: Promise.resolve({ slug: "requested-slug" }) });
 beforeEach(() => {
   state.thumbnail = "";

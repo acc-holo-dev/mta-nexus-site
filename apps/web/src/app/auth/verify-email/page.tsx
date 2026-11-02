@@ -1,14 +1,14 @@
 "use client";
 
+import { Button } from "@nexus/ui";
+import { MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { MailCheck } from "lucide-react";
-import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../components/locale-context";
 import {
+  type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
   recoveryJsonRequest,
-  type AccountRecoveryProof,
 } from "../../../lib/account-recovery-browser";
 
 type Proof = AccountRecoveryProof;

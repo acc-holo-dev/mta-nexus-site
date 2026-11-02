@@ -2,10 +2,10 @@ import { AppError } from "@nexus/domain";
 import { resourceMediaCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceMediaUpload } from "../../../../../lib/resource-media-upload-http";
 import { resourceMediaService } from "../../../../../lib/services/resource-media-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, context: Context) {

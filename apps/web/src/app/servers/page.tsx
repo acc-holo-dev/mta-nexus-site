@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Plus, Server as ServerIcon } from "lucide-react";
+import Link from "next/link";
 import { MtaMasterServerDirectory } from "../../components/mta-master-server-directory";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";

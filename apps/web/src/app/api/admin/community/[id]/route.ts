@@ -1,15 +1,16 @@
-import type { NextRequest } from "next/server";
 import { AppError, UnauthorizedError } from "@nexus/domain";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
+import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
-  parseModerationDetailQuery,
   moderationCommandSchema,
+  parseModerationDetailQuery,
 } from "../../../../../lib/community-moderation-contract";
 import { moderationError } from "../../../../../lib/community-moderation-copy";
 import { reportRateLimit } from "../../../../../lib/community-report-api";
 import { communityModerationService } from "../../../../../lib/services/community-moderation-service";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { userPlatformApi } from "../../../../../lib/user-platform-api";
+
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, { params }: Context) {
   return userPlatformApi(

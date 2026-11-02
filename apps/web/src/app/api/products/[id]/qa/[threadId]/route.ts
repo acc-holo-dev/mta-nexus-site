@@ -1,6 +1,6 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
 import {
   createRequestLogContext,
   jsonWithRequestId,

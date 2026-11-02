@@ -1,6 +1,6 @@
 import { CommunityModerationScreen } from "../../../components/community-moderation-screen";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { moderationCopy } from "../../../lib/community-moderation-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

@@ -1,11 +1,11 @@
-import { cache } from "react";
+import { AppError } from "@nexus/domain";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
+import { cache } from "react";
 import { PublicUserTrustPanel } from "../../../../components/public-user-trust";
-import { publicUserTrustService } from "../../../../lib/services/public-user-trust-service";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { trustCopy } from "../../../../lib/public-user-trust-copy";
+import { publicUserTrustService } from "../../../../lib/services/public-user-trust-service";
 export const dynamic = "force-dynamic";
 const load = cache((username: string) =>
   publicUserTrustService.get(username).catch((error: unknown) => {

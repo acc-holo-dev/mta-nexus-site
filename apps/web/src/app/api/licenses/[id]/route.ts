@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { NotFoundError } from "@nexus/domain";
+import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
 import { licenseControlService } from "../../../../lib/services/license-control-service";
 

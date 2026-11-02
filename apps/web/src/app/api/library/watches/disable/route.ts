@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import { resourceReleaseWatchDisableCommandSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 export const POST = withBrowserMutation((request: NextRequest) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     const currentToken = request.cookies.get("nexus_session")?.value;

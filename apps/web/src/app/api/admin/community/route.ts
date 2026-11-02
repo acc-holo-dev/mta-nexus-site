@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
+import type { NextRequest } from "next/server";
 import { parseModerationQuery } from "../../../../lib/community-moderation-contract";
 import { moderationError } from "../../../../lib/community-moderation-copy";
 import { reportRateLimit } from "../../../../lib/community-report-api";
 import { communityModerationService } from "../../../../lib/services/community-moderation-service";
+import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseSessionRevocation } from "../../../../lib/session-revocation";
 
 const state = vi.hoisted(() => ({
@@ -49,8 +49,8 @@ vi.mock("@nexus/domain", () => ({
   AppError: class AppError extends Error {},
 }));
 
-import { DELETE, GET } from "./route";
 import { authService } from "../../../../lib/services/auth-service";
+import { DELETE, GET } from "./route";
 
 function listRequest() {
   return new NextRequest("http://nexus.test/api/auth/sessions", {

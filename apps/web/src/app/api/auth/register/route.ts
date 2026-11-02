@@ -1,14 +1,14 @@
-import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { AppError } from "@nexus/domain";
+import { consumeRateLimit } from "@nexus/security";
+import { registerSchema } from "@nexus/validation";
+import { type NextRequest, NextResponse } from "next/server";
 import { readAuthJson } from "../../../../lib/auth-request-body";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { registerSchema } from "@nexus/validation";
-import { consumeRateLimit } from "@nexus/security";
-import { AppError } from "@nexus/domain";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
+import { authService } from "../../../../lib/services/auth-service";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

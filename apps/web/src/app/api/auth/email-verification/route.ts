@@ -1,13 +1,13 @@
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
+import { AppError } from "@nexus/domain";
 import {
   confirmRecoveryEmailVerificationSchema,
   requestRecoveryEmailVerificationSchema,
 } from "@nexus/validation";
-import { AppError } from "@nexus/domain";
+import { type NextRequest, NextResponse } from "next/server";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import { authService } from "../../../../lib/services/auth-service";
 
 const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 

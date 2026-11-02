@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
-import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../lib/observability";
+import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 

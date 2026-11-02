@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceReleaseWatchesQuery } from "../../../../../lib/resource-release-watches-query";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";

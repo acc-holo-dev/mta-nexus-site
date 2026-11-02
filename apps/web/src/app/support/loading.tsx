@@ -14,7 +14,7 @@ export default async function Loading() {
         <h1 id="support-loading-heading" className="font-display text-primary">
           {dictionary.support.title}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {dictionary.support.loading}
         </p>
       </header>

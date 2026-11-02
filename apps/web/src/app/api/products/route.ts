@@ -1,19 +1,19 @@
+import { AppError, type Product } from "@nexus/domain";
+import { consumeRateLimit } from "@nexus/security";
+import { createProductSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
-import { AppError, type Product } from "@nexus/domain";
-import { createProductSchema } from "@nexus/validation";
-import { consumeRateLimit } from "@nexus/security";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { parseMarketQuery } from "../../../lib/market-query";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
+import { isUniqueConstraintViolation } from "../../../lib/postgres-error";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
-import { parseMarketQuery } from "../../../lib/market-query";
-import { isUniqueConstraintViolation } from "../../../lib/postgres-error";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

@@ -1,5 +1,6 @@
-import type { NextRequest } from "next/server";
 import { can, consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   inspectMtaMetaXml,
   MetaInspectionInputError,
@@ -12,7 +13,6 @@ import {
   type RequestLogContext,
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

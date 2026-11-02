@@ -1,13 +1,13 @@
-import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { authEntryHref } from "../../../components/auth-return-path";
+import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { ProfilePrivacyEditor } from "../../../components/profile-privacy-editor";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { editablePrivacySchema } from "../../../lib/profile-privacy-contract";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
-import { editablePrivacySchema } from "../../../lib/profile-privacy-contract";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

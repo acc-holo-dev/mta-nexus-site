@@ -10,7 +10,7 @@ export default async function Loading() {
         <h1 id="organizations-loading-heading" className="text-2xl font-extrabold text-primary">
           {copy.organizationsTitle}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.organizationsLoading}
         </p>
       </header>

@@ -1,15 +1,15 @@
-import type { NextRequest } from "next/server";
-import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
-import { notificationPreferencesSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
+import { notificationPreferencesSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { authService } from "../../../../lib/services/auth-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

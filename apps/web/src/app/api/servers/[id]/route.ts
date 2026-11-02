@@ -1,9 +1,10 @@
-import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { updateServerSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -12,7 +13,6 @@ import {
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

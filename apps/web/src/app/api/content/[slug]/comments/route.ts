@@ -3,6 +3,8 @@ import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { parseCommentIntentKey } from "../../../../../lib/content-comment-client";
 import {
   discussionCommentSchema,
   parseDiscussionQuery,
@@ -15,10 +17,8 @@ import {
   logRequestEvent,
 } from "../../../../../lib/observability";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { parseCommentIntentKey } from "../../../../../lib/content-comment-client";
 import { authService } from "../../../../../lib/services/auth-service";
 import { contentService } from "../../../../../lib/services/content-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 const validSlug = (slug: string) => !!slug && slug.length <= 200 && /^[a-z0-9-]+$/u.test(slug);

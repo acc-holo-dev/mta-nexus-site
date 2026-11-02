@@ -1,8 +1,10 @@
 vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   exists: true,
@@ -44,8 +46,10 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-import Page, { generateMetadata } from "./page";
+
 import { getDictionary } from "../../../lib/i18n";
+import Page, { generateMetadata } from "./page";
+
 const input = (page?: string | string[], articlePage?: string | string[]) => ({
   params: Promise.resolve({ slug: "team" }),
   searchParams: Promise.resolve({ page, articlePage }),

@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { moderationCopy } from "../../../lib/community-moderation-copy";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /admin/community.
 export default async function Loading() {

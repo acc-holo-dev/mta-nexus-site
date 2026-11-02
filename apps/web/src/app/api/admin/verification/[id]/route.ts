@@ -1,12 +1,12 @@
-import type { NextRequest } from "next/server";
 import { AppError, UnauthorizedError } from "@nexus/domain";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
-import { verificationDecisionError } from "../../../../../lib/verification-workspace-copy";
-import { verificationDecisionSchema } from "../../../../../lib/verification-workspace-contract";
-import { verificationRate } from "../../../../../lib/verification-workspace-api";
+import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
+import { userPlatformApi } from "../../../../../lib/user-platform-api";
+import { verificationRate } from "../../../../../lib/verification-workspace-api";
+import { verificationDecisionSchema } from "../../../../../lib/verification-workspace-contract";
+import { verificationDecisionError } from "../../../../../lib/verification-workspace-copy";
 export const PATCH = withBrowserMutation(
   async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
     return userPlatformApi(

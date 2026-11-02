@@ -1,31 +1,31 @@
-import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
-import { AppError, ValidationError } from "@nexus/domain";
 import {
-  resourceDownloadAuthorizationRepository,
   buildRepository,
   productRepository,
+  resourceDownloadAuthorizationRepository,
 } from "@nexus/db";
+import { AppError, ValidationError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
-import { parseDownloadBuildSelection } from "../../../../../lib/build-download-selection";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../lib/build-download-metadata";
-import { resourceDeliveryStream } from "../../../../../lib/resource-delivery-stream";
-import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
+import { parseDownloadBuildSelection } from "../../../../../lib/build-download-selection";
 import {
-  REQUEST_ID_HEADER,
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
+  REQUEST_ID_HEADER,
   type RequestLogContext,
 } from "../../../../../lib/observability";
+import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
+import { resourceDeliveryStream } from "../../../../../lib/resource-delivery-stream";
 import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productService } from "../../../../../lib/services/product-service";
+import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

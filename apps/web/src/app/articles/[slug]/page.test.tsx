@@ -1,8 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+
 import type { Content } from "@nexus/domain";
 import { createContentSchema } from "@nexus/validation";
+
 const state = vi.hoisted(() => ({ cover: "", locale: "en" as "en" | "ru" }));
 const article = () =>
   ({
@@ -41,8 +44,10 @@ vi.mock("../../../lib/services/content-reaction-service", () => ({
     }),
   },
 }));
-import Page, { generateMetadata } from "./page";
+
 import { ArticleCard } from "../../../components/article-card";
+import Page, { generateMetadata } from "./page";
+
 const input = () => ({ params: Promise.resolve({ slug: "guide" }) });
 beforeEach(() => {
   state.cover = "";

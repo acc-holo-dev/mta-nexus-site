@@ -1,11 +1,11 @@
 import type { NextRequest } from "next/server";
+import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
-import { verificationError } from "../../../../../lib/verification-workspace-copy";
 import {
   verificationFilters,
   verificationRate,
 } from "../../../../../lib/verification-workspace-api";
-import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
+import { verificationError } from "../../../../../lib/verification-workspace-copy";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

@@ -1,21 +1,21 @@
-import { FollowButton } from "../../../components/follow-button";
-import Link from "next/link";
-import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { safeExternalWebUrl } from "@nexus/validation";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
-import { parseProfilePage } from "../../../lib/profile-pagination";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { Building2, ExternalLink, Globe, ShieldCheck } from "lucide-react";
-import { StatCard } from "@nexus/ui";
 import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
-import { ProductCard } from "../../../components/product-card";
+import { StatCard } from "@nexus/ui";
+import { safeExternalWebUrl } from "@nexus/validation";
+import { Building2, ExternalLink, Globe, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 import { ArticleCard } from "../../../components/article-card";
+import { FollowButton } from "../../../components/follow-button";
+import { ProductCard } from "../../../components/product-card";
+import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { parseProfilePage } from "../../../lib/profile-pagination";
+import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { productService } from "../../../lib/services/product-service";
-import { cache } from "react";
 
 export const dynamic = "force-dynamic";
 

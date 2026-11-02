@@ -1,4 +1,8 @@
+import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
+import { createContentSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -6,12 +10,8 @@ import {
   type RequestLogContext,
 } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
-import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
-import { serverService } from "../../../lib/services/server-service";
 import { productService } from "../../../lib/services/product-service";
-import { createContentSchema } from "@nexus/validation";
-import { can, consumeRateLimit, generateId } from "@nexus/security";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { serverService } from "../../../lib/services/server-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",

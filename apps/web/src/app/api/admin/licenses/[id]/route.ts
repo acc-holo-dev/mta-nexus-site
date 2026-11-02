@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import { UnauthorizedError, ValidationError } from "@nexus/domain";
 import { licenseModerationCommandSchema } from "@nexus/validation";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { licenseControlService } from "../../../../../lib/services/license-control-service";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
+import { licenseControlService } from "../../../../../lib/services/license-control-service";
 
 export const POST = withBrowserMutation(
   (request: NextRequest, context: { params: Promise<{ id: string }> }) => {

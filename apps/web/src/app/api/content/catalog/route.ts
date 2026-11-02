@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
+import { resolveLocale } from "../../../../lib/i18n";
 import { contentService } from "../../../../lib/services/content-service";
 import { parseContentPage } from "../../../../lib/user-platform-contract";
-import { resolveLocale } from "../../../../lib/i18n";
 import { userPlatformError } from "../../../../lib/user-platform-copy";
 export async function GET(request: NextRequest) {
   const filters = parseContentPage(request.nextUrl.searchParams);

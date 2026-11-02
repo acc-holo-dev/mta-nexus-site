@@ -56,8 +56,8 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: !state.rateLimited })),
 }));
 
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { POST } from "./route";
 
 function request(overrides: { headers?: Record<string, string>; body?: string } = {}) {

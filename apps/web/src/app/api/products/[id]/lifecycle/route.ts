@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { resourceLifecycleSchema } from "@nexus/validation";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { productService } from "../../../../../lib/services/product-service";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {

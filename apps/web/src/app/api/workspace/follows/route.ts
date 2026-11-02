@@ -1,9 +1,9 @@
-import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
-import { followError } from "../../../../lib/follow-workspace-copy";
+import type { NextRequest } from "next/server";
 import { parseFollowQuery } from "../../../../lib/follow-workspace-contract";
+import { followError } from "../../../../lib/follow-workspace-copy";
 import { followWorkspaceService } from "../../../../lib/services/follow-workspace-service";
+import { userPlatformApi } from "../../../../lib/user-platform-api";
 export function GET(request: NextRequest) {
   return userPlatformApi(
     request,

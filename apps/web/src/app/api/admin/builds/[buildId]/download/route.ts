@@ -1,6 +1,5 @@
-import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
+import { buildRepository, buildReviewDownloadRepository } from "@nexus/db";
 import { AppError, ValidationError } from "@nexus/domain";
-import { buildReviewDownloadRepository, buildRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
@@ -10,12 +9,13 @@ import {
 } from "../../../../../../lib/build-download-metadata";
 import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
 import {
-  REQUEST_ID_HEADER,
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
+  REQUEST_ID_HEADER,
   type RequestLogContext,
 } from "../../../../../../lib/observability";
+import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
 import { authService } from "../../../../../../lib/services/auth-service";
 
 const privateHeaders = {

@@ -1,17 +1,17 @@
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { organizationRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
+import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { authService } from "../../../../lib/services/auth-service";
-import { organizationRepository } from "@nexus/db";
-import { consumeRateLimit } from "@nexus/security";
-import { AppError } from "@nexus/domain";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
+import { authService } from "../../../../lib/services/auth-service";
 
 const contextSchema = z
   .object({

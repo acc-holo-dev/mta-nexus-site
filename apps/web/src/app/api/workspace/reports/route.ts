@@ -1,15 +1,15 @@
+import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
+import { reportFilters, reportRateLimit } from "../../../../lib/community-report-api";
+import { communityReportCreateSchema } from "../../../../lib/community-report-contract";
 import {
   communityReportError,
   communityReportMutationError,
 } from "../../../../lib/community-report-copy";
-import { reportFilters, reportRateLimit } from "../../../../lib/community-report-api";
-import { communityReportCreateSchema } from "../../../../lib/community-report-contract";
-import { requireServerJsonContentType, readBoundedJson } from "../../../../lib/bounded-json";
-import { AppError } from "@nexus/domain";
 import { communityReportService } from "../../../../lib/services/community-report-service";
+import { userPlatformApi } from "../../../../lib/user-platform-api";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

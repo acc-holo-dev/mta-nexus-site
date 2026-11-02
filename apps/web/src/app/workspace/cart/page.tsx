@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
+import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { ResourceCartControls } from "../../../components/resource-cart-controls";
-import { authService } from "../../../lib/services/auth-service";
-import { commerceService } from "../../../lib/services/commerce-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authService } from "../../../lib/services/auth-service";
+import { commerceService } from "../../../lib/services/commerce-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

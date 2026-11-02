@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { consumeRateLimit } from "@nexus/security";
+import type { NextRequest } from "next/server";
 import { parseDiscoverApiQuery } from "../../../lib/discover-query";
 import { discoveryCopy } from "../../../lib/discovery-copy";
 import { resolveLocale } from "../../../lib/i18n";

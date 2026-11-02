@@ -1,15 +1,16 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { publicPlatformApi } from "../../../../../lib/public-platform-api";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
-import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
-import { authService } from "../../../../../lib/services/auth-service";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { reactionCommandSchema } from "../../../../../lib/content-reaction-contract";
-import { reactionError } from "../../../../../lib/content-reaction-copy";
+import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { reactionCommandSchema } from "../../../../../lib/content-reaction-contract";
+import { reactionError } from "../../../../../lib/content-reaction-copy";
+import { publicPlatformApi } from "../../../../../lib/public-platform-api";
+import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
+import { authService } from "../../../../../lib/services/auth-service";
+import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
+import { userPlatformApi } from "../../../../../lib/user-platform-api";
+
 const validQuery = (request: NextRequest) => {
   if (request.nextUrl.searchParams.size)
     throw new AppError("Unexpected filters", 400, "VALIDATION_ERROR");

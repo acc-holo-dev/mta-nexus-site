@@ -1,12 +1,12 @@
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { changePasswordSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import { changePasswordSchema } from "@nexus/validation";
+import { type NextRequest, NextResponse } from "next/server";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import { authService } from "../../../../lib/services/auth-service";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, {

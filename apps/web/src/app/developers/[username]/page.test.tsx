@@ -1,6 +1,7 @@
 vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -56,7 +57,9 @@ vi.mock("@nexus/ui", () => ({
   ),
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
 }));
+
 import Page, { generateMetadata } from "./page";
+
 const params = () => ({ params: Promise.resolve({ username: "creator" }) });
 
 beforeEach(() => {

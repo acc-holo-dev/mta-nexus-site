@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   actor: { id: "author" } as { id: string } | null,
   locale: "en" as "en" | "ru",
@@ -18,7 +19,9 @@ vi.mock("next/navigation", () => ({
   },
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+
 import Page, { metadata } from "./page";
+
 beforeEach(() => {
   mocks.actor = { id: "author" };
   mocks.locale = "en";

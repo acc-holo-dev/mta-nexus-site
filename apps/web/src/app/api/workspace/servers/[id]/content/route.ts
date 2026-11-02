@@ -1,13 +1,14 @@
 import type { NextRequest } from "next/server";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
-import { serverContentService } from "../../../../../../lib/services/server-content-service";
-import {
-  serverContentId,
-  serverContentFilters,
-  serverContentRate,
-} from "../../../../../../lib/server-content-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+import {
+  serverContentFilters,
+  serverContentId,
+  serverContentRate,
+} from "../../../../../../lib/server-content-api";
+import { serverContentService } from "../../../../../../lib/services/server-content-service";
+import { userPlatformApi } from "../../../../../../lib/user-platform-api";
+
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {
   return userPlatformApi(request, async (actor) => {

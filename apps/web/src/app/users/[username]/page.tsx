@@ -1,30 +1,30 @@
-import { DeveloperExperience } from "../../../components/developer-experience";
-import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
-import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
-import { FollowButton } from "../../../components/follow-button";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
-import { trustCopy } from "../../../lib/public-user-trust-copy";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
-import { parseProfilePage } from "../../../lib/profile-pagination";
-import { notFound } from "next/navigation";
-import type { Metadata } from "next";
-import { Calendar, ShieldCheck } from "lucide-react";
-import { Avatar, StatCard } from "@nexus/ui";
 import { productRepository, serverRepository, userRepository } from "@nexus/db";
+import { Avatar, StatCard } from "@nexus/ui";
+import { Calendar, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { DeveloperExperience } from "../../../components/developer-experience";
+import { FollowButton } from "../../../components/follow-button";
 import { ProductCard } from "../../../components/product-card";
+import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { ServerCard } from "../../../components/server-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { parseProfilePage } from "../../../lib/profile-pagination";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
+import { trustCopy } from "../../../lib/public-user-trust-copy";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { authService } from "../../../lib/services/auth-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
-import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
-import { cache } from "react";
+import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
+import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
 
 export const dynamic = "force-dynamic";
 

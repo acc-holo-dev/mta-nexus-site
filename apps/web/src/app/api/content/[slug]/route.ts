@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
-import { contentService } from "../../../../lib/services/content-service";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../lib/observability";
+import { contentService } from "../../../../lib/services/content-service";
 
 const publicHeaders = {
   "Cache-Control": "public, max-age=30, stale-while-revalidate=120",

@@ -1,5 +1,3 @@
-import type { NextRequest } from "next/server";
-import { authService } from "../../../lib/services/auth-service";
 import {
   contentRepository,
   productRepository,
@@ -7,15 +5,16 @@ import {
   serverRepository,
   userRepository,
 } from "@nexus/db";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createReportSchema } from "@nexus/validation";
-import { generateId, can, consumeRateLimit } from "@nexus/security";
-
+import type { NextRequest } from "next/server";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
+import { authService } from "../../../lib/services/auth-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 

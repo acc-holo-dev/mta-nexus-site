@@ -1,15 +1,15 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
+import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { profilePrivacyUpdateSchema } from "../../../../lib/profile-privacy-contract";
 import {
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../../../../lib/profile-privacy-copy";
 import { profilePrivacyService } from "../../../../lib/services/profile-privacy-service";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { userPlatformApi } from "../../../../lib/user-platform-api";
 
 export const dynamic = "force-dynamic";
 const validQuery = (request: NextRequest) => {

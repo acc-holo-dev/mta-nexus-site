@@ -1,11 +1,7 @@
-import type { NextRequest } from "next/server";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { resourceReviewCreateSchema } from "@nexus/validation";
-import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceReviewQuery } from "../../../../../lib/resource-review-query";
+import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
@@ -13,6 +9,10 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
+import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
+import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
+import { resourceReviewQuery } from "../../../../../lib/resource-review-query";
+import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
   const headers = { "Cache-Control": "no-store" };
