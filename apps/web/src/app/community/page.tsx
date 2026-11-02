@@ -31,6 +31,7 @@ export default async function CommunityPage({
   const { status: _status, ...filters } = parseContentPage((await searchParams) ?? {});
   const result = await contentService.pageCommunity(filters).catch(() => null);
   const topics = result?.items ?? [];
+  const filtersActive = Boolean(filters.query || filters.type || filters.page > 1);
 
   return (
     <div className="space-y-6">
@@ -103,16 +104,25 @@ export default async function CommunityPage({
         </section>
       ) : (
         <EmptyState
-          title={copy.noTopics}
-          description={copy.description}
+          title={filtersActive ? copy.emptyFiltered : copy.noTopics}
+          description={filtersActive ? copy.clearFilters : copy.description}
           icon={<MessageSquare className="h-6 w-6" />}
           action={
-            <Link
-              href="/community/new"
-              className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
-            >
-              {copy.newTopic}
-            </Link>
+            filtersActive ? (
+              <Link
+                href="/community"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.clearFilters}
+              </Link>
+            ) : (
+              <Link
+                href="/community/new"
+                className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
+              >
+                {copy.newTopic}
+              </Link>
+            )
           }
         />
       )}

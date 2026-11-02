@@ -207,11 +207,11 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
   }
 
   return (
-    <section aria-label={copy.directory} className="min-w-0 space-y-4">
+    <section aria-label={copy.directory} aria-busy={loading} className="min-w-0 space-y-4">
       <div className="nexus-panel space-y-3 p-4">
         <div>
           <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
-          <p role="status" className="mt-1 text-xs text-secondary">
+          <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
             {loading ? (
               copy.loading
             ) : directory ? (

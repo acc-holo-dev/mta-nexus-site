@@ -1,4 +1,5 @@
-import type { ReactElement, ReactNode } from "react";
+import { createElement, type ReactElement, type ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -50,22 +51,9 @@ vi.mock("./locale-context", async () => {
   };
 });
 
-import { SupportCenter } from "./support-center";
 import { getDictionary } from "../lib/i18n";
-
-type Element = ReactElement<Record<string, unknown>>;
-
-function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  return [element, ...descendants(element.props.children as ReactNode)];
-}
-
-function renderAuthGate() {
-  harness.cursor = 0;
-  return descendants(SupportCenter({}));
-}
+import { PlatformSignIn } from "./content-catalog-controls";
+import { SupportCenter } from "./support-center";
 
 beforeEach(() => {
   harness.slots = [[], 1, 1, false, false, null, true];
@@ -81,8 +69,15 @@ afterEach(() => {
 });
 
 it("seeds guest sign-in with the current pathname return target", () => {
-  const copy = getDictionary("en").support;
-  const signIn = renderAuthGate().find((node) => node.props.href === "/auth/login?next=%2Fsupport");
-  expect(signIn).toBeTruthy();
-  expect(String(signIn?.props.children)).toContain(copy.signIn);
+  harness.cursor = 0;
+  const gate = SupportCenter({}) as ReactElement<{
+    locale: "en";
+    returnPath?: string | null;
+  }>;
+  expect(gate.type).toBe(PlatformSignIn);
+  expect(gate.props.returnPath).toBeUndefined();
+  const html = renderToStaticMarkup(createElement(gate.type, gate.props));
+  expect(html).toContain('href="/auth/login?next=%2Fsupport"');
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
+  expect(html).toContain(getDictionary("en").workspace.signIn);
 });

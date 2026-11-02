@@ -109,12 +109,15 @@ export async function ServerStatisticsPage({
           {serverStatisticsError(locale, code)}
         </p>
         <nav className="flex flex-wrap gap-4 text-sm text-accent">
-          <Link href={serverStatisticsHref(path, query)} className="min-h-11 underline">
+          <Link
+            href={serverStatisticsHref(path, query)}
+            className="min-h-11 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.retry}
           </Link>
           <Link
             href={serverStatisticsHref(path, { window: query.window })}
-            className="min-h-11 underline"
+            className="min-h-11 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.refresh}
           </Link>

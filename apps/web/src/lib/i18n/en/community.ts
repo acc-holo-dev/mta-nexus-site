@@ -5,6 +5,8 @@ export const community = {
     loading: "Loading community topics…",
     newTopic: "New topic",
     noTopics: "No topics yet. Start the first useful discussion.",
+    emptyFiltered: "No topics match these filters.",
+    clearFilters: "Clear filters",
     replies: "replies",
     startTitle: "Start a community topic",
     startDescription:

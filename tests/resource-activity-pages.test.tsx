@@ -39,6 +39,7 @@ vi.mock("../apps/web/src/lib/services/resource-activity-service", () => ({
 }));
 
 import History, { metadata as historyMeta } from "../apps/web/src/app/workspace/acquisitions/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import Activity, {
   metadata as activityMeta,
 } from "../apps/web/src/app/workspace/resources/[id]/activity/page";
@@ -98,6 +99,20 @@ const activityInput = {
   searchParams: Promise.resolve({ days: "7" }),
 };
 
+it("offers a clear link when acquisition history is empty under a source filter", async () => {
+  state.history.mockResolvedValue({
+    items: [],
+    total: 0,
+    page: 1,
+    totalPages: 1,
+    filter: "cart",
+  });
+  const html = renderToStaticMarkup(
+    await History({ searchParams: Promise.resolve({ source: "cart" }) }),
+  );
+  expect(html).toContain(getDictionary("en").articles.clearFilters);
+  expect(html).toContain('href="/workspace/acquisitions?source=all&amp;page=1"');
+});
 it("keeps acquisition history private and paginated without rendering withdrawn metadata", async () => {
   const html = renderToStaticMarkup(await History(historyInput));
   expect(state.history).toHaveBeenCalledWith(state.user, 2, "cart");

@@ -144,7 +144,25 @@ export async function CollectionReleasesScreen({
           </Link>
         ))}
       </nav>
-      {!result.items.length && <p>{cc.emptyItems}</p>}
+      {!result.items.length && (
+        <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
+          <p>
+            {result.q
+              ? cc.emptyFilteredItems
+              : result.filter !== "all"
+                ? cc.emptyFiltered
+                : cc.emptyItems}
+          </p>
+          {(result.filter !== "all" || result.q) && (
+            <Link
+              href={collectionHref(path.id, "releases")}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {cc.clear}
+            </Link>
+          )}
+        </div>
+      )}
       <ol className="grid gap-4 sm:grid-cols-2">
         {result.items.map((item) => {
           const version = item.mode === "fixed" ? item.selectedVersion : item.latestVersion,

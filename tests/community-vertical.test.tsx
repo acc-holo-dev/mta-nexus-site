@@ -133,6 +133,21 @@ describe("community topic submission behavior", () => {
     ).toBeNull();
   });
 
+  it("shows filtered empty state with clear link when topics are missing under active filters", async () => {
+    listCommunityTopics.mockResolvedValue({ items: [], page: 2, hasMore: false });
+    const copy = getDictionary("en").community;
+    const html = renderToStaticMarkup(
+      await CommunityPage({
+        searchParams: Promise.resolve({ q: "help", type: "question", page: "2" }),
+      }),
+    );
+    expect(listCommunityTopics).toHaveBeenCalledWith({ page: 2, query: "help", type: "question" });
+    expect(html).toContain(copy.emptyFiltered);
+    expect(html).toContain('href="/community"');
+    expect(html).toContain(copy.clearFilters);
+    expect(html).not.toContain(copy.noTopics);
+  });
+
   it("renders the bounded community feed and existing article discussion path", async () => {
     state.topics = [
       {

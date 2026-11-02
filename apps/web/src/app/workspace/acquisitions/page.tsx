@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
 import {
@@ -79,7 +80,17 @@ export default async function AcquisitionHistoryPage({
         ))}
       </nav>
       {result.items.length === 0 ? (
-        <p className="nexus-panel p-6 text-secondary">{copy.empty}</p>
+        <div className="nexus-panel space-y-3 p-6 text-secondary">
+          <p>{copy.empty}</p>
+          {result.filter !== "all" ? (
+            <Link
+              href={acquisitionHistoryHref("all", 1)}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {getDictionary(locale).articles.clearFilters}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.items.map((item) => (

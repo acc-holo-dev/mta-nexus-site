@@ -5,6 +5,8 @@ export const community = {
     loading: "Загрузка тем сообщества…",
     newTopic: "Новая тема",
     noTopics: "Тем пока нет. Начните первое полезное обсуждение.",
+    emptyFiltered: "Нет тем по выбранным фильтрам.",
+    clearFilters: "Сбросить фильтры",
     replies: "ответов",
     startTitle: "Начать обсуждение",
     startDescription:

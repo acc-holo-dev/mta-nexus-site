@@ -55,6 +55,7 @@ it.each(["ru", "en"] as const)(
     expect(html).not.toContain("Server <private>");
     expect(html).toContain(">0</td>");
     expect(html).toContain(">90 (90%)</td>");
+    expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
     expect(html).toContain("before=obs_1");
     expect(html).toContain("end=2026-10-11T00%3A00%3A00.000Z");
     expect(html).toContain(locale === "ru" ? "Среднее число игроков" : "Average players");

@@ -31,6 +31,7 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 }));
 
 import { CollectionReleasesScreen } from "../apps/web/src/components/collection-releases-screen";
+import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
 
 const item = {
   productId: "prd_a",
@@ -111,6 +112,17 @@ it.each(["en", "ru"])(
     );
   },
 );
+it("shows filtered empty releases with a clear link that keeps the collection path", async () => {
+  const result = report();
+  result.items = [];
+  h.releases.mockResolvedValue(result);
+  const html = await screen({ filter: "pinned", q: "missing" });
+  const cc = libraryCollectionsCopy("en");
+  expect(html).toContain(cc.emptyFilteredItems);
+  expect(html).toContain("/lcol_a/releases");
+  expect(html).toContain(cc.clear);
+  expect(html).not.toContain(cc.emptyItems);
+});
 it("preserves filters/search in navigation and export while clear resets the search", async () => {
   const html = await screen({ q: "core & maps", filter: "all" });
   expect(html).toContain("page=2&amp;filter=all&amp;q=core+%26+maps");

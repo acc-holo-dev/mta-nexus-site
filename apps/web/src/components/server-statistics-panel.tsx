@@ -251,14 +251,17 @@ export function ServerStatisticsPanel({
           className="flex flex-wrap gap-4 text-sm font-semibold text-accent"
         >
           {before && (
-            <Link href={serverStatisticsHref(path, state)} className="min-h-11 py-2 underline">
+            <Link
+              href={serverStatisticsHref(path, state)}
+              className="min-h-11 py-2 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.latest}
             </Link>
           )}
           {report.nextCursor && (
             <Link
               href={serverStatisticsHref(path, { ...state, before: report.nextCursor })}
-              className="min-h-11 py-2 underline"
+              className="min-h-11 py-2 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.earlier} →
             </Link>

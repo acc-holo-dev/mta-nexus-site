@@ -16,6 +16,8 @@ describe("MTA directory/visibility chrome", () => {
     const copy = getDictionary("en").servers;
     const html = renderToStaticMarkup(createElement(MtaMasterServerDirectory, { locale: "en" }));
     expect(html).toContain(copy.directory);
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain('aria-live="polite"');
     expect(html).toContain("rounded-lg");
   });
 
