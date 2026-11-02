@@ -468,7 +468,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {reviewPage && user && (
               <Link
                 href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-                className="ml-4 text-sm text-accent underline"
+                className="ml-4 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {resourceReviewCopy(locale).write}
               </Link>

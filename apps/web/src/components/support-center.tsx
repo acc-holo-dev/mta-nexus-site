@@ -478,7 +478,10 @@ export function SupportCenter({
                 <Button type="submit" className="min-h-10" variant="outline">
                   {workspaceCopy.apply}
                 </Button>
-                <Link href={basePath} className="min-h-10 py-2 text-sm text-accent underline">
+                <Link
+                  href={basePath}
+                  className="min-h-10 py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
                   {workspaceCopy.reset}
                 </Link>
               </div>

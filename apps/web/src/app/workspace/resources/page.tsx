@@ -81,7 +81,10 @@ export default async function AuthorResourcesPage({
           {dictionary.workspace.publishResource}
         </Link>
       </header>
-      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">
+      <Link
+        href="/subscriptions"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {getCommercialCopy(locale).catalog}
       </Link>
       <ResourcePublisherFilters query={query} statusCounts={result.statusCounts} locale={locale} />
