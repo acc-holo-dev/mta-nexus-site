@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import type { ObjectMuteDuration } from "../lib/follow-workspace-contract";
 import { followCopy, followError } from "../lib/follow-workspace-copy";
-import type { Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { LocaleProvider, useNexusLocale } from "./locale-context";
@@ -45,11 +45,17 @@ function ContentFollowControl({
   const { locale: appLocale } = useNexusLocale();
   const locale = providedLocale ?? appLocale;
   const copy = followCopy(locale);
+  const workspace = getDictionary(locale).workspace;
   const pathname = usePathname();
+  const authLinkFocus =
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
-  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh auth return paths after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const path = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
   const [authenticated, setAuthenticated] = useState(initial?.authenticated ?? false);
   const [following, setFollowing] = useState(initial?.following ?? false);
@@ -215,8 +221,8 @@ function ContentFollowControl({
     }
   }
 
-  const linkStyle =
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-accent";
+  const linkStyle = `inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-base bg-surface px-4 py-2 text-sm font-semibold text-secondary ${authLinkFocus}`;
+  const loading = pending || !ready;
 
   if (failed) {
     return (
@@ -241,17 +247,25 @@ function ContentFollowControl({
 
   if (!authenticated) {
     return (
-      <div className="space-y-2">
-        <Link href={loginHref} className={linkStyle}>
-          {copy.signIn}
-        </Link>
+      <div className="space-y-2" aria-busy={!ready && !failed}>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link href={loginHref} className={linkStyle}>
+            {copy.signIn}
+          </Link>
+          <Link
+            href={registerHref}
+            className={`inline-flex min-h-11 items-center text-sm text-secondary underline ${authLinkFocus}`}
+          >
+            {workspace.createAccount}
+          </Link>
+        </div>
         <p className="max-w-sm text-xs text-muted">{copy.discussionHelp}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" aria-busy={loading}>
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"

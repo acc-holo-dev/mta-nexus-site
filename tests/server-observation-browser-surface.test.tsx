@@ -157,8 +157,12 @@ it("keeps invalid, unavailable, revoked and genuinely empty results distinct", a
   empty.nextCursor = null;
   state.read.mockResolvedValueOnce(empty);
   const html = renderToStaticMarkup(await page());
-  expect(html).toContain("нет наблюдений");
+  expect(html).toContain("В этом периоде сохранённых наблюдений нет.");
   expect(html).toContain('disabled=""');
+  state.read.mockResolvedValueOnce(empty);
+  const filtered = renderToStaticMarkup(await page({ q: "Lua" }));
+  expect(filtered).toContain("В этом периоде нет наблюдений с выбранными фильтрами.");
+  expect(filtered).toContain("Сбросить фильтры");
   state.read.mockResolvedValueOnce(null);
   await expect(page()).rejects.toThrow("NOT_FOUND");
 });

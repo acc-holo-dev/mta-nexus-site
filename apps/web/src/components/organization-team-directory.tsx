@@ -114,7 +114,7 @@ export function OrganizationTeamDirectory({
           <p className="text-xs text-muted">{team.owner}</p>
           <Link
             href={`/users/${encodeURIComponent(data.owner.username)}`}
-            className="break-words text-sm text-accent"
+            className="inline-flex min-h-11 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {data.owner.displayName} (@{data.owner.username})
           </Link>

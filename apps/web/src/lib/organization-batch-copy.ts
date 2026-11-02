@@ -22,6 +22,7 @@ const en = {
   effective: "Effective server access",
   removed: "Removed",
   confirm: "Save reviewed changes",
+  commitConfirm: "I confirm the reviewed team changes shown above.",
   saving: "Saving…",
   cancel: "Cancel review",
   warning:
@@ -55,6 +56,7 @@ const ru: Record<keyof typeof en, string> = {
   effective: "Фактический доступ к серверам",
   removed: "Удалён",
   confirm: "Сохранить проверенные изменения",
+  commitConfirm: "Подтверждаю показанные выше проверенные изменения команды.",
   saving: "Сохранение…",
   cancel: "Отменить проверку",
   warning:

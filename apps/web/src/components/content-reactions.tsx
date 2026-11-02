@@ -10,7 +10,7 @@ import {
   reactionStateSchema,
 } from "../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
-import type { Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 export function ContentReactions({
@@ -26,17 +26,21 @@ export function ContentReactions({
 }) {
   const pathname = usePathname();
   const copy = reactionCopy(locale),
+    workspace = getDictionary(locale).workspace,
     [state, setState] = useState(initial),
     [pending, setPending] = useState(false),
     [blocked, setBlocked] = useState(!initial),
     [message, setMessage] = useState(initial ? "" : copy.unavailable),
-    [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+    [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname)),
+    [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const busy = useRef(false),
     alive = useRef(true),
     request = useRef<AbortController | null>(null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh auth return paths after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const path = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
   useEffect(() => {
     alive.current = true;
@@ -137,12 +141,20 @@ export function ContentReactions({
         </Button>
       </div>
       {state && !state.authenticated && (
-        <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={loginHref}
-        >
-          {copy.signIn}
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            href={loginHref}
+          >
+            {copy.signIn}
+          </Link>
+          <Link
+            className="inline-flex min-h-11 items-center text-sm text-secondary underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            href={registerHref}
+          >
+            {workspace.createAccount}
+          </Link>
+        </div>
       )}
       {state?.authenticated && (
         <Link

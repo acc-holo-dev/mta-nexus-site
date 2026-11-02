@@ -155,12 +155,26 @@ it("rejects duplicate filters and does not read private data without a session",
   );
   expect(state.application).not.toHaveBeenCalled();
 });
+it("distinguishes never-empty history from filtered-empty results", async () => {
+  state.applications.mockResolvedValue({ items: [], olderCursor: null, newerCursor: null });
+  const never = renderToStaticMarkup(await History({}));
+  const copy = verificationApplicationsCopy("en");
+  expect(never).toContain(copy.emptyNever);
+  expect(never).not.toContain(copy.emptyFiltered);
+  const filtered = renderToStaticMarkup(
+    await History({ searchParams: Promise.resolve({ status: "pending" }) }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).not.toContain(copy.emptyNever);
+  expect(filtered).toContain(copy.clear);
+});
 it("distinguishes safe auth and target errors from an empty history", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const history = renderToStaticMarkup(await History({}));
   expect(history).toContain('href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"');
   expect(history).not.toContain("PRIVATE_AUTH");
-  expect(history).not.toContain(verificationApplicationsCopy("en").empty);
+  expect(history).not.toContain(verificationApplicationsCopy("en").emptyNever);
+  expect(history).not.toContain(verificationApplicationsCopy("en").emptyFiltered);
   expect(history).not.toContain(verificationApplicationsCopy("en").title);
   state.application.mockRejectedValueOnce(new AppError("PRIVATE_TARGET", 404, "NOT_FOUND"));
   const detail = renderToStaticMarkup(await Detail(params));

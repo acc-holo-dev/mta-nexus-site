@@ -141,7 +141,13 @@ function ServerObservationBrowserPanel({
       players: query.players,
       password: query.password,
       responding: query.responding,
-    };
+    },
+    observationFiltersActive = Boolean(
+      query.query ||
+        query.players !== "all" ||
+        query.password !== "all" ||
+        query.responding !== "all",
+    );
   const time = (value: string) =>
     new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB", {
       timeZone: "UTC",
@@ -242,19 +248,23 @@ function ServerObservationBrowserPanel({
       <p className="text-sm text-muted">{copy.scope}</p>
       {report.observations.length === 0 ? (
         <div className="nexus-panel space-y-3 p-5">
-          <p className="text-sm text-muted">{copy.empty}</p>
-          <Link
-            href={serverObservationBrowserHref(path, {
-              ...state,
-              query: "",
-              players: "all",
-              password: "all",
-              responding: "all",
-            })}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reset}
-          </Link>
+          <p className="text-sm text-muted">
+            {observationFiltersActive ? copy.emptyFiltered : copy.emptyNever}
+          </p>
+          {observationFiltersActive ? (
+            <Link
+              href={serverObservationBrowserHref(path, {
+                ...state,
+                query: "",
+                players: "all",
+                password: "all",
+                responding: "all",
+              })}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
         </div>
       ) : (
         <section

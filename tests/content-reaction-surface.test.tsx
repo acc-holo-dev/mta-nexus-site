@@ -4,6 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { ContentReactions } from "../apps/web/src/components/content-reactions";
 import { PublicUserTrustPanel } from "../apps/web/src/components/public-user-trust";
 import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { trustCopy } from "../apps/web/src/lib/public-user-trust-copy";
 
 const mocks = vi.hoisted(() => ({
@@ -101,6 +102,8 @@ it("shows sign-in for guests and disables votes for an author while allowing old
     />,
   );
   expect(guest).toContain('href="/auth/login?next=%2Farticles%2Fguide"');
+  expect(guest).toContain('href="/auth/register?next=%2Farticles%2Fguide"');
+  expect(guest).toContain(getDictionary("en").workspace.createAccount);
   expect(guest.match(/disabled=""/gu)).toHaveLength(3);
   const own = renderToStaticMarkup(
     <ContentReactions

@@ -60,6 +60,9 @@ function descendants(node: ReactNode): Element[] {
       ...descendants(element.props.children as ReactNode),
     ];
   }
+  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
+    return descendants(type(element.props));
+  }
   return [element, ...descendants(element.props.children as ReactNode)];
 }
 const time = "2026-10-11T00:00:00.000Z",
@@ -154,6 +157,13 @@ function click(kind: "team" | "comment", label: string) {
   expect(node.props.disabled).not.toBe(true);
   (node.props.onClick as () => void)();
 }
+function acknowledgeTeamCommit() {
+  const confirm = render("team")
+    .filter((node) => node.type === "input")
+    .at(-1);
+  if (!confirm) throw Error("Missing commit acknowledgement");
+  (confirm.props.onChange as (event: unknown) => void)({ target: { checked: true } });
+}
 function prepareTeam() {
   click("team", "Select eligible members on this page");
   const fields = render("team").filter((node) => node.type === "select");
@@ -181,8 +191,10 @@ it("selects eligible page members, performs server review and commits only the r
   harness.fetch.mockResolvedValueOnce(response(preview));
   click("team", "Review changes");
   await vi.waitFor(() =>
-    expect(button(render("team"), "Save reviewed changes").props.disabled).toBe(false),
+    expect(button(render("team"), "Save reviewed changes").props.disabled).toBe(true),
   );
+  acknowledgeTeamCommit();
+  expect(button(render("team"), "Save reviewed changes").props.disabled).toBe(false);
   expect(JSON.parse(harness.fetch.mock.calls[0][1].body)).toEqual({
     userIds: ["member"],
     change: { action: "role", role: "developer" },
@@ -195,6 +207,7 @@ it("selects eligible page members, performs server review and commits only the r
       previewRevision: version,
     }),
   );
+  acknowledgeTeamCommit();
   click("team", "Save reviewed changes");
   await vi.waitFor(() => expect(harness.committed).toHaveBeenCalled());
   expect(JSON.parse(harness.fetch.mock.calls[1][1].body).previewRevision).toBe(version);

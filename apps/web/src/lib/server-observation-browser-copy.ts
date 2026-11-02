@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { serverStatisticsError } from "./server-statistics-copy";
+
 const en = {
   title: "Observation browser",
   description:
@@ -17,7 +18,8 @@ const en = {
   no: "No",
   apply: "Apply filters",
   reset: "Clear filters",
-  empty: "No observations match these filters in this period.",
+  emptyNever: "No observations were stored in this period.",
+  emptyFiltered: "No observations match these filters in this period.",
   scope:
     "Each page contains up to 25 stored observations, newest first. Unknown values and missing records do not establish that a server was offline.",
   export: "Download this filtered page as CSV",
@@ -49,7 +51,8 @@ const ru: Record<keyof typeof en, string> = {
   no: "Нет",
   apply: "Применить фильтры",
   reset: "Сбросить фильтры",
-  empty: "В этом периоде нет наблюдений с выбранными фильтрами.",
+  emptyNever: "В этом периоде сохранённых наблюдений нет.",
+  emptyFiltered: "В этом периоде нет наблюдений с выбранными фильтрами.",
   scope:
     "До 25 сохранённых наблюдений на странице, сначала новые. Неизвестные значения и отсутствие записей не доказывают, что сервер был отключён.",
   export: "Скачать эту страницу с фильтрами в CSV",

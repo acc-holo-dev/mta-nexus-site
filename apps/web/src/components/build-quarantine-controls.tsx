@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { verificationCopy } from "../lib/verification-workspace-copy";
+import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
@@ -99,7 +100,7 @@ export function BuildQuarantineControls({
         <label className="flex items-start gap-2 text-[11px] text-secondary">
           <input
             type="checkbox"
-            className="mt-0.5"
+            className={`mt-0.5 ${actionConfirmCheckboxFocusClass}`}
             checked={notifyAffectedDownloaders}
             onChange={(event) => setNotifyAffectedDownloaders(event.target.checked)}
             disabled={pending !== null}

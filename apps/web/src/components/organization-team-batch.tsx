@@ -17,6 +17,7 @@ import type { OrganizationTeamPage } from "../lib/organization-team-contract";
 import { organizationRequest } from "../lib/organization-workspace-client";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { confirmAction } from "./confirm-action";
 export function OrganizationTeamBatch({
   data,
@@ -45,6 +46,7 @@ export function OrganizationTeamBatch({
     [role, setRole] = useState<OrganizationTeamRole>("member"),
     [enabled, setEnabled] = useState(true),
     [preview, setPreview] = useState<OrganizationBatchPreview | null>(null),
+    [commitAcknowledged, setCommitAcknowledged] = useState(false),
     [stage, setStage] = useState<"idle" | "reviewing" | "saving">("idle");
   const alive = useRef(true),
     controller = useRef<AbortController | null>(null),
@@ -108,6 +110,7 @@ export function OrganizationTeamBatch({
         const reviewed = confirmsOrganizationBatchPreview(result, data.organization.id, input);
         if (!reviewed) throw new Error(copy.uncertain);
         setPreview(reviewed);
+        setCommitAcknowledged(false);
       } else {
         const committed =
           preview && confirmsOrganizationBatchCommand(result, data.organization, preview);
@@ -265,11 +268,21 @@ export function OrganizationTeamBatch({
               {copy.noChanges}
             </p>
           )}
+          <ActionConfirmCheckbox
+            id={`${data.organization.id}-team-batch-commit`}
+            checked={commitAcknowledged}
+            required
+            disabled={disabled || !preview.changedCount}
+            checkboxClassName={actionConfirmCheckboxFocusClass}
+            onCheckedChange={setCommitAcknowledged}
+          >
+            {copy.commitConfirm}
+          </ActionConfirmCheckbox>
           <div className="flex flex-wrap gap-3">
             <Button
               type="button"
               className="min-h-11"
-              disabled={disabled || !preview.changedCount}
+              disabled={disabled || !preview.changedCount || !commitAcknowledged}
               onClick={() => void perform(true)}
             >
               {stage === "saving" ? copy.saving : copy.confirm}
@@ -279,7 +292,10 @@ export function OrganizationTeamBatch({
               variant="ghost"
               className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               disabled={disabled}
-              onClick={() => setPreview(null)}
+              onClick={() => {
+                setPreview(null);
+                setCommitAcknowledged(false);
+              }}
             >
               {copy.cancel}
             </Button>

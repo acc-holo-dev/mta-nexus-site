@@ -472,7 +472,7 @@ export function ContentDiscussion({
               />
               {comment.author ? (
                 <Link
-                  className="min-w-0 break-words text-sm font-semibold text-accent"
+                  className="min-w-0 break-words text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   href={`/users/${encodeURIComponent(comment.author.username)}`}
                 >
                   {comment.author.displayName} (@{comment.author.username})

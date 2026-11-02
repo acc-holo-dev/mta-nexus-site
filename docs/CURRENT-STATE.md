@@ -4,10 +4,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `7cc7304bbae738e530b3490c4d6f96c2eddf74aa` (`fix(web): enrich PlatformSignIn and library empty honesty`).
-- **Verified CI green on that tip:** [CI 41478298167](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41478298167) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `9e1245ab8bd41dfcf31dffe8f59c3adfcaf82253` (`fix(web): verification empty, guest register, and busy honesty`).
+- **Verified CI green on that tip:** [CI 41480166414](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41480166414) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `7cc7304b…` / [CI 41478298167](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41478298167).
 - **Prior selected green:** `a09da425…` / [CI 41476458351](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41476458351).
-- **Prior selected green:** `decb480c…` / [CI 41474749992](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41474749992).
 - **Prior selected green:** `a80545ff…` / [CI 41472797954](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41472797954).
 - **Failed tip (not baseline):** `0ae6747a…` knip unused ActionConfirmCheckboxProps; `71b7191b…` displayName typecheck; `dc035b0c…` support-center lint/auth-entry.
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
@@ -38,7 +38,7 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `7cc7304b…` selected green (CI 41478298167); PlatformSignIn register + library empty honesty; next: verification/support/discussion/build/context polish.
+**Последняя локальная волна:** tip `9e1245ab…` selected green (CI 41480166414); verification/support/discussion/build/context polish; next: guest register + emptyNever + aria-busy.
 
 ## Свидетельства и ограничения
 

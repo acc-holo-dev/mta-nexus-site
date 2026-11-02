@@ -6,7 +6,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { communityReportCreateSchema, REPORT_TYPES } from "../lib/community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../lib/community-report-copy";
-import type { Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 export function CommunityReportForm({
@@ -22,7 +22,9 @@ export function CommunityReportForm({
 }) {
   const pathname = usePathname();
   const copy = communityReportCopy(locale);
+  const workspace = getDictionary(locale).workspace;
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const [open, setOpen] = useState(false),
     [pending, setPending] = useState(false);
   const [type, setType] = useState<(typeof REPORT_TYPES)[number]>("abuse");
@@ -33,9 +35,11 @@ export function CommunityReportForm({
   const guard = useRef(false);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh auth return paths after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const path = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -115,12 +119,20 @@ export function CommunityReportForm({
         </Button>
       </div>
       {!authenticated ? (
-        <Link
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={loginHref}
-        >
-          {copy.signIn}
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            href={loginHref}
+          >
+            {copy.signIn}
+          </Link>
+          <Link
+            className="inline-flex min-h-11 items-center text-sm text-secondary underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            href={registerHref}
+          >
+            {workspace.createAccount}
+          </Link>
+        </div>
       ) : result ? (
         <div className="space-y-2">
           <p

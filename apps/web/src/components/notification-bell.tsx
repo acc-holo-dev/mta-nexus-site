@@ -233,6 +233,7 @@ export function NotificationBell() {
 
           <section
             aria-label={copy.previewList}
+            aria-busy={!loaded}
             className="min-h-0 max-h-80 divide-y divide-[color:var(--nexus-border)] overflow-y-auto"
           >
             {!loaded ? (

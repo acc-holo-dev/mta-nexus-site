@@ -39,6 +39,9 @@ export default async function VerificationHistoryPage({
     if (value !== undefined)
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseVerificationApplicationsQuery(params);
+  const historyFiltered = Boolean(
+    filters?.query || filters?.status !== "all" || filters?.type !== "all",
+  );
   const returnPath = params.size
     ? `/workspace/verification/history?${params}`
     : "/workspace/verification/history";
@@ -142,14 +145,18 @@ export default async function VerificationHistoryPage({
       )}
       {report && !report.items.length && (
         <div className="nexus-panel space-y-3 p-6">
-          <p className="text-sm text-muted">{copy.empty}</p>
-          <Link
-            prefetch={false}
-            href="/workspace/verification/history"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.clear}
-          </Link>
+          <p className="text-sm text-muted">
+            {historyFiltered ? copy.emptyFiltered : copy.emptyNever}
+          </p>
+          {historyFiltered ? (
+            <Link
+              prefetch={false}
+              href="/workspace/verification/history"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.clear}
+            </Link>
+          ) : null}
         </div>
       )}
       <ul className="space-y-3">

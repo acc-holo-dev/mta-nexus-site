@@ -29,6 +29,7 @@ vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => n
 vi.mock("../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
 vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
 
+import { ContentFollowControls } from "../apps/web/src/components/content-follow-controls";
 import { DirectoryFilters, DirectoryResults } from "../apps/web/src/components/discovery-directory";
 import { FollowButton } from "../apps/web/src/components/follow-button";
 import { FollowWorkspace } from "../apps/web/src/components/follow-workspace";
@@ -37,6 +38,7 @@ import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
 import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
 import type { FollowPage } from "../apps/web/src/lib/follow-workspace-contract";
 import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -188,10 +190,55 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain("disabled");
     expect(html).toContain(followCopy(locale).checking);
+    expect(html).toContain('aria-busy="true"');
     expect(html).toContain("rounded-lg");
     expect(html).not.toContain('aria-pressed="false"');
   },
 );
+it.each(["en", "ru"] as const)(
+  "offers guest login and create-account links for follow controls in %s",
+  (locale) => {
+    const workspace = getDictionary(locale).workspace;
+    const follow = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        <FollowButton
+          targetType="user"
+          targetId="user"
+          targetName="Member"
+          initial={{ authenticated: false, following: false }}
+        />
+      </LocaleProvider>,
+    );
+    expect(follow).toContain('href="/auth/login?next=%2Fdiscover"');
+    expect(follow).toContain('href="/auth/register?next=%2Fdiscover"');
+    expect(follow).toContain(workspace.createAccount);
+    const discussion = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        <ContentFollowControls
+          contentId="article"
+          title="Article"
+          initial={{
+            authenticated: false,
+            following: false,
+            notifyComments: false,
+            muted: false,
+            mutedUntil: null,
+          }}
+        />
+      </LocaleProvider>,
+    );
+    expect(discussion).toContain('href="/auth/register?next=%2Fdiscover"');
+    expect(discussion).toContain(workspace.createAccount);
+  },
+);
+it("marks content follow controls busy while saved state is loading", () => {
+  const html = renderToStaticMarkup(
+    <LocaleProvider locale="en">
+      <ContentFollowControls contentId="article" title="Article" />
+    </LocaleProvider>,
+  );
+  expect(html).toContain('aria-busy="true"');
+});
 it("reads all grid follow states once and renders each authoritative initial state", async () => {
   mocks.viewer.mockResolvedValue({ id: "actor" });
   mocks.states.mockResolvedValue(["first"]);
