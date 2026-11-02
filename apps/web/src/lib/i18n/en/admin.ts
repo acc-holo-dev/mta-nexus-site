@@ -4,6 +4,7 @@ export const admin = {
     accessDeniedDescription: "Administration requires an administrator or moderator account.",
     signIn: "Sign in",
     title: "Administration",
+    loading: "Loading administration…",
     supportQueue: "Support queue",
     description: "Platform moderation, verification queue, resource review, and audit trail.",
     authorizedSession: "Authorized admin session",
