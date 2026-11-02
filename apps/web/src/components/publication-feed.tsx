@@ -225,6 +225,19 @@ export function PublicationFeed({
                     ? copy.emptyFiltered
                     : copy.empty}
             </p>
+            {filters.target && !filters.cursor && (
+              <Link
+                prefetch={false}
+                href={publicationHref(path, {
+                  ...filters,
+                  target: undefined,
+                  cursor: undefined,
+                })}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.clearTarget}
+              </Link>
+            )}
             {(filters.query || filters.type || filters.source || filters.author || filters.tag) &&
               !filters.cursor && (
                 <Link
@@ -238,7 +251,7 @@ export function PublicationFeed({
                     tag: undefined,
                     cursor: undefined,
                   })}
-                  className="inline-flex min-h-11 items-center text-accent underline"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.reset}
                 </Link>

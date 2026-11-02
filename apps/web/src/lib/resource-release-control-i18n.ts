@@ -1,6 +1,7 @@
 const copy = {
   en: {
     updates: "Library versions and updates",
+    updatesLoading: "Loading library updates…",
     versions: "Choose a download version",
     moderation: "Resource moderation",
     moderationHistory: "Publication restrictions",
@@ -82,6 +83,7 @@ const copy = {
   },
   ru: {
     updates: "Версии и обновления библиотеки",
+    updatesLoading: "Загрузка обновлений библиотеки…",
     versions: "Выбор версии для скачивания",
     moderation: "Модерация ресурсов",
     moderationHistory: "Ограничения публикации",

@@ -1,12 +1,12 @@
 "use client";
 
 import { type ReactNode, useEffect, useState } from "react";
+import { getDictionary, type Locale } from "../lib/i18n";
 import { Footer } from "./footer";
+import { LocaleProvider } from "./locale-context";
 import { MobileNav } from "./mobile-nav";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { LocaleProvider } from "./locale-context";
 
 export function NexusShell({ children, locale }: { children: ReactNode; locale: Locale }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -47,7 +47,7 @@ export function NexusShell({ children, locale }: { children: ReactNode; locale: 
             <main
               id="main-content"
               tabIndex={-1}
-              className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-24 outline-none sm:px-6 lg:pb-6"
+              className="mx-auto min-w-0 w-full max-w-7xl flex-1 overflow-x-clip px-4 py-6 pb-24 outline-none sm:px-6 lg:pb-6"
             >
               {children}
             </main>

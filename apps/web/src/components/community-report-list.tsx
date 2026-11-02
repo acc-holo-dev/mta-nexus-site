@@ -119,7 +119,10 @@ export function CommunityReportList({
           </select>
         </label>
         <Button type="submit">{copy.search}</Button>
-        <Link className="min-h-9 py-2 text-sm text-accent underline" href={path}>
+        <Link
+          className={`min-h-9 py-2 text-sm text-accent underline ${filterNavLinkClass}`}
+          href={path}
+        >
           {copy.reset}
         </Link>
       </form>
@@ -135,7 +138,10 @@ export function CommunityReportList({
         <div className="nexus-panel space-y-3 p-8 text-sm text-muted">
           <p>{filters.target || filters.type || filters.query ? copy.emptyFiltered : copy.empty}</p>
           {(filters.target || filters.type || filters.query) && (
-            <Link href={path} className="inline-flex min-h-11 items-center text-accent underline">
+            <Link
+              href={path}
+              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+            >
               {copy.reset}
             </Link>
           )}
@@ -146,7 +152,7 @@ export function CommunityReportList({
           <article key={report.id} className="nexus-panel space-y-2 p-4">
             <div className="flex flex-wrap justify-between gap-2">
               <Link
-                className="text-sm font-semibold text-accent underline"
+                className={`text-sm font-semibold text-accent underline ${filterNavLinkClass}`}
                 href={`${path}/${encodeURIComponent(report.id)}`}
               >
                 {copy[report.targetType]} · {copy[report.type]}
@@ -170,7 +176,10 @@ export function CommunityReportList({
       </div>
       <nav className="flex flex-wrap items-center gap-4 text-sm" aria-label={copy.page}>
         {filters.page > 1 && (
-          <Link className="text-accent underline" href={href({ page: filters.page - 1 })}>
+          <Link
+            className={`text-accent underline ${filterNavLinkClass}`}
+            href={href({ page: filters.page - 1 })}
+          >
             {copy.previous}
           </Link>
         )}
@@ -178,7 +187,10 @@ export function CommunityReportList({
           {copy.page} {filters.page}
         </span>
         {page?.hasMore && filters.page < 9999 && (
-          <Link className="text-accent underline" href={href({ page: filters.page + 1 })}>
+          <Link
+            className={`text-accent underline ${filterNavLinkClass}`}
+            href={href({ page: filters.page + 1 })}
+          >
             {copy.next}
           </Link>
         )}

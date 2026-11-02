@@ -6,6 +6,7 @@ const en = {
   search: "Search comments or authors",
   applySearch: "Search",
   noMatches: "No matching comments.",
+  clearSearch: "Clear search",
   focusMissing:
     "This comment link is unavailable. The publication may still be open — return to the full discussion.",
   returnDiscussion: "Return to discussion",
@@ -64,6 +65,7 @@ const ru: Record<keyof typeof en, string> = {
   search: "Поиск по комментариям и авторам",
   applySearch: "Найти",
   noMatches: "Подходящих комментариев нет.",
+  clearSearch: "Очистить поиск",
   focusMissing:
     "Ссылка на комментарий недоступна. Публикация может быть открыта — вернитесь к общему обсуждению.",
   returnDiscussion: "Вернуться к обсуждению",

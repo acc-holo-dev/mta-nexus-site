@@ -84,6 +84,7 @@ const copy = {
     preview: "Showing up to four recently updated servers.",
     previewPlayers: "On the displayed servers",
     previewOnline: "online in this preview",
+    loading: "Loading managed servers…",
   },
   ru: {
     title: "Управляемые серверы",
@@ -131,6 +132,7 @@ const copy = {
     preview: "Показаны до четырёх недавно обновлённых серверов.",
     previewPlayers: "На показанных серверах",
     previewOnline: "онлайн среди показанных",
+    loading: "Загрузка управляемых серверов…",
   },
 } as const;
 

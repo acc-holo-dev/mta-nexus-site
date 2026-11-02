@@ -555,7 +555,23 @@ export function ContentDiscussion({
         ))}
       </div>
       {page && !page.items.length && (
-        <p className="text-sm text-muted">{activeQuery.current ? copy.noMatches : copy.first}</p>
+        <div className="space-y-3 text-sm text-muted">
+          <p>{activeQuery.current ? copy.noMatches : copy.first}</p>
+          {activeQuery.current ? (
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              disabled={loading || submitting || !!managingId}
+              onClick={() => {
+                setSearch("");
+                void load(false, "");
+              }}
+            >
+              {copy.clearSearch}
+            </Button>
+          ) : null}
+        </div>
       )}
       {readError && (
         <div className="space-y-2">

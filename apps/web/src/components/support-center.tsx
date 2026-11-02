@@ -512,10 +512,20 @@ export function SupportCenter({
                 {workspaceCopy.reload}
               </Button>
             ) : cases.length === 0 ? (
-              <div className="nexus-panel p-5 text-sm text-muted">
-                {initialFilters.q || initialFilters.category || initialFilters.status
-                  ? workspaceCopy.noMatches
-                  : copy.empty}
+              <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
+                <p>
+                  {initialFilters.q || initialFilters.category || initialFilters.status
+                    ? workspaceCopy.noMatches
+                    : copy.empty}
+                </p>
+                {(initialFilters.q || initialFilters.category || initialFilters.status) && (
+                  <Link
+                    href={basePath}
+                    className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {workspaceCopy.reset}
+                  </Link>
+                )}
               </div>
             ) : (
               cases.map((supportCase) => (

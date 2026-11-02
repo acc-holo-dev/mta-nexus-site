@@ -63,7 +63,7 @@ export default async function NotificationCenterPage({
       <header className="space-y-3 border-b border-base pb-6">
         <Link
           href="/workspace"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.workspace}
         </Link>
@@ -72,7 +72,7 @@ export default async function NotificationCenterPage({
         <p className="text-xs text-muted">{copy.openBetaNote}</p>
         <Link
           href="/settings#notification-heading"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.settings}
         </Link>
@@ -151,7 +151,7 @@ export default async function NotificationCenterPage({
             </Button>
             <Link
               href="/notifications"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
@@ -164,7 +164,7 @@ export default async function NotificationCenterPage({
               ? notificationInboxHref("/notifications", { ...filters, at: undefined })
               : "/notifications"
           }
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </Link>

@@ -11,6 +11,7 @@ import {
 } from "../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { authEntryHref } from "./auth-return-path";
+
 type Filters = ReturnType<typeof parseContentPage>;
 export function ContentCatalogControls({
   path,
@@ -65,7 +66,10 @@ export function ContentCatalogControls({
         )}
         <Button type="submit">{copy.apply}</Button>
         {(filters.query || filters.type || filters.status) && (
-          <Link href={path} className="py-2 text-sm text-accent underline">
+          <Link
+            href={path}
+            className="py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.reset}
           </Link>
         )}
@@ -73,6 +77,10 @@ export function ContentCatalogControls({
     </search>
   );
 }
+
+const pageNavFocusClass =
+  "text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function ContentPageNavigation({
   path,
   filters,
@@ -94,7 +102,7 @@ export function ContentPageNavigation({
         <Link
           href={contentPageHref(path, filters, page - 1)}
           rel="prev"
-          className="text-accent underline"
+          className={pageNavFocusClass}
         >
           {copy.previous}
         </Link>
@@ -108,7 +116,7 @@ export function ContentPageNavigation({
         <Link
           href={contentPageHref(path, filters, page + 1)}
           rel="next"
-          className="text-accent underline"
+          className={pageNavFocusClass}
         >
           {copy.next}
         </Link>
