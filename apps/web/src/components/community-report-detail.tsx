@@ -152,7 +152,7 @@ export function CommunityReportDetailView({
       <div className="flex flex-wrap items-center gap-4">
         <Link
           href={staff ? "/admin/reports" : "/workspace/reports"}
-          className="text-sm text-accent underline"
+          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.back}
         </Link>
@@ -174,7 +174,7 @@ export function CommunityReportDetailView({
         <>
           <Link
             href={`${path}/history`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {reportHistoryCopy(locale).title}
           </Link>
@@ -238,7 +238,7 @@ export function CommunityReportDetailView({
             {staff && report.moderationHref && (
               <Link
                 href={report.moderationHref}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {discussionReportsCopy(locale).link}
               </Link>
@@ -246,7 +246,7 @@ export function CommunityReportDetailView({
             {staff && report.moderationHref && (
               <Link
                 href={`${report.moderationHref}/reports`}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {reportGroupsCopy(locale).inspect}
               </Link>
@@ -258,7 +258,7 @@ export function CommunityReportDetailView({
                 </h3>
                 {report.target.author && (
                   <Link
-                    className="text-xs text-accent underline"
+                    className="rounded text-xs text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     href={`/users/${encodeURIComponent(report.target.author)}`}
                   >
                     @{report.target.author}
@@ -269,7 +269,10 @@ export function CommunityReportDetailView({
                 </p>
                 {report.target.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
                 {report.target.href && (
-                  <Link className="text-sm text-accent underline" href={report.target.href}>
+                  <Link
+                    className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    href={report.target.href}
+                  >
                     {copy.viewTarget}
                   </Link>
                 )}

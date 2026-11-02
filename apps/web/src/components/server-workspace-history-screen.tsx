@@ -45,7 +45,7 @@ export async function ServerWorkspaceHistoryScreen({
         ) : (
           <Link
             href={authEntryHref("login", `/workspace/servers/${encodeURIComponent(id)}/history`)}
-            className="inline-flex min-h-11 text-accent underline"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {labels.signIn}
           </Link>
@@ -87,7 +87,7 @@ export async function ServerWorkspaceHistoryScreen({
       <header className="space-y-2">
         <Link
           href={`/workspace/servers/${encodeURIComponent(id)}`}
-          className="inline-flex min-h-11 text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {history.back}
         </Link>
@@ -124,7 +124,7 @@ export async function ServerWorkspaceHistoryScreen({
         </Button>
         <Link
           href={base}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.reset}
         </Link>
@@ -138,7 +138,7 @@ export async function ServerWorkspaceHistoryScreen({
           <div className="space-y-2">
             <a
               href={exportPath}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.export}
             </a>
@@ -199,7 +199,7 @@ export async function ServerWorkspaceHistoryScreen({
             <Link
               prefetch={false}
               href={serverWorkspaceHistoryHref(id, query)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {history.latest}
             </Link>
@@ -207,7 +207,7 @@ export async function ServerWorkspaceHistoryScreen({
               <Link
                 prefetch={false}
                 href={serverWorkspaceHistoryHref(id, query, data.nextCursor)}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {history.older}
               </Link>
