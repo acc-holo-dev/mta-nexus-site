@@ -1,5 +1,9 @@
-import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import {
+  type FlatTestElement,
+  findTestButton,
+  flattenReactTestTree,
+} from "./helpers/flatten-react-test-tree";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -87,55 +91,10 @@ const ack = {
   previewRevision: token,
   items: items.map((item) => ({ id: item.id, status: "resolved" })),
 };
-type Element = ReactElement<Record<string, unknown>>;
-function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const rawType = element.type;
-  let componentName: string | undefined;
-  if (typeof rawType === "string") {
-    componentName = rawType;
-  } else if (typeof rawType === "function") {
-    const fn = rawType as { displayName?: string; name?: string };
-    componentName = fn.displayName ?? fn.name;
-  } else if (typeof rawType === "object" && rawType !== null) {
-    componentName = (rawType as { displayName?: string }).displayName;
-  }
-  if (componentName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  if (componentName === "ActionConfirmCheckbox") {
-    const props = element.props as {
-      id: string;
-      checked: boolean;
-      disabled?: boolean;
-      onCheckedChange: (checked: boolean) => void;
-      children: ReactNode;
-    };
-    return [
-      {
-        type: "input",
-        props: {
-          type: "checkbox",
-          id: props.id,
-          checked: props.checked,
-          disabled: props.disabled,
-          onChange: (event: { target: { checked: boolean } }) =>
-            props.onCheckedChange(event.target.checked),
-        },
-      } as unknown as Element,
-      ...descendants(props.children),
-    ];
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
-}
+type Element = FlatTestElement;
 function render(locale: "ru" | "en" = "en", allowActions = true, publication = false) {
   harness.cursor = 0;
-  return descendants(
+  return flattenReactTestTree(
     DiscussionReportBatch({
       contentId: "post",
       commentId: publication ? null : "comment",
@@ -145,11 +104,7 @@ function render(locale: "ru" | "en" = "en", allowActions = true, publication = f
     }),
   );
 }
-function button(nodes: Element[], label: string) {
-  const node = nodes.find((node) => node.type === "button" && node.props.children === label);
-  if (!node) throw Error(`Missing ${label}`);
-  return node;
-}
+const button = findTestButton;
 function click(nodes: Element[], label: string) {
   return (button(nodes, label).props.onClick as () => void)();
 }

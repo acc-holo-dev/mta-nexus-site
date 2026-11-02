@@ -17,7 +17,7 @@ import {
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
 } from "../lib/notification-inbox-export-client";
-import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 export function NotificationInbox({
@@ -35,7 +35,8 @@ export function NotificationInbox({
     [exporting, setExporting] = useState(false),
     [blocked, setBlocked] = useState(false),
     [error, setError] = useState(""),
-    [announcement, setAnnouncement] = useState("");
+    [announcement, setAnnouncement] = useState(""),
+    [selectionAcknowledged, setSelectionAcknowledged] = useState(false);
   const pending = useRef(false),
     controller = useRef<AbortController | null>(null),
     mounted = useRef(true),
@@ -146,7 +147,7 @@ export function NotificationInbox({
       if (mounted.current) setBusy(false);
     }
   }
-  async function mark(isRead: boolean, ids = selected, entireInbox = false) {
+  async function mark(isRead: boolean, ids = selected, entireInbox = false, fromSelection = false) {
     if (pending.current || blocked || (!entireInbox && !ids.length)) return;
     // Page selection uses PATCH with expectedIsRead; account-wide all-read is a separate POST.
     if (
@@ -164,6 +165,22 @@ export function NotificationInbox({
         })))
     )
       return;
+    if (fromSelection) {
+      if (!selectionAcknowledged) return;
+      if (
+        !(await confirmAction({
+          title: isRead ? copy.markRead : copy.markUnread,
+          object: copy.title,
+          scope: String(ids.length),
+          consequences: isRead ? copy.selectionReadConfirm : copy.selectionUnreadConfirm,
+          confirmLabel: isRead ? copy.markRead : copy.markUnread,
+          cancelLabel: copy.reset,
+          closeLabel: copy.reset,
+          danger: false,
+        }))
+      )
+        return;
+    }
     if (!entireInbox && ids.length > NOTIFICATION_INBOX_SELECTION_LIMIT) return;
     const items = page.items
       .filter((item) => ids.includes(item.id))
@@ -306,20 +323,31 @@ export function NotificationInbox({
             className={actionConfirmCheckboxFocusClass}
             checked={page.items.length > 0 && selected.length === page.items.length}
             disabled={disabled || !page.items.length}
-            onChange={(event) =>
-              setSelected(event.target.checked ? page.items.map((item) => item.id) : [])
-            }
+            onChange={(event) => {
+              setSelectionAcknowledged(false);
+              setSelected(event.target.checked ? page.items.map((item) => item.id) : []);
+            }}
           />
           {copy.selectPage}
         </label>
         <span className="text-xs text-muted">
           {copy.selected}: {selected.length}
         </span>
+        <ActionConfirmCheckbox
+          id="notification-inbox-selection-confirm"
+          checked={selectionAcknowledged}
+          disabled={disabled || !selected.length}
+          labelClassName="inline-flex min-h-11 items-center gap-2 text-sm text-secondary"
+          checkboxClassName={actionConfirmCheckboxFocusClass}
+          onCheckedChange={setSelectionAcknowledged}
+        >
+          {copy.selectionConfirm}
+        </ActionConfirmCheckbox>
         <Button
           type="button"
           variant="outline"
-          disabled={disabled || !selected.length}
-          onClick={() => void mark(true)}
+          disabled={disabled || !selected.length || !selectionAcknowledged}
+          onClick={() => void mark(true, selected, false, true)}
           className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.markRead}
@@ -327,8 +355,8 @@ export function NotificationInbox({
         <Button
           type="button"
           variant="outline"
-          disabled={disabled || !selected.length}
-          onClick={() => void mark(false)}
+          disabled={disabled || !selected.length || !selectionAcknowledged}
+          onClick={() => void mark(false, selected, false, true)}
           className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.markUnread}
@@ -379,15 +407,16 @@ export function NotificationInbox({
                     className={actionConfirmCheckboxFocusClass}
                     checked={selected.includes(item.id)}
                     disabled={disabled}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      setSelectionAcknowledged(false);
                       setSelected((current) =>
                         event.target.checked
                           ? current.includes(item.id)
                             ? current
                             : [...current, item.id]
                           : current.filter((id) => id !== item.id),
-                      )
-                    }
+                      );
+                    }}
                   />
                 </label>
                 <div className="min-w-0 flex-1 space-y-2">

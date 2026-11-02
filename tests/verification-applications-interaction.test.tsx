@@ -181,7 +181,7 @@ it.each([
   );
   if (!reload) throw Error("Missing reload action");
   (reload.props.onClick as () => void)();
-  expect(harness.reload).toHaveBeenCalledTimes(1);
+  expect(harness.refresh).toHaveBeenCalledTimes(1);
 });
 it.each(["VERIFICATION_APPLICATION_CHANGED", "VERIFICATION_AUTHORITY_CHANGED", "NOT_FOUND"])(
   "localizes %s and blocks retries with the stale version",

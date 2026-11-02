@@ -8,11 +8,11 @@ import {
 import { Button } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedResourceReleaseWatchBatch } from "../lib/resource-release-watch-batch-confirmation";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 export function ResourceReleaseWatchBatchControls({
   items,
   locale,
@@ -240,12 +240,7 @@ export function ResourceReleaseWatchBatchControls({
               {copy.retrySame}
             </Button>
           )}
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={() => window.location.reload()}
-          >
+          <Button type="button" variant="outline" disabled={busy} onClick={() => router.refresh()}>
             {copy.reloadState}
           </Button>
         </div>

@@ -1,5 +1,9 @@
-import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import {
+  clickTestButton,
+  findTestButton,
+  flattenReactTestTree,
+} from "./helpers/flatten-react-test-tree";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -74,31 +78,26 @@ const refreshed = {
   olderCursor: null,
   newerCursor: null,
 };
-type Element = ReactElement<Record<string, unknown>>;
-function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
-}
 function render() {
   harness.cursor = 0;
-  return descendants(NotificationInbox({ initialPage, filters }));
+  return flattenReactTestTree(NotificationInbox({ initialPage, filters }));
 }
-function button(nodes: Element[], label: string) {
-  const found = nodes.find((node) => node.type === "button" && node.props.children === label);
-  if (!found) throw Error(`Missing ${label}`);
+const button = findTestButton;
+const click = clickTestButton;
+function selectionConfirmCheckbox(nodes = render()) {
+  const found = nodes.find(
+    (node) =>
+      node.type === "input" &&
+      node.props.type === "checkbox" &&
+      node.props.id === "notification-inbox-selection-confirm",
+  );
+  if (!found) throw Error("Missing selection confirmation");
   return found;
 }
-function click(nodes: Element[], label: string) {
-  return (button(nodes, label).props.onClick as () => void)();
+function acknowledgeSelection(nodes = render()) {
+  (selectionConfirmCheckbox(nodes).props.onChange as (event: unknown) => void)({
+    target: { checked: true },
+  });
 }
 const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -171,11 +170,14 @@ it("saves a single observed notification then reads the filtered inbox before sh
   expect(button(render(), "Mark selected as read").props.disabled).toBe(true);
 });
 it("saves exactly the visible selected rows and supports unread state", async () => {
-  const checkbox = render().find((node) => node.type === "input");
+  const checkbox = render().find(
+    (node) => node.type === "input" && node.props.id !== "notification-inbox-selection-confirm",
+  );
   if (!checkbox) throw Error("Missing page selection");
   (checkbox.props.onChange as (event: unknown) => void)({
     target: { checked: true },
   });
+  acknowledgeSelection();
   harness.fetch
     .mockReset()
     .mockResolvedValueOnce(response({ isRead: false, ids: ["owned"] }))
@@ -186,6 +188,42 @@ it("saves exactly the visible selected rows and supports unread state", async ()
     isRead: false,
     items: [{ id: "owned", expectedIsRead: false }],
   });
+  expect(confirmAction).toHaveBeenCalledWith(
+    expect.objectContaining({
+      title: "Mark selected as unread",
+      consequences: expect.stringContaining("outside the selection"),
+    }),
+  );
+});
+it("requires selection acknowledgement and confirmAction before batch read or unread writes", async () => {
+  const pageSelect = render().find(
+    (node) => node.type === "input" && node.props.id !== "notification-inbox-selection-confirm",
+  );
+  if (!pageSelect) throw Error("Missing page selection");
+  (pageSelect.props.onChange as (event: unknown) => void)({ target: { checked: true } });
+  click(render(), "Mark selected as read");
+  expect(harness.fetch).not.toHaveBeenCalled();
+  expect(confirmAction).not.toHaveBeenCalled();
+  acknowledgeSelection();
+  confirmAction.mockReset().mockResolvedValueOnce(false);
+  click(render(), "Mark selected as read");
+  expect(harness.fetch).not.toHaveBeenCalled();
+  confirmAction.mockReset().mockResolvedValueOnce(true);
+  click(render(), "Mark selected as read");
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalled());
+  expect(confirmAction).toHaveBeenCalledWith(
+    expect.objectContaining({ title: "Mark selected as read" }),
+  );
+});
+it("clears selection acknowledgement when the page selection changes", () => {
+  acknowledgeSelection();
+  const pageSelect = render().find(
+    (node) => node.type === "input" && node.props.id !== "notification-inbox-selection-confirm",
+  );
+  if (!pageSelect) throw Error("Missing page selection");
+  (pageSelect.props.onChange as (event: unknown) => void)({ target: { checked: true } });
+  expect(selectionConfirmCheckbox().props.checked).toBe(false);
+  expect(button(render(), "Mark selected as read").props.disabled).toBe(true);
 });
 it("preserves explicit whole-inbox reading with a scope warning, cancellation and saved-state refresh", async () => {
   confirmAction.mockReset().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
@@ -274,9 +312,7 @@ it("coalesces rapid commands while a write or refresh is pending", async () => {
   click(nodes, "Reload saved inbox");
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   expect(
-    render().some(
-      (node) => node.props.role === "status" && node.props["aria-busy"] === "true",
-    ),
+    render().some((node) => node.props.role === "status" && node.props["aria-busy"] === "true"),
   ).toBe(true);
   complete(response({ isRead: true, ids: ["owned"] }));
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
@@ -381,6 +417,7 @@ it("prepares a verified export without changing selected or read notifications a
   (checkbox.props.onChange as (event: unknown) => void)({
     target: { checked: true },
   });
+  acknowledgeSelection();
   harness.fetch.mockReset().mockResolvedValueOnce(exportResponse());
   exportClick();
   expect(render().some((node) => node.props.children === "Preparing notification export…")).toBe(

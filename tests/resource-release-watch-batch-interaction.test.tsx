@@ -151,7 +151,7 @@ it("requires reload after a revision conflict and clears acknowledgement when se
     render().some((n) => n.type === "button" && n.props.children === "Retry the same request"),
   ).toBe(false);
   await click("Reload current state");
-  expect(h.reload).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
 });
 it("coalesces stale duplicate click handlers while a request is in flight", async () => {
   reviewed();

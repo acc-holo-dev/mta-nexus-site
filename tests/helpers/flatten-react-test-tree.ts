@@ -1,39 +1,65 @@
 import type { ReactElement, ReactNode } from "react";
 
-export type FlattenedElement = ReactElement<Record<string, unknown>>;
+export type FlatTestElement = ReactElement<Record<string, unknown>>;
+/** @deprecated Use FlatTestElement */
+export type FlattenedElement = FlatTestElement;
 
-type ElementType =
-  | string
-  | { displayName?: string }
-  | (((props: unknown) => ReactNode) & { displayName?: string; name?: string });
-
-function unwrapComponent(type: ElementType, props: Record<string, unknown>): ReactNode | null {
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return type(props);
+function componentName(type: FlatTestElement["type"]): string | undefined {
+  if (typeof type === "string") return type;
+  if (typeof type === "function") {
+    const fn = type as { displayName?: string; name?: string };
+    return fn.displayName ?? fn.name;
   }
-  if (
-    typeof type === "function" &&
-    (type.displayName === "GuestAuthLinks" || type.name === "GuestAuthLinks")
-  ) {
-    return type(props);
+  if (typeof type === "object" && type !== null) {
+    return (type as { displayName?: string }).displayName;
   }
-  return null;
+  return undefined;
 }
 
-export function flattenReactTestTree(node: ReactNode): FlattenedElement[] {
+/** Flattens a static React element tree for interaction tests (Button + ActionConfirmCheckbox). */
+export function flattenReactTestTree(node: ReactNode): FlatTestElement[] {
   if (Array.isArray(node)) return node.flatMap(flattenReactTestTree);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as FlattenedElement;
-  const type = element.type as ElementType;
-  if (typeof type === "object" && type?.displayName === "Button") {
+  const element = node as FlatTestElement;
+  const name = componentName(element.type);
+  if (name === "Button") {
     return [
-      { ...element, type: "button" } as FlattenedElement,
+      { ...element, type: "button" } as FlatTestElement,
       ...flattenReactTestTree(element.props.children as ReactNode),
     ];
   }
-  const unwrapped = unwrapComponent(type, element.props);
-  if (unwrapped != null) {
-    return flattenReactTestTree(unwrapped);
+  if (name === "ActionConfirmCheckbox") {
+    const props = element.props as {
+      id: string;
+      checked: boolean;
+      disabled?: boolean;
+      onCheckedChange: (checked: boolean) => void;
+      children: ReactNode;
+    };
+    return [
+      {
+        type: "input",
+        props: {
+          type: "checkbox",
+          id: props.id,
+          checked: props.checked,
+          disabled: props.disabled,
+          onChange: (event: { target: { checked: boolean } }) =>
+            props.onCheckedChange(event.target.checked),
+        },
+      } as unknown as FlatTestElement,
+      ...flattenReactTestTree(props.children),
+    ];
   }
   return [element, ...flattenReactTestTree(element.props.children as ReactNode)];
+}
+
+export function findTestButton(nodes: FlatTestElement[], label: string): FlatTestElement {
+  const found = nodes.find((node) => node.type === "button" && node.props.children === label);
+  if (!found) throw Error(`Missing ${label}`);
+  return found;
+}
+
+export function clickTestButton(nodes: FlatTestElement[], label: string) {
+  return (findTestButton(nodes, label).props.onClick as () => void)();
 }

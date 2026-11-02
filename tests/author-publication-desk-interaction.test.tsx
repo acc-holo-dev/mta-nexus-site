@@ -153,7 +153,7 @@ it.each([
   click(render(), copy.restore);
   expect(harness.fetch).toHaveBeenCalledTimes(1);
   click(render(), copy.reload);
-  expect(harness.reload).toHaveBeenCalledTimes(1);
+  expect(harness.refresh).toHaveBeenCalledTimes(1);
 });
 it.each(["CONFLICT", "FORBIDDEN", "PUBLICATION_RESTORE_DENIED"])(
   "shows a safe localized recovery error for %s without retrying the stale version",

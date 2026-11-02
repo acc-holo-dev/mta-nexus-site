@@ -200,7 +200,7 @@ export function ResourceBuildControls({
       )}
       {message && <p role={uncertain ? "alert" : "status"}>{message}</p>}
       {uncertain && (
-        <Button type="button" variant="outline" onClick={() => window.location.reload()}>
+        <Button type="button" variant="outline" onClick={() => router.refresh()}>
           {copy.reload}
         </Button>
       )}

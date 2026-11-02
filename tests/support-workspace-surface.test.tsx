@@ -99,6 +99,7 @@ it("gates server-rendered support pages before showing private controls", async 
   );
   expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
   expect(guest).toContain('href="/auth/register?next=%2Fsupport"');
+  expect(guest).toContain(getDictionary("en").workspace.createAccount);
   expect(guest).toContain(getDictionary("en").workspace.signInRequired);
   expect(guest).toContain(getDictionary("en").workspace.signInMessage);
   const filtered = renderToStaticMarkup(

@@ -3,12 +3,13 @@ import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus
 import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
+import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 
 type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };
@@ -28,7 +29,8 @@ export function LibraryCollectionItemCopyForm({
   initialDestinationId?: string;
 }) {
   const c = libraryCollectionsCopy(locale),
-    action = move ? "move-items" : "copy-items";
+    action = move ? "move-items" : "copy-items",
+    router = useRouter();
   const [ids, setIds] = useState<string[]>([]),
     [destinationId, setDestinationId] = useState(initialDestinationId),
     [confirmed, setConfirmed] = useState(false),
@@ -272,7 +274,7 @@ export function LibraryCollectionItemCopyForm({
           <Button
             type="button"
             disabled={busy}
-            onClick={() => window.location.reload()}
+            onClick={() => router.refresh()}
             className="h-auto rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >

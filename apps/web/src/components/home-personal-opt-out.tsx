@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@nexus/ui";
+import { useRouter } from "next/navigation";
 import {
   HOME_PERSONAL_HIDE,
   HOME_PERSONAL_SHOW,
@@ -19,6 +20,7 @@ export function HomePersonalOptOut({
   showLabel: string;
   describedBy?: string;
 }) {
+  const router = useRouter();
   const next = preference === "hide" ? HOME_PERSONAL_SHOW : HOME_PERSONAL_HIDE;
   const label = preference === "hide" ? showLabel : hideLabel;
 
@@ -30,9 +32,9 @@ export function HomePersonalOptOut({
       className="h-auto min-h-11 px-2 text-xs font-medium text-muted"
       aria-describedby={describedBy}
       onClick={() => {
-        // biome-ignore lint/suspicious/noDocumentCookie: non-sensitive SameSite preference before reload.
+        // biome-ignore lint/suspicious/noDocumentCookie: non-sensitive SameSite preference before refresh.
         document.cookie = homePersonalPreferenceCookie(next);
-        window.location.reload();
+        router.refresh();
       }}
     >
       {label}

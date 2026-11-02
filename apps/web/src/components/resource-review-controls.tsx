@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@nexus/ui";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "../lib/i18n";
 import {
@@ -25,12 +26,13 @@ type Review = {
   moderationReason?: string | null;
 };
 function Recovery({ locale }: { locale: Locale }) {
+  const router = useRouter();
   return (
     <Button
       type="button"
       variant="ghost"
       className="h-auto rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      onClick={() => window.location.reload()}
+      onClick={() => router.refresh()}
     >
       {resourceReviewCopy(locale).reload}
     </Button>

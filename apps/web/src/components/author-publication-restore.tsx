@@ -166,7 +166,7 @@ export function AuthorPublicationRestore({
         <Button
           type="button"
           variant="ghost"
-          onClick={() => window.location.reload()}
+          onClick={() => router.refresh()}
           className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reload}

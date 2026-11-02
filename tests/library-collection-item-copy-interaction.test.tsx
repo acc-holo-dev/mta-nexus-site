@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -30,8 +31,10 @@ vi.mock("react", async (original) => ({
   },
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+
 import { LibraryCollectionItemCopyForm } from "../apps/web/src/components/library-collection-item-copy";
 import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
@@ -253,7 +256,7 @@ it("blocks stale handlers after a conflict and requires reload", async () => {
   const button = render().find((n) => n.type === "button");
   if (!button) throw new Error("Missing reload action");
   (button.props.onClick as () => void)();
-  expect(h.reload).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
 });
 it("coalesces duplicate submissions and ignores a successful response after unmount", async () => {
   reviewed();

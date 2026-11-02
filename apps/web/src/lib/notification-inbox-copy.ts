@@ -52,6 +52,11 @@ const en = {
   selected: "Selected",
   markRead: "Mark selected as read",
   markUnread: "Mark selected as unread",
+  selectionConfirm: "I confirm this page selection before updating reading status.",
+  selectionReadConfirm:
+    "Mark the selected notifications as read on this page? This does not change notifications outside the selection.",
+  selectionUnreadConfirm:
+    "Mark the selected notifications as unread on this page? This does not change notifications outside the selection.",
   saved: "Reading status saved and the inbox refreshed.",
   uncertain:
     "The update could not be confirmed. Reload the saved inbox before making another change.",
@@ -121,6 +126,11 @@ const ru: typeof en = {
   selected: "Выбрано",
   markRead: "Отметить выбранные прочитанными",
   markUnread: "Отметить выбранные непрочитанными",
+  selectionConfirm: "Подтверждаю выбор на этой странице перед изменением прочитанного состояния.",
+  selectionReadConfirm:
+    "Отметить выбранные уведомления прочитанными на этой странице? Это не затронет сообщения вне выбора.",
+  selectionUnreadConfirm:
+    "Отметить выбранные уведомления непрочитанными на этой странице? Это не затронет сообщения вне выбора.",
   saved: "Прочитанное состояние сохранено, список обновлён.",
   uncertain:
     "Обновление не удалось подтвердить. Загрузите сохранённый список перед следующим изменением.",

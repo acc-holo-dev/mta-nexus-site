@@ -109,7 +109,8 @@ export function LibraryReleaseCommandStatus({
   locale: string;
 }) {
   const { pending, pendingProductId, pendingHref, blocked, busy, saved, error, send } = state;
-  const copy = getResourceReleaseControlCopy(locale);
+  const copy = getResourceReleaseControlCopy(locale),
+    router = useRouter();
   return (
     <>
       {pending && pendingHref ? (
@@ -158,12 +159,7 @@ export function LibraryReleaseCommandStatus({
               {copy.retrySame}
             </Button>
           ) : null}
-          <Button
-            type="button"
-            disabled={busy}
-            onClick={() => window.location.reload()}
-            variant="outline"
-          >
+          <Button type="button" disabled={busy} onClick={() => router.refresh()} variant="outline">
             {copy.reloadState}
           </Button>
         </div>
@@ -180,7 +176,7 @@ export function LibraryReleaseCommandStatus({
           </p>
           <Button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={() => router.refresh()}
             className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >

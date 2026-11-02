@@ -200,7 +200,7 @@ export function OrderCaseCreateForm({
         type="button"
         variant="ghost"
         disabled={busy}
-        onClick={() => window.location.reload()}
+        onClick={() => router.refresh()}
         className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.reload}
@@ -233,6 +233,7 @@ export function OrderCaseReviewForm({
   locale: string;
 }) {
   const copy = orderCaseCopy(locale),
+    router = useRouter(),
     [notes, setNotes] = useState(""),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
@@ -348,7 +349,7 @@ export function OrderCaseReviewForm({
         type="button"
         variant="ghost"
         disabled={busy}
-        onClick={() => window.location.reload()}
+        onClick={() => router.refresh()}
         className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.reload}

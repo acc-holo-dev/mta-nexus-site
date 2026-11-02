@@ -157,7 +157,7 @@ it("requires a new comparison after archive or preference conflict", async () =>
     render().some((n) => n.type === "button" && n.props.children === "Retry the same request"),
   ).toBe(false);
   await click("Reload current state");
-  expect(h.reload).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
 });
 it("does not send a command for an already fixed target", () => {
   selection = { revision: 4, mode: "fixed", buildId: target.id };
