@@ -218,7 +218,7 @@ export function AuthorContentForm({
             <Link
               prefetch={false}
               href={`/workspace/content/${encodeURIComponent(saved.id)}/history`}
-              className="inline-flex min-h-11 items-center text-accent underline"
+              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {authorPublicationDeskCopy(locale).history}
             </Link>
@@ -258,7 +258,7 @@ export function AuthorContentForm({
               variant="ghost"
               disabled={busy}
               onClick={() => window.location.reload()}
-              className="h-auto px-0 text-sm text-accent underline"
+              className="h-auto rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.retry}
             </Button>
@@ -266,7 +266,7 @@ export function AuthorContentForm({
           {notice.error && (organization || server) && !saved && (
             <Link
               href={workspacePath}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {server ? serverContentCopy(locale).title : organizationContentCopy(locale).title}
             </Link>
@@ -367,7 +367,7 @@ export function AuthorContentForm({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto px-0 text-sm text-accent underline"
+              className="h-auto rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               onClick={() =>
                 setPreview(
                   preview === null

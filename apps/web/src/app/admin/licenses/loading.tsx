@@ -1,21 +1,24 @@
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /admin/licenses.
 export default async function Loading() {
-  const copy = getCommerceHistoryCopy(await getRequestLocale());
+  const locale = await getRequestLocale();
+  const copy = getLicenseControlCopy(locale);
+  const history = getCommerceHistoryCopy(locale);
   return (
     <section
-      className="space-y-6"
+      className="mx-auto max-w-5xl space-y-6 py-8"
       aria-busy="true"
       aria-labelledby="admin-licenses-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="admin-licenses-loading-heading" className="font-display text-primary">
-          {copy.licensesTitle}
+          {copy.title}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
+          {history.loading}
         </p>
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">

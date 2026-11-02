@@ -196,7 +196,10 @@ export default async function PublicResourceVersionsPage({
               {copy.acquire}
             </Link>
           ) : (
-            <Link href={authEntryHref("login", returnPath)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+            <Link
+              href={authEntryHref("login", returnPath)}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.signIn}
             </Link>
           )}

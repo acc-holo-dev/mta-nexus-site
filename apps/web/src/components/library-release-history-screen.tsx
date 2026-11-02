@@ -7,8 +7,10 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { libraryReleaseHistoryCopy } from "../lib/library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../lib/library-release-history-query";
+import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
+import { authEntryHref } from "./auth-return-path";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {
@@ -16,7 +18,31 @@ export async function LibraryReleaseHistoryScreen({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const authCopy = getResourceReleaseControlCopy(locale);
+  if (!actor) {
+    let returnPath = "/workspace/library/version-history";
+    try {
+      const preview = libraryReleaseHistoryQuery(collectionPageParams(raw));
+      returnPath = `${returnPath}?${new URLSearchParams({
+        page: String(preview.page),
+        days: String(preview.days),
+        ...(preview.productId ? { productId: preview.productId } : {}),
+      })}`;
+    } catch {
+      // Keep the history route when filters are invalid for unsigned visitors.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {authCopy.signIn}
+        </Link>
+      </section>
+    );
+  }
   let query: ReturnType<typeof libraryReleaseHistoryQuery>;
   try {
     query = libraryReleaseHistoryQuery(collectionPageParams(raw));

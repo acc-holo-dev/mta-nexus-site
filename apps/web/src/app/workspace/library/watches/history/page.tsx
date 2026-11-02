@@ -7,10 +7,12 @@ import { Button, EmptyState, Input } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../lib/library-collections-query";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../lib/resource-release-watch-history-i18n";
 import { resourceReleaseWatchHistoryQuery } from "../../../../../lib/resource-release-watch-history-query";
+import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
 
@@ -27,7 +29,32 @@ export default async function Page({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const watchesCopy = resourceReleaseWatchesCopy(locale);
+  if (!actor) {
+    let returnPath = "/workspace/library/watches/history";
+    try {
+      const preview = resourceReleaseWatchHistoryQuery(collectionPageParams(raw));
+      returnPath = `${returnPath}?${new URLSearchParams({
+        page: String(preview.page),
+        days: String(preview.days),
+        source: preview.source,
+        ...(preview.productId ? { productId: preview.productId } : {}),
+      })}`;
+    } catch {
+      // Keep the history route when filters are invalid for unsigned visitors.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{watchesCopy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {watchesCopy.signIn}
+        </Link>
+      </section>
+    );
+  }
   let query: ReturnType<typeof resourceReleaseWatchHistoryQuery>;
   try {
     query = resourceReleaseWatchHistoryQuery(collectionPageParams(raw));

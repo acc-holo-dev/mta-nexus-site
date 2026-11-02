@@ -144,7 +144,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`/workspace/purchases/${encodeURIComponent(orderId)}`}
-        className="text-sm text-accent underline"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.order}: {result.order.orderNumber}
       </Link>
@@ -215,7 +215,7 @@ export async function OrderCaseListPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={staff ? "/admin" : "/workspace/purchases"}
-        className="text-sm text-accent underline"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {staff ? copy.review : copy.order}
       </Link>
@@ -257,7 +257,10 @@ export async function OrderCaseListPage({
         <Button type="submit" variant="outline" size="sm">
           {copy.apply}
         </Button>
-        <Link href={base} className="p-2 text-sm text-accent underline">
+        <Link
+          href={base}
+          className="rounded p-2 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.clear}
         </Link>
       </form>
@@ -267,7 +270,7 @@ export async function OrderCaseListPage({
             <li key={item.id} className="nexus-panel space-y-2 p-5">
               <Link
                 href={`${base}/${encodeURIComponent(item.id)}`}
-                className="break-words font-semibold text-accent underline"
+                className="break-words rounded font-semibold text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {item.subject}
               </Link>
@@ -345,7 +348,7 @@ export async function OrderCaseDetailPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={staff ? "/admin/commerce/order-cases" : "/workspace/order-cases"}
-        className="text-sm text-accent underline"
+        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.back}
       </Link>
@@ -376,7 +379,7 @@ export async function OrderCaseDetailPage({
       {staff && actor.role === "admin" && (
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(result.order.id)}`}
-          className="text-sm text-accent underline"
+          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.reconcile}
         </Link>

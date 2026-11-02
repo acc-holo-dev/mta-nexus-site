@@ -1,6 +1,6 @@
 import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getLicenseMaintenanceCopy } from "../../../../lib/license-maintenance-i18n";
+import { getRequestLocale } from "../../../../lib/i18n-server";
 
 // Honest loading shell for /admin/licenses/maintenance.
 export default async function Loading() {
@@ -9,7 +9,7 @@ export default async function Loading() {
   const history = getCommerceHistoryCopy(locale);
   return (
     <section
-      className="space-y-6"
+      className="mx-auto max-w-5xl space-y-6 py-8"
       aria-busy="true"
       aria-labelledby="admin-license-maintenance-loading-heading"
     >

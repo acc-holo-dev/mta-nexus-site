@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../../components/auth-return-path";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../../lib/library-collections-query";
@@ -27,7 +28,32 @@ export default async function Page({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const copy = resourceReleaseWatchesCopy(locale);
+  const base = `/workspace/library/collections/${encodeURIComponent(path.id)}/watches`;
+  if (!actor) {
+    let returnPath = base;
+    try {
+      const preview = resourceReleaseWatchesQuery(collectionPageParams(raw));
+      returnPath = `${base}?${new URLSearchParams({
+        page: String(preview.page),
+        filter: preview.filter,
+        query: preview.query,
+      })}`;
+    } catch {
+      // Keep the collection watches route when filters are invalid for guests.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {copy.signIn}
+        </Link>
+      </section>
+    );
+  }
   let query: ReturnType<typeof resourceReleaseWatchesQuery>;
   try {
     query = resourceReleaseWatchesQuery(collectionPageParams(raw));
@@ -40,8 +66,6 @@ export default async function Page({
       if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
       throw error;
     });
-  const copy = resourceReleaseWatchesCopy(locale),
-    base = `/workspace/library/collections/${encodeURIComponent(path.id)}/watches`;
   const href = (page: number, filter = query.filter) =>
     `${base}?${new URLSearchParams({ page: String(page), filter, query: query.query })}`;
   return (

@@ -34,7 +34,7 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `046c687c…` selected green (CI 41403085034); shipping nested commerce/library/admin loaders + accent-link focus rings.
+**Последняя локальная волна:** tip `046c687c…` selected green (CI 41403085034). Tip `7cd137da…` nested loaders failed format:check ([CI 41404734366](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41404734366)); fix + guest returnPath honesty shipping next.
 
 ## Свидетельства и ограничения
 

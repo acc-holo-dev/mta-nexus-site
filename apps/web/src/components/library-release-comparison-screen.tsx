@@ -6,8 +6,10 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
 import { libraryReleaseComparisonQuery } from "../lib/library-release-comparison-query";
+import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
+import { authEntryHref } from "./auth-return-path";
 import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
 export async function LibraryReleaseComparisonScreen({
   params,
@@ -23,7 +25,32 @@ export async function LibraryReleaseComparisonScreen({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) notFound();
+  const authCopy = getResourceReleaseControlCopy(locale);
+  const base = `/workspace/library/${encodeURIComponent(path.id)}/versions/compare`;
+  if (!actor) {
+    let returnPath = base;
+    try {
+      const preview = libraryReleaseComparisonQuery(collectionPageParams(raw));
+      returnPath = `${base}?${new URLSearchParams({
+        from: preview.from,
+        to: preview.to,
+        returnPage: String(preview.returnPage),
+      })}`;
+    } catch {
+      // Keep the compare route when query params are invalid for guests.
+    }
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {authCopy.signIn}
+        </Link>
+      </section>
+    );
+  }
   let query: ReturnType<typeof libraryReleaseComparisonQuery>;
   try {
     query = libraryReleaseComparisonQuery(collectionPageParams(raw));

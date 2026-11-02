@@ -6,7 +6,7 @@ export default async function Loading() {
   const copy = getCommerceHistoryCopy(await getRequestLocale());
   return (
     <section
-      className="space-y-6"
+      className="mx-auto max-w-5xl space-y-6 py-8"
       aria-busy="true"
       aria-labelledby="admin-license-history-loading-heading"
     >

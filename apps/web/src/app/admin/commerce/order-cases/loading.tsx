@@ -1,21 +1,24 @@
-import { getDictionary } from "../../../../lib/i18n";
+import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
+import { orderCaseCopy } from "../../../../lib/order-case-i18n";
 
 // Honest loading shell for /admin/commerce/order-cases.
 export default async function Loading() {
-  const copy = getDictionary(await getRequestLocale()).admin;
+  const locale = await getRequestLocale();
+  const copy = orderCaseCopy(locale);
+  const history = getCommerceHistoryCopy(locale);
   return (
     <section
-      className="space-y-6"
+      className="mx-auto max-w-5xl space-y-6 py-8"
       aria-busy="true"
       aria-labelledby="admin-order-cases-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="admin-order-cases-loading-heading" className="font-display text-primary">
-          {copy.title}
+          {copy.queue}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
+          {history.loading}
         </p>
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">

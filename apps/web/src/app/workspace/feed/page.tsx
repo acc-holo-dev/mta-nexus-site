@@ -53,7 +53,10 @@ export default async function FollowingFeedPage({
     return (
       <div className="nexus-panel space-y-4 p-8">
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </div>
