@@ -28,8 +28,10 @@ test("registration, authenticated workspace and logout on the production image",
   );
   await assertAxeAccessibility(page, testInfo, "authenticated-workspace");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
-  await page.waitForURL("**/auth/login");
+  // Sign-out keeps a return path (`?next=…`); glob `**/auth/login` does not match query URLs.
+  await page.waitForURL(/\/auth\/login(?:\?|$)/);
   await page.goto("/workspace");
+
   await expect(page.getByRole("heading", { name: "Sign in required", exact: true })).toBeVisible();
   assert.deepEqual(errors, []);
 });
