@@ -4,14 +4,17 @@ import { verificationApplicationsCopy } from "../../../../lib/verification-appli
 export default async function Loading() {
   const copy = verificationApplicationsCopy(await getRequestLocale());
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-      className="nexus-panel min-h-40 space-y-3 p-6 text-sm text-muted"
-    >
-      <p className="font-medium text-foreground">{copy.detail}</p>
-      <p>{copy.loading}</p>
+    <div className="nexus-panel space-y-4 p-6" aria-busy="true">
+      <h1 className="text-xl font-semibold text-fg">{copy.detail}</h1>
+      <p role="status" className="text-sm text-muted">
+        {copy.loading}
+      </p>
+      <div className="animate-pulse space-y-4" aria-hidden="true">
+        <div className="h-6 w-2/3 rounded bg-inset" />
+        {[1, 2, 3].map((key) => (
+          <div key={key} className="h-20 rounded bg-inset" />
+        ))}
+      </div>
     </div>
   );
 }
