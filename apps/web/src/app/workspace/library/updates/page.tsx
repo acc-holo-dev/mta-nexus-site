@@ -2,11 +2,10 @@ import { LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { parseHistoryPage } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { libraryReleaseHistoryCopy } from "../../../../lib/library-release-history-i18n";
 import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../lib/services/resource-release-control-service";
@@ -26,24 +25,7 @@ export default async function LibraryUpdatesPage({
   const filter = LIBRARY_RELEASE_FILTERS.find((value) => value === query.filter) ?? "all";
   const page = Math.min(parseHistoryPage(query.page), 1000);
   const returnPath = `/workspace/library/updates?${new URLSearchParams({ filter, page: String(page) })}`;
-  if (!user)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <Link
-          href="/workspace/library/version-history"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {libraryReleaseHistoryCopy(locale).title}
-        </Link>
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+  if (!user) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const result = await libraryReleaseService.page(user, page, filter);
   const href = (page: number, value = filter) =>
     `/workspace/library/updates?${new URLSearchParams({ filter: value, page: String(page) })}`;

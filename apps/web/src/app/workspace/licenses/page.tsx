@@ -85,9 +85,7 @@ export default async function LicensesHistoryPage({
       {result.licenses.length === 0 ? (
         <div className="space-y-3 py-12 text-sm text-secondary">
           <p>
-            {hasNonDefaultLicenseFilters(filters)
-              ? copy.emptyLicensesFiltered
-              : copy.emptyLicenses}
+            {hasNonDefaultLicenseFilters(filters) ? copy.emptyLicensesFiltered : copy.emptyLicenses}
           </p>
           {hasNonDefaultLicenseFilters(filters) && (
             <Link

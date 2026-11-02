@@ -7,7 +7,10 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
   directory: vi.fn(),
 }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/workspace/servers",
+}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("@nexus/db", () => ({ serverRepository: { pageManagedByUser: state.page } }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -95,7 +98,7 @@ it.each(["en", "ru"] as const)(
 );
 it("does not read private data or contact the directory for anonymous visitors", async () => {
   state.user = null;
-  expect(await render()).toContain("Sign in to manage your servers");
+  expect(await render()).toContain("Sign in to manage your account");
   expect(await render()).toContain('href="/auth/login?next=%2Fworkspace%2Fservers"');
   expect(state.page).not.toHaveBeenCalled();
   expect(state.directory).not.toHaveBeenCalled();
@@ -121,6 +124,12 @@ it("avoids directory work for empty filters and offers a reset", async () => {
   expect(html).toContain("No servers match these filters");
   expect(html).toContain("Reset filters");
   expect(state.directory).not.toHaveBeenCalled();
+});
+it("links to server registration when the managed list is empty without filters", async () => {
+  state.page.mockResolvedValue({ servers: [], total: 0, page: 1, pageSize: 12, totalPages: 1 });
+  const html = await render();
+  expect(html).toContain("You have no servers to manage yet.");
+  expect(html).toContain('href="/workspace/servers/new"');
 });
 it.each(["missing", "stale", "failure"])(
   "keeps %s observations unknown without showing stale player counts",

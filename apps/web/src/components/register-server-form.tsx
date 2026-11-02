@@ -3,7 +3,6 @@
 import { normalizeMtaAddress } from "@nexus/domain";
 import { Button, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useState } from "react";
-import { useNexusLocale } from "./locale-context";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedCreatedServer } from "../lib/server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../lib/server-mutation-errors";
@@ -11,6 +10,7 @@ import {
   parseServerOrganizations,
   type ServerOrganizationOption,
 } from "../lib/server-organization-options";
+import { useNexusLocale } from "./locale-context";
 
 const controlClass =
   "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

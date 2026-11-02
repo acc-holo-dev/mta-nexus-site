@@ -11,6 +11,9 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => ({ value: "session-cookie" }) }),
 }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library",
+}));
 vi.mock("@nexus/db", () => ({
   userLibraryRepository: { pageByUser: state.page },
 }));
@@ -117,7 +120,7 @@ describe("private resource library", () => {
     state.user = null;
     const html = renderToStaticMarkup(await LibraryPage(pageProps()));
     expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary"');
-    expect(html).toContain("Sign in to view your resource library");
+    expect(html).toContain("Sign in to manage your account");
     expect(state.page).not.toHaveBeenCalled();
   });
 

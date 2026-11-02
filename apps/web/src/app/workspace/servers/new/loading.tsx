@@ -1,5 +1,5 @@
-import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 
 // Honest loading shell for /workspace/servers/new — neutral, not create chrome.
 export default async function Loading() {

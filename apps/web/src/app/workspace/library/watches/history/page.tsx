@@ -48,7 +48,7 @@ export default async function Page({
         <h1 className="font-display text-primary">{watchesCopy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {watchesCopy.signIn}
         </Link>
@@ -76,11 +76,12 @@ export default async function Page({
         ...(result.productId ? { productId: result.productId } : {}),
       }).toString();
   const href = (page: number) => `/workspace/library/watches/history?${suffix(page)}`;
+  const filtered = result.source !== "all" || Boolean(result.productId) || result.days !== 30;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
         href="/workspace/library/watches"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>
@@ -121,18 +122,33 @@ export default async function Page({
         </Button>
         <Link
           href="/workspace/library/watches/history"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.clear}
         </Link>
       </form>
       <a
         href={`/api/library/watches/history/export?${suffix(result.page)}`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.export}
       </a>
-      {!result.items.length && <EmptyState title={c.empty} description={c.note} />}
+      {!result.items.length && (
+        <EmptyState
+          title={c.empty}
+          description={c.note}
+          action={
+            filtered ? (
+              <Link
+                href="/workspace/library/watches/history"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {c.clear}
+              </Link>
+            ) : undefined
+          }
+        />
+      )}
       <ol className="space-y-4">
         {result.items.map((item) => (
           <li key={item.id} className="nexus-panel space-y-3 p-5">
@@ -169,7 +185,7 @@ export default async function Page({
                     {change.currentAvailable && (
                       <Link
                         href={`/workspace/library/${encodeURIComponent(change.productId)}/versions`}
-                        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {c.manage}
                       </Link>

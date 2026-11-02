@@ -53,7 +53,7 @@ export default async function Page({
         <h1>{c.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.signIn}
         </Link>
@@ -69,13 +69,13 @@ export default async function Page({
         <nav className="flex flex-wrap gap-4">
           <Link
             href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>
           <Link
             href="/workspace/library"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.library}
           </Link>
@@ -158,7 +158,7 @@ export default async function Page({
           </Button>
           <Link
             href={collectionInventoryHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {v.clear}
           </Link>
@@ -181,7 +181,7 @@ export default async function Page({
                 key={release}
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix({ ...query, page: 1, release })}`}
                 aria-current={release === report.release ? "page" : undefined}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {v.releaseFilters[release]} (
                 {
@@ -200,7 +200,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/resources/export?${suffix(report.page)}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {v.export}
         </a>
@@ -210,7 +210,7 @@ export default async function Page({
             <p>{v.empty}</p>
             <Link
               href={collectionInventoryHref()}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {v.clear}
             </Link>
@@ -253,7 +253,7 @@ export default async function Page({
                         {release.canReviewRequirements && (
                           <Link
                             href={`${resourceHref}/requirements?${new URLSearchParams({ previewBuildId: release.effective.buildId })}`}
-                            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                           >
                             {v.preparation}
                           </Link>
@@ -281,14 +281,14 @@ export default async function Page({
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href={`${resourceHref}/collections`}
-                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {v.manage}
                   </Link>
                   {item.available && (
                     <Link
                       href={`${resourceHref}/versions`}
-                      className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {c.versions}
                     </Link>
@@ -296,7 +296,7 @@ export default async function Page({
                   {first && second && (
                     <Link
                       href={collectionHref(first.id, "compare", { to: second.id })}
-                      className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {v.compare}
                     </Link>
@@ -327,7 +327,7 @@ export default async function Page({
             {report.page > 1 && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page - 1)}`}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -338,7 +338,7 @@ export default async function Page({
             {report.page < report.totalPages && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page + 1)}`}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>
@@ -355,7 +355,7 @@ export default async function Page({
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         <Link
           href={collectionInventoryHref()}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </Link>

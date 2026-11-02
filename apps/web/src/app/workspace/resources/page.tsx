@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { ResourcePublisherFilters } from "../../../components/resource-publisher-filters";
 import { getCommercialCopy } from "../../../lib/commercial-i18n";
 import { getDictionary } from "../../../lib/i18n";
@@ -43,17 +43,7 @@ export default async function AuthorResourcesPage({
     const returnPath = returnParams.size
       ? `/workspace/resources?${returnParams}`
       : "/workspace/resources";
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof resourcePublisherQuery>;
   try {

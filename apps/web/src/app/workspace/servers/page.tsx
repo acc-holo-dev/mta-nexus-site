@@ -3,7 +3,7 @@ import { Button, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { ManagedServerCard } from "../../../components/managed-server-card";
 import { ManagedServerVisibilityBatch } from "../../../components/managed-server-visibility-batch";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -44,23 +44,21 @@ export default async function ManagedServersPage({
     failure = serverWorkspaceCopy(locale).unavailable;
     return null;
   });
-  if (!user)
+  if (!user) {
+    const returnPath = managedServerHref(filters, page);
     return (
-      <section className="mx-auto max-w-xl space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        {failure && (
-          <p role="alert" className="text-sm text-danger">
-            {failure}
-          </p>
-        )}
-        <Link
-          href={authEntryHref("login", managedServerHref(filters, page))}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
+      <>
+        {failure ? (
+          <div className="mx-auto max-w-xl pt-8 text-center">
+            <p role="alert" className="text-sm text-danger">
+              {failure}
+            </p>
+          </div>
+        ) : null}
+        <PlatformSignIn locale={locale} returnPath={returnPath} />
+      </>
     );
+  }
   const result = await serverRepository
     .pageManagedByUser(user.id, page, filters, 20)
     .catch(() => null);
@@ -196,7 +194,14 @@ export default async function ManagedServersPage({
             >
               {copy.reset}
             </Link>
-          ) : null}
+          ) : (
+            <Link
+              href="/workspace/servers/new"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.register}
+            </Link>
+          )}
         </div>
       ) : (
         <ManagedServerVisibilityBatch

@@ -4,7 +4,7 @@ import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../components/auth-return-path";
+import { PlatformSignIn } from "../../components/content-catalog-controls";
 import { ManagedServerCard } from "../../components/managed-server-card";
 import { formatHistoryDate } from "../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
@@ -36,20 +36,7 @@ export default async function WorkspacePage() {
   const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
-  if (!user) {
-    return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <p className="font-caption text-muted">{dictionary.workspace.signInMessage}</p>
-        <Link
-          href={authEntryHref("login", "/workspace")}
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </div>
-    );
-  }
+  if (!user) return <PlatformSignIn locale={locale} returnPath="/workspace" />;
 
   const [library, { serverPage, directory }] = await Promise.all([
     userLibraryRepository.pageByUser(user.id, 1, "all", 4),

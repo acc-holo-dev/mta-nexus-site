@@ -99,3 +99,20 @@ it("requires sign-in and rejects duplicate filters before reading audit records"
   ).rejects.toThrow("NOT_FOUND");
   expect(h.history).not.toHaveBeenCalled();
 });
+it("offers to clear filters when a filtered watch history view is empty", async () => {
+  h.history.mockResolvedValue({
+    days: 30,
+    source: "batch",
+    productId: "prd_a",
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
+  const html = renderToStaticMarkup(
+    await Page({
+      searchParams: Promise.resolve({ source: "batch", productId: "prd_a" }),
+    }),
+  );
+  expect(html).toContain("Clear filters");
+  expect(html).toContain('href="/workspace/library/watches/history"');
+});

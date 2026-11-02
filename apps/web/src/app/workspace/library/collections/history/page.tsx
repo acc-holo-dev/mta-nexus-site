@@ -62,7 +62,7 @@ export default async function Page({
         <h1>{c.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.signIn}
         </Link>
@@ -78,19 +78,19 @@ export default async function Page({
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
           <Link
             href={membershipHistoryHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
           <Link
             href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>
           <Link
             href="/workspace/library"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.library}
           </Link>
@@ -145,7 +145,7 @@ export default async function Page({
           </Button>
           <Link
             href="/workspace/library/collections/history"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {h.clear}
           </Link>
@@ -156,7 +156,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/history/export?${suffix(result.page)}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {h.export}
         </a>
@@ -165,7 +165,7 @@ export default async function Page({
             <EmptyState title={h.empty} description={h.note} />
             <Link
               href="/workspace/library/collections/history"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {h.clear}
             </Link>
@@ -179,7 +179,7 @@ export default async function Page({
               <li key={item.id} className="nexus-panel space-y-3 p-5">
                 <Link
                   href={collectionReceiptHref(item.id)}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {libraryCollectionReceiptsCopy(locale).open}
                 </Link>
@@ -203,7 +203,7 @@ export default async function Page({
                         {h.current}:{" "}
                         <Link
                           href={collectionHref(item.currentCollection.id)}
-                          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         >
                           {item.currentCollection.name}
                         </Link>{" "}
@@ -226,7 +226,7 @@ export default async function Page({
                         {h.sourceCurrent}:{" "}
                         <Link
                           href={collectionHref(item.currentSource.id)}
-                          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         >
                           {item.currentSource.name}
                         </Link>{" "}
@@ -319,7 +319,7 @@ export default async function Page({
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         <Link
           href="/workspace/library/collections/history"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </Link>

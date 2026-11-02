@@ -1,7 +1,7 @@
 import type { User } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { PublicationFeed } from "../../../components/publication-feed";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
@@ -49,18 +49,7 @@ export default async function FollowingFeedPage({
       </div>
     );
   }
-  if (!actor)
-    return (
-      <div className="nexus-panel space-y-4 p-8">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const { filters, initial, errorCode } = await publicationFeedView(
     { kind: "following", actorId: actor.id },
     await searchParams,

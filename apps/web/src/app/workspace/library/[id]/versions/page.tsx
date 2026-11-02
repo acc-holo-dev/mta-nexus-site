@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
 import { BuildProvenanceDetails } from "../../../../../components/build-provenance-details";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
@@ -12,7 +12,6 @@ import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../../lib/library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../../../../../lib/library-release-comparison-i18n";
-import { libraryReleaseHistoryCopy } from "../../../../../lib/library-release-history-i18n";
 import { getResourceReleaseControlCopy } from "../../../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
 import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
@@ -44,24 +43,7 @@ export default async function LibraryVersionsPage({
     page > 1
       ? `/workspace/library/${encodeURIComponent(id)}/versions?page=${page}`
       : `/workspace/library/${encodeURIComponent(id)}/versions`;
-  if (!user)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <Link
-          href={`/workspace/library/version-history?${new URLSearchParams({ productId: id })}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {libraryReleaseHistoryCopy(locale).title}
-        </Link>
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+  if (!user) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const result = await libraryReleaseService.detail(user, id, page).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
     throw error;

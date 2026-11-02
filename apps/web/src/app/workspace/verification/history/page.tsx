@@ -51,7 +51,9 @@ export default async function VerificationHistoryPage({
   let error = filters ? "" : copy.invalid;
   const report = await (async () => {
     try {
-      return filters ? await verificationWorkspaceService.applications(sessionActor, filters) : null;
+      return filters
+        ? await verificationWorkspaceService.applications(sessionActor, filters)
+        : null;
     } catch (failure) {
       error =
         failure instanceof AppError
@@ -128,9 +130,7 @@ export default async function VerificationHistoryPage({
       <p className="text-xs text-muted">{copy.live}</p>
       <Link
         prefetch={false}
-        href={
-          filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"
-        }
+        href={filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"}
         className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.latest}
@@ -167,17 +167,14 @@ export default async function VerificationHistoryPage({
                 </h2>
                 <span className="text-xs text-muted">{labels[item.status]}</span>
               </div>
-              <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                {item.notes}
-              </p>
+              <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.notes}</p>
               <p className="break-all text-xs text-muted">{item.id}</p>
               <p className="text-xs text-muted">
                 {labels.submittedAt}:{" "}
                 <time dateTime={item.createdAt}>
-                  {new Date(item.createdAt).toLocaleString(
-                    locale === "ru" ? "ru-RU" : "en-US",
-                    { timeZone: "UTC" },
-                  )}{" "}
+                  {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
+                    timeZone: "UTC",
+                  })}{" "}
                   UTC
                 </time>
               </p>

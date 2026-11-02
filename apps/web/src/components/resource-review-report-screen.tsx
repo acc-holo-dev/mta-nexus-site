@@ -25,9 +25,7 @@ export async function ResourceReviewReportScreen({
 }) {
   const [locale, cookieStore] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = resourceReviewCopy(locale),
-    actor = await authService
-      .getSession(cookieStore.get("nexus_session")?.value)
-      .catch(() => null);
+    actor = await authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => null);
   const base = staff ? "/admin/commerce/reviews" : "/workspace/review-reports";
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {

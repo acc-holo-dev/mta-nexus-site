@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { ResourceCartControls } from "../../../components/resource-cart-controls";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
@@ -18,18 +17,7 @@ export default async function ResourceCartPage() {
   const [locale, cookieStore] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getResourceCommerceCopy(locale);
   const actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signIn}</h1>
-        <Link
-          href={authEntryHref("login", "/workspace/cart")}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.login}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/cart" />;
   const cart = await commerceService.getResourceCart(actor);
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">

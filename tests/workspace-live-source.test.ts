@@ -23,6 +23,9 @@ vi.mock("next/headers", () => ({
       name === "nexus_session" && state.user ? { value: "session-token" } : undefined,
   })),
 }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace",
+}));
 
 vi.mock("next/link", async () => {
   const React = await import("react");
