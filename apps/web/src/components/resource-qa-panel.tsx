@@ -323,7 +323,7 @@ export function ResourceQaPanel({
                     {canResolve && detail.thread.status !== "resolved" ? (
                       <button
                         type="button"
-                        className="text-accent underline"
+                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         disabled={busy}
                         onClick={() => void onResolve(item.id)}
                       >
@@ -371,7 +371,10 @@ export function ResourceQaPanel({
         <div className="space-y-4">
           {!authenticated ? (
             <p className="text-xs text-muted">
-              <Link href={loginHref} className="text-accent underline">
+              <Link
+                href={loginHref}
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {copy.signIn}
               </Link>
             </p>

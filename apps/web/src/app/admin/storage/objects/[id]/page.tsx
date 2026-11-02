@@ -24,7 +24,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         (!item.leaseExpiresAt || item.leaseExpiresAt.getTime() <= Date.now()));
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/admin/storage" className="text-accent underline">
+      <Link
+        href="/admin/storage"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.inventory}
       </Link>
       <h1>{copy.detail}</h1>

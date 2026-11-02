@@ -278,7 +278,7 @@ export function LibraryMembershipBatchForm({
           </p>
           <a
             href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.reload}
           </a>
@@ -287,12 +287,15 @@ export function LibraryMembershipBatchForm({
       {saved && (
         <div className="space-y-2">
           <p role="status">{h.success}</p>
-          <a href={membershipHistoryHref(saved.id)} className="text-accent underline">
+          <a
+            href={membershipHistoryHref(saved.id)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryMembershipHistoryCopy(locale).detail}
           </a>
           <a
             href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.reload}
           </a>
@@ -304,7 +307,7 @@ export function LibraryMembershipBatchForm({
               <li key={child.id}>
                 <a
                   href={collectionHref(child.collection.id, "history")}
-                  className="text-accent underline"
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {child.collection.name}
                 </a>{" "}

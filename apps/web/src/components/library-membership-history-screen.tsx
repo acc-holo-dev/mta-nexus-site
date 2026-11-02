@@ -7,7 +7,6 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "./auth-return-path";
 import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
@@ -20,6 +19,7 @@ import {
 } from "../lib/library-membership-history-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
+import { authEntryHref } from "./auth-return-path";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
 export async function LibraryMembershipHistoryScreen({
   params,
@@ -53,7 +53,10 @@ export async function LibraryMembershipHistoryScreen({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -66,7 +69,10 @@ export async function LibraryMembershipHistoryScreen({
       const result = await libraryCollectionsService.membershipReceipt(actor, (await params).id);
       return (
         <div className="mx-auto max-w-5xl space-y-6 py-8">
-          <Link href={membershipHistoryHref()} className="text-accent underline">
+          <Link
+            href={membershipHistoryHref()}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {m.history}
           </Link>
           <h1>{m.detail}</h1>
@@ -84,10 +90,16 @@ export async function LibraryMembershipHistoryScreen({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={m.title}>
-          <Link href={collectionHref()} className="text-accent underline">
+          <Link
+            href={collectionHref()}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {c.title}
           </Link>
-          <Link href="/workspace/library/collections/history" className="text-accent underline">
+          <Link
+            href="/workspace/library/collections/history"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {h.title}
           </Link>
         </nav>
@@ -149,7 +161,10 @@ export async function LibraryMembershipHistoryScreen({
           <Button type="submit" variant="outline">
             {h.filter}
           </Button>
-          <Link href={membershipHistoryHref()} className="text-accent underline">
+          <Link
+            href={membershipHistoryHref()}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {h.clear}
           </Link>
         </form>
@@ -159,7 +174,7 @@ export async function LibraryMembershipHistoryScreen({
         </p>
         <a
           href={`/api/library/collections/membership-history/export?${suffix(result.page)}`}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {h.export}
         </a>
@@ -176,7 +191,7 @@ export async function LibraryMembershipHistoryScreen({
             {result.page > 1 && (
               <Link
                 href={`${membershipHistoryHref()}?${suffix(result.page - 1)}`}
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -187,7 +202,7 @@ export async function LibraryMembershipHistoryScreen({
             {result.page < result.totalPages && (
               <Link
                 href={`${membershipHistoryHref()}?${suffix(result.page + 1)}`}
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>
@@ -202,7 +217,10 @@ export async function LibraryMembershipHistoryScreen({
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href={membershipHistoryHref()} className="text-accent underline">
+        <Link
+          href={membershipHistoryHref()}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {c.reload}
         </Link>
       </section>

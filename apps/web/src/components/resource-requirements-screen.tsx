@@ -57,7 +57,10 @@ export async function ResourceRequirementsScreen({
         : `/api/admin/resources/${encodeURIComponent(productId)}/requirements`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href={back} className="text-accent underline">
+      <Link
+        href={back}
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.title}</h1>

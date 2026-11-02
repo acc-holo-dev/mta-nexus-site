@@ -249,7 +249,7 @@ export function LibraryCollectionReconcileForm({
             returnHref ??
             collectionHref(shown.collection.id, "reconcile")
           }
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </a>
@@ -260,12 +260,15 @@ export function LibraryCollectionReconcileForm({
           <code className="block break-all text-xs">
             {c.receipt}: {saved}
           </code>
-          <a href={collectionReceiptHref(saved)} className="text-accent underline">
+          <a
+            href={collectionReceiptHref(saved)}
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
           <a
             href={collectionHref(shown.collection.id, "history")}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.history}
           </a>

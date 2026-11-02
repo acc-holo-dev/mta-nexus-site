@@ -1,15 +1,15 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { can } from "@nexus/security";
-import { authEntryHref } from "./auth-return-path";
-import { SupportCenter } from "./support-center";
-import { SupportCaseThread } from "./support-case-thread";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { supportQuery } from "../lib/support-workspace-contract";
 import { supportWorkspaceCopy } from "../lib/support-workspace-copy";
+import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
+import { SupportCaseThread } from "./support-case-thread";
+import { SupportCenter } from "./support-center";
 export async function supportMetadata(staff = false) {
   const copy = getDictionary(await getRequestLocale()).support;
   return { title: staff ? copy.staffQueue : copy.title, robots: { index: false, follow: false } };
@@ -79,7 +79,10 @@ export async function SupportPageSurface({
         <p role="alert" className="nexus-panel p-5 text-danger">
           {copy.queryInvalid}
         </p>
-        <Link href={base} className="text-accent underline">
+        <Link
+          href={base}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.reset}
         </Link>
       </div>
