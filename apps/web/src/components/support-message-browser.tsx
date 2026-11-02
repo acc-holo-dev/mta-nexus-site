@@ -95,9 +95,17 @@ export function SupportMessageBrowser({
         {copy.snapshot}: <time dateTime={page.until}>{date(page.until)} UTC</time>
       </p>
       {page.items.length === 0 ? (
-        <p role="status" className="nexus-panel p-5 text-muted">
-          {filtered ? copy.emptyFiltered : copy.empty}
-        </p>
+        <div role="status" className="nexus-panel space-y-3 p-5 text-muted">
+          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
+          {filtered ? (
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <section aria-label={copy.title} className="space-y-3">
           {page.items.map((message) => (

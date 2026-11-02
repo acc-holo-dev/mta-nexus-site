@@ -4,8 +4,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `cabef166309f8d714ec03a3c920d780d55418fc9` (`fix(web): clear filtered empties and deepen workspace loading shells`).
-- **Verified CI green on that tip:** [CI 41381947276](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41381947276) (lint/unit, DB, image build, production browser smoke; selected scope).
+- **Tip SHA:** `d9c2b5da7c8a86bd2102f4854472bbf68a70fb04` (`fix(web): rename open-beta nav key and extend loading honesty`).
+- **Verified CI green on that tip:** [CI 41382797159](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41382797159) (lint/unit, DB, image build, production browser smoke; selected scope).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path, QA/follow first-paint.
 - **Honesty/a11y wave (tip series):** clear-filter CTAs (support/discussion/publication target/inbox), confirmAction on destructive clients, honest loading shells across public directories and workspace hubs, filter `focus-visible` outlines, market/main overflow clip, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.
@@ -30,11 +30,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** filtered-empty reset CTAs; workspace servers/orgs/verification/library updates loaders; tip docs sync to `cabef166…` / CI 41381947276.
+**Последняя локальная волна:** `nav.openFreeBeta` rename; community/library/content loaders; library updates clear-filter; tip docs sync to `d9c2b5da…` / CI 41382797159.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `cabef166…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `d9c2b5da…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

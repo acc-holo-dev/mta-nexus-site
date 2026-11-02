@@ -84,9 +84,17 @@ export function OrganizationHistoryView({
         </p>
       )}
       {data?.items.length === 0 && (
-        <p className="nexus-panel p-5 text-sm text-muted">
-          {filtered ? journal.emptyFiltered : journal.empty}
-        </p>
+        <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
+          <p>{filtered ? journal.emptyFiltered : journal.empty}</p>
+          {filtered ? (
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {journal.reset}
+            </Link>
+          ) : null}
+        </div>
       )}
       {data?.items.map((item) => (
         <article className="nexus-panel space-y-3 p-5" key={item.id}>

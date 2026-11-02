@@ -8,15 +8,17 @@ export default function GlobalLoading() {
   const { dictionary } = useNexusLocale();
 
   return (
-    <div
-      className="mx-auto max-w-7xl space-y-6"
-      role="status"
+    <section
+      className="mx-auto min-w-0 max-w-7xl space-y-6 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="global-loading-heading"
     >
       <h1 id="global-loading-heading" className="sr-only">
         {dictionary.errors.loading}
       </h1>
+      <p role="status" className="sr-only">
+        {dictionary.errors.loading}
+      </p>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         <div className="h-8 w-64 rounded-md bg-inset" />
         <div className="h-24 rounded bg-inset" />
@@ -24,6 +26,6 @@ export default function GlobalLoading() {
           <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

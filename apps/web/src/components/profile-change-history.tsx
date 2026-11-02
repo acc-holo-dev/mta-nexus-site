@@ -70,9 +70,17 @@ export function ProfileChangeHistoryView({
             <p className="text-xs text-muted">{copy.exportHelp}</p>
           </div>
           {!data.items.length && (
-            <p className="nexus-panel p-5 text-sm text-muted">
-              {filtered ? copy.emptyFiltered : copy.empty}
-            </p>
+            <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
+              <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
+              {filtered ? (
+                <Link
+                  href={path}
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {copy.reset}
+                </Link>
+              ) : null}
+            </div>
           )}
           {data.items.map((item) => (
             <article key={item.id} className="nexus-panel space-y-3 p-5">

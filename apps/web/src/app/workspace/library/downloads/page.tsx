@@ -61,7 +61,8 @@ export default async function ResourceDownloadsPage({
     );
   }
   const result = await resourceDeliveriesService.page(user, query),
-    href = (page: number) => resourceDeliveriesUrl({ ...query, page });
+    href = (page: number) => resourceDeliveriesUrl({ ...query, page }),
+    filtered = query.status !== "all" || query.days !== "all" || Boolean(query.resourceId);
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link href="/workspace/library" className="text-sm text-accent underline">
@@ -117,7 +118,7 @@ export default async function ResourceDownloadsPage({
             key={status}
             href={resourceDeliveriesUrl({ ...query, status, page: 1 })}
             aria-current={query.status === status ? "page" : undefined}
-            className="rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white"
+            className="rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white"
           >
             {copy[status]} ({result.counts[status]})
           </Link>
@@ -165,7 +166,22 @@ export default async function ResourceDownloadsPage({
           ))}
         </ol>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <div className="space-y-3 text-secondary">
+          <p>{copy.empty}</p>
+          {filtered ? (
+            <Link
+              href={resourceDeliveriesUrl({
+                page: 1,
+                days: "all",
+                status: "all",
+                resourceId: null,
+              })}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.all}
+            </Link>
+          ) : null}
+        </div>
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
