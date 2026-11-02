@@ -1,5 +1,6 @@
 const en = {
   title: "Collection membership history",
+  loading: "Loading membership history…",
   note: "Inspect whole resource membership operations. Recorded names, revisions and changes remain unchanged; current collection membership and resource access are shown separately. Filters select whole groups, including every recorded collection.",
   detail: "Group receipt",
   additions: "Additions only",
@@ -16,6 +17,7 @@ const en = {
 };
 const ru: typeof en = {
   title: "История состава коллекций",
+  loading: "Загрузка истории состава…",
   note: "Операции с одним ресурсом показаны целиком. Записанные названия, ревизии и изменения сохраняются; текущий состав коллекций и доступ к ресурсу показаны отдельно. Фильтры выбирают группы со всеми записанными коллекциями.",
   detail: "Общая квитанция",
   additions: "Только добавления",
