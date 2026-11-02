@@ -3,6 +3,7 @@ import type { Locale } from "./i18n";
 const copy = {
   en: {
     cart: "Resource cart",
+    loading: "Loading your resource cart…",
     subtitle: "Collect up to 20 free resources and add them to your library together.",
     add: "Add to cart",
     added: "In cart",
@@ -72,6 +73,7 @@ const copy = {
   },
   ru: {
     cart: "Корзина ресурсов",
+    loading: "Загрузка корзины ресурсов…",
     subtitle: "Соберите до 20 бесплатных ресурсов и добавьте их в библиотеку вместе.",
     add: "В корзину",
     added: "В корзине",

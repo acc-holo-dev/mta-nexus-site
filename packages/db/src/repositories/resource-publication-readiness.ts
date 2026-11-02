@@ -120,7 +120,8 @@ export class ResourcePublicationReadinessRepository {
           latestBuild: latestRows[0] ? mapBuild(latestRows[0]) : null,
         });
       },
-      { isolationLevel: "repeatable read", accessMode: "read only" },
+      // Row locks (FOR SHARE) require a read/write transaction; read-only mode rejects them.
+      { isolationLevel: "repeatable read" },
     );
   }
 }
