@@ -39,6 +39,7 @@ import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
+  shellDestinationActive,
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
@@ -126,12 +127,7 @@ export function Sidebar({
       : []),
   ];
 
-  const isActive = (href: string) =>
-    href === "/workspace"
-      ? pathname === "/workspace"
-      : href === "/workspace/servers"
-        ? pathname === href || (pathname.startsWith(`${href}/`) && pathname !== `${href}/new`)
-        : pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+  const isActive = (href: string) => shellDestinationActive(href, pathname);
 
   const renderItems = (items: NavItem[]) =>
     items.map((item) => {
@@ -268,7 +264,7 @@ export function Sidebar({
             <Link
               href="/admin"
               title={dictionary.nav.adminStaffHint}
-              aria-label={isCollapsed ? adminAccessibleName : undefined}
+              aria-label={adminAccessibleName}
               aria-current={pathname.startsWith("/admin") ? "page" : undefined}
               className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
                 pathname.startsWith("/admin")

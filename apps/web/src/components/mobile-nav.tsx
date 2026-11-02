@@ -15,6 +15,7 @@ import {
   LogIn,
   Menu,
   MessageSquare,
+  Plus,
   Server,
   Settings,
   ShieldAlert,
@@ -29,6 +30,7 @@ import { communityReportCopy } from "../lib/community-report-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
@@ -37,6 +39,7 @@ import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
+  shellDestinationActive,
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
@@ -102,7 +105,17 @@ export function MobileNav({ locale }: { locale: Locale }) {
     },
     { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
-    { href: "/workspace/servers", label: dictionary.nav.liveServers, icon: Server },
+    {
+      href: "/workspace/resources/new",
+      label: dictionary.nav.publishResource,
+      icon: Plus,
+    },
+    { href: "/workspace/servers", label: getManagedServerCopy(locale).title, icon: Server },
+    {
+      href: "/workspace/servers/new",
+      label: dictionary.nav.registerServer,
+      icon: Plus,
+    },
     { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
     { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
     { href: "/workspace/discussions", label: ownDiscussionCopy(locale).title, icon: MessageSquare },
@@ -127,10 +140,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
     ? [...workspaceMoreItems, ...publicMoreItems]
     : publicMoreItems;
 
-  const isActive = (href: string) =>
-    href === "/" || href === "/workspace"
-      ? pathname === href
-      : pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) => shellDestinationActive(href, pathname);
 
   const moreActive =
     pathname === "/workspace" ||

@@ -43,3 +43,18 @@ export function isShellSessionLoading(session: ShellAuthSession): boolean {
 export function adminDestinationAccessibleName(adminLabel: string, staffHint: string): string {
   return `${adminLabel} (${staffHint})`;
 }
+
+/** One current destination. Developer profile is not the Settings item; new-server is not the server list. */
+export function shellDestinationActive(href: string, pathname: string): boolean {
+  if (href === "/" || href === "/workspace") return pathname === href;
+  if (href === "/workspace/servers") {
+    return pathname === href || (pathname.startsWith(`${href}/`) && pathname !== `${href}/new`);
+  }
+  if (href === "/settings") {
+    return (
+      pathname === href ||
+      (pathname.startsWith(`${href}/`) && !pathname.startsWith("/settings/developer"))
+    );
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}

@@ -13,7 +13,7 @@ export const shell = {
     community: "Сообщество",
     updates: "Обновления",
     creators: "Авторы",
-    overview: "Обзор",
+    overview: "Кабинет",
     publishResource: "Опубликовать ресурс",
     registerServer: "Добавить сервер",
     saved: "Сохранённое",

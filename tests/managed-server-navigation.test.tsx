@@ -17,10 +17,12 @@ vi.mock("../apps/web/src/components/use-auth-session", () => ({
   useAuthSession: () => state.session,
 }));
 
+import { FooterContribute } from "../apps/web/src/components/footer-contribute";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
   isStaffRole,
+  shellDestinationActive,
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
@@ -41,6 +43,8 @@ it.each(["en", "ru"] as const)("exposes a localized managed-server destination i
   const html = renderToStaticMarkup(
     <Sidebar locale={locale} isCollapsed={false} onToggle={() => {}} />,
   );
+  expect(html).toContain(locale === "ru" ? "Кабинет" : "Overview");
+  expect(html).toContain(locale === "ru" ? "Обзор" : "Discover");
   expect(html).toContain(locale === "ru" ? "Управляемые серверы" : "Managed servers");
   expect(html).toContain(locale === "ru" ? "Библиотека ресурсов" : "Resource library");
   expect(html).toContain('href="/workspace/library"');
@@ -96,6 +100,11 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
     }),
   ).toBe(true);
   expect(adminDestinationAccessibleName("Admin", "Staff only")).toBe("Admin (Staff only)");
+  expect(shellDestinationActive("/settings", "/settings/developer")).toBe(false);
+  expect(shellDestinationActive("/settings/developer", "/settings/developer")).toBe(true);
+  expect(shellDestinationActive("/settings", "/settings/privacy")).toBe(true);
+  expect(shellDestinationActive("/workspace/servers", "/workspace/servers/new")).toBe(false);
+  expect(shellDestinationActive("/workspace/servers/new", "/workspace/servers/new")).toBe(true);
 });
 
 it("keeps mobile More menu session checking and staff admin labels in source", () => {
@@ -105,6 +114,9 @@ it("keeps mobile More menu session checking and staff admin labels in source", (
   );
   expect(source).toContain("dictionary.nav.checkingSession");
   expect(source).toContain('href: "/workspace/library"');
+  expect(source).toContain('href: "/workspace/resources/new"');
+  expect(source).toContain('href: "/workspace/servers/new"');
+  expect(source).toContain("getManagedServerCopy");
   expect(source).toContain("adminAccessibleName");
   expect(source).toContain('aria-busy="true"');
   expect(source).toContain("aria-label={adminAccessibleName}");
@@ -122,4 +134,48 @@ it("shows session checking chrome without workspace, sign-in, or admin while loa
   expect(html).not.toContain('href="/workspace"');
   expect(html).not.toContain('href="/auth/login');
   expect(html).not.toContain('href="/admin"');
+});
+
+it("keeps one current destination on the developer profile and names staff admin", () => {
+  state.path = "/settings/developer";
+  const dictionary = getDictionary("en");
+  const html = renderToStaticMarkup(
+    <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
+  );
+  const active = html.match(/<a\b[^>]*aria-current="page"[^>]*>/g) ?? [];
+  expect(active).toHaveLength(1);
+  expect(active[0]).toContain('href="/settings/developer"');
+
+  state.session = {
+    status: "authenticated",
+    user: { username: "mod", role: "moderator" },
+  };
+  state.path = "/admin";
+  const staff = renderToStaticMarkup(
+    <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
+  );
+  expect(staff).toContain(
+    `aria-label="${dictionary.nav.admin} (${dictionary.nav.adminStaffHint})"`,
+  );
+});
+
+it("shows footer workspace links only for a confirmed member", () => {
+  state.session = { status: "loading", user: null };
+  const loading = renderToStaticMarkup(<FooterContribute locale="en" />);
+  expect(loading).toContain("Checking session...");
+  expect(loading).not.toContain('href="/workspace');
+
+  state.session = { status: "anonymous", user: null };
+  const guest = renderToStaticMarkup(<FooterContribute locale="en" />);
+  expect(guest).not.toContain('href="/workspace');
+  expect(guest).toContain('href="/auth/login?next=%2Fworkspace%2Fservers"');
+
+  state.session = {
+    status: "authenticated",
+    user: { username: "owner", role: "user" },
+  };
+  const member = renderToStaticMarkup(<FooterContribute locale="en" />);
+  expect(member).toContain('href="/workspace/servers/new"');
+  expect(member).toContain('href="/workspace/resources/new"');
+  expect(member).toContain('href="/workspace"');
 });

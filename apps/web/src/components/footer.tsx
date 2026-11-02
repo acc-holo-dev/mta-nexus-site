@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { FooterContribute } from "./footer-contribute";
 
 export function Footer({ locale }: { locale: Locale }) {
   const dictionary = getDictionary(locale);
@@ -45,35 +46,7 @@ export function Footer({ locale }: { locale: Locale }) {
             </li>
           </ul>
         </div>
-        <div>
-          <h4 className="mb-3 font-label uppercase text-primary">{dictionary.footer.contribute}</h4>
-          <ul className="space-y-2 text-muted">
-            <li>
-              <Link
-                href="/workspace/servers/new"
-                className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {dictionary.footer.registerServer}
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/workspace/resources/new"
-                className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {dictionary.footer.publishResource}
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/workspace"
-                className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {dictionary.footer.workspace}
-              </Link>
-            </li>
-          </ul>
-        </div>
+        <FooterContribute locale={locale} />
       </div>
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
         <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.openFreeBeta}</div>
