@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Building2,
   Code2,
@@ -7,17 +6,18 @@ import {
   Server as ServerIcon,
   ShoppingBag,
 } from "lucide-react";
+import Link from "next/link";
 import { DirectoryFilters, DirectoryResults } from "../../components/discovery-directory";
 import {
   DISCOVER_TYPES,
+  type DiscoverType,
   discoverHref,
   parseDiscoverQuery,
-  type DiscoverType,
 } from "../../lib/discover-query";
+import { discoveryStreamHref } from "../../lib/discovery-stream-contract";
+import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
-import { discoveryStreamHref } from "../../lib/discovery-stream-contract";
 
 export const dynamic = "force-dynamic";
 
@@ -100,7 +100,7 @@ export default async function DiscoverPage({
       <DirectoryFilters state={state} locale={locale} />
       {["servers", "creators", "organizations"].includes(state.type) && (
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={discoveryStreamHref({
             ...state,
             type: state.type as "servers" | "creators" | "organizations",

@@ -3,12 +3,12 @@ import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { z } from "zod";
 import { communityReportCreateSchema, REPORT_TYPES } from "../lib/community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../lib/community-report-copy";
 import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 export function CommunityReportForm({
   targetType,
   targetId,
@@ -115,7 +115,10 @@ export function CommunityReportForm({
         </Button>
       </div>
       {!authenticated ? (
-        <Link className="text-sm text-accent underline" href={loginHref}>
+        <Link
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          href={loginHref}
+        >
           {copy.signIn}
         </Link>
       ) : result ? (
@@ -124,7 +127,7 @@ export function CommunityReportForm({
             {result.created ? copy.saved : copy.duplicate}
           </p>
           <Link
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href={`/workspace/reports/${encodeURIComponent(result.id)}`}
           >
             {copy.track}
@@ -175,7 +178,10 @@ export function CommunityReportForm({
             <Button type="submit" isLoading={pending} disabled={reason.trim().length < 10}>
               {pending ? copy.submitting : copy.submit}
             </Button>
-            <Link className="text-xs text-accent underline" href="/workspace/reports">
+            <Link
+              className="text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              href="/workspace/reports"
+            >
               {copy.myReports}
             </Link>
           </div>

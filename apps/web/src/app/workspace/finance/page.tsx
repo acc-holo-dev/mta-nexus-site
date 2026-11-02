@@ -1,18 +1,18 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
 import { financialStatementsRepository } from "@nexus/db";
-import { authService } from "../../../lib/services/auth-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  getFinancialCopy,
-  formatFinancialMinor,
-  financialReferenceLabel,
-} from "../../../lib/financial-i18n";
-import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
+import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../components/auth-return-path";
+import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
+import {
+  financialReferenceLabel,
+  formatFinancialMinor,
+  getFinancialCopy,
+} from "../../../lib/financial-i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
+import { authService } from "../../../lib/services/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Financial statements | MTA NEXUS",
@@ -78,7 +78,10 @@ export default async function FinancialStatements({
     `/workspace/finance?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), ...(selectedCurrency ? { currency: selectedCurrency } : {}), ...(selectedScope ? { organizationId: selectedScope } : {}) })}`;
   return (
     <div className="mx-auto max-w-6xl space-y-6 py-8">
-      <Link href="/workspace/sales" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/sales"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>

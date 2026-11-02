@@ -19,8 +19,8 @@ import {
 } from "../lib/server-publication-history-copy";
 import { authService } from "../lib/services/auth-service";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { AuthorPublicationRestore } from "./author-publication-restore";
 import { authEntryHref } from "./auth-return-path";
+import { AuthorPublicationRestore } from "./author-publication-restore";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
@@ -180,7 +180,7 @@ export async function ContextPublicationHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className="inline-flex min-h-11 items-center text-sm text-accent"
+                      className="inline-flex min-h-11 items-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>

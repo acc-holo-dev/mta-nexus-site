@@ -92,7 +92,10 @@ export default function ForgotPasswordPage() {
           </p>
         )}
 
-        <Link href="/auth/login" className="text-sm font-semibold text-accent hover:underline">
+        <Link
+          href="/auth/login"
+          className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.backToSignIn}
         </Link>
       </section>

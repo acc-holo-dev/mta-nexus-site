@@ -149,7 +149,7 @@ export function PublicationFeed({
               <Link
                 href={`/users/${encodeURIComponent(item.author.username)}`}
                 prefetch={false}
-                className="break-words text-sm font-semibold text-accent"
+                className="break-words text-sm font-semibold text-accent rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {item.author.name} (@{item.author.username})
               </Link>
@@ -200,7 +200,7 @@ export function PublicationFeed({
                     <Link
                       href={publicationHref(path, { ...filters, tag })}
                       prefetch={false}
-                      className="inline-flex min-h-8 items-center break-all rounded-md border border-base px-2 text-xs text-accent"
+                      className="inline-flex min-h-8 items-center break-all rounded-md border border-base px-2 text-xs text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       #{tag}
                     </Link>

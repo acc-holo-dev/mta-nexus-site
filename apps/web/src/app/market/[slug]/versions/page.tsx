@@ -74,7 +74,10 @@ export default async function PublicResourceVersionsPage({
   return (
     <div className="mx-auto max-w-5xl space-y-7 py-8">
       <header className="space-y-3 border-b border-base pb-6">
-        <Link href={back} className="text-sm text-accent hover:underline">
+        <Link
+          href={back}
+          className="text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">

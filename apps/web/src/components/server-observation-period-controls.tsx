@@ -56,7 +56,7 @@ export function ServerObservationPeriodControls({
         ))}
         <a
           href={href(window)}
-          className="inline-flex min-h-11 items-center px-3 text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center px-3 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.refresh}
         </a>
@@ -91,7 +91,7 @@ export function ServerObservationPeriodControls({
           <Link
             prefetch={false}
             href={href(window, new Date(time - width).toISOString())}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.previousPeriod}
           </Link>
@@ -100,7 +100,7 @@ export function ServerObservationPeriodControls({
           <Link
             prefetch={false}
             href={href(window, new Date(time + width).toISOString())}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.nextPeriod}
           </Link>

@@ -174,7 +174,7 @@ export async function ServerWorkspaceHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className="inline-flex min-h-11 text-sm text-accent"
+                      className="inline-flex min-h-11 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>

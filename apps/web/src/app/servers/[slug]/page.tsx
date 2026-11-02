@@ -242,7 +242,7 @@ export default async function ServerDetailPage({
                   href={websiteUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline"
+                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.website} ↗
                 </a>
@@ -252,7 +252,7 @@ export default async function ServerDetailPage({
                   href={discordUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline"
+                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   Discord ↗
                 </a>
@@ -262,7 +262,7 @@ export default async function ServerDetailPage({
                   href={rulesUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline"
+                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.rules} ↗
                 </a>

@@ -1,12 +1,12 @@
+import { can } from "@nexus/security";
 import { ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { can } from "@nexus/security";
-import { authService } from "../../../lib/services/auth-service";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { authService } from "../../../lib/services/auth-service";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,10 @@ export default async function AdminSupportLayout({ children }: { children: React
   const token = (await cookies()).get("nexus_session")?.value;
   const currentUser = await authService.getSession(token);
 
-  if (!currentUser || !can(currentUser, "admin.moderation")) {
+  if (!currentUser) {
+    return <PlatformSignIn locale={locale} returnPath="/admin/support" />;
+  }
+  if (!can(currentUser, "admin.moderation")) {
     return (
       <div className="mx-auto max-w-md space-y-4 py-20 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-danger-soft text-danger">
@@ -25,10 +28,10 @@ export default async function AdminSupportLayout({ children }: { children: React
         <h1 className="font-display text-primary">{dictionary.admin.accessDenied}</h1>
         <p className="font-caption text-muted">{dictionary.admin.accessDeniedDescription}</p>
         <Link
-          href={authEntryHref("login", "/admin/support")}
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white"
+          href="/"
+          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          {dictionary.admin.signIn}
+          {dictionary.errors.home}
         </Link>
       </div>
     );

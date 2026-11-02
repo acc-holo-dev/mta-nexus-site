@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
             </p>
             <Link
               href="/auth/forgot-password"
-              className="text-sm font-semibold text-accent hover:underline"
+              className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.requestNew}
             </Link>
@@ -181,7 +181,10 @@ export default function ResetPasswordPage() {
             <p role="status" className="text-sm text-success">
               {copy.resetSuccess}
             </p>
-            <Link href="/auth/login" className="text-sm font-semibold text-accent hover:underline">
+            <Link
+              href="/auth/login"
+              className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.signIn}
             </Link>
           </>

@@ -353,7 +353,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {isPublished && (
               <Link
                 href={releaseHistoryHref(product.slug)}
-                className="inline-flex text-xs font-semibold text-accent hover:underline"
+                className="inline-flex text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {getReleaseHistoryCopy(locale).browse}
               </Link>
@@ -460,7 +460,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {reviewPage && (
               <Link
                 href={`/market/${encodeURIComponent(product.slug)}/reviews`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {resourceReviewCopy(locale).all} ({reviewPage.total})
               </Link>

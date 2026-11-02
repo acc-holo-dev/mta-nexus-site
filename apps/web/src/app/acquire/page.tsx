@@ -254,13 +254,13 @@ function AcquireContent() {
             <p className="mt-3 flex flex-wrap items-center justify-center gap-3 text-sm">
               <Link
                 href={authEntryHref("login", acquireReturnPath)}
-                className="font-semibold text-accent underline"
+                className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {authCopy.signIn}
               </Link>
               <Link
                 href={authEntryHref("register", acquireReturnPath)}
-                className="font-semibold text-accent underline"
+                className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {authCopy.create}
               </Link>

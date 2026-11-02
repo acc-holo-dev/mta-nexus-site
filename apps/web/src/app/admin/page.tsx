@@ -23,8 +23,8 @@ import {
 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../components/auth-return-path";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
+import { PlatformSignIn } from "../../components/content-catalog-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { ReportEvidenceLinks } from "../../components/report-evidence-links";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
@@ -96,7 +96,10 @@ export default async function AdminPage({
   const token = cookieStore.get("nexus_session")?.value;
   const currentUser = await authService.getSession(token);
 
-  if (!currentUser || !can(currentUser, "admin.access")) {
+  if (!currentUser) {
+    return <PlatformSignIn locale={locale} returnPath="/admin" />;
+  }
+  if (!can(currentUser, "admin.access")) {
     return (
       <div className="mx-auto max-w-md space-y-4 py-20 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-danger-soft text-danger">
@@ -105,10 +108,10 @@ export default async function AdminPage({
         <h1 className="font-display text-primary">{copy.accessDenied}</h1>
         <p className="font-caption text-muted">{copy.accessDeniedDescription}</p>
         <Link
-          href={authEntryHref("login", "/admin")}
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+          href="/"
+          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          {copy.signIn}
+          {dictionary.errors.home}
         </Link>
       </div>
     );

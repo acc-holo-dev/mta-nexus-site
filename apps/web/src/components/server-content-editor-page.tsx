@@ -45,7 +45,10 @@ export async function ServerContentEditorPage({
   const path = `/workspace/servers/${encodeURIComponent(id)}/content`;
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href={path} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <Link
+        href={path}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {team.title}
       </Link>
       <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
@@ -54,7 +57,7 @@ export async function ServerContentEditorPage({
           {contentId && (
             <Link
               href={`${path}/${encodeURIComponent(contentId)}/history`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {serverPublicationHistoryCopy(locale).history}
             </Link>

@@ -198,7 +198,7 @@ export function LibraryCollectionCommandForm({
           </p>
           <a
             href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection?.id)}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.reload}
           </a>
