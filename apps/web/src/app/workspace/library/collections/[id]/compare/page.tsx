@@ -68,13 +68,13 @@ export default async function Page({
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
           <Link
             href={collectionHref(id)}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.back}
           </Link>
           <Link
             href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>
@@ -167,7 +167,7 @@ export default async function Page({
                 {c.destination}:{" "}
                 <Link
                   href={collectionHref(comparison.destination.id)}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {comparison.destination.name}
                 </Link>
@@ -264,7 +264,7 @@ export default async function Page({
                 {comparison.page > 1 && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page - 1)}`}
-                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {c.previous}
                   </Link>
@@ -272,7 +272,7 @@ export default async function Page({
                 {comparison.page < comparison.totalPages && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page + 1)}`}
-                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {c.next}
                   </Link>
@@ -300,7 +300,7 @@ export default async function Page({
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         <Link
           href={collectionHref(id, "compare")}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </Link>

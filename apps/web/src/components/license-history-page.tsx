@@ -64,7 +64,7 @@ export async function LicenseHistoryPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`${base}/${encodeURIComponent(licenseId)}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.manage}
       </Link>
@@ -104,7 +104,7 @@ export async function LicenseHistoryPage({
           {result.page > 1 && (
             <Link
               href={`?page=${result.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -115,7 +115,7 @@ export async function LicenseHistoryPage({
           {result.page < result.totalPages && (
             <Link
               href={`?page=${result.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>

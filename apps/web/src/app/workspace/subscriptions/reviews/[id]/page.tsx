@@ -61,7 +61,7 @@ export default async function PlanReviewPage({
           <p role="alert">{c.invalid}</p>
           <Link
             href="/workspace/subscriptions/reviews"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>

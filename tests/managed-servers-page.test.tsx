@@ -98,7 +98,7 @@ it.each(["en", "ru"] as const)(
 );
 it("does not read private data or contact the directory for anonymous visitors", async () => {
   state.user = null;
-  expect(await render()).toContain("Sign in to manage your account");
+  expect(await render()).toContain("Sign in required");
   expect(await render()).toContain('href="/auth/login?next=%2Fworkspace%2Fservers"');
   expect(state.page).not.toHaveBeenCalled();
   expect(state.directory).not.toHaveBeenCalled();

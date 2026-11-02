@@ -54,13 +54,13 @@ export default async function Page({
         <nav className="flex flex-wrap gap-4">
           <Link
             href="/workspace/library/collections/history"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.history}
           </Link>
           <Link
             href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>
@@ -75,7 +75,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/receipts/${encodeURIComponent(report.id)}/export`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {r.export}
         </a>
@@ -121,7 +121,7 @@ export default async function Page({
                 {r.current}:{" "}
                 <Link
                   href={collectionHref(report.currentCollection.id)}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {report.currentCollection.name}
                 </Link>{" "}
@@ -204,7 +204,7 @@ export default async function Page({
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         <Link
           href={collectionHref()}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </Link>

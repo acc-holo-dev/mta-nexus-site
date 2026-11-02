@@ -44,7 +44,7 @@ export async function LibraryReleaseComparisonScreen({
         <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {authCopy.signIn}
         </Link>
@@ -81,7 +81,7 @@ export async function LibraryReleaseComparisonScreen({
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
         href={`${base}?page=${query.returnPage}`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>
@@ -127,7 +127,7 @@ export async function LibraryReleaseComparisonScreen({
             </h2>
             <Link
               href={`/workspace/library/${encodeURIComponent(path.id)}/requirements?${new URLSearchParams({ previewBuildId: release.id, returnFrom: index === 0 ? result.to.id : result.from.id, returnPage: String(query.returnPage) })}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.preparation}
             </Link>
@@ -179,13 +179,13 @@ export async function LibraryReleaseComparisonScreen({
       <nav className="flex flex-wrap gap-4">
         <Link
           href={`${base}/compare?${new URLSearchParams({ ...values, from: query.to, to: query.from })}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.swap}
         </Link>
         <a
           href={`/api/library/releases/${encodeURIComponent(path.id)}/compare/export?${suffix}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.export}
         </a>

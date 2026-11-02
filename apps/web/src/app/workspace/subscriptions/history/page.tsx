@@ -47,7 +47,7 @@ export default async function SubscriptionHistoryPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={subscriptionAccountHref(query.organizationId)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.title}
         </Link>
@@ -87,7 +87,7 @@ export default async function SubscriptionHistoryPage({
               <li key={r.id} className="nexus-panel space-y-2 p-4">
                 <Link
                   href={subscriptionReceiptHref(r.id, query.organizationId)}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {c.actions[r.action]}: {locale === "ru" ? r.titleRu : r.titleEn}
                 </Link>

@@ -36,7 +36,7 @@ export async function LibraryReleaseHistoryScreen({
         <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {authCopy.signIn}
         </Link>
@@ -65,7 +65,7 @@ export async function LibraryReleaseHistoryScreen({
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
         href="/workspace/library"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>
@@ -98,7 +98,7 @@ export async function LibraryReleaseHistoryScreen({
       {result.productId && (
         <Link
           href={`/workspace/library/version-history?days=${result.days}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.clear}
         </Link>
@@ -136,7 +136,7 @@ export async function LibraryReleaseHistoryScreen({
             {item.hasCurrentAccess && (
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.manage}
               </Link>
@@ -153,7 +153,7 @@ export async function LibraryReleaseHistoryScreen({
       </nav>
       <a
         href={`/api/library/releases/history/export?${suffix(result.page)}`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.export}
       </a>

@@ -48,7 +48,7 @@ export async function LibrarySelectionBatchScreen({
         <h1 className="font-display text-primary">{cc.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {cc.signIn}
         </Link>
@@ -65,7 +65,7 @@ export async function LibrarySelectionBatchScreen({
         <div className="mx-auto max-w-5xl space-y-6 py-8">
           <Link
             href={base}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>
@@ -127,7 +127,7 @@ export async function LibrarySelectionBatchScreen({
           </nav>
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/versions/history/export?page=${result.page}`}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.export}
           </a>
@@ -141,7 +141,7 @@ export async function LibrarySelectionBatchScreen({
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(id)}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.back}
         </Link>
@@ -150,7 +150,7 @@ export async function LibrarySelectionBatchScreen({
         </h1>
         <Link
           href={`${base}/history`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.history}
         </Link>
@@ -173,7 +173,7 @@ export async function LibrarySelectionBatchScreen({
           {result.page > 1 && (
             <Link
               href={pageHref(result.page - 1)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {cc.previous}
             </Link>
@@ -184,7 +184,7 @@ export async function LibrarySelectionBatchScreen({
           {result.page < result.totalPages && (
             <Link
               href={pageHref(result.page + 1)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {cc.next}
             </Link>

@@ -47,7 +47,7 @@ export default async function ResourceCopyDetailPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={`/workspace/resources/${encodeURIComponent(id)}/copies`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.history}
         </Link>
@@ -73,13 +73,13 @@ export default async function ResourceCopyDetailPage({
         <div className="flex flex-wrap gap-4">
           <Link
             href={`/workspace/resources/${encodeURIComponent(receipt.target.id)}`}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.target}
           </Link>
           <a
             href={`/api/products/${encodeURIComponent(id)}/copies/${encodeURIComponent(receipt.id)}/export`}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.export}
           </a>
@@ -94,7 +94,7 @@ export default async function ResourceCopyDetailPage({
           <p role="alert">{resourceCopyError(locale, error.code)}</p>
           <Link
             href="/workspace/resources"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.back}
           </Link>

@@ -51,14 +51,14 @@ export default async function AcquisitionHistoryPage({
       <header className="space-y-3">
         <Link
           href="/workspace/library"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.library}
         </Link>
         <h1 className="font-display text-primary">{copy.history}</h1>
         <Link
           href="/workspace/acquisitions/receipts"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {resourceCartReceiptsCopy(locale).title}
         </Link>
@@ -121,7 +121,7 @@ export default async function AcquisitionHistoryPage({
           {result.page > 1 ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page - 1)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -132,7 +132,7 @@ export default async function AcquisitionHistoryPage({
           {result.page < result.totalPages ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page + 1)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>

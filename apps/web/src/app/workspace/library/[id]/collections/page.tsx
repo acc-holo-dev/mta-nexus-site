@@ -57,26 +57,26 @@ export default async function ResourceCollectionsPage({
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.library}>
           <Link
             href="/workspace/library"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.library}
           </Link>
           <Link
             href={`${membershipHistoryHref()}?productId=${encodeURIComponent(id)}`}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
           <Link
             href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>
           {result.resource.available && (
             <Link
               href={`/workspace/library/${encodeURIComponent(id)}/versions`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.versions}
             </Link>
@@ -85,7 +85,7 @@ export default async function ResourceCollectionsPage({
         <h1 className="font-display text-primary">{c.resourceCollections}</h1>
         <Link
           href={`/workspace/library/collections/history?${new URLSearchParams({ productId: id })}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {libraryCollectionHistoryCopy(locale).title}
         </Link>
@@ -122,7 +122,7 @@ export default async function ResourceCollectionsPage({
                 <h3 className="break-words font-semibold">
                   <Link
                     href={collectionHref(collection.id)}
-                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {collection.name}
                   </Link>
@@ -170,7 +170,7 @@ export default async function ResourceCollectionsPage({
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         <Link
           href={collectionHref()}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.title}
         </Link>

@@ -274,7 +274,7 @@ export function LibraryCollectionItemCopyForm({
             type="button"
             disabled={busy}
             onClick={() => window.location.reload()}
-            className="h-auto rounded px-0 text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="h-auto rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {c.reload}
@@ -292,14 +292,14 @@ export function LibraryCollectionItemCopyForm({
           {shownMove && (
             <a
               href={collectionHref(savedSourceId)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.back}
             </a>
           )}
           <a
             href={collectionHref(savedDestinationId)}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.openDestination}
           </a>

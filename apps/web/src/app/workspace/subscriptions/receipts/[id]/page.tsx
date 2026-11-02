@@ -54,7 +54,7 @@ export default async function SubscriptionReceiptPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={subscriptionAccountHref(query.organizationId)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.title}
         </Link>
@@ -84,7 +84,7 @@ export default async function SubscriptionReceiptPage({
         </p>
         <a
           href={`/api/subscriptions/account/receipts/${encodeURIComponent(r.id)}/export${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.export}
         </a>

@@ -42,7 +42,7 @@ export default async function ResourceCompatibilityPage({
       </header>
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}/requirements`}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {resourceRequirementsCopy(locale).title}
       </Link>

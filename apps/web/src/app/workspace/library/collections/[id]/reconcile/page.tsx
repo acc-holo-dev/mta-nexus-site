@@ -52,13 +52,13 @@ export default async function Page({
         <nav className="flex flex-wrap gap-4">
           <Link
             href={collectionHref(collection.id)}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.back}
           </Link>
           <a
             href={`/api/library/collections/${encodeURIComponent(collection.id)}/export`}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {m.export}
           </a>
@@ -88,7 +88,7 @@ export default async function Page({
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
         <Link
           href={collectionHref()}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </Link>

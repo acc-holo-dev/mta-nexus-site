@@ -39,7 +39,7 @@ export function ResourceRequirementsReportBody({
       )}
       <a
         href={exportHref}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.export}
       </a>
@@ -104,7 +104,7 @@ export function ResourceRequirementsReportBody({
               {node.published && (
                 <Link
                   href={`/market/${encodeURIComponent(node.slug)}`}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.catalog}
                 </Link>
@@ -115,7 +115,7 @@ export function ResourceRequirementsReportBody({
               {scope === "library" && node.accessible && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(node.id)}/versions`}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.inspect}
                 </Link>

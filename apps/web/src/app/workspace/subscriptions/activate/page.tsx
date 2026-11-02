@@ -53,7 +53,7 @@ export default async function SubscriptionActivationPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href="/subscriptions"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.catalog}
         </Link>

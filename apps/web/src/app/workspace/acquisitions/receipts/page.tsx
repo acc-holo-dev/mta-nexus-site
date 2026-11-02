@@ -52,7 +52,7 @@ export default async function ResourceCartReceiptsPage({
         <p role="alert">{copy.invalid}</p>
         <Link
           href="/workspace/acquisitions/receipts"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.title}
         </Link>
@@ -66,19 +66,19 @@ export default async function ResourceCartReceiptsPage({
       <nav className="flex flex-wrap gap-4 text-sm">
         <Link
           href="/workspace/cart"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.cart}
         </Link>
         <Link
           href="/workspace/acquisitions"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.history}
         </Link>
         <Link
           href="/workspace/library"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.library}
         </Link>
@@ -125,7 +125,7 @@ export default async function ResourceCartReceiptsPage({
         </Button>
         <Link
           href="/workspace/acquisitions/receipts"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.clear}
         </Link>
@@ -135,7 +135,7 @@ export default async function ResourceCartReceiptsPage({
           <p className="text-secondary">{copy.empty}</p>
           <Link
             href="/workspace/acquisitions/receipts"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.clear}
           </Link>
@@ -147,7 +147,7 @@ export default async function ResourceCartReceiptsPage({
               <h2 className="font-semibold">
                 <Link
                   href={resourceCartReceiptUrl(item.requestId)}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   prefetch={false}
                 >
                   {copy.receipt}
@@ -171,7 +171,7 @@ export default async function ResourceCartReceiptsPage({
         {result.page > 1 ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page - 1 })}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.previous}
           </Link>
@@ -182,14 +182,14 @@ export default async function ResourceCartReceiptsPage({
         {result.page < result.totalPages ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page + 1 })}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.next}
           </Link>
         ) : null}
         <a
           href={resourceCartReceiptsUrl(current, true).replace("receipts?", "receipts/export?")}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.export}
         </a>

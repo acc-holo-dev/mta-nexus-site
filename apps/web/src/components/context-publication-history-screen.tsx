@@ -67,7 +67,7 @@ export async function ContextPublicationHistoryScreen({
         ) : (
           <Link
             href={authEntryHref("login", path)}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {labels.signIn}
           </Link>
@@ -101,7 +101,7 @@ export async function ContextPublicationHistoryScreen({
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href={base}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {workspaceTitle}
       </Link>
@@ -121,7 +121,7 @@ export async function ContextPublicationHistoryScreen({
           </p>
           <a
             href={path}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {history.reload}
           </a>
@@ -133,7 +133,7 @@ export async function ContextPublicationHistoryScreen({
           </p>
           <Link
             href={`${base}/${encodeURIComponent(contentId)}`}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {labels.edit}
           </Link>
@@ -151,7 +151,7 @@ export async function ContextPublicationHistoryScreen({
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
               <Link
                 href="/support"
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {history.support}
               </Link>
@@ -200,7 +200,7 @@ export async function ContextPublicationHistoryScreen({
             <Link
               prefetch={false}
               href={path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {history.historyLatest}
             </Link>
@@ -208,7 +208,7 @@ export async function ContextPublicationHistoryScreen({
               <Link
                 prefetch={false}
                 href={`${path}?${new URLSearchParams({ cursor: data.olderCursor })}`}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {history.historyOlder}
               </Link>

@@ -28,7 +28,7 @@ export function OrderTermsReportView({
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
         href={base}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>
@@ -88,7 +88,7 @@ export function OrderTermsReportView({
       </section>
       <a
         href={`${api}/export?page=${report.page}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.export}
       </a>
@@ -154,7 +154,7 @@ export function OrderTermsReportView({
           {report.page > 1 ? (
             <Link
               href={`${base}/terms?page=${report.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.previous}
             </Link>
@@ -165,7 +165,7 @@ export function OrderTermsReportView({
           {report.page < report.totalPages ? (
             <Link
               href={`${base}/terms?page=${report.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.next}
             </Link>

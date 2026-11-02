@@ -54,7 +54,7 @@ export default async function ResourceCopiesPage({
     return (
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={`/workspace/resources/${encodeURIComponent(id)}`}
         >
           {c.back}
@@ -108,7 +108,7 @@ export default async function ResourceCopiesPage({
                 </p>
                 <Link
                   href={`/workspace/resources/${encodeURIComponent(row.target.id)}`}
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {c.target}
                 </Link>
@@ -133,7 +133,7 @@ export default async function ResourceCopiesPage({
           <p role="alert">{resourceCopyError(locale, error.code)}</p>
           <Link
             href="/workspace/resources"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.back}
           </Link>

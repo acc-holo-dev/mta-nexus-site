@@ -26,7 +26,7 @@ export async function ResourceMediaScreen({
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.signIn}
         </Link>
@@ -47,7 +47,7 @@ export async function ResourceMediaScreen({
             ? `/admin/resources/${encodeURIComponent(productId)}`
             : `/workspace/resources/${encodeURIComponent(productId)}`
         }
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>

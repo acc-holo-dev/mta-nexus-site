@@ -122,7 +122,7 @@ export default async function ServerPublications({
                     </span>
                     <Link
                       href={`${path}/${encodeURIComponent(item.id)}`}
-                      className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.edit}
                     </Link>
@@ -135,7 +135,7 @@ export default async function ServerPublications({
                     {item.status === "published" && (
                       <Link
                         href={`/articles/${encodeURIComponent(item.slug)}`}
-                        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {copy.publicView}
                       </Link>

@@ -51,7 +51,7 @@ export default async function PlanReviewsPage({
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <Link
           href="/subscriptions"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.back}
         </Link>
@@ -103,7 +103,7 @@ export default async function PlanReviewsPage({
             {scopes.page > 1 ? (
               <Link
                 href={href(result.page, scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -114,7 +114,7 @@ export default async function PlanReviewsPage({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={href(result.page, scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>
@@ -152,7 +152,7 @@ export default async function PlanReviewsPage({
             {result.page > 1 ? (
               <Link
                 href={href(result.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -163,7 +163,7 @@ export default async function PlanReviewsPage({
             {result.page < result.totalPages ? (
               <Link
                 href={href(result.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>
@@ -180,7 +180,7 @@ export default async function PlanReviewsPage({
           <p role="alert">{c.invalid}</p>
           <Link
             href="/workspace/subscriptions/reviews"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.title}
           </Link>

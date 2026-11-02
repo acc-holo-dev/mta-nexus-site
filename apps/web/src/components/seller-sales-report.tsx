@@ -27,7 +27,7 @@ export function SellerSalesReportView({
     <div className="mx-auto max-w-6xl space-y-6 py-8">
       <Link
         href="/workspace/sales"
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>
@@ -49,7 +49,7 @@ export function SellerSalesReportView({
       </p>
       <Link
         href={`/workspace/finance${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.finance}
       </Link>
@@ -151,7 +151,7 @@ export function SellerSalesReportView({
               organizationId: query.organizationId,
               attribution: query.attribution,
             })}
-            className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.reset}
           </Link>
@@ -195,7 +195,7 @@ export function SellerSalesReportView({
       ) : null}
       <a
         href={exportUrl}
-        className="inline-block rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="inline-block rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.export}
       </a>
@@ -218,7 +218,7 @@ export function SellerSalesReportView({
               </p>
               <Link
                 href={sellerSaleUrl(sale.id, query.organizationId, query.attribution)}
-                className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.details}
               </Link>
@@ -233,7 +233,7 @@ export function SellerSalesReportView({
           {report.page > 1 ? (
             <Link
               href={sellerSalesUrl(query, report.page - 1, scopes.page)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.previous}
             </Link>
@@ -244,7 +244,7 @@ export function SellerSalesReportView({
           {report.page < report.totalPages ? (
             <Link
               href={sellerSalesUrl(query, report.page + 1, scopes.page)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.next}
             </Link>
@@ -290,7 +290,7 @@ export function SellerSalesReportView({
         <nav aria-label={c.account} className="flex flex-wrap gap-4 text-sm">
           <Link
             href={sellerSalesUrl({ ...query, organizationId: undefined, productId: undefined }, 1)}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.personal}
           </Link>
@@ -303,7 +303,7 @@ export function SellerSalesReportView({
                 scopes.page,
               )}
               aria-current={query.organizationId === scope.id ? "page" : undefined}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {scope.name}
             </Link>
@@ -314,7 +314,7 @@ export function SellerSalesReportView({
             {scopes.page > 1 ? (
               <Link
                 href={sellerSalesUrl(query, report.page, scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -325,7 +325,7 @@ export function SellerSalesReportView({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={sellerSalesUrl(query, report.page, scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>

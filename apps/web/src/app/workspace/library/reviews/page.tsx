@@ -44,7 +44,7 @@ export default async function Page({
     <section className="mx-auto max-w-4xl space-y-5 py-8">
       <Link
         href="/workspace/library"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
@@ -52,7 +52,7 @@ export default async function Page({
       <p className="text-sm text-secondary">{copy.subtitle}</p>
       <Link
         href="/workspace/review-reports"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.reports}
       </Link>
@@ -66,7 +66,7 @@ export default async function Page({
             <p className="line-clamp-4 whitespace-pre-wrap break-words text-sm">{review.text}</p>
             <Link
               href={`/workspace/library/review/${encodeURIComponent(review.productId)}`}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.write}
             </Link>

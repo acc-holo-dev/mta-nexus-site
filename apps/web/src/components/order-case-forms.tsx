@@ -190,7 +190,7 @@ export function OrderCaseCreateForm({
           {copy.saved}{" "}
           <Link
             href={`/workspace/order-cases/${encodeURIComponent(savedId)}`}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.open}
           </Link>
@@ -201,7 +201,7 @@ export function OrderCaseCreateForm({
         variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.reload}
       </Button>
@@ -349,7 +349,7 @@ export function OrderCaseReviewForm({
         variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.reload}
       </Button>

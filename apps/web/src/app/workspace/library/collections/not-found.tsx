@@ -8,7 +8,7 @@ export default async function NotFound() {
       <h1>{c.notFound}</h1>
       <Link
         href="/workspace/library/collections"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.title}
       </Link>

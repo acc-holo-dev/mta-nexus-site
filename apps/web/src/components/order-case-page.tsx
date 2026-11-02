@@ -110,7 +110,7 @@ function Pagination({
       {page > 1 && (
         <Link
           href={href(page - 1)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.previous}
         </Link>
@@ -121,7 +121,7 @@ function Pagination({
       {page < totalPages && (
         <Link
           href={href(page + 1)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.next}
         </Link>
@@ -145,7 +145,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`/workspace/purchases/${encodeURIComponent(orderId)}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.order}: {result.order.orderNumber}
       </Link>
@@ -158,7 +158,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       {result.existingCase ? (
         <Link
           href={`/workspace/order-cases/${encodeURIComponent(result.existingCase.id)}`}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.existing} · {orderCaseStatusLabel(locale, result.existingCase.reviewStatus)}
         </Link>
@@ -205,7 +205,7 @@ export async function OrderCaseListPage({
         {copy.invalidQuery}{" "}
         <Link
           href={base}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.clear}
         </Link>
@@ -219,7 +219,7 @@ export async function OrderCaseListPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={staff ? "/admin" : "/workspace/purchases"}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {staff ? copy.review : copy.order}
       </Link>
@@ -263,7 +263,7 @@ export async function OrderCaseListPage({
         </Button>
         <Link
           href={base}
-          className="rounded p-2 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded p-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.clear}
         </Link>
@@ -274,7 +274,7 @@ export async function OrderCaseListPage({
             <li key={item.id} className="nexus-panel space-y-2 p-5">
               <Link
                 href={`${base}/${encodeURIComponent(item.id)}`}
-                className="break-words rounded font-semibold text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="break-words rounded font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {item.subject}
               </Link>
@@ -302,7 +302,7 @@ export async function OrderCaseListPage({
           <p className="text-secondary">{copy.empty}</p>
           <Link
             href={base}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.clear}
           </Link>
@@ -363,7 +363,7 @@ export async function OrderCaseDetailPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={staff ? "/admin/commerce/order-cases" : "/workspace/order-cases"}
-        className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
@@ -394,7 +394,7 @@ export async function OrderCaseDetailPage({
       {staff && actor.role === "admin" && (
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(result.order.id)}`}
-          className="rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reconcile}
         </Link>

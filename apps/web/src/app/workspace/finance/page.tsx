@@ -82,7 +82,7 @@ export default async function FinancialStatements({
       <nav aria-label={copy.currency} className="flex flex-wrap gap-4 text-sm">
         <Link
           href={href(1, null)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.all}
         </Link>
@@ -91,7 +91,7 @@ export default async function FinancialStatements({
             key={value}
             href={href(1, value)}
             aria-current={value === currency ? "page" : undefined}
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {value}
           </Link>
@@ -177,7 +177,7 @@ export default async function FinancialStatements({
           {result.page > 1 ? (
             <Link
               href={href(result.page - 1)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -188,7 +188,7 @@ export default async function FinancialStatements({
           {result.page < result.totalPages ? (
             <Link
               href={href(result.page + 1)}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>
@@ -220,7 +220,7 @@ export default async function FinancialStatements({
             {scopes.page > 1 ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.previous}
               </Link>
@@ -231,7 +231,7 @@ export default async function FinancialStatements({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.next}
               </Link>

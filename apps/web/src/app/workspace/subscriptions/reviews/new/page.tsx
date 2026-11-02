@@ -42,7 +42,7 @@ export default async function NewPlanReview({
           <p role="alert">{c.planChanged}</p>
           <Link
             href="/subscriptions"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.back}
           </Link>
@@ -57,7 +57,7 @@ export default async function NewPlanReview({
       <div className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href="/subscriptions"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.back}
         </Link>
@@ -74,7 +74,7 @@ export default async function NewPlanReview({
             {scopes.page > 1 ? (
               <Link
                 href={href(scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -85,7 +85,7 @@ export default async function NewPlanReview({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={href(scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>
@@ -94,7 +94,7 @@ export default async function NewPlanReview({
         ) : null}
         <Link
           href="/workspace/subscriptions/reviews"
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.history}
         </Link>
@@ -108,7 +108,7 @@ export default async function NewPlanReview({
           <p role="alert">{c.invalid}</p>
           <Link
             href="/subscriptions"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.back}
           </Link>

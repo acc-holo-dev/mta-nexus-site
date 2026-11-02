@@ -52,7 +52,7 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
           </p>
           <a
             href={returnPath}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reload}
           </a>

@@ -115,7 +115,7 @@ export default async function ResourceCartReceiptPage({
       )}
       <Link
         href="/workspace/library"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.library}
       </Link>

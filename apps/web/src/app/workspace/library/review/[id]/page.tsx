@@ -36,7 +36,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     <section className="mx-auto max-w-3xl space-y-5 py-8">
       <Link
         href="/workspace/library/reviews"
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
