@@ -8,10 +8,10 @@ export default async function Loading() {
     <section
       className="mx-auto max-w-5xl space-y-6 py-8"
       aria-busy="true"
-      aria-labelledby="saved-loading-heading"
+      aria-labelledby="saved-follows-loading-heading"
     >
       <header className="space-y-2">
-        <h1 id="saved-loading-heading" className="font-display text-primary">
+        <h1 id="saved-follows-loading-heading" className="font-display text-primary">
           {copy.title}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">

@@ -4,10 +4,11 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** awaiting format-fix push after `bed85829` Biome format red on purchases/sales report classNames.
+- **Tip SHA:** awaiting saved-loader heading-id fix after `e5c274cf` unit red (`saved-follows-loading-heading`).
 - **Last verified green tip:** `59326c30a91c009310d1ee314a024a4ebd4b6c10` / [CI 41395566631](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395566631) (lint/unit selected).
 - **Failed tip (not baseline):** `53badf5a…` / [CI 41395863320](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41395863320) — resource-browser RU claim-button focus flake after hydration.
 - **Failed tip (format):** `bed85829…` / [CI 41397465924](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41397465924) — Biome format on focus-ring classNames.
+- **Failed tip (unit):** `e5c274cf…` / [CI 41398117711](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41398117711) — saved loader heading id drift.
 - **Cancelled unverified tip:** `e7468237…` / [CI 41397169120](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41397169120) — superseded by docs tip concurrency before gates finished.
 - **Prior full selected-scope green:** `a27e55a5…` / [CI 41394529674](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41394529674).
 - PASS только на exact SHA; green CI ≠ deploy.
@@ -34,7 +35,7 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** Biome format fix for purchases/sales report; library version-history/versions loaders; claim focus poll retained from `e7468237`.
+**Последняя локальная волна:** restore `saved-follows-loading-heading` on /workspace/saved loader after unit contract drift.
 
 ## Свидетельства и ограничения
 
