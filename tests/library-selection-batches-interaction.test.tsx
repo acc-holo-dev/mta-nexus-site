@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],

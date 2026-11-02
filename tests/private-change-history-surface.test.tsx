@@ -127,7 +127,9 @@ it("requires sign in before loading either private journal", async () => {
   const orgGuest = renderToStaticMarkup(
     await OrganizationPage({ params: Promise.resolve({ id: "org" }) }),
   );
-  expect(orgGuest).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"');
+  expect(orgGuest).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"',
+  );
   expect(orgGuest).toContain(
     'href="/auth/register?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"',
   );

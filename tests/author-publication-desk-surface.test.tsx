@@ -204,7 +204,9 @@ it("requires a session on the desk and history without exposing target titles", 
   const historyGuest = renderToStaticMarkup(
     await History({ params: Promise.resolve({ id: "article" }) }),
   );
-  expect(historyGuest).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent%2Farticle%2Fhistory"');
+  expect(historyGuest).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fcontent%2Farticle%2Fhistory"',
+  );
   expect(historyGuest).toContain(
     'href="/auth/register?next=%2Fworkspace%2Fcontent%2Farticle%2Fhistory"',
   );

@@ -1,8 +1,9 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { organizationContentCopy } from "../apps/web/src/lib/organization-content-copy";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -22,10 +23,12 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
   organizationContentService: mocks,
 }));
+
 import Page, {
   generateMetadata,
 } from "../apps/web/src/app/workspace/organizations/[id]/content/page";
 import { OrganizationContentEditorPage } from "../apps/web/src/components/organization-content-editor-page";
+
 const organization = { id: "org", name: "Team", slug: "team" };
 const content = {
   id: "content",
@@ -76,7 +79,9 @@ it("does not load private organization data without a session", async () => {
   mocks.session.mockResolvedValue(null);
   const guest = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }));
   expect(guest).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"');
-  expect(guest).toContain('href="/auth/register?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"');
+  expect(guest).toContain(
+    'href="/auth/register?next=%2Fworkspace%2Forganizations%2Forg%2Fcontent"',
+  );
   expect(mocks.page).not.toHaveBeenCalled();
 });
 

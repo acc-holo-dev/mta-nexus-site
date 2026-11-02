@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({

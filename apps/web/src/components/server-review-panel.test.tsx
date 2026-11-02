@@ -7,6 +7,11 @@ vi.mock("./locale-context", () => ({
 }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo",
+  useRouter: () => ({
+    refresh: vi.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
 }));
 
 import { ServerReviewPanel } from "./server-review-panel";
