@@ -12,6 +12,10 @@ export function supportWorkspaceCopy(locale: Locale) {
         reopenOwn: "Проблема осталась",
         ownHelp:
           "Отметьте проблему решённой или переоткройте решённое обращение. Закрытое сотрудником обращение может переоткрыть только сотрудник.",
+        resolvedReplyReopens: "Ответ в решённом обращении снова откроет его.",
+        confirmStatus: "Изменить статус обращения?",
+        confirmStatusNote: "Новый статус сохранится только после подтверждения.",
+        cancel: "Отмена",
         saved: "Состояние обращения сохранено.",
         replySaved: "Ответ сохранён.",
         created: "Обращение создано.",
@@ -49,6 +53,10 @@ export function supportWorkspaceCopy(locale: Locale) {
         reopenOwn: "I still need help",
         ownHelp:
           "Mark your problem as solved or reopen a resolved case. Only staff can reopen a case that staff closed.",
+        resolvedReplyReopens: "A reply on a resolved case reopens it.",
+        confirmStatus: "Change this case status?",
+        confirmStatusNote: "The new status is saved only after you confirm.",
+        cancel: "Cancel",
         saved: "Case status saved.",
         replySaved: "Reply saved.",
         created: "Support case created.",

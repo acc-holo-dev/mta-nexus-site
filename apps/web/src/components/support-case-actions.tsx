@@ -1,7 +1,10 @@
+"use client";
+
 import { Button } from "@nexus/ui";
 import { getDictionary, type Locale } from "../lib/i18n";
 import type { SupportCaseData, SupportCaseStatus } from "../lib/support-response";
 import { supportWorkspaceCopy } from "../lib/support-workspace-copy";
+import { confirmAction } from "./confirm-action";
 export function SupportCaseActions({
   supportCase,
   staff,
@@ -36,15 +39,25 @@ export function SupportCaseActions({
           label: supportCase.status === "open" ? workspace.resolveOwn : workspace.reopenOwn,
         },
       ];
+  async function changeStatus(status: SupportCaseStatus, label: string) {
+    if (busy) return;
+    const confirmed = await confirmAction({
+      title: workspace.confirmStatus,
+      object: supportCase.subject,
+      consequences: workspace.confirmStatusNote,
+      confirmLabel: label,
+      cancelLabel: workspace.cancel,
+      closeLabel: workspace.cancel,
+      danger: status === "closed",
+    });
+    if (!confirmed) return;
+    onChangeStatus(status);
+  }
   return (
     <div className="space-y-2">
       {!staff && <p className="text-sm text-muted">{workspace.ownHelp}</p>}
       {supportCase.status === "resolved" && !staff ? (
-        <p className="text-sm text-secondary">
-          {locale === "ru"
-            ? "Ответ в решённом обращении снова откроет его."
-            : "A reply on a resolved case reopens it."}
-        </p>
+        <p className="text-sm text-secondary">{workspace.resolvedReplyReopens}</p>
       ) : null}
       <div className="flex flex-wrap gap-2">
         {actions.map((action) => (
@@ -53,7 +66,7 @@ export function SupportCaseActions({
             type="button"
             variant="outline"
             disabled={busy}
-            onClick={() => onChangeStatus(action.status)}
+            onClick={() => void changeStatus(action.status, action.label)}
             className={
               action.status === "closed"
                 ? "min-h-10 border-danger/30 text-danger"
