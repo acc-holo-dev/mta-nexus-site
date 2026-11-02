@@ -89,6 +89,10 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
 import HomePage from "../apps/web/src/app/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 

@@ -116,6 +116,10 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
 vi.mock("../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) =>
     createElement("article", null, product.title),

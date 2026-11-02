@@ -51,6 +51,10 @@ export function flattenReactTestTree(node: ReactNode): FlatTestElement[] {
       ...flattenReactTestTree(props.children),
     ];
   }
+  if (name === "GuestAuthLinks") {
+    const type = element.type as (props: Record<string, unknown>) => ReactNode;
+    return flattenReactTestTree(type(element.props));
+  }
   return [element, ...flattenReactTestTree(element.props.children as ReactNode)];
 }
 

@@ -139,7 +139,7 @@ it("keeps a malformed success response unresolved until the same request is conf
   expect(render().some((n) => n.props.role === "alert")).toBe(true);
   expect(button("Retry the same request").props.disabled).toBe(false);
   await click("Reload current state");
-  expect(h.reload).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
 });
 it.each([400, 401, 403, 404, 409])(
   "requires reloading after a definitive rejection %s",
@@ -156,7 +156,7 @@ it.each([400, 401, 403, 404, 409])(
     expect(h.refresh).not.toHaveBeenCalled();
     expect(button("Use this version: 3").props.disabled).toBe(true);
     await click("Reload current state");
-    expect(h.reload).toHaveBeenCalledOnce();
+    expect(h.refresh).toHaveBeenCalledOnce();
   },
 );
 it.each([429, 500, 503])(

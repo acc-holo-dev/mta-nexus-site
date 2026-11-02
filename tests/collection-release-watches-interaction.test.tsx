@@ -141,7 +141,7 @@ it("requires reload when collection membership changed", async () => {
     render().some((n) => n.type === "button" && n.props.children === "Retry the same request"),
   ).toBe(false);
   await click("Reload current state");
-  expect(h.reload).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
 });
 
 it("retains the reviewed collection endpoint when props change before a retry", async () => {

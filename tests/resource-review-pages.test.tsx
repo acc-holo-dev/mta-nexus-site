@@ -14,6 +14,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/library/review/prd_a",
+  useRouter: () => ({ refresh: vi.fn() }),
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
