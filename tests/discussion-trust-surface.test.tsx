@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/discussions",
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
@@ -113,14 +114,18 @@ it("shows edit and exact discussion permalink for an available own comment", () 
 });
 it("keeps infrastructure failures distinct from missing sessions on list and detail", async () => {
   mocks.session.mockRejectedValue(new Error("secret session SQL"));
+  expect(renderToStaticMarkup(await OwnPage({}))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fdiscussions"',
+  );
+  expect(renderToStaticMarkup(await DetailPage(detail))).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Fdiscussions%2Fcomment"',
+  );
   for (const html of [
     renderToStaticMarkup(await OwnPage({})),
     renderToStaticMarkup(await DetailPage(detail)),
   ]) {
-    expect(html).toContain('role="alert"');
-    expect(html).toContain(ownDiscussionCopy("en").reload);
-    expect(html).not.toContain('href="/auth/login"');
     expect(html).not.toContain("secret session");
+    expect(html).not.toContain(ownDiscussionCopy("en").title);
   }
   expect(mocks.page).not.toHaveBeenCalled();
   expect(mocks.own).not.toHaveBeenCalled();

@@ -31,7 +31,7 @@ export function CommunityReportHistory({
     <div className="mx-auto max-w-4xl space-y-5">
       <Link
         href={base}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
@@ -72,7 +72,7 @@ export function CommunityReportHistory({
         </Button>
         <Link
           href={path}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reset}
         </Link>
@@ -80,13 +80,13 @@ export function CommunityReportHistory({
       <div className="flex flex-wrap justify-between gap-3 text-sm">
         <Link
           href={changeHistoryHref(path, filters, { fresh: true })}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </Link>
         <a
           href={changeHistoryHref(`/api${base}/history/export`, filters, { until: page.until })}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.download}
         </a>
@@ -136,7 +136,7 @@ export function CommunityReportHistory({
       {page.nextCursor && (
         <Link
           href={changeHistoryHref(path, filters, { cursor: page.nextCursor, until: page.until })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.older}
         </Link>

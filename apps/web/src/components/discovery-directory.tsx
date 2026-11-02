@@ -105,14 +105,14 @@ export function DirectoryFilters({
                     })
                   : discoverHref({ ...state, query: "", page: 1 }, path)
               }
-              className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.clearQuery}
             </Link>
           ) : null}
           <Link
             href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reset}
           </Link>
@@ -171,7 +171,7 @@ export async function DirectoryResults({
       <div role="alert" className="nexus-panel space-y-3 p-5 text-danger">
         <p>{loadError}</p>
         <Link
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
         >
           {dictionary.searchButton}
@@ -240,7 +240,7 @@ export async function DirectoryResults({
           {copy.serversHint}{" "}
           <Link
             href="/servers"
-            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.master}
           </Link>
@@ -288,14 +288,14 @@ export async function DirectoryResults({
               <div className="flex flex-wrap gap-3 pt-1">
                 {state.query ? (
                   <Link
-                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     href={discoverHref({ ...state, query: "", page: 1 }, path)}
                   >
                     {copy.clearQuery}
                   </Link>
                 ) : null}
                 <Link
-                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   href={discoverHref({ type: state.type }, path)}
                 >
                   {copy.reset}

@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
@@ -39,19 +39,19 @@ export default async function VerificationHistoryPage({
     if (value !== undefined)
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseVerificationApplicationsQuery(params);
-  const historyPath = params.size
+  const returnPath = params.size
     ? `/workspace/verification/history?${params}`
     : "/workspace/verification/history";
-  let error = filters ? "" : copy.invalid,
-    signIn = false;
+  const sessionActor = await authService
+    .getSession((await cookies()).get("nexus_session")?.value)
+    .catch(() => null);
+  if (!sessionActor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
+  let error = filters ? "" : copy.invalid;
   const report = await (async () => {
     try {
-      const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-      if (!actor) {
-        signIn = true;
-        return null;
-      }
-      return filters ? await verificationWorkspaceService.applications(actor, filters) : null;
+      return filters ? await verificationWorkspaceService.applications(sessionActor, filters) : null;
     } catch (failure) {
       error =
         failure instanceof AppError
@@ -72,158 +72,147 @@ export default async function VerificationHistoryPage({
       >
         {labels.back}
       </Link>
-      {signIn ? (
-        <Link
-          href={authEntryHref("login", historyPath)}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {labels.signIn}
-        </Link>
-      ) : (
-        <>
-          <form
-            method="get"
-            action="/workspace/verification/history"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+      <form
+        method="get"
+        action="/workspace/verification/history"
+        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+      >
+        <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          {copy.query}
+          <input
+            type="search"
+            name="q"
+            maxLength={100}
+            defaultValue={filters?.query ?? ""}
+            className={`${platformFieldClass} block min-h-11`}
+          />
+        </label>
+        <label className="space-y-1 text-xs text-muted">
+          {copy.status}
+          <select
+            name="status"
+            defaultValue={filters?.status ?? "all"}
+            className={`${platformFieldClass} block min-h-11`}
           >
-            <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-              {copy.query}
-              <input
-                type="search"
-                name="q"
-                maxLength={100}
-                defaultValue={filters?.query ?? ""}
-                className={`${platformFieldClass} block min-h-11`}
-              />
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.status}
-              <select
-                name="status"
-                defaultValue={filters?.status ?? "all"}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                {(["all", "pending", "approved", "rejected"] as const).map((value) => (
-                  <option key={value} value={value}>
-                    {value === "all" ? copy.all : labels[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {labels.type}
-              <select
-                name="type"
-                defaultValue={filters?.type ?? "all"}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                <option value="all">{copy.all}</option>
-                {VERIFICATION_TYPES.map((value) => (
-                  <option key={value} value={value}>
-                    {labels[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Button type="submit">{copy.search}</Button>
-            <Link
-              prefetch={false}
-              href="/workspace/verification/history"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.clear}
-            </Link>
-          </form>
-          <p className="text-xs text-muted">{copy.live}</p>
+            {(["all", "pending", "approved", "rejected"] as const).map((value) => (
+              <option key={value} value={value}>
+                {value === "all" ? copy.all : labels[value]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="space-y-1 text-xs text-muted">
+          {labels.type}
+          <select
+            name="type"
+            defaultValue={filters?.type ?? "all"}
+            className={`${platformFieldClass} block min-h-11`}
+          >
+            <option value="all">{copy.all}</option>
+            {VERIFICATION_TYPES.map((value) => (
+              <option key={value} value={value}>
+                {labels[value]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Button type="submit">{copy.search}</Button>
+        <Link
+          prefetch={false}
+          href="/workspace/verification/history"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.clear}
+        </Link>
+      </form>
+      <p className="text-xs text-muted">{copy.live}</p>
+      <Link
+        prefetch={false}
+        href={
+          filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"
+        }
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
+        {copy.latest}
+      </Link>
+      {error && (
+        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
+          {error}
+        </p>
+      )}
+      {report && !report.items.length && (
+        <div className="nexus-panel space-y-3 p-6">
+          <p className="text-sm text-muted">{copy.empty}</p>
           <Link
             prefetch={false}
-            href={
-              filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"
-            }
+            href="/workspace/verification/history"
             className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
-            {copy.latest}
+            {copy.clear}
           </Link>
-          {error && (
-            <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-              {error}
-            </p>
-          )}
-          {report && !report.items.length && (
-            <div className="nexus-panel space-y-3 p-6">
-              <p className="text-sm text-muted">{copy.empty}</p>
-              <Link
-                prefetch={false}
-                href="/workspace/verification/history"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.clear}
-              </Link>
-            </div>
-          )}
-          <ul className="space-y-3">
-            {report?.items.map((item) => (
-              <li key={item.id}>
-                <article className="nexus-panel space-y-3 p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <h2 className="font-semibold text-primary">
-                      <Link
-                        prefetch={false}
-                        href={`/workspace/verification/${encodeURIComponent(item.id)}`}
-                      >
-                        {labels[item.targetType]}
-                      </Link>
-                    </h2>
-                    <span className="text-xs text-muted">{labels[item.status]}</span>
-                  </div>
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                    {item.notes}
-                  </p>
-                  <p className="break-all text-xs text-muted">{item.id}</p>
-                  <p className="text-xs text-muted">
-                    {labels.submittedAt}:{" "}
-                    <time dateTime={item.createdAt}>
-                      {new Date(item.createdAt).toLocaleString(
-                        locale === "ru" ? "ru-RU" : "en-US",
-                        { timeZone: "UTC" },
-                      )}{" "}
-                      UTC
-                    </time>
-                  </p>
+        </div>
+      )}
+      <ul className="space-y-3">
+        {report?.items.map((item) => (
+          <li key={item.id}>
+            <article className="nexus-panel space-y-3 p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <h2 className="font-semibold text-primary">
                   <Link
                     prefetch={false}
                     href={`/workspace/verification/${encodeURIComponent(item.id)}`}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
-                    {copy.open}
+                    {labels[item.targetType]}
                   </Link>
-                </article>
-              </li>
-            ))}
-          </ul>
-          {filters && report && (
-            <nav aria-label={copy.title} className="flex flex-wrap justify-between gap-4 text-sm">
-              {report.newerCursor && (
-                <Link
-                  prefetch={false}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  href={verificationApplicationsHref(filters, report.newerCursor)}
-                >
-                  {copy.newer}
-                </Link>
-              )}
-              {report.olderCursor && (
-                <Link
-                  prefetch={false}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  href={verificationApplicationsHref(filters, report.olderCursor)}
-                >
-                  {copy.older}
-                </Link>
-              )}
-            </nav>
+                </h2>
+                <span className="text-xs text-muted">{labels[item.status]}</span>
+              </div>
+              <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                {item.notes}
+              </p>
+              <p className="break-all text-xs text-muted">{item.id}</p>
+              <p className="text-xs text-muted">
+                {labels.submittedAt}:{" "}
+                <time dateTime={item.createdAt}>
+                  {new Date(item.createdAt).toLocaleString(
+                    locale === "ru" ? "ru-RU" : "en-US",
+                    { timeZone: "UTC" },
+                  )}{" "}
+                  UTC
+                </time>
+              </p>
+              <Link
+                prefetch={false}
+                href={`/workspace/verification/${encodeURIComponent(item.id)}`}
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.open}
+              </Link>
+            </article>
+          </li>
+        ))}
+      </ul>
+      {filters && report && (
+        <nav aria-label={copy.title} className="flex flex-wrap justify-between gap-4 text-sm">
+          {report.newerCursor && (
+            <Link
+              prefetch={false}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              href={verificationApplicationsHref(filters, report.newerCursor)}
+            >
+              {copy.newer}
+            </Link>
           )}
-        </>
+          {report.olderCursor && (
+            <Link
+              prefetch={false}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              href={verificationApplicationsHref(filters, report.olderCursor)}
+            >
+              {copy.older}
+            </Link>
+          )}
+        </nav>
       )}
     </div>
   );

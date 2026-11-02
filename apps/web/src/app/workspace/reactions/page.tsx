@@ -2,7 +2,7 @@ import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/doma
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { ReactionRemoval } from "../../../components/reaction-removal";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
@@ -22,28 +22,18 @@ export default async function ReactionsPage({
   const locale = await getRequestLocale(),
     copy = reactionCopy(locale);
   const rawSearchParams = (await searchParams) ?? {};
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor) {
-    const returnParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(rawSearchParams)) {
-      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
-      else if (value !== undefined) returnParams.append(key, value);
-    }
-    const returnPath = returnParams.size
-      ? `/workspace/reactions?${returnParams}`
-      : "/workspace/reactions";
-    return (
-      <div className="nexus-panel mx-auto max-w-md space-y-4 p-8 text-center">
-        <h1 className="text-xl font-bold text-primary">{copy.my}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(rawSearchParams)) {
+    if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+    else if (value !== undefined) returnParams.append(key, value);
   }
+  const returnPath = returnParams.size
+    ? `/workspace/reactions?${returnParams}`
+    : "/workspace/reactions";
+  const actor = await authService
+    .getSession((await cookies()).get("nexus_session")?.value)
+    .catch(() => null);
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
     if (Array.isArray(value)) for (const part of value) params.append(key, part);

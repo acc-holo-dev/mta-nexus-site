@@ -69,7 +69,7 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import RegisterServerPage from "../apps/web/src/app/workspace/servers/new/page";
+import { RegisterServerForm } from "../apps/web/src/components/register-server-form";
 import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
 
 describe("server forms use the same editable MTA metadata", () => {
@@ -113,7 +113,7 @@ describe("server forms use the same editable MTA metadata", () => {
   });
 
   it("makes map name available when registering a new server", () => {
-    const html = renderToStaticMarkup(createElement(RegisterServerPage));
+    const html = renderToStaticMarkup(createElement(RegisterServerForm));
     expect(html).toContain('name="mapName"');
     expect(html).toContain("Map name");
     expect(html).toContain('name="httpPort"');

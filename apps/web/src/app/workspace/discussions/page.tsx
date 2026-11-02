@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import {
   ownDiscussionHref,
   parseOwnDiscussionQuery,
@@ -28,48 +28,18 @@ export default async function OwnDiscussionsPage({
   const locale = await getRequestLocale(),
     copy = ownDiscussionCopy(locale);
   const rawSearchParams = (await searchParams) ?? {};
-  let authFailed = false;
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(rawSearchParams)) {
+    if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+    else if (value !== undefined) returnParams.append(key, value);
+  }
+  const returnPath = returnParams.size
+    ? `/workspace/discussions?${returnParams}`
+    : "/workspace/discussions";
   const actor = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      authFailed = true;
-      return null;
-    });
-  if (!actor) {
-    const returnParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(rawSearchParams)) {
-      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
-      else if (value !== undefined) returnParams.append(key, value);
-    }
-    const returnPath = returnParams.size
-      ? `/workspace/discussions?${returnParams}`
-      : "/workspace/discussions";
-    return (
-      <div className="nexus-panel mx-auto max-w-md space-y-4 p-8 text-center">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        {authFailed ? (
-          <>
-            <p role="alert" className="text-sm text-danger">
-              {copy.failed}
-            </p>
-            <a
-              href="/workspace/discussions"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reload}
-            </a>
-          </>
-        ) : (
-          <Link
-            href={authEntryHref("login", returnPath)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.signIn}
-          </Link>
-        )}
-      </div>
-    );
-  }
+    .catch(() => null);
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
     if (Array.isArray(value)) for (const part of value) params.append(key, part);

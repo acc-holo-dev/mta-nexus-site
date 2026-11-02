@@ -9,7 +9,10 @@ const state = vi.hoisted(() => ({
   application: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/workspace/verification/history",
+}));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
@@ -26,7 +29,6 @@ import History, {
   generateMetadata as historyMetadata,
 } from "../apps/web/src/app/workspace/verification/history/page";
 import { verificationApplicationsCopy } from "../apps/web/src/lib/verification-applications-copy";
-import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   params = { params: Promise.resolve({ id: "request" }) },
@@ -156,9 +158,10 @@ it("rejects duplicate filters and does not read private data without a session",
 it("distinguishes safe auth and target errors from an empty history", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const history = renderToStaticMarkup(await History({}));
-  expect(history).toContain(verificationCopy("en").unavailable);
+  expect(history).toContain('href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"');
   expect(history).not.toContain("PRIVATE_AUTH");
   expect(history).not.toContain(verificationApplicationsCopy("en").empty);
+  expect(history).not.toContain(verificationApplicationsCopy("en").title);
   state.application.mockRejectedValueOnce(new AppError("PRIVATE_TARGET", 404, "NOT_FOUND"));
   const detail = renderToStaticMarkup(await Detail(params));
   expect(detail).toContain('role="alert"');

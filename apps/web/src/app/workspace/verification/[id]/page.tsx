@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { VerificationApplicationAmend } from "../../../../components/verification-application-amend";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
@@ -27,24 +27,44 @@ export default async function VerificationApplicationPage({
     copy = verificationApplicationsCopy(locale),
     labels = verificationCopy(locale),
     { id } = await params;
-  let error = "",
-    signIn = false;
-  const application = await (async () => {
-    try {
-      const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-      if (!actor) {
-        signIn = true;
-        return null;
-      }
-      return await verificationWorkspaceService.application(actor, id);
-    } catch (failure) {
-      error =
-        failure instanceof AppError
-          ? verificationApplicationsError(locale, failure.code)
-          : labels.unavailable;
-      return null;
-    }
-  })();
+  const returnPath = `/workspace/verification/${encodeURIComponent(id)}`;
+  let actor: Awaited<ReturnType<typeof authService.getSession>> | null = null;
+  let authFailed = false;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    authFailed = true;
+  }
+  if (authFailed) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6">
+        <header>
+          <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
+          <p className="mt-2 text-sm text-muted">{copy.privacy}</p>
+        </header>
+        <Link
+          href="/workspace/verification/history"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.title}
+        </Link>
+        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
+          {labels.unavailable}
+        </p>
+      </div>
+    );
+  }
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
+  let error = "";
+  const application = await verificationWorkspaceService.application(actor, id).catch((failure) => {
+    error =
+      failure instanceof AppError
+        ? verificationApplicationsError(locale, failure.code)
+        : labels.unavailable;
+    return null;
+  });
   const eventLabels = {
     "verification.requested": copy.requested,
     "verification.application_updated": copy.updated,
@@ -68,14 +88,6 @@ export default async function VerificationApplicationPage({
       >
         {copy.title}
       </Link>
-      {signIn && (
-        <Link
-          href={authEntryHref("login", `/workspace/verification/${encodeURIComponent(id)}`)}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {labels.signIn}
-        </Link>
-      )}
       {error && (
         <p role="alert" className="nexus-panel p-4 text-sm text-danger">
           {error}

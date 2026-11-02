@@ -7,6 +7,9 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/saved",
+}));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));

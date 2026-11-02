@@ -106,7 +106,7 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-import RegisterServerPage from "../apps/web/src/app/workspace/servers/new/page";
+import { RegisterServerForm } from "../apps/web/src/components/register-server-form";
 import { ServerClaimControlPanel } from "../apps/web/src/components/server-claim-control-panel";
 import { ServerDetailsForm } from "../apps/web/src/components/server-details-form";
 
@@ -116,7 +116,7 @@ describe("server workspace UI surface", () => {
     (locale) => {
       localeState.locale = locale;
       const copy = getDictionary(locale).serverRegistration;
-      const html = renderToStaticMarkup(createElement(RegisterServerPage));
+      const html = renderToStaticMarkup(createElement(RegisterServerForm));
 
       expect(html).toContain(copy.title);
       expect(html).toContain('data-ui="input"');

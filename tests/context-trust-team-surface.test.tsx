@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/organizations/org/team",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -226,9 +227,9 @@ it("does not load private team data for guests and separates session failures fr
   expect(mocks.team).not.toHaveBeenCalled();
   mocks.session.mockRejectedValueOnce(new Error("private session"));
   const failed = renderToStaticMarkup(await TeamPage(teamParams));
-  expect(failed).toContain('role="alert"');
-  expect(failed).not.toContain('href="/auth/login"');
+  expect(failed).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fteam"');
   expect(failed).not.toContain("private session");
+  expect(failed).not.toContain(organizationTeamCopy("en").title);
 });
 it.each(["constructor", "toString", "__proto__"])(
   "renders unsupported legacy role %s as text without granting controls",

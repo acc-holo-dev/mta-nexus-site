@@ -7,7 +7,7 @@ import { resourceReviewCopy, resourceReviewState } from "../lib/resource-review-
 import { resourceReviewPageQuery } from "../lib/resource-review-query";
 import { authService } from "../lib/services/auth-service";
 import { resourceReviewService } from "../lib/services/resource-review-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ResourceReviewDecisionForm } from "./resource-review-controls";
 import { ResourceReviewPager } from "./resource-review-list";
 
@@ -25,20 +25,21 @@ export async function ResourceReviewReportScreen({
 }) {
   const [locale, cookieStore] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = resourceReviewCopy(locale),
-    actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+    actor = await authService
+      .getSession(cookieStore.get("nexus_session")?.value)
+      .catch(() => null);
   const base = staff ? "/admin/commerce/reviews" : "/workspace/review-reports";
-  const loginReturn = id ? `${base}/${encodeURIComponent(id)}` : base;
-  if (!actor)
-    return (
-      <section className="py-12">
-        <Link
-          href={authEntryHref("login", loginReturn)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined) continue;
+    for (const part of Array.isArray(value) ? value : [value]) returnParams.append(key, part);
+  }
+  const loginReturn = id
+    ? `${base}/${encodeURIComponent(id)}`
+    : returnParams.size
+      ? `${base}?${returnParams}`
+      : base;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={loginReturn} />;
   if (staff && !["admin", "moderator"].includes(actor.role)) notFound();
   if (id) {
     const report = await resourceReviewService.reportDetail(actor, staff, id).catch((error) => {

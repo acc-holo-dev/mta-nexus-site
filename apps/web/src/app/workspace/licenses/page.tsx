@@ -16,7 +16,19 @@ import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { licenseArchiveQuery, licenseArchiveUrl } from "../../../lib/license-archive-query";
 import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
+import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 import { authService } from "../../../lib/services/auth-service";
+
+function hasNonDefaultLicenseFilters(filters: ReturnType<typeof licenseArchiveQuery>) {
+  return (
+    filters.page > 1 ||
+    filters.status !== "all" ||
+    filters.binding !== "all" ||
+    filters.term !== "all" ||
+    filters.sort !== "newest" ||
+    Boolean(filters.q)
+  );
+}
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -71,7 +83,21 @@ export default async function LicensesHistoryPage({
         </Link>
       )}
       {result.licenses.length === 0 ? (
-        <p className="py-12 text-sm text-secondary">{copy.emptyLicenses}</p>
+        <div className="space-y-3 py-12 text-sm text-secondary">
+          <p>
+            {hasNonDefaultLicenseFilters(filters)
+              ? copy.emptyLicensesFiltered
+              : copy.emptyLicenses}
+          </p>
+          {hasNonDefaultLicenseFilters(filters) && (
+            <Link
+              href="/workspace/licenses"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {getLicenseMaintenanceCopy(locale).clear}
+            </Link>
+          )}
+        </div>
       ) : (
         <ol className="space-y-3">
           {result.licenses.map((license) => (
@@ -135,7 +161,7 @@ export default async function LicensesHistoryPage({
           {result.page > 1 ? (
             <Link
               href={licenseArchiveUrl({ ...filters, page: result.page - 1 })}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -148,7 +174,7 @@ export default async function LicensesHistoryPage({
           {result.page < result.totalPages && (
             <Link
               href={licenseArchiveUrl({ ...filters, page: result.page + 1 })}
-              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>

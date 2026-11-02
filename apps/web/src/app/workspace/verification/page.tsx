@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
-import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { VerificationWorkspace } from "../../../components/verification-workspace";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -45,17 +44,7 @@ export default async function VerificationPage({
     const returnPath = returnParams.size
       ? `/workspace/verification?${returnParams}`
       : "/workspace/verification";
-    return (
-      <div className="nexus-panel space-y-4 p-8">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <Link
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          href={authEntryHref("login", returnPath)}
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const query = await searchParams,
     filters = verificationPageQuery(query),

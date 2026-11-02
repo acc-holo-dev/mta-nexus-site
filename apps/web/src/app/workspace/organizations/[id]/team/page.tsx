@@ -2,7 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { OrganizationTeamDirectory } from "../../../../../components/organization-team-directory";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
@@ -36,45 +36,22 @@ export default async function TeamPage({
     locale = await getRequestLocale(),
     copy = organizationTeamCopy(locale),
     team = getOrganizationCopy(locale);
-  let authFailed = false;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      authFailed = true;
-      return null;
-    });
-  if (!actor)
-    return (
-      <div className="nexus-panel mx-auto max-w-md space-y-4 p-6">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        {authFailed ? (
-          <>
-            <p role="alert" className="text-sm text-danger">
-              {copy.unavailable}
-            </p>
-            <a
-              href={organizationTeamHref(id, { query: "" })}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {team.reload}
-            </a>
-          </>
-        ) : (
-          <Link
-            href={authEntryHref("login", organizationTeamHref(id, { query: "" }))}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {locale === "ru" ? "Войти" : "Sign in"}
-          </Link>
-        )}
-      </div>
-    );
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {})) {
     if (Array.isArray(value)) for (const part of value) query.append(key, part);
     else if (value !== undefined) query.append(key, value);
   }
-  const filters = parseOrganizationTeamQuery(query);
+  const teamFilters = parseOrganizationTeamQuery(query);
+  const returnPath = teamFilters
+    ? organizationTeamHref(id, teamFilters)
+    : query.size
+      ? `/workspace/organizations/${encodeURIComponent(id)}/team?${query}`
+      : organizationTeamHref(id, { query: "" });
+  const actor = await authService
+    .getSession((await cookies()).get("nexus_session")?.value)
+    .catch(() => null);
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const filters = teamFilters;
   let error = filters ? "" : copy.invalid;
   const result = filters
     ? await organizationTeamService.page(id, actor, filters).catch((failure: unknown) => {

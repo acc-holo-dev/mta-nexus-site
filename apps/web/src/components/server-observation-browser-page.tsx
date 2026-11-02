@@ -60,7 +60,7 @@ export async function ServerObservationBrowserPage({
       </p>
       <a
         href={href}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {stats.retry}
       </a>
@@ -80,7 +80,7 @@ export async function ServerObservationBrowserPage({
         <h1 className="text-xl font-bold text-primary">{copy.signIn}</h1>
         <Link
           href={authEntryHref("login", path)}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {stats.signInAction}
         </Link>
@@ -159,7 +159,7 @@ function ServerObservationBrowserPanel({
       <header className="space-y-3">
         <Link
           href={base}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {managed ? stats.management : stats.back}
         </Link>
@@ -172,7 +172,7 @@ function ServerObservationBrowserPanel({
             window: report.window,
             end: report.windowEnd,
           })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.statistics}
         </Link>
@@ -237,7 +237,7 @@ function ServerObservationBrowserPanel({
             password: "all",
             responding: "all",
           })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reset}
         </Link>
@@ -254,7 +254,7 @@ function ServerObservationBrowserPanel({
               password: "all",
               responding: "all",
             })}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reset}
           </Link>
@@ -315,7 +315,7 @@ function ServerObservationBrowserPanel({
       <nav aria-label={stats.navigation} className="flex flex-wrap gap-4">
         <a
           href={serverObservationBrowserHref(path, state)}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </a>
@@ -323,7 +323,7 @@ function ServerObservationBrowserPanel({
           <Link
             prefetch={false}
             href={serverObservationBrowserHref(path, state, report.previousCursor)}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.newer}
           </Link>
@@ -332,7 +332,7 @@ function ServerObservationBrowserPanel({
           <Link
             prefetch={false}
             href={serverObservationBrowserHref(path, state, report.nextCursor)}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.older}
           </Link>
