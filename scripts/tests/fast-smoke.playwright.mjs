@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
+
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 
@@ -28,6 +29,11 @@ test("registration, authenticated workspace and logout on the production image",
   );
   await assertAxeAccessibility(page, testInfo, "authenticated-workspace");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  // Account chrome confirms sign-out before DELETE (wave110); confirmLabel matches signOut.
+  await page
+    .getByRole("dialog", { name: "Sign out" })
+    .getByRole("button", { name: "Sign out", exact: true })
+    .click();
   // Sign-out keeps a return path (`?next=…`); glob `**/auth/login` does not match query URLs.
   await page.waitForURL(/\/auth\/login(?:\?|$)/);
   await page.goto("/workspace");
