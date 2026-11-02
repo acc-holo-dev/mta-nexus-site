@@ -1,13 +1,13 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Button } from "@nexus/ui";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
 import {
   confirmedPrivacyUpdate,
-  parseEditablePrivacy,
   type EditablePrivacy,
+  parseEditablePrivacy,
 } from "../lib/profile-privacy-contract";
 import {
   profilePrivacyCopy,
@@ -235,13 +235,13 @@ export function ProfilePrivacyEditor({
           <div className="flex flex-wrap gap-4">
             <Link
               href={`/users/${encodeURIComponent(profile.username)}?preview=guest`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.openGuestPreview}
             </Link>
             <Link
               href={`/users/${encodeURIComponent(profile.username)}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.publicProfile}
             </Link>

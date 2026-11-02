@@ -114,7 +114,7 @@ export default async function AcquisitionHistoryPage({
               {item.downloadable && item.slug ? (
                 <Link
                   href={`/market/${item.slug}`}
-                  className="inline-block text-sm text-accent underline"
+                  className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.open}
                 </Link>

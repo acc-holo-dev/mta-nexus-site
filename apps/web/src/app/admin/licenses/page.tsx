@@ -49,13 +49,19 @@ export default async function LicensesModerationPage({
     `/admin/licenses?${new URLSearchParams({ page: String(page), status, q: text })}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/admin" className="text-sm text-accent underline">
+      <Link
+        href="/admin"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.adminBack}
       </Link>
       <h1 className="font-display text-primary">{copy.moderation}</h1>
       <p className="text-sm text-secondary">{copy.policy}</p>
       {user.role === "admin" && (
-        <Link href="/admin/licenses/maintenance" className="text-sm text-accent underline">
+        <Link
+          href="/admin/licenses/maintenance"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {getLicenseMaintenanceCopy(locale).maintenance}
         </Link>
       )}
@@ -99,7 +105,7 @@ export default async function LicensesModerationPage({
               </p>
               <Link
                 href={`/admin/licenses/${license.id}`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.manage} · {license.id}
               </Link>

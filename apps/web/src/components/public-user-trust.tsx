@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Avatar } from "@nexus/ui";
+import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import type { PublicUserTrust } from "../lib/public-user-trust-contract";
 import { trustCopy } from "../lib/public-user-trust-copy";
@@ -18,14 +18,14 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href={profile}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
       <header className="nexus-panel space-y-3 p-6">
         <Link
           href={`${profile}/trust/history`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {approvalCopy(locale).title}
         </Link>
@@ -107,7 +107,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
             <p className="font-numeric text-2xl font-bold text-primary">{data.publications}</p>
             <Link
               href={`${profile}/activity`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.activity}
             </Link>
@@ -120,7 +120,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         <p className="text-sm text-secondary">{copy.limitsDescription}</p>
         <Link
           href="/workspace/verification"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.settings}
         </Link>

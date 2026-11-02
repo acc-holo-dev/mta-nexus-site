@@ -177,14 +177,14 @@ export default async function ServerDetailPage({
           <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap md:max-w-md md:justify-end">
             <Link
               href={`/servers/${encodeURIComponent(server.slug)}/statistics?window=${historyWindow}`}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base bg-inset px-4 py-3 text-sm font-semibold text-accent"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base bg-inset px-4 py-3 text-sm font-semibold text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {serverStatisticsCopy(locale).open}
             </Link>
             {server.visibility === "public" && server.status === "active" && (
               <Link
                 href={`/servers/${encodeURIComponent(server.slug)}/trust`}
-                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base px-4 py-3 text-sm font-semibold text-accent"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base px-4 py-3 text-sm font-semibold text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {contextTrustCopy(locale).title}
               </Link>

@@ -59,7 +59,7 @@ export default async function CommercialPlansAdmin({
         <Link
           href="/admin/commerce/plans"
           aria-current={!status ? "page" : undefined}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.all}
         </Link>
@@ -68,7 +68,7 @@ export default async function CommercialPlansAdmin({
             key={value}
             href={`?status=${value}`}
             aria-current={status === value ? "page" : undefined}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy[value]}
           </Link>
@@ -80,7 +80,7 @@ export default async function CommercialPlansAdmin({
             <li key={plan.id} className="nexus-panel space-y-2 p-5">
               <Link
                 href={`/admin/commerce/plans/${encodeURIComponent(plan.id)}`}
-                className="break-words font-semibold text-accent underline"
+                className="break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {locale === "ru" ? plan.titleRu : plan.titleEn}
               </Link>

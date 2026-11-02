@@ -54,7 +54,10 @@ export default async function ResourceCartReceiptPage({
   });
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/workspace/acquisitions/receipts" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/acquisitions/receipts"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.title}
       </Link>
       <h1 className="font-display text-primary">{copy.receipt}</h1>
@@ -108,7 +111,7 @@ export default async function ResourceCartReceiptPage({
               {item.downloadable ? (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className="text-sm text-accent underline"
+                  className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   prefetch={false}
                 >
                   {copy.versions}

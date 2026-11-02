@@ -265,7 +265,7 @@ export function NotificationInbox({
               event.preventDefault();
               void exportPage();
             }}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.export}
           </a>
@@ -336,7 +336,7 @@ export function NotificationInbox({
           variant="ghost"
           disabled={busy}
           onClick={() => void refresh()}
-          className="h-auto min-h-11 px-2 text-accent underline"
+          className="h-auto min-h-11 px-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.retry}
         </Button>
@@ -353,7 +353,7 @@ export function NotificationInbox({
             <Link
               prefetch={false}
               href="/notifications"
-              className="inline-flex min-h-11 items-center text-accent underline"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
@@ -410,7 +410,7 @@ export function NotificationInbox({
                       <Link
                         prefetch={false}
                         href={item.link}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {copy.view}
                       </Link>
@@ -420,7 +420,7 @@ export function NotificationInbox({
                       variant="ghost"
                       disabled={disabled}
                       onClick={() => void mark(!item.isRead, [item.id])}
-                      className="h-auto min-h-11 px-0 text-sm text-accent underline"
+                      className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {item.isRead ? copy.markOneUnread : copy.markOneRead}
                     </Button>
@@ -436,7 +436,7 @@ export function NotificationInbox({
           <Link
             prefetch={false}
             href={notificationInboxHref("/notifications", filters, page.newerCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.newer}
           </Link>
@@ -445,7 +445,7 @@ export function NotificationInbox({
           <Link
             prefetch={false}
             href={notificationInboxHref("/notifications", filters, page.olderCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.older}
           </Link>

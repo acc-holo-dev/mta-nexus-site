@@ -147,7 +147,10 @@ export function ResourceReleaseWatchControl({
       <div className="space-y-2">
         <p className="text-sm text-secondary">{copy.signInRequired}</p>
         <p className="text-xs text-muted">{copy.note}</p>
-        <Link href={loginHref} className="text-sm text-accent underline">
+        <Link
+          href={loginHref}
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.signIn}
         </Link>
       </div>
@@ -174,7 +177,10 @@ export function ResourceReleaseWatchControl({
         </p>
       ) : null}
       {!hasAccess && acquireHref ? (
-        <Link href={acquireHref} className="text-sm text-accent underline">
+        <Link
+          href={acquireHref}
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.acquireRequired}
         </Link>
       ) : null}
@@ -185,7 +191,7 @@ export function ResourceReleaseWatchControl({
           onClick={save}
           disabled={busy || saved || (!canToggle && !watch.enabled)}
           aria-busy={busy}
-          className="text-accent"
+          className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {busy ? copy.busy : watch.enabled ? copy.unwatch : copy.watch}
         </Button>
@@ -202,7 +208,7 @@ export function ResourceReleaseWatchControl({
               onClick={save}
               disabled={busy}
               aria-busy={busy}
-              className="text-accent"
+              className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {busy ? copy.busy : copy.retrySame}
             </Button>
@@ -212,7 +218,7 @@ export function ResourceReleaseWatchControl({
             variant="outline"
             onClick={() => window.location.reload()}
             disabled={busy}
-            className="text-accent"
+            className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reloadState}
           </Button>

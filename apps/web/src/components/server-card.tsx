@@ -163,7 +163,10 @@ export function ServerCard({
 
       <div className="flex flex-1 flex-col gap-2 p-3.5">
         <h3 className="line-clamp-1 text-xs font-heading text-primary">
-          <Link href={profileHref} className="transition-colors hover:text-accent">
+          <Link
+            href={profileHref}
+            className="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {server.name}
           </Link>
         </h3>
@@ -201,7 +204,7 @@ export function ServerCard({
           <a
             href={connectUri}
             aria-label={`${copy.connect}: ${server.name}`}
-            className="inline-flex items-center rounded-lg border border-base bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent"
+            className="inline-flex items-center rounded-lg border border-base bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.connect}
           </a>
@@ -259,7 +262,7 @@ export function HomeNetworkServerCard({
         <a
           href={connectUri}
           aria-label={`${copy.connect}: ${name}`}
-          className="inline-flex items-center rounded-lg border border-base bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent"
+          className="inline-flex items-center rounded-lg border border-base bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.connect}
         </a>

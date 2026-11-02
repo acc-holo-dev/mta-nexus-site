@@ -56,7 +56,10 @@ export async function ServerStatisticsPage({
         <p role="alert" className="text-sm text-danger">
           {copy.unavailable}
         </p>
-        <a href={path} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+        <a
+          href={path}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.retry}
         </a>
       </div>
@@ -92,7 +95,10 @@ export async function ServerStatisticsPage({
         <p role="alert" className="text-sm text-danger">
           {copy.invalid}
         </p>
-        <Link href={path} className="inline-block min-h-11 text-sm text-accent underline">
+        <Link
+          href={path}
+          className="inline-block min-h-11 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.refresh}
         </Link>
       </div>

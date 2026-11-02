@@ -49,7 +49,10 @@ export default async function LibraryUpdatesPage({
     `/workspace/library/updates?${new URLSearchParams({ filter: value, page: String(page) })}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/workspace/library" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/library"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.updates}</h1>
@@ -106,7 +109,7 @@ export default async function LibraryUpdatesPage({
                 ) : null}
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className="inline-block text-sm text-accent underline"
+                  className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.manage}
                 </Link>

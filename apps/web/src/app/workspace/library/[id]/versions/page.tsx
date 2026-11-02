@@ -73,7 +73,10 @@ export default async function LibraryVersionsPage({
   });
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/workspace/library/updates" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/library/updates"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.updates}
       </Link>
       <h1 className="font-display text-primary">{copy.versions}</h1>
@@ -153,7 +156,7 @@ export default async function LibraryVersionsPage({
         />
         <Link
           href="/workspace/library/watches"
-          className="inline-block text-sm text-accent underline"
+          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {resourceReleaseWatchesCopy(locale).title}
         </Link>

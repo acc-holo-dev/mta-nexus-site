@@ -25,7 +25,10 @@ export function ResourceSubmissionSuccess({
         >
           {copy.openStatus}
         </Link>
-        <Link href="/workspace/resources" className="block text-accent underline">
+        <Link
+          href="/workspace/resources"
+          className="block text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {dictionary.authorResources.title}
         </Link>
       </div>

@@ -1,15 +1,15 @@
+import { AppError } from "@nexus/domain";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
 import { getRequestLocale } from "../lib/i18n-server";
-import { publicContextTrustService } from "../lib/services/public-context-trust-service";
 import {
+  type ContextKind,
   contextTrustHref,
   parseContextTrustQuery,
-  type ContextKind,
 } from "../lib/public-context-trust-contract";
 import { contextTrustCopy, contextTrustError } from "../lib/public-context-trust-copy";
 import { approvalCopy } from "../lib/public-verification-history-copy";
+import { publicContextTrustService } from "../lib/services/public-context-trust-service";
 export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -53,7 +53,10 @@ export async function PublicContextTrustPage({
   const base = `/${kind === "organization" ? "organizations" : "servers"}/${encodeURIComponent(slug)}`;
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href={base} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <Link
+        href={base}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <header className="nexus-panel space-y-3 p-6">
@@ -112,7 +115,7 @@ export async function PublicContextTrustPage({
                 <dd>
                   <Link
                     href={contextTrustHref("organization", page.subject.organization.slug)}
-                    className="break-words text-sm text-accent underline"
+                    className="break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {page.subject.organization.name}
                   </Link>
@@ -125,7 +128,7 @@ export async function PublicContextTrustPage({
           </dl>
           <Link
             href={`${base}/${kind === "organization" ? "activity" : "updates"}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.activity}
           </Link>
@@ -136,7 +139,7 @@ export async function PublicContextTrustPage({
         <p className="text-sm text-muted">{approvals.scope}</p>
         <a
           href={latest}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </a>
@@ -167,7 +170,7 @@ export async function PublicContextTrustPage({
           <Link
             prefetch={false}
             href={contextTrustHref(kind, slug, page.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.older}
           </Link>

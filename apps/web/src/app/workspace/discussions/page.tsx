@@ -54,7 +54,7 @@ export default async function OwnDiscussionsPage({
             </p>
             <a
               href="/workspace/discussions"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reload}
             </a>
@@ -62,7 +62,7 @@ export default async function OwnDiscussionsPage({
         ) : (
           <Link
             href={authEntryHref("login", returnPath)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.signIn}
           </Link>
@@ -89,7 +89,7 @@ export default async function OwnDiscussionsPage({
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href="/workspace"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.workspace}
       </Link>
@@ -130,12 +130,15 @@ export default async function OwnDiscussionsPage({
         </Button>
         <Link
           href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reset}
         </Link>
       </form>
-      <a href={latest} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <a
+        href={latest}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.latest}
       </a>
       {error && (
@@ -153,7 +156,7 @@ export default async function OwnDiscussionsPage({
           {(filters?.cursor || filters?.query || filters?.availability) && (
             <Link
               href="/workspace/discussions"
-              className="inline-flex min-h-11 items-center text-accent underline"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
@@ -178,7 +181,7 @@ export default async function OwnDiscussionsPage({
                 <Link
                   prefetch={false}
                   href={`/workspace/discussions/${encodeURIComponent(item.id)}`}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.open}
                 </Link>
@@ -186,7 +189,7 @@ export default async function OwnDiscussionsPage({
                   <Link
                     prefetch={false}
                     href={`/articles/${encodeURIComponent(item.slug)}?comment=${encodeURIComponent(item.id)}#comment-${encodeURIComponent(item.id)}`}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {copy.discussion}
                   </Link>

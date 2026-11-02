@@ -4,8 +4,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `d8dd25e825da381fc149dd7ec52937b659370b5c` (`fix(web): clear filters from inventory and order-case empties`).
-- **Verified CI green on that tip:** [CI 41441839599](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41441839599) (lint/unit/db/image + production browser smoke selected; resource-browser skipped).
+- **Tip SHA:** `204e48ffe5daa62482257168105ac44405b88046` (`fix(web): add aria-live polite across residual loading shells`).
+- **Verified CI green on that tip:** [CI 41443043221](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41443043221) (selected scope incl. lint/unit/db/image/smoke; browsers ran on this tip).
 - **Prior selected green:** `89738363…` / [CI 41436177810](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41436177810).
 - **Prior selected green:** `65b0afcd…` / [CI 41435049421](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41435049421).
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
@@ -36,11 +36,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `d8dd25e8…` selected green (CI 41441839599); broad loading aria-live sweep next.
+**Последняя локальная волна:** tip `204e48ff…` selected green (CI 41443043221); residual accent-link focus sweep next.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `d8dd25e8…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `204e48ff…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

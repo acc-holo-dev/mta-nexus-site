@@ -76,7 +76,7 @@ export default async function AuthorContentPage({
       {signIn ? (
         <Link
           href={authEntryHref("login", returnPath)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {labels.signIn}
         </Link>
@@ -154,7 +154,7 @@ export default async function AuthorContentPage({
             </Button>
             <Link
               href="/workspace/content"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
@@ -163,7 +163,7 @@ export default async function AuthorContentPage({
           <Link
             prefetch={false}
             href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.latest}
           </Link>
@@ -192,7 +192,7 @@ export default async function AuthorContentPage({
                 filters?.source !== "all") && (
                 <Link
                   href="/workspace/content"
-                  className="inline-flex min-h-11 items-center text-accent underline"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.reset}
                 </Link>
@@ -239,7 +239,7 @@ export default async function AuthorContentPage({
                             key={context.href}
                             prefetch={false}
                             href={context.href}
-                            className="inline-flex min-h-11 items-center break-words text-xs text-accent underline"
+                            className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                           >
                             {context.name}
                           </Link>
@@ -250,7 +250,7 @@ export default async function AuthorContentPage({
                           key={tag}
                           prefetch={false}
                           href={authorPublicationDeskHref({ ...filters, tag, cursor: undefined })}
-                          className="inline-flex min-h-11 items-center break-words text-xs text-accent underline"
+                          className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         >
                           #{tag}
                         </Link>
@@ -260,14 +260,14 @@ export default async function AuthorContentPage({
                       <Link
                         prefetch={false}
                         href={`/workspace/content/${encodeURIComponent(item.id)}`}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {labels.edit}
                       </Link>
                       <Link
                         prefetch={false}
                         href={`/workspace/content/${encodeURIComponent(item.id)}/history`}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {copy.history}
                       </Link>
@@ -275,7 +275,7 @@ export default async function AuthorContentPage({
                         <Link
                           prefetch={false}
                           href={`/articles/${encodeURIComponent(item.slug)}`}
-                          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         >
                           {labels.publicView}
                         </Link>
@@ -291,7 +291,7 @@ export default async function AuthorContentPage({
                 <Link
                   prefetch={false}
                   href={authorPublicationDeskHref(filters, report.newerCursor)}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.newer}
                 </Link>
@@ -300,7 +300,7 @@ export default async function AuthorContentPage({
                 <Link
                   prefetch={false}
                   href={authorPublicationDeskHref(filters, report.olderCursor)}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.older}
                 </Link>

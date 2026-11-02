@@ -261,7 +261,7 @@ export default async function Page({
                         {release.effective.buildId !== release.latest.buildId && (
                           <Link
                             href={`${resourceHref}/versions/compare?${new URLSearchParams({ from: release.effective.buildId, to: release.latest.buildId })}`}
-                            className="block text-accent underline"
+                            className="block text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                           >
                             {v.compareVersions}
                           </Link>
@@ -307,7 +307,7 @@ export default async function Page({
                     <li key={membership.id} className="border-t border-base pt-2">
                       <Link
                         href={collectionHref(membership.id)}
-                        className="break-words text-accent underline"
+                        className="break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       >
                         {membership.name}
                       </Link>{" "}

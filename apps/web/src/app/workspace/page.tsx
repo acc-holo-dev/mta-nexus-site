@@ -184,13 +184,13 @@ export default async function WorkspacePage() {
             <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/workspace/library"
-                className="text-xs font-semibold text-accent hover:underline"
+                className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {libraryCopy.title}
               </Link>
               <Link
                 href="/market?maxPrice=0"
-                className="text-xs font-semibold text-accent hover:underline"
+                className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {dictionary.workspace.browseResources}
               </Link>
@@ -222,7 +222,7 @@ export default async function WorkspacePage() {
                   {entitlement.downloadable && entitlement.slug && (
                     <Link
                       href={`/market/${entitlement.slug}`}
-                      className="shrink-0 text-xs font-semibold text-accent hover:underline"
+                      className="shrink-0 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {dictionary.workspace.open}
                     </Link>
@@ -246,13 +246,13 @@ export default async function WorkspacePage() {
             <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/workspace/servers"
-                className="text-xs font-semibold text-accent hover:underline"
+                className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {serverCopy.openAll}
               </Link>
               <Link
                 href="/workspace/servers/new"
-                className="text-xs font-semibold text-accent hover:underline"
+                className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {dictionary.workspace.registerServer}
               </Link>

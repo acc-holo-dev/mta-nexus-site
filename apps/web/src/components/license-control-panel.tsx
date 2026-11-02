@@ -321,7 +321,10 @@ export function LicenseControlPanel({
         </p>
       )}
       {completedRevision && !error && (
-        <p role="status" className="text-sm text-accent">
+        <p
+          role="status"
+          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.success}
         </p>
       )}
@@ -330,7 +333,7 @@ export function LicenseControlPanel({
         variant="ghost"
         disabled={busy}
         onClick={() => window.location.reload()}
-        className="h-auto px-0 text-sm text-accent underline"
+        className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.refresh}
       </Button>

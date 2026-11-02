@@ -63,7 +63,10 @@ export default async function LicensesHistoryPage({
         {copy.licenseNotice}
       </p>
       {can(user, "admin.moderation") && (
-        <Link href="/admin/licenses" className="text-sm text-accent underline">
+        <Link
+          href="/admin/licenses"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {getLicenseControlCopy(locale).moderation}
         </Link>
       )}
@@ -119,7 +122,7 @@ export default async function LicensesHistoryPage({
               </dl>
               <Link
                 href={`/workspace/licenses/${license.id}`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {getLicenseControlCopy(locale).manage}
               </Link>

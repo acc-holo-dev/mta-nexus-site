@@ -155,7 +155,7 @@ export function LicenseRuntimeProbe({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto px-0 text-sm text-accent underline"
+            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             disabled={busy}
             onClick={() => void check()}
           >
@@ -204,7 +204,10 @@ export function LicenseRuntimeProbe({
         </label>
       )}
       {confirmed && (
-        <p role="status" className="text-sm text-accent">
+        <p
+          role="status"
+          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.releaseSaved}{" "}
           <time dateTime={confirmed.leaseExpiresAt}>
             {new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "medium" }).format(

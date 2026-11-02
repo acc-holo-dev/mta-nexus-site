@@ -184,7 +184,7 @@ export function ContentModerationControls({
       )}
       {saved && (
         <a
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={workspace ? moderationDetailHref(contentId) : "/admin"}
         >
           {moderationCopy(locale).reload}
@@ -199,7 +199,7 @@ export function ContentModerationControls({
             type="button"
             disabled={pending !== null}
             onClick={() => window.location.reload()}
-            className="h-auto min-h-11 px-0 text-sm text-accent underline"
+            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {locale === "ru" ? "Загрузить сохранённую версию" : "Reload saved version"}

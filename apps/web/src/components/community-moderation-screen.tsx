@@ -86,7 +86,10 @@ export async function CommunityModerationScreen({
       <p role="alert" className="text-sm text-danger">
         {message}
       </p>
-      <a className="inline-flex min-h-11 items-center text-sm text-accent underline" href={href}>
+      <a
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        href={href}
+      >
         {copy.reload}
       </a>
     </div>
@@ -112,7 +115,7 @@ export async function CommunityModerationScreen({
       return (
         <div className="space-y-5">
           <Link
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href="/admin/community"
           >
             {copy.back}
@@ -125,7 +128,7 @@ export async function CommunityModerationScreen({
     return (
       <div className="mx-auto max-w-4xl space-y-6">
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href="/admin/community"
         >
           {copy.back}
@@ -136,7 +139,7 @@ export async function CommunityModerationScreen({
             {types[item.type]} · {copy[item.status]}
           </p>
           <Link
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href={`/users/${encodeURIComponent(item.author.username)}`}
           >
             {item.author.name} (@{item.author.username})
@@ -147,7 +150,7 @@ export async function CommunityModerationScreen({
           {item.status === "published" && (
             <Link
               href={`/articles/${encodeURIComponent(item.slug)}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.publicPage}
             </Link>
@@ -158,7 +161,7 @@ export async function CommunityModerationScreen({
                 <Link
                   key={context.href}
                   href={context.href}
-                  className="block break-words text-sm text-accent underline"
+                  className="block break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {context.name}
                 </Link>
@@ -183,7 +186,7 @@ export async function CommunityModerationScreen({
           <p className="text-sm text-muted">{copy.description}</p>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}/discussion`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {moderatedDiscussionCopy(locale).open}
           </Link>
@@ -200,7 +203,7 @@ export async function CommunityModerationScreen({
           <h2 className="font-heading text-primary">{copy.history}</h2>
           <p className="text-sm text-muted">{copy.historyScope}</p>
           <a
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href={moderationDetailHref(id)}
           >
             {copy.latest}
@@ -230,7 +233,7 @@ export async function CommunityModerationScreen({
           {nextCursor && (
             <Link
               prefetch={false}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={moderationDetailHref(id, nextCursor)}
             >
               {copy.older}
@@ -259,7 +262,7 @@ export async function CommunityModerationScreen({
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href="/admin/reports"
         >
           {locale === "ru" ? "Жалобы сообщества" : "Community reports"}
@@ -324,7 +327,7 @@ export async function CommunityModerationScreen({
               {copy.apply}
             </Button>
             <Link
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href="/admin/community"
             >
               {copy.reset}
@@ -337,7 +340,7 @@ export async function CommunityModerationScreen({
               {parsed.data.items.map((item) => (
                 <li key={item.id} className="nexus-panel space-y-2 p-5">
                   <Link
-                    className="block break-words font-semibold text-accent underline"
+                    className="block break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     href={moderationDetailHref(item.id)}
                   >
                     {item.title}
@@ -353,7 +356,7 @@ export async function CommunityModerationScreen({
           )}
           <nav aria-label={copy.title} className="flex flex-wrap gap-4">
             <a
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={moderationHref(filters)}
             >
               {copy.latest}
@@ -361,7 +364,7 @@ export async function CommunityModerationScreen({
             {parsed.data.nextCursor && (
               <Link
                 prefetch={false}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={moderationHref(filters, parsed.data.nextCursor)}
               >
                 {copy.older}

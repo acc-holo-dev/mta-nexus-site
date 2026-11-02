@@ -20,7 +20,7 @@ export function ReportEvidenceLinks({ urls, label }: { urls: string[]; label: st
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${label} ${index + 1}: ${url}`}
-          className="break-all text-accent underline"
+          className="break-all text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {index + 1}
         </a>

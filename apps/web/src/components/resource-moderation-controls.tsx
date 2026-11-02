@@ -159,7 +159,7 @@ export function ResourceModerationControls({
           </p>
           <Link
             href={unavailableBuildSupportHref()}
-            className="mt-2 inline-flex text-accent underline"
+            className="mt-2 inline-flex text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             onClick={() =>
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }

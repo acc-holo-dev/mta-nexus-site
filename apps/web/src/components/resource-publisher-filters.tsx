@@ -114,7 +114,10 @@ export function ResourcePublisherFilters({
           <Button type="submit" className="min-h-11">
             {copy.apply}
           </Button>
-          <Link className="text-sm text-accent underline" href="/workspace/resources">
+          <Link
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            href="/workspace/resources"
+          >
             {copy.reset}
           </Link>
         </div>

@@ -28,7 +28,7 @@ export function ResourceReviewList({
               {review.author && (
                 <Link
                   href={`/users/${encodeURIComponent(review.author.username)}`}
-                  className="text-accent hover:underline"
+                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {review.author.displayName || review.author.username}
                 </Link>

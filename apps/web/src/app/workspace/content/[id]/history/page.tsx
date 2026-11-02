@@ -80,7 +80,7 @@ export default async function PublicationHistoryPage({
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href="/workspace/content"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {labels.back}
       </Link>
@@ -94,7 +94,7 @@ export default async function PublicationHistoryPage({
       {signIn && (
         <Link
           href={authEntryHref("login", returnPath)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {labels.signIn}
         </Link>
@@ -112,7 +112,7 @@ export default async function PublicationHistoryPage({
           <Link
             prefetch={false}
             href={`/workspace/content/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {labels.edit}
           </Link>
@@ -129,7 +129,7 @@ export default async function PublicationHistoryPage({
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
               <Link
                 href="/support"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.support}
               </Link>
@@ -138,7 +138,7 @@ export default async function PublicationHistoryPage({
           <Link
             prefetch={false}
             href={path}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.historyLatest}
           </Link>
@@ -178,7 +178,7 @@ export default async function PublicationHistoryPage({
             <Link
               prefetch={false}
               href={`${path}?${new URLSearchParams({ cursor: report.olderCursor })}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.historyOlder}
             </Link>

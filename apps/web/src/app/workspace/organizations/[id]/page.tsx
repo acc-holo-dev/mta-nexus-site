@@ -58,7 +58,10 @@ export default async function OrganizationPage({
   const parsed = organizationWorkspaceSchema.safeParse(result);
   return (
     <div className="space-y-5">
-      <Link className="text-sm text-accent underline" href="/workspace/organizations">
+      <Link
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        href="/workspace/organizations"
+      >
         {copy.back}
       </Link>
       {parsed.success ? (
@@ -77,7 +80,7 @@ export default async function OrganizationPage({
             {failure}
           </p>
           <Link
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href={`/workspace/organizations/${encodeURIComponent(id)}`}
           >
             {copy.reload}

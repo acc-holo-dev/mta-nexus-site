@@ -31,7 +31,10 @@ export default async function EditPublicationPage({ params }: { params: Promise<
   const initial = item ? parseEditableContent(JSON.parse(JSON.stringify(item))) : null;
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/workspace/content" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/content"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.edit}</h1>

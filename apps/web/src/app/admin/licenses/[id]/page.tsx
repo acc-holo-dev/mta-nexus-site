@@ -28,7 +28,10 @@ export default async function ModerateLicensePage({ params }: { params: Promise<
   if (!license) notFound();
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/admin/licenses" className="text-sm text-accent underline">
+      <Link
+        href="/admin/licenses"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {getLicenseControlCopy(locale).moderation}
       </Link>
       <LicenseDetailView license={license} locale={locale} />
@@ -48,7 +51,7 @@ export default async function ModerateLicensePage({ params }: { params: Promise<
       />
       <Link
         href={`/admin/licenses/${encodeURIComponent(id)}/history`}
-        className="text-sm text-accent underline"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {getLicenseControlCopy(locale).fullHistory}
       </Link>

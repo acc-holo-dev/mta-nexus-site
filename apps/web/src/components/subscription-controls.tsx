@@ -158,7 +158,7 @@ export function SubscriptionControls(props: Props) {
       </Button>
       <Link
         href={`${subscriptionAccountHref(props.action === "cancel" ? props.organizationId : props.scope === "organization" ? organizationId || undefined : undefined).replace("/workspace/subscriptions", "/workspace/subscriptions/history")}`}
-        className="ml-4 text-accent underline"
+        className="ml-4 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.history}
       </Link>

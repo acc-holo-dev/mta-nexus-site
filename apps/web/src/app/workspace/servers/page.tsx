@@ -55,7 +55,7 @@ export default async function ManagedServersPage({
         )}
         <Link
           href={authEntryHref("login", managedServerHref(filters, page))}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.signIn}
         </Link>
@@ -73,7 +73,7 @@ export default async function ManagedServersPage({
         </p>
         <a
           href={managedServerHref(filters, page)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {serverWorkspaceCopy(locale).reload}
         </a>
@@ -92,7 +92,10 @@ export default async function ManagedServersPage({
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <Link href="/workspace" className="text-xs font-semibold text-accent hover:underline">
+          <Link
+            href="/workspace"
+            className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             ← {copy.back}
           </Link>
           <h1 className="font-display text-primary">{copy.title}</h1>

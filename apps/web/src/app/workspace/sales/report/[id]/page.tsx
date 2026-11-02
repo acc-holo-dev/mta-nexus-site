@@ -79,7 +79,7 @@ export default async function SellerSalePage({
           organizationId,
           attribution,
         })}
-        className="text-sm text-accent underline"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.back}
       </Link>
@@ -111,7 +111,7 @@ export default async function SellerSalePage({
       {sale.inCurrentPortfolio !== false ? (
         <Link
           href={`/workspace/resources/${encodeURIComponent(sale.productId)}`}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.manage}
         </Link>

@@ -30,7 +30,7 @@ export function CommunityReportGroups({
     <div className="mx-auto max-w-5xl space-y-5">
       <Link
         href="/admin/reports"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
@@ -92,7 +92,7 @@ export function CommunityReportGroups({
           </Button>
           <Link
             href={path}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reset}
           </Link>
@@ -135,7 +135,7 @@ export function CommunityReportGroups({
               <div className="flex flex-wrap gap-4">
                 <Link
                   href={item.reportHref}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {labels.detail}
                 </Link>
@@ -143,7 +143,7 @@ export function CommunityReportGroups({
                   <>
                     <Link
                       href={`${item.targetType === "content" ? `/admin/community/${item.target.contentId}/reports` : `/admin/community/${item.target.contentId}/discussion/${item.targetId}/reports`}?${contextQuery}`}
-                      className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.inspect}
                     </Link>
@@ -153,7 +153,7 @@ export function CommunityReportGroups({
                           ? `/admin/community/${item.target.contentId}`
                           : `/admin/community/${item.target.contentId}/discussion/${item.targetId}`
                       }
-                      className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.context}
                     </Link>
@@ -167,14 +167,14 @@ export function CommunityReportGroups({
       <nav aria-label={copy.title} className="flex flex-wrap gap-4">
         <Link
           href={reportGroupsHref(filters, path, { fresh: true })}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </Link>
         {page.nextCursor && (
           <Link
             href={reportGroupsHref(filters, path, { cursor: page.nextCursor, until: page.until })}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.more}
           </Link>

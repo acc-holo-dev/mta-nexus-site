@@ -131,7 +131,7 @@ export function ModeratedDiscussionRemoval({
       )}
       {blocked && (
         <a
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
         >
           {general.reload}

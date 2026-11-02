@@ -96,7 +96,10 @@ export async function DiscussionReportsScreen({
         <p role="alert" className="text-danger">
           {failure || copy.unavailable}
         </p>
-        <a href={path} className="inline-flex min-h-11 items-center text-accent underline">
+        <a
+          href={path}
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {general.reload}
         </a>
       </section>
@@ -112,7 +115,7 @@ export async function DiscussionReportsScreen({
         </p>
         <Link
           href={moderatedDiscussionHref(id, undefined, undefined, commentId)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>
@@ -175,7 +178,7 @@ export async function DiscussionReportsScreen({
         <Link
           prefetch={false}
           href={discussionReportsHref(id, commentId, filters ?? undefined)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {general.latest}
         </Link>
@@ -183,7 +186,7 @@ export async function DiscussionReportsScreen({
           <Link
             prefetch={false}
             href={discussionReportsHref(id, commentId, filters ?? undefined, data.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {general.older}
           </Link>

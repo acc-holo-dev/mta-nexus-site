@@ -276,7 +276,10 @@ export function ServerReviewPanel({
       <div className="nexus-panel space-y-4 p-5">
         <h3 className="text-sm font-semibold text-primary">{copy.write}</h3>
         {!signedIn ? (
-          <Link href={loginHref} className="text-sm text-accent underline">
+          <Link
+            href={loginHref}
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.signIn}
           </Link>
         ) : (
@@ -365,7 +368,7 @@ export function ServerReviewPanel({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto px-0 text-sm text-accent underline"
+            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             onClick={() => window.location.reload()}
           >
             {copy.reload}

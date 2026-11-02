@@ -126,7 +126,7 @@ export function OrganizationTeamDirectory({
       {canManageOrganization(data.role) ? (
         <Link
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.management}
         </Link>
@@ -230,7 +230,7 @@ export function OrganizationTeamDirectory({
               {data.role === "owner" && ["admin", "developer", "member"].includes(member.role) && (
                 <Link
                   href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}?${new URLSearchParams({ q: member.username })}`}
-                  className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                  className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.transfer}
                 </Link>
@@ -254,7 +254,7 @@ export function OrganizationTeamDirectory({
       {blocked && (
         <a
           href={organizationTeamHref(data.organization.id, filters)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.uncertain}
         </a>
@@ -262,7 +262,7 @@ export function OrganizationTeamDirectory({
       <nav aria-label={copy.title} className="flex flex-wrap gap-4">
         <a
           href={organizationTeamHref(data.organization.id, filters)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </a>
@@ -270,7 +270,7 @@ export function OrganizationTeamDirectory({
           <Link
             prefetch={false}
             href={organizationTeamHref(data.organization.id, filters, data.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.older}
           </Link>

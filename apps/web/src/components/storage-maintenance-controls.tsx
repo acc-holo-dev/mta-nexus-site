@@ -85,7 +85,7 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
               <Button
                 type="button"
                 variant="ghost"
-                className="h-auto px-0 text-accent underline"
+                className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 disabled={pending}
                 onClick={() => {
                   setOwner(owner);

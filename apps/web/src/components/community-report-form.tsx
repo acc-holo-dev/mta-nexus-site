@@ -107,7 +107,7 @@ export function CommunityReportForm({
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-9 px-0 text-xs text-accent underline"
+          className="h-auto min-h-9 px-0 text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           disabled={pending}
           onClick={() => setOpen(false)}
         >
@@ -123,7 +123,10 @@ export function CommunityReportForm({
         </Link>
       ) : result ? (
         <div className="space-y-2">
-          <p role="status" className="text-sm text-accent">
+          <p
+            role="status"
+            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {result.created ? copy.saved : copy.duplicate}
           </p>
           <Link

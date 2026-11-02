@@ -1,11 +1,11 @@
+import { AppError } from "@nexus/domain";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
-import { PublicationFeed } from "./publication-feed";
-import { publicationFeedView } from "../lib/publication-feed-view";
-import { publicationCopy } from "../lib/publication-feed-copy";
 import { getRequestLocale } from "../lib/i18n-server";
+import { publicationCopy } from "../lib/publication-feed-copy";
+import { publicationFeedView } from "../lib/publication-feed-view";
 import { publicationFeedService } from "../lib/services/publication-feed-service";
+import { PublicationFeed } from "./publication-feed";
 export async function PublicProfileActivity({
   kind,
   handle,
@@ -29,7 +29,10 @@ export async function PublicProfileActivity({
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <Link href={profilePath} className="text-sm text-accent underline">
+        <Link
+          href={profilePath}
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">

@@ -361,7 +361,7 @@ export function SupportCenter({
                     type="button"
                     variant="ghost"
                     disabled={creating}
-                    className="mt-2 h-auto min-h-9 px-0 text-accent underline"
+                    className="mt-2 h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     onClick={() => {
                       clearSupportObjectContext();
                       setObjectContext(null);
@@ -409,7 +409,7 @@ export function SupportCenter({
             <div role="status">
               <Link
                 href={`${basePath}/${encodeURIComponent(createdCaseId)}`}
-                className="block text-sm font-semibold text-accent underline"
+                className="block text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {workspaceCopy.created}: {createdCaseId}
               </Link>
@@ -509,7 +509,7 @@ export function SupportCenter({
               <Button
                 type="button"
                 onClick={() => void loadCases()}
-                className="h-auto min-h-10 px-0 text-sm text-accent underline"
+                className="h-auto min-h-10 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 variant="ghost"
               >
                 {workspaceCopy.reload}
@@ -571,7 +571,7 @@ export function SupportCenter({
               {page > 1 ? (
                 <Link
                   href={supportHref(basePath, initialFilters, page - 1)}
-                  className="min-h-9 text-sm text-accent underline"
+                  className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {dictionary.market.previousPage}
                 </Link>
@@ -584,7 +584,7 @@ export function SupportCenter({
               {page < totalPages ? (
                 <Link
                   href={supportHref(basePath, initialFilters, page + 1)}
-                  className="min-h-9 text-sm text-accent underline"
+                  className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {dictionary.market.nextPage}
                 </Link>

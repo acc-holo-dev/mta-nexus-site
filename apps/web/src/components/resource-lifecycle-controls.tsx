@@ -176,7 +176,7 @@ export function ResourceLifecycleControls({
           </p>
           <Link
             href={unavailableBuildSupportHref()}
-            className="mt-2 inline-flex text-accent underline"
+            className="mt-2 inline-flex text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             onClick={() =>
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }
@@ -193,7 +193,7 @@ export function ResourceLifecycleControls({
           {product.status === "suspended" ? (
             <Link
               href={unavailableBuildSupportHref()}
-              className="inline-flex text-sm text-accent underline"
+              className="inline-flex text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() => stashSupportObjectContext({ productId: product.id })}
             >
               {locale === "ru" ? "Открыть обращение" : "Open a support case"}

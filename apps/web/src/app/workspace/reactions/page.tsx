@@ -37,7 +37,7 @@ export default async function ReactionsPage({
         <h1 className="text-xl font-bold text-primary">{copy.my}</h1>
         <Link
           href={authEntryHref("login", returnPath)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.signIn}
         </Link>
@@ -63,7 +63,7 @@ export default async function ReactionsPage({
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href="/workspace"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
@@ -106,12 +106,15 @@ export default async function ReactionsPage({
         </Button>
         <Link
           href="/workspace/reactions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reset}
         </Link>
       </form>
-      <a href={latest} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <a
+        href={latest}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.latest}
       </a>
       {error && (
@@ -129,7 +132,7 @@ export default async function ReactionsPage({
           {(filters?.cursor || filters?.query || filters?.reaction) && (
             <Link
               href="/workspace/reactions"
-              className="inline-flex min-h-11 items-center text-accent underline"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>

@@ -133,7 +133,7 @@ export default async function PlanReviewsPage({
               <li key={r.id} className="nexus-panel space-y-3 p-5">
                 <Link
                   href={planReviewHref(r.id, query.organizationId)}
-                  className="break-words text-lg text-accent underline"
+                  className="break-words text-lg text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {locale === "ru" ? r.terms.titleRu : r.terms.titleEn}
                 </Link>

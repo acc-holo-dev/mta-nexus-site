@@ -111,12 +111,15 @@ export async function ModeratedDiscussionScreen({
         <p role="alert" className="text-danger">
           {failure || general.unavailable}
         </p>
-        <a href={href} className="inline-flex min-h-11 items-center text-accent underline">
+        <a
+          href={href}
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {general.reload}
         </a>
         <Link
           href={moderatedDiscussionHref(id)}
-          className="inline-flex min-h-11 items-center text-accent underline"
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>
@@ -154,14 +157,14 @@ export async function ModeratedDiscussionScreen({
         <nav className="flex flex-wrap gap-4">
           <Link
             href={`/admin/community/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.publication}
           </Link>
           {commentId && (
             <Link
               href={moderatedDiscussionHref(id)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.back}
             </Link>
@@ -169,7 +172,7 @@ export async function ModeratedDiscussionScreen({
           {commentId && (
             <Link
               href={discussionReportsHref(id, commentId)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {discussionReportsCopy(locale).open}
             </Link>
@@ -205,7 +208,7 @@ export async function ModeratedDiscussionScreen({
               {general.apply}
             </Button>
             <Link
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={moderatedDiscussionHref(id)}
             >
               {general.reset}
@@ -223,7 +226,7 @@ export async function ModeratedDiscussionScreen({
                   </p>
                   <Link
                     href={moderatedDiscussionHref(id, undefined, undefined, item.id)}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {copy.review}
                   </Link>
@@ -307,7 +310,7 @@ export async function ModeratedDiscussionScreen({
             undefined,
             commentId,
           )}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {general.latest}
         </Link>
@@ -322,7 +325,7 @@ export async function ModeratedDiscussionScreen({
               data.nextCursor,
               commentId,
             )}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {general.older}
           </Link>

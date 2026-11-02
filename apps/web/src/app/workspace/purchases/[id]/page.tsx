@@ -53,7 +53,10 @@ export default async function OrderDetailsPage({
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <header className="space-y-3 border-b border-base pb-5">
-        <Link href="/workspace/purchases" className="text-sm text-accent underline">
+        <Link
+          href="/workspace/purchases"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.backToPurchases}
         </Link>
         <h1 className="break-words font-display text-primary">
@@ -81,19 +84,19 @@ export default async function OrderDetailsPage({
       </header>
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/operations`}
-        className="inline-block text-sm text-accent underline"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {getCommercialCopy(locale).paymentOperations}
       </Link>
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/support`}
-        className="inline-block text-sm text-accent underline"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {orderCaseCopy(locale).title}
       </Link>
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/terms`}
-        className="inline-block text-sm text-accent underline"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {orderTermsCopy(locale).title}
       </Link>
@@ -123,14 +126,17 @@ export default async function OrderDetailsPage({
                   {item.hasCurrentAccess ? copy.accessReady : copy.accessMissing}
                 </p>
                 {item.hasCurrentAccess && (
-                  <Link href="/workspace/library" className="mr-4 text-sm text-accent underline">
+                  <Link
+                    href="/workspace/library"
+                    className="mr-4 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
                     {getResourceCommerceCopy(locale).library}
                   </Link>
                 )}
                 {item.productSlug && (
                   <Link
                     href={`/market/${item.productSlug}`}
-                    className="text-sm text-accent underline"
+                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {copy.openResource}
                   </Link>

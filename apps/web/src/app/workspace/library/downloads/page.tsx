@@ -71,7 +71,10 @@ export default async function ResourceDownloadsPage({
     filtered = query.status !== "all" || query.days !== "all" || Boolean(query.resourceId);
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/workspace/library" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/library"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
@@ -112,7 +115,7 @@ export default async function ResourceDownloadsPage({
         {query.resourceId ? (
           <Link
             href={resourceDeliveriesUrl({ ...query, resourceId: null, page: 1 })}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reset}
           </Link>
@@ -135,7 +138,7 @@ export default async function ResourceDownloadsPage({
           { ...query, page: result.page },
           "/api/library/downloads/export",
         )}
-        className="inline-block text-sm text-accent underline"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.export}
       </a>
@@ -154,7 +157,7 @@ export default async function ResourceDownloadsPage({
               <div className="flex flex-wrap gap-4">
                 <Link
                   href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
-                  className="text-sm text-accent underline"
+                  className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.details}
                 </Link>

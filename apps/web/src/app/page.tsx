@@ -167,7 +167,7 @@ export default async function HomePage() {
           action={
             <Link
               href="/servers"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               <span>{dictionary.home.openDirectory}</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -211,7 +211,7 @@ export default async function HomePage() {
           action={
             <Link
               href="/market?maxPrice=0"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               <span>{dictionary.home.viewAllResources}</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -244,7 +244,7 @@ export default async function HomePage() {
           action={
             <Link
               href="/articles"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               <span>{dictionary.home.allUpdates}</span>
               <ArrowRight className="h-3.5 w-3.5" />

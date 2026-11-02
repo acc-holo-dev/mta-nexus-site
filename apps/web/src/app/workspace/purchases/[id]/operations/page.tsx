@@ -69,7 +69,7 @@ export default async function OrderOperationsPage({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}`}
-        className="text-sm text-accent underline"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>

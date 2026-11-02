@@ -38,13 +38,13 @@ export default async function TrustPage({ params }: { params: Promise<{ username
         </p>
         <a
           href={`/users/${encodeURIComponent(username)}/trust`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reload}
         </a>
         <Link
           href={`/users/${encodeURIComponent(username)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>

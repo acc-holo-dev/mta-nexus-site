@@ -169,7 +169,10 @@ export function ResourceDownloadButton({
         </p>
       )}
       {failure === "signIn" && (
-        <Link href={loginHref} className="text-sm text-accent underline">
+        <Link
+          href={loginHref}
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.downloadSignIn}
         </Link>
       )}
@@ -184,7 +187,7 @@ export function ResourceDownloadButton({
       receipt.version === version ? (
         <Link
           href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {resourceDeliveriesCopy(locale).details}
         </Link>

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { ProductDependencyResolution } from "../lib/product-dependency-resolution";
 import { getDictionary, type Locale } from "../lib/i18n";
+import type { ProductDependencyResolution } from "../lib/product-dependency-resolution";
 
 export function ProductDependencyList({
   declared,
@@ -33,7 +33,7 @@ export function ProductDependencyList({
           <div key={dependencyItem.slug}>
             <Link
               href={`/market/${dependencyItem.product.slug}`}
-              className="font-mono text-accent hover:underline"
+              className="font-mono text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {dependencyItem.product.slug}
             </Link>

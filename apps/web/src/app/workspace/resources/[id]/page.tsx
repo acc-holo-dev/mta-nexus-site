@@ -61,7 +61,10 @@ export default async function ManageResourcePage({
   const publisherCopy = getResourcePublisherCopy(locale);
   return (
     <div className="space-y-8">
-      <Link href="/workspace/resources" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/resources"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -195,7 +198,7 @@ export default async function ManageResourcePage({
                 )}
               <Link
                 href={`/workspace/resources/${id}/builds/${build.id}`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {buildCopy.manage}
               </Link>

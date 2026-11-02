@@ -138,7 +138,7 @@ export function ContentReactions({
       </div>
       {state && !state.authenticated && (
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={loginHref}
         >
           {copy.signIn}
@@ -146,7 +146,7 @@ export function ContentReactions({
       )}
       {state?.authenticated && (
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href="/workspace/reactions"
         >
           {copy.my}

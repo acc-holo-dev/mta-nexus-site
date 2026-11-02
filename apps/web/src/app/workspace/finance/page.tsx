@@ -207,13 +207,19 @@ export default async function FinancialStatements({
       ) : null}
       <section className="space-y-3 border-t border-base pt-5">
         <h2 className="text-lg font-semibold">{copy.organizations}</h2>
-        <Link href="/workspace/finance" className="text-sm text-accent underline">
+        <Link
+          href="/workspace/finance"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.personal}
         </Link>
         <ul className="flex flex-wrap gap-4">
           {scopes.scopes.map((scope) => (
             <li key={scope.id}>
-              <Link href={href(1, currency, scope.id)} className="text-sm text-accent underline">
+              <Link
+                href={href(1, currency, scope.id)}
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {scope.name}
               </Link>
             </li>

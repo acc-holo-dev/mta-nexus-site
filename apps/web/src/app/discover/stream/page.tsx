@@ -52,7 +52,7 @@ export default async function StreamPage({
         <p className="text-sm text-muted">{copy.description}</p>
         <Link
           href={discoverHref(state ?? fallback)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.paged}
         </Link>
@@ -63,7 +63,7 @@ export default async function StreamPage({
             key={type}
             aria-current={state?.type === type ? "page" : undefined}
             href={discoveryStreamHref({ ...fallback, type, query: state?.query ?? "" })}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {dictionary[type]}
           </Link>
@@ -77,7 +77,7 @@ export default async function StreamPage({
           </p>
           <a
             href={discoveryStreamHref(state ?? fallback)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.latest}
           </a>

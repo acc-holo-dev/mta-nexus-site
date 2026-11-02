@@ -273,7 +273,7 @@ export default async function Page({
                         {resource.currentAvailable && (
                           <Link
                             href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
-                            className="text-sm text-accent underline"
+                            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                           >
                             {c.resourceCollections}
                           </Link>

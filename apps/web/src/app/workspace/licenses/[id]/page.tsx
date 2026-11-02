@@ -34,7 +34,10 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
       : undefined;
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/workspace/licenses" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/licenses"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {getLicenseControlCopy(locale).back}
       </Link>
       <LicenseDetailView license={license} locale={locale} />
@@ -56,7 +59,7 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
       />
       <Link
         href={`/workspace/licenses/${encodeURIComponent(id)}/history`}
-        className="text-sm text-accent underline"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {getLicenseControlCopy(locale).fullHistory}
       </Link>

@@ -180,7 +180,7 @@ export function OrganizationWorkspacePanel({
     <div className="space-y-6">
       <Link
         href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {organizationTeamCopy(locale).title}
       </Link>
@@ -201,7 +201,7 @@ export function OrganizationWorkspacePanel({
       />
       {manageable && (
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}
         >
           {organizationContentCopy(locale).title}
@@ -209,7 +209,7 @@ export function OrganizationWorkspacePanel({
       )}
       {manageable && (
         <Link
-          className="inline-flex min-h-9 items-center text-sm text-accent underline"
+          className="inline-flex min-h-9 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/activity`}
         >
           {governanceCopy.history}
@@ -420,7 +420,10 @@ export function OrganizationWorkspacePanel({
           </p>
         )}
         {message && (
-          <p role="status" className="text-sm text-accent">
+          <p
+            role="status"
+            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {message}
           </p>
         )}
@@ -439,7 +442,7 @@ export function OrganizationWorkspacePanel({
           type="button"
           variant="ghost"
           disabled={busy}
-          className="h-auto px-0 text-sm text-accent underline"
+          className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           onClick={() => router.refresh()}
         >
           {copy.reload}

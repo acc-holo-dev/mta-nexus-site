@@ -57,7 +57,7 @@ export default async function ServerManagementPage({
       <div>
         <Link
           href="/workspace/servers"
-          className="text-xs font-semibold text-accent hover:underline"
+          className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           ← {serverCopy.title}
         </Link>

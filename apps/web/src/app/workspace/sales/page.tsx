@@ -45,10 +45,16 @@ export default async function SalesHistoryPage({
 
   return (
     <HistoryShell copy={copy} area="sales">
-      <Link href="/workspace/sales/report" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/sales/report"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {sellerSalesCopy(locale).title}
       </Link>
-      <Link href="/workspace/finance" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/finance"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {getFinancialCopy(locale).title}
       </Link>
       <p role="note" className="text-sm text-muted">

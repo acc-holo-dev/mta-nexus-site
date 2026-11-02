@@ -56,7 +56,7 @@ export default async function ResourceLibraryPage({
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", libraryHref(filter, page))}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.signIn}
         </Link>
@@ -159,13 +159,16 @@ export default async function ResourceLibraryPage({
           description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilterHint}
           action={
             result.counts.all === 0 ? (
-              <Link href="/market?maxPrice=0" className="text-sm font-medium text-accent underline">
+              <Link
+                href="/market?maxPrice=0"
+                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {copy.browse}
               </Link>
             ) : (
               <Link
                 href={libraryHref("all", 1)}
-                className="text-sm font-medium text-accent underline"
+                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.clearFilters}
               </Link>
@@ -205,13 +208,13 @@ export default async function ResourceLibraryPage({
                   <div className="flex flex-wrap gap-4">
                     <Link
                       href={`/market/${item.slug}`}
-                      className="inline-block text-sm text-accent underline"
+                      className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {copy.open}
                     </Link>
                     <Link
                       href={releaseHistoryHref(item.slug)}
-                      className="inline-block text-sm text-accent underline"
+                      className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {releaseCopy.browse}
                     </Link>
@@ -222,19 +225,19 @@ export default async function ResourceLibraryPage({
               )}
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {getResourceReleaseControlCopy(locale).manage}
               </Link>
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {libraryCollectionsCopy(locale).resourceCollections}
               </Link>
               <Link
                 href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`}
-                className="text-sm text-accent underline"
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {resourceReviewCopy(locale).write}
               </Link>

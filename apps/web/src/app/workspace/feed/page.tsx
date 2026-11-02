@@ -42,7 +42,7 @@ export default async function FollowingFeedPage({
         </p>
         <Link
           href="/workspace/feed"
-          className="inline-flex min-h-11 items-center text-accent underline"
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.retry}
         </Link>

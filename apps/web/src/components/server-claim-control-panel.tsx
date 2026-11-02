@@ -12,8 +12,8 @@ import {
   parseIssuedServerClaimChallenge,
 } from "../lib/server-claim-confirmation";
 import { serverClaimErrorMessage } from "../lib/server-claim-status-view";
-import { useNexusLocale } from "./locale-context";
 import { authEntryHref } from "./auth-return-path";
+import { useNexusLocale } from "./locale-context";
 
 export function ServerClaimControlPanel({
   serverId,
@@ -195,7 +195,7 @@ export function ServerClaimControlPanel({
         <p className="text-xs text-secondary">
           <Link
             href={authEntryHref("login", pathname)}
-            className="font-semibold text-accent hover:underline"
+            className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.signIn}
           </Link>{" "}

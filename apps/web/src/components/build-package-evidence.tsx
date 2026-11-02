@@ -1,11 +1,11 @@
 import {
-  buildPackageSummary,
   type BuildPackageEvidence,
   type BuildPackageSummary,
+  buildPackageSummary,
 } from "@nexus/domain";
+import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getDictionary } from "../lib/i18n";
 import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
-import { buildPackageCopy } from "../lib/build-package-i18n";
 
 export function BuildPackageSummaryPanel({
   summary,
@@ -105,7 +105,10 @@ export function BuildPackageEvidencePanel({
               {new Date(evidence.inspectedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
             </time>
           </p>
-          <a href={reportHref} className="text-sm text-accent underline">
+          <a
+            href={reportHref}
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.export}
           </a>
           <p className="text-sm text-muted">{copy.note}</p>

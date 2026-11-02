@@ -84,7 +84,7 @@ export default function VerifyEmailPage() {
             </p>
             <Link
               href="/settings"
-              className="inline-block text-sm font-semibold text-accent hover:underline"
+              className="inline-block text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.backToSettings}
             </Link>
@@ -125,7 +125,7 @@ export default function VerifyEmailPage() {
             )}
             <Link
               href="/settings"
-              className="block text-sm font-semibold text-accent hover:underline"
+              className="block text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.backToSettings}
             </Link>
@@ -140,7 +140,7 @@ export default function VerifyEmailPage() {
             <p className="text-xs text-muted">{copy.confirmationConsumed}</p>
             <Link
               href="/settings"
-              className="inline-block text-sm font-semibold text-accent hover:underline"
+              className="inline-block text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.backToSettings}
             </Link>

@@ -166,7 +166,10 @@ export function CommunityReportDetailView({
         </p>
       )}
       {success && (
-        <p role="status" className="text-sm text-accent">
+        <p
+          role="status"
+          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {success}
         </p>
       )}

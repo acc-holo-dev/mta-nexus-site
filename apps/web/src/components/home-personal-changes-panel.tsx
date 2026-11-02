@@ -64,7 +64,10 @@ export function HomePersonalChangesPanel({
       {summary.status === "error" ? (
         <div className="space-y-2 text-sm text-muted">
           <p>{copy.error}</p>
-          <Link href="/notifications?state=unread" className="font-semibold text-accent underline">
+          <Link
+            href="/notifications?state=unread"
+            className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.openInbox}
           </Link>
         </div>

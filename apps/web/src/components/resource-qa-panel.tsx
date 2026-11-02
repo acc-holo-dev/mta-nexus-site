@@ -264,7 +264,7 @@ export function ResourceQaPanel({
         <div className="space-y-4">
           <button
             type="button"
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             onClick={() => {
               setSelectedId(null);
               setDetail(null);
@@ -437,7 +437,7 @@ export function ResourceQaPanel({
                   <p className="text-sm text-secondary">{thread.body}</p>
                   <button
                     type="button"
-                    className="mt-2 text-sm text-accent underline"
+                    className="mt-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     onClick={() => void loadThread(thread.id)}
                   >
                     {copy.loadThread}

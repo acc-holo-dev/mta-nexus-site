@@ -1,5 +1,5 @@
-import { ShieldCheck } from "lucide-react";
 import { safeExternalWebUrl } from "@nexus/validation";
+import { ShieldCheck } from "lucide-react";
 import type { Locale } from "../lib/i18n";
 import { verificationCopy } from "../lib/verification-workspace-copy";
 export function DeveloperExperience({
@@ -38,7 +38,7 @@ export function DeveloperExperience({
       </ul>
       {githubUrl && (
         <a
-          className="block break-all text-sm text-accent underline"
+          className="block break-all text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={githubUrl}
           target="_blank"
           rel="noopener noreferrer"

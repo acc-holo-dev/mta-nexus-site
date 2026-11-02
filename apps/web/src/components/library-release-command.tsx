@@ -114,7 +114,10 @@ export function LibraryReleaseCommandStatus({
     <>
       {pending && pendingHref ? (
         <div className="space-y-2 text-sm">
-          <Link href={pendingHref} className="break-all text-accent underline">
+          <Link
+            href={pendingHref}
+            className="break-all text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.pendingResource}: {pendingProductId}
           </Link>
           <p>
@@ -178,7 +181,7 @@ export function LibraryReleaseCommandStatus({
           <Button
             type="button"
             onClick={() => window.location.reload()}
-            className="h-auto px-0 text-accent underline"
+            className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {copy.reloadState}

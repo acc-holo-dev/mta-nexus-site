@@ -24,7 +24,7 @@ export default async function PrivacySettingsPage() {
       <div className="nexus-panel p-8">
         <Link
           href={authEntryHref("login", "/settings/privacy")}
-          className="inline-flex min-h-11 items-center text-accent underline"
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.signIn}
         </Link>
@@ -40,7 +40,7 @@ export default async function PrivacySettingsPage() {
       <header className="space-y-2">
         <Link
           href="/settings"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>
@@ -51,7 +51,7 @@ export default async function PrivacySettingsPage() {
       {["developer", "admin"].includes(actor.role) && (
         <Link
           href="/settings/developer"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.professional}
         </Link>

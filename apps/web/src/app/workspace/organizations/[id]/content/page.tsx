@@ -48,7 +48,7 @@ export default async function OrganizationPublications({
     <div className="space-y-6">
       <Link
         href={`/workspace/organizations/${encodeURIComponent(id)}`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {team.back}
       </Link>
@@ -75,7 +75,10 @@ export default async function OrganizationPublications({
           <p role="alert" className="text-sm text-danger">
             {failure}
           </p>
-          <Link href={path} className="text-sm text-accent underline">
+          <Link
+            href={path}
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.retry}
           </Link>
         </div>
@@ -125,7 +128,7 @@ export default async function OrganizationPublications({
                     </Link>
                     <Link
                       href={`${path}/${encodeURIComponent(item.id)}/history`}
-                      className="inline-flex min-h-11 items-center text-accent underline"
+                      className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       {organizationPublicationHistoryCopy(locale).history}
                     </Link>

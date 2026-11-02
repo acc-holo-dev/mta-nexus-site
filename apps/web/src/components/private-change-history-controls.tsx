@@ -64,7 +64,10 @@ export function PrivateChangeHistoryFilters<
       <Button type="submit" variant="secondary">
         {copy.apply}
       </Button>
-      <Link href={path} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+      <Link
+        href={path}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.reset}
       </Link>
     </form>
@@ -86,7 +89,7 @@ export function ProfileChangeHistoryLink({ locale }: { locale: Locale }) {
   return (
     <Link
       href="/settings/history"
-      className="inline-flex min-h-11 items-center text-sm text-accent underline"
+      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
     >
       {privateChangeHistoryCopy(locale).profileTitle}
     </Link>

@@ -1,7 +1,7 @@
-import { safeExternalWebUrl } from "@nexus/validation";
-import Link from "next/link";
-import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import type { Content } from "@nexus/domain";
+import { safeExternalWebUrl } from "@nexus/validation";
+import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
+import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 
@@ -74,7 +74,9 @@ export function ArticleCard({ article, locale = "en" }: { article: Content; loca
               <span className="font-numeric">{article.commentCount}</span>
             </span>
           </div>
-          <span className="font-semibold text-accent group-hover:underline">{copy.read} →</span>
+          <span className="font-semibold text-accent group-hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
+            {copy.read} →
+          </span>
         </div>
       </div>
     </Link>

@@ -156,7 +156,7 @@ export function VerificationApplicationAmend({
         <Button
           type="button"
           onClick={() => window.location.reload()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           variant="ghost"
         >
           {labels.reload}

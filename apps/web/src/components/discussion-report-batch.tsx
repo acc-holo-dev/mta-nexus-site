@@ -193,7 +193,7 @@ export function DiscussionReportBatch({
             <div className="flex flex-wrap gap-3">
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline"
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 onClick={() => {
                   resetReview();
                   setSelected(available.map((item) => item.id));
@@ -204,7 +204,7 @@ export function DiscussionReportBatch({
               </Button>
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline"
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 onClick={() => {
                   resetReview();
                   setSelected([]);
@@ -284,7 +284,7 @@ export function DiscussionReportBatch({
       {blocked && !busy && (
         <Button
           type="button"
-          className="h-auto min-h-11 px-0 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           onClick={() => window.location.reload()}
           variant="ghost"
         >
@@ -317,7 +317,7 @@ export function DiscussionReportBatch({
               <li key={item.id} className="space-y-1 rounded-lg border border-base p-3">
                 <Link
                   href={`/admin/reports/${encodeURIComponent(item.id)}`}
-                  className="inline-flex min-h-11 text-sm text-accent underline"
+                  className="inline-flex min-h-11 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {labels[item.type]} · {item.id}
                 </Link>
@@ -343,7 +343,7 @@ export function DiscussionReportBatch({
             <Button
               type="button"
               disabled={busy || blocked}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() => setPreview(null)}
               variant="ghost"
             >
@@ -381,7 +381,7 @@ export function DiscussionReportBatch({
               </time>
               <Link
                 href={`/admin/reports/${encodeURIComponent(item.id)}`}
-                className="flex min-h-11 items-center text-sm text-accent underline"
+                className="flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {discussionReportsCopy(locale).review}
               </Link>

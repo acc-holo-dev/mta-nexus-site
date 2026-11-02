@@ -49,7 +49,10 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
   });
   return (
     <div className="mx-auto max-w-3xl space-y-6 py-8">
-      <Link href="/workspace/library/downloads" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/library/downloads"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.title}
       </Link>
       <h1 className="font-display text-primary">{copy.receipt}</h1>
@@ -79,7 +82,7 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
           status: "all",
           resourceId: receipt.resourceId,
         })}
-        className="text-sm text-accent underline"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.history}
       </Link>

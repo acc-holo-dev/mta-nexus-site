@@ -106,7 +106,7 @@ export default async function DevelopmentStatusPage() {
         </h2>
         <a
           href={config.NEXT_PUBLIC_APP_URL}
-          className="block truncate text-sm text-accent hover:underline"
+          className="block truncate text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {config.NEXT_PUBLIC_APP_URL}
         </a>

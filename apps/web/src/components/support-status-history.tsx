@@ -67,7 +67,7 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               <Button
                 type="button"
                 onClick={() => setRetry((value) => value + 1)}
-                className="h-auto min-h-9 px-0 text-accent underline"
+                className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 variant="ghost"
               >
                 {copy.reload}
@@ -102,7 +102,7 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               <Button
                 type="button"
                 onClick={() => setBefore(undefined)}
-                className="h-auto min-h-9 px-0 text-accent underline"
+                className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 variant="ghost"
               >
                 {copy.latest}
@@ -112,7 +112,7 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               <Button
                 type="button"
                 onClick={() => setBefore(data.nextCursor ?? undefined)}
-                className="h-auto min-h-9 px-0 text-accent underline"
+                className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 variant="ghost"
               >
                 {copy.older}

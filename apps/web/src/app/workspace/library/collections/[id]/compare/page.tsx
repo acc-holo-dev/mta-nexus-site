@@ -296,7 +296,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/${encodeURIComponent(id)}/compare?${suffix(comparison?.page ?? 1)}`}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.json}
         </a>

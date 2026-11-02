@@ -176,7 +176,10 @@ export function Sidebar({
               </div>
               <div className="flex min-w-0 flex-col">
                 <span className="font-heading leading-tight text-primary">
-                  MTA <span className="text-accent">NEXUS</span>
+                  MTA{" "}
+                  <span className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
+                    NEXUS
+                  </span>
                 </span>
                 <span className="font-caption leading-tight text-faint">
                   {dictionary.nav.openFreeBeta}

@@ -183,7 +183,10 @@ export function DeveloperProfileEditor({
           {copy.saved}
         </p>
       )}
-      <Link href="/workspace/verification" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/verification"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
     </div>

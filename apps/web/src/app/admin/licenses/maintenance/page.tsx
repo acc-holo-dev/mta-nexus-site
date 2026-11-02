@@ -47,7 +47,10 @@ export default async function Page({
     history = getCommerceHistoryCopy(locale);
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/admin/licenses" className="text-sm text-accent underline">
+      <Link
+        href="/admin/licenses"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.maintenance}</h1>
@@ -71,7 +74,7 @@ export default async function Page({
             <li key={license.id} className="nexus-panel space-y-2 p-4">
               <Link
                 href={`/admin/licenses/${encodeURIComponent(license.id)}`}
-                className="break-words text-accent underline"
+                className="break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {license.productTitle}
               </Link>

@@ -141,7 +141,7 @@ export default async function UserProfilePage({
             {visibility.showActivity && (
               <Link
                 href={`/users/${encodeURIComponent(user.username)}/activity`}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {publicationCopy(locale).activity}
               </Link>
@@ -164,7 +164,7 @@ export default async function UserProfilePage({
       <DeveloperExperience profile={professional} locale={locale} />
       <Link
         href={`/users/${encodeURIComponent(user.username)}/trust`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {trustCopy(locale).title}
       </Link>

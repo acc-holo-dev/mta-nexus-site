@@ -6,11 +6,11 @@ import { AlertTriangle, Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatNotification } from "../lib/notification-copy";
+import { notificationInboxCopy } from "../lib/notification-inbox-copy";
 import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
 } from "../lib/notification-inbox-events";
-import { notificationInboxCopy } from "../lib/notification-inbox-copy";
 import { privateApiRequest } from "../lib/private-api-request";
 import { startVisiblePolling } from "../lib/visible-polling";
 import { confirmAction } from "./confirm-action";
@@ -202,7 +202,7 @@ export function NotificationBell() {
                 size="sm"
                 disabled={marking}
                 onClick={() => void markAllRead()}
-                className="h-auto min-h-6 gap-1 px-1 text-[11px] font-semibold text-accent hover:underline"
+                className="h-auto min-h-6 gap-1 px-1 text-[11px] font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 <CheckCheck className="h-3 w-3" aria-hidden="true" />
                 <span>{inboxCopy.markAllRead}</span>

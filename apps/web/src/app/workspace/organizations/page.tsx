@@ -81,7 +81,7 @@ export default async function OrganizationsPage({
                 </p>
                 <p className="line-clamp-3 text-sm text-secondary">{item.description}</p>
                 <Link
-                  className="text-sm text-accent underline"
+                  className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   href={`/workspace/organizations/${encodeURIComponent(item.id)}`}
                 >
                   {copy.open}

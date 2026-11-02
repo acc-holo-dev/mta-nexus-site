@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ManagedServerClaimStatus } from "@nexus/db";
+import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import { getServerClaimStatusCopy } from "../lib/server-claim-status-view";
 import { ServerClaimControlPanel } from "./server-claim-control-panel";
@@ -64,7 +64,7 @@ export function ServerClaimStatusPanel({
           )}
           <Link
             href={`/workspace/servers/${encodeURIComponent(serverId)}`}
-            className="text-xs font-semibold text-accent hover:underline"
+            className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.refresh}
           </Link>

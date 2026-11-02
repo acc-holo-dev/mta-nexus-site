@@ -64,14 +64,14 @@ export default async function VerificationApplicationPage({
       </header>
       <Link
         href="/workspace/verification/history"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.title}
       </Link>
       {signIn && (
         <Link
           href={authEntryHref("login", `/workspace/verification/${encodeURIComponent(id)}`)}
-          className="inline-flex min-h-11 items-center text-accent underline"
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {labels.signIn}
         </Link>
@@ -105,7 +105,7 @@ export default async function VerificationApplicationPage({
                 href={application.proofUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {labels.proof}
               </a>
@@ -133,7 +133,7 @@ export default async function VerificationApplicationPage({
               </p>
               <Link
                 href="/settings/developer"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {labels.editProfile}
               </Link>

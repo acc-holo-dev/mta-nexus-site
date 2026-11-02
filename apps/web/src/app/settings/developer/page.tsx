@@ -47,7 +47,7 @@ export default async function DeveloperSettingsPage() {
       <DeveloperProfileEditor key={actor.id} initial={initial} locale={locale} />
       <Link
         href="/settings/privacy"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {profilePrivacyCopy(locale).title}
       </Link>

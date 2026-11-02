@@ -50,7 +50,7 @@ export function OrganizationHistoryView({
         <p className="text-xs text-muted">{copy.privacy}</p>
       </header>
       <Link
-        className="inline-flex min-h-9 items-center text-sm text-accent underline"
+        className="inline-flex min-h-9 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         href={`/workspace/organizations/${encodeURIComponent(id)}`}
       >
         {copy.back}
@@ -71,7 +71,7 @@ export function OrganizationHistoryView({
               filters,
               { until: data.until },
             )}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {journal.export}
           </a>
@@ -158,7 +158,7 @@ export function OrganizationHistoryView({
       <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.history}>
         {(before || filters.cursor || filters.until || !data) && (
           <Link
-            className="min-h-9 py-2 text-accent underline"
+            className="min-h-9 py-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href={changeHistoryHref(path, filters, { fresh: true })}
           >
             {copy.latest}
@@ -166,7 +166,7 @@ export function OrganizationHistoryView({
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
-            className="min-h-9 py-2 text-accent underline"
+            className="min-h-9 py-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             href={
               data.until
                 ? changeHistoryHref(path, filters, { cursor: data.nextCursor })

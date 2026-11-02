@@ -100,7 +100,7 @@ export default async function ResourceCopiesPage({
               <li key={row.id} className="nexus-panel space-y-2 p-4">
                 <Link
                   href={`${base}/${encodeURIComponent(row.id)}`}
-                  className="break-words text-accent underline"
+                  className="break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {row.target.title}
                 </Link>

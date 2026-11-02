@@ -91,7 +91,7 @@ export default async function TeamPage({
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href={`/workspace/organizations/${encodeURIComponent(id)}`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.workspace}
       </Link>
@@ -152,7 +152,7 @@ export default async function TeamPage({
             </Button>
             <Link
               href={organizationTeamHref(id, { query: "" })}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
@@ -173,7 +173,7 @@ export default async function TeamPage({
           </p>
           <a
             href={organizationTeamHref(id, filters ?? { query: "" })}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {team.reload}
           </a>

@@ -76,7 +76,7 @@ export async function ServerContentEditorPage({
           </p>
           <Link
             href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.retry}
           </Link>

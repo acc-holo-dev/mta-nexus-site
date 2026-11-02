@@ -126,13 +126,13 @@ export default async function OrganizationProfilePage({
             />
             <Link
               href={`/organizations/${encodeURIComponent(organization.slug)}/activity`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {publicationCopy(locale).activity}
             </Link>
             <Link
               href={`/organizations/${encodeURIComponent(organization.slug)}/trust`}
-              className="inline-flex min-h-11 items-center text-xs text-accent underline"
+              className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {contextTrustCopy(locale).title}
             </Link>
@@ -141,7 +141,7 @@ export default async function OrganizationProfilePage({
                 href={websiteUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex max-w-full items-center gap-1.5 pt-1 text-xs font-semibold text-accent hover:underline"
+                className="inline-flex max-w-full items-center gap-1.5 pt-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 <span className="truncate">{websiteUrl}</span>

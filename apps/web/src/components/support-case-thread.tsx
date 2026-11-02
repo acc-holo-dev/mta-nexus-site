@@ -303,7 +303,10 @@ export function SupportCaseThread({
   if (!supportCase) {
     return (
       <div className="mx-auto max-w-4xl space-y-4">
-        <Link href={backHref} className="text-sm text-accent hover:underline">
+        <Link
+          href={backHref}
+          className="text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.back}
         </Link>
         <div role="alert" className="nexus-panel p-5 text-sm text-danger">

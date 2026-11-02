@@ -173,7 +173,7 @@ export function ManagedServerVisibilityBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() => changeSelection(items.map((item) => item.id))}
             >
               {copy.selectAll}
@@ -181,7 +181,7 @@ export function ManagedServerVisibilityBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() => changeSelection([])}
             >
               {copy.clear}
@@ -237,7 +237,7 @@ export function ManagedServerVisibilityBatch({
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-11 px-0 text-sm text-accent underline"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           onClick={() => window.location.reload()}
         >
           {copy.reload}
@@ -253,7 +253,7 @@ export function ManagedServerVisibilityBatch({
               <li key={item.id} className="space-y-2 rounded-lg border border-base p-4">
                 <Link
                   href={`/workspace/servers/${encodeURIComponent(item.id)}`}
-                  className="inline-flex min-h-11 break-words text-sm text-accent underline"
+                  className="inline-flex min-h-11 break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {item.name}
                 </Link>
@@ -266,7 +266,7 @@ export function ManagedServerVisibilityBatch({
                 </p>
                 <Link
                   href={`/workspace/servers/${encodeURIComponent(item.id)}/activity`}
-                  className="inline-flex min-h-11 text-xs text-accent underline"
+                  className="inline-flex min-h-11 text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.actionAll}
                 </Link>
@@ -292,7 +292,7 @@ export function ManagedServerVisibilityBatch({
               type="button"
               variant="ghost"
               disabled={busy || blocked}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline"
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() => setPreview(null)}
             >
               {copy.cancel}

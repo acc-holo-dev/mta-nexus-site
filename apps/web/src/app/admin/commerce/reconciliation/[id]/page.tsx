@@ -52,13 +52,16 @@ export default async function ReconciliationDetail({
     });
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link href="/admin/commerce/reconciliation" className="text-sm text-accent underline">
+      <Link
+        href="/admin/commerce/reconciliation"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">{result.order.orderNumber}</h1>
       <Link
         href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`}
-        className="inline-block text-sm text-accent underline"
+        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {orderTermsCopy(locale).title}
       </Link>

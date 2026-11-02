@@ -405,13 +405,21 @@ export function ContentDiscussion({
           onPersistDraft={() => persistComposeDraft()}
         />
         {published && (
-          <p role="status" aria-live="polite" className="text-sm text-accent">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.saved}
           </p>
         )}
       </form>
       {managementSuccess && (
-        <p role="status" aria-live="polite" className="text-sm text-accent">
+        <p
+          role="status"
+          aria-live="polite"
+          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {managementSuccess}
         </p>
       )}

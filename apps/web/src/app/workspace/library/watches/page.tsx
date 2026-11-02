@@ -86,7 +86,10 @@ export default async function ReleaseWatchesPage({
   );
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/workspace/library" className="text-sm text-accent underline">
+      <Link
+        href="/workspace/library"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
@@ -102,7 +105,10 @@ export default async function ReleaseWatchesPage({
       <p className="text-sm text-secondary">
         {copy.pinned} {copy.limit}
       </p>
-      <Link href="/settings" className="text-sm text-accent underline">
+      <Link
+        href="/settings"
+        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.settings}
       </Link>
       <form className="flex flex-wrap items-end gap-3">
@@ -196,7 +202,7 @@ export default async function ReleaseWatchesPage({
               {watch.available ? (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(watch.productId)}/versions`}
-                  className="inline-block text-sm text-accent underline"
+                  className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.versions}
                 </Link>

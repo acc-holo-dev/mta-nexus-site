@@ -68,14 +68,14 @@ export default async function VerificationHistoryPage({
       </header>
       <Link
         href="/workspace/verification"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {labels.back}
       </Link>
       {signIn ? (
         <Link
           href={authEntryHref("login", historyPath)}
-          className="inline-flex min-h-11 items-center text-accent underline"
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {labels.signIn}
         </Link>
@@ -193,7 +193,7 @@ export default async function VerificationHistoryPage({
                   <Link
                     prefetch={false}
                     href={`/workspace/verification/${encodeURIComponent(item.id)}`}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline"
+                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {copy.open}
                   </Link>
@@ -206,7 +206,7 @@ export default async function VerificationHistoryPage({
               {report.newerCursor && (
                 <Link
                   prefetch={false}
-                  className="inline-flex min-h-11 items-center text-accent underline"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   href={verificationApplicationsHref(filters, report.newerCursor)}
                 >
                   {copy.newer}
@@ -215,7 +215,7 @@ export default async function VerificationHistoryPage({
               {report.olderCursor && (
                 <Link
                   prefetch={false}
-                  className="inline-flex min-h-11 items-center text-accent underline"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   href={verificationApplicationsHref(filters, report.olderCursor)}
                 >
                   {copy.older}

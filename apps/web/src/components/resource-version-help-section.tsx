@@ -145,7 +145,7 @@ export function ResourceVersionHelpSection({
           {supportContext ? (
             <ResourceVersionHelpSupportLink
               context={supportContext}
-              className="font-semibold text-accent hover:underline"
+              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.openSupport}
             </ResourceVersionHelpSupportLink>
