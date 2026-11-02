@@ -102,6 +102,7 @@ it.each(["en", "ru"] as const)(
     const html = await render();
     expect(html).toContain(getDictionary(locale).workspace.signInRequired);
     expect(html).toContain('href="/auth/login?next=%2Fnotifications"');
+    expect(html).toContain('href="/auth/register?next=%2Fnotifications"');
     expect(html).not.toContain('action="/notifications"');
     expect(html).not.toContain(locale === "ru" ? "Уведомлений пока нет" : "No notifications yet");
     expect(state.page).not.toHaveBeenCalled();
@@ -113,6 +114,9 @@ it("preserves notification filters in the guest login return path", async () => 
   const html = await render({ q: "needle", state: "unread", category: "content" });
   expect(html).toContain(
     'href="/auth/login?next=%2Fnotifications%3Fq%3Dneedle%26state%3Dunread%26category%3Dcontent"',
+  );
+  expect(html).toContain(
+    'href="/auth/register?next=%2Fnotifications%3Fq%3Dneedle%26state%3Dunread%26category%3Dcontent"',
   );
   expect(state.page).not.toHaveBeenCalled();
 });

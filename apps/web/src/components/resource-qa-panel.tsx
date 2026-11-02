@@ -6,13 +6,14 @@ import type {
   ResourceQaThreadSummary,
 } from "@nexus/domain";
 import { Button } from "@nexus/ui";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
+import { getDictionary } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { GuestAuthLinks } from "./guest-auth-links";
 
 type BuildOption = { id: string; version: string };
 
@@ -61,13 +62,17 @@ export function ResourceQaPanel({
   const [writeError, setWriteError] = useState("");
   const [busy, setBusy] = useState(false);
   const pathname = usePathname();
+  const workspaceCopy = getDictionary(locale).workspace;
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
+  const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const writeGuard = useRef(false);
   const base = `/api/products/${encodeURIComponent(productId)}/qa`;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
+    const path = currentBrowserReturnPath();
+    setLoginHref(authEntryHref("login", path));
+    setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
 
   const capabilities = detail?.capabilities ?? page?.capabilities;
@@ -370,14 +375,12 @@ export function ResourceQaPanel({
       ) : (
         <div className="space-y-4">
           {!authenticated ? (
-            <p className="text-xs text-muted">
-              <Link
-                href={loginHref}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.signIn}
-              </Link>
-            </p>
+            <GuestAuthLinks
+              loginHref={loginHref}
+              registerHref={registerHref}
+              signInLabel={copy.signIn}
+              createAccountLabel={workspaceCopy.createAccount}
+            />
           ) : capabilities?.askReason === "access_required" ? (
             <p className="text-xs text-muted">{copy.accessRequired}</p>
           ) : canAsk ? (

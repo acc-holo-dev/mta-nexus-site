@@ -175,8 +175,22 @@ it("shows stable detail after access and final current references are gone", asy
 });
 it("authenticates before query inspection or detail reads", async () => {
   state.actor = null;
-  expect(await screen({ userId: "other" })).toContain("Sign in");
-  expect(await screen({ userId: "other" }, "lmb_a")).toContain("Sign in");
+  const list = await screen({ userId: "other" });
+  expect(list).toContain("Sign in");
+  expect(list).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Fcollections%2Fmembership-history"',
+  );
+  expect(list).toContain(
+    'href="/auth/register?next=%2Fworkspace%2Flibrary%2Fcollections%2Fmembership-history"',
+  );
+  const detail = await screen({ userId: "other" }, "lmb_a");
+  expect(detail).toContain("Sign in");
+  expect(detail).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Fcollections%2Fmembership-history%2Flmb_a"',
+  );
+  expect(detail).toContain(
+    'href="/auth/register?next=%2Fworkspace%2Flibrary%2Fcollections%2Fmembership-history%2Flmb_a"',
+  );
   expect(state.history).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
 });
@@ -195,9 +209,34 @@ it("rejects all detail selectors and maps missing/foreign detail to a missing pa
   state.detail.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen({}, "lmb_foreign")).rejects.toThrow("NEXT_NOT_FOUND");
 });
+it("distinguishes never-empty history from filtered-empty results", async () => {
+  const copy = libraryMembershipHistoryCopy("en");
+  const historyHref = 'href="/workspace/library/collections/membership-history"';
+  const clearLinks = (html: string) => (html.match(new RegExp(historyHref, "g")) ?? []).length;
+  state.history.mockResolvedValue({ ...report(), items: [], total: 0, totalPages: 1, page: 1 });
+  const filteredEmpty = await screen();
+  expect(filteredEmpty).toContain(copy.emptyFiltered);
+  expect(filteredEmpty).not.toContain(copy.emptyNever);
+  expect(clearLinks(filteredEmpty)).toBe(2);
+  state.history.mockResolvedValue({
+    ...report(),
+    items: [],
+    total: 0,
+    totalPages: 1,
+    page: 1,
+    days: 30,
+    operation: "all",
+    collectionId: undefined,
+    productId: undefined,
+  });
+  const defaultEmpty = await screen({});
+  expect(defaultEmpty).toContain(copy.emptyNever);
+  expect(defaultEmpty).not.toContain(copy.emptyFiltered);
+  expect(clearLinks(defaultEmpty)).toBe(0);
+});
 it("shows empty history and available resource links without granting download rights", async () => {
   state.history.mockResolvedValue({ ...report(), items: [] });
-  expect(await screen()).toContain(libraryMembershipHistoryCopy("en").empty);
+  expect(await screen()).toContain(libraryMembershipHistoryCopy("en").emptyFiltered);
   state.detail.mockResolvedValue({
     schemaVersion: 1,
     generatedAt: date,

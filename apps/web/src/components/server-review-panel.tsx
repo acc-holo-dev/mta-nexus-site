@@ -3,6 +3,7 @@
 import { Button, fieldClassBlock } from "@nexus/ui";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
+import { getDictionary } from "../lib/i18n";
 import { confirmedServerReview } from "../lib/server-review-confirmation";
 import {
   serverReviewCopy,
@@ -42,8 +43,9 @@ export function ServerReviewPanel({
   initialPage?: PublicPage;
   loadState?: "ready" | "unavailable";
 }) {
-  const { locale, dictionary } = useNexusLocale();
+  const { locale } = useNexusLocale();
   const pathname = usePathname();
+  const workspace = getDictionary(locale).workspace;
   const copy = serverReviewCopy(locale);
   const loadCopy = serverReviewLoadCopy(locale);
   const statusId = useId();
@@ -283,7 +285,7 @@ export function ServerReviewPanel({
             loginHref={loginHref}
             registerHref={registerHref}
             signInLabel={copy.signIn}
-            createAccountLabel={dictionary.workspace.createAccount}
+            createAccountLabel={workspace.createAccount}
           />
         ) : (
           <>

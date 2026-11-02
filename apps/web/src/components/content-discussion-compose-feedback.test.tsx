@@ -15,12 +15,15 @@ describe("discussion compose write feedback", () => {
           needsSignIn: true,
           loginHref: "/auth/login?next=%2Farticles%2Fguide",
           signInLabel: copy.signIn,
+          registerHref: "/auth/register?next=%2Farticles%2Fguide",
+          registerLabel: "Create account",
           onPersistDraft: () => undefined,
         }),
       );
       expect(html).toContain('role="alert"');
       expect(html).toContain(copy.invalid);
       expect(html).toContain('href="/auth/login?next=%2Farticles%2Fguide"');
+      expect(html).toContain('href="/auth/register?next=%2Farticles%2Fguide"');
       expect(html).toContain(copy.signIn);
       expect(html).toContain("min-h-11");
       expect(html).toContain("bg-accent");

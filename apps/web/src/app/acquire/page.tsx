@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useState } from "react";
 import { authEntryHref } from "../../components/auth-return-path";
+import { GuestAuthLinks } from "../../components/guest-auth-links";
 import { useNexusLocale } from "../../components/locale-context";
 import { licenseModelLabel } from "../../lib/license-model-i18n";
 import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
@@ -256,20 +257,13 @@ function AcquireContent() {
         >
           <p>{error}</p>
           {needsSignIn && acquireReturnPath ? (
-            <p className="mt-3 flex flex-wrap items-center justify-center gap-3 text-sm">
-              <Link
-                href={authEntryHref("login", acquireReturnPath)}
-                className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {authCopy.signIn}
-              </Link>
-              <Link
-                href={authEntryHref("register", acquireReturnPath)}
-                className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {authCopy.create}
-              </Link>
-            </p>
+            <GuestAuthLinks
+              loginHref={authEntryHref("login", acquireReturnPath)}
+              registerHref={authEntryHref("register", acquireReturnPath)}
+              signInLabel={authCopy.signIn}
+              createAccountLabel={authCopy.create}
+              className="mt-3 justify-center"
+            />
           ) : null}
         </div>
       )}

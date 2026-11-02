@@ -4,6 +4,7 @@ import { Button } from "@nexus/ui";
 import { KeyRound, ShieldCheck } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { getDictionary } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import {
   confirmsServerClaimVerification,
@@ -27,6 +28,7 @@ export function ServerClaimControlPanel({
   const router = useRouter();
   const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
+  const workspace = getDictionary(locale).workspace;
   const copy = dictionary.serverClaim;
   const [challenge, setChallenge] = useState<IssuedServerClaimChallenge | null>(null);
   const [state, setState] = useState<"idle" | "issuing" | "issued" | "verifying" | "verified">(
@@ -197,7 +199,7 @@ export function ServerClaimControlPanel({
             loginHref={authEntryHref("login", pathname)}
             registerHref={authEntryHref("register", pathname)}
             signInLabel={copy.signIn}
-            createAccountLabel={dictionary.workspace.createAccount}
+            createAccountLabel={workspace.createAccount}
           />
           <p>{copy.signInHint}</p>
         </div>

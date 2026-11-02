@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/servers/demo",
+}));
 
 import { ServerReviewPanel } from "./server-review-panel";
 

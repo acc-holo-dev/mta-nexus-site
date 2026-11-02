@@ -12,7 +12,9 @@ const en = {
   present: "Included",
   absent: "Not included",
   currentMembership: "Current membership",
-  empty: "No matching membership operations.",
+  emptyNever: "You have no recorded collection membership operations yet.",
+  emptyFiltered: "No matching membership operations.",
+  clear: "Clear filters",
   history: "Membership history",
 };
 const ru: typeof en = {
@@ -29,7 +31,9 @@ const ru: typeof en = {
   present: "Включён",
   absent: "Не включён",
   currentMembership: "Текущее вхождение",
-  empty: "Подходящих операций с составом коллекций нет.",
+  emptyNever: "Записанных операций с составом коллекций пока нет.",
+  emptyFiltered: "Подходящих операций с составом коллекций нет.",
+  clear: "Сбросить фильтры",
   history: "История состава",
 };
 export function libraryMembershipHistoryCopy(locale: "ru" | "en") {

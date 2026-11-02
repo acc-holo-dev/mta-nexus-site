@@ -77,6 +77,11 @@ export async function LibraryMembershipHistoryScreen({
     const query = libraryMembershipHistoryQuery(filters),
       result = await libraryCollectionsService.membershipHistory(actor, query);
     const suffix = (page: number) => libraryMembershipHistorySuffix({ ...query, page });
+    const filtered =
+      result.operation !== "all" ||
+      Boolean(result.collectionId) ||
+      Boolean(result.productId) ||
+      result.days !== 30;
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={m.title}>
@@ -151,12 +156,14 @@ export async function LibraryMembershipHistoryScreen({
           <Button type="submit" variant="outline">
             {h.filter}
           </Button>
-          <Link
-            href={membershipHistoryHref()}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {h.clear}
-          </Link>
+          {filtered ? (
+            <Link
+              href={membershipHistoryHref()}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {m.clear}
+            </Link>
+          ) : null}
         </form>
         <p>
           {c.items}: {result.total} ·{" "}
@@ -168,7 +175,19 @@ export async function LibraryMembershipHistoryScreen({
         >
           {h.export}
         </a>
-        {!result.items.length && <p>{m.empty}</p>}
+        {!result.items.length && (
+          <div className="space-y-3 text-sm text-muted">
+            <p>{filtered ? m.emptyFiltered : m.emptyNever}</p>
+            {filtered ? (
+              <Link
+                href={membershipHistoryHref()}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {m.clear}
+              </Link>
+            ) : null}
+          </div>
+        )}
         <ol className="space-y-4">
           {result.items.map((item) => (
             <li key={item.id}>
