@@ -94,7 +94,7 @@ export function PublicProfileForm() {
       </h2>
       <p className="text-xs text-muted">{copy.profileDescription}</p>
       {loading && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" aria-busy={true} className="text-sm text-muted">
           {copy.loading}
         </p>
       )}

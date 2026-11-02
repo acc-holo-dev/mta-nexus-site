@@ -10,6 +10,7 @@ import {
   getResourceManagementCopy,
   resourceManagementError,
 } from "../lib/resource-management-i18n";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { useNexusLocale } from "./locale-context";
 
 type Candidate = { productId: string; title: string; slug: string; status: string };
@@ -330,16 +331,17 @@ export function ResourceVariantsForm({
             rows={3}
             className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
           />
-          <label className="flex gap-3 text-sm text-secondary">
-            <input
-              type="checkbox"
-              checked={confirmed}
-              required
-              disabled={disabled}
-              onChange={(event) => setConfirmed(event.target.checked)}
-            />
+          <ActionConfirmCheckbox
+            id={`${field}-remove-confirm`}
+            checked={confirmed}
+            onCheckedChange={setConfirmed}
+            required
+            disabled={disabled}
+            labelClassName="flex gap-3 text-sm text-secondary"
+            checkboxClassName={actionConfirmCheckboxFocusClass}
+          >
             {copy.confirm}
-          </label>
+          </ActionConfirmCheckbox>
           <Button
             type="submit"
             variant="outline"

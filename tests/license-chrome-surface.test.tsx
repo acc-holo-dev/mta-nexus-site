@@ -74,5 +74,8 @@ describe("license chrome surface", () => {
     expect(html).toContain(copy.refresh);
     expect(html).toContain("rounded-lg");
     expect(html).toContain("bg-accent");
+    expect(html).toMatch(/id="[^"]+-confirm"/u);
+    expect(html).toMatch(/for="[^"]+-confirm"/u);
+    expect(html).toContain('type="checkbox"');
   });
 });

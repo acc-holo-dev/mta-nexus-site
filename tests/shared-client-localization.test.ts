@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
@@ -14,6 +14,9 @@ describe("shared client localization and request hardening", () => {
     expect(source.match(/credentials: "same-origin"/g)?.length).toBe(2);
     expect(source.match(/cache: "no-store"/g)?.length).toBe(2);
     expect(source.match(/AbortSignal.timeout\(10_000\)/g)?.length).toBe(2);
+    expect(source).toContain('role="status"');
+    expect(source).toContain('aria-live="polite"');
+    expect(source).toContain("dictionary.workspace.loading");
 
     const en = getDictionary("en").workspaceContext;
     const ru = getDictionary("ru").workspaceContext;

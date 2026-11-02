@@ -17,6 +17,7 @@ export function ContextSwitcher() {
   const router = useRouter();
   const { dictionary } = useNexusLocale();
   const copy = dictionary.workspaceContext;
+  const loadingLabel = dictionary.workspace.loading;
   const [contexts, setContexts] = useState<ContextOption[]>([]);
   const [activeContextId, setActiveContextId] = useState("personal");
   const [loading, setLoading] = useState(true);
@@ -97,7 +98,21 @@ export function ContextSwitcher() {
     }
   }
 
-  if (loading || (contexts.length <= 1 && !error)) return null;
+  if (loading) {
+    return (
+      <section className="nexus-panel space-y-3 p-5">
+        <div>
+          <h2 className="text-sm font-semibold text-primary">{copy.title}</h2>
+          <p className="mt-1 text-xs text-muted">{copy.description}</p>
+        </div>
+        <p role="status" aria-live="polite" className="text-xs text-muted">
+          {loadingLabel}
+        </p>
+      </section>
+    );
+  }
+
+  if (contexts.length <= 1 && !error) return null;
 
   return (
     <section className="nexus-panel space-y-3 p-5">

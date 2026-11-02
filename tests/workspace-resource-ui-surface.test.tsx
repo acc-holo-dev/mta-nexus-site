@@ -2,8 +2,8 @@ import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
-import { resourceCopyCopy } from "../apps/web/src/lib/resource-copy-i18n";
 import { getResourceCommerceCopy } from "../apps/web/src/lib/resource-commerce-i18n";
+import { resourceCopyCopy } from "../apps/web/src/lib/resource-copy-i18n";
 import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
 import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
@@ -260,6 +260,8 @@ describe("workspace and resource UI surface", () => {
     expect(html).toContain(copy.profile);
     expect(html).toContain(copy.loading);
     expect(html).toContain('id="public-profile-heading"');
+    expect(html).toContain('aria-live="polite"');
+    expect(html).toContain('aria-busy="true"');
   });
 
   it("keeps RU and EN resource workspace copy distinct", () => {

@@ -12,6 +12,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { confirmedLicenseControl } from "../lib/license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../lib/license-control-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
 import { useNexusLocale } from "./locale-context";
 
@@ -301,14 +302,15 @@ export function LicenseControlPanel({
                 className={`${fieldClassBlock} mt-1`}
               />
             </label>
-            <label className="flex items-start gap-2 text-sm text-secondary">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(event) => setConfirmed(event.target.checked)}
-              />
+            <ActionConfirmCheckbox
+              id={`${fieldId}-confirm`}
+              checked={confirmed}
+              onCheckedChange={setConfirmed}
+              labelClassName="flex items-start gap-2 text-sm text-secondary"
+              checkboxClassName={actionConfirmCheckboxFocusClass}
+            >
               {copy.confirm}
-            </label>
+            </ActionConfirmCheckbox>
             <Button type="submit" disabled={!confirmed || loadingServers} isLoading={busy}>
               {busy ? copy.pending : copy.submit}
             </Button>

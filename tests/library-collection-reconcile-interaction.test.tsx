@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -30,17 +31,24 @@ vi.mock("react", async (original) => ({
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 
-import { LibraryCollectionReconcileForm } from "../apps/web/src/components/library-collection-reconcile";
 import type { LibraryCollectionReconcilePreview } from "@nexus/domain";
+import { LibraryCollectionReconcileForm } from "../apps/web/src/components/library-collection-reconcile";
 import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
+
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const e = node as Element;
-  const type = e.type as { displayName?: string } | string;
+  const type = e.type as
+    | string
+    | { displayName?: string }
+    | (((props: unknown) => ReactNode) & { displayName?: string });
   if (typeof type === "object" && type?.displayName === "Button") {
     return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
+  }
+  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
+    return nodes(type(e.props));
   }
   return [e, ...nodes(e.props.children as ReactNode)];
 }

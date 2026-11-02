@@ -13,6 +13,7 @@ import { confirmedCollectionCommand } from "../lib/library-collections-confirmat
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 
 type Command = Extract<LibraryCollectionCommand, { action: "reconcile-items" }>;
 export function LibraryCollectionReconcileForm({
@@ -206,19 +207,20 @@ export function LibraryCollectionReconcileForm({
               </li>
             ))}
         </ul>
-        <label className="flex gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={acknowledged}
-            required
-            onChange={(event) => {
-              if (!mounted.current || pending.current || lock.current || settled.current) return;
-              reviewed.current = event.target.checked ? fingerprint : null;
-              setChecked(event.target.checked);
-            }}
-          />
+        <ActionConfirmCheckbox
+          id={`${shown.collection.id}-reconcile-confirm`}
+          checked={acknowledged}
+          required
+          labelClassName="flex gap-2 text-sm"
+          checkboxClassName={actionConfirmCheckboxFocusClass}
+          onCheckedChange={(value) => {
+            if (!mounted.current || pending.current || lock.current || settled.current) return;
+            reviewed.current = value ? fingerprint : null;
+            setChecked(value);
+          }}
+        >
           {m.reconcileConfirm}
-        </label>
+        </ActionConfirmCheckbox>
       </fieldset>
       <Button
         type="submit"
