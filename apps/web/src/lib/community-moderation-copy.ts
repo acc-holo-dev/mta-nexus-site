@@ -1,4 +1,5 @@
 import type { Locale } from "./i18n";
+
 const en = {
   title: "Publication moderation",
   description:
@@ -43,6 +44,7 @@ const en = {
     "This legacy text exceeds the full-preview limit. Publishing is blocked until the author shortens it. Archiving remains available.",
   already: "The publication already has the requested state.",
   rate: "Too many moderation requests. Try again shortly.",
+  reports: "Community reports",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Модерация публикаций",
@@ -88,6 +90,7 @@ const ru: Record<keyof typeof en, string> = {
     "Этот старый текст превышает лимит полного просмотра. Публикация заблокирована, пока автор не сократит текст. Архивация доступна.",
   already: "Публикация уже находится в нужном состоянии.",
   rate: "Слишком много запросов модерации. Попробуйте чуть позже.",
+  reports: "Жалобы сообщества",
 };
 export const moderationCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export const moderationError = (locale: Locale, code: unknown) => {

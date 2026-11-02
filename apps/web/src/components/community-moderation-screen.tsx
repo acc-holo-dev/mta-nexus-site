@@ -20,8 +20,8 @@ import { PUBLICATION_TYPES } from "../lib/publication-feed-contract";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./platform-sign-in";
 import { ContentModerationControls } from "./content-moderation-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function CommunityModerationScreen({
   id,
   searchParams,
@@ -265,7 +265,7 @@ export async function CommunityModerationScreen({
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href="/admin/reports"
         >
-          {locale === "ru" ? "Жалобы сообщества" : "Community reports"}
+          {copy.reports}
         </Link>
       </header>
       {parsed.success && filters && (
