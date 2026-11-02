@@ -1,5 +1,6 @@
 const en = {
   title: "Compare my collections",
+  loading: "Loading collection comparison…",
   note: "Compare resource references in two of your collections. Counts cover the full pair; search matches currently accessible names. Collection membership never grants downloads.",
   choose: "Choose another collection to compare.",
   destination: "Comparison destination",
@@ -18,6 +19,7 @@ const en = {
 };
 const ru: typeof en = {
   title: "Сравнить мои коллекции",
+  loading: "Загрузка сравнения коллекций…",
   note: "Сравните записи ресурсов двух своих коллекций. Счётчики относятся к полному составу; поиск учитывает названия доступных сейчас ресурсов. Коллекции не предоставляют права на скачивание.",
   choose: "Выберите другую коллекцию для сравнения.",
   destination: "Коллекция для сравнения",
