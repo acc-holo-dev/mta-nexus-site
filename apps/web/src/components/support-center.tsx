@@ -421,7 +421,7 @@ export function SupportCenter({
               name="q"
               maxLength={120}
               defaultValue={initialFilters.q}
-              className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+              className={platformFieldClass}
             />
           </label>
           <label className="block space-y-1.5">
@@ -432,7 +432,7 @@ export function SupportCenter({
               onChange={(event) => {
                 setStaffStatus(event.target.value as SupportCaseStatus | "");
               }}
-              className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+              className={platformFieldClass}
             >
               <option value="">{copy.allStatuses}</option>
               <option value="open">{copy.open}</option>
