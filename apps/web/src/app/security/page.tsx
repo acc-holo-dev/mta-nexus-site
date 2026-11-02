@@ -1,7 +1,7 @@
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../components/auth-return-path";
+import { PlatformSignIn } from "../../components/content-catalog-controls";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { securityActivityLabelKey } from "../../lib/security-activity";
@@ -18,18 +18,7 @@ export default async function SecurityPage() {
   const authenticated = await authService.getSessionIdentity(token);
 
   if (!authenticated) {
-    return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <ShieldCheck className="mx-auto h-10 w-10 text-accent" aria-hidden="true" />
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", "/security")}
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+    return <PlatformSignIn locale={locale} returnPath="/security" />;
   }
 
   const { user, sessionId: currentSessionId } = authenticated;

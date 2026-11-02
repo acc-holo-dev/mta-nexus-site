@@ -1,8 +1,9 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
-import packageFixtures from "./fixtures/build-packages.json";
 import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
+import packageFixtures from "./fixtures/build-packages.json";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
   locale: "en" as "en" | "ru",
@@ -10,6 +11,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/resources/prd_a/builds/bld_a/package",
   notFound: () => {
     throw Error("NOT_FOUND");
   },
@@ -21,13 +23,15 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
-import { BuildPackageScreen } from "../apps/web/src/components/build-package-screen";
+
+import { buildPackageSummary } from "@nexus/domain";
 import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
 } from "../apps/web/src/components/build-package-evidence";
-import { buildPackageSummary } from "@nexus/domain";
+import { BuildPackageScreen } from "../apps/web/src/components/build-package-screen";
 import { buildPackageCopy } from "../apps/web/src/lib/build-package-i18n";
+
 const detail = {
   product: { id: "prd_a", title: "<Private title>" },
   build: { id: "bld_a", version: "2.0.0", hasInventory: true },

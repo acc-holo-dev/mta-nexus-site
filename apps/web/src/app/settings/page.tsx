@@ -1,12 +1,12 @@
 "use client";
 
 import { Button, fieldClassBlock } from "@nexus/ui";
-import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
+import { Bell, KeyRound, MailCheck, Monitor } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "../../components/auth-return-path";
 import { confirmAction } from "../../components/confirm-action";
+import { PlatformSignIn } from "../../components/content-catalog-controls";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { useNexusLocale } from "../../components/locale-context";
 import { ProfileChangeHistoryLink } from "../../components/private-change-history-controls";
@@ -98,13 +98,7 @@ export default function SettingsPage() {
   });
   const [recoveryEmail, setRecoveryEmail] = useState<RecoveryEmail | null>(null);
   const [recoveryPassword, setRecoveryPassword] = useState("");
-  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
-  useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
-  }, [pathname]);
 
   const preferenceLabels: Array<{
     key: keyof NotificationPreferences;
@@ -411,7 +405,7 @@ export default function SettingsPage() {
       <div className="max-w-3xl space-y-8" aria-busy="true">
         <div>
           <h1 className="font-display text-primary">{copy.title}</h1>
-          <p role="status" className="mt-1 font-caption text-muted">
+          <p role="status" aria-live="polite" className="mt-1 font-caption text-muted">
             {copy.loading}
           </p>
         </div>
@@ -428,19 +422,7 @@ export default function SettingsPage() {
   }
 
   if (signedOut) {
-    return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <ShieldCheck className="mx-auto h-10 w-10 text-accent" aria-hidden="true" />
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <p className="text-sm text-muted">{copy.signInAgain}</p>
-        <Link
-          href={loginHref}
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+    return <PlatformSignIn locale={locale} returnPath={pathname} />;
   }
 
   if (loadError) {

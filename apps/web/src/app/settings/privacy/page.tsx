@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { ProfilePrivacyEditor } from "../../../components/profile-privacy-editor";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -19,17 +19,7 @@ export default async function PrivacySettingsPage() {
   const locale = await getRequestLocale(),
     copy = profilePrivacyCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <div className="nexus-panel p-8">
-        <Link
-          href={authEntryHref("login", "/settings/privacy")}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/settings/privacy" />;
   const initial = await profilePrivacyService
     .own(actor)
     .then((row) => editablePrivacySchema.parse(row))

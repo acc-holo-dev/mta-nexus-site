@@ -513,6 +513,7 @@ describe("resource detail acquisition behavior", () => {
 
     expect(productService.getPublicAttribution).toHaveBeenCalledWith("prd_detail");
     expect(html).toContain('href="/developers/detail_author"');
+    expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
     expect(html).toContain("Detail Author");
     expect(html).toContain(copy.noReviewsYet);
     expect(html).toContain(copy.libraryAdditions);

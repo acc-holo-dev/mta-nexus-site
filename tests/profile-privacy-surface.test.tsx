@@ -1,7 +1,8 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
 import { profilePrivacyCopy } from "../apps/web/src/lib/profile-privacy-copy";
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   session: vi.fn(),
@@ -12,6 +13,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
+  usePathname: () => "/settings/privacy",
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
@@ -26,10 +28,12 @@ vi.mock("../apps/web/src/lib/services/profile-privacy-service", () => ({
 vi.mock("../apps/web/src/lib/services/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
+
 import PrivacyPage, { generateMetadata } from "../apps/web/src/app/settings/privacy/page";
 import UserActivity, {
   generateMetadata as activityMetadata,
 } from "../apps/web/src/app/users/[username]/activity/page";
+
 const saved = {
   id: "actor",
   username: "member",

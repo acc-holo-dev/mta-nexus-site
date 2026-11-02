@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -10,6 +11,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/collections/membership-history",
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
@@ -29,15 +31,16 @@ vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { membershipHistory: state.history, membershipReceipt: state.detail },
 }));
 
+import Detail, {
+  generateMetadata as detailMetadata,
+} from "../apps/web/src/app/workspace/library/collections/membership-history/[id]/page";
 import Page, {
   dynamic,
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/membership-history/page";
-import Detail, {
-  generateMetadata as detailMetadata,
-} from "../apps/web/src/app/workspace/library/collections/membership-history/[id]/page";
 import { LibraryMembershipHistoryScreen } from "../apps/web/src/components/library-membership-history-screen";
 import { libraryMembershipHistoryCopy } from "../apps/web/src/lib/library-membership-history-i18n";
+
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
 const snapshot = { id: "lcol_a", name: "Recorded <name>", status: "active", revision: 3 };

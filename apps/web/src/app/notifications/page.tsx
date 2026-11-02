@@ -3,7 +3,7 @@ import { AppError } from "@nexus/domain";
 import { Button, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../components/auth-return-path";
+import { PlatformSignIn } from "../../components/content-catalog-controls";
 import { NotificationCenterTabs } from "../../components/notification-center-tabs";
 import { NotificationInbox } from "../../components/notification-inbox";
 import { getRequestLocale } from "../../lib/i18n-server";
@@ -38,17 +38,25 @@ export default async function NotificationCenterPage({
     else if (value !== undefined) params.append(key, value);
   }
   const returnPath = params.size ? `/notifications?${params}` : "/notifications";
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <div className="mx-auto max-w-4xl space-y-6">
+        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
+          {copy.unavailable}
+        </p>
+      </div>
+    );
+  }
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
   const filters = parseNotificationInboxQuery(params);
-  let error = filters ? "" : copy.invalid,
-    authenticated = false;
+  let error = filters ? "" : copy.invalid;
   const page = await (async () => {
     try {
-      const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-      if (!actor) {
-        error = copy.unauthorized;
-        return null;
-      }
-      authenticated = true;
       return filters ? await notificationInboxService.page(actor.id, filters, locale) : null;
     } catch (failure) {
       error =
@@ -87,76 +95,74 @@ export default async function NotificationCenterPage({
           read: copy.read,
         }}
       >
-        {authenticated && (
-          <form
-            action="/notifications"
-            method="get"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-          >
-            <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-              {copy.query}
-              <input
-                type="search"
-                name="q"
-                maxLength={100}
-                defaultValue={filters?.query ?? ""}
-                className={`${fieldClass} block min-h-11 w-full`}
-              />
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.state}
-              <select
-                name="state"
-                defaultValue={filters?.state ?? "all"}
-                className={`${fieldClass} block min-h-11`}
-              >
-                {(["all", "unread", "read"] as const).map((value) => (
-                  <option key={value} value={value}>
-                    {copy[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.category}
-              <select
-                name="category"
-                defaultValue={filters?.category ?? "all"}
-                className={`${fieldClass} block min-h-11`}
-              >
-                <option value="all">{copy.all}</option>
-                {INBOX_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {copy[category]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.period}
-              <select
-                name="period"
-                defaultValue={filters?.period ?? "all"}
-                className={`${fieldClass} block min-h-11`}
-              >
-                {INBOX_PERIODS.map((period) => (
-                  <option key={period} value={period}>
-                    {period === "all" ? copy.all : copy[`period${period}`]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Button type="submit" className="min-h-11 font-semibold">
-              {copy.search}
-            </Button>
-            <Link
-              href="/notifications"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        <form
+          action="/notifications"
+          method="get"
+          className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+        >
+          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+            {copy.query}
+            <input
+              type="search"
+              name="q"
+              maxLength={100}
+              defaultValue={filters?.query ?? ""}
+              className={`${fieldClass} block min-h-11 w-full`}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.state}
+            <select
+              name="state"
+              defaultValue={filters?.state ?? "all"}
+              className={`${fieldClass} block min-h-11`}
             >
-              {copy.reset}
-            </Link>
-          </form>
-        )}
+              {(["all", "unread", "read"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {copy[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.category}
+            <select
+              name="category"
+              defaultValue={filters?.category ?? "all"}
+              className={`${fieldClass} block min-h-11`}
+            >
+              <option value="all">{copy.all}</option>
+              {INBOX_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {copy[category]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.period}
+            <select
+              name="period"
+              defaultValue={filters?.period ?? "all"}
+              className={`${fieldClass} block min-h-11`}
+            >
+              {INBOX_PERIODS.map((period) => (
+                <option key={period} value={period}>
+                  {period === "all" ? copy.all : copy[`period${period}`]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button type="submit" className="min-h-11 font-semibold">
+            {copy.search}
+          </Button>
+          <Link
+            href="/notifications"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.reset}
+          </Link>
+        </form>
         <Link
           prefetch={false}
           href={
@@ -172,14 +178,6 @@ export default async function NotificationCenterPage({
           <p role="alert" className="nexus-panel p-4 text-sm text-danger">
             {error}
           </p>
-        )}
-        {!authenticated && error === copy.unauthorized && (
-          <Link
-            href={authEntryHref("login", returnPath)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.signIn}
-          </Link>
         )}
         {page && filters && (
           <NotificationInbox key={randomUUID()} initialPage={page} filters={filters} />

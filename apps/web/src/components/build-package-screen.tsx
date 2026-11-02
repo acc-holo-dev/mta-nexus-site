@@ -5,11 +5,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../lib/build-package-query";
-import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { buildPackageService } from "../lib/services/build-package-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function BuildPackageScreen({
   productId,
   buildId,
@@ -22,8 +21,7 @@ export async function BuildPackageScreen({
   staff?: boolean;
 }) {
   const locale = await getRequestLocale(),
-    copy = buildPackageCopy(locale),
-    dictionary = getDictionary(locale);
+    copy = buildPackageCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const rawSearchParams = await searchParams;
   const returnQuery = new URLSearchParams();
@@ -33,18 +31,7 @@ export async function BuildPackageScreen({
   }
   const packageBase = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`;
   const returnPath = returnQuery.size ? `${packageBase}?${returnQuery}` : packageBase;
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{dictionary.workspace.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const queryParams = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
     if (Array.isArray(value)) for (const item of value) queryParams.append(key, item);

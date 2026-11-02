@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { DeveloperProfileEditor } from "../../../components/developer-profile-editor";
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -20,17 +20,7 @@ export default async function DeveloperSettingsPage() {
   const locale = await getRequestLocale(),
     copy = verificationCopy(locale),
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <div className="nexus-panel p-8">
-        <Link
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={authEntryHref("login", "/settings/developer")}
-        >
-          {copy.signIn}
-        </Link>
-      </div>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/settings/developer" />;
   if (!["developer", "admin"].includes(actor.role))
     return <div className="nexus-panel p-8 text-sm text-muted">{copy.roleRequired}</div>;
   const initial = await verificationWorkspaceService

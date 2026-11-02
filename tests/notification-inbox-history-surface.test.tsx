@@ -7,6 +7,7 @@ Object.assign(globalThis, { React });
 
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", session: vi.fn(), page: vi.fn() }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/notifications" }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -19,6 +20,7 @@ vi.mock("../apps/web/src/lib/services/notification-inbox-service", () => ({
 import Loading from "../apps/web/src/app/notifications/loading";
 import Page, { generateMetadata } from "../apps/web/src/app/notifications/page";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { notificationInboxCopy } from "../apps/web/src/lib/notification-inbox-copy";
 
 beforeEach(() => {
@@ -89,15 +91,9 @@ it.each(["en", "ru"] as const)(
 it("shows sign-in when the session is absent without reading another inbox", async () => {
   state.session.mockResolvedValue(null);
   const html = await render();
-  expect(html).toContain('aria-label="Notification center"');
-  expect(html).toContain('aria-current="page"');
-  expect(html).toContain('href="/notifications"');
-  expect(html).toContain('href="/notifications?state=unread"');
-  expect(html).toContain('href="/notifications?state=read"');
-  expect(html).not.toContain('role="tablist"');
-  expect(html).not.toContain('role="tabpanel"');
-  expect(html).toContain("rounded-lg");
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
   expect(html).toContain('href="/auth/login?next=%2Fnotifications"');
+  expect(html).not.toContain('action="/notifications"');
   expect(html).not.toContain("No notifications yet");
   expect(state.page).not.toHaveBeenCalled();
 });

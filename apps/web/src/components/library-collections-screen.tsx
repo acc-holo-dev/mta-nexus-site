@@ -28,7 +28,7 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
@@ -105,21 +105,14 @@ export async function LibraryCollectionsScreen({
   const routeCollectionId = path?.id;
   const c = libraryCollectionsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
+  if (!actor) {
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref(
-            "login",
-            guestCollectionsReturnPath(view, queryValues, routeCollectionId),
-          )}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={guestCollectionsReturnPath(view, queryValues, routeCollectionId)}
+      />
     );
+  }
   try {
     if (view === "copy" && collectionPageParams(queryValues).size)
       throw new AppError("Unexpected copy query", 400, "COLLECTION_INVALID");

@@ -1,27 +1,29 @@
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 
-// Honest loading shell for /settings.
-export default async function Loading() {
-  const dictionary = getDictionary(await getRequestLocale());
+export default async function SettingsLoading() {
+  const locale = await getRequestLocale();
+  const copy = getDictionary(locale).settings;
   return (
     <section
-      className="mx-auto max-w-3xl space-y-6 py-8"
+      className="max-w-3xl space-y-8"
       aria-busy="true"
       aria-labelledby="settings-loading-heading"
     >
-      <header className="space-y-2">
+      <header>
         <h1 id="settings-loading-heading" className="font-display text-primary">
-          {dictionary.settings.title}
+          {copy.title}
         </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {dictionary.settings.loading}
+        <p role="status" aria-live="polite" className="mt-1 font-caption text-muted">
+          {copy.loading}
         </p>
       </header>
-      <div className="animate-pulse space-y-4" aria-hidden="true">
-        <div className="h-28 rounded bg-inset" />
+      <div className="animate-pulse space-y-8" aria-hidden="true">
         {[1, 2, 3, 4].map((key) => (
-          <div key={key} className="h-24 rounded bg-inset" />
+          <div key={key} className="nexus-panel space-y-4 p-5 shadow-nexus-sm">
+            <div className="h-4 w-1/3 rounded bg-inset" />
+            <div className="h-20 rounded bg-inset" />
+          </div>
         ))}
       </div>
     </section>

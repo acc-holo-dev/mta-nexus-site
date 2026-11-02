@@ -28,6 +28,10 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/security",
+}));
+
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {

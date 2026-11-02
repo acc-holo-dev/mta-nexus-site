@@ -1,7 +1,8 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   actor: { id: "usr_a" } as { id: string } | null,
@@ -10,6 +11,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/workspace/resources/prd_a/builds/bld_a",
   notFound: () => {
     throw Error("NOT_FOUND");
   },
@@ -24,8 +26,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
-import { ResourceBuildScreen } from "../apps/web/src/components/resource-build-screen";
+
 import { generateMetadata } from "../apps/web/src/app/workspace/resources/[id]/builds/[buildId]/page";
+import { ResourceBuildScreen } from "../apps/web/src/components/resource-build-screen";
+
 const detail = {
   product: { id: "prd_a", title: "<Private resource>", slug: "resource", status: "published" },
   build: {

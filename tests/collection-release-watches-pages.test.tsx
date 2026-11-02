@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   locale: "en" as "en" | "ru",
@@ -20,10 +21,12 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { collectionPage: h.page },
 }));
+
 import Page, {
   metadata,
 } from "../apps/web/src/app/workspace/library/collections/[id]/watches/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const screen = async () =>
   renderToStaticMarkup(
     await Page({
@@ -77,4 +80,23 @@ it("requires sign-in before reading a private collection", async () => {
   expect(html).toContain("/auth/login?next=");
   expect(html).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fwatches");
   expect(h.page).not.toHaveBeenCalled();
+});
+it("offers a filter reset when a collection watch page is empty", async () => {
+  h.page.mockResolvedValue({
+    collection: { id: "lcol_a", name: "Core", status: "active", revision: 3 },
+    activeWatchCount: 0,
+    items: [],
+    counts: { all: 3, enabled: 0, disabled: 3, unavailable: 0 },
+    page: 1,
+    totalPages: 1,
+  });
+  const html = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ id: "lcol_a" }),
+      searchParams: Promise.resolve({ filter: "disabled" }),
+    }),
+  );
+  expect(html).toContain("No resource watches match this filter.");
+  expect(html).toContain("Clear filters");
+  expect(html).toContain("filter=all");
 });

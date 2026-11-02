@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPackageCopy } from "../lib/build-package-i18n";
-import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
@@ -11,10 +10,10 @@ import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceBuildWorkspaceService } from "../lib/services/resource-build-workspace-service";
-import { authEntryHref } from "./auth-return-path";
 import { BuildModerationControls } from "./build-moderation-controls";
 import { BuildPackageEvidencePanel } from "./build-package-evidence";
 import { BuildProvenanceDetails } from "./build-provenance-details";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ResourceBuildControls } from "./resource-build-controls";
 export async function ResourceBuildScreen({
   productId,
@@ -26,22 +25,10 @@ export async function ResourceBuildScreen({
   staff?: boolean;
 }) {
   const locale = await getRequestLocale(),
-    copy = getResourceBuildWorkspaceCopy(locale),
-    dictionary = getDictionary(locale);
+    copy = getResourceBuildWorkspaceCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const returnPath = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}`;
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{dictionary.workspace.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {dictionary.workspace.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let detail: Awaited<ReturnType<typeof resourceBuildWorkspaceService.detail>>;
   try {
     detail = await resourceBuildWorkspaceService.detail(productId, buildId, actor, staff);

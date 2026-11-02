@@ -6,7 +6,7 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceMediaService } from "../lib/services/resource-media-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ResourceGallery } from "./resource-gallery";
 import { ResourceMediaEditor } from "./resource-media-editor";
 export async function ResourceMediaScreen({
@@ -20,18 +20,7 @@ export async function ResourceMediaScreen({
     copy = resourceMediaCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const returnPath = `/workspace/resources/${encodeURIComponent(productId)}/media`;
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let gallery: Awaited<ReturnType<typeof resourceMediaService.managed>>;
   try {
     gallery = await resourceMediaService.managed(productId, actor.id, staff);

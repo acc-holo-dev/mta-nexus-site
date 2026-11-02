@@ -19,7 +19,7 @@ import {
 } from "../lib/library-membership-history-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
 export async function LibraryMembershipHistoryScreen({
   params,
@@ -50,17 +50,7 @@ export async function LibraryMembershipHistoryScreen({
         // Keep the list route when filters are invalid for unsigned visitors.
       }
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   try {
     const filters = collectionPageParams(raw);

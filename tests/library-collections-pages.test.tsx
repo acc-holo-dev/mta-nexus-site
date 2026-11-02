@@ -14,6 +14,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/workspace/library/collections",
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
@@ -63,6 +64,7 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 }));
 
 import { LibraryCollectionsScreen } from "../apps/web/src/components/library-collections-screen";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   collection = {
@@ -149,7 +151,7 @@ beforeEach(() => {
 it("authenticates all views before repository access", async () => {
   state.actor = null;
   for (const view of ["list", "detail", "add", "history", "copy"] as const)
-    expect(await screen(view)).toContain("Sign in to manage");
+    expect(await screen(view)).toContain(getDictionary("en").workspace.signInRequired);
   expect(state.page).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
   expect(state.history).not.toHaveBeenCalled();

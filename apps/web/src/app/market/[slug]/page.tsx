@@ -273,7 +273,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <span className="text-muted">{copy.publisher}: </span>
             <Link
               href={`/organizations/${encodeURIComponent(attribution.organization.slug)}`}
-              className="font-semibold text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {attribution.organization.name}
             </Link>
@@ -284,7 +284,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <span className="text-muted">{copy.author}: </span>
             <Link
               href={attribution.author.href}
-              className="font-semibold text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {attribution.author.displayName}
             </Link>

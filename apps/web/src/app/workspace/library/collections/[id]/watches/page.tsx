@@ -131,7 +131,19 @@ export default async function Page({
           title: available ? title : null,
         }))}
       />
-      {!result.items.length && <p>{copy.empty}</p>}
+      {!result.items.length && (
+        <div className="nexus-panel space-y-3 p-6 text-sm text-muted" role="status">
+          <p>{result.counts.all === 0 ? copy.empty : copy.emptyFiltered}</p>
+          {result.counts.all !== 0 ? (
+            <Link
+              href={href(1, "all")}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
+      )}
       <ul className="grid gap-4 sm:grid-cols-2">
         {result.items.map((item) => (
           <li key={item.productId} className="nexus-panel space-y-3 p-5">
