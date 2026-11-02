@@ -498,7 +498,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({ pag
     });
     await expect(paidStatus).toBeVisible();
     const paidDescription = page.getByText(
-      "Paid resources are disabled during the closed beta. No payment attempt will be created.",
+      "Paid resources are disabled during the open free beta. No payment attempt will be created.",
       { exact: true },
     );
     await expect(paidDescription).toBeVisible();
@@ -539,7 +539,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({ pag
       }),
     ).toBeVisible();
     const russianPaidDescription = page.getByText(
-      "Платные ресурсы отключены на время закрытой беты. Попытка оплаты не создаётся.",
+      "Платные ресурсы отключены на время открытой бесплатной беты. Попытка оплаты не создаётся.",
       { exact: true },
     );
     await expect(russianPaidDescription).toBeVisible();

@@ -29,6 +29,7 @@ export const libraryCopy = {
     emptyFilter: "There are no resources matching this filter.",
     emptyFilterHint:
       "Switch to All or another availability filter to see the rest of your library.",
+    clearFilters: "Show all library resources",
     unavailableResource: "Resource temporarily unavailable",
     unavailableReason:
       "This resource is unpublished or has no approved, safely scanned build. Downloads are disabled until availability is restored.",
@@ -58,6 +59,7 @@ export const libraryCopy = {
     emptyFilter: "Нет ресурсов с выбранным статусом.",
     emptyFilterHint:
       "Выберите «Все» или другой фильтр доступности, чтобы увидеть остальные ресурсы.",
+    clearFilters: "Показать всю библиотеку",
     unavailableResource: "Ресурс временно недоступен",
     unavailableReason:
       "Ресурс не опубликован либо не имеет одобренной, безопасно проверенной сборки. Скачивание недоступно до восстановления публикации.",

@@ -1,36 +1,36 @@
 import {
-  productRepository,
   buildRepository,
   organizationRepository,
   productLifecycleRepository,
+  productRepository,
 } from "@nexus/db";
-import { generateId, can } from "@nexus/security";
+import type {
+  Build,
+  BuildPackageEvidence,
+  NexusDomainEvent,
+  Product,
+  ProductType,
+  ResourceLifecycleAction,
+  User,
+} from "@nexus/domain";
 import {
   AppError,
-  NotFoundError,
-  ForbiddenError,
   eventBus,
+  ForbiddenError,
+  NotFoundError,
   normalizeResourceVersionForStorage,
 } from "@nexus/domain";
-import type {
-  Product,
-  Build,
-  User,
-  ProductType,
-  NexusDomainEvent,
-  ResourceLifecycleAction,
-  BuildPackageEvidence,
-} from "@nexus/domain";
-import { buildProductDependencyResolution } from "../product-dependency-resolution";
-import {
-  buildReverseDependencySummary,
-  reverseDependencyLimits,
-} from "../reverse-dependency-summary";
+import { can, generateId } from "@nexus/security";
 import { isUniqueConstraintViolation } from "../postgres-error";
+import { buildProductDependencyResolution } from "../product-dependency-resolution";
 import {
   mapPublicResourceAttribution,
   type PublicResourceAttribution,
 } from "../public-resource-attribution";
+import {
+  buildReverseDependencySummary,
+  reverseDependencyLimits,
+} from "../reverse-dependency-summary";
 
 export type { PublicResourceAttribution };
 
@@ -259,7 +259,7 @@ export class ProductService {
   ): Promise<Product> {
     if (input.price !== 0) {
       throw new AppError(
-        "Paid resources are disabled during the closed beta",
+        "Paid resources are disabled during the open free beta",
         422,
         "PAID_RESOURCES_DISABLED",
       );
@@ -336,7 +336,7 @@ export class ProductService {
     if (!product) throw new NotFoundError("Product", productId);
     if (product.price !== 0) {
       throw new AppError(
-        "Build releases for paid resources are disabled during the closed beta",
+        "Build releases for paid resources are disabled during the open free beta",
         422,
         "PAID_RESOURCES_DISABLED",
       );

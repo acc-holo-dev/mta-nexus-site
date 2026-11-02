@@ -1,4 +1,4 @@
-/** Read-only closed-beta legacy history wording, independent of paid checkout. */
+/** Read-only open free-beta legacy history wording, independent of paid checkout. */
 export const commerceHistoryCopy = {
   en: {
     navigation: "Account history",
@@ -7,7 +7,7 @@ export const commerceHistoryCopy = {
     signIn: "Sign in",
     back: "Back to workspace",
     betaNotice:
-      "Existing records only. Paid checkout, payouts, invoices, new licenses and paid renewals are not available in this closed beta.",
+      "Existing records only. Paid checkout, payouts, invoices, new licenses and paid renewals are not available in this open free beta.",
     page: "Page",
     of: "of",
     previous: "Previous",
@@ -72,7 +72,7 @@ export const commerceHistoryCopy = {
     signIn: "Войти",
     back: "Вернуться в кабинет",
     betaNotice:
-      "Только существующие данные. Оплата, вывод средств, счета, новые лицензии и платное продление пока недоступны в закрытой бета-версии.",
+      "Только существующие данные. Оплата, вывод средств, счета, новые лицензии и платное продление пока недоступны в открытой бесплатной бете.",
     page: "Страница",
     of: "из",
     previous: "Назад",

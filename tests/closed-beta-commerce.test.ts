@@ -38,7 +38,7 @@ describe("closed-beta commerce behavior", () => {
 
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({
-      error: "Paid checkout is not available during the closed beta.",
+      error: "Paid checkout is not available during the open free beta.",
       code: "CHECKOUT_DISABLED",
     });
   });

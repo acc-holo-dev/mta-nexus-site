@@ -3,7 +3,7 @@ import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { createRequestLogContext, jsonWithRequestId } from "../../../lib/observability";
 
 /**
- * Paid checkout is intentionally unavailable in the player-first closed beta.
+ * Paid checkout is intentionally unavailable in the player-first open free beta.
  * Do not add a provider here until the legal, refund and payout flows are ready.
  */
 export const POST = withBrowserMutation(async function POST(request: NextRequest) {
@@ -11,7 +11,7 @@ export const POST = withBrowserMutation(async function POST(request: NextRequest
   return jsonWithRequestId(
     context,
     {
-      error: "Paid checkout is not available during the closed beta.",
+      error: "Paid checkout is not available during the open free beta.",
       code: "CHECKOUT_DISABLED",
     },
     {

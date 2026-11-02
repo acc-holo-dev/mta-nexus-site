@@ -39,7 +39,7 @@ export const publishing = {
     uploadRateLimited: "Too many upload attempts. Wait a moment and try again.",
     resourceNotFound: "The resource was not found.",
     buildForbidden: "You do not have permission to submit builds for this resource.",
-    paidPublishingUnavailable: "Paid resource publishing is unavailable during the closed beta.",
+    paidPublishingUnavailable: "Paid resource publishing is unavailable during the open free beta.",
     versionAlreadyExists: "This build version already exists. Choose a different version.",
     multipartRequired: "The build upload form could not be read. Choose the file again and retry.",
     multipartInvalid:

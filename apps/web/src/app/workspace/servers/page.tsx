@@ -181,9 +181,14 @@ export default async function ManagedServersPage({
         {copy.of} {result.total}
       </p>
       {result.servers.length === 0 ? (
-        <p className="nexus-panel p-8 text-center text-sm text-muted">
-          {filtered ? copy.emptyFilter : copy.empty}
-        </p>
+        <div className="nexus-panel space-y-3 p-8 text-center text-sm text-muted">
+          <p>{filtered ? copy.emptyFilter : copy.empty}</p>
+          {filtered ? (
+            <Link href="/workspace/servers" className="text-accent underline">
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <ManagedServerVisibilityBatch
           key={`${result.page}:${JSON.stringify(filters)}:${result.servers.map((server) => `${server.id}:${server.visibility}:${server.updatedAt.toISOString()}`).join(":")}`}

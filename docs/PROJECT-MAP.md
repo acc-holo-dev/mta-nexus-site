@@ -45,7 +45,7 @@ scripts/          → doctor, CI policy, browser/axe, release/beta evidence
 | Orgs / teams              | `organization-*`, `/workspace/organizations`                         |
 | Moderation / trust        | reports, verification, admin queues                                  |
 | Notifications / PWA       | inbox services, push worker, mail worker (optional Mailpit)          |
-| Commerce shell            | cart/checkout/orders **без** реальных платежей (closed beta)         |
+| Commerce shell            | cart/checkout/orders **без** реальных платежей (open free beta)      |
 
 ## Запуск и проверки (кратко)
 

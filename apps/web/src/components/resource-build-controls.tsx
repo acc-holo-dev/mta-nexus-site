@@ -6,6 +6,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateRequest } from "../lib/private-request";
 import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
 import { confirmedBuildCommand } from "../lib/resource-build-workspace-response";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 const textareaClass =
@@ -40,8 +41,23 @@ export function ResourceBuildControls({
   const editable = current.status === "draft" || current.status === "rejected";
   const dirty =
     notes !== (current.releaseNotes ?? "") || target !== (current.mtaVersionTarget ?? "");
+  async function confirmDestructive(action: "withdraw" | "retire") {
+    const object = `${current.version} · ${copy.revision} ${current.revision}`;
+    return confirmAction({
+      title: action === "withdraw" ? copy.withdrawConfirmTitle : copy.retireConfirmTitle,
+      object,
+      consequences: action === "withdraw" ? copy.withdrawConfirm : copy.retirement,
+      confirmLabel: action === "withdraw" ? copy.withdraw : copy.retire,
+      cancelLabel: copy.cancel,
+      closeLabel: copy.cancel,
+      danger: true,
+    });
+  }
   async function command(action: ResourceBuildCommand["action"]) {
     if (busy.current || uncertain) return;
+    if ((action === "withdraw" || action === "retire") && !(await confirmDestructive(action))) {
+      return;
+    }
     const input: ResourceBuildCommand =
       action === "save"
         ? {

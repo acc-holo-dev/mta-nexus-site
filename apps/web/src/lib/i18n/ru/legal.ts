@@ -1,6 +1,6 @@
 export const legal = {
   legal: {
-    closedBeta: "Закрытая бета",
+    closedBeta: "Открытая бесплатная бета",
     openFreeBeta: "Открытая бесплатная бета",
     lastUpdated: "Последнее обновление",
     terms: {

@@ -4,11 +4,11 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `4c8f2c81dc2c278b599fd78b0aa39f14a113bab0` (`fix(web): confirm resource review removal decisions`).
-- **Verified CI green on that tip:** [CI 41371109579](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41371109579) (lint/unit, DB, image build, production browser smoke; selected scope).
+- **Tip SHA:** `aed1e7e200be31dea8b341cd89b2122de3338e34` (`fix(web): confirm library archive and duplicate actions`).
+- **Verified CI green on that tip:** [CI 41372388408](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41372388408) (lint/unit, DB, image build, production browser smoke; selected scope).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path.
-- **Honesty/a11y wave (tip series):** clear-filter CTAs, confirmAction on destructive clients (incl. review removal), honest loading shells, filter `focus-visible` outlines, connect-controls clipboard a11y.
+- **Honesty/a11y wave (tip series):** clear-filter CTAs, confirmAction on destructive clients (sessions, cart, push, review removal, library archive/duplicate), honest loading shells, filter `focus-visible` outlines, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.
 - **Auth chrome:** full shell kept on `/auth` (theme + banner); logout redirects to bare `/auth/login`.
 - **Open free beta copy (tip series):** public/legal/support surfaces say open free beta (not closed beta); support SLA disclaimer matches product terms.
 
@@ -28,11 +28,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** guest-return/`next=` first paint; confirmAction destructive clients (sessions, cart, push, review removal); honest loading shells; filter focus rings; connect-controls a11y; CURRENT-STATE синхронизирован с verified baseline `4c8f2c81…` / CI 41371109579.
+**Последняя локальная волна:** guest-return/`next=` first paint; confirmAction destructive clients (sessions, cart, push, review removal, library archive/duplicate); honest loading shells; filter focus rings; connect-controls a11y; CURRENT-STATE синхронизирован с verified baseline `aed1e7e2…` / CI 41372388408.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `4c8f2c81…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `aed1e7e2…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
