@@ -3,6 +3,7 @@
 import { Button } from "@nexus/ui";
 import {
   Bell,
+  BookMarked,
   Bookmark,
   BookOpen,
   Code2,
@@ -93,6 +94,11 @@ export function MobileNav({ locale }: { locale: Locale }) {
       href: "/workspace",
       label: dictionary.nav.mobileWorkspace,
       icon: LayoutDashboard,
+    },
+    {
+      href: "/workspace/library",
+      label: dictionary.workspace.libraryTitle,
+      icon: BookMarked,
     },
     { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },

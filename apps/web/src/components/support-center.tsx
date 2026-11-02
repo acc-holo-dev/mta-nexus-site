@@ -327,21 +327,18 @@ export function SupportCenter({
               role="note"
               className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary"
             >
-              <p className="font-label uppercase text-muted">
-                {locale === "ru" ? "Контекст обращения" : "Attached context"}
-              </p>
+              <p className="font-label uppercase text-muted">{copy.attachedContext}</p>
               <p className="mt-1 break-all">
-                {locale === "ru" ? "Ресурс" : "Resource"}: {objectContext.productId}
+                {copy.contextResource}: {objectContext.productId}
               </p>
               {objectContext.buildId ? (
                 <p className="break-all">
-                  {locale === "ru" ? "Сборка" : "Build"}: {objectContext.buildId}
+                  {copy.contextBuild}: {objectContext.buildId}
                 </p>
               ) : null}
               {objectContext.receiptId ? (
                 <p className="break-all">
-                  {locale === "ru" ? "Квитанция скачивания" : "Download receipt"}:{" "}
-                  {objectContext.receiptId}
+                  {copy.contextReceipt}: {objectContext.receiptId}
                 </p>
               ) : null}
               <Button
@@ -354,7 +351,7 @@ export function SupportCenter({
                   setObjectContext(null);
                 }}
               >
-                {locale === "ru" ? "Убрать контекст" : "Remove context"}
+                {copy.removeContext}
               </Button>
             </div>
           ) : null}

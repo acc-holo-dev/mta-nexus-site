@@ -3,6 +3,7 @@
 import { Button } from "@nexus/ui";
 import {
   Bell,
+  BookMarked,
   Bookmark,
   BookOpen,
   ChevronLeft,
@@ -11,6 +12,7 @@ import {
   Compass,
   LayoutDashboard,
   Library,
+  LifeBuoy,
   LogIn,
   MessageSquare,
   Plus,
@@ -84,11 +86,17 @@ export function Sidebar({
     { href: "/community", label: dictionary.nav.community, icon: MessageSquare },
     { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },
     { href: "/developers", label: dictionary.nav.creators, icon: Code2 },
+    { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
   ];
 
   // Authenticated workspace: grouped by real objects (library / servers / publications), not roles.
   const libraryNav: NavItem[] = [
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
+    {
+      href: "/workspace/library",
+      label: dictionary.workspace.libraryTitle,
+      icon: BookMarked,
+    },
     { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },

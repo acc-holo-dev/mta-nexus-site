@@ -139,5 +139,10 @@ export const community = {
     categorySeller: "Продавец",
     categoryIntegration: "Интеграция",
     categoryOther: "Другое",
+    attachedContext: "Контекст обращения",
+    contextResource: "Ресурс",
+    contextBuild: "Сборка",
+    contextReceipt: "Квитанция скачивания",
+    removeContext: "Убрать контекст",
   },
 };

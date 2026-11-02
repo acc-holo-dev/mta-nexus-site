@@ -42,7 +42,10 @@ it.each(["en", "ru"] as const)("exposes a localized managed-server destination i
     <Sidebar locale={locale} isCollapsed={false} onToggle={() => {}} />,
   );
   expect(html).toContain(locale === "ru" ? "Управляемые серверы" : "Managed servers");
+  expect(html).toContain(locale === "ru" ? "Библиотека ресурсов" : "Resource library");
+  expect(html).toContain('href="/workspace/library"');
   expect(html).toContain('href="/workspace/servers"');
+  expect(html).toContain('href="/support"');
   expect(html).not.toContain('href="/admin"');
 });
 
@@ -52,6 +55,8 @@ it("hides managed-server tools for guests and keeps a sign-in CTA", () => {
     <Sidebar locale="en" isCollapsed={false} onToggle={() => {}} />,
   );
   expect(html).not.toContain('href="/workspace/servers"');
+  expect(html).not.toContain('href="/workspace/library"');
+  expect(html).toContain('href="/support"');
   expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fservers"');
   expect(html).toContain("Sign in");
 });
@@ -99,6 +104,7 @@ it("keeps mobile More menu session checking and staff admin labels in source", (
     "utf8",
   );
   expect(source).toContain("dictionary.nav.checkingSession");
+  expect(source).toContain('href: "/workspace/library"');
   expect(source).toContain("adminAccessibleName");
   expect(source).toContain('aria-busy="true"');
   expect(source).toContain("aria-label={adminAccessibleName}");

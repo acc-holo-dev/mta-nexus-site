@@ -138,5 +138,10 @@ export const community = {
     categorySeller: "Seller",
     categoryIntegration: "Integration",
     categoryOther: "Other",
+    attachedContext: "Attached context",
+    contextResource: "Resource",
+    contextBuild: "Build",
+    contextReceipt: "Download receipt",
+    removeContext: "Remove context",
   },
 };

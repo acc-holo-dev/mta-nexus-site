@@ -103,6 +103,8 @@ describe("workspace live telemetry behavior", () => {
     expect(repos.directory).not.toHaveBeenCalled();
     expect(html).toContain(dictionary.workspace.liveUnavailable);
     expect(html).toContain(dictionary.workspace.noServers);
+    expect(html).toContain('href="/workspace/library"');
+    expect(html).toContain(dictionary.workspace.libraryTitle);
   });
 
   it("renders fresh official-directory observations as live workspace state", async () => {

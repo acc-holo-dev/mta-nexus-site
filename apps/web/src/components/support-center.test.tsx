@@ -39,9 +39,18 @@ describe("staff support queue UI", () => {
 
     const customer = renderToStaticMarkup(
       <LocaleProvider locale={locale}>
-        <SupportCenter />
+        <SupportCenter
+          initialContext={{
+            productId: `prd_${"a".repeat(24)}`,
+            buildId: `bld_${"b".repeat(24)}`,
+          }}
+        />
       </LocaleProvider>,
     );
+    expect(customer).toContain(copy.attachedContext);
+    expect(customer).toContain(copy.contextResource);
+    expect(customer).toContain(copy.contextBuild);
+    expect(customer).toContain(copy.removeContext);
     expect(customer).toContain(copy.allStatuses);
     expect(customer).toContain(copy.allCategories);
     expect(customer).toContain('action="/support"');

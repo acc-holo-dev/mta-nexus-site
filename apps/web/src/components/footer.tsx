@@ -79,6 +79,12 @@ export function Footer({ locale }: { locale: Locale }) {
         <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.openFreeBeta}</div>
         <div className="flex items-center gap-3 font-caption">
           <Link
+            href="/support"
+            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {dictionary.nav.support}
+          </Link>
+          <Link
             href="/terms"
             className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >

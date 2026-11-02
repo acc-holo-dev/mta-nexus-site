@@ -85,8 +85,14 @@ export default async function WorkspacePage() {
         <div className="flex flex-col gap-3">
           <nav className="flex flex-wrap gap-2" aria-label={dictionary.workspace.libraryTitle}>
             <Link
+              href="/workspace/library"
+              className={`rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary ${platformSignInFocusClass}`}
+            >
+              {dictionary.workspace.libraryTitle}
+            </Link>
+            <Link
               href="/workspace/resources"
-              className="rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary"
+              className={`rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary ${platformSignInFocusClass}`}
             >
               {dictionary.authorResources.title}
             </Link>
@@ -101,7 +107,7 @@ export default async function WorkspacePage() {
           <nav className="flex flex-wrap gap-2" aria-label={serverCopy.title}>
             <Link
               href="/workspace/servers/new"
-              className="flex items-center gap-1.5 rounded-md border border-base bg-surface px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary"
+              className={`flex items-center gap-1.5 rounded-md border border-base bg-surface px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary ${platformSignInFocusClass}`}
             >
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               {dictionary.workspace.registerServer}
@@ -110,13 +116,13 @@ export default async function WorkspacePage() {
           <nav className="flex flex-wrap gap-2" aria-label={ownDiscussionCopy(locale).title}>
             <Link
               href="/workspace/discussions"
-              className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
+              className={`inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary ${platformSignInFocusClass}`}
             >
               {ownDiscussionCopy(locale).title}
             </Link>
             <Link
               href="/workspace/reactions"
-              className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
+              className={`inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary ${platformSignInFocusClass}`}
             >
               {reactionCopy(locale).my}
             </Link>
