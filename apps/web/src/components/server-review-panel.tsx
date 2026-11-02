@@ -5,7 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { confirmedServerReview } from "../lib/server-review-confirmation";
-import { serverReviewCopy, serverReviewError, serverReviewState } from "../lib/server-review-i18n";
+import {
+  serverReviewCopy,
+  serverReviewError,
+  serverReviewLoadCopy,
+  serverReviewState,
+} from "../lib/server-review-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
@@ -28,22 +33,6 @@ type PublicPage = {
   totalPages: number;
 };
 
-function reviewsUnavailableCopy(locale: "en" | "ru") {
-  return locale === "ru"
-    ? {
-        unavailable: "Отзывы временно недоступны. Это не означает, что отзывов нет.",
-        retry: "Повторить загрузку",
-        reloadReason:
-          "Состояние сохранено на сервере. Обновите страницу, чтобы снова изменить отзыв.",
-      }
-    : {
-        unavailable:
-          "Reviews are temporarily unavailable. This does not mean there are no reviews.",
-        retry: "Retry loading reviews",
-        reloadReason: "Your review is saved on the server. Reload to edit it again.",
-      };
-}
-
 export function ServerReviewPanel({
   serverId,
   initialPage,
@@ -56,7 +45,7 @@ export function ServerReviewPanel({
   const { locale } = useNexusLocale();
   const pathname = usePathname();
   const copy = serverReviewCopy(locale);
-  const loadCopy = reviewsUnavailableCopy(locale);
+  const loadCopy = serverReviewLoadCopy(locale);
   const statusId = useId();
   const statusRef = useRef<HTMLParagraphElement>(null);
   const [page, setPage] = useState<PublicPage | null>(initialPage ?? null);

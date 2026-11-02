@@ -11,6 +11,8 @@ const REQUEST_TIMEOUT_MS = 12_000;
 const SEARCH_DELAY_MS = 250;
 const controlClass =
   "rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
+const connectActionClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 
 type DirectoryResponse = {
   servers: MtaMasterServer[];
@@ -89,7 +91,7 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
             href={`mtasa://${server.address}:${server.port}`}
             aria-label={`${copy.connect}: ${name}`}
             title={copy.connectHint}
-            className={`${controlClass} inline-flex items-center bg-accent-soft font-semibold text-accent`}
+            className={connectActionClass}
           >
             {copy.connect}
           </a>
@@ -100,7 +102,7 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
             aria-label={`${copy.copyAddress}: ${name}`}
             disabled={copying}
             onClick={() => void copyAddress()}
-            className="gap-1.5"
+            className="min-h-11 gap-1.5"
           >
             <Copy className="h-4 w-4" aria-hidden="true" />
             {copying ? copy.copying : copy.copyAddress}

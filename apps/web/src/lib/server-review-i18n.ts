@@ -39,6 +39,9 @@ const en = {
   author: "Author",
   all: "Follow-based reviews",
   openTrust: "Server trust",
+  loadUnavailable: "Reviews are temporarily unavailable. This does not mean there are no reviews.",
+  loadRetry: "Retry loading reviews",
+  reloadReason: "Your review is saved on the server. Reload to edit it again.",
 };
 
 const ru: typeof en = {
@@ -80,10 +83,22 @@ const ru: typeof en = {
   author: "Автор",
   all: "Отзывы на основании follow",
   openTrust: "Доверие к серверу",
+  loadUnavailable: "Отзывы временно недоступны. Это не означает, что отзывов нет.",
+  loadRetry: "Повторить загрузку",
+  reloadReason: "Состояние сохранено на сервере. Обновите страницу, чтобы снова изменить отзыв.",
 };
 
 export function serverReviewCopy(locale: Locale) {
   return locale === "ru" ? ru : en;
+}
+
+export function serverReviewLoadCopy(locale: Locale) {
+  const copy = serverReviewCopy(locale);
+  return {
+    unavailable: copy.loadUnavailable,
+    retry: copy.loadRetry,
+    reloadReason: copy.reloadReason,
+  };
 }
 
 export function serverReviewState(locale: Locale, status: "published" | "withdrawn" | "removed") {
