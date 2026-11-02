@@ -259,7 +259,10 @@ export function PublicationFeed({
             {following && (
               <>
                 <p>{copy.emptyFollowing}</p>
-                <Link href="/discover" className="text-accent underline">
+                <Link
+                  href="/discover"
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
                   {copy.discover}
                 </Link>
               </>

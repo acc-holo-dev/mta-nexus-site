@@ -55,7 +55,10 @@ export async function SupportMessagePage({
         <p role="alert" className="nexus-panel p-5 text-danger">
           {supportMessageError(locale, error instanceof AppError ? error.code : "INTERNAL_ERROR")}
         </p>
-        <Link href={path} className="text-accent underline">
+        <Link
+          href={path}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.reset}
         </Link>
       </div>

@@ -104,7 +104,10 @@ export function ProfileChangeHistoryView({
               {item.experienceVerificationInvalidated && (
                 <p className="text-sm text-muted">
                   {copy.invalidated}{" "}
-                  <Link href="/workspace/verification" className="text-accent underline">
+                  <Link
+                    href="/workspace/verification"
+                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
                     {copy.verification}
                   </Link>
                 </p>

@@ -2,7 +2,6 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "./auth-return-path";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -12,6 +11,7 @@ import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceBuildWorkspaceService } from "../lib/services/resource-build-workspace-service";
+import { authEntryHref } from "./auth-return-path";
 import { BuildModerationControls } from "./build-moderation-controls";
 import { BuildPackageEvidencePanel } from "./build-package-evidence";
 import { BuildProvenanceDetails } from "./build-provenance-details";
@@ -34,7 +34,10 @@ export async function ResourceBuildScreen({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{dictionary.workspace.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {dictionary.workspace.signIn}
         </Link>
       </section>
@@ -55,7 +58,7 @@ export async function ResourceBuildScreen({
     <div className="space-y-6">
       <Link
         href={staff ? "/admin" : `/workspace/resources/${productId}`}
-        className="text-accent underline"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {staff ? copy.reviewBack : copy.back}
       </Link>
@@ -69,7 +72,7 @@ export async function ResourceBuildScreen({
       </header>
       <Link
         href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`}
-        className="text-accent underline"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
@@ -79,7 +82,7 @@ export async function ResourceBuildScreen({
       {staff && (
         <Link
           href={`/admin/resources/${encodeURIComponent(productId)}/media`}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {resourceMediaCopy(locale).title}
         </Link>

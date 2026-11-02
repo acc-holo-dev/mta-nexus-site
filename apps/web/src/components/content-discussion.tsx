@@ -449,7 +449,7 @@ export function ContentDiscussion({
             {comment.parentId && (
               <blockquote className="border-l-2 border-base pl-3 text-xs text-muted">
                 <Link
-                  className="text-accent underline"
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.parentId)}#comment-${encodeURIComponent(comment.parentId)}`}
                 >
                   {copy.parent}{" "}
