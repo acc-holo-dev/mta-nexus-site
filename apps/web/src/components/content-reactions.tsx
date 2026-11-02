@@ -13,6 +13,7 @@ import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
 export function ContentReactions({
   slug,
@@ -52,6 +53,19 @@ export function ContentReactions({
   }, []);
   async function send(reaction?: ContentReaction | null) {
     if (busy.current || (reaction !== undefined && (!state?.authenticated || blocked))) return;
+    if (
+      reaction === null &&
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: state?.reaction ? copy[state.reaction] : copy.title,
+        consequences: copy.removeConfirm,
+        confirmLabel: copy.remove,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: false,
+      }))
+    )
+      return;
     busy.current = true;
     setPending(true);
     setMessage("");
