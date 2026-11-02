@@ -189,6 +189,8 @@ it("authenticated resource readers can report reviews and reach their review edi
     }),
   );
   expect(html).toContain("Report review");
+  expect(html).toContain("Report type");
+  expect(html).toContain("focus-visible:ring-2");
   expect(html).toContain("/workspace/library/review/prd_a");
   expect(html).toContain("/workspace/review-reports");
 });

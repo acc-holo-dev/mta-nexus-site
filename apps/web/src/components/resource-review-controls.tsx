@@ -18,6 +18,9 @@ import {
 } from "../lib/resource-review-i18n";
 import { confirmAction } from "./confirm-action";
 
+const nativeFieldClass =
+  "rounded border border-base bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+
 type Review = {
   text: string;
   rating: number | null;
@@ -134,6 +137,7 @@ export function ResourceReviewEditor({
       {canReview ? (
         <form
           className="space-y-4"
+          aria-busy={busy || undefined}
           onSubmit={(event) => {
             event.preventDefault();
             void submit("save");
@@ -145,7 +149,7 @@ export function ResourceReviewEditor({
               value={rating}
               onChange={(event) => setRating(Number(event.target.value))}
               disabled={busy || confirmed}
-              className="ml-3 rounded border border-base bg-surface p-2"
+              className={`${nativeFieldClass} ml-3 p-2`}
             >
               {[1, 2, 3, 4, 5].map((value) => (
                 <option key={value} value={value}>
@@ -163,7 +167,7 @@ export function ResourceReviewEditor({
               maxLength={4000}
               required
               disabled={busy || confirmed}
-              className="mt-2 block min-h-36 w-full rounded border border-base bg-surface p-3"
+              className={`${nativeFieldClass} mt-2 block min-h-36 w-full p-3`}
             />
           </label>
           <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
@@ -215,6 +219,7 @@ export function ResourceReviewReportForm({
       <summary className="cursor-pointer text-accent">{copy.report}</summary>
       <form
         className="mt-3 space-y-3"
+        aria-busy={busy || undefined}
         onSubmit={async (event) => {
           event.preventDefault();
           if (busy || id) return;
@@ -240,12 +245,12 @@ export function ResourceReviewReportForm({
         }}
       >
         <label className="block">
-          {copy.reason}
+          {copy.reportType}
           <select
             value={type}
             onChange={(event) => setType(event.target.value)}
             disabled={busy || !!id}
-            className="ml-3 rounded border border-base bg-surface p-2"
+            className={`${nativeFieldClass} ml-3 p-2`}
           >
             {(["spam", "abuse", "copyright", "other"] as const).map((value) => (
               <option key={value} value={value}>
@@ -262,7 +267,7 @@ export function ResourceReviewReportForm({
           maxLength={1000}
           required
           disabled={busy || !!id}
-          className="block min-h-24 w-full rounded border border-base bg-surface p-3"
+          className={`${nativeFieldClass} block min-h-24 w-full p-3`}
         />
         <Button type="submit" disabled={busy || !!id} isLoading={busy}>
           {busy ? copy.busy : copy.send}
@@ -350,6 +355,7 @@ export function ResourceReviewDecisionForm({
   return (
     <form
       className="nexus-panel space-y-3 p-5"
+      aria-busy={busy || undefined}
       onSubmit={(event) => {
         event.preventDefault();
         void submitDecision();
@@ -361,7 +367,7 @@ export function ResourceReviewDecisionForm({
           value={action}
           onChange={(event) => setAction(event.target.value as ResourceReviewDecisionAction)}
           disabled={busy || confirmed}
-          className="ml-3 rounded border border-base bg-surface p-2"
+          className={`${nativeFieldClass} ml-3 p-2`}
         >
           {(
             [
@@ -386,7 +392,7 @@ export function ResourceReviewDecisionForm({
           minLength={3}
           maxLength={2000}
           disabled={busy || confirmed}
-          className="mt-2 block min-h-24 w-full rounded border border-base bg-surface p-3"
+          className={`${nativeFieldClass} mt-2 block min-h-24 w-full p-3`}
         />
       </label>
       <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
