@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../components/content-catalog-controls";
 import { PlanReviewTerms } from "../../../components/plan-review-terms";
 import { SubscriptionControls } from "../../../components/subscription-controls";
 import { SubscriptionFeeEstimator } from "../../../components/subscription-fee-estimator";
@@ -33,12 +33,11 @@ export default async function SubscriptionAccountPage({
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const params = subscriptionPageParams(raw);
-    const returnPath = `/workspace/subscriptions${params.size ? `?${params}` : ""}`;
     return (
-      <section className="space-y-4 py-8">
-        <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)}>{c.signIn}</Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/subscriptions${params.size ? `?${params}` : ""}`}
+      />
     );
   }
   try {

@@ -3,7 +3,7 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../../components/content-catalog-controls";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../../lib/library-collections-query";
@@ -42,17 +42,7 @@ export default async function Page({
     } catch {
       // Keep the collection watches route when filters are invalid for guests.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof resourceReleaseWatchesQuery>;
   try {

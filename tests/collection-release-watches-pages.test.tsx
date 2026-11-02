@@ -11,6 +11,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/collections/lcol_a/watches",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -22,6 +23,7 @@ vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => (
 import Page, {
   metadata,
 } from "../apps/web/src/app/workspace/library/collections/[id]/watches/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 const screen = async () =>
   renderToStaticMarkup(
     await Page({
@@ -71,7 +73,7 @@ it("leaves archived collections inspectable without enrollment controls", async 
 it("requires sign-in before reading a private collection", async () => {
   h.user = null;
   const html = await screen();
-  expect(html).toContain("Sign in to manage release notifications");
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
   expect(html).toContain("/auth/login?next=");
   expect(html).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fwatches");
   expect(h.page).not.toHaveBeenCalled();

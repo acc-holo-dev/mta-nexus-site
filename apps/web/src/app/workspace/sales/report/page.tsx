@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { SellerSalesReportView } from "../../../../components/seller-sales-report";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
@@ -28,17 +28,11 @@ export default async function SellerSalesPage({
     for (const [key, value] of Object.entries(params)) {
       if (typeof value === "string") pageParams.set(key, value);
     }
-    const returnPath = `/workspace/sales/report${pageParams.size ? `?${pageParams}` : ""}`;
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display">{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/sales/report${pageParams.size ? `?${pageParams}` : ""}`}
+      />
     );
   }
   try {

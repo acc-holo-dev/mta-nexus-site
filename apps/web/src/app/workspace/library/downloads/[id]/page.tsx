@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { ResourceDeliveryEvidence } from "../../../../../components/resource-delivery-evidence";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -27,15 +27,10 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", `/workspace/library/downloads/${encodeURIComponent(id)}`)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {copy.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/library/downloads/${encodeURIComponent(id)}`}
+      />
     );
   let receiptId: string;
   try {

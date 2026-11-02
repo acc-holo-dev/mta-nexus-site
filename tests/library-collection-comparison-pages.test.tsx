@@ -12,6 +12,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/collections/lcol_a/compare",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -58,6 +59,7 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/[id]/compare/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { libraryCollectionComparisonCopy } from "../apps/web/src/lib/library-collection-comparison-i18n";
 const source = {
     id: "lcol_a",
@@ -198,7 +200,9 @@ it("chooses an owned comparison target before reading resources", async () => {
 });
 it("authenticates before inspecting query selectors", async () => {
   state.actor = null;
-  expect(await screen({ userId: "other" })).toContain("Sign in");
+  const html = await screen({ userId: "other" });
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
+  expect(html).toContain("/auth/login?next=");
   expect(state.comparison).not.toHaveBeenCalled();
 });
 it.each([{ userId: "other" }, { to: ["a", "b"] }, { to: "../private" }, { filter: "common" }])(

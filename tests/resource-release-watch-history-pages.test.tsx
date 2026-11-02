@@ -10,6 +10,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/watches/history",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -19,6 +20,7 @@ vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => (
   resourceReleaseWatchesService: { history: h.history },
 }));
 import Page, { metadata } from "../apps/web/src/app/workspace/library/watches/history/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 const screen = async () =>
   renderToStaticMarkup(
     await Page({
@@ -89,7 +91,7 @@ it("shows a current accessible title and management link without rewriting histo
 it("requires sign-in and rejects duplicate filters before reading audit records", async () => {
   h.user = null;
   const html = await screen();
-  expect(html).toContain("Sign in to manage release notifications");
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
   expect(html).toContain("/auth/login?next=");
   expect(html).toContain("%2Fworkspace%2Flibrary%2Fwatches%2Fhistory");
   expect(h.history).not.toHaveBeenCalled();

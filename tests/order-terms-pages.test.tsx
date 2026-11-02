@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
-  usePathname: () => "/admin/commerce/reconciliation/ord_a/terms",
+  usePathname: () => "/workspace/purchases/ord_a/terms",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");

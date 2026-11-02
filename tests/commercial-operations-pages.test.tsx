@@ -15,7 +15,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NEXT_NOT_FOUND");
   },
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
-  usePathname: () => "/admin/commerce/plans/ord_a",
+  usePathname: () => "/workspace/purchases/ord_a/operations",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");

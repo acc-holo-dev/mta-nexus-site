@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { ResourceReviewEditor } from "../../../../../components/resource-review-controls";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceReviewCopy } from "../../../../../lib/resource-review-i18n";
@@ -23,12 +23,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
   if (!actor)
     return (
-      <Link
-        href={authEntryHref("login", `/workspace/library/review/${target.id}`)}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-      >
-        {copy.signIn}
-      </Link>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/library/review/${encodeURIComponent(target.id)}`}
+      />
     );
   const detail = await resourceReviewService.ownDetail(actor, target.id).catch((error) => {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { LibraryCollectionCommandForm } from "../../../../../components/library-collection-command";
 import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -42,15 +42,10 @@ export default async function ResourceCollectionsPage({
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", `/workspace/library/${encodeURIComponent(id)}/collections`)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {c.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/library/${encodeURIComponent(id)}/collections`}
+      />
     );
   try {
     if (collectionPageParams(query).size)

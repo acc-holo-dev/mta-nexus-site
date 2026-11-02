@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../../components/content-catalog-controls";
 import { LibraryCollectionImport } from "../../../../../../components/library-collection-import";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionManifestsCopy } from "../../../../../../lib/library-collection-manifests-i18n";
@@ -41,17 +41,7 @@ export default async function Page({
     m = libraryCollectionManifestsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", collectionHref(id, "reconcile"))}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {c.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={collectionHref(id, "reconcile")} />;
   try {
     if (collectionPageParams(raw).size)
       throw new AppError("Unexpected import query", 400, "COLLECTION_INVALID");

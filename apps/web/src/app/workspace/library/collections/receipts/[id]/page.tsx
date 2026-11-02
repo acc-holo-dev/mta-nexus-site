@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../../components/content-catalog-controls";
 import { LibraryCollectionRestoreControls } from "../../../../../../components/library-collection-restore";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import {
@@ -43,18 +43,7 @@ export default async function Page({
   const c = libraryCollectionsCopy(locale),
     r = libraryCollectionReceiptsCopy(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor)
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1>{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", collectionReceiptHref(id))}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {c.signIn}
-        </Link>
-      </section>
-    );
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={collectionReceiptHref(id)} />;
   try {
     if (collectionPageParams(raw).size)
       throw new AppError("Unexpected receipt query", 400, "COLLECTION_INVALID");

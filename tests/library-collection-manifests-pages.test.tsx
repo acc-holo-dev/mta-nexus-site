@@ -1,10 +1,11 @@
-import ReconcilePage, {
-  generateMetadata as reconcileMetadata,
-} from "../apps/web/src/app/workspace/library/collections/[id]/reconcile/page";
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import ReconcilePage, {
+  generateMetadata as reconcileMetadata,
+} from "../apps/web/src/app/workspace/library/collections/[id]/reconcile/page";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -15,6 +16,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/collections/lcol_a/import",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -40,11 +42,14 @@ vi.mock("../apps/web/src/components/library-collection-import", () => ({
     locale: string;
   }) => <div data-import={collection.id} data-locale={locale} />,
 }));
+
 import Page, {
   dynamic,
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/[id]/import/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
+
 const collection = { id: "lcol_a", name: "Private & name", status: "active", revision: 7 };
 const screen = async (query: Record<string, string | string[] | undefined> = {}, id = "lcol_a") =>
   renderToStaticMarkup(
@@ -81,7 +86,11 @@ it.each(["en", "ru"] as const)(
 );
 it("authenticates before receipt or selector inspection", async () => {
   state.actor = null;
-  expect(await screen({ userId: "other" })).toContain("Sign in");
+  const html = await screen({ userId: "other" });
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
+  expect(html).toContain(
+    'href="/auth/login?next=%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fimport"',
+  );
   expect(state.history).not.toHaveBeenCalled();
 });
 it.each([{ userId: "other" }, { page: "1" }, { q: ["a", "b"] }])(

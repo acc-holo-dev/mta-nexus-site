@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../../components/auth-return-path";
 import { AuthorPublicationRestore } from "../../../../../components/author-publication-restore";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { parseAuthorPublicationHistoryQuery } from "../../../../../lib/author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
@@ -39,17 +39,17 @@ export default async function PublicationHistoryPage({
       for (const part of Array.isArray(value) ? value : [value]) query.append(key, part);
   const returnQuery = query.toString();
   const returnPath = returnQuery ? `${path}?${returnQuery}` : path;
+  const sessionActor = await authService
+    .getSession((await cookies()).get("nexus_session")?.value)
+    .catch(() => null);
+  if (!sessionActor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
   const filters = parseAuthorPublicationHistoryQuery(query);
-  let error = filters ? "" : copy.invalid,
-    signIn = false;
+  let error = filters ? "" : copy.invalid;
   const report = await (async () => {
     try {
-      const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-      if (!actor) {
-        signIn = true;
-        return null;
-      }
-      return filters ? await authorContentService.history(id, actor, filters) : null;
+      return filters ? await authorContentService.history(id, sessionActor, filters) : null;
     } catch (failure) {
       error =
         failure instanceof AppError
@@ -91,14 +91,6 @@ export default async function PublicationHistoryPage({
           <h2 className="break-words text-lg font-semibold text-primary">{report.item.title}</h2>
         )}
       </header>
-      {signIn && (
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {labels.signIn}
-        </Link>
-      )}
       {error && (
         <p role="alert" className="nexus-panel p-4 text-sm text-danger">
           {error}

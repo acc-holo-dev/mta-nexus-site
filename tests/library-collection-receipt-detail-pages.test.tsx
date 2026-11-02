@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -9,6 +10,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/collections/receipts/lcr_a",
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
@@ -37,11 +39,13 @@ vi.mock("../apps/web/src/components/library-collection-restore", () => ({
     preview: { itemCount: number };
   }) => <div data-restore={receiptId} data-count={preview.itemCount} />,
 }));
+
 import Page, {
   dynamic,
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/receipts/[id]/page";
 import { libraryCollectionReceiptsCopy } from "../apps/web/src/lib/library-collection-receipts-i18n";
+
 const date = "2026-10-13T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
   collection = { id: "lcol_a", name: "Recorded <name>", status: "active", revision: 3 };

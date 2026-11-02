@@ -1,10 +1,12 @@
 vi.mock("../apps/web/src/components/library-membership-batch", () => ({
   LibraryMembershipBatchForm: () => <div data-membership-batch="review" />,
 }));
+
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -15,6 +17,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/prd_a/collections",
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -53,11 +56,14 @@ vi.mock("../apps/web/src/components/library-collection-command", () => ({
     </button>
   ),
 }));
+
 import Page, {
-  generateMetadata,
   dynamic,
+  generateMetadata,
 } from "../apps/web/src/app/workspace/library/[id]/collections/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+
 const collection = {
   id: "lcol_a",
   name: "Core & maps",
@@ -141,7 +147,8 @@ it("allows acquired references with a hidden unsafe publication title to be adde
 it("authenticates before scope or selector inspection", async () => {
   state.actor = null;
   const html = await screen({ userId: "other" });
-  expect(html).toContain(libraryCollectionsCopy("en").signInRequired);
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
+  expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary%2Fprd_a%2Fcollections"');
   expect(state.report).not.toHaveBeenCalled();
 });
 it.each([{ userId: "other" }, { page: "1" }, { q: "hidden" }, { page: ["1", "2"] }])(

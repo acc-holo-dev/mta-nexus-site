@@ -120,7 +120,7 @@ describe("private resource library", () => {
     state.user = null;
     const html = renderToStaticMarkup(await LibraryPage(pageProps()));
     expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary"');
-    expect(html).toContain("Sign in to manage your account");
+    expect(html).toContain("Sign in required");
     expect(state.page).not.toHaveBeenCalled();
   });
 

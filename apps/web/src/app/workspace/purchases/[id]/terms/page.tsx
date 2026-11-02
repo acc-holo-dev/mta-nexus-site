@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { OrderTermsReportView } from "../../../../../components/order-terms-report";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
@@ -32,15 +32,10 @@ export default async function TermsPage({
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display">{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", `/workspace/purchases/${encodeURIComponent(id)}/terms`)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {c.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/purchases/${encodeURIComponent(id)}/terms`}
+      />
     );
   try {
     const values = new URLSearchParams();

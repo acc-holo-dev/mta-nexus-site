@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../../components/content-catalog-controls";
 import { formatFinancialMinor } from "../../../../../lib/financial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { sellerSalesCopy, sellerSalesTime } from "../../../../../lib/seller-sales-i18n";
@@ -35,17 +35,11 @@ export default async function SellerSalePage({
     for (const [key, value] of Object.entries(query)) {
       if (typeof value === "string") pageParams.set(key, value);
     }
-    const returnPath = `/workspace/sales/report/${encodeURIComponent(id)}${pageParams.size ? `?${pageParams}` : ""}`;
     return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display">{c.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {c.signIn}
-        </Link>
-      </section>
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/sales/report/${encodeURIComponent(id)}${pageParams.size ? `?${pageParams}` : ""}`}
+      />
     );
   }
   const values = new URLSearchParams();

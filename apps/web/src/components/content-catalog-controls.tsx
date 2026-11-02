@@ -3,7 +3,7 @@
 import { Button, fieldClass } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { Locale } from "../lib/i18n";
+import { getDictionary, type Locale } from "../lib/i18n";
 import {
   contentPageHref,
   type parseContentPage,
@@ -134,7 +134,7 @@ export function PlatformSignIn({
   returnPath?: string | null;
 }) {
   const pathname = usePathname();
-  const copy = getUserPlatformCopy(locale);
+  const copy = getDictionary(locale).workspace;
   const nextPath = returnPath !== undefined ? returnPath : pathname;
   return (
     <section className="space-y-4 py-16 text-center">
