@@ -32,10 +32,10 @@ export default async function ServerPublications({
     copy = getUserPlatformCopy(locale),
     team = serverContentCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
-  const { id } = await params,
-    path = `/workspace/servers/${encodeURIComponent(id)}/content`,
-    filters = parseContentPage((await searchParams) ?? {});
+  const { id } = await params;
+  const path = `/workspace/servers/${encodeURIComponent(id)}/content`;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
+  const filters = parseContentPage((await searchParams) ?? {});
   let failure = copy.unavailable;
   const result = await Promise.resolve()
     .then(() => serverContentService.page(serverContentId(id), actor, filters))

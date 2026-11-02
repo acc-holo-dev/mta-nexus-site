@@ -22,7 +22,7 @@ export default async function OrganizationsPage({
 }) {
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/organizations" />;
   const copy = getOrganizationCopy(locale);
   const filters = parseOrganizationPage(query);
   const result = await organizationWorkspaceService

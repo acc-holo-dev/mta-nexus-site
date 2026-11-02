@@ -23,7 +23,7 @@ export async function CommunityReportGroupsPage({
   const locale = await getRequestLocale(),
     copy = reportGroupsCopy(locale),
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/admin/reports/targets" />;
   try {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(await searchParams)) {

@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { OrganizationTeamDirectory } from "../../../../../components/organization-team-directory";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
@@ -17,7 +18,6 @@ import { getOrganizationCopy } from "../../../../../lib/organization-workspace-c
 import { authService } from "../../../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../../../lib/services/organization-team-service";
 import { platformFieldClass } from "../../../../../lib/user-platform-client";
-import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

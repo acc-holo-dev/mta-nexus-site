@@ -1,14 +1,14 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { AuthorContentForm } from "../../../../components/author-content-form";
 import { PlatformSignIn } from "../../../../components/content-catalog-controls";
+import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { authorContentService } from "../../../../lib/services/author-content-service";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 import { parseEditableContent } from "../../../../lib/user-platform-client";
+import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -19,7 +19,10 @@ export async function generateMetadata() {
 export default async function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor)
+    return (
+      <PlatformSignIn locale={locale} returnPath={`/workspace/content/${encodeURIComponent(id)}`} />
+    );
   const copy = getUserPlatformCopy(locale);
   const item = await authorContentService.get(id, actor).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();

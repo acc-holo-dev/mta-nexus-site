@@ -29,13 +29,13 @@ export async function SupportMessagePage({
     copy = supportMessageCopy(locale),
     store = await cookies(),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
   const validId = /^sup_[a-f0-9]{24}$/u.test(id);
   const path = validId
     ? `${staff ? "/admin/support" : "/support"}/${id}/messages`
     : staff
       ? "/admin/support"
       : "/support";
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   try {
     if (!validId) throw new AppError("Support case not found", 404, "NOT_FOUND");
     const query = new URLSearchParams();

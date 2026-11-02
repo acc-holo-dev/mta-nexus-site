@@ -6,6 +6,7 @@
 
 - **Tip SHA:** `f6ef5754e65bdd6532beefafe1f44233b4a8466e` (`fix(web): reset history empties and label nested loading shells`).
 - **Verified CI green on that tip:** [CI 41383584322](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41383584322) (lint/unit, DB, image build, production browser smoke; selected scope).
+- **Later tip `0e6ef1ea` not green:** [CI 41384259234](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41384259234) failed typecheck on confirmAction test `consequences` typing — fixed forward-only.
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path, QA/follow first-paint.
 - **Honesty/a11y wave (tip series):** clear-filter CTAs (support/discussion/publication target/inbox), confirmAction on destructive clients, honest loading shells across public directories and workspace hubs, filter `focus-visible` outlines, market/main overflow clip, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.

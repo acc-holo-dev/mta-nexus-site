@@ -34,7 +34,7 @@ export async function PublicationReportsPage({
     labels = communityReportCopy(locale),
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value),
     path = `/admin/community/${encodeURIComponent(id)}/reports`;
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   try {
     const filters = publicationReportPageQuery(await searchParams);
     if (!filters || (filters.target && filters.target !== "content"))

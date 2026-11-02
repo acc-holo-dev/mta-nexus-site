@@ -125,7 +125,7 @@ it("requires sign in before loading either private journal", async () => {
   );
   expect(
     renderToStaticMarkup(await OrganizationPage({ params: Promise.resolve({ id: "org" }) })),
-  ).toContain('href="/auth/login"');
+  ).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Factivity"');
   expect(mock.profile).not.toHaveBeenCalled();
   expect(mock.organization).not.toHaveBeenCalled();
 });

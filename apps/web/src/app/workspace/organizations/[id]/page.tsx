@@ -1,19 +1,19 @@
-import Link from "next/link";
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
-import { authService } from "../../../../lib/services/auth-service";
-import { organizationWorkspaceService } from "../../../../lib/services/organization-workspace-service";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import {
-  organizationError,
-  getOrganizationCopy,
-} from "../../../../lib/organization-workspace-copy";
-import {
-  parseOrganizationPage,
-  organizationWorkspaceSchema,
-} from "../../../../lib/organization-workspace-contract";
+import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { OrganizationWorkspacePanel } from "../../../../components/organization-workspace";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import {
+  organizationWorkspaceSchema,
+  parseOrganizationPage,
+} from "../../../../lib/organization-workspace-contract";
+import {
+  getOrganizationCopy,
+  organizationError,
+} from "../../../../lib/organization-workspace-copy";
+import { authService } from "../../../../lib/services/auth-service";
+import { organizationWorkspaceService } from "../../../../lib/services/organization-workspace-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -35,7 +35,13 @@ export default async function OrganizationPage({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor)
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/organizations/${encodeURIComponent(id)}`}
+      />
+    );
   const copy = getOrganizationCopy(locale);
   const filters = parseOrganizationPage(query);
   let failure = copy.unavailable;

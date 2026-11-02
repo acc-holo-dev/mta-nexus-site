@@ -34,7 +34,13 @@ export default async function OrganizationHistoryPage({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor)
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/organizations/${encodeURIComponent(id)}/activity`}
+      />
+    );
   const values = new URLSearchParams();
   for (const [key, value] of Object.entries(query ?? {})) {
     if (Array.isArray(value)) for (const item of value) values.append(key, item);

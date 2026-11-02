@@ -22,7 +22,10 @@ export async function ServerContentEditorPage({
     copy = getUserPlatformCopy(locale),
     team = serverContentCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  const returnPath = contentId
+    ? `/workspace/servers/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}`
+    : `/workspace/servers/${encodeURIComponent(id)}/content/new`;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let failure = copy.unavailable;
   const result = await Promise.resolve()
     .then(async () => {

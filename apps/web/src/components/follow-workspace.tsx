@@ -153,9 +153,9 @@ export function FollowWorkspace({
   return (
     <Root
       {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
-      className="space-y-5"
+      className="min-w-0 space-y-5"
     >
-      <nav aria-label={copy.title} className="flex gap-2 overflow-x-auto">
+      <nav aria-label={copy.title} className="flex min-w-0 gap-2 overflow-x-auto">
         {[undefined, ...FOLLOW_TYPES].map((value) => (
           <Link
             key={value ?? "all"}

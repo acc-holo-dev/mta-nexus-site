@@ -27,8 +27,8 @@ export async function CommunityReportHistoryPage({
   const locale = await getRequestLocale(),
     copy = reportHistoryCopy(locale),
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
   const path = `${staff ? "/admin/reports" : "/workspace/reports"}/${encodeURIComponent(id)}/history`;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   try {
     reportId(id);
     const query = new URLSearchParams();

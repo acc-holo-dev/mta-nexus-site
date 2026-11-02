@@ -1,6 +1,6 @@
 import { OrganizationContentEditorPage } from "../../../../../../components/organization-content-editor-page";
-import { organizationContentCopy } from "../../../../../../lib/organization-content-copy";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { organizationContentCopy } from "../../../../../../lib/organization-content-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

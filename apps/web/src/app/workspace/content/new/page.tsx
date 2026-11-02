@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { AuthorContentForm } from "../../../../components/author-content-form";
 import { PlatformSignIn } from "../../../../components/content-catalog-controls";
-import { authService } from "../../../../lib/services/auth-service";
 import { getRequestLocale } from "../../../../lib/i18n-server";
+import { authService } from "../../../../lib/services/auth-service";
 import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
@@ -15,7 +15,7 @@ export async function generateMetadata() {
 export default async function NewPublicationPage() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   if (!(await authService.getSession(store.get("nexus_session")?.value)))
-    return <PlatformSignIn locale={locale} />;
+    return <PlatformSignIn locale={locale} returnPath="/workspace/content/new" />;
   const copy = getUserPlatformCopy(locale);
   return (
     <div className="mx-auto max-w-3xl space-y-6">
