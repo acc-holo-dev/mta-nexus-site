@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/purchases",
   notFound: () => {
     throw new Error("NOT_FOUND");
   },

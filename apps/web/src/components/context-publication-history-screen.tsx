@@ -18,6 +18,7 @@ import {
   serverPublicationHistoryError,
 } from "../lib/server-publication-history-copy";
 import { authService } from "../lib/services/auth-service";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { AuthorPublicationRestore } from "./author-publication-restore";
 import { PlatformSignIn } from "./content-catalog-controls";
 export async function ContextPublicationHistoryScreen({
@@ -46,6 +47,7 @@ export async function ContextPublicationHistoryScreen({
     workspaceTitle =
       kind === "servers" ? serverContentCopy(locale).title : organizationContentCopy(locale).title,
     history = authorPublicationDeskCopy(locale),
+    labels = getUserPlatformCopy(locale),
     path = `/workspace/${kind}/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}/history`;
   let failure = "";
   const actor = await authService

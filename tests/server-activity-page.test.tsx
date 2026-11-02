@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/servers",
   notFound: () => {
     throw Error("NEXT_NOT_FOUND");
   },

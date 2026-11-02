@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/workspace/reports",
   notFound: () => {
     throw Error("NOT_FOUND_BOUNDARY");
   },
