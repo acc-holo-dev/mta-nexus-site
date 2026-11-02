@@ -177,14 +177,21 @@ export async function LibraryCollectionsScreen({
             ))}
           </nav>
           {!result.items.length && (
-            <div className="space-y-3 text-sm text-muted" role="status">
+            <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
               <p>{result.status === "active" ? c.empty : c.emptyFiltered}</p>
-              {result.status !== "active" && (
+              {result.status !== "active" ? (
                 <Link
                   href={collectionHref()}
-                  className="inline-flex min-h-11 items-center text-accent underline"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {c.clear}
+                </Link>
+              ) : (
+                <Link
+                  href="/market?maxPrice=0"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {c.browseLibrary}
                 </Link>
               )}
             </div>

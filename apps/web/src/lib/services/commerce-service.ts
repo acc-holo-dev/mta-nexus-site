@@ -1,9 +1,9 @@
-import { entitlementRepository, resourceCartRepository, orderRepository } from "@nexus/db";
-import { generateId } from "@nexus/security";
+import { entitlementRepository, orderRepository, resourceCartRepository } from "@nexus/db";
 import type { FreeResourceClaimResult, User } from "@nexus/domain";
+import { generateId } from "@nexus/security";
 
 /**
- * Closed-beta resource access service.
+ * Open free-beta resource access service.
  *
  * The historical CommerceService export name is kept to avoid unnecessary
  * import churn, but paid checkout/license operations are intentionally absent.

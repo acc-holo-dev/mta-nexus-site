@@ -28,20 +28,29 @@ export async function CommunityReportScreen({
   const locale = await getRequestLocale(),
     copy = communityReportCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
-  const loginReturn = staff
-    ? id
-      ? `/admin/reports/${encodeURIComponent(id)}`
-      : "/admin/reports"
-    : id
-      ? `/workspace/reports/${encodeURIComponent(id)}`
-      : "/workspace/reports";
+  const base = staff ? "/admin/reports" : "/workspace/reports";
+  const listParams = new URLSearchParams();
+  if (!id) {
+    for (const [key, value] of Object.entries((await searchParams) ?? {})) {
+      if (Array.isArray(value)) for (const item of value) listParams.append(key, item);
+      else if (value !== undefined) listParams.append(key, value);
+    }
+  }
+  const loginReturn = id
+    ? `${base}/${encodeURIComponent(id)}`
+    : listParams.size
+      ? `${base}?${listParams}`
+      : base;
   if (!actor || (staff && !can(actor, "admin.moderation")))
     return (
       <div className="nexus-panel space-y-3 p-8">
         <h1 className="text-xl font-semibold text-primary">
           {staff ? copy.forbidden : copy.title}
         </h1>
-        <Link className="text-sm text-accent underline" href={authEntryHref("login", loginReturn)}>
+        <Link
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          href={authEntryHref("login", loginReturn)}
+        >
           {copy.signIn}
         </Link>
       </div>

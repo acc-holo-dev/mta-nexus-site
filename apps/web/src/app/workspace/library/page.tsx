@@ -77,57 +77,62 @@ export default async function ResourceLibraryPage({
         <p className="max-w-2xl text-sm text-secondary">{copy.subtitle}</p>
       </header>
 
-      <Link
-        href="/workspace/library/collections"
-        className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {libraryCollectionsCopy(locale).title}
-      </Link>
-      <Link
-        href={collectionInventoryHref()}
-        className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {libraryCollectionInventoryCopy(locale).inventory}
-      </Link>
-      <Link
-        href="/workspace/cart"
-        className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {getResourceCommerceCopy(locale).openCart}
-      </Link>
-      <Link
-        href="/workspace/acquisitions"
-        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {getResourceActivityCopy(locale).history}
-      </Link>
-      <Link
-        href="/workspace/library/updates"
-        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {getResourceReleaseControlCopy(locale).updates}
-      </Link>
-      <Link
-        href="/workspace/library/downloads"
-        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {resourceDeliveriesCopy(locale).title}
-      </Link>
-      <Link
-        href="/workspace/library/watches"
-        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {resourceReleaseWatchesCopy(locale).title}
-      </Link>
-      <Link href="/workspace/acquisitions/receipts" className="text-sm text-accent underline">
-        {resourceCartReceiptsCopy(locale).title}
-      </Link>
-      <Link
-        href="/workspace/library/reviews"
-        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
-      >
-        {resourceReviewCopy(locale).own}
-      </Link>
+      <div className="flex min-w-0 flex-wrap gap-2">
+        <Link
+          href="/workspace/library/collections"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {libraryCollectionsCopy(locale).title}
+        </Link>
+        <Link
+          href={collectionInventoryHref()}
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {libraryCollectionInventoryCopy(locale).inventory}
+        </Link>
+        <Link
+          href="/workspace/cart"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {getResourceCommerceCopy(locale).openCart}
+        </Link>
+        <Link
+          href="/workspace/acquisitions"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {getResourceActivityCopy(locale).history}
+        </Link>
+        <Link
+          href="/workspace/library/updates"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {getResourceReleaseControlCopy(locale).updates}
+        </Link>
+        <Link
+          href="/workspace/library/downloads"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {resourceDeliveriesCopy(locale).title}
+        </Link>
+        <Link
+          href="/workspace/library/watches"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {resourceReleaseWatchesCopy(locale).title}
+        </Link>
+        <Link
+          href="/workspace/acquisitions/receipts"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {resourceCartReceiptsCopy(locale).title}
+        </Link>
+        <Link
+          href="/workspace/library/reviews"
+          className="inline-flex min-h-11 items-center rounded-lg border border-base px-4 py-2 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {resourceReviewCopy(locale).own}
+        </Link>
+      </div>
       <nav aria-label={copy.title} className="flex flex-wrap gap-2">
         {filters.map((value) => (
           <Link

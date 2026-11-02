@@ -19,7 +19,7 @@ export async function PublicationFeedLoading({
         <h1 id="publication-feed-loading-heading" className="text-2xl font-bold text-primary">
           {copy[heading]}
         </h1>
-        <p role="status" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}
         </p>
       </header>
