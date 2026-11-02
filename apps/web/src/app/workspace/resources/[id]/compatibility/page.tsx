@@ -1,4 +1,3 @@
-import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +7,7 @@ import { ResourceCompatibilityForm } from "../../../../../components/resource-co
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";
+import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { productService } from "../../../../../lib/services/product-service";
 
@@ -33,7 +33,10 @@ export default async function ResourceCompatibilityPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {dictionary.workspace.signIn}
         </Link>
       </section>
@@ -52,7 +55,7 @@ export default async function ResourceCompatibilityPage({
       </header>
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}/requirements`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {resourceRequirementsCopy(locale).title}
       </Link>

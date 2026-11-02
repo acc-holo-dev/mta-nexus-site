@@ -146,7 +146,10 @@ export function OrderTermsReportView({
       {report.totalPages > 1 ? (
         <nav aria-label={c.page} className="flex gap-4 text-sm">
           {report.page > 1 ? (
-            <Link href={`${base}/terms?page=${report.page - 1}`} className="text-accent underline">
+            <Link
+              href={`${base}/terms?page=${report.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {c.previous}
             </Link>
           ) : null}
@@ -154,7 +157,10 @@ export function OrderTermsReportView({
             {c.page} {report.page} {c.of} {report.totalPages}
           </span>
           {report.page < report.totalPages ? (
-            <Link href={`${base}/terms?page=${report.page + 1}`} className="text-accent underline">
+            <Link
+              href={`${base}/terms?page=${report.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {c.next}
             </Link>
           ) : null}

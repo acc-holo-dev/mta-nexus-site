@@ -290,11 +290,17 @@ export function LibraryCollectionItemCopyForm({
         <div className="space-y-2">
           <p role="status">{c.saved}</p>
           {shownMove && (
-            <a href={collectionHref(savedSourceId)} className="text-accent underline">
+            <a
+              href={collectionHref(savedSourceId)}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {c.back}
             </a>
           )}
-          <a href={collectionHref(savedDestinationId)} className="text-accent underline">
+          <a
+            href={collectionHref(savedDestinationId)}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.openDestination}
           </a>
         </div>

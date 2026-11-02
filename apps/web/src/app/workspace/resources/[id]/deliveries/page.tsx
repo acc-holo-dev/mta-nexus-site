@@ -48,7 +48,10 @@ export default async function PublisherDeliveriesPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -63,7 +66,7 @@ export default async function PublisherDeliveriesPage({
         <p role="alert">{copy.invalid}</p>
         <Link
           href={`/workspace/resources/${encodeURIComponent(id)}/deliveries`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.publisherTitle}
         </Link>

@@ -17,7 +17,10 @@ export function PlanReviewDetailView({
     context = organizationId ? `?${new URLSearchParams({ organizationId })}` : "";
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href={`/workspace/subscriptions/reviews${context}`} className="text-accent underline">
+      <Link
+        href={`/workspace/subscriptions/reviews${context}`}
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.history}
       </Link>
       <h1 className="font-display">{c.saved}</h1>
@@ -64,7 +67,7 @@ export function PlanReviewDetailView({
             <PlanReviewTerms terms={detail.current.terms} locale={locale} />
             <Link
               href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: r.planId, revision: String(detail.current.revision) })}`}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {c.newReview}
             </Link>
@@ -73,7 +76,7 @@ export function PlanReviewDetailView({
       </section>
       <a
         href={`/api/subscriptions/reviews/${encodeURIComponent(r.id)}/export${context}`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {c.export}
       </a>

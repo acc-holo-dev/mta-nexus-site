@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../../../lib/services/auth-service";
-import { resourceCartReceiptsService } from "../../../../../lib/services/resource-cart-receipts-service";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
+import { ResourceCartReviewEvidence } from "../../../../../components/resource-cart-review-evidence";
+import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../../lib/resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../../../../../lib/resource-cart-receipts-query";
-import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
-import { ResourceCartReviewEvidence } from "../../../../../components/resource-cart-review-evidence";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { authService } from "../../../../../lib/services/auth-service";
+import { resourceCartReceiptsService } from "../../../../../lib/services/resource-cart-receipts-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -36,7 +36,7 @@ export default async function ResourceCartReceiptPage({
             "login",
             `/workspace/acquisitions/receipts/${encodeURIComponent(id)}`,
           )}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.signIn}
         </Link>
@@ -118,7 +118,10 @@ export default async function ResourceCartReceiptPage({
           ))}
         </ol>
       )}
-      <Link href="/workspace/library" className="text-accent underline">
+      <Link
+        href="/workspace/library"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {copy.library}
       </Link>
     </div>

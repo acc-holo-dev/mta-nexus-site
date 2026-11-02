@@ -1,20 +1,20 @@
-import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
 import { financialReviewRepository } from "@nexus/db";
-import { authService } from "../../../../../lib/services/auth-service";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
 import {
-  getFinancialCopy,
-  formatFinancialMinor,
   financialFlags,
   financialOrderLabel,
   financialPaymentLabel,
+  formatFinancialMinor,
+  getFinancialCopy,
 } from "../../../../../lib/financial-i18n";
-import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
+import { authService } from "../../../../../lib/services/auth-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Recorded financial evidence | MTA NEXUS",
@@ -89,7 +89,10 @@ export default async function ReconciliationDetail({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -97,7 +100,10 @@ export default async function ReconciliationDetail({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.next}
             </Link>
           ) : null}

@@ -191,12 +191,12 @@ export default async function PublicResourceVersionsPage({
           {user ? (
             <Link
               href={`/acquire?productId=${encodeURIComponent(product.id)}`}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.acquire}
             </Link>
           ) : (
-            <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+            <Link href={authEntryHref("login", returnPath)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
               {copy.signIn}
             </Link>
           )}

@@ -53,7 +53,7 @@ export default async function ResourceCopyDetailPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={`/workspace/resources/${encodeURIComponent(id)}/copies`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.history}
         </Link>
@@ -79,13 +79,13 @@ export default async function ResourceCopyDetailPage({
         <div className="flex flex-wrap gap-4">
           <Link
             href={`/workspace/resources/${encodeURIComponent(receipt.target.id)}`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {c.target}
           </Link>
           <a
             href={`/api/products/${encodeURIComponent(id)}/copies/${encodeURIComponent(receipt.id)}/export`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {c.export}
           </a>
@@ -98,7 +98,10 @@ export default async function ResourceCopyDetailPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{resourceCopyError(locale, error.code)}</p>
-          <Link href="/workspace/resources" className="text-accent underline">
+          <Link
+            href="/workspace/resources"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
         </section>

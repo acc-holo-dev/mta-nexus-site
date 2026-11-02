@@ -29,11 +29,17 @@ export default async function LibraryUpdatesPage({
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
-        <Link href="/workspace/library/version-history" className="text-accent underline">
+        <Link
+          href="/workspace/library/version-history"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {libraryReleaseHistoryCopy(locale).title}
         </Link>
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>

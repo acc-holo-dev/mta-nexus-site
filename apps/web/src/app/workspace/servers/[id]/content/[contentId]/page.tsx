@@ -1,6 +1,6 @@
 import { ServerContentEditorPage } from "../../../../../../components/server-content-editor-page";
-import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

@@ -52,7 +52,10 @@ export async function LibraryReleaseComparisonScreen({
   ];
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href={`${base}?page=${query.returnPage}`} className="text-accent underline">
+      <Link
+        href={`${base}?page=${query.returnPage}`}
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.back}
       </Link>
       <h1 id="library-release-comparison-heading" className="font-display">
@@ -97,7 +100,7 @@ export async function LibraryReleaseComparisonScreen({
             </h2>
             <Link
               href={`/workspace/library/${encodeURIComponent(path.id)}/requirements?${new URLSearchParams({ previewBuildId: release.id, returnFrom: index === 0 ? result.to.id : result.from.id, returnPage: String(query.returnPage) })}`}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {c.preparation}
             </Link>
@@ -149,13 +152,13 @@ export async function LibraryReleaseComparisonScreen({
       <nav className="flex flex-wrap gap-4">
         <Link
           href={`${base}/compare?${new URLSearchParams({ ...values, from: query.to, to: query.from })}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.swap}
         </Link>
         <a
           href={`/api/library/releases/${encodeURIComponent(path.id)}/compare/export?${suffix}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.export}
         </a>

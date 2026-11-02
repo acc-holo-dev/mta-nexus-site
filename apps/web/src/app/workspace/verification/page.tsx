@@ -48,7 +48,7 @@ export default async function VerificationPage({
     return (
       <div className="nexus-panel space-y-4 p-8">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <Link className="text-accent underline" href={authEntryHref("login", returnPath)}>
+        <Link className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href={authEntryHref("login", returnPath)}>
           {copy.signIn}
         </Link>
       </div>

@@ -22,7 +22,7 @@ export default async function NewResourcePage() {
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
         <Link
           href={authEntryHref("login", "/workspace/resources/new")}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {dictionary.workspace.signIn}
         </Link>

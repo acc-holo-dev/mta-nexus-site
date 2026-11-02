@@ -37,7 +37,10 @@ export async function LibraryReleaseHistoryScreen({
   const href = (page: number) => `/workspace/library/version-history?${suffix(page)}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/workspace/library" className="text-accent underline">
+      <Link
+        href="/workspace/library"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.back}
       </Link>
       <h1 className="font-display">{c.title}</h1>
@@ -69,7 +72,7 @@ export async function LibraryReleaseHistoryScreen({
       {result.productId && (
         <Link
           href={`/workspace/library/version-history?days=${result.days}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.clear}
         </Link>
@@ -107,7 +110,7 @@ export async function LibraryReleaseHistoryScreen({
             {item.hasCurrentAccess && (
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {c.manage}
               </Link>
@@ -124,7 +127,7 @@ export async function LibraryReleaseHistoryScreen({
       </nav>
       <a
         href={`/api/library/releases/history/export?${suffix(result.page)}`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {c.export}
       </a>

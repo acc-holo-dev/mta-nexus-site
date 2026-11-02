@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { OrderCancellationForm } from "../../../../../components/order-cancellation-form";
-import { authService } from "../../../../../lib/services/auth-service";
-import { orderOperationsService } from "../../../../../lib/services/commercial-plan-service";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
 import {
   formatHistoryAmount,
   formatHistoryDate,
   parseHistoryPage,
 } from "../../../../../lib/commerce-history-format";
-import { authEntryHref } from "../../../../../components/auth-return-path";
+import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { authService } from "../../../../../lib/services/auth-service";
+import { orderOperationsService } from "../../../../../lib/services/commercial-plan-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Order operations | MTA NEXUS",
@@ -40,7 +40,7 @@ export default async function OrderOperationsPage({
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", `/workspace/purchases/${encodeURIComponent(id)}/operations`)}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.signIn}
         </Link>
@@ -130,7 +130,10 @@ export default async function OrderOperationsPage({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -138,7 +141,10 @@ export default async function OrderOperationsPage({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.next}
             </Link>
           ) : null}

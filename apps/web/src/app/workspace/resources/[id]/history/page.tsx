@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../../components/auth-return-path";
-import { authService } from "../../../../../lib/services/auth-service";
-import { resourcePublisherService } from "../../../../../lib/services/resource-publisher-service";
+import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourcePublisherCopy } from "../../../../../lib/resource-publisher-i18n";
 import {
   publisherSearchParams,
   resourcePublisherHistoryQuery,
 } from "../../../../../lib/resource-publisher-query";
-import { getDictionary } from "../../../../../lib/i18n";
-import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
+import { authService } from "../../../../../lib/services/auth-service";
+import { resourcePublisherService } from "../../../../../lib/services/resource-publisher-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -50,7 +50,7 @@ export default async function Page({
       <div className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={`/workspace/resources/${encodeURIComponent(id)}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.back}
         </Link>
@@ -58,7 +58,10 @@ export default async function Page({
         <p className="text-sm text-muted">{copy.historyNote}</p>
         <section className="space-y-4 py-8 text-center">
           <h2 className="font-display text-primary">{dictionary.workspace.signInRequired}</h2>
-          <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+          <Link
+            href={authEntryHref("login", returnPath)}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {dictionary.workspace.signIn}
           </Link>
         </section>
@@ -83,7 +86,7 @@ export default async function Page({
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.back}
       </Link>

@@ -190,7 +190,7 @@ export function OrderCaseCreateForm({
           {copy.saved}{" "}
           <Link
             href={`/workspace/order-cases/${encodeURIComponent(savedId)}`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.open}
           </Link>

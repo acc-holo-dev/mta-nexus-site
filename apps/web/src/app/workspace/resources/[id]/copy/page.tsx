@@ -49,7 +49,7 @@ export default async function ResourceCopyPage({
     return (
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           href={`/workspace/resources/${encodeURIComponent(id)}`}
         >
           {c.back}
@@ -69,7 +69,10 @@ export default async function ResourceCopyPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{resourceCopyError(locale, error.code)}</p>
-          <Link href="/workspace/resources" className="text-accent underline">
+          <Link
+            href="/workspace/resources"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
         </section>

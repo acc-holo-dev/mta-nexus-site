@@ -1,18 +1,18 @@
-import Link from "next/link";
-import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
-import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceActivityService } from "../../../lib/services/resource-activity-service";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { authEntryHref } from "../../../components/auth-return-path";
+import { formatHistoryDate } from "../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
 import {
-  acquisitionSource,
-  acquisitionPage,
   acquisitionHistoryHref,
+  acquisitionPage,
+  acquisitionSource,
 } from "../../../lib/resource-activity-view";
-import { formatHistoryDate } from "../../../lib/commerce-history-format";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
+import { authService } from "../../../lib/services/auth-service";
+import { resourceActivityService } from "../../../lib/services/resource-activity-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -42,7 +42,10 @@ export default async function AcquisitionHistoryPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -56,11 +59,17 @@ export default async function AcquisitionHistoryPage({
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <header className="space-y-3">
-        <Link href="/workspace/library" className="text-accent underline">
+        <Link
+          href="/workspace/library"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.library}
         </Link>
         <h1 className="font-display text-primary">{copy.history}</h1>
-        <Link href="/workspace/acquisitions/receipts" className="text-accent underline">
+        <Link
+          href="/workspace/acquisitions/receipts"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {resourceCartReceiptsCopy(locale).title}
         </Link>
         <p className="max-w-3xl text-sm text-secondary" role="note">
@@ -122,7 +131,7 @@ export default async function AcquisitionHistoryPage({
           {result.page > 1 ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page - 1)}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.previous}
             </Link>
@@ -133,7 +142,7 @@ export default async function AcquisitionHistoryPage({
           {result.page < result.totalPages ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page + 1)}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.next}
             </Link>

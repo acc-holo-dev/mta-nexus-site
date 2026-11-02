@@ -41,7 +41,7 @@ export default async function FinancialStatements({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
           {copy.signIn}
         </Link>
       </section>
@@ -84,7 +84,7 @@ export default async function FinancialStatements({
         {copy.note}
       </p>
       <nav aria-label={copy.currency} className="flex flex-wrap gap-4 text-sm">
-        <Link href={href(1, null)} className="text-accent underline">
+        <Link href={href(1, null)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
           {copy.all}
         </Link>
         {["USD", "EUR", "RUB"].map((value) => (
@@ -92,7 +92,7 @@ export default async function FinancialStatements({
             key={value}
             href={href(1, value)}
             aria-current={value === currency ? "page" : undefined}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {value}
           </Link>
@@ -176,7 +176,7 @@ export default async function FinancialStatements({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className="text-accent underline">
+            <Link href={href(result.page - 1)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
               {copy.previous}
             </Link>
           ) : null}
@@ -184,7 +184,7 @@ export default async function FinancialStatements({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className="text-accent underline">
+            <Link href={href(result.page + 1)} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
               {copy.next}
             </Link>
           ) : null}
@@ -209,7 +209,7 @@ export default async function FinancialStatements({
             {scopes.page > 1 ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page - 1)}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {copy.previous}
               </Link>
@@ -220,7 +220,7 @@ export default async function FinancialStatements({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page + 1)}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {copy.next}
               </Link>

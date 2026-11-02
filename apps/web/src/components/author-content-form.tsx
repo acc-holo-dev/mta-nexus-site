@@ -227,12 +227,18 @@ export function AuthorContentForm({
             {copy.status}: {copy[saved.status]}
           </span>
           {saved.status === "published" && (
-            <Link href={`/articles/${saved.slug}`} className="text-accent underline">
+            <Link
+              href={`/articles/${saved.slug}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.publicView}
             </Link>
           )}
           {archived && (
-            <Link href="/support" className="text-accent underline">
+            <Link
+              href="/support"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.archivedNote}
             </Link>
           )}

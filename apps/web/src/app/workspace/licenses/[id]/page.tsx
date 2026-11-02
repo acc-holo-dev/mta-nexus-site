@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authService } from "../../../../lib/services/auth-service";
-import { licenseControlService } from "../../../../lib/services/license-control-service";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getLicenseControlCopy } from "../../../../lib/license-control-i18n";
-import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import { HistorySignIn } from "../../../../components/commerce-history-ui";
 import { LicenseControlPanel } from "../../../../components/license-control-panel";
 import { LicenseDetailView } from "../../../../components/license-detail-view";
+import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { getLicenseControlCopy } from "../../../../lib/license-control-i18n";
+import { authService } from "../../../../lib/services/auth-service";
+import { licenseControlService } from "../../../../lib/services/license-control-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

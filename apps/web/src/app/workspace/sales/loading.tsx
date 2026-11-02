@@ -1,5 +1,5 @@
-import { getRequestLocale } from "../../../lib/i18n-server";
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/sales.
 export default async function Loading() {

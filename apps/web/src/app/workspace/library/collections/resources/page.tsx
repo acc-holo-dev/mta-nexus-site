@@ -51,7 +51,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -64,10 +67,16 @@ export default async function Page({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4">
-          <Link href={collectionHref()} className="text-accent underline">
+          <Link
+            href={collectionHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
-          <Link href="/workspace/library" className="text-accent underline">
+          <Link
+            href="/workspace/library"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.library}
           </Link>
         </nav>
@@ -147,7 +156,10 @@ export default async function Page({
           <Button type="submit" variant="outline" className="px-3">
             {v.apply}
           </Button>
-          <Link href={collectionInventoryHref()} className="text-accent underline">
+          <Link
+            href={collectionInventoryHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {v.clear}
           </Link>
         </form>
@@ -169,7 +181,7 @@ export default async function Page({
                 key={release}
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix({ ...query, page: 1, release })}`}
                 aria-current={release === report.release ? "page" : undefined}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {v.releaseFilters[release]} (
                 {
@@ -188,7 +200,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/resources/export?${suffix(report.page)}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {v.export}
         </a>
@@ -231,7 +243,7 @@ export default async function Page({
                         {release.canReviewRequirements && (
                           <Link
                             href={`${resourceHref}/requirements?${new URLSearchParams({ previewBuildId: release.effective.buildId })}`}
-                            className="text-accent underline"
+                            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                           >
                             {v.preparation}
                           </Link>
@@ -257,18 +269,24 @@ export default async function Page({
                   </section>
                 )}
                 <div className="flex flex-wrap gap-4">
-                  <Link href={`${resourceHref}/collections`} className="text-accent underline">
+                  <Link
+                    href={`${resourceHref}/collections`}
+                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
                     {v.manage}
                   </Link>
                   {item.available && (
-                    <Link href={`${resourceHref}/versions`} className="text-accent underline">
+                    <Link
+                      href={`${resourceHref}/versions`}
+                      className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
                       {c.versions}
                     </Link>
                   )}
                   {first && second && (
                     <Link
                       href={collectionHref(first.id, "compare", { to: second.id })}
-                      className="text-accent underline"
+                      className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       {v.compare}
                     </Link>
@@ -299,7 +317,7 @@ export default async function Page({
             {report.page > 1 && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page - 1)}`}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {c.previous}
               </Link>
@@ -310,7 +328,7 @@ export default async function Page({
             {report.page < report.totalPages && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page + 1)}`}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {c.next}
               </Link>
@@ -325,7 +343,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href={collectionInventoryHref()} className="text-accent underline">
+        <Link
+          href={collectionInventoryHref()}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.reload}
         </Link>
       </section>

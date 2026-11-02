@@ -1,22 +1,22 @@
+import { licenseRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
+import { can } from "@nexus/security";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
-import { can } from "@nexus/security";
-import { licenseRepository } from "@nexus/db";
-import { authService } from "../../../lib/services/auth-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
-import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
+import { HistoryShell, HistorySignIn } from "../../../components/commerce-history-ui";
+import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
   licenseStatusLabel,
 } from "../../../lib/commerce-history-format";
-import { HistoryShell, HistorySignIn } from "../../../components/commerce-history-ui";
-import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
+import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import { licenseArchiveQuery, licenseArchiveUrl } from "../../../lib/license-archive-query";
+import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
+import { authService } from "../../../lib/services/auth-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -132,7 +132,7 @@ export default async function LicensesHistoryPage({
           {result.page > 1 ? (
             <Link
               href={licenseArchiveUrl({ ...filters, page: result.page - 1 })}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.previous}
             </Link>
@@ -145,7 +145,7 @@ export default async function LicensesHistoryPage({
           {result.page < result.totalPages && (
             <Link
               href={licenseArchiveUrl({ ...filters, page: result.page + 1 })}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.next}
             </Link>

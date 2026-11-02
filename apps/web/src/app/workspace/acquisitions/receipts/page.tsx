@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../lib/resource-cart-receipts-i18n";
@@ -13,7 +14,6 @@ import {
 } from "../../../../lib/resource-cart-receipts-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../lib/services/resource-cart-receipts-service";
-import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -38,7 +38,10 @@ export default async function ResourceCartReceiptsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -57,7 +60,10 @@ export default async function ResourceCartReceiptsPage({
     return (
       <section className="space-y-4 py-8">
         <p role="alert">{copy.invalid}</p>
-        <Link href="/workspace/acquisitions/receipts" className="text-accent underline">
+        <Link
+          href="/workspace/acquisitions/receipts"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.title}
         </Link>
       </section>
@@ -68,13 +74,22 @@ export default async function ResourceCartReceiptsPage({
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <nav className="flex flex-wrap gap-4 text-sm">
-        <Link href="/workspace/cart" className="text-accent underline">
+        <Link
+          href="/workspace/cart"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.cart}
         </Link>
-        <Link href="/workspace/acquisitions" className="text-accent underline">
+        <Link
+          href="/workspace/acquisitions"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.history}
         </Link>
-        <Link href="/workspace/library" className="text-accent underline">
+        <Link
+          href="/workspace/library"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.library}
         </Link>
       </nav>
@@ -128,7 +143,7 @@ export default async function ResourceCartReceiptsPage({
               <h2 className="font-semibold">
                 <Link
                   href={resourceCartReceiptUrl(item.requestId)}
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   prefetch={false}
                 >
                   {copy.receipt}
@@ -152,7 +167,7 @@ export default async function ResourceCartReceiptsPage({
         {result.page > 1 ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page - 1 })}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.previous}
           </Link>
@@ -163,14 +178,14 @@ export default async function ResourceCartReceiptsPage({
         {result.page < result.totalPages ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page + 1 })}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.next}
           </Link>
         ) : null}
         <a
           href={resourceCartReceiptsUrl(current, true).replace("receipts?", "receipts/export?")}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.export}
         </a>

@@ -44,7 +44,10 @@ export default async function TermsPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.invalid}</p>
-          <Link href="/admin/commerce/reconciliation" className="text-accent underline">
+          <Link
+            href="/admin/commerce/reconciliation"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
         </section>

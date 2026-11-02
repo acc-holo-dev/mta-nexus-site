@@ -51,7 +51,10 @@ export default async function Page({
   const href = (page: number) => `/workspace/library/watches/history?${suffix(page)}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/workspace/library/watches" className="text-accent underline">
+      <Link
+        href="/workspace/library/watches"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.back}
       </Link>
       <h1 className="font-display">{c.title}</h1>
@@ -92,7 +95,7 @@ export default async function Page({
       </form>
       <a
         href={`/api/library/watches/history/export?${suffix(result.page)}`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {c.export}
       </a>
@@ -133,7 +136,7 @@ export default async function Page({
                     {change.currentAvailable && (
                       <Link
                         href={`/workspace/library/${encodeURIComponent(change.productId)}/versions`}
-                        className="text-accent underline"
+                        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                       >
                         {c.manage}
                       </Link>

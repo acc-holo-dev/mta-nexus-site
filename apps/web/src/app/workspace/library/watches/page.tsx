@@ -47,7 +47,10 @@ export default async function ReleaseWatchesPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -66,7 +69,10 @@ export default async function ReleaseWatchesPage({
     return (
       <section className="space-y-4 py-8">
         <p role="alert">{copy.invalid}</p>
-        <Link href="/workspace/library/watches" className="text-accent underline">
+        <Link
+          href="/workspace/library/watches"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.title}
         </Link>
       </section>
@@ -84,7 +90,10 @@ export default async function ReleaseWatchesPage({
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
-      <Link href="/workspace/library/watches/history" className="text-accent underline">
+      <Link
+        href="/workspace/library/watches/history"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
       <p role="note" className="text-sm text-secondary">
@@ -112,7 +121,7 @@ export default async function ReleaseWatchesPage({
         </Button>
       </form>
       <a
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         href={`/api/library/watches/export?${new URLSearchParams({ filter: query.filter, page: String(result.page), query: query.query })}`}
       >
         {copy.export}

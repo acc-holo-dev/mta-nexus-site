@@ -24,7 +24,7 @@ export default async function DeveloperSettingsPage() {
     return (
       <div className="nexus-panel p-8">
         <Link
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           href={authEntryHref("login", "/settings/developer")}
         >
           {copy.signIn}

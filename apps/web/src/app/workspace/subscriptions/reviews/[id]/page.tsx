@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { PlanReviewDetailView } from "../../../../../components/plan-review-detail";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
@@ -13,7 +14,6 @@ import {
 } from "../../../../../lib/plan-reviews-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
-import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Recorded plan terms | MTA NEXUS",
@@ -40,7 +40,10 @@ export default async function PlanReviewPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -62,7 +65,10 @@ export default async function PlanReviewPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.invalid}</p>
-          <Link href="/workspace/subscriptions/reviews" className="text-accent underline">
+          <Link
+            href="/workspace/subscriptions/reviews"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
         </section>

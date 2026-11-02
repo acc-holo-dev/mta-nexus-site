@@ -1,7 +1,3 @@
-import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
-import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
-import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import { AppError } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -9,12 +5,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../../components/auth-return-path";
 import { LibraryCollectionCommandForm } from "../../../../../components/library-collection-command";
+import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
 } from "../../../../../lib/library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../../../lib/library-collections-query";
+import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
 
@@ -46,7 +46,7 @@ export default async function ResourceCollectionsPage({
         <h1>{c.signInRequired}</h1>
         <Link
           href={authEntryHref("login", `/workspace/library/${encodeURIComponent(id)}/collections`)}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.signIn}
         </Link>
@@ -60,22 +60,28 @@ export default async function ResourceCollectionsPage({
     return (
       <div className="mx-auto max-w-4xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.library}>
-          <Link href="/workspace/library" className="text-accent underline">
+          <Link
+            href="/workspace/library"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.library}
           </Link>
           <Link
             href={`${membershipHistoryHref()}?productId=${encodeURIComponent(id)}`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
-          <Link href={collectionHref()} className="text-accent underline">
+          <Link
+            href={collectionHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
           {result.resource.available && (
             <Link
               href={`/workspace/library/${encodeURIComponent(id)}/versions`}
-              className="text-accent underline"
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {c.versions}
             </Link>
@@ -84,7 +90,7 @@ export default async function ResourceCollectionsPage({
         <h1 className="font-display text-primary">{c.resourceCollections}</h1>
         <Link
           href={`/workspace/library/collections/history?${new URLSearchParams({ productId: id })}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {libraryCollectionHistoryCopy(locale).title}
         </Link>
@@ -119,7 +125,10 @@ export default async function ResourceCollectionsPage({
             return (
               <li key={collection.id} className="nexus-panel space-y-3 p-5">
                 <h3 className="break-words font-semibold">
-                  <Link href={collectionHref(collection.id)} className="text-accent underline">
+                  <Link
+                    href={collectionHref(collection.id)}
+                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
                     {collection.name}
                   </Link>
                 </h3>
@@ -164,7 +173,10 @@ export default async function ResourceCollectionsPage({
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href={collectionHref()} className="text-accent underline">
+        <Link
+          href={collectionHref()}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.title}
         </Link>
       </section>

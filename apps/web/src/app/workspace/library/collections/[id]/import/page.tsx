@@ -8,8 +8,8 @@ import { LibraryCollectionImport } from "../../../../../../components/library-co
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionManifestsCopy } from "../../../../../../lib/library-collection-manifests-i18n";
 import {
-  libraryCollectionsCopy,
   libraryCollectionError,
+  libraryCollectionsCopy,
 } from "../../../../../../lib/library-collections-i18n";
 import {
   collectionHref,
@@ -46,7 +46,7 @@ export default async function Page({
         <h1>{c.signInRequired}</h1>
         <Link
           href={authEntryHref("login", collectionHref(id, "import"))}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.signIn}
         </Link>
@@ -60,12 +60,15 @@ export default async function Page({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4">
-          <Link href={collectionHref(collection.id)} className="text-accent underline">
+          <Link
+            href={collectionHref(collection.id)}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
           <a
             href={`/api/library/collections/${encodeURIComponent(collection.id)}/export`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {m.export}
           </a>
@@ -88,7 +91,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href={collectionHref()} className="text-accent underline">
+        <Link
+          href={collectionHref()}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.reload}
         </Link>
       </section>

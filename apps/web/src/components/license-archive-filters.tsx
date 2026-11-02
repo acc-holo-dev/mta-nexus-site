@@ -72,7 +72,10 @@ export function LicenseArchiveFilters({
           >
             {copy.apply}
           </Button>
-          <Link href="/workspace/licenses" className="text-accent underline">
+          <Link
+            href="/workspace/licenses"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {copy.clear}
           </Link>
         </div>

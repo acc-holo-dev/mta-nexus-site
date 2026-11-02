@@ -40,7 +40,10 @@ export default async function ResourceDownloadsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -54,7 +57,10 @@ export default async function ResourceDownloadsPage({
     return (
       <section className="space-y-4 py-8">
         <p role="alert">{copy.invalid}</p>
-        <Link href="/workspace/library/downloads" className="text-accent underline">
+        <Link
+          href="/workspace/library/downloads"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.title}
         </Link>
       </section>

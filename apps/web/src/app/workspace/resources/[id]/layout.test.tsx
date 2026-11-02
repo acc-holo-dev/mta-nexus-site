@@ -1,5 +1,5 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   actor: { id: "author" } as { id: string } | null,

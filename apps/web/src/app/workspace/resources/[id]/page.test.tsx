@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   product: vi.fn(),
@@ -48,7 +49,9 @@ vi.mock("../../../../components/author-resource-forms", () => ({
 vi.mock("../../../../components/resource-lifecycle-controls", () => ({
   ResourceLifecycleControls: () => null,
 }));
+
 import Page, { metadata } from "./page";
+
 const input = {
   params: Promise.resolve({ id: "resource" }),
   searchParams: Promise.resolve({ page: "2" }),

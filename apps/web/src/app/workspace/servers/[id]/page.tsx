@@ -1,17 +1,17 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
-import { Server } from "lucide-react";
-import { authService } from "../../../../lib/services/auth-service";
-import { serverService } from "../../../../lib/services/server-service";
-import { ServerDetailsForm } from "../../../../components/server-details-form";
-import { ServerClaimStatusPanel } from "../../../../components/server-claim-status-panel";
 import { readManagedServerClaimStatus } from "@nexus/db";
+import { Server } from "lucide-react";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../components/auth-return-path";
+import { ServerClaimStatusPanel } from "../../../../components/server-claim-status-panel";
+import { ServerDetailsForm } from "../../../../components/server-details-form";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { authService } from "../../../../lib/services/auth-service";
+import { serverService } from "../../../../lib/services/server-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {

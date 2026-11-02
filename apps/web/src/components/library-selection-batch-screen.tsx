@@ -3,12 +3,12 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../lib/i18n-server";
+import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import {
   collectionId,
   collectionPageParams,
   collectionsQuery,
 } from "../lib/library-collections-query";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
@@ -41,7 +41,10 @@ export async function LibrarySelectionBatchScreen({
       const result = await librarySelectionBatchesService.history(actor, id, query.page);
       return (
         <div className="mx-auto max-w-5xl space-y-6 py-8">
-          <Link href={base} className="text-accent underline">
+          <Link
+            href={base}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
           <h1 className="font-display">
@@ -102,7 +105,7 @@ export async function LibrarySelectionBatchScreen({
           </nav>
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/versions/history/export?page=${result.page}`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {c.export}
           </a>
@@ -116,14 +119,17 @@ export async function LibrarySelectionBatchScreen({
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(id)}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.back}
         </Link>
         <h1 className="font-display">
           {c.title}: {result.collection.name}
         </h1>
-        <Link href={`${base}/history`} className="text-accent underline">
+        <Link
+          href={`${base}/history`}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.history}
         </Link>
         {result.collection.status === "archived" ? (

@@ -60,7 +60,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -73,13 +76,22 @@ export default async function Page({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
-          <Link href={membershipHistoryHref()} className="text-accent underline">
+          <Link
+            href={membershipHistoryHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
-          <Link href={collectionHref()} className="text-accent underline">
+          <Link
+            href={collectionHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
-          <Link href="/workspace/library" className="text-accent underline">
+          <Link
+            href="/workspace/library"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.library}
           </Link>
         </nav>
@@ -144,7 +156,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/history/export?${suffix(result.page)}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {h.export}
         </a>
@@ -155,7 +167,10 @@ export default async function Page({
               command = receipt?.command;
             return (
               <li key={item.id} className="nexus-panel space-y-3 p-5">
-                <Link href={collectionReceiptHref(item.id)} className="text-accent underline">
+                <Link
+                  href={collectionReceiptHref(item.id)}
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                >
                   {libraryCollectionReceiptsCopy(locale).open}
                 </Link>
                 <h2 className="font-semibold">{command ? c[command.action] : h.unknown}</h2>
@@ -178,7 +193,7 @@ export default async function Page({
                         {h.current}:{" "}
                         <Link
                           href={collectionHref(item.currentCollection.id)}
-                          className="text-accent underline"
+                          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
                           {item.currentCollection.name}
                         </Link>{" "}
@@ -201,7 +216,7 @@ export default async function Page({
                         {h.sourceCurrent}:{" "}
                         <Link
                           href={collectionHref(item.currentSource.id)}
-                          className="text-accent underline"
+                          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
                           {item.currentSource.name}
                         </Link>{" "}
@@ -292,7 +307,10 @@ export default async function Page({
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href="/workspace/library/collections/history" className="text-accent underline">
+        <Link
+          href="/workspace/library/collections/history"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.reload}
         </Link>
       </section>

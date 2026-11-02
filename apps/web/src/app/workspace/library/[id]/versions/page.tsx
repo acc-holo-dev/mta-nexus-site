@@ -1,24 +1,24 @@
-import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
+import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
+import { BuildProvenanceDetails } from "../../../../../components/build-provenance-details";
+import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
+import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
+import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionsCopy } from "../../../../../lib/library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../../../../../lib/library-release-comparison-i18n";
 import { libraryReleaseHistoryCopy } from "../../../../../lib/library-release-history-i18n";
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { authEntryHref } from "../../../../../components/auth-return-path";
-import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
-import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
-import { BuildProvenanceDetails } from "../../../../../components/build-provenance-details";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
-import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
+import { getResourceReleaseControlCopy } from "../../../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
-import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
+import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getResourceReleaseControlCopy } from "../../../../../lib/resource-release-control-i18n";
-import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
+import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Library release selection | MTA NEXUS",
@@ -49,12 +49,15 @@ export default async function LibraryVersionsPage({
       <section className="space-y-4 py-16 text-center">
         <Link
           href={`/workspace/library/version-history?${new URLSearchParams({ productId: id })}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {libraryReleaseHistoryCopy(locale).title}
         </Link>
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -116,13 +119,13 @@ export default async function LibraryVersionsPage({
       ) : null}
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/requirements`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/collections`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {libraryCollectionsCopy(locale).resourceCollections}
       </Link>
@@ -169,7 +172,7 @@ export default async function LibraryVersionsPage({
               {current && current.id !== version.id && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(id)}/versions/compare?${new URLSearchParams({ from: current.id, to: version.id, returnPage: String(result.page) })}`}
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {libraryReleaseComparisonCopy(locale).title}
                 </Link>
@@ -205,7 +208,10 @@ export default async function LibraryVersionsPage({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -213,7 +219,10 @@ export default async function LibraryVersionsPage({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.next}
             </Link>
           ) : null}

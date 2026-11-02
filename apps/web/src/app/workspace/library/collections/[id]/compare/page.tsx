@@ -56,7 +56,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -73,10 +76,16 @@ export default async function Page({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
-          <Link href={collectionHref(id)} className="text-accent underline">
+          <Link
+            href={collectionHref(id)}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
-          <Link href={collectionHref()} className="text-accent underline">
+          <Link
+            href={collectionHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
         </nav>
@@ -168,7 +177,7 @@ export default async function Page({
                 {c.destination}:{" "}
                 <Link
                   href={collectionHref(comparison.destination.id)}
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {comparison.destination.name}
                 </Link>
@@ -265,7 +274,7 @@ export default async function Page({
                 {comparison.page > 1 && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page - 1)}`}
-                    className="text-accent underline"
+                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     {c.previous}
                   </Link>
@@ -273,7 +282,7 @@ export default async function Page({
                 {comparison.page < comparison.totalPages && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page + 1)}`}
-                    className="text-accent underline"
+                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     {c.next}
                   </Link>
@@ -299,7 +308,10 @@ export default async function Page({
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href={collectionHref(id, "compare")} className="text-accent underline">
+        <Link
+          href={collectionHref(id, "compare")}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.reload}
         </Link>
       </section>

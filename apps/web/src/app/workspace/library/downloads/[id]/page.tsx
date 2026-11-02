@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { authEntryHref } from "../../../../../components/auth-return-path";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../../../lib/services/auth-service";
-import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
+import { ResourceDeliveryEvidence } from "../../../../../components/resource-delivery-evidence";
+import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";
 import {
-  resourceDeliveryId,
   resourceDeliveriesUrl,
+  resourceDeliveryId,
 } from "../../../../../lib/resource-deliveries-query";
-import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
-import { ResourceDeliveryEvidence } from "../../../../../components/resource-delivery-evidence";
+import { authService } from "../../../../../lib/services/auth-service";
+import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -31,7 +31,7 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <Link
           href={authEntryHref("login", `/workspace/library/downloads/${encodeURIComponent(id)}`)}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.signIn}
         </Link>

@@ -56,7 +56,10 @@ export async function CollectionReleasesScreen({
     `${collectionHref(path.id, "releases")}?${suffix(page, filter)}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href={collectionHref(path.id)} className="text-accent underline">
+      <Link
+        href={collectionHref(path.id)}
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {cc.back}
       </Link>
       <h1 className="font-display">{c.title}</h1>
@@ -65,12 +68,15 @@ export async function CollectionReleasesScreen({
         {cc.revision}: {result.collection.revision} · {cc.items}: {result.itemCount}
       </p>
       <p className="text-secondary">{c.note}</p>
-      <Link href={collectionInventoryHref(path.id, "attention")} className="text-accent underline">
+      <Link
+        href={collectionInventoryHref(path.id, "attention")}
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {libraryCollectionInventoryCopy(locale).versionOverview}
       </Link>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}/watches`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {resourceReleaseWatchesCopy(locale).collectionTitle}
       </Link>
@@ -79,7 +85,7 @@ export async function CollectionReleasesScreen({
       ) : (
         <Link
           href={collectionHref(path.id, "versions", result.q ? { q: result.q } : {})}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {librarySelectionBatchesCopy(locale).title}
         </Link>
@@ -105,7 +111,7 @@ export async function CollectionReleasesScreen({
         {result.q && (
           <Link
             href={collectionHref(path.id, "releases", { filter: result.filter })}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {cc.clear}
           </Link>
@@ -117,7 +123,7 @@ export async function CollectionReleasesScreen({
             key={filter}
             href={href(1, filter)}
             aria-current={filter === result.filter ? "page" : undefined}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {filter === "updates" ? copy.update_available : copy[filter]} ({result.counts[filter]})
           </Link>
@@ -154,7 +160,7 @@ export async function CollectionReleasesScreen({
               {item.hasAccess && item.title !== null && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {copy.manage}
                 </Link>
@@ -175,7 +181,7 @@ export async function CollectionReleasesScreen({
       </p>
       <a
         href={`/api/library/collections/${encodeURIComponent(path.id)}/releases/export?${suffix()}`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {c.export}
       </a>

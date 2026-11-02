@@ -6,7 +6,10 @@ export default async function NotFound() {
   return (
     <section className="mx-auto max-w-xl space-y-4 py-16">
       <h1>{c.notFound}</h1>
-      <Link href="/workspace/library/collections" className="text-accent underline">
+      <Link
+        href="/workspace/library/collections"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {c.title}
       </Link>
     </section>

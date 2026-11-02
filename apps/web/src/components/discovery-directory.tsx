@@ -171,7 +171,7 @@ export async function DirectoryResults({
       <div role="alert" className="nexus-panel space-y-3 p-5 text-danger">
         <p>{loadError}</p>
         <Link
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
         >
           {dictionary.searchButton}
@@ -238,7 +238,10 @@ export async function DirectoryResults({
       {state.type === "servers" && (
         <p className="text-sm text-muted">
           {copy.serversHint}{" "}
-          <Link href="/servers" className="text-accent underline">
+          <Link
+            href="/servers"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {copy.master}
           </Link>
         </p>
@@ -285,14 +288,14 @@ export async function DirectoryResults({
               <div className="flex flex-wrap gap-3 pt-1">
                 {state.query ? (
                   <Link
-                    className="text-accent underline"
+                    className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     href={discoverHref({ ...state, query: "", page: 1 }, path)}
                   >
                     {copy.clearQuery}
                   </Link>
                 ) : null}
                 <Link
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   href={discoverHref({ type: state.type }, path)}
                 >
                   {copy.reset}

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
@@ -15,7 +16,6 @@ import {
   subscriptionReceiptHref,
   subscriptionsQuery,
 } from "../../../../lib/subscriptions-query";
-import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Subscription history | MTA NEXUS",
@@ -48,7 +48,7 @@ export default async function SubscriptionHistoryPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={subscriptionAccountHref(query.organizationId)}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.title}
         </Link>
@@ -88,7 +88,7 @@ export default async function SubscriptionHistoryPage({
               <li key={r.id} className="nexus-panel space-y-2 p-4">
                 <Link
                   href={subscriptionReceiptHref(r.id, query.organizationId)}
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {c.actions[r.action]}: {locale === "ru" ? r.titleRu : r.titleEn}
                 </Link>

@@ -11,8 +11,8 @@ import {
   libraryCollectionReceiptsCopy,
 } from "../../../../../../lib/library-collection-receipts-i18n";
 import {
-  libraryCollectionsCopy,
   libraryCollectionError,
+  libraryCollectionsCopy,
 } from "../../../../../../lib/library-collections-i18n";
 import {
   collectionHref,
@@ -49,7 +49,7 @@ export default async function Page({
         <h1>{c.signInRequired}</h1>
         <Link
           href={authEntryHref("login", collectionReceiptHref(id))}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.signIn}
         </Link>
@@ -63,10 +63,16 @@ export default async function Page({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4">
-          <Link href="/workspace/library/collections/history" className="text-accent underline">
+          <Link
+            href="/workspace/library/collections/history"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.history}
           </Link>
-          <Link href={collectionHref()} className="text-accent underline">
+          <Link
+            href={collectionHref()}
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
         </nav>
@@ -80,7 +86,7 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/receipts/${encodeURIComponent(report.id)}/export`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {r.export}
         </a>
@@ -126,7 +132,7 @@ export default async function Page({
                 {r.current}:{" "}
                 <Link
                   href={collectionHref(report.currentCollection.id)}
-                  className="text-accent underline"
+                  className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {report.currentCollection.name}
                 </Link>{" "}
@@ -207,7 +213,10 @@ export default async function Page({
     return (
       <section className="space-y-4 py-16">
         <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link href={collectionHref()} className="text-accent underline">
+        <Link
+          href={collectionHref()}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.reload}
         </Link>
       </section>

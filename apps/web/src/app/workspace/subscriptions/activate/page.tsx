@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { PlanReviewTerms } from "../../../../components/plan-review-terms";
 import { SubscriptionControls } from "../../../../components/subscription-controls";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -13,7 +14,6 @@ import {
   subscriptionActivationQuery,
   subscriptionPageParams,
 } from "../../../../lib/subscriptions-query";
-import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Activate free subscription | MTA NEXUS",
@@ -52,7 +52,10 @@ export default async function SubscriptionActivationPage({
       `/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
       <section className="mx-auto max-w-4xl space-y-6 py-8">
-        <Link href="/subscriptions" className="text-accent underline">
+        <Link
+          href="/subscriptions"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.catalog}
         </Link>
         <h1 className="font-display">{c.activate}</h1>

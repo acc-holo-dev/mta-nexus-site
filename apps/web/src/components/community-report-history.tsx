@@ -77,13 +77,13 @@ export function CommunityReportHistory({
       <div className="flex flex-wrap justify-between gap-3 text-sm">
         <Link
           href={changeHistoryHref(path, filters, { fresh: true })}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.latest}
         </Link>
         <a
           href={changeHistoryHref(`/api${base}/history/export`, filters, { until: page.until })}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.download}
         </a>

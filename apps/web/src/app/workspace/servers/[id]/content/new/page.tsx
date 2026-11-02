@@ -1,6 +1,6 @@
 import { ServerContentEditorPage } from "../../../../../../components/server-content-editor-page";
-import { serverContentCopy } from "../../../../../../lib/server-content-copy";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
+import { serverContentCopy } from "../../../../../../lib/server-content-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {

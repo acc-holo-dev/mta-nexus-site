@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../../lib/services/auth-service";
-import { licenseControlService } from "../../../../lib/services/license-control-service";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { formatHistoryDate, licenseStatusLabel } from "../../../../lib/commerce-history-format";
+import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getLicenseMaintenanceCopy } from "../../../../lib/license-maintenance-i18n";
 import { licenseRuntimePage } from "../../../../lib/license-runtime-query";
-import { formatHistoryDate, licenseStatusLabel } from "../../../../lib/commerce-history-format";
-import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
+import { authService } from "../../../../lib/services/auth-service";
+import { licenseControlService } from "../../../../lib/services/license-control-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {

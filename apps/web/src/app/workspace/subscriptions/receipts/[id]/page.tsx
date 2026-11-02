@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { PlanReviewTerms } from "../../../../../components/plan-review-terms";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -12,10 +13,9 @@ import { subscriptionError, subscriptionsCopy } from "../../../../../lib/subscri
 import {
   subscriptionAccountHref,
   subscriptionPageParams,
-  subscriptionsQuery,
   subscriptionReceiptHref,
+  subscriptionsQuery,
 } from "../../../../../lib/subscriptions-query";
-import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Recorded subscription operation | MTA NEXUS",
@@ -58,7 +58,7 @@ export default async function SubscriptionReceiptPage({
       <section className="mx-auto max-w-4xl space-y-6 py-8">
         <Link
           href={subscriptionAccountHref(query.organizationId)}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.title}
         </Link>
@@ -88,7 +88,7 @@ export default async function SubscriptionReceiptPage({
         </p>
         <a
           href={`/api/subscriptions/account/receipts/${encodeURIComponent(r.id)}/export${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.export}
         </a>

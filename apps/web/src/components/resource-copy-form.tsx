@@ -117,7 +117,7 @@ export function ResourceCopyForm({
         </Button>
         <Link
           href={`/workspace/resources/${encodeURIComponent(preview.source.id)}/copies`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {c.history}
         </Link>

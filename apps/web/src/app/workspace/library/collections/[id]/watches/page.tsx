@@ -48,7 +48,7 @@ export default async function Page({
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.library}
       </Link>
@@ -60,12 +60,15 @@ export default async function Page({
       <p>
         {copy.activeCount}: {result.activeWatchCount}/{RESOURCE_RELEASE_WATCH_LIMIT}
       </p>
-      <Link href="/workspace/library/watches" className="text-accent underline">
+      <Link
+        href="/workspace/library/watches"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {copy.watchCenter}
       </Link>
       <Link
         href="/workspace/library/watches/history?source=collection"
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
@@ -91,7 +94,7 @@ export default async function Page({
             key={filter}
             href={href(1, filter)}
             aria-current={filter === query.filter ? "page" : undefined}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy[filter]} ({result.counts[filter]})
           </Link>
@@ -126,7 +129,7 @@ export default async function Page({
             {item.available && (
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                className="text-accent underline"
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {copy.versions}
               </Link>

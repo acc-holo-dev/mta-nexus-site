@@ -41,7 +41,10 @@ export default async function ManageResourcePage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {dictionary.workspace.signIn}
         </Link>
       </section>
@@ -202,7 +205,10 @@ export default async function ManageResourcePage({
         {history.totalPages > 1 && (
           <nav aria-label={copy.page} className="flex gap-4 text-sm">
             {history.page > 1 && (
-              <Link href={`?page=${history.page - 1}`} className="text-accent underline">
+              <Link
+                href={`?page=${history.page - 1}`}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {copy.previous}
               </Link>
             )}
@@ -210,7 +216,10 @@ export default async function ManageResourcePage({
               {copy.page} {history.page} {copy.of} {history.totalPages}
             </span>
             {history.page < history.totalPages && (
-              <Link href={`?page=${history.page + 1}`} className="text-accent underline">
+              <Link
+                href={`?page=${history.page + 1}`}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {copy.next}
               </Link>
             )}

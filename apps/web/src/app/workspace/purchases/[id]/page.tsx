@@ -1,22 +1,22 @@
-import { orderTermsCopy } from "../../../../lib/order-terms-i18n";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HistorySignIn } from "../../../../components/commerce-history-ui";
-import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
-import { getCommercialCopy } from "../../../../lib/commercial-i18n";
-import { orderCaseCopy } from "../../../../lib/order-case-i18n";
-import { authService } from "../../../../lib/services/auth-service";
-import { commerceService } from "../../../../lib/services/commerce-service";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
 import {
   formatHistoryAmount,
   formatHistoryDate,
   orderStatusLabel,
   parseHistoryPage,
 } from "../../../../lib/commerce-history-format";
+import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
+import { getCommercialCopy } from "../../../../lib/commercial-i18n";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { orderCaseCopy } from "../../../../lib/order-case-i18n";
+import { orderTermsCopy } from "../../../../lib/order-terms-i18n";
+import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
+import { authService } from "../../../../lib/services/auth-service";
+import { commerceService } from "../../../../lib/services/commerce-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -143,7 +143,10 @@ export default async function OrderDetailsPage({
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex gap-4 text-sm text-secondary">
           {result.page > 1 && (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.previous}
             </Link>
           )}
@@ -151,7 +154,10 @@ export default async function OrderDetailsPage({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.next}
             </Link>
           )}

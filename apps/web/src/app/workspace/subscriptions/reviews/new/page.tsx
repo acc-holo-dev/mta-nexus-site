@@ -3,13 +3,13 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../../components/auth-return-path";
 import { PlanReviewForm } from "../../../../../components/plan-review-form";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
 import { planReviewNewQuery, planReviewsPageParams } from "../../../../../lib/plan-reviews-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
-import { authEntryHref } from "../../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Review a plan | MTA NEXUS",
@@ -29,7 +29,10 @@ export default async function NewPlanReview({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -43,7 +46,10 @@ export default async function NewPlanReview({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.planChanged}</p>
-          <Link href="/subscriptions" className="text-accent underline">
+          <Link
+            href="/subscriptions"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
         </section>
@@ -55,7 +61,10 @@ export default async function NewPlanReview({
       `/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
       <div className="mx-auto max-w-4xl space-y-6 py-8">
-        <Link href="/subscriptions" className="text-accent underline">
+        <Link
+          href="/subscriptions"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.back}
         </Link>
         <h1 className="font-display">{c.newReview}</h1>
@@ -69,7 +78,10 @@ export default async function NewPlanReview({
         {plan.scope === "organization" && scopes.totalPages > 1 ? (
           <nav aria-label={c.scopeNext} className="flex gap-4 text-sm">
             {scopes.page > 1 ? (
-              <Link href={href(scopes.page - 1)} className="text-accent underline">
+              <Link
+                href={href(scopes.page - 1)}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {c.previous}
               </Link>
             ) : null}
@@ -77,13 +89,19 @@ export default async function NewPlanReview({
               {c.page} {scopes.page} {c.of} {scopes.totalPages}
             </span>
             {scopes.page < scopes.totalPages ? (
-              <Link href={href(scopes.page + 1)} className="text-accent underline">
+              <Link
+                href={href(scopes.page + 1)}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {c.next}
               </Link>
             ) : null}
           </nav>
         ) : null}
-        <Link href="/workspace/subscriptions/reviews" className="text-accent underline">
+        <Link
+          href="/workspace/subscriptions/reviews"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.history}
         </Link>
       </div>
@@ -94,7 +112,10 @@ export default async function NewPlanReview({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.invalid}</p>
-          <Link href="/subscriptions" className="text-accent underline">
+          <Link
+            href="/subscriptions"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.back}
           </Link>
         </section>

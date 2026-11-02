@@ -1,18 +1,18 @@
+import { AppError } from "@nexus/domain";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../../components/auth-return-path";
-import { AppError } from "@nexus/domain";
-import { authService } from "../../../../../lib/services/auth-service";
-import { productService } from "../../../../../lib/services/product-service";
-import { resourceModerationService } from "../../../../../lib/services/resource-release-control-service";
+import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
   getResourceReleaseControlCopy,
   resourceModerationLabel,
 } from "../../../../../lib/resource-release-control-i18n";
-import { formatHistoryDate, parseHistoryPage } from "../../../../../lib/commerce-history-format";
+import { authService } from "../../../../../lib/services/auth-service";
+import { productService } from "../../../../../lib/services/product-service";
+import { resourceModerationService } from "../../../../../lib/services/resource-release-control-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -46,7 +46,10 @@ export default async function PublisherModerationHistory({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -99,7 +102,10 @@ export default async function PublisherModerationHistory({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -107,7 +113,10 @@ export default async function PublisherModerationHistory({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.next}
             </Link>
           ) : null}

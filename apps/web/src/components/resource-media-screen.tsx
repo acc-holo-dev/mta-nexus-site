@@ -2,11 +2,11 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "./auth-return-path";
 import { getRequestLocale } from "../lib/i18n-server";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceMediaService } from "../lib/services/resource-media-service";
+import { authEntryHref } from "./auth-return-path";
 import { ResourceGallery } from "./resource-gallery";
 import { ResourceMediaEditor } from "./resource-media-editor";
 export async function ResourceMediaScreen({
@@ -42,7 +42,7 @@ export async function ResourceMediaScreen({
             ? `/admin/resources/${encodeURIComponent(productId)}`
             : `/workspace/resources/${encodeURIComponent(productId)}`
         }
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.back}
       </Link>

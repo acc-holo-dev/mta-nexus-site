@@ -33,7 +33,10 @@ export default async function ResourceVariantsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {dictionary.workspace.signIn}
         </Link>
       </section>
@@ -69,7 +72,7 @@ export default async function ResourceVariantsPage({
           <p className="text-secondary">{copy.anchorNote}</p>
           <Link
             href={`/workspace/resources/${managed.anchorProductId}/variants`}
-            className="text-accent underline"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {copy.manageAnchor}
           </Link>

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { formatHistoryAmount, formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../lib/plan-reviews-i18n";
@@ -14,7 +15,6 @@ import {
 } from "../../../../lib/plan-reviews-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../lib/services/plan-reviews-service";
-import { authEntryHref } from "../../../../components/auth-return-path";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Saved plan reviews | MTA NEXUS",
@@ -34,7 +34,10 @@ export default async function PlanReviewsPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.signIn}
         </Link>
       </section>
@@ -52,7 +55,10 @@ export default async function PlanReviewsPage({
       `/workspace/subscriptions/reviews?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
-        <Link href="/subscriptions" className="text-accent underline">
+        <Link
+          href="/subscriptions"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
@@ -101,7 +107,10 @@ export default async function PlanReviewsPage({
         {scopes.totalPages > 1 ? (
           <nav aria-label={c.scopeNext} className="flex gap-4 text-sm">
             {scopes.page > 1 ? (
-              <Link href={href(result.page, scopes.page - 1)} className="text-accent underline">
+              <Link
+                href={href(result.page, scopes.page - 1)}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {c.previous}
               </Link>
             ) : null}
@@ -109,7 +118,10 @@ export default async function PlanReviewsPage({
               {c.scopeNext} · {scopes.page} / {scopes.totalPages}
             </span>
             {scopes.page < scopes.totalPages ? (
-              <Link href={href(result.page, scopes.page + 1)} className="text-accent underline">
+              <Link
+                href={href(result.page, scopes.page + 1)}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {c.next}
               </Link>
             ) : null}
@@ -144,7 +156,10 @@ export default async function PlanReviewsPage({
         {result.totalPages > 1 ? (
           <nav aria-label={c.page} className="flex gap-4 text-sm">
             {result.page > 1 ? (
-              <Link href={href(result.page - 1)} className="text-accent underline">
+              <Link
+                href={href(result.page - 1)}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {c.previous}
               </Link>
             ) : null}
@@ -152,7 +167,10 @@ export default async function PlanReviewsPage({
               {c.page} {result.page} {c.of} {result.totalPages}
             </span>
             {result.page < result.totalPages ? (
-              <Link href={href(result.page + 1)} className="text-accent underline">
+              <Link
+                href={href(result.page + 1)}
+                className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {c.next}
               </Link>
             ) : null}
@@ -166,7 +184,10 @@ export default async function PlanReviewsPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.invalid}</p>
-          <Link href="/workspace/subscriptions/reviews" className="text-accent underline">
+          <Link
+            href="/workspace/subscriptions/reviews"
+            className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
             {c.title}
           </Link>
         </section>

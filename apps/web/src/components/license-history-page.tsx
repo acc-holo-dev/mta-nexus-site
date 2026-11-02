@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
-import { authService } from "../lib/services/auth-service";
-import { licenseControlService } from "../lib/services/license-control-service";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { formatHistoryDate } from "../lib/commerce-history-format";
+import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { getLicenseControlCopy, licenseActionLabel } from "../lib/license-control-i18n";
-import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
-import { formatHistoryDate } from "../lib/commerce-history-format";
 import { licenseRuntimePage } from "../lib/license-runtime-query";
+import { authService } from "../lib/services/auth-service";
+import { licenseControlService } from "../lib/services/license-control-service";
 import { HistorySignIn } from "./commerce-history-ui";
 
 export async function licenseHistoryMetadata(): Promise<Metadata> {
@@ -98,7 +98,10 @@ export async function LicenseHistoryPage({
       {result.totalPages > 1 && (
         <nav aria-label={copy.fullHistory} className="flex gap-4 text-sm">
           {result.page > 1 && (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.previous}
             </Link>
           )}
@@ -106,7 +109,10 @@ export async function LicenseHistoryPage({
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
               {copy.next}
             </Link>
           )}

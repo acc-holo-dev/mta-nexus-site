@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { authEntryHref } from "../../../../../components/auth-return-path";
+import { ResourceReviewEditor } from "../../../../../components/resource-review-controls";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { resourceReviewCopy } from "../../../../../lib/resource-review-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
-import { resourceReviewCopy } from "../../../../../lib/resource-review-i18n";
-import { ResourceReviewEditor } from "../../../../../components/resource-review-controls";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -25,7 +25,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     return (
       <Link
         href={authEntryHref("login", `/workspace/library/review/${target.id}`)}
-        className="text-accent underline"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {copy.signIn}
       </Link>
@@ -36,7 +36,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   });
   return (
     <section className="mx-auto max-w-3xl space-y-5 py-8">
-      <Link href="/workspace/library/reviews" className="text-accent underline">
+      <Link
+        href="/workspace/library/reviews"
+        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.write}</h1>

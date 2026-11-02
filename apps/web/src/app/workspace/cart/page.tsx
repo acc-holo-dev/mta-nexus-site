@@ -22,7 +22,7 @@ export default async function ResourceCartPage() {
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signIn}</h1>
-        <Link href={authEntryHref("login", "/workspace/cart")} className="text-accent underline">
+        <Link href={authEntryHref("login", "/workspace/cart")} className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
           {copy.login}
         </Link>
       </section>

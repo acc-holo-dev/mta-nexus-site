@@ -1,22 +1,22 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError, ORDER_CASE_REVIEW_STATUSES, type OrderCaseEvidence } from "@nexus/domain";
 import { Button } from "@nexus/ui";
-import { authService } from "../lib/services/auth-service";
-import { orderCaseService } from "../lib/services/order-case-service";
-import { getRequestLocale } from "../lib/i18n-server";
-import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { formatHistoryAmount, formatHistoryDate } from "../lib/commerce-history-format";
+import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
 import { financialOrderLabel, financialPaymentLabel } from "../lib/financial-i18n";
-import { orderCasePageQuery } from "../lib/order-case-query";
+import { getRequestLocale } from "../lib/i18n-server";
 import {
   orderCaseCopy,
   orderCaseKindLabel,
   orderCaseStatusLabel,
   orderCaseThreadLabel,
 } from "../lib/order-case-i18n";
+import { orderCasePageQuery } from "../lib/order-case-query";
+import { authService } from "../lib/services/auth-service";
+import { orderCaseService } from "../lib/services/order-case-service";
 import { HistorySignIn } from "./commerce-history-ui";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
 import { SupportCaseThread } from "./support-case-thread";
@@ -107,7 +107,10 @@ function Pagination({
   return (
     <nav aria-label={copy.page} className="flex gap-4 text-sm">
       {page > 1 && (
-        <Link href={href(page - 1)} className="text-accent underline">
+        <Link
+          href={href(page - 1)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.previous}
         </Link>
       )}
@@ -115,7 +118,10 @@ function Pagination({
         {copy.page} {page} / {totalPages}
       </span>
       {page < totalPages && (
-        <Link href={href(page + 1)} className="text-accent underline">
+        <Link
+          href={href(page + 1)}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.next}
         </Link>
       )}
@@ -151,7 +157,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       {result.existingCase ? (
         <Link
           href={`/workspace/order-cases/${encodeURIComponent(result.existingCase.id)}`}
-          className="text-accent underline"
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {copy.existing} · {orderCaseStatusLabel(locale, result.existingCase.reviewStatus)}
         </Link>
@@ -193,7 +199,10 @@ export async function OrderCaseListPage({
     return (
       <p className="py-8">
         {copy.invalidQuery}{" "}
-        <Link href={base} className="text-accent underline">
+        <Link
+          href={base}
+          className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           {copy.clear}
         </Link>
       </p>
