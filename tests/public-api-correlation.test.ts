@@ -101,7 +101,7 @@ describe("public and disabled API correlation boundaries", () => {
     }
   });
 
-  it("returns correlated no-store closed-beta checkout failures", async () => {
+  it("returns correlated no-store free-beta checkout failures", async () => {
     const response = await checkoutPOST(
       new NextRequest("https://nexus.test/api/checkout", {
         method: "POST",

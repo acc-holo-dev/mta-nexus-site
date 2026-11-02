@@ -54,12 +54,12 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   indexMtaObservations: vi.fn(() => () => undefined),
 }));
 
-import SavedPage from "../apps/web/src/app/workspace/saved/page";
 import LicensesPage from "../apps/web/src/app/workspace/licenses/page";
 import PurchasesPage from "../apps/web/src/app/workspace/purchases/page";
 import SalesPage from "../apps/web/src/app/workspace/sales/page";
+import SavedPage from "../apps/web/src/app/workspace/saved/page";
 
-describe("closed-beta workspace behavior", () => {
+describe("open free-beta workspace behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.session = null;
@@ -132,7 +132,7 @@ describe("closed-beta workspace behavior", () => {
     expect(state.redirects).toEqual([]);
   });
 
-  it("keeps UX-23 A guest shell policy aligned with closed-beta sign-in gates", () => {
+  it("keeps UX-23 A guest shell policy aligned with free-beta sign-in gates", () => {
     expect(showWorkspaceTools({ status: "anonymous", user: null })).toBe(false);
     expect(showAdminDestination({ status: "anonymous", user: null })).toBe(false);
     expect(

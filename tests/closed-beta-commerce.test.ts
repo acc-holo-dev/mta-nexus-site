@@ -22,7 +22,7 @@ vi.mock("@nexus/security", () => ({
 import { POST as disabledCheckout } from "../apps/web/src/app/api/checkout/route";
 import { CommerceService } from "../apps/web/src/lib/services/commerce-service";
 
-describe("closed-beta commerce behavior", () => {
+describe("open free-beta commerce behavior", () => {
   beforeEach(() => {
     stubBrowserMutationOrigin();
     vi.clearAllMocks();

@@ -1,5 +1,3 @@
-import { beforeAll, describe, expect, it } from "vitest";
-import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import {
   buildRepository,
   entitlementRepository,
@@ -8,6 +6,8 @@ import {
   userRepository,
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
+import { beforeAll, describe, expect, it } from "vitest";
+import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 
 describe("safe resource acquisition", () => {
   const suffix = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -113,7 +113,7 @@ describe("safe resource acquisition", () => {
     ).toBe(true);
   });
 
-  it("does not expose a paid checkout primitive in the closed-beta runtime", async () => {
+  it("does not expose a paid checkout primitive in the open free-beta runtime", async () => {
     expect("createOrderAndCheckout" in commerceService).toBe(false);
     expect("verifyLicense" in commerceService).toBe(false);
     expect("getUserLicenses" in commerceService).toBe(false);

@@ -434,7 +434,7 @@ describe("resource detail acquisition behavior", () => {
     },
   );
 
-  it("keeps paid closed-beta resources visibly disabled without acquisition mutations", async () => {
+  it("keeps paid free-beta resources visibly disabled without acquisition mutations", async () => {
     state.product = product(1999);
     const dictionary = getDictionary("en");
 

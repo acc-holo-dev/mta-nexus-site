@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Product, User } from "@nexus/domain";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   list: vi.fn(),
@@ -84,7 +84,7 @@ function createInput(price: number) {
   return input;
 }
 
-describe("closed-beta product behavior", () => {
+describe("open free-beta product behavior", () => {
   const service = new ProductService();
 
   beforeEach(() => {

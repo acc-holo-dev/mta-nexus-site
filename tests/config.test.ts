@@ -76,7 +76,7 @@ describe("production configuration", () => {
     expect(config.EMAIL_PROVIDER).toBe("smtp");
   });
 
-  it("allows production email to be explicitly disabled for closed beta", () => {
+  it("allows production email to be explicitly disabled for open free beta", () => {
     const config = getEnvConfig({
       NODE_ENV: "production",
       NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
