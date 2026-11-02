@@ -235,14 +235,14 @@ export default async function AdminPage({
           <Link
             href={verificationHref("pending", 1)}
             aria-current={verificationView === "pending" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
+            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
           >
             {copy.verificationPending} ({pendingVerificationCount})
           </Link>
           <Link
             href={verificationHref("history", 1)}
             aria-current={verificationView === "history" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
+            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
           >
             {copy.verificationHistory}
           </Link>
@@ -694,25 +694,28 @@ export default async function AdminPage({
         </Link>
         <Link
           href="/admin/commerce/reviews"
-          className="mb-3 mr-4 inline-block text-sm text-accent underline"
+          className="mb-3 mr-4 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {resourceReviewCopy(locale).queue}
         </Link>
-        <Link href="/admin/reports" className="mb-3 inline-block text-sm text-accent underline">
+        <Link
+          href="/admin/reports"
+          className="mb-3 inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {communityReportCopy(locale).queue}
         </Link>
         <nav aria-label={copy.reports} className="mb-3 flex gap-2">
           <Link
             href={reportHref("pending", 1)}
             aria-current={reportView === "pending" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
+            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
           >
             {copy.reportQueue} ({health.counts.reportsOpen})
           </Link>
           <Link
             href={reportHref("history", 1)}
             aria-current={reportView === "history" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
+            className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
           >
             {copy.reportHistory}
           </Link>
