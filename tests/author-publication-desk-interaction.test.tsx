@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -42,22 +42,13 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh
 
 import { AuthorPublicationRestore } from "../apps/web/src/components/author-publication-restore";
 import { authorPublicationDeskCopy } from "../apps/web/src/lib/author-publication-desk-copy";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 const revision = "2026-10-11T00:00:00.123456Z",
   next = "2026-10-11T00:00:00.123457Z";
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlatTestElement;
 function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 function render(locale: "en" | "ru" = "en", organizationId?: string, serverId?: string) {
   harness.cursor = 0;

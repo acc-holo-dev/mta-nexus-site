@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -48,22 +48,13 @@ import { VerificationApplicationAmend } from "../apps/web/src/components/verific
 import { VerificationModerationControls } from "../apps/web/src/components/verification-moderation-controls";
 import { verificationApplicationsCopy } from "../apps/web/src/lib/verification-applications-copy";
 import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 const revision = "a".repeat(64),
   next = "b".repeat(64);
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlatTestElement;
 function descendants(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [
-      { ...element, type: "button" } as Element,
-      ...descendants(element.props.children as ReactNode),
-    ];
-  }
-  return [element, ...descendants(element.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 function render(locale: "en" | "ru" = "en") {
   harness.cursor = 0;
