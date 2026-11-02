@@ -1,6 +1,8 @@
 import type { Locale } from "./i18n";
+
 const en = {
   title: "Download history",
+  loading: "Loading download history…",
   publisherTitle: "Resource deliveries",
   library: "Library",
   back: "Manage resource",
@@ -48,6 +50,7 @@ const en = {
 };
 const ru: typeof en = {
   title: "История скачиваний",
+  loading: "Загрузка истории скачиваний…",
   publisherTitle: "Передачи ресурса",
   library: "Библиотека",
   back: "Управление ресурсом",

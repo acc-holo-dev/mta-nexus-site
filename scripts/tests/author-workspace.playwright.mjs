@@ -61,6 +61,8 @@ async function logout(page) {
 }
 async function moderate(page, buildId, action, notes, expectedRevision) {
   assert.equal(typeof expectedRevision, "number");
+  const currentPassword = process.env.NEXUS_AUTHOR_BROWSER_PASSWORD;
+  assert(currentPassword);
   const result = await page.evaluate(
     async (body) => {
       const response = await fetch("/api/admin/actions", {
@@ -70,7 +72,14 @@ async function moderate(page, buildId, action, notes, expectedRevision) {
       });
       return { status: response.status, body: await response.json() };
     },
-    { targetType: "build", targetId: buildId, action, notes, expectedRevision },
+    {
+      targetType: "build",
+      targetId: buildId,
+      action,
+      notes,
+      expectedRevision,
+      currentPassword,
+    },
   );
   assert.equal(result.status, 200, JSON.stringify(result.body));
 }
@@ -658,7 +667,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     pendingFirst.revision,
   );
   const repeated = await outsider.evaluate(
-    async ({ buildId, expectedRevision }) =>
+    async ({ buildId, expectedRevision, currentPassword }) =>
       (
         await fetch("/api/admin/actions", {
           method: "POST",
@@ -669,10 +678,15 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
             action: "approve",
             notes: "Repeat approval",
             expectedRevision,
+            currentPassword,
           }),
         })
       ).status,
-    { buildId: pendingFirst.id, expectedRevision: pendingFirst.revision },
+    {
+      buildId: pendingFirst.id,
+      expectedRevision: pendingFirst.revision,
+      currentPassword: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD,
+    },
   );
   assert.equal(repeated, 409);
   await page.goto("/notifications");
