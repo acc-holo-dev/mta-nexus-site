@@ -1,6 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   stream: vi.fn(),
   page: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock("react", async (importOriginal) => {
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/admin/community",
   notFound: () => {
     throw new Error("TEST_NOT_FOUND");
   },
@@ -54,15 +56,17 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
 vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
 vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
 vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
+
+import { generateMetadata as moderationMetadata } from "../apps/web/src/app/admin/community/page";
 import StreamPage, {
   generateMetadata as streamMetadata,
 } from "../apps/web/src/app/discover/stream/page";
-import { generateMetadata as moderationMetadata } from "../apps/web/src/app/admin/community/page";
 import { CommunityModerationScreen } from "../apps/web/src/components/community-moderation-screen";
 import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
 import { discoveryStreamCopy } from "../apps/web/src/lib/discovery-stream-copy";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const time = "2026-10-11T00:00:00.000Z",
   item = {
     id: "item",
@@ -185,16 +189,22 @@ it.each(["ru", "en"] as const)(
     expect(await moderationMetadata()).toMatchObject({ robots: { index: false, follow: false } });
   },
 );
-it.each([null, { id: "user", role: "user" }])(
-  "does not read private moderation data without staff %j",
-  async (actor) => {
-    mocks.session.mockResolvedValueOnce(actor);
-    const html = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
-    expect(html).toContain(moderationCopy("en").denied);
-    expect(html).not.toContain("Private draft");
-    expect(mocks.detail).not.toHaveBeenCalled();
-  },
-);
+it("asks unsigned visitors to sign in without reading private moderation data", async () => {
+  mocks.session.mockResolvedValueOnce(null);
+  const html = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
+  expect(html).toContain("/auth/login?next=");
+  expect(html).not.toContain(moderationCopy("en").denied);
+  expect(html).not.toContain("Private draft");
+  expect(mocks.detail).not.toHaveBeenCalled();
+});
+it("denies signed-in non-staff without reading private moderation data", async () => {
+  mocks.session.mockResolvedValueOnce({ id: "user", role: "user" });
+  const html = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
+  expect(html).toContain(moderationCopy("en").denied);
+  expect(html).not.toContain("/auth/login");
+  expect(html).not.toContain("Private draft");
+  expect(mocks.detail).not.toHaveBeenCalled();
+});
 it("separates session failure from login and masks revoked-authority errors", async () => {
   mocks.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
   const auth = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));

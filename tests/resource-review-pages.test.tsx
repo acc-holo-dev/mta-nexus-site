@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -12,6 +13,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/workspace/library/reviews",
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
@@ -46,11 +48,13 @@ vi.mock("@nexus/db", () => ({
     reportDetail: state.reportDetail,
   },
 }));
-import Own from "../apps/web/src/app/workspace/library/reviews/page";
-import Editor from "../apps/web/src/app/workspace/library/review/[id]/page";
+
 import Public from "../apps/web/src/app/market/[slug]/reviews/page";
-import { ResourceReviewReportScreen } from "../apps/web/src/components/resource-review-report-screen";
+import Editor from "../apps/web/src/app/workspace/library/review/[id]/page";
+import Own from "../apps/web/src/app/workspace/library/reviews/page";
 import { ResourceReviewEditor } from "../apps/web/src/components/resource-review-controls";
+import { ResourceReviewReportScreen } from "../apps/web/src/components/resource-review-report-screen";
+
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };
 const review = {

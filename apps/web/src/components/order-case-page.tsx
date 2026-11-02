@@ -18,6 +18,7 @@ import { orderCasePageQuery } from "../lib/order-case-query";
 import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
 import { HistorySignIn } from "./commerce-history-ui";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
 import { SupportCaseThread } from "./support-case-thread";
 
@@ -189,6 +190,9 @@ export async function OrderCaseListPage({
       if (typeof value === "string") pageParams.set(key, value);
     }
     const returnPath = `${base}${pageParams.size ? `?${pageParams}` : ""}`;
+    if (staff) {
+      return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    }
     return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
   }
   let filters: ReturnType<typeof orderCasePageQuery>;
@@ -321,6 +325,9 @@ export async function OrderCaseDetailPage({
       if (typeof value === "string") pageParams.set(key, value);
     }
     const returnPath = `${detailBase}${pageParams.size ? `?${pageParams}` : ""}`;
+    if (staff) {
+      return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    }
     return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
   }
   let page = 1;

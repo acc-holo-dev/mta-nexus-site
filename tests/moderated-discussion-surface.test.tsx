@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/admin/community/post/discussion",
   notFound: () => {
     throw Error("NOT_FOUND_BOUNDARY");
   },
