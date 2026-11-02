@@ -225,6 +225,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(filtered).toContain(copy.emptyFiltered);
     expect(filtered).not.toContain(copy.empty);
+    expect(filtered).toContain(copy.reset);
+    expect(filtered).toContain('href="/workspace/content"');
   },
 );
 it("distinguishes auth, unavailable and forbidden-target errors from empty histories", async () => {

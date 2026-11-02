@@ -134,6 +134,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(filtered).toContain(copy.emptyFiltered);
     expect(filtered).not.toContain(copy.empty);
+    expect(filtered).toContain(copy.reset);
+    expect(filtered).toContain('href="/workspace/library/watches"');
   },
 );
 

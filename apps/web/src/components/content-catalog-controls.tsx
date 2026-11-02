@@ -131,7 +131,10 @@ export function PlatformSignIn({
   return (
     <section className="space-y-4 py-16 text-center">
       <h1 className="font-display text-primary">{copy.signInRequired}</h1>
-      <Link href={authEntryHref("login", nextPath)} className="text-sm text-accent underline">
+      <Link
+        href={authEntryHref("login", nextPath)}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.signIn}
       </Link>
     </section>

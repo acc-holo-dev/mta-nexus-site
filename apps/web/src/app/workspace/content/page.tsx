@@ -173,16 +173,31 @@ export default async function AuthorContentPage({
             </p>
           )}
           {report && !report.items.length && (
-            <p className="nexus-panel p-6 text-sm text-muted">
-              {filters?.cursor ||
-              filters?.query ||
-              filters?.tag ||
-              filters?.status !== "all" ||
-              filters?.type !== "all" ||
-              filters?.source !== "all"
-                ? copy.emptyFiltered
-                : copy.empty}
-            </p>
+            <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
+              <p>
+                {filters?.cursor ||
+                filters?.query ||
+                filters?.tag ||
+                filters?.status !== "all" ||
+                filters?.type !== "all" ||
+                filters?.source !== "all"
+                  ? copy.emptyFiltered
+                  : copy.empty}
+              </p>
+              {(filters?.cursor ||
+                filters?.query ||
+                filters?.tag ||
+                filters?.status !== "all" ||
+                filters?.type !== "all" ||
+                filters?.source !== "all") && (
+                <Link
+                  href="/workspace/content"
+                  className="inline-flex min-h-11 items-center text-accent underline"
+                >
+                  {copy.reset}
+                </Link>
+              )}
+            </div>
           )}
           <ul className="space-y-3">
             {filters &&

@@ -97,6 +97,8 @@ it("renders service failure separately from an empty feed and hides internal tex
 it("adds login next from pathname when PlatformSignIn has no returnPath", () => {
   const html = renderToStaticMarkup(<PlatformSignIn locale="en" />);
   expect(html).toContain("/auth/login?next=%2Fworkspace%2Fcontent");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
 });
 
 it("prefers explicit returnPath over pathname for PlatformSignIn login href", () => {

@@ -196,9 +196,17 @@ export default async function ReleaseWatchesPage({
           ))}
         </ul>
       ) : (
-        <p role="status" className="text-secondary">
-          {result.counts.all === 0 ? copy.empty : copy.emptyFiltered}
-        </p>
+        <div className="nexus-panel space-y-3 p-6 text-sm text-muted" role="status">
+          <p>{result.counts.all === 0 ? copy.empty : copy.emptyFiltered}</p>
+          {result.counts.all !== 0 ? (
+            <Link
+              href={resourceReleaseWatchesUrl("all", 1, "")}
+              className="inline-flex min-h-11 items-center text-accent underline"
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </div>
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
