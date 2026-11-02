@@ -379,12 +379,15 @@ export function ResourceQaPanel({
       ) : (
         <div className="space-y-4">
           {!authenticated ? (
-            <GuestAuthLinks
-              loginHref={loginHref}
-              registerHref={registerHref}
-              signInLabel={copy.signIn}
-              createAccountLabel={workspaceCopy.createAccount}
-            />
+            <div className="space-y-2">
+              <p className="text-xs text-muted">{copy.publicRead}</p>
+              <GuestAuthLinks
+                loginHref={loginHref}
+                registerHref={registerHref}
+                signInLabel={copy.signIn}
+                createAccountLabel={workspaceCopy.createAccount}
+              />
+            </div>
           ) : capabilities?.askReason === "access_required" ? (
             <p className="text-xs text-muted">{copy.accessRequired}</p>
           ) : canAsk ? (
@@ -422,7 +425,9 @@ export function ResourceQaPanel({
                 {busy ? copy.asking : copy.ask}
               </Button>
             </form>
-          ) : null}
+          ) : (
+            <p className="text-xs text-muted">{copy.unavailable}</p>
+          )}
 
           {loadingDetail ? (
             <p role="status" className="text-xs text-faint">
@@ -442,6 +447,7 @@ export function ResourceQaPanel({
                     {thread.buildContext ? (
                       <span>
                         {copy.buildContext}: {thread.buildContext.version}
+                        {!thread.buildContext.available ? ` · ${copy.buildUnavailable}` : ""}
                       </span>
                     ) : null}
                   </div>
