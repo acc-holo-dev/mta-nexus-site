@@ -301,7 +301,9 @@ export function LibraryCollectionBatchForm({
       )}
       {saved && pending.current && (
         <div className="space-y-2">
-          <p role="status">{c.saved}</p>
+          <p role="status" aria-live="polite">
+            {c.saved}
+          </p>
           <ul className="space-y-1 text-sm">
             {collectionCommandItemResults(pending.current.command).map((entry) => {
               const item = shownItems.find((value) => value.productId === entry.productId);

@@ -256,7 +256,9 @@ export function LibraryCollectionReconcileForm({
       )}
       {saved && (
         <div>
-          <p role="status">{c.saved}</p>
+          <p role="status" aria-live="polite">
+            {c.saved}
+          </p>
           <code className="block break-all text-xs">
             {c.receipt}: {saved}
           </code>

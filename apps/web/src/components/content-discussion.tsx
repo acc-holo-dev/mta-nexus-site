@@ -405,13 +405,13 @@ export function ContentDiscussion({
           onPersistDraft={() => persistComposeDraft()}
         />
         {published && (
-          <p role="status" className="text-sm text-accent">
+          <p role="status" aria-live="polite" className="text-sm text-accent">
             {copy.saved}
           </p>
         )}
       </form>
       {managementSuccess && (
-        <p role="status" className="text-sm text-accent">
+        <p role="status" aria-live="polite" className="text-sm text-accent">
           {managementSuccess}
         </p>
       )}
