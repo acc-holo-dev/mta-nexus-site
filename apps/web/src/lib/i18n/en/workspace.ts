@@ -41,9 +41,11 @@ export const workspace = {
     status: "Status",
     scan: "Malware scan",
     retire: "Retire version",
+    retireConfirmTitle: "Retire this version?",
     retireReason: "Reason for retirement",
     retireHint:
       "Retirement removes this version from downloads. Retiring the last public version also removes the resource from the catalog.",
+    cancel: "Cancel",
     retired: "Version retired.",
     retireFailed: "Could not retire this version. Refresh and try again.",
     retiring: "Retiring…",

@@ -32,6 +32,7 @@ import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
 const textareaClass =
@@ -614,6 +615,19 @@ export function RetireBuildForm({
     event.preventDefault();
     if (pending) return;
     const reason = String(new FormData(event.currentTarget).get("reason") ?? "").trim();
+    if (
+      !(await confirmAction({
+        title: copy.retireConfirmTitle,
+        object: version,
+        consequences: copy.retireHint,
+        confirmLabel: copy.retire,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    ) {
+      return;
+    }
     setPending(true);
     setError("");
     try {

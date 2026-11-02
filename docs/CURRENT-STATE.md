@@ -4,11 +4,11 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `e47b979b5261d23123cb23dd81752e878a04521a` (`fix(db): allow row locks in publication readiness summary`).
-- **Verified CI green on that tip:** [CI 41374959571](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41374959571) (lint/unit, DB, image build, production browser smoke; selected scope).
+- **Tip SHA:** `4a688ecb960982758ce3a020303817639557cd0a` (`fix(web): add discover and servers loading shells after green tip`).
+- **Verified CI green on that tip:** [CI 41375604945](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41375604945) (lint/unit, DB, image build, production browser smoke; selected scope).
 - PASS только на exact SHA; green CI ≠ deploy.
 - **Guest-return wave (tip series):** `PlatformSignIn`/`authEntryHref` first-paint `next=`, commerce/server gates, statistics login, AuthForm initial return path.
-- **Honesty/a11y wave (tip series):** clear-filter CTAs, confirmAction on destructive clients (sessions, cart, push, review removal, library archive/duplicate, build withdraw/retire), honest loading shells (library/market/settings/support/cart), filter `focus-visible` outlines, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.
+- **Honesty/a11y wave (tip series):** clear-filter CTAs, confirmAction on destructive clients (sessions, cart, push, review removal, library archive/duplicate, build withdraw/retire), honest loading shells (library/market/settings/support/cart/discover/servers), filter `focus-visible` outlines, connect-controls clipboard a11y, community filtered-report reset, neutral root loading shell.
 - **Auth chrome:** full shell kept on `/auth` (theme + banner); logout redirects to bare `/auth/login`.
 - **Open free beta copy (tip series):** public/legal/support/commerce surfaces say open free beta (not closed beta); paid features stay disabled; support SLA disclaimer matches product terms.
 - **Publication readiness:** summary transaction allows FOR SHARE (no longer `accessMode: read only`).
@@ -29,11 +29,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** open free beta copy honesty; library clear-filter + loading; build withdraw/retire confirm; publication-readiness FOR SHARE fix; CURRENT-STATE синхронизирован с verified baseline `e47b979b…` / CI 41374959571.
+**Последняя локальная волна:** open free beta copy honesty; library clear-filter + loading; build withdraw/retire confirm; publication-readiness FOR SHARE fix; discover/servers loading shells; CURRENT-STATE синхронизирован с verified baseline `4a688ecb…` / CI 41375604945.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `e47b979b…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; verified baseline tip `4a688ecb…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

@@ -936,6 +936,10 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await publishedRow
     .getByRole("button", { name: "Снять версию с публикации", exact: true })
     .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Снять версию с публикации", exact: true })
+    .click();
   await expect(
     publishedRow.getByText("Снята с публикации", { exact: false }).first(),
   ).toBeVisible();
