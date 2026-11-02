@@ -113,9 +113,17 @@ export async function PublicationReportsPage({
               ))}
             </select>
           </label>
-          <Button type="submit" className="min-h-11" variant="outline">
-            {copy.apply}
-          </Button>
+          <div className="flex flex-wrap items-end gap-3">
+            <Button type="submit" className="min-h-11" variant="outline">
+              {copy.apply}
+            </Button>
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          </div>
         </form>
         <DiscussionReportBatch
           key={`${actor.id}:${id}:${JSON.stringify(filters)}:${data.items.map((item) => `${item.id}:${item.status}`).join("|")}`}

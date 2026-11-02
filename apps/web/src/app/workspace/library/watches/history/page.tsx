@@ -119,6 +119,12 @@ export default async function Page({
         <Button type="submit" variant="secondary">
           {c.filter}
         </Button>
+        <Link
+          href="/workspace/library/watches/history"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {c.clear}
+        </Link>
       </form>
       <a
         href={`/api/library/watches/history/export?${suffix(result.page)}`}

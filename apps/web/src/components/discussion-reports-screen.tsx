@@ -151,9 +151,17 @@ export async function DiscussionReportsScreen({
             ))}
           </select>
         </label>
-        <Button className="min-h-11 self-end" type="submit">
-          {copy.apply}
-        </Button>
+        <div className="flex flex-wrap items-end gap-3 self-end">
+          <Button className="min-h-11" type="submit">
+            {copy.apply}
+          </Button>
+          <Link
+            href={path}
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.clear}
+          </Link>
+        </div>
       </form>
       <DiscussionReportBatch
         key={`${id}:${commentId}:${filters?.query}:${filters?.view}:${filters?.type}:${filters?.cursor?.id}:${data.removed}:${data.items.map((item) => `${item.id}:${item.status}:${item.createdAt}`).join("|")}`}

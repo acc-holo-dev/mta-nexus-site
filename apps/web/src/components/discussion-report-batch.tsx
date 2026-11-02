@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import { communityReportCopy } from "../lib/community-report-copy";
+import { reportGroupsCopy } from "../lib/community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../lib/discussion-reports-contract";
 import { discussionReportsCopy } from "../lib/discussion-reports-copy";
 import type { Locale } from "../lib/i18n";
@@ -388,9 +389,25 @@ export function DiscussionReportBatch({
           ))}
         </ul>
       ) : (
-        <p className="nexus-panel p-5 text-muted">
-          {commentId === null ? copy.publicationEmpty : discussionReportsCopy(locale).empty}
-        </p>
+        <div className="nexus-panel space-y-3 p-5">
+          <p className="text-muted">
+            {commentId === null
+              ? reportGroupsCopy(locale).publicationEmpty
+              : discussionReportsCopy(locale).emptyFiltered}
+          </p>
+          <Link
+            href={
+              commentId === null
+                ? `/admin/community/${encodeURIComponent(contentId)}/reports`
+                : `/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports`
+            }
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {commentId === null
+              ? reportGroupsCopy(locale).reset
+              : discussionReportsCopy(locale).clear}
+          </Link>
+        </div>
       )}
     </section>
   );
