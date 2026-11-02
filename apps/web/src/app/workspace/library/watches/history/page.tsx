@@ -146,12 +146,26 @@ export default async function Page({
         ))}
       </ol>
       {result.totalPages > 1 && (
-        <nav aria-label={c.page} className="flex gap-4">
-          {result.page > 1 && <Link href={href(result.page - 1)}>{c.previous}</Link>}
+        <nav aria-label={c.page} className="flex gap-4 text-sm">
+          {result.page > 1 ? (
+            <Link
+              href={href(result.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.previous}
+            </Link>
+          ) : null}
           <span>
             {c.page} {result.page} {c.of} {result.totalPages}
           </span>
-          {result.page < result.totalPages && <Link href={href(result.page + 1)}>{c.next}</Link>}
+          {result.page < result.totalPages ? (
+            <Link
+              href={href(result.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.next}
+            </Link>
+          ) : null}
         </nav>
       )}
     </div>

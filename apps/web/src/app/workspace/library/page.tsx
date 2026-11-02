@@ -242,7 +242,10 @@ export default async function ResourceLibraryPage({
         {result.totalPages > 1 && (
           <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4">
             {result.page > 1 ? (
-              <Link href={libraryHref(filter, result.page - 1)} className="text-accent underline">
+              <Link
+                href={libraryHref(filter, result.page - 1)}
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {copy.previous}
               </Link>
             ) : null}
@@ -250,7 +253,10 @@ export default async function ResourceLibraryPage({
               {copy.page} {result.page} {copy.of} {result.totalPages}
             </span>
             {result.page < result.totalPages ? (
-              <Link href={libraryHref(filter, result.page + 1)} className="text-accent underline">
+              <Link
+                href={libraryHref(filter, result.page + 1)}
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {copy.next}
               </Link>
             ) : null}

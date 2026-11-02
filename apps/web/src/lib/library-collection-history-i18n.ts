@@ -18,6 +18,7 @@ const en = {
     "Full copy receipt stores a count and digest; individual resource IDs are not recorded.",
   noCurrent: "Current collection unavailable",
   time: "Time (UTC)",
+  loading: "Loading collection command history…",
 };
 const ru: typeof en = {
   title: "История команд коллекций",
@@ -39,6 +40,7 @@ const ru: typeof en = {
     "Квитанция полной копии хранит количество и хэш состава; отдельные ID ресурсов не записаны.",
   noCurrent: "Текущая коллекция недоступна",
   time: "Время (UTC)",
+  loading: "Загружаем историю команд коллекций…",
 };
 export function libraryCollectionHistoryCopy(locale: "ru" | "en") {
   return locale === "ru" ? ru : en;

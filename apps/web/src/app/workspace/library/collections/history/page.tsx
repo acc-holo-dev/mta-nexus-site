@@ -266,7 +266,7 @@ export default async function Page({
             {result.page > 1 && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page - 1)}`}
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.previous}
               </Link>
@@ -277,7 +277,7 @@ export default async function Page({
             {result.page < result.totalPages && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page + 1)}`}
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.next}
               </Link>

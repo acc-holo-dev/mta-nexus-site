@@ -203,16 +203,25 @@ export default async function MarketPage({
               </Link>
             ) : null}
             {query ? (
-              <Link href={buildHref(type, sort, "")} className="text-sm text-accent underline">
+              <Link
+                href={buildHref(type, sort, "")}
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {dictionary.market.clearQuery}
               </Link>
             ) : null}
             {type !== "all" ? (
-              <Link href={buildHref("all", sort, query)} className="text-sm text-accent underline">
+              <Link
+                href={buildHref("all", sort, query)}
+                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
                 {dictionary.market.clearCategory}
               </Link>
             ) : null}
-            <Link href="/market" className="text-sm text-accent underline">
+            <Link
+              href="/market"
+              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {dictionary.market.clear}
             </Link>
           </div>

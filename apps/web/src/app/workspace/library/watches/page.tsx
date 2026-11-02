@@ -201,7 +201,7 @@ export default async function ReleaseWatchesPage({
           {result.counts.all !== 0 ? (
             <Link
               href={resourceReleaseWatchesUrl("all", 1, "")}
-              className="inline-flex min-h-11 items-center text-accent underline"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.reset}
             </Link>
@@ -213,7 +213,7 @@ export default async function ReleaseWatchesPage({
           {result.page > 1 ? (
             <Link
               href={resourceReleaseWatchesUrl(query.filter, result.page - 1, query.query)}
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.previous}
             </Link>
@@ -224,7 +224,7 @@ export default async function ReleaseWatchesPage({
           {result.page < result.totalPages ? (
             <Link
               href={resourceReleaseWatchesUrl(query.filter, result.page + 1, query.query)}
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.next}
             </Link>

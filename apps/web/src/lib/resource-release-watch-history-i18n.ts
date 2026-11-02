@@ -26,6 +26,7 @@ const en = {
   of: "of",
   previous: "Previous",
   next: "Next",
+  loading: "Loading release watch history…",
 };
 const ru: typeof en = {
   title: "История подписок на выпуски",
@@ -55,6 +56,7 @@ const ru: typeof en = {
   of: "из",
   previous: "Назад",
   next: "Далее",
+  loading: "Загружаем историю подписок на выпуски…",
 };
 export function resourceReleaseWatchHistoryCopy(locale: string) {
   return locale === "ru" ? ru : en;
