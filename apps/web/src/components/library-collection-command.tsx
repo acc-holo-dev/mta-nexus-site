@@ -12,6 +12,7 @@ import { confirmedCollectionCommand } from "../lib/library-collections-confirmat
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
+import { confirmAction } from "./confirm-action";
 export function LibraryCollectionCommandForm({
   locale,
   collection,
@@ -53,7 +54,6 @@ export function LibraryCollectionCommandForm({
   const [name, setName] = useState(
       action === "rename" || action === "duplicate" ? (collection?.name ?? "") : "",
     ),
-    [checked, setChecked] = useState(false),
     [busy, setBusy] = useState(false),
     [frozen, setFrozen] = useState(false),
     [saved, setSaved] = useState(false),
@@ -62,10 +62,6 @@ export function LibraryCollectionCommandForm({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!active.current || lock.current || settled.current) return;
-    if (!pending.current && (action === "archive" || action === "duplicate") && !checked) {
-      setError(c.invalid);
-      return;
-    }
     if (
       !pending.current &&
       action === "duplicate" &&
@@ -99,6 +95,19 @@ export function LibraryCollectionCommandForm({
       setError(c.invalid);
       return;
     }
+    if (
+      !pending.current &&
+      (action === "archive" || action === "duplicate") &&
+      !(await confirmAction({
+        title: action === "archive" ? c.archive : c.duplicate,
+        object: collection?.name ?? name,
+        consequences: action === "archive" ? c.archiveConfirm : c.copyConfirm,
+        confirmLabel: action === "archive" ? c.archive : c.duplicate,
+        cancelLabel: c.back,
+        closeLabel: c.back,
+      }))
+    )
+      return;
     pending.current ??= {
       command: parsed.data,
       collection: collection
@@ -164,18 +173,6 @@ export function LibraryCollectionCommandForm({
             disabled={busy || frozen || saved}
             className="w-full rounded border border-base bg-surface p-2"
           />
-        </label>
-      )}
-      {(action === "archive" || action === "duplicate") && (
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={checked}
-            onChange={(e) => setChecked(e.target.checked)}
-            disabled={busy || frozen || saved}
-            required
-          />
-          {action === "duplicate" ? c.copyConfirm : c.archiveConfirm}
         </label>
       )}
       <Button type="submit" disabled={busy || saved || blocked} variant="outline">
