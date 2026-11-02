@@ -132,8 +132,13 @@ export function CommunityReportList({
         {pending ? copy.loading : copy.reload}
       </Button>
       {page?.items.length === 0 && (
-        <div className="nexus-panel p-8 text-sm text-muted">
-          {filters.target || filters.type || filters.query ? copy.emptyFiltered : copy.empty}
+        <div className="nexus-panel space-y-3 p-8 text-sm text-muted">
+          <p>{filters.target || filters.type || filters.query ? copy.emptyFiltered : copy.empty}</p>
+          {(filters.target || filters.type || filters.query) && (
+            <Link href={path} className="inline-flex min-h-11 items-center text-accent underline">
+              {copy.reset}
+            </Link>
+          )}
         </div>
       )}
       <div className="space-y-3">

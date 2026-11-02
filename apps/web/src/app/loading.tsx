@@ -2,7 +2,7 @@
 
 import { useNexusLocale } from "../components/locale-context";
 
-const PLACEHOLDER_IDS = ["first", "second", "third", "fourth"] as const;
+const PLACEHOLDER_KEYS = [1, 2, 3] as const;
 
 export default function GlobalLoading() {
   const { dictionary } = useNexusLocale();
@@ -12,26 +12,16 @@ export default function GlobalLoading() {
       className="mx-auto max-w-7xl space-y-6"
       role="status"
       aria-busy="true"
-      aria-label={dictionary.errors.loading}
+      aria-labelledby="global-loading-heading"
     >
-      <div className="h-8 w-64 animate-pulse rounded-md bg-inset" />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {PLACEHOLDER_IDS.map((id) => (
-          <div key={id} className="nexus-panel space-y-2 p-4">
-            <div className="h-3 w-20 animate-pulse rounded bg-inset" />
-            <div className="h-7 w-16 animate-pulse rounded bg-inset" />
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {PLACEHOLDER_IDS.map((id) => (
-          <div key={id} className="nexus-panel overflow-hidden">
-            <div className="aspect-video animate-pulse bg-inset" />
-            <div className="space-y-2 p-4">
-              <div className="h-3.5 w-3/4 animate-pulse rounded bg-inset" />
-              <div className="h-3 w-1/2 animate-pulse rounded bg-inset" />
-            </div>
-          </div>
+      <h1 id="global-loading-heading" className="sr-only">
+        {dictionary.errors.loading}
+      </h1>
+      <div className="animate-pulse space-y-4" aria-hidden="true">
+        <div className="h-8 w-64 rounded-md bg-inset" />
+        <div className="h-24 rounded bg-inset" />
+        {PLACEHOLDER_KEYS.map((key) => (
+          <div key={key} className="h-20 rounded bg-inset" />
         ))}
       </div>
     </div>

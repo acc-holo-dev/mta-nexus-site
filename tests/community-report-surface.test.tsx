@@ -107,6 +107,8 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   );
   expect(filteredEmpty).toContain(communityReportCopy("en").emptyFiltered);
   expect(filteredEmpty).not.toContain(communityReportCopy("en").empty);
+  expect(filteredEmpty).toContain(communityReportCopy("en").reset);
+  expect(filteredEmpty).toContain('href="/workspace/reports"');
   const detail = renderToStaticMarkup(
     <CommunityReportDetailView id="report" initial={{ ...row, target: null }} locale="en" />,
   );
