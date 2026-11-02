@@ -1,99 +1,34 @@
-import { AppError, collectionCommandItemResults } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
-import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
-import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
-import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
-import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
-import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
-import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
-import {
-  collectionReceiptHref,
-  libraryCollectionReceiptsCopy,
-} from "../lib/library-collection-receipts-i18n";
-import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import {
   collectionHref,
   collectionId,
   collectionPageParams,
-  collectionsQuery,
 } from "../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../lib/library-membership-history-query";
-import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
-import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
-import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
+import { LibraryCollectionsCopyView } from "./library-collections-copy-view";
+import { LibraryCollectionsDetailView } from "./library-collections-detail-view";
+import { LibraryCollectionsErrorPanel } from "./library-collections-error-panel";
+import { LibraryCollectionsHistoryView } from "./library-collections-history-view";
+import { LibraryCollectionsItemTransferView } from "./library-collections-item-transfer-view";
+import { LibraryCollectionsListView } from "./library-collections-list-view";
+import {
+  guestCollectionsReturnPath,
+  type LibraryCollectionsActor,
+  type LibraryCollectionsQuery,
+  type LibraryCollectionsView,
+} from "./library-collections-screen-shared";
 import { PlatformSignIn } from "./platform-sign-in";
-import { LibraryCollectionBatchForm } from "./library-collection-batch";
-import { LibraryCollectionCommandForm } from "./library-collection-command";
-import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
-import { ResourceDownloadButton } from "./resource-download-button";
 
-type Query = Record<string, string | string[] | undefined>;
-type Bounds = { page: number; totalPages: number; total: number };
-type CollectionsView = "list" | "detail" | "add" | "history" | "copy" | "copy-items" | "move-items";
-function guestCollectionsReturnPath(
-  view: CollectionsView,
-  queryValues: Query,
-  collectionId?: string,
-): string {
-  const params = collectionPageParams(queryValues);
-  const query = Object.fromEntries(params.entries());
-  const sectionByView: Partial<Record<CollectionsView, string>> = {
-    history: "history",
-    add: "add",
-    copy: "copy",
-    "copy-items": "copy-items",
-    "move-items": "move-items",
-  };
-  return collectionHref(collectionId, sectionByView[view] ?? "", query);
-}
-function Pagination({
-  bounds,
-  locale,
-  href,
-}: {
-  bounds: Bounds;
-  locale: "ru" | "en";
-  href: (page: number) => string;
-}) {
-  const c = libraryCollectionsCopy(locale);
-  return (
-    <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
-      {bounds.page > 1 && (
-        <Link
-          href={href(bounds.page - 1)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.previous}
-        </Link>
-      )}
-      <span>
-        {c.page} {bounds.page} {c.of} {bounds.totalPages}
-      </span>
-      {bounds.page < bounds.totalPages && (
-        <Link
-          href={href(bounds.page + 1)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.next}
-        </Link>
-      )}
-    </nav>
-  );
-}
 export async function LibraryCollectionsScreen({
   view = "list",
   searchParams,
   params,
 }: {
-  view?: "list" | "detail" | "add" | "history" | "copy" | "copy-items" | "move-items";
-  searchParams: Promise<Query>;
+  view?: LibraryCollectionsView;
+  searchParams: Promise<LibraryCollectionsQuery>;
   params?: Promise<{ id: string }>;
 }) {
   const [locale, store, queryValues, path] = await Promise.all([
@@ -103,9 +38,8 @@ export async function LibraryCollectionsScreen({
     params,
   ]);
   const routeCollectionId = path?.id;
-  const c = libraryCollectionsCopy(locale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
+  const session = await authService.getSession(store.get("nexus_session")?.value);
+  if (!session) {
     return (
       <PlatformSignIn
         locale={locale}
@@ -113,653 +47,42 @@ export async function LibraryCollectionsScreen({
       />
     );
   }
+  const actor: LibraryCollectionsActor = session;
   try {
     if (view === "copy" && collectionPageParams(queryValues).size)
       throw new AppError("Unexpected copy query", 400, "COLLECTION_INVALID");
-    const query = collectionsQuery(
-      collectionPageParams(queryValues),
-      view === "list" ? "list" : view === "history" ? "history" : "detail",
-    );
     if (view === "list") {
-      const result = await service.page(actor, query);
-      return (
-        <div className="mx-auto max-w-4xl space-y-6 py-8">
-          <Link
-            href="/workspace/library"
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.library}
-          </Link>
-          <h1 className="font-display text-primary">{c.title}</h1>
-          <Link
-            href={membershipHistoryHref()}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryMembershipHistoryCopy(locale).history}
-          </Link>
-          <Link
-            href={collectionInventoryHref()}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionInventoryCopy(locale).inventory}
-          </Link>
-          <Link
-            href="/workspace/library/collections/history"
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionHistoryCopy(locale).title}
-          </Link>
-          <p className="text-sm text-secondary">{c.subtitle}</p>
-          <p role="note" className="text-sm text-muted">
-            {c.limit}
-          </p>
-          <section className="nexus-panel space-y-3 p-5">
-            <h2 className="font-semibold">{c.create}</h2>
-            <LibraryCollectionCommandForm locale={locale} />
-          </section>
-          <nav aria-label={c.title} className="flex gap-4">
-            {(["active", "archived", "all"] as const).map((status) => (
-              <Link
-                key={status}
-                href={collectionHref(undefined, "", { status })}
-                aria-current={result.status === status ? "page" : undefined}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-[current=page]:font-bold"
-              >
-                {c[status]}
-              </Link>
-            ))}
-          </nav>
-          {!result.items.length && (
-            <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
-              <p>{result.status === "active" ? c.empty : c.emptyFiltered}</p>
-              {result.status !== "active" ? (
-                <Link
-                  href={collectionHref()}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {c.clear}
-                </Link>
-              ) : (
-                <Link
-                  href="/market?maxPrice=0"
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {c.browseLibrary}
-                </Link>
-              )}
-            </div>
-          )}
-          <ol className="grid gap-4 sm:grid-cols-2">
-            {result.items.map((item) => (
-              <li key={item.id} className="nexus-panel space-y-2 p-5">
-                <h2 className="break-words font-semibold">
-                  <Link
-                    href={collectionHref(item.id)}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
-                    {item.name}
-                  </Link>
-                </h2>
-                <p className="text-sm">
-                  {c[item.status]} · {c.items}: {item.itemCount} · {c.revision}: {item.revision}
-                </p>
-              </li>
-            ))}
-          </ol>
-          <Pagination
-            bounds={result}
-            locale={locale}
-            href={(page) =>
-              collectionHref(undefined, "", { status: result.status, page: String(page) })
-            }
-          />
-          <a
-            href={`/api/library/collections?${new URLSearchParams({ status: result.status, page: String(result.page) })}`}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.json}
-          </a>
-        </div>
-      );
+      return await LibraryCollectionsListView({ locale, actor, queryValues });
     }
     const id = collectionId(path?.id ?? "");
     if (view === "copy-items" || view === "move-items") {
-      const result = await service.copyItemsPage(actor, id, query);
-      return (
-        <div className="mx-auto max-w-4xl space-y-6 py-8">
-          <Link
-            href={collectionHref(id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.back}
-          </Link>
-          <h1 className="font-display">{c[view]}</h1>
-          <p className="break-words">
-            {c.source}: {result.source.name} · {c[result.source.status]} · {c.revision}{" "}
-            {result.source.revision}
-          </p>
-          <form method="get" className="flex flex-wrap items-end gap-3">
-            <label className="grid gap-1">
-              {c.search}
-              <input
-                name="q"
-                defaultValue={result.q}
-                maxLength={80}
-                className="rounded border border-base bg-inset px-3 py-2"
-              />
-            </label>
-            <Button type="submit" variant="outline">
-              {c.apply}
-            </Button>
-          </form>
-          <LibraryCollectionItemCopyForm
-            key={JSON.stringify([
-              view,
-              result.source,
-              result.items.map((item) => item.productId),
-              result.destinations,
-            ])}
-            move={view === "move-items"}
-            locale={locale}
-            source={result.source}
-            items={result.items}
-            destinations={result.destinations}
-          />
-          <Pagination
-            bounds={result}
-            locale={locale}
-            href={(page) =>
-              collectionHref(id, view, {
-                page: String(page),
-                ...(result.q ? { q: result.q } : {}),
-              })
-            }
-          />
-          <a
-            href={`/api/library/collections/${encodeURIComponent(id)}/${view}?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.json}
-          </a>
-        </div>
-      );
+      return await LibraryCollectionsItemTransferView({
+        locale,
+        actor,
+        id,
+        view,
+        queryValues,
+      });
     }
     if (view === "copy") {
-      const preview = await service.copyPreview(actor, id);
-      return (
-        <div className="mx-auto max-w-2xl space-y-6 py-8">
-          <Link
-            href={collectionHref(id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.back}
-          </Link>
-          <h1 className="font-display">{c.duplicate}</h1>
-          <p className="break-words">
-            {c.source}: {preview.source.name}
-          </p>
-          <p>
-            {c[preview.source.status]} · {c.revision}: {preview.source.revision} · {c.items}:{" "}
-            {preview.itemCount}
-          </p>
-          <p role="note" className="text-sm text-secondary">
-            {c.copyNote}
-          </p>
-          <p className="text-sm text-muted">{c.limit}</p>
-          <LibraryCollectionCommandForm
-            key={`copy:${id}:${preview.source.revision}:${preview.sourceDigest}`}
-            locale={locale}
-            collection={preview.source}
-            copyPreview={preview}
-            action="duplicate"
-          />
-          <a
-            href={`/api/library/collections/${encodeURIComponent(id)}/copy`}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.json}
-          </a>
-        </div>
-      );
+      return await LibraryCollectionsCopyView({ locale, actor, id });
     }
     if (view === "history") {
-      const result = await service.history(actor, id, query.page);
-      return (
-        <div className="mx-auto max-w-4xl space-y-6 py-8">
-          <Link
-            href={collectionHref(id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.back}
-          </Link>
-          <h1 className="font-display text-primary">
-            {c.history}: {result.collection.name}
-          </h1>
-          <Link
-            href={`/workspace/library/collections/history?${new URLSearchParams({ collectionId: id })}`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionHistoryCopy(locale).title}
-          </Link>
-          <ol className="space-y-4">
-            {result.items.map((item) => (
-              <li key={item.id} className="nexus-panel space-y-2 p-4">
-                <Link
-                  href={collectionReceiptHref(item.id)}
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {libraryCollectionReceiptsCopy(locale).open}
-                </Link>
-                <h2 className="font-semibold">
-                  {c[item.command.action]} · {c.revision} {item.collection.revision}
-                </h2>
-                <p className="break-words">
-                  {item.collection.name} · {c[item.collection.status]}
-                </p>
-                {item.command.action === "duplicate" && (
-                  <p className="break-all text-sm">
-                    {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
-                    {item.command.expectedRevision} · {c.items}: {item.command.expectedItemCount}
-                  </p>
-                )}
-                {(item.command.action === "copy-items" || item.command.action === "move-items") && (
-                  <p className="break-all text-sm">
-                    {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
-                    {item.command.expectedSourceRevision}
-                  </p>
-                )}
-                {item.sourceCollection && (
-                  <p className="break-all text-sm">
-                    {c.sourceSuccessor}: {item.sourceCollection.id} ·{" "}
-                    {item.sourceCollection.revision}
-                  </p>
-                )}
-                {item.command.action === "move-items" && (
-                  <p className="break-all text-sm">
-                    {c.destination}: {item.collection.id} · {c.revision} {item.collection.revision}
-                  </p>
-                )}
-                {item.command.action === "reconcile-items" && (
-                  <div>
-                    <p>
-                      {c.add}: {item.command.addProductIds.join(", ") || "—"}
-                    </p>
-                    <p>
-                      {c.remove}: {item.command.removeProductIds.join(", ") || "—"}
-                    </p>
-                  </div>
-                )}
-                {(() => {
-                  const results = collectionCommandItemResults(item.command);
-                  if (!results.length) {
-                    return (
-                      <>
-                        {"productIds" in item.command && (
-                          <ul className="space-y-1 text-sm">
-                            {item.command.productIds.map((id) => (
-                              <li key={id} className="break-all">
-                                {id}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {"productId" in item.command && (
-                          <p className="break-all text-sm">{item.command.productId}</p>
-                        )}
-                      </>
-                    );
-                  }
-                  const outcomeLabel = {
-                    added: c.add,
-                    removed: c.remove,
-                    copied: c["copy-items"],
-                    moved: c["move-items"],
-                  } as const;
-                  return (
-                    <ul className="space-y-1 text-sm">
-                      {results.map((entry) => (
-                        <li key={`${entry.outcome}:${entry.productId}`} className="break-all">
-                          {outcomeLabel[entry.outcome]}: {entry.productId} · {c.batchApplied}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                })()}
-                <p className="text-sm">
-                  {c.created}:{" "}
-                  <time dateTime={item.createdAt.toISOString()}>
-                    {item.createdAt.toISOString()}
-                  </time>
-                </p>
-                <p className="break-all text-xs text-muted">
-                  {c.receipt}: {item.id} · {c.request}: {item.requestId}
-                </p>
-              </li>
-            ))}
-          </ol>
-          <Pagination
-            bounds={result}
-            locale={locale}
-            href={(page) => collectionHref(id, "history", { page: String(page) })}
-          />
-          <a
-            href={`/api/library/collections/${encodeURIComponent(id)}/history?page=${result.page}`}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.json}
-          </a>
-        </div>
-      );
+      return await LibraryCollectionsHistoryView({ locale, actor, id, queryValues });
     }
-    const adding = view === "add",
-      result = await service.detail(actor, id, query, adding),
-      collection = result.collection;
-    const snapshot = {
-      id: collection.id,
-      name: collection.name,
-      status: collection.status,
-      revision: collection.revision,
-    };
-    const href = (page: number) =>
-      collectionHref(id, adding ? "add" : "", {
-        page: String(page),
-        ...(result.q ? { q: result.q } : {}),
-      });
-    return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
-        <Link
-          href={adding ? collectionHref(id) : collectionHref()}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {adding ? c.back : c.title}
-        </Link>
-        <h1 className="break-words font-display text-primary">
-          {collection.name}
-          {adding ? ` · ${c.candidates}` : ""}
-        </h1>
-        <p className="text-sm">
-          {c[collection.status]} · {c.revision} {collection.revision}
-        </p>
-        <p role="note" className="text-sm text-secondary">
-          {c.subtitle}
-        </p>
-        {collection.status === "archived" && (
-          <p role="note" className="rounded border border-base p-4">
-            {c.archivedNote}
-          </p>
-        )}
-        {!adding && (
-          <>
-            <p role="note" className="text-sm text-muted">
-              {c.watchesIndependentNote}
-            </p>
-            <Link
-              href={`/workspace/library/collections/${encodeURIComponent(id)}/watches`}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {resourceReleaseWatchesCopy(locale).collectionTitle}
-            </Link>
-            <Link
-              href={collectionHref(id, "releases")}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {collectionReleasesCopy(locale).title}
-            </Link>
-          </>
-        )}
-        {!adding && (
-          <Link
-            href={`${collectionHref(id)}/versions`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {librarySelectionBatchesCopy(locale).title}
-          </Link>
-        )}
-        {!adding && (
-          <Link
-            href={`${collectionHref(id)}/requirements`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {collectionRequirementsCopy(locale).title}
-          </Link>
-        )}
-        {!adding && (
-          <section className="nexus-panel grid gap-5 p-5 sm:grid-cols-2">
-            {collection.status === "active" ? (
-              <>
-                <LibraryCollectionCommandForm
-                  key={`rename:${collection.revision}`}
-                  locale={locale}
-                  collection={snapshot}
-                  action="rename"
-                />
-                <LibraryCollectionCommandForm
-                  key={`archive:${collection.revision}`}
-                  locale={locale}
-                  collection={snapshot}
-                  action="archive"
-                />
-              </>
-            ) : (
-              <LibraryCollectionCommandForm
-                key={`restore:${collection.revision}`}
-                locale={locale}
-                collection={snapshot}
-                action="restore"
-              />
-            )}
-          </section>
-        )}
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.title}>
-          <a
-            href={`/api/library/collections/${encodeURIComponent(id)}/export`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionManifestsCopy(locale).export}
-          </a>
-          <Link
-            href={collectionHref(id, "reconcile")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionManifestsCopy(locale).reconcileTitle}
-          </Link>
-          <Link
-            href={collectionHref(id, "import")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionManifestsCopy(locale).title}
-          </Link>
-          <Link
-            href={collectionInventoryHref(id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionInventoryCopy(locale).inventory}
-          </Link>
-          <Link
-            href={collectionHref(id, "compare")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryCollectionComparisonCopy(locale).title}
-          </Link>
-          {!adding && collection.status === "active" && (
-            <Link
-              href={collectionHref(id, "add")}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {c.candidates}
-            </Link>
-          )}
-          <Link
-            href={collectionHref(id, "copy")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.duplicate}
-          </Link>
-          {collection.status === "active" && (
-            <Link
-              href={collectionHref(id, "move-items")}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {c["move-items"]}
-            </Link>
-          )}
-          <Link
-            href={collectionHref(id, "copy-items")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c["copy-items"]}
-          </Link>
-          <Link
-            href={collectionHref(id, "history")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.history}
-          </Link>
-        </nav>
-        <form
-          method="get"
-          action={collectionHref(id, adding ? "add" : "")}
-          className="flex flex-wrap items-end gap-3"
-        >
-          <label className="space-y-1">
-            <span className="block text-sm">{c.search}</span>
-            <input
-              name="q"
-              defaultValue={result.q}
-              maxLength={80}
-              className="rounded border border-base bg-surface p-2"
-            />
-          </label>
-          <Button type="submit" variant="outline">
-            {c.apply}
-          </Button>
-          {result.q && (
-            <Link
-              href={collectionHref(id, adding ? "add" : "")}
-              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {c.clear}
-            </Link>
-          )}
-        </form>
-        <p className="text-sm">
-          {c.items}: {result.total} · {c.ready}: {result.ready}
-        </p>
-        {!result.items.length && (
-          <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
-            <p>{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
-            {result.q && (
-              <Link
-                href={collectionHref(id, adding ? "add" : "")}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {c.clear}
-              </Link>
-            )}
-          </div>
-        )}
-        {collection.status === "active" && result.items.length > 0 && (
-          <LibraryCollectionBatchForm
-            key={`batch:${collection.revision}:${adding}:${result.page}:${result.q}`}
-            locale={locale}
-            collection={snapshot}
-            action={adding ? "add-many" : "remove-many"}
-            items={result.items.filter((item) => !adding || !item.inCollection)}
-          />
-        )}
-        <ol className="grid gap-4 md:grid-cols-2">
-          {result.items.map((item) => (
-            <li key={item.productId} className="nexus-panel space-y-3 p-5">
-              <h2 className="break-words font-semibold">{item.title ?? c.unavailable}</h2>
-              {item.downloadable && item.version ? (
-                <ResourceDownloadButton
-                  productId={item.productId}
-                  version={item.version}
-                  buildId={item.buildId ?? undefined}
-                />
-              ) : (
-                <p className="text-sm text-muted">{c.unavailableNote}</p>
-              )}
-              <div className="flex flex-wrap gap-4 text-sm">
-                <Link
-                  href={`/workspace/library/${encodeURIComponent(item.productId)}/collections`}
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {c.toCollection}
-                </Link>
-                {item.slug && (
-                  <Link
-                    href={`/market/${encodeURIComponent(item.slug)}`}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
-                    {c.open}
-                  </Link>
-                )}
-                {item.hasAccess && (
-                  <Link
-                    href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
-                    {c.versions}
-                  </Link>
-                )}
-              </div>
-              {collection.status === "active" &&
-                (adding && item.inCollection ? (
-                  <p role="status" className="text-sm text-muted">
-                    {c.inCollection}
-                  </p>
-                ) : (
-                  <LibraryCollectionCommandForm
-                    key={`${collection.revision}:${item.productId}`}
-                    locale={locale}
-                    collection={snapshot}
-                    productId={item.productId}
-                    action={adding ? "add" : "remove"}
-                  />
-                ))}
-            </li>
-          ))}
-        </ol>
-        <Pagination bounds={result} locale={locale} href={href} />
-        <a
-          href={`/api/library/collections/${encodeURIComponent(id)}${adding ? "/candidates" : ""}?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.json}
-        </a>
-      </div>
-    );
+    return await LibraryCollectionsDetailView({
+      locale,
+      actor,
+      id,
+      adding: view === "add",
+      queryValues,
+    });
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     if (error.code === "COLLECTION_ARCHIVED" && path?.id) redirect(collectionHref(path.id));
     return (
-      <section className="mx-auto max-w-xl space-y-4 py-16">
-        <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        {error.code === "COLLECTION_ITEM_LIMIT" && path?.id && (
-          <Link
-            href={collectionHref(path.id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.itemLimitNext}
-          </Link>
-        )}
-        {error.code === "COLLECTION_LIMIT" && (
-          <Link
-            href={collectionHref(undefined, "", { status: "archived" })}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.archived}
-          </Link>
-        )}
-        <Link
-          href={collectionHref()}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.title}
-        </Link>
-      </section>
+      <LibraryCollectionsErrorPanel locale={locale} code={error.code} collectionId={path?.id} />
     );
   }
 }

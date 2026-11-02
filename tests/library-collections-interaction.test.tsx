@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const h = vi.hoisted(() => ({
@@ -39,17 +39,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh, push
 
 import { LibraryCollectionCommandForm } from "../apps/web/src/components/library-collection-command";
 import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlatTestElement;
 function nodes(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(nodes);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const e = node as Element;
-  const type = e.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
-  }
-  return [e, ...nodes(e.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 const collection = { id: "lcol_a", name: "Core", status: "active" as const, revision: 4 };
 const render = (

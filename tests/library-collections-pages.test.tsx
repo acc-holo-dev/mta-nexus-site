@@ -208,6 +208,13 @@ it("shows immutable command history and current private JSON link", async () => 
   expect(html).toContain("Revision 3");
   expect(html).toContain("/api/library/collections/lcol_a/history?page=1");
 });
+it("distinguishes empty collection history from populated receipts", async () => {
+  const result = await state.history();
+  state.history.mockResolvedValue({ ...result, items: [] });
+  const html = await screen("history");
+  expect(html).toContain("No changes recorded for this collection yet.");
+  expect(html).not.toContain("2026-10-11T00:00:00.000Z");
+});
 it("rejects spoofed account controls before service invocation", async () => {
   const html = await screen("list", { userId: "other" });
   expect(html).toContain("Check the name");

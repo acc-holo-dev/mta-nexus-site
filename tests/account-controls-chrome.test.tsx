@@ -49,15 +49,11 @@ vi.mock("../apps/web/src/components/locale-context", async () => {
 
 import { AccountControls } from "../apps/web/src/components/account-controls";
 import { getDictionary } from "../apps/web/src/lib/i18n";
-import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
+import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
-type Element = FlatTestElement;
-function descendants(node: ReactNode): Element[] {
-  return flattenReactTestTree(node);
-}
 function render() {
   harness.cursor = 0;
-  return descendants(AccountControls());
+  return flattenReactTestTree(AccountControls());
 }
 beforeEach(() => {
   // account, checking, signingOut, error, attempt, loginHref, login effect, session effect, focus effect
