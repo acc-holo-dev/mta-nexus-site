@@ -48,6 +48,7 @@ export const commerceHistoryCopy = {
     salesTitle: "Sales history",
     salesDescription: "Completed historical line items for resources authored by this account.",
     emptySales: "No completed historical sales for your resources.",
+    loading: "Loading history…",
     grossNotice:
       "Amounts below are historical gross line prices, not your withdrawable balance, fees, earnings or payout authorization.",
     grossPrice: "Gross line price",
@@ -113,6 +114,7 @@ export const commerceHistoryCopy = {
     salesDescription:
       "Ранее завершённые операции по ресурсам, автором которых является ваш аккаунт.",
     emptySales: "Завершённые продажи ваших ресурсов не найдены.",
+    loading: "Загрузка истории…",
     grossNotice:
       "Показана полная цена позиции заказа, а не доступный к выводу баланс, прибыль, комиссия или разрешение на выплату.",
     grossPrice: "Цена позиции",

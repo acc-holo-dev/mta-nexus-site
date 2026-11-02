@@ -32,7 +32,7 @@ export default async function SellerSalesPage({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1 className="font-display">{c.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link href={authEntryHref("login", returnPath)} className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
           {c.signIn}
         </Link>
       </section>
@@ -55,7 +55,7 @@ export default async function SellerSalesPage({
       return (
         <section className="space-y-4 py-8">
           <p role="alert">{c.invalid}</p>
-          <Link href="/workspace/sales/report" className="text-accent underline">
+          <Link href="/workspace/sales/report" className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
             {c.reset}
           </Link>
         </section>

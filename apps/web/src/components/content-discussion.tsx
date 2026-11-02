@@ -283,13 +283,13 @@ export function ContentDiscussion({
         <div className="flex flex-wrap gap-4">
           <Link
             href="/workspace/saved?type=content"
-            className="inline-flex min-h-11 items-center text-xs text-accent underline"
+            className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {followCopy(locale).content}
           </Link>
           <Link
             href="/settings#notification-heading"
-            className="inline-flex min-h-11 items-center text-xs text-accent underline"
+            className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {followCopy(locale).notificationSettings}
           </Link>
@@ -299,7 +299,7 @@ export function ContentDiscussion({
       {viewer && (
         <Link
           href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {ownDiscussionCopy(locale).title}
         </Link>
@@ -346,7 +346,7 @@ export function ContentDiscussion({
               {copy.replying} {reply.name}
             </span>
             <Button
-              className="h-auto px-0 text-accent underline"
+              className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               variant="ghost"
               type="button"
               disabled={submitting}
@@ -389,7 +389,7 @@ export function ContentDiscussion({
           <span className="text-xs text-muted">{text.length}/5000</span>
           {!viewer && (
             <Link
-              className="text-xs text-accent underline"
+              className="text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={loginHref}
               onClick={() => persistComposeDraft()}
             >
@@ -462,7 +462,7 @@ export function ContentDiscussion({
               {comment.text}
             </p>
             <Link
-              className="inline-flex min-h-11 items-center text-xs text-accent underline"
+              className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
             >
               {copy.permalink}
@@ -476,7 +476,7 @@ export function ContentDiscussion({
               />
             )}
             <Button
-              className="h-auto px-0 text-xs text-accent underline"
+              className="h-auto px-0 text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               variant="ghost"
               type="button"
               disabled={submitting || !!managingId}
@@ -582,7 +582,7 @@ export function ContentDiscussion({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto px-0 text-sm text-accent underline"
+              className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               disabled={loading || submitting || !!managingId}
               onClick={returnToDiscussion}
             >
@@ -607,7 +607,7 @@ export function ContentDiscussion({
           type="button"
           variant="ghost"
           disabled={loading || submitting || !!managingId}
-          className="h-auto px-0 text-sm text-accent underline"
+          className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           onClick={() => void load(false, "")}
         >
           {!page || readError ? copy.retry : copy.latest}

@@ -46,10 +46,10 @@ export default async function PurchasesHistoryPage({
 
   return (
     <HistoryShell copy={copy} area="purchases">
-      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">
+      <Link href="/subscriptions" className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
         {getCommercialCopy(locale).catalog}
       </Link>
-      <Link href="/workspace/order-cases" className="inline-block text-sm text-accent underline">
+      <Link href="/workspace/order-cases" className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">
         {orderCaseCopy(locale).buyerCases}
       </Link>
       {result.orders.length === 0 ? (
@@ -84,7 +84,7 @@ export default async function PurchasesHistoryPage({
               </dl>
               <Link
                 href={`/workspace/purchases/${encodeURIComponent(order.id)}`}
-                className="inline-block text-sm text-accent underline"
+                className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.details}
               </Link>

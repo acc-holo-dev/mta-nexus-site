@@ -317,7 +317,7 @@ export function SupportCaseThread({
         <Button
           type="button"
           onClick={() => void load()}
-          className="h-auto min-h-9 px-0 text-accent underline"
+          className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           variant="ghost"
         >
           {workspaceCopy.reload}
@@ -363,7 +363,7 @@ export function SupportCaseThread({
         />
         <Link
           href={`${backHref}/${caseId}/messages`}
-          className="inline-flex min-h-9 items-center text-sm text-accent underline"
+          className="inline-flex min-h-9 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {supportMessageCopy(locale).title}
         </Link>
@@ -384,7 +384,7 @@ export function SupportCaseThread({
             type="button"
             disabled={sending || updatingStatus}
             onClick={() => void load()}
-            className="h-auto min-h-9 px-0 text-accent underline"
+            className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {workspaceCopy.reload}
@@ -423,7 +423,7 @@ export function SupportCaseThread({
             </p>
             <Link
               href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
-              className="mt-2 inline-flex min-h-9 items-center text-xs text-accent underline"
+              className="mt-2 inline-flex min-h-9 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {supportMessageCopy(locale).link}
             </Link>
@@ -440,7 +440,7 @@ export function SupportCaseThread({
             type="button"
             disabled={messagePage <= 1 || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.max(1, value - 1))}
-            className="h-auto px-0 text-sm text-accent underline"
+            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {dictionary.market.previousPage}
@@ -452,7 +452,7 @@ export function SupportCaseThread({
             type="button"
             disabled={messagePage >= messageTotalPages || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.min(messageTotalPages, value + 1))}
-            className="h-auto px-0 text-sm text-accent underline"
+            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {dictionary.market.nextPage}
@@ -499,7 +499,7 @@ export function SupportCaseThread({
                 : "You cannot reopen a staff-closed case yourself. Open a new related case if you still need help."}
               <Link
                 href={supportObjectContextHref(relatedContext)}
-                className="ml-2 text-accent underline"
+                className="ml-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {locale === "ru" ? "Новое связанное обращение" : "Open a related case"}
               </Link>

@@ -2,6 +2,7 @@ const copy = {
   en: {
     history: "Acquisition history",
     analytics: "Resource activity",
+    loading: "Loading acquisition history…",
     signIn: "Sign in",
     signInRequired: "Sign in to continue",
     historyNote:
@@ -45,6 +46,7 @@ const copy = {
   ru: {
     history: "История приобретений",
     analytics: "Активность ресурса",
+    loading: "Загрузка истории приобретений…",
     signIn: "Войти",
     signInRequired: "Войдите, чтобы продолжить",
     historyNote:

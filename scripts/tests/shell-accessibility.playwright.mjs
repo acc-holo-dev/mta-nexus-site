@@ -1088,15 +1088,23 @@ for (const locale of ["en", "ru"]) {
     await expect(resourceTitle).toBeFocused();
 
     await page.goto(`/servers/${process.env.NEXUS_CLAIM_BROWSER_SERVER_SLUG}`);
+    await expect(
+      page.getByText(dictionary.serverClaim.exactEndpoint, { exact: true }),
+    ).toBeVisible();
     const claimButton = page.getByRole("button", {
       name: dictionary.serverClaim.create,
       exact: true,
     });
-    await claimButton.focus();
-    await expect(claimButton).toBeFocused();
-    await expect(
-      page.getByText(dictionary.serverClaim.exactEndpoint, { exact: true }),
-    ).toBeVisible();
+    await expect(claimButton).toBeEnabled();
+    await claimButton.scrollIntoViewIfNeeded();
+    // Client panels on this route can remount once after hydration; retry focus
+    // until the live button keeps document focus instead of failing the locale once.
+    await expect
+      .poll(async () => {
+        await claimButton.focus();
+        return claimButton.evaluate((node) => node === document.activeElement);
+      })
+      .toBe(true);
 
     assert.deepEqual(errors, []);
     await logoutFixture(page);

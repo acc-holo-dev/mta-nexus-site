@@ -222,7 +222,7 @@ export async function LibraryCollectionsScreen({
           />
           <a
             href={`/api/library/collections?${new URLSearchParams({ status: result.status, page: String(result.page) })}`}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.json}
           </a>
@@ -322,7 +322,7 @@ export async function LibraryCollectionsScreen({
           />
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/copy`}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.json}
           </a>
@@ -451,7 +451,7 @@ export async function LibraryCollectionsScreen({
           />
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/history?page=${result.page}`}
-            className="text-sm text-accent underline"
+            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {c.json}
           </a>
@@ -643,7 +643,7 @@ export async function LibraryCollectionsScreen({
           {result.q && (
             <Link
               href={collectionHref(id, adding ? "add" : "")}
-              className="text-sm text-accent underline"
+              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {c.clear}
             </Link>
@@ -658,7 +658,7 @@ export async function LibraryCollectionsScreen({
             {result.q && (
               <Link
                 href={collectionHref(id, adding ? "add" : "")}
-                className="inline-flex min-h-11 items-center text-accent underline"
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {c.clear}
               </Link>
@@ -731,7 +731,7 @@ export async function LibraryCollectionsScreen({
         <Pagination bounds={result} locale={locale} href={href} />
         <a
           href={`/api/library/collections/${encodeURIComponent(id)}${adding ? "/candidates" : ""}?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
-          className="text-sm text-accent underline"
+          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.json}
         </a>
