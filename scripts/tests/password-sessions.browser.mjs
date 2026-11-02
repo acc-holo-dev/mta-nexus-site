@@ -303,7 +303,12 @@ check("P6 selected session is ended in UI and its cookie no longer authorizes", 
     .locator(`[data-session-id="${target}"]`)
     .getByRole("button", { name: "End session", exact: true })
     .click();
+  await alice.page
+    .getByRole("dialog")
+    .getByRole("button", { name: "End session", exact: true })
+    .click();
   assert.equal((await response).status(), 200);
+
   await expect(alice.page.locator("#settings-notice")).toContainText("Session ended.");
   await expect(rows(alice)).toHaveCount(1);
   assert.equal((await list(guest)).status, 401);
@@ -319,6 +324,10 @@ check("P7 end-other-sessions keeps this browser and invalidates both other cooki
     (r) => r.url().endsWith("/api/auth/sessions") && r.request().method() === "DELETE",
   );
   await alice.page.getByRole("button", { name: "End other sessions", exact: true }).click();
+  await alice.page
+    .getByRole("dialog")
+    .getByRole("button", { name: "End other sessions", exact: true })
+    .click();
   const ended = await response;
   assert.equal(ended.status(), 200);
   assert.equal((await ended.json()).revokedCount, 2);
