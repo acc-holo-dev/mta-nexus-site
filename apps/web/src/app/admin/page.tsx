@@ -1,23 +1,5 @@
-import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
-import { resourceReviewCopy } from "../../lib/resource-review-i18n";
-import { orderCaseCopy } from "../../lib/order-case-i18n";
-import { ReportEvidenceLinks } from "../../components/report-evidence-links";
-import { getFinancialCopy } from "../../lib/financial-i18n";
-import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
-import { cookies } from "next/headers";
-import Link from "next/link";
 import { buildRepository, contentRepository, verificationRepository } from "@nexus/db";
 import { can } from "@nexus/security";
-import {
-  AlertTriangle,
-  BadgeCheck,
-  BookOpen,
-  Box,
-  PackageCheck,
-  Server,
-  ShieldAlert,
-  Users,
-} from "lucide-react";
 import {
   DataTable,
   DataTableBody,
@@ -28,22 +10,40 @@ import {
   StatCard,
   StatusBadge,
 } from "@nexus/ui";
-import { adminService } from "../../lib/services/admin-service";
-import { authService } from "../../lib/services/auth-service";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
+import { safeExternalWebUrl } from "@nexus/validation";
+import {
+  AlertTriangle,
+  BadgeCheck,
+  BookOpen,
+  Box,
+  PackageCheck,
+  Server,
+  ShieldAlert,
+  Users,
+} from "lucide-react";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import { authEntryHref } from "../../components/auth-return-path";
-import { adminStatusLabel, adminStatusTone } from "./status-labels";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
-import { moderationCopy } from "../../lib/community-moderation-copy";
-import { VerificationModerationControls } from "../../components/verification-moderation-controls";
+import { ReportEvidenceLinks } from "../../components/report-evidence-links";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
-import { communityReportCopy } from "../../lib/community-report-copy";
-import { verificationCopy } from "../../lib/verification-workspace-copy";
-import { verificationApplicationsCopy } from "../../lib/verification-applications-copy";
-import { safeExternalWebUrl } from "@nexus/validation";
+import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
+import { moderationCopy } from "../../lib/community-moderation-copy";
+import { communityReportCopy } from "../../lib/community-report-copy";
+import { getFinancialCopy } from "../../lib/financial-i18n";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n-server";
+import { orderCaseCopy } from "../../lib/order-case-i18n";
+import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
+import { resourceReviewCopy } from "../../lib/resource-review-i18n";
+import { adminService } from "../../lib/services/admin-service";
+import { authService } from "../../lib/services/auth-service";
+import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
+import { verificationApplicationsCopy } from "../../lib/verification-applications-copy";
+import { verificationCopy } from "../../lib/verification-workspace-copy";
+import { adminStatusLabel, adminStatusTone } from "./status-labels";
 
 export const dynamic = "force-dynamic";
 
@@ -356,7 +356,7 @@ export default async function AdminPage({
           <nav aria-label={copy.verificationPages} className="mt-3 flex items-center gap-3 text-xs">
             {verificationPage > 1 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={verificationHref(verificationView, verificationPage - 1)}
               >
                 {copy.previous}
@@ -367,7 +367,7 @@ export default async function AdminPage({
             </span>
             {moreVerifications && verificationPage < 99_999 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={verificationHref(verificationView, verificationPage + 1)}
               >
                 {copy.next}
@@ -406,7 +406,7 @@ export default async function AdminPage({
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
                       <Link
-                        className="text-accent underline"
+                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         href={`/market/${encodeURIComponent(build.productSlug)}`}
                       >
                         {build.productTitle}
@@ -420,7 +420,7 @@ export default async function AdminPage({
                   <p className="font-caption text-muted">
                     {copy.resourcePublisher}:{" "}
                     <Link
-                      className="text-accent underline"
+                      className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       href={`/users/${encodeURIComponent(build.publisherUsername)}`}
                     >
                       @{build.publisherUsername}
@@ -466,7 +466,7 @@ export default async function AdminPage({
           <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
             {buildPage > 1 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={adminHref({ buildPage: buildPage - 1 })}
               >
                 {copy.previous}
@@ -477,7 +477,7 @@ export default async function AdminPage({
             </span>
             {moreBuilds && buildPage < 99_999 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={adminHref({ buildPage: buildPage + 1 })}
               >
                 {copy.next}
@@ -514,7 +514,7 @@ export default async function AdminPage({
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
                       <Link
-                        className="text-accent underline"
+                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                         href={`/market/${encodeURIComponent(build.productSlug)}`}
                       >
                         {build.productTitle}
@@ -528,7 +528,7 @@ export default async function AdminPage({
                   <p className="font-caption text-muted">
                     {copy.resourcePublisher}:{" "}
                     <Link
-                      className="text-accent underline"
+                      className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                       href={`/users/${encodeURIComponent(build.publisherUsername)}`}
                     >
                       @{build.publisherUsername}
@@ -578,7 +578,7 @@ export default async function AdminPage({
           <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
             {riskBuildPage > 1 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={adminHref({ riskBuildPage: riskBuildPage - 1 })}
               >
                 {copy.previous}
@@ -589,7 +589,7 @@ export default async function AdminPage({
             </span>
             {moreRiskBuilds && riskBuildPage < 99_999 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={adminHref({ riskBuildPage: riskBuildPage + 1 })}
               >
                 {copy.next}
@@ -657,7 +657,7 @@ export default async function AdminPage({
           <nav aria-label={copy.contentPages} className="mt-3 flex items-center gap-3 text-xs">
             {contentPage > 1 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={adminHref({ contentPage: contentPage - 1 })}
               >
                 {copy.previous}
@@ -668,7 +668,7 @@ export default async function AdminPage({
             </span>
             {moreContent && contentPage < 99_999 && (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={adminHref({ contentPage: contentPage + 1 })}
               >
                 {copy.next}
@@ -781,7 +781,10 @@ export default async function AdminPage({
         {(reportPage > 1 || moreReports) && (
           <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
             {reportPage > 1 && (
-              <Link className="text-accent underline" href={reportHref(reportView, reportPage - 1)}>
+              <Link
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={reportHref(reportView, reportPage - 1)}
+              >
                 {copy.previous}
               </Link>
             )}
@@ -789,7 +792,10 @@ export default async function AdminPage({
               {copy.reportPage} {reportPage}
             </span>
             {moreReports && reportPage < 99_999 && (
-              <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>
+              <Link
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={reportHref(reportView, reportPage + 1)}
+              >
                 {copy.next}
               </Link>
             )}

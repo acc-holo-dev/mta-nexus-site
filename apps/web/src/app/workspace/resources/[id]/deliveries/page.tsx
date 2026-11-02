@@ -158,7 +158,10 @@ export default async function PublisherDeliveriesPage({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className="text-accent underline">
+            <Link
+              href={href(result.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -166,7 +169,10 @@ export default async function PublisherDeliveriesPage({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className="text-accent underline">
+            <Link
+              href={href(result.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.next}
             </Link>
           ) : null}

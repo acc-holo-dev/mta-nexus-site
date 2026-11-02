@@ -39,7 +39,10 @@ export default async function Page({
   const href = (page: number) => `?view=${query.view}&page=${page}`;
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link href="/admin" className="text-accent underline">
+      <Link
+        href="/admin"
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.title}</h1>
@@ -55,7 +58,7 @@ export default async function Page({
             key={view}
             href={`?view=${view}`}
             aria-current={query.view === view ? "page" : undefined}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {label}
           </Link>
@@ -85,12 +88,26 @@ export default async function Page({
         <p>{copy.empty}</p>
       )}
       {result.totalPages > 1 && (
-        <nav className="flex gap-4" aria-label={copy.inventory}>
-          {result.page > 1 && <Link href={href(result.page - 1)}>{copy.previous}</Link>}
+        <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
+          {result.page > 1 ? (
+            <Link
+              href={href(result.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.previous}
+            </Link>
+          ) : null}
           <span>
             {result.page} / {result.totalPages}
           </span>
-          {result.page < result.totalPages && <Link href={href(result.page + 1)}>{copy.next}</Link>}
+          {result.page < result.totalPages ? (
+            <Link
+              href={href(result.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.next}
+            </Link>
+          ) : null}
         </nav>
       )}
     </div>

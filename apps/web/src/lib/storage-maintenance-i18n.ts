@@ -2,6 +2,7 @@ export function storageMaintenanceCopy(locale: string) {
   return locale === "ru"
     ? {
         title: "Обслуживание хранилища",
+        loading: "Загрузка журнала хранилища…",
         back: "Администрирование",
         inventory: "Журнал объектов",
         discovery: "Обнаружить объекты",
@@ -54,6 +55,7 @@ export function storageMaintenanceCopy(locale: string) {
       }
     : {
         title: "Storage maintenance",
+        loading: "Loading storage journal…",
         back: "Administration",
         inventory: "Object journal",
         discovery: "Discover objects",
