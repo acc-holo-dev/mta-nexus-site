@@ -8,10 +8,9 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
-import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { authService } from "../lib/services/auth-service";
 import { resourceRequirementsService } from "../lib/services/resource-requirements-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ResourceRequirementsReportBody } from "./resource-requirements-report-body";
 
 export async function CollectionRequirementsScreen({
@@ -28,7 +27,6 @@ export async function CollectionRequirementsScreen({
     searchParams,
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  const authCopy = libraryCollectionsCopy(locale);
   const requirementsBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/requirements`;
   if (!actor) {
     let returnPath = requirementsBase;
@@ -40,17 +38,7 @@ export async function CollectionRequirementsScreen({
     } catch {
       // Keep the requirements route when query params are invalid for guests.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {authCopy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof resourceRequirementsQuery>;
   try {

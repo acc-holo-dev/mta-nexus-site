@@ -3,7 +3,6 @@ import { Button, Input } from "@nexus/ui";
 
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
   confirmSupportCaseCreated,
@@ -22,7 +21,8 @@ import {
   supportWorkspaceCopy,
   supportWorkspaceError,
 } from "../lib/support-workspace-copy";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { currentBrowserReturnPath } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { useNexusLocale } from "./locale-context";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
@@ -93,7 +93,6 @@ export function SupportCenter({
   initialFilters?: SupportQuery;
   initialContext?: SupportFormObjectContext | null;
 }) {
-  const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
     workspaceCopy = supportWorkspaceCopy(locale);
@@ -107,7 +106,6 @@ export function SupportCenter({
   const pendingCreate = useRef<{ payload: string; key: string } | null>(null);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
-  const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState(initialFilters.category ?? "account");
   const [subject, setSubject] = useState("");
@@ -120,11 +118,6 @@ export function SupportCenter({
   );
   const [staffCategory, setStaffCategory] = useState(initialFilters.category ?? "");
   const loadSequence = useRef(0);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
-  useEffect(() => {
-    setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
-  }, [pathname]);
 
   useEffect(() => {
     if (initialContext) {
@@ -278,6 +271,10 @@ export function SupportCenter({
   const statusLabel = (status: SupportCaseSummary["status"]) =>
     status === "open" ? copy.open : status === "resolved" ? copy.resolved : copy.closed;
 
+  if (authRequired) {
+    return <PlatformSignIn locale={locale} returnPath={currentBrowserReturnPath()} />;
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-8">
       <header className="space-y-2 border-b border-base pb-6">
@@ -291,310 +288,298 @@ export function SupportCenter({
         {!staffMode && <p className="text-xs text-warning">{copy.noGuaranteedSla}</p>}
       </header>
 
-      {authRequired ? (
-        <div className="nexus-panel space-y-3 p-5">
-          <p className="text-sm text-secondary">{copy.authRequired}</p>
-          <Link
-            href={loginHref}
-            className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      <>
+        {!staffMode && (
+          <form
+            onSubmit={(event) => void createCase(event)}
+            aria-busy={creating}
+            className="nexus-panel space-y-4 p-5"
           >
-            {copy.signIn}
-          </Link>
-        </div>
-      ) : (
-        <>
-          {!staffMode && (
-            <form
-              onSubmit={(event) => void createCase(event)}
-              aria-busy={creating}
-              className="nexus-panel space-y-4 p-5"
-            >
-              <div className="flex items-center gap-2">
-                <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
-                <h2 className="font-heading text-primary">{copy.newCase}</h2>
-              </div>
+            <div className="flex items-center gap-2">
+              <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
+              <h2 className="font-heading text-primary">{copy.newCase}</h2>
+            </div>
 
-              <label className="block space-y-1.5">
-                <span className="font-label text-secondary">{copy.category}</span>
-                <select
-                  value={category}
-                  disabled={creating}
-                  onChange={(event) => {
-                    const next = event.target.value;
-                    if (categories.some(([value]) => value === next)) {
-                      setCategory(next as (typeof categories)[number][0]);
-                    }
-                  }}
-                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {categories.map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              {objectContext ? (
-                <div
-                  role="note"
-                  className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary"
-                >
-                  <p className="font-label uppercase text-muted">
-                    {locale === "ru" ? "Контекст обращения" : "Attached context"}
-                  </p>
-                  <p className="mt-1 break-all">
-                    {locale === "ru" ? "Ресурс" : "Resource"}: {objectContext.productId}
-                  </p>
-                  {objectContext.buildId ? (
-                    <p className="break-all">
-                      {locale === "ru" ? "Сборка" : "Build"}: {objectContext.buildId}
-                    </p>
-                  ) : null}
-                  {objectContext.receiptId ? (
-                    <p className="break-all">
-                      {locale === "ru" ? "Квитанция скачивания" : "Download receipt"}:{" "}
-                      {objectContext.receiptId}
-                    </p>
-                  ) : null}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={creating}
-                    className="mt-2 h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    onClick={() => {
-                      clearSupportObjectContext();
-                      setObjectContext(null);
-                    }}
-                  >
-                    {locale === "ru" ? "Убрать контекст" : "Remove context"}
-                  </Button>
-                </div>
-              ) : null}
-
-              <Input
-                label={copy.subject}
-                value={subject}
+            <label className="block space-y-1.5">
+              <span className="font-label text-secondary">{copy.category}</span>
+              <select
+                value={category}
                 disabled={creating}
-                onChange={(event) => setSubject(event.target.value)}
-                minLength={5}
-                maxLength={120}
-                required
-                placeholder={copy.subjectPlaceholder}
-              />
-
-              <label className="block space-y-1.5">
-                <span className="font-label text-secondary">{copy.message}</span>
-                <textarea
-                  value={message}
-                  disabled={creating}
-                  onChange={(event) => setMessage(event.target.value)}
-                  minLength={10}
-                  maxLength={4000}
-                  required
-                  rows={5}
-                  className="w-full resize-y rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  placeholder={copy.messagePlaceholder}
-                />
-              </label>
-
-              <Button type="submit" disabled={creating} isLoading={creating} variant="primary">
-                <MessageSquareText className="h-4 w-4" aria-hidden="true" />
-                {creating ? copy.creating : copy.create}
-              </Button>
-            </form>
-          )}
-
-          {createdCaseId && !staffMode && (
-            <div role="status">
-              <Link
-                href={`${basePath}/${encodeURIComponent(createdCaseId)}`}
-                className="block text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                onChange={(event) => {
+                  const next = event.target.value;
+                  if (categories.some(([value]) => value === next)) {
+                    setCategory(next as (typeof categories)[number][0]);
+                  }
+                }}
+                className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
-                {workspaceCopy.created}: {createdCaseId}
+                {categories.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {objectContext ? (
+              <div
+                role="note"
+                className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary"
+              >
+                <p className="font-label uppercase text-muted">
+                  {locale === "ru" ? "Контекст обращения" : "Attached context"}
+                </p>
+                <p className="mt-1 break-all">
+                  {locale === "ru" ? "Ресурс" : "Resource"}: {objectContext.productId}
+                </p>
+                {objectContext.buildId ? (
+                  <p className="break-all">
+                    {locale === "ru" ? "Сборка" : "Build"}: {objectContext.buildId}
+                  </p>
+                ) : null}
+                {objectContext.receiptId ? (
+                  <p className="break-all">
+                    {locale === "ru" ? "Квитанция скачивания" : "Download receipt"}:{" "}
+                    {objectContext.receiptId}
+                  </p>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={creating}
+                  className="mt-2 h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  onClick={() => {
+                    clearSupportObjectContext();
+                    setObjectContext(null);
+                  }}
+                >
+                  {locale === "ru" ? "Убрать контекст" : "Remove context"}
+                </Button>
+              </div>
+            ) : null}
+
+            <Input
+              label={copy.subject}
+              value={subject}
+              disabled={creating}
+              onChange={(event) => setSubject(event.target.value)}
+              minLength={5}
+              maxLength={120}
+              required
+              placeholder={copy.subjectPlaceholder}
+            />
+
+            <label className="block space-y-1.5">
+              <span className="font-label text-secondary">{copy.message}</span>
+              <textarea
+                value={message}
+                disabled={creating}
+                onChange={(event) => setMessage(event.target.value)}
+                minLength={10}
+                maxLength={4000}
+                required
+                rows={5}
+                className="w-full resize-y rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                placeholder={copy.messagePlaceholder}
+              />
+            </label>
+
+            <Button type="submit" disabled={creating} isLoading={creating} variant="primary">
+              <MessageSquareText className="h-4 w-4" aria-hidden="true" />
+              {creating ? copy.creating : copy.create}
+            </Button>
+          </form>
+        )}
+
+        {createdCaseId && !staffMode && (
+          <div role="status">
+            <Link
+              href={`${basePath}/${encodeURIComponent(createdCaseId)}`}
+              className="block text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {workspaceCopy.created}: {createdCaseId}
+            </Link>
+          </div>
+        )}
+
+        {error && (
+          <div
+            role="alert"
+            className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
+          >
+            {error}
+          </div>
+        )}
+
+        <form action={basePath} method="get">
+          <fieldset
+            className="nexus-panel grid gap-4 p-4 sm:grid-cols-2"
+            aria-label={copy.staffFilters}
+          >
+            <label className="block space-y-1.5 sm:col-span-2">
+              <span className="font-label text-secondary">{workspaceCopy.search}</span>
+              <input
+                type="search"
+                name="q"
+                maxLength={120}
+                defaultValue={initialFilters.q}
+                className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="font-label text-secondary">{copy.filterStatus}</span>
+              <select
+                name="status"
+                value={staffStatus}
+                onChange={(event) => {
+                  setStaffStatus(event.target.value as SupportCaseStatus | "");
+                }}
+                className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+              >
+                <option value="">{copy.allStatuses}</option>
+                <option value="open">{copy.open}</option>
+                <option value="resolved">{copy.resolved}</option>
+                <option value="closed">{copy.closed}</option>
+              </select>
+            </label>
+            <label className="block space-y-1.5">
+              <span className="font-label text-secondary">{copy.category}</span>
+              <select
+                name="category"
+                value={staffCategory}
+                onChange={(event) => {
+                  setStaffCategory(event.target.value);
+                }}
+                className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+              >
+                <option value="">{copy.allCategories}</option>
+                {categories.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex flex-wrap gap-4 sm:col-span-2">
+              <Button type="submit" className="min-h-10" variant="outline">
+                {workspaceCopy.apply}
+              </Button>
+              <Link
+                href={basePath}
+                className="min-h-10 py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {workspaceCopy.reset}
               </Link>
             </div>
-          )}
+          </fieldset>
+        </form>
 
-          {error && (
-            <div
-              role="alert"
-              className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
-            >
-              {error}
+        <section className="space-y-3" aria-busy={loading}>
+          <h2 className="font-heading text-primary">
+            {staffMode ? copy.staffQueue : copy.yourCases}
+          </h2>
+
+          {loading ? (
+            <div role="status" aria-live="polite" className="space-y-3">
+              <p className="text-sm text-muted">{copy.loading}</p>
+              <div className="animate-pulse space-y-3" aria-hidden="true">
+                {[1, 2, 3].map((key) => (
+                  <div key={key} className="nexus-panel h-24 p-4">
+                    <div className="mb-3 h-4 max-w-md rounded bg-inset" />
+                    <div className="h-3 w-32 rounded bg-inset" />
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
-
-          <form action={basePath} method="get">
-            <fieldset
-              className="nexus-panel grid gap-4 p-4 sm:grid-cols-2"
-              aria-label={copy.staffFilters}
+          ) : error ? (
+            <Button
+              type="button"
+              onClick={() => void loadCases()}
+              className="h-auto min-h-10 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              variant="ghost"
             >
-              <label className="block space-y-1.5 sm:col-span-2">
-                <span className="font-label text-secondary">{workspaceCopy.search}</span>
-                <input
-                  type="search"
-                  name="q"
-                  maxLength={120}
-                  defaultValue={initialFilters.q}
-                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
-                />
-              </label>
-              <label className="block space-y-1.5">
-                <span className="font-label text-secondary">{copy.filterStatus}</span>
-                <select
-                  name="status"
-                  value={staffStatus}
-                  onChange={(event) => {
-                    setStaffStatus(event.target.value as SupportCaseStatus | "");
-                  }}
-                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
-                >
-                  <option value="">{copy.allStatuses}</option>
-                  <option value="open">{copy.open}</option>
-                  <option value="resolved">{copy.resolved}</option>
-                  <option value="closed">{copy.closed}</option>
-                </select>
-              </label>
-              <label className="block space-y-1.5">
-                <span className="font-label text-secondary">{copy.category}</span>
-                <select
-                  name="category"
-                  value={staffCategory}
-                  onChange={(event) => {
-                    setStaffCategory(event.target.value);
-                  }}
-                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
-                >
-                  <option value="">{copy.allCategories}</option>
-                  {categories.map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="flex flex-wrap gap-4 sm:col-span-2">
-                <Button type="submit" className="min-h-10" variant="outline">
-                  {workspaceCopy.apply}
-                </Button>
+              {workspaceCopy.reload}
+            </Button>
+          ) : cases.length === 0 ? (
+            <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
+              <p>
+                {initialFilters.q || initialFilters.category || initialFilters.status
+                  ? workspaceCopy.noMatches
+                  : copy.empty}
+              </p>
+              {(initialFilters.q || initialFilters.category || initialFilters.status) && (
                 <Link
                   href={basePath}
-                  className="min-h-10 py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {workspaceCopy.reset}
                 </Link>
-              </div>
-            </fieldset>
-          </form>
-
-          <section className="space-y-3" aria-busy={loading}>
-            <h2 className="font-heading text-primary">
-              {staffMode ? copy.staffQueue : copy.yourCases}
-            </h2>
-
-            {loading ? (
-              <div role="status" aria-live="polite" className="space-y-3">
-                <p className="text-sm text-muted">{copy.loading}</p>
-                <div className="animate-pulse space-y-3" aria-hidden="true">
-                  {[1, 2, 3].map((key) => (
-                    <div key={key} className="nexus-panel h-24 p-4">
-                      <div className="mb-3 h-4 max-w-md rounded bg-inset" />
-                      <div className="h-3 w-32 rounded bg-inset" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : error ? (
-              <Button
-                type="button"
-                onClick={() => void loadCases()}
-                className="h-auto min-h-10 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                variant="ghost"
+              )}
+            </div>
+          ) : (
+            cases.map((supportCase) => (
+              <Link
+                key={supportCase.id}
+                href={`${basePath}/${encodeURIComponent(supportCase.id)}`}
+                className="nexus-panel block space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
-                {workspaceCopy.reload}
-              </Button>
-            ) : cases.length === 0 ? (
-              <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
-                <p>
-                  {initialFilters.q || initialFilters.category || initialFilters.status
-                    ? workspaceCopy.noMatches
-                    : copy.empty}
-                </p>
-                {(initialFilters.q || initialFilters.category || initialFilters.status) && (
-                  <Link
-                    href={basePath}
-                    className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
-                    {workspaceCopy.reset}
-                  </Link>
-                )}
-              </div>
-            ) : (
-              cases.map((supportCase) => (
-                <Link
-                  key={supportCase.id}
-                  href={`${basePath}/${encodeURIComponent(supportCase.id)}`}
-                  className="nexus-panel block space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="break-words text-sm font-bold text-primary">
-                        {supportCase.subject}
-                      </h3>
-                      {staffMode && supportCase.requesterUsername && (
-                        <p className="mt-1 text-xs text-muted">
-                          {copy.requester}: @{supportCase.requesterUsername}
-                        </p>
-                      )}
-                    </div>
-                    <span className="rounded-full border border-base bg-inset px-2.5 py-1 font-label text-muted">
-                      {statusLabel(supportCase.status)}
-                    </span>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-sm font-bold text-primary">
+                      {supportCase.subject}
+                    </h3>
+                    {staffMode && supportCase.requesterUsername && (
+                      <p className="mt-1 text-xs text-muted">
+                        {copy.requester}: @{supportCase.requesterUsername}
+                      </p>
+                    )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-faint">
-                    <span>{categoryLabel(supportCase.category)}</span>
-                    <time dateTime={new Date(supportCase.updatedAt).toISOString()}>
-                      {copy.updated}: {new Date(supportCase.updatedAt).toLocaleString(dateLocale)}
-                    </time>
-                  </div>
-                </Link>
-              ))
-            )}
-          </section>
-
-          {totalPages > 1 && (
-            <nav
-              aria-label={dictionary.market.paginationLabel}
-              className="flex items-center justify-between gap-3"
-            >
-              {page > 1 ? (
-                <Link
-                  href={supportHref(basePath, initialFilters, page - 1)}
-                  className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {dictionary.market.previousPage}
-                </Link>
-              ) : (
-                <span />
-              )}
-              <span className="text-sm text-secondary">
-                {dictionary.market.pageLabel} {page} / {totalPages}
-              </span>
-              {page < totalPages ? (
-                <Link
-                  href={supportHref(basePath, initialFilters, page + 1)}
-                  className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {dictionary.market.nextPage}
-                </Link>
-              ) : (
-                <span />
-              )}
-            </nav>
+                  <span className="rounded-full border border-base bg-inset px-2.5 py-1 font-label text-muted">
+                    {statusLabel(supportCase.status)}
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-faint">
+                  <span>{categoryLabel(supportCase.category)}</span>
+                  <time dateTime={new Date(supportCase.updatedAt).toISOString()}>
+                    {copy.updated}: {new Date(supportCase.updatedAt).toLocaleString(dateLocale)}
+                  </time>
+                </div>
+              </Link>
+            ))
           )}
-        </>
-      )}
+        </section>
+
+        {totalPages > 1 && (
+          <nav
+            aria-label={dictionary.market.paginationLabel}
+            className="flex items-center justify-between gap-3"
+          >
+            {page > 1 ? (
+              <Link
+                href={supportHref(basePath, initialFilters, page - 1)}
+                className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.market.previousPage}
+              </Link>
+            ) : (
+              <span />
+            )}
+            <span className="text-sm text-secondary">
+              {dictionary.market.pageLabel} {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link
+                href={supportHref(basePath, initialFilters, page + 1)}
+                className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.market.nextPage}
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )}
+      </>
     </div>
   );
 }

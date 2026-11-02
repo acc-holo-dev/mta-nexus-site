@@ -12,6 +12,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/collections/lcol_a/requirements",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -35,6 +36,7 @@ vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
   ),
 }));
 
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { CollectionRequirementsScreen as screen } from "../apps/web/src/components/collection-requirements-screen";
 
 const root: ResourceRequirementNode = {
@@ -140,7 +142,7 @@ it("rejects invalid or duplicate query fields before loading metadata", async ()
 it("requires an authenticated user before querying the collection", async () => {
   state.actor = null;
   const guest = renderToStaticMarkup(await screen(props));
-  expect(guest).toContain("Sign in to manage your collections");
+  expect(guest).toContain(getDictionary("en").workspace.signInRequired);
   expect(guest).toContain("/auth/login?next=");
   expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Frequirements");
   expect(state.report).not.toHaveBeenCalled();

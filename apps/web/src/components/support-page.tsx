@@ -25,7 +25,9 @@ export async function SupportPageSurface({
 }) {
   const locale = await getRequestLocale(),
     copy = supportWorkspaceCopy(locale),
-    support = getDictionary(locale).support;
+    dictionary = getDictionary(locale),
+    support = dictionary.support,
+    workspace = dictionary.workspace;
   const base = staff ? "/admin/support" : "/support";
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {})) {
@@ -36,8 +38,7 @@ export async function SupportPageSurface({
   const store = await cookies(),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
-    // Case detail stays a plain sign-in gate; the list keeps the Support H1 the
-    // shell a11y acceptance asserts for guests on /support.
+    // Case detail uses the shared gate; the list keeps the Support H1 shell a11y asserts.
     if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={`${base}/${id}`} />;
     return (
       <div className="mx-auto max-w-5xl space-y-8">
@@ -47,12 +48,12 @@ export async function SupportPageSurface({
           <p className="text-xs text-warning">{support.noGuaranteedSla}</p>
         </header>
         <div className="nexus-panel space-y-3 p-5">
-          <p className="text-sm text-secondary">{support.authRequired}</p>
+          <p className="text-sm text-secondary">{workspace.signInRequired}</p>
           <Link
             href={authEntryHref("login", listReturnPath)}
             className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
-            {support.signIn}
+            {workspace.signIn}
           </Link>
         </div>
       </div>

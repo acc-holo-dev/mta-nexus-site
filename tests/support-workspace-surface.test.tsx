@@ -91,10 +91,11 @@ it("renders URL-based escaped search inputs and role-specific create forms", () 
 it("gates server-rendered support pages before showing private controls", async () => {
   mocks.session.mockResolvedValue(null);
   const guest = renderToStaticMarkup(await SupportPageSurface({}));
-  expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
   expect(guest).toContain(
     `<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`,
   );
+  expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
+  expect(guest).toContain(getDictionary("en").workspace.signInRequired);
   const filtered = renderToStaticMarkup(
     await SupportPageSurface({
       searchParams: Promise.resolve({ q: "billing", status: "open", category: "account" }),

@@ -7,10 +7,9 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { libraryReleaseHistoryCopy } from "../lib/library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../lib/library-release-history-query";
-import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {
@@ -18,7 +17,6 @@ export async function LibraryReleaseHistoryScreen({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  const authCopy = getResourceReleaseControlCopy(locale);
   if (!actor) {
     let returnPath = "/workspace/library/version-history";
     try {
@@ -31,17 +29,7 @@ export async function LibraryReleaseHistoryScreen({
     } catch {
       // Keep the history route when filters are invalid for unsigned visitors.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{authCopy.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {authCopy.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof libraryReleaseHistoryQuery>;
   try {

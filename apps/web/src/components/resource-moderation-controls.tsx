@@ -16,6 +16,7 @@ import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
 } from "../lib/resource-release-control-i18n";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { useNexusLocale } from "./locale-context";
 import { stashSupportObjectContext } from "./support-center";
 
@@ -184,17 +185,14 @@ export function ResourceModerationControls({
             className={textareaClass}
           />
         </div>
-        <label htmlFor={`${field}-confirm`} className="flex items-start gap-3 text-sm">
-          <input
-            id={`${field}-confirm`}
-            type="checkbox"
-            checked={confirmed}
-            onChange={(event) => setConfirmed(event.target.checked)}
-            required
-            className="mt-1"
-          />
-          <span>{release ? copy.confirmRelease : copy.confirmSuspend}</span>
-        </label>
+        <ActionConfirmCheckbox
+          id={`${field}-confirm`}
+          checked={confirmed}
+          onCheckedChange={setConfirmed}
+          required
+        >
+          {release ? copy.confirmRelease : copy.confirmSuspend}
+        </ActionConfirmCheckbox>
       </fieldset>
       {error ? (
         <p role="alert" className="text-sm text-danger">

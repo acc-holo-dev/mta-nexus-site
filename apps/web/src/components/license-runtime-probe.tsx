@@ -130,7 +130,9 @@ export function LicenseRuntimeProbe({
       <h3 className="font-semibold text-primary">{copy.releaseCheck}</h3>
       <p className="text-sm text-secondary">{copy.releaseNote}</p>
       {loading ? (
-        <p className="text-sm text-muted">{copy.releaseLoading}</p>
+        <p role="status" aria-live="polite" className="text-sm text-muted">
+          {copy.releaseLoading}
+        </p>
       ) : context?.items.length ? (
         <>
           <label className="block text-sm">

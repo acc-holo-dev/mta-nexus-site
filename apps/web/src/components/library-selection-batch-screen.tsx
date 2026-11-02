@@ -13,7 +13,7 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { librarySelectionBatchesService } from "../lib/services/library-selection-batches-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { LibrarySelectionBatchControls } from "./library-selection-batch-controls";
 export async function LibrarySelectionBatchScreen({
   params,
@@ -43,17 +43,7 @@ export async function LibrarySelectionBatchScreen({
     } catch {
       // Keep the versions route when pagination is invalid for guests.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{cc.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {cc.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   try {
     const id = collectionId(path.id),

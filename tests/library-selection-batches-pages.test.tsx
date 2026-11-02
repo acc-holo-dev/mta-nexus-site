@@ -11,6 +11,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/collections/lcol_a/versions",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -27,6 +28,7 @@ vi.mock("../apps/web/src/components/library-selection-batch-controls", () => ({
     <p data-batch={items.map((i) => i.productId).join(",")}>Batch controls</p>
   ),
 }));
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { LibrarySelectionBatchScreen as screen } from "../apps/web/src/components/library-selection-batch-screen";
 const collection = { id: "lcol_a", name: "<Core>", status: "active", revision: 4 };
 const props = { params: Promise.resolve({ id: "lcol_a" }), searchParams: Promise.resolve({}) };
@@ -104,7 +106,7 @@ it("keeps history navigation available when no operations exist", async () => {
 it("requires authentication before either read", async () => {
   state.actor = null;
   const guest = renderToStaticMarkup(await screen(props));
-  expect(guest).toContain("Sign in to manage your collections");
+  expect(guest).toContain(getDictionary("en").workspace.signInRequired);
   expect(guest).toContain("/auth/login?next=");
   expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Fversions");
   expect(state.detail).not.toHaveBeenCalled();

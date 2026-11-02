@@ -99,14 +99,14 @@ export default async function DeveloperProfilePage({
             >
               <Link
                 href={`/users/${encodeURIComponent(user.username)}/trust`}
-                className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+                className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {trustCopy(locale).title}
               </Link>
               {visibility.showActivity && (
                 <Link
                   href={`/users/${encodeURIComponent(user.username)}/activity`}
-                  className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2"
+                  className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {publicationCopy(locale).activity}
                 </Link>

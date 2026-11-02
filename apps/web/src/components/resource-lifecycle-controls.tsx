@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { useNexusLocale } from "./locale-context";
 import { stashSupportObjectContext } from "./support-center";
 
@@ -259,17 +260,17 @@ export function ResourceLifecycleControls({
               className={textareaClass}
             />
           </div>
-          <label className="flex items-start gap-3 text-sm text-secondary">
-            <input
-              type="checkbox"
-              checked={confirmed}
-              disabled={busy || saved}
-              onChange={(event) => setConfirmed(event.target.checked)}
-              required
-              aria-describedby={`${fieldId}-note`}
-            />
-            <span>{copy.confirm}</span>
-          </label>
+          <ActionConfirmCheckbox
+            id={`${fieldId}-confirm`}
+            checked={confirmed}
+            onCheckedChange={setConfirmed}
+            disabled={busy || saved}
+            required
+            labelClassName="flex items-start gap-3 text-sm text-secondary"
+            describedBy={`${fieldId}-note`}
+          >
+            {copy.confirm}
+          </ActionConfirmCheckbox>
           <Button
             type="submit"
             isLoading={busy}

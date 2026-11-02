@@ -3,6 +3,7 @@ import { Button, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { storageMaintenanceCopy } from "../lib/storage-maintenance-i18n";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 
 async function json(url: string, body?: unknown) {
   const response = await fetch(url, {
@@ -194,15 +195,16 @@ export function StorageCleanupControls({
   return (
     <section className="nexus-panel space-y-4 p-4">
       <p>{copy.cleanupNote}</p>
-      <label className="flex gap-2">
-        <input
-          type="checkbox"
-          checked={confirmed}
-          disabled={pending}
-          onChange={(event) => setConfirmed(event.target.checked)}
-        />
+      <ActionConfirmCheckbox
+        id="storage-maintenance-cleanup-confirm"
+        checked={confirmed}
+        onCheckedChange={setConfirmed}
+        disabled={pending}
+        labelClassName="flex gap-2"
+        checkboxClassName={actionConfirmCheckboxFocusClass}
+      >
         {copy.confirm}
-      </label>
+      </ActionConfirmCheckbox>
       <div className="flex flex-wrap gap-3">
         <Button
           type="button"

@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 import { resourceCopyCopy } from "../apps/web/src/lib/resource-copy-i18n";
+import { getResourceCommerceCopy } from "../apps/web/src/lib/resource-commerce-i18n";
 import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
 import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
@@ -235,6 +236,7 @@ describe("workspace and resource UI surface", () => {
     expect(compatibility).toContain('data-ui="input"');
     expect(compatibility).toContain('data-ui="button"');
 
+    const lifecycleCopy = getResourceCommerceCopy("en");
     const lifecycle = renderToStaticMarkup(
       createElement(ResourceLifecycleControls, {
         product: {
@@ -245,7 +247,10 @@ describe("workspace and resource UI surface", () => {
       }),
     );
     expect(lifecycle).toContain('data-ui="button"');
-    expect(lifecycle).toContain('id="');
+    expect(lifecycle).toContain(lifecycleCopy.confirm);
+    expect(lifecycle).toMatch(/id="[^"]+-confirm"/u);
+    expect(lifecycle).toMatch(/for="[^"]+-confirm"/u);
+    expect(lifecycle).toContain('type="checkbox"');
   });
 
   it.each(["en", "ru"] as const)("localizes the workspace profile editor shell in %s", (locale) => {

@@ -7,6 +7,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmedOrderCancellation } from "../lib/commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { useNexusLocale } from "./locale-context";
 
 export function OrderCancellationForm({
@@ -96,17 +97,14 @@ export function OrderCancellationForm({
             className={fieldClassBlock}
           />
         </label>
-        <label htmlFor={`${field}-confirm`} className="flex items-start gap-3 text-sm">
-          <input
-            id={`${field}-confirm`}
-            type="checkbox"
-            checked={confirmed}
-            onChange={(event) => setConfirmed(event.target.checked)}
-            required
-            className="mt-1"
-          />
-          <span>{copy.confirmCancel}</span>
-        </label>
+        <ActionConfirmCheckbox
+          id={`${field}-confirm`}
+          checked={confirmed}
+          onCheckedChange={setConfirmed}
+          required
+        >
+          {copy.confirmCancel}
+        </ActionConfirmCheckbox>
       </fieldset>
       {error ? (
         <p role="alert" className="text-sm text-danger">

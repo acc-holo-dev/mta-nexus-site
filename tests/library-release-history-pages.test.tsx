@@ -10,6 +10,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/version-history",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -18,6 +19,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { LibraryReleaseHistoryScreen } from "../apps/web/src/components/library-release-history-screen";
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",
@@ -95,7 +97,7 @@ it("rejects ambiguous scope and requires authentication before history calls", a
   expect(h.history).not.toHaveBeenCalled();
   h.actor = null;
   const html = await screen();
-  expect(html).toContain("Sign in to manage your library");
+  expect(html).toContain(getDictionary("en").workspace.signInRequired);
   expect(html).toContain("/auth/login?next=");
   expect(html).toContain("%2Fworkspace%2Flibrary%2Fversion-history");
   expect(h.history).not.toHaveBeenCalled();
