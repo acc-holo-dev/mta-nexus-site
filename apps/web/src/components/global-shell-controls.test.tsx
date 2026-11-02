@@ -60,8 +60,12 @@ describe("global shell controls behavior", () => {
         </LocaleProvider>,
       );
 
-      expect(html).toContain('role="status"');
-      expect(html).toContain(dictionary.accountControls.checking);
+      expect(html).toContain(
+        `<span role="status" class="hidden max-w-28 truncate text-xs text-muted sm:block">${dictionary.accountControls.checking}</span>`,
+      );
+      expect(html).toContain(
+        `<span role="status" class="sr-only sm:hidden">${dictionary.accountControls.checking}</span>`,
+      );
     },
   );
 

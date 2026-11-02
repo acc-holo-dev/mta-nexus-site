@@ -402,13 +402,19 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl space-y-8" aria-busy="true">
-        <div>
-          <h1 className="font-display text-primary">{copy.title}</h1>
+      <section
+        className="max-w-3xl space-y-8"
+        aria-busy="true"
+        aria-labelledby="settings-loading-heading"
+      >
+        <header>
+          <h1 id="settings-loading-heading" className="font-display text-primary">
+            {copy.title}
+          </h1>
           <p role="status" aria-live="polite" className="mt-1 font-caption text-muted">
             {copy.loading}
           </p>
-        </div>
+        </header>
         <div className="animate-pulse space-y-8" aria-hidden="true">
           {[1, 2, 3, 4].map((key) => (
             <div key={key} className="nexus-panel space-y-4 p-5 shadow-nexus-sm">
@@ -417,7 +423,7 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
-      </div>
+      </section>
     );
   }
 

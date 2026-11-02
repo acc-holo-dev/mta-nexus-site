@@ -123,9 +123,14 @@ export function AccountControls() {
       className="relative flex min-w-0 items-center gap-1.5 sm:gap-2"
     >
       {checking ? (
-        <span role="status" className="hidden max-w-28 truncate text-xs text-muted sm:block">
-          {copy.checking}
-        </span>
+        <>
+          <span role="status" className="hidden max-w-28 truncate text-xs text-muted sm:block">
+            {copy.checking}
+          </span>
+          <span role="status" className="sr-only sm:hidden">
+            {copy.checking}
+          </span>
+        </>
       ) : account ? (
         <>
           <Link

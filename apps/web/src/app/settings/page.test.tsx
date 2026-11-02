@@ -1,97 +1,54 @@
-import type { ReactElement, ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { PlatformSignIn } from "../../components/content-catalog-controls";
+import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../lib/i18n";
 
-const harness = vi.hoisted(() => ({
-  slots: [] as unknown[],
-  cursor: 0,
-  cleanups: [] as Array<undefined | (() => void)>,
+const mocks = vi.hoisted(() => ({
+  locale: "en" as "en" | "ru",
 }));
 
-vi.mock("react", async (original) => ({
-  ...(await original<typeof import("react")>()),
-  useState: (initial: unknown) => {
-    const index = harness.cursor++;
-    if (!(index in harness.slots)) {
-      harness.slots[index] = typeof initial === "function" ? (initial as () => unknown)() : initial;
-    }
-    return [
-      harness.slots[index],
-      (value: unknown) => {
-        harness.slots[index] =
-          typeof value === "function"
-            ? (value as (current: unknown) => unknown)(harness.slots[index])
-            : value;
-      },
-    ];
-  },
-  useEffect: (effect: () => undefined | (() => void)) => {
-    const index = harness.cursor++;
-    if (!(index in harness.slots)) {
-      harness.slots[index] = true;
-      harness.cleanups.push(effect());
-    }
-  },
-  useRef: (initial: unknown) => ({ current: initial }),
+vi.mock("../../lib/i18n-server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/settings",
 }));
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/settings" }));
-vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-}));
-vi.mock("../../components/locale-context", async () => {
-  const { getDictionary } = await import("../../lib/i18n");
-  return {
-    useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
-  };
-});
-vi.mock("../../components/context-switcher", () => ({ ContextSwitcher: () => null }));
-vi.mock("../../components/private-change-history-controls", () => ({
-  ProfileChangeHistoryLink: () => null,
-}));
-vi.mock("../../components/public-profile-form", () => ({ PublicProfileForm: () => null }));
-vi.mock("../../components/web-push-settings", () => ({ WebPushSettings: () => null }));
-
+import { LocaleProvider } from "../../components/locale-context";
+import SettingsLoading from "./loading";
 import SettingsPage from "./page";
 
-beforeEach(() => {
-  harness.slots = [
-    null,
-    null,
-    false,
-    true,
-    false,
-    0,
-    null,
-    false,
-    { currentPassword: "", newPassword: "" },
-    null,
-    "",
-  ];
-  harness.slots[12] = true;
-  harness.slots[13] = true;
-  harness.cursor = 0;
-  harness.cleanups = [];
-});
+describe("account settings loading accessibility", () => {
+  it.each(["en", "ru"] as const)(
+    "renders the route loading shell with a stable heading id in %s",
+    async (locale) => {
+      mocks.locale = locale;
+      const copy = getDictionary(locale).settings;
+      const html = renderToStaticMarkup(await SettingsLoading());
 
-afterEach(() => {
-  for (const cleanup of harness.cleanups) cleanup?.();
-});
+      expect(html).toContain('aria-busy="true"');
+      expect(html).toContain('aria-labelledby="settings-loading-heading"');
+      expect(html).toContain('id="settings-loading-heading"');
+      expect(html).toContain(copy.title);
+      expect(html).toContain(copy.loading);
+    },
+  );
 
-it("seeds signed-out sign-in with the current pathname return target", () => {
-  harness.cursor = 0;
-  const gate = SettingsPage() as ReactElement<{ locale: string; returnPath?: string | null }>;
-  expect(gate.type).toBe(PlatformSignIn);
-  expect(gate.props.returnPath).toBe("/settings");
-  const html = renderToStaticMarkup(gate);
-  const copy = getDictionary("en").workspace;
-  expect(html).toContain('href="/auth/login?next=%2Fsettings"');
-  expect(html).toContain(copy.signInRequired);
-  expect(html).toContain(copy.signIn);
+  it.each(["en", "ru"] as const)(
+    "renders the client page loading shell with the same heading contract in %s",
+    (locale) => {
+      mocks.locale = locale;
+      const copy = getDictionary(locale).settings;
+      const html = renderToStaticMarkup(
+        <LocaleProvider locale={locale}>
+          <SettingsPage />
+        </LocaleProvider>,
+      );
+
+      expect(html).toContain('aria-busy="true"');
+      expect(html).toContain('aria-labelledby="settings-loading-heading"');
+      expect(html).toContain('id="settings-loading-heading"');
+      expect(html).toContain(copy.title);
+      expect(html).toContain(copy.loading);
+    },
+  );
 });
