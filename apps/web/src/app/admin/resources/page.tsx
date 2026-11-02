@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
 import { Button } from "@nexus/ui";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceModerationService } from "../../../lib/services/resource-release-control-service";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   getResourceReleaseControlCopy,
   resourceStatusLabel,
 } from "../../../lib/resource-release-control-i18n";
-import { formatHistoryDate, parseHistoryPage } from "../../../lib/commerce-history-format";
+import { authService } from "../../../lib/services/auth-service";
+import { resourceModerationService } from "../../../lib/services/resource-release-control-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -103,7 +103,10 @@ export default async function ResourceModerationPage({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={href(result.page - 1)} className="text-accent underline">
+            <Link
+              href={href(result.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -111,7 +114,10 @@ export default async function ResourceModerationPage({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={href(result.page + 1)} className="text-accent underline">
+            <Link
+              href={href(result.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.next}
             </Link>
           ) : null}

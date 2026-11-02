@@ -207,7 +207,7 @@ export default async function PublicResourceVersionsPage({
         <nav aria-label={copy.title} className="flex items-center justify-between gap-4 text-sm">
           {history.page > 1 ? (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={releaseHistoryHref(product.slug, history.page - 1)}
             >
               {copy.previous}
@@ -220,7 +220,7 @@ export default async function PublicResourceVersionsPage({
           </span>
           {history.page < history.totalPages ? (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={releaseHistoryHref(product.slug, history.page + 1)}
             >
               {copy.next}

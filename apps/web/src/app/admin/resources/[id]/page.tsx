@@ -1,20 +1,20 @@
-import { resourceRequirementsCopy } from "../../../../lib/resource-requirements-i18n";
-import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ResourceModerationControls } from "../../../../components/resource-moderation-controls";
-import { authService } from "../../../../lib/services/auth-service";
-import { resourceModerationService } from "../../../../lib/services/resource-release-control-service";
+import { formatHistoryDate, parseHistoryPage } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
+import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
 import {
   getResourceReleaseControlCopy,
   resourceModerationLabel,
   resourceStatusLabel,
 } from "../../../../lib/resource-release-control-i18n";
-import { formatHistoryDate, parseHistoryPage } from "../../../../lib/commerce-history-format";
+import { resourceRequirementsCopy } from "../../../../lib/resource-requirements-i18n";
+import { authService } from "../../../../lib/services/auth-service";
+import { resourceModerationService } from "../../../../lib/services/resource-release-control-service";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -97,7 +97,10 @@ export default async function ResourceModerationDetail({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -105,7 +108,10 @@ export default async function ResourceModerationDetail({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className="text-accent underline">
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {copy.next}
             </Link>
           ) : null}

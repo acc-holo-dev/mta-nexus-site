@@ -1,10 +1,12 @@
 import type { Locale } from "./i18n";
+
 const en = {
   title: "Resource reviews",
   own: "My reviews",
   write: "Write or manage my review",
   reports: "My review reports",
   queue: "Review report queue",
+  loading: "Loading review reports…",
   subtitle:
     "Reviews reflect acquired access, including free resources and legacy licenses. This does not confirm payment, install, or gameplay.",
   published: "Published",
@@ -79,6 +81,7 @@ const ru: typeof en = {
   write: "Написать или изменить мой отзыв",
   reports: "Мои жалобы на отзывы",
   queue: "Жалобы на отзывы ресурсов",
+  loading: "Загрузка жалоб на отзывы…",
   subtitle:
     "Отзывы опираются на доступ к ресурсу, включая бесплатные ресурсы и старые лицензии. Это не подтверждение оплаты, установки или игровой сессии.",
   published: "Опубликован",
