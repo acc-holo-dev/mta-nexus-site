@@ -4,8 +4,9 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `8163c0c5b14c1b31119811a09fb5752f770fadb5` (`fix(web): confirm password change, honest empty resets, and busy markers`).
-- **Verified CI green on that tip:** [CI 41507032591](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41507032591) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `98d245f0279669d8fe549af082514e4dd82c033e` (`fix(web): focus review fields and record the green tip`).
+- **Verified CI green on that tip:** [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `8163c0c5…` / [CI 41507032591](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41507032591).
 - **Prior selected green:** `748df327…` / [CI 41503267385](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41503267385).
 - **Prior selected green:** `359faea8…` / [CI 41485628226](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41485628226).
 - **Prior selected green:** `bed43fc1…` / [CI 41484238459](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41484238459).
@@ -39,11 +40,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** verified green — `8163c0c5…` / [CI 41507032591](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41507032591) (подтверждение смены пароля, честные пустые сбросы, busy-маркеры). Коммиты после этого SHA (подтверждение статуса обращения, библиотека и поддержка в оболочке, честный Q&A, общие подписи модерации, фокус фильтров поддержки и полей отзыва) ещё не являются verified tip, пока их CI не зелёный. Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+**Последняя локальная волна:** verified green — `98d245f0…` / [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990) (статус обращения, библиотека и поддержка в оболочке, честный Q&A, фокус полей отзыва). Коммиты после этого SHA (подтверждение снятия реакции и остановки уведомлений о версиях, подвал по сессии, ошибки темы и черновик обращения из публикации) ещё не являются verified tip. Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; verified tip `8163c0c5…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; verified tip `98d245f0…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
