@@ -286,7 +286,7 @@ export function SupportCaseThread({
           <h1 id="support-case-thread-loading-heading" className="font-display text-primary">
             {copy.title}
           </h1>
-          <p role="status" className="text-sm text-muted">
+          <p role="status" aria-live="polite" className="text-sm text-muted">
             {copy.loading}
           </p>
         </header>
@@ -310,7 +310,7 @@ export function SupportCaseThread({
           {error ?? copy.loadError}
         </div>
         {success && (
-          <p role="status" className="text-sm text-success">
+          <p role="status" aria-live="polite" className="text-sm text-success">
             {success}
           </p>
         )}
@@ -370,7 +370,7 @@ export function SupportCaseThread({
       </header>
 
       {success && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" aria-live="polite" className="text-sm text-success">
           {success}
         </p>
       )}
