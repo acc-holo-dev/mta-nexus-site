@@ -1,15 +1,15 @@
-import { libraryReleaseHistoryCopy } from "../../../../lib/library-release-history-i18n";
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { authEntryHref } from "../../../../components/auth-return-path";
 import { LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { authEntryHref } from "../../../../components/auth-return-path";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
+import { parseHistoryPage } from "../../../../lib/commerce-history-format";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { libraryReleaseHistoryCopy } from "../../../../lib/library-release-history-i18n";
+import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../lib/services/resource-release-control-service";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
-import { parseHistoryPage } from "../../../../lib/commerce-history-format";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Library updates | MTA NEXUS",
@@ -59,7 +59,7 @@ export default async function LibraryUpdatesPage({
             key={value}
             href={href(1, value)}
             aria-current={filter === value ? "page" : undefined}
-            className="rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white"
+            className="rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white"
           >
             {value === "updates" ? copy.update_available : copy[value]} ({result.counts[value]})
           </Link>
@@ -109,7 +109,17 @@ export default async function LibraryUpdatesPage({
           })}
         </ul>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <div className="space-y-3 text-secondary">
+          <p>{copy.empty}</p>
+          {filter !== "all" ? (
+            <Link
+              href={href(1, "all")}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.all}
+            </Link>
+          ) : null}
+        </div>
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">

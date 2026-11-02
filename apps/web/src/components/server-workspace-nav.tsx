@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getServerWorkspaceNavCopy } from "../lib/server-workspace-nav-i18n";
 import type { Locale } from "../lib/i18n";
+import { getServerWorkspaceNavCopy } from "../lib/server-workspace-nav-i18n";
 
 type NavItem = {
   key: "overview" | "content" | "activity" | "statistics" | "observations";
@@ -49,8 +49,8 @@ export function ServerWorkspaceNav({
                 aria-current={current ? "page" : undefined}
                 className={
                   current
-                    ? "font-semibold text-primary underline decoration-accent underline-offset-4"
-                    : "text-accent underline underline-offset-2 hover:text-primary"
+                    ? "font-semibold text-primary underline decoration-accent underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    : "text-accent underline underline-offset-2 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 }
               >
                 {copy[item.key]}

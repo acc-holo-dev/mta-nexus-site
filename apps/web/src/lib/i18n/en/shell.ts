@@ -33,7 +33,7 @@ export const shell = {
     collapse: "Collapse sidebar",
     expand: "Expand sidebar",
     search: "Search servers, resources, creators...",
-    closedBeta: "Open free beta",
+    openFreeBeta: "Open free beta",
   },
   locale: {
     label: "Language",

@@ -24,7 +24,7 @@ import {
 } from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
 import { SupportCaseActions } from "./support-case-actions";
-import { supportObjectContextHref, type SupportFormObjectContext } from "./support-center";
+import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";
 
 export function SupportCaseThread({
@@ -277,24 +277,26 @@ export function SupportCaseThread({
 
   if (loading) {
     return (
-      <div
+      <section
         className="mx-auto max-w-4xl space-y-6"
-        role="status"
-        aria-live="polite"
         aria-busy="true"
+        aria-labelledby="support-case-thread-loading-heading"
       >
-        <div className="h-4 w-32 animate-pulse rounded bg-inset" aria-hidden="true" />
-        <div className="space-y-3 border-b border-base pb-5" aria-hidden="true">
-          <div className="h-8 max-w-lg animate-pulse rounded bg-inset" />
-          <div className="h-4 w-40 animate-pulse rounded bg-inset" />
-        </div>
-        <p className="text-sm text-muted">{copy.loading}</p>
+        <header className="space-y-2 border-b border-base pb-5">
+          <h1 id="support-case-thread-loading-heading" className="font-display text-primary">
+            {copy.title}
+          </h1>
+          <p role="status" className="text-sm text-muted">
+            {copy.loading}
+          </p>
+        </header>
         <div className="animate-pulse space-y-3" aria-hidden="true">
+          <div className="h-8 max-w-lg rounded bg-inset" />
           {[1, 2, 3].map((key) => (
             <div key={key} className="h-16 rounded bg-inset" />
           ))}
         </div>
-      </div>
+      </section>
     );
   }
 

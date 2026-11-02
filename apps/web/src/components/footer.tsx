@@ -76,7 +76,7 @@ export function Footer({ locale }: { locale: Locale }) {
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
-        <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.closedBeta}</div>
+        <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.openFreeBeta}</div>
         <div className="flex items-center gap-3 font-caption">
           <Link
             href="/terms"

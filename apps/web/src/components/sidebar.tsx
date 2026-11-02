@@ -24,7 +24,6 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { communityReportCopy } from "../lib/community-report-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
@@ -34,6 +33,7 @@ import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
+import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import {
   showAdminDestination,
   showGuestSignInCta,
@@ -179,7 +179,7 @@ export function Sidebar({
                   MTA <span className="text-accent">NEXUS</span>
                 </span>
                 <span className="font-caption leading-tight text-faint">
-                  {dictionary.nav.closedBeta}
+                  {dictionary.nav.openFreeBeta}
                 </span>
               </div>
             </Link>

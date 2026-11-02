@@ -15,7 +15,7 @@ export function ResourceSubmissionSuccess({
     <div className="mx-auto max-w-xl space-y-4 py-12">
       <div className="nexus-panel space-y-4 p-6 shadow-nexus-sm">
         <div className="inline-flex rounded-full bg-success-soft px-2.5 py-1 font-label text-success">
-          {dictionary.nav.closedBeta}
+          {dictionary.nav.openFreeBeta}
         </div>
         <h1 className="text-2xl font-black text-primary">{copy.submittedTitle}</h1>
         <p className="text-sm leading-relaxed text-muted">{copy.submittedDescription}</p>
