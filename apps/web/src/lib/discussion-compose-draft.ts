@@ -3,12 +3,15 @@
  * Never auto-publishes after restore; clears only after a confirmed publish.
  */
 
+import { parseCommentIntentKey } from "./content-comment-client";
+
 export type DiscussionComposeDraft = {
   version: 1;
   contentId: string;
   text: string;
   parentId?: string;
   parentName?: string;
+  intentKey?: string;
   savedAt: number;
 };
 
@@ -73,12 +76,19 @@ export function parseDiscussionComposeDraft(
     if (draft.parentName !== undefined) {
       if (typeof draft.parentName !== "string" || draft.parentName.length > 120) return null;
     }
+    let intentKey: string | undefined;
+    if (draft.intentKey !== undefined) {
+      const parsedKey = parseCommentIntentKey(draft.intentKey);
+      if (!parsedKey) return null;
+      intentKey = parsedKey;
+    }
     return {
       version: 1,
       contentId,
       text: draft.text,
       ...(draft.parentId ? { parentId: draft.parentId } : {}),
       ...(draft.parentName ? { parentName: draft.parentName } : {}),
+      ...(intentKey ? { intentKey } : {}),
       savedAt: draft.savedAt,
     };
   } catch {
@@ -115,12 +125,14 @@ export function writeDiscussionComposeDraft(
   const text = draft.text.trimEnd();
   if (!CONTENT_ID.test(draft.contentId) || text.length < 1 || text.length > 5000) return false;
   const store = resolveStore(options?.store);
+  const intentKey = draft.intentKey ? parseCommentIntentKey(draft.intentKey) : null;
   const payload: DiscussionComposeDraft = {
     version: 1,
     contentId: draft.contentId,
     text,
     ...(draft.parentId && PARENT_ID.test(draft.parentId) ? { parentId: draft.parentId } : {}),
     ...(draft.parentName && draft.parentName.length <= 120 ? { parentName: draft.parentName } : {}),
+    ...(intentKey ? { intentKey } : {}),
     savedAt: draft.savedAt ?? options?.now ?? Date.now(),
   };
   try {

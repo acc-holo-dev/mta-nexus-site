@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   ContentCommentSubmitError,
   createCommentIntentKey,
+  parseCommentIntentKey,
   submitContentCommentRequest,
 } from "../lib/content-comment-client";
 import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
@@ -75,13 +76,21 @@ export function ContentDiscussion({
   const [composeBootstrap] = useState(() => {
     const stored = readDiscussionComposeDraft(contentId);
     if (!stored)
-      return { text: "", reply: null as { id: string; name: string } | null, restored: false };
+      return {
+        text: "",
+        reply: null as { id: string; name: string } | null,
+        restored: false,
+        pendingIntent: null as { key: string; text: string; parentId?: string } | null,
+      };
+    const parentId = stored.parentId;
+    const intentKey = stored.intentKey ? parseCommentIntentKey(stored.intentKey) : null;
     return {
       text: stored.text,
-      reply: stored.parentId
-        ? { id: stored.parentId, name: stored.parentName ?? getDiscussionCopy(locale).anonymous }
+      reply: parentId
+        ? { id: parentId, name: stored.parentName ?? getDiscussionCopy(locale).anonymous }
         : null,
       restored: true,
+      pendingIntent: intentKey ? { key: intentKey, text: stored.text.trim(), parentId } : null,
     };
   });
   const [text, setText] = useState(composeBootstrap.text);
@@ -98,21 +107,33 @@ export function ContentDiscussion({
     key: string;
     text: string;
     parentId?: string;
-  } | null>(null);
+  } | null>(composeBootstrap.pendingIntent);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
   function persistComposeDraft(nextText = text, nextReply = reply) {
     const normalized = nextText.trimEnd();
     if (normalized.length < 1) {
+      pendingIntent.current = null;
       clearDiscussionComposeDraft(contentId);
       return;
     }
+    const trimmed = normalized.slice(0, 5000);
+    const parentId = nextReply?.id;
+    const pending = pendingIntent.current;
+    const intentKey =
+      pending &&
+      pending.text === trimmed.trim() &&
+      pending.parentId === parentId &&
+      parseCommentIntentKey(pending.key)
+        ? pending.key
+        : undefined;
     writeDiscussionComposeDraft({
       contentId,
-      text: normalized.slice(0, 5000),
+      text: trimmed,
       ...(nextReply
         ? { parentId: nextReply.id, parentName: nextReply.name }
         : { parentId: undefined, parentName: undefined }),
+      ...(intentKey ? { intentKey } : {}),
     });
   }
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
@@ -134,12 +155,16 @@ export function ContentDiscussion({
     const stored = readDiscussionComposeDraft(contentId);
     if (stored) {
       setText(stored.text);
-      setReply(
-        stored.parentId ? { id: stored.parentId, name: stored.parentName ?? copy.anonymous } : null,
-      );
+      const parentId = stored.parentId;
+      setReply(parentId ? { id: parentId, name: stored.parentName ?? copy.anonymous } : null);
+      const intentKey = stored.intentKey ? parseCommentIntentKey(stored.intentKey) : null;
+      pendingIntent.current = intentKey
+        ? { key: intentKey, text: stored.text.trim(), parentId }
+        : null;
       setDraftRestoreNotice(true);
       return;
     }
+    pendingIntent.current = null;
     setText("");
     setReply(null);
     setDraftRestoreNotice(false);
@@ -266,6 +291,7 @@ export function ContentDiscussion({
       clearDiscussionComposeDraft(contentId);
       setText("");
       setReply(null);
+      setDraftRestoreNotice(false);
       setPublished(true);
       setDisplayCount((current) => current + 1);
       // Saved state is independent from a subsequent read failure.
@@ -411,7 +437,13 @@ export function ContentDiscussion({
             isLoading={submitting}
             disabled={text.trim().length < 2 || loading || !!managingId}
           >
-            {submitting ? copy.publishing : copy.publish}
+            {submitting
+              ? viewer && draftRestoreNotice
+                ? copy.publishingRestoredDraft
+                : copy.publishing
+              : viewer && draftRestoreNotice
+                ? copy.publishRestoredDraft
+                : copy.publish}
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
           {!viewer && (

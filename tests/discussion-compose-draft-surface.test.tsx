@@ -1,19 +1,23 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { DiscussionComposeWriteFeedback } from "../apps/web/src/components/content-discussion-compose-feedback";
+import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
+import type { DiscussionComposeDraft } from "../apps/web/src/lib/discussion-compose-draft";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
   usePathname: () => "/articles/article",
 }));
+const restoredDraft: DiscussionComposeDraft = {
+  version: 1,
+  contentId: "content",
+  text: "Stored draft",
+  savedAt: Date.now(),
+};
+
 vi.mock("../apps/web/src/lib/discussion-compose-draft", () => ({
-  readDiscussionComposeDraft: () => ({
-    version: 1,
-    contentId: "content",
-    text: "Stored draft",
-    savedAt: Date.now(),
-  }),
+  readDiscussionComposeDraft: () => restoredDraft,
   writeDiscussionComposeDraft: vi.fn(),
   clearDiscussionComposeDraft: vi.fn(),
 }));
@@ -34,6 +38,25 @@ it("announces a session draft restore in the compose form", () => {
   expect(html).toContain('role="status"');
   expect(html).toContain('aria-live="polite"');
   expect(html).toContain("Stored draft");
+  expect(html).not.toContain(getDiscussionCopy("en").publishRestoredDraft);
+});
+
+it("shows an explicit publish affordance for a signed-in restored draft", () => {
+  restoredDraft.intentKey = "12345678-1234-4234-8234-123456789abc";
+  const discussionCopy = getDiscussionCopy("en");
+  const html = renderToStaticMarkup(
+    <ContentDiscussion
+      slug="article"
+      contentId="content"
+      locale="en"
+      count={0}
+      initial={{ items: [], hasMore: false, nextCursor: null }}
+      viewer={{ id: "user-1", canModerate: false }}
+    />,
+  );
+  expect(html).toContain(getDictionary("en").workspace.draftRestored);
+  expect(html).toContain(discussionCopy.publishRestoredDraft);
+  delete restoredDraft.intentKey;
 });
 
 it("shows login and register links when compose write needs sign-in", () => {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   clearDiscussionComposeDraft,
+  type DiscussionComposeDraftStore,
   parseDiscussionComposeDraft,
   readDiscussionComposeDraft,
   writeDiscussionComposeDraft,
-  type DiscussionComposeDraftStore,
 } from "../apps/web/src/lib/discussion-compose-draft";
 
 function memoryStore(): DiscussionComposeDraftStore & { data: Map<string, string> } {
@@ -43,6 +43,38 @@ describe("discussion compose draft", () => {
       parentName: "@author",
       savedAt: 1_000,
     });
+  });
+
+  it("round-trips a publish intent key for post-auth retry", () => {
+    const store = memoryStore();
+    const intentKey = "12345678-1234-4234-8234-123456789abc";
+    writeDiscussionComposeDraft(
+      { contentId: "cnt_demo", text: "Retry me", intentKey },
+      { store, now: 5_000 },
+    );
+    expect(readDiscussionComposeDraft("cnt_demo", { store, now: 5_500 })).toEqual({
+      version: 1,
+      contentId: "cnt_demo",
+      text: "Retry me",
+      intentKey,
+      savedAt: 5_000,
+    });
+  });
+
+  it("rejects malformed intent keys in stored payloads", () => {
+    expect(
+      parseDiscussionComposeDraft(
+        JSON.stringify({
+          version: 1,
+          contentId: "cnt_demo",
+          text: "kept",
+          intentKey: "not-a-uuid",
+          savedAt: 1_000,
+        }),
+        "cnt_demo",
+        2_000,
+      ),
+    ).toBeNull();
   });
 
   it("rejects foreign content, expired, and oversized payloads", () => {
