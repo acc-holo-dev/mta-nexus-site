@@ -331,7 +331,7 @@ export function VerificationWorkspace({
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.manage}>
           {teamFilters.page > 1 && (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={href({ teamsPage: teamFilters.page - 1 })}
             >
               {copy.previous}
@@ -342,7 +342,7 @@ export function VerificationWorkspace({
           </span>
           {teams?.hasMore && teamFilters.page < 9999 && (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={href({ teamsPage: teamFilters.page + 1 })}
             >
               {copy.next}
@@ -536,7 +536,10 @@ export function VerificationWorkspace({
         ))}
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.title}>
           {filters.page > 1 && (
-            <Link className="text-accent underline" href={href({ page: filters.page - 1 })}>
+            <Link
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              href={href({ page: filters.page - 1 })}
+            >
               {copy.previous}
             </Link>
           )}
@@ -544,7 +547,10 @@ export function VerificationWorkspace({
             {copy.page} {filters.page}
           </span>
           {overview?.history.hasMore && filters.page < 9999 && (
-            <Link className="text-accent underline" href={href({ page: filters.page + 1 })}>
+            <Link
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              href={href({ page: filters.page + 1 })}
+            >
               {copy.next}
             </Link>
           )}

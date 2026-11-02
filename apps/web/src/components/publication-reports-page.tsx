@@ -127,7 +127,10 @@ export async function PublicationReportsPage({
         />
         <nav aria-label={labels.page} className="flex flex-wrap items-center gap-4 text-sm">
           {filters.page > 1 && (
-            <Link href={href(filters.page - 1)} className="text-accent underline">
+            <Link
+              href={href(filters.page - 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {labels.previous}
             </Link>
           )}
@@ -135,7 +138,10 @@ export async function PublicationReportsPage({
             {labels.page} {filters.page}
           </span>
           {data.hasMore && filters.page < 9999 && (
-            <Link href={href(filters.page + 1)} className="text-accent underline">
+            <Link
+              href={href(filters.page + 1)}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               {labels.next}
             </Link>
           )}

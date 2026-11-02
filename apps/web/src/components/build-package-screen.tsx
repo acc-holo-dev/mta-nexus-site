@@ -3,13 +3,13 @@ import { Button } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "./auth-return-path";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../lib/build-package-query";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { buildPackageService } from "../lib/services/build-package-service";
+import { authEntryHref } from "./auth-return-path";
 export async function BuildPackageScreen({
   productId,
   buildId,
@@ -37,7 +37,10 @@ export async function BuildPackageScreen({
     return (
       <section className="space-y-4 py-16 text-center">
         <h1>{dictionary.workspace.signInRequired}</h1>
-        <Link href={authEntryHref("login", returnPath)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", returnPath)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {dictionary.workspace.signIn}
         </Link>
       </section>
@@ -174,7 +177,7 @@ export async function BuildPackageScreen({
         <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
           {detail.page > 1 && (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,
@@ -190,7 +193,7 @@ export async function BuildPackageScreen({
           </span>
           {detail.page < detail.totalPages && (
             <Link
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,

@@ -9,11 +9,11 @@ import {
   confirmedReviewReport,
 } from "../lib/resource-review-confirmation";
 import {
+  type ResourceReviewEligibilityReason,
   resourceReviewCopy,
   resourceReviewEligibilityCopy,
   resourceReviewError,
   resourceReviewState,
-  type ResourceReviewEligibilityReason,
 } from "../lib/resource-review-i18n";
 import { confirmAction } from "./confirm-action";
 
@@ -270,12 +270,15 @@ export function ResourceReviewReportForm({
       {id ? (
         <Link
           href={`/workspace/review-reports/${encodeURIComponent(id)}`}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.detail}
         </Link>
       ) : (
-        <Link href="/workspace/review-reports" className="text-accent underline">
+        <Link
+          href="/workspace/review-reports"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.reports}
         </Link>
       )}

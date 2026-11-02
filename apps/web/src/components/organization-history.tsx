@@ -111,7 +111,7 @@ export function OrganizationHistoryView({
             {copy.by}:{" "}
             {item.actorUsername ? (
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={`/users/${encodeURIComponent(item.actorUsername)}`}
               >
                 {item.actorName} (@{item.actorUsername})
@@ -124,7 +124,7 @@ export function OrganizationHistoryView({
             <p className="text-sm text-secondary">
               {copy.subject}:{" "}
               <Link
-                className="text-accent underline"
+                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 href={`/users/${encodeURIComponent(item.subjectUsername)}`}
               >
                 {item.subjectName} (@{item.subjectUsername})

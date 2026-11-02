@@ -13,9 +13,9 @@ import { reportGroupsCopy } from "../lib/community-report-groups-copy";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
+import { authEntryHref } from "./auth-return-path";
 import { CommunityReportDetailView } from "./community-report-detail";
 import { CommunityReportList } from "./community-report-list";
-import { authEntryHref } from "./auth-return-path";
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -93,7 +93,7 @@ export async function CommunityReportScreen({
         </p>
         <Link
           href={staff ? "/admin/reports" : "/workspace/reports"}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.reset}
         </Link>

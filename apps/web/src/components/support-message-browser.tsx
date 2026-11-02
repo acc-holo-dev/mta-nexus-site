@@ -27,7 +27,10 @@ export function SupportMessageBrowser({
     new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" });
   return (
     <div className="mx-auto max-w-4xl space-y-5">
-      <Link href={base} className="text-accent underline">
+      <Link
+        href={base}
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -77,7 +80,7 @@ export function SupportMessageBrowser({
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <Link
           href={supportMessageHref(path, filters, { fresh: true })}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </Link>
@@ -85,7 +88,7 @@ export function SupportMessageBrowser({
           href={supportMessageHref(`/api/support/${page.supportCase.id}/messages/export`, filters, {
             until: page.until,
           })}
-          className="text-accent underline"
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.download}
         </a>
@@ -148,7 +151,7 @@ export function SupportMessageBrowser({
               cursor: page.olderCursor,
               until: page.until,
             })}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.older}
           </Link>
@@ -159,7 +162,7 @@ export function SupportMessageBrowser({
               cursor: page.newerCursor,
               until: page.until,
             })}
-            className="text-accent underline"
+            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.newer}
           </Link>

@@ -1,15 +1,15 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getRequestLocale } from "../lib/i18n-server";
-import { authService } from "../lib/services/auth-service";
-import { resourceReviewService } from "../lib/services/resource-review-service";
 import { resourceReviewCopy, resourceReviewState } from "../lib/resource-review-i18n";
 import { resourceReviewPageQuery } from "../lib/resource-review-query";
-import { ResourceReviewPager } from "./resource-review-list";
-import { ResourceReviewDecisionForm } from "./resource-review-controls";
+import { authService } from "../lib/services/auth-service";
+import { resourceReviewService } from "../lib/services/resource-review-service";
 import { authEntryHref } from "./auth-return-path";
+import { ResourceReviewDecisionForm } from "./resource-review-controls";
+import { ResourceReviewPager } from "./resource-review-list";
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -31,7 +31,10 @@ export async function ResourceReviewReportScreen({
   if (!actor)
     return (
       <section className="py-12">
-        <Link href={authEntryHref("login", loginReturn)} className="text-accent underline">
+        <Link
+          href={authEntryHref("login", loginReturn)}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.signIn}
         </Link>
       </section>
@@ -44,7 +47,10 @@ export async function ResourceReviewReportScreen({
     });
     return (
       <section className="mx-auto max-w-3xl space-y-5 py-8">
-        <Link href={base} className="text-accent underline">
+        <Link
+          href={base}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
           {copy.back}
         </Link>
         <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
@@ -83,7 +89,10 @@ export async function ResourceReviewReportScreen({
     result = await resourceReviewService.reportsPage(actor, staff, filters.page, filters.view);
   return (
     <section className="mx-auto max-w-4xl space-y-5 py-8">
-      <Link href={staff ? "/admin" : "/workspace/library"} className="text-accent underline">
+      <Link
+        href={staff ? "/admin" : "/workspace/library"}
+        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
         {copy.back}
       </Link>
       <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
@@ -104,7 +113,7 @@ export async function ResourceReviewReportScreen({
           <article key={report.id} className="nexus-panel space-y-2 p-4">
             <Link
               href={`${base}/${encodeURIComponent(report.id)}`}
-              className="text-accent underline"
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.detail} · {resourceReviewState(locale, report.status)}
             </Link>
