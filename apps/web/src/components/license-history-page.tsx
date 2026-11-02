@@ -11,6 +11,7 @@ import { licenseRuntimePage } from "../lib/license-runtime-query";
 import { authService } from "../lib/services/auth-service";
 import { licenseControlService } from "../lib/services/license-control-service";
 import { HistorySignIn } from "./commerce-history-ui";
+import { PlatformSignIn } from "./content-catalog-controls";
 
 export async function licenseHistoryMetadata(): Promise<Metadata> {
   return {
@@ -40,6 +41,9 @@ export async function LicenseHistoryPage({
       ? `/admin/licenses/${encodeURIComponent(licenseId)}/history`
       : `/workspace/licenses/${encodeURIComponent(licenseId)}/history`;
     const returnPath = `${base}${params.size ? `?${params}` : ""}`;
+    if (moderation) {
+      return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    }
     return <HistorySignIn copy={getCommerceHistoryCopy(locale)} returnPath={returnPath} />;
   }
   let page = 1;

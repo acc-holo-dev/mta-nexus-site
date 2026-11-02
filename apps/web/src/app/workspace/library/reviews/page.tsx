@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { authEntryHref } from "../../../../components/auth-return-path";
+import { PlatformSignIn } from "../../../../components/content-catalog-controls";
 import { ResourceReviewPager } from "../../../../components/resource-review-list";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceReviewCopy, resourceReviewState } from "../../../../lib/resource-review-i18n";
@@ -36,15 +36,9 @@ export default async function Page({
   const returnPath = returnParams.size
     ? `/workspace/library/reviews?${returnParams}`
     : "/workspace/library/reviews";
-  if (!actor)
-    return (
-      <Link
-        href={authEntryHref("login", returnPath)}
-        className="rounded text-accent underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-      >
-        {copy.signIn}
-      </Link>
-    );
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
   const result = await resourceReviewService.ownPage(actor, resourceReviewPageQuery(params).page);
   return (
     <section className="mx-auto max-w-4xl space-y-5 py-8">

@@ -13,9 +13,9 @@ import { reportGroupsCopy } from "../lib/community-report-groups-copy";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
-import { authEntryHref } from "./auth-return-path";
 import { CommunityReportDetailView } from "./community-report-detail";
 import { CommunityReportList } from "./community-report-list";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -41,20 +41,16 @@ export async function CommunityReportScreen({
     : listParams.size
       ? `${base}?${listParams}`
       : base;
-  if (!actor || (staff && !can(actor, "admin.moderation")))
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={loginReturn} />;
+  }
+  if (staff && !can(actor, "admin.moderation")) {
     return (
       <div className="nexus-panel space-y-3 p-8">
-        <h1 className="text-xl font-semibold text-primary">
-          {staff ? copy.forbidden : copy.title}
-        </h1>
-        <Link
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={authEntryHref("login", loginReturn)}
-        >
-          {copy.signIn}
-        </Link>
+        <h1 className="text-xl font-semibold text-primary">{copy.forbidden}</h1>
       </div>
     );
+  }
   const title = id ? copy.detail : staff ? copy.queue : copy.title;
   const header = (
     <header>

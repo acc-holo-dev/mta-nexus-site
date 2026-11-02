@@ -20,8 +20,8 @@ import { PUBLICATION_TYPES } from "../lib/publication-feed-contract";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ContentModerationControls } from "./content-moderation-controls";
-import { authEntryHref } from "./auth-return-path";
 export async function CommunityModerationScreen({
   id,
   searchParams,
@@ -39,30 +39,36 @@ export async function CommunityModerationScreen({
       authError = true;
       return null;
     });
-  if (!actor || !can(actor, "admin.moderation"))
+  const returnPath = id ? moderationDetailHref(id) : "/admin/community";
+  if (authError) {
     return (
       <div className="nexus-panel mx-auto max-w-md space-y-3 p-6">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <p role="alert" className="text-sm text-danger">
-          {authError ? copy.unavailable : copy.denied}
+          {copy.unavailable}
         </p>
-        {!actor && !authError ? (
-          <Link
-            href={authEntryHref("login", id ? moderationDetailHref(id) : "/admin/community")}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          >
-            {copy.signIn}
-          </Link>
-        ) : authError ? (
-          <a
-            href={id ? moderationDetailHref(id) : "/admin/community"}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          >
-            {copy.reload}
-          </a>
-        ) : null}
+        <a
+          href={returnPath}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.reload}
+        </a>
       </div>
     );
+  }
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
+  if (!can(actor, "admin.moderation")) {
+    return (
+      <div className="nexus-panel mx-auto max-w-md space-y-3 p-6">
+        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+        <p role="alert" className="text-sm text-danger">
+          {copy.denied}
+        </p>
+      </div>
+    );
+  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)

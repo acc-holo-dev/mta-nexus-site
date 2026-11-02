@@ -19,8 +19,8 @@ import { moderatedDiscussionError } from "../lib/moderated-discussion-copy";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { DiscussionReportBatch } from "./discussion-report-batch";
-import { authEntryHref } from "./auth-return-path";
 export async function DiscussionReportsScreen({
   id,
   commentId,
@@ -42,23 +42,35 @@ export async function DiscussionReportsScreen({
       failure = general.unavailable;
       return null;
     });
-  if (!actor || !can(actor, "admin.moderation"))
+  if (failure) {
     return (
       <section className="nexus-panel space-y-3 p-5">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <p role="alert" className="text-danger">
-          {failure || general.denied}
+          {failure}
         </p>
-        {!actor && !failure && (
-          <Link
-            href={authEntryHref("login", path)}
-            className="inline-flex min-h-11 items-center text-accent underline"
-          >
-            {general.signIn}
-          </Link>
-        )}
+        <a
+          href={path}
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {general.reload}
+        </a>
       </section>
     );
+  }
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={path} />;
+  }
+  if (!can(actor, "admin.moderation")) {
+    return (
+      <section className="nexus-panel space-y-3 p-5">
+        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+        <p role="alert" className="text-danger">
+          {general.denied}
+        </p>
+      </section>
+    );
+  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)

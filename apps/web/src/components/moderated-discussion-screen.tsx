@@ -22,8 +22,8 @@ import {
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ModeratedDiscussionRemoval } from "./moderated-discussion-removal";
-import { authEntryHref } from "./auth-return-path";
 export async function ModeratedDiscussionScreen({
   id,
   commentId,
@@ -44,28 +44,35 @@ export async function ModeratedDiscussionScreen({
       unavailable = true;
       return null;
     });
-  if (!actor || !can(actor, "admin.moderation"))
+  if (unavailable) {
     return (
       <section className="nexus-panel space-y-3 p-5">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <p role="alert" className="text-danger">
-          {unavailable ? general.unavailable : general.denied}
+          {general.unavailable}
         </p>
-        {!actor && !unavailable && (
-          <Link
-            href={authEntryHref("login", href)}
-            className="inline-flex min-h-11 items-center text-accent underline"
-          >
-            {general.signIn}
-          </Link>
-        )}
-        {unavailable && (
-          <a href={href} className="inline-flex min-h-11 items-center text-accent underline">
-            {general.reload}
-          </a>
-        )}
+        <a
+          href={href}
+          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {general.reload}
+        </a>
       </section>
     );
+  }
+  if (!actor) {
+    return <PlatformSignIn locale={locale} returnPath={href} />;
+  }
+  if (!can(actor, "admin.moderation")) {
+    return (
+      <section className="nexus-panel space-y-3 p-5">
+        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+        <p role="alert" className="text-danger">
+          {general.denied}
+        </p>
+      </section>
+    );
+  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
