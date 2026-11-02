@@ -11,7 +11,10 @@ const state = vi.hoisted(() => ({
   feed: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+  usePathname: () => "/workspace/content",
+}));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
@@ -232,9 +235,10 @@ it.each(["en", "ru"] as const)(
 it("distinguishes auth, unavailable and forbidden-target errors from empty histories", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH_DETAILS"));
   const desk = renderToStaticMarkup(await Desk({}));
-  expect(desk).toContain('role="alert"');
+  expect(desk).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent"');
   expect(desk).not.toContain("PRIVATE_AUTH_DETAILS");
   expect(desk).not.toContain(authorPublicationDeskCopy("en").empty);
+  expect(desk).not.toContain(authorPublicationDeskCopy("en").title);
   state.history.mockRejectedValueOnce(new AppError("PRIVATE_TITLE", 404, "NOT_FOUND"));
   const history = renderToStaticMarkup(
     await History({ params: Promise.resolve({ id: "article" }) }),
