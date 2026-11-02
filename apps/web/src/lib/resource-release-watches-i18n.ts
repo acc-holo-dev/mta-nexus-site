@@ -1,4 +1,5 @@
 import type { Locale } from "./i18n";
+
 const en = {
   title: "Release notifications",
   resumeTitle: "Resume stopped release watches",
@@ -28,6 +29,10 @@ const en = {
   pendingNote: "The result is unconfirmed. Retry the same selection or reload before changing it.",
   watch: "Notify me about new versions",
   unwatch: "Stop release notifications",
+  stopConfirmTitle: "Stop release notifications?",
+  stopConfirm:
+    "Future release notices for this resource stop. Existing inbox notices stay. You can turn notifications back on later if the resource is still available.",
+  cancel: "Cancel",
   enabled: "Enabled",
   disabled: "Disabled",
   unavailable: "Currently unavailable",
@@ -97,6 +102,10 @@ const ru: typeof en = {
     "Результат не подтверждён. Повторите тот же выбор или обновите состояние перед изменением.",
   watch: "Сообщать о новых версиях",
   unwatch: "Отключить уведомления о версиях",
+  stopConfirmTitle: "Отключить уведомления о версиях?",
+  stopConfirm:
+    "Новые уведомления об этом ресурсе прекратятся. Уже полученные сообщения останутся. Уведомления можно включить снова, если ресурс ещё доступен.",
+  cancel: "Отмена",
   enabled: "Включены",
   disabled: "Отключены",
   unavailable: "Сейчас недоступно",

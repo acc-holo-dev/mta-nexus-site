@@ -32,6 +32,8 @@ vi.mock("react", async (original) => ({
   },
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
@@ -88,6 +90,7 @@ beforeEach(() => {
     updatedAt: new Date("2026-10-12T00:00:00.000Z"),
   };
   vi.clearAllMocks();
+  confirmAction.mockResolvedValue(true);
   vi.stubGlobal("fetch", h.fetch);
   vi.stubGlobal("window", { location: { reload: h.reload } });
 });
@@ -172,6 +175,23 @@ it("aborts on unmount and ignores a late success", async () => {
   resolve({ ok: true, status: 200, json: async () => ack });
   await pending;
   expect(h.refresh).not.toHaveBeenCalled();
+});
+it("does not stop notifications when confirmation is cancelled", async () => {
+  watch = { ...watch, enabled: true };
+  confirmAction.mockResolvedValueOnce(false);
+  const copy = resourceReleaseWatchesCopy("en");
+  await click(copy.unwatch);
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.stopConfirmTitle,
+    object: copy.title,
+    consequences: copy.stopConfirm,
+    confirmLabel: copy.unwatch,
+    cancelLabel: copy.cancel,
+    closeLabel: copy.cancel,
+    danger: false,
+  });
+  expect(h.fetch).not.toHaveBeenCalled();
+  expect(button(copy.unwatch).props.disabled).toBe(false);
 });
 it("allows an unavailable enabled resource to be stopped", async () => {
   available = false;

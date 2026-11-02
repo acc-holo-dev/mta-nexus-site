@@ -8,6 +8,7 @@ import { getDictionary } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
 
@@ -81,6 +82,20 @@ export function ResourceReleaseWatchControl({
     )
       return;
     if (!frozen.current && !watch.enabled && !canToggle) return;
+    if (
+      !frozen.current &&
+      watch.enabled &&
+      !(await confirmAction({
+        title: copy.stopConfirmTitle,
+        object: copy.title,
+        consequences: copy.stopConfirm,
+        confirmLabel: copy.unwatch,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: false,
+      }))
+    )
+      return;
     const request = frozen.current ?? {
       productId: watch.productId,
       command: { enabled: !watch.enabled, expectedRevision: watch.revision },
