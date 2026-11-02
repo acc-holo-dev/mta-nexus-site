@@ -1,6 +1,8 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en",
@@ -11,6 +13,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/library/collections/lcol_a/releases",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -26,7 +29,9 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
     </button>
   ),
 }));
+
 import { CollectionReleasesScreen } from "../apps/web/src/components/collection-releases-screen";
+
 const item = {
   productId: "prd_a",
   hasAccess: true,
@@ -127,7 +132,7 @@ it("keeps archived collections inspectable without batch mutation navigation", a
 it("requires authentication, strict query controls and current ownership", async () => {
   h.actor = null;
   const guest = await screen();
-  expect(guest).toContain("Sign in to manage your collections");
+  expect(guest).toContain(getDictionary("en").workspace.signInRequired);
   expect(guest).toContain("/auth/login?next=");
   expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Freleases");
   expect(h.releases).not.toHaveBeenCalled();

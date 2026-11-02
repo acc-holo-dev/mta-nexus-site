@@ -15,7 +15,7 @@ import {
   type ServerStatisticsResult,
   serverStatisticsService,
 } from "../lib/services/server-statistics-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
 
 export async function serverStatisticsMetadata(): Promise<Metadata> {
@@ -72,17 +72,7 @@ export async function ServerStatisticsPage({
       else if (value !== undefined) returnParams.append(key, value);
     }
     const returnPath = returnParams.size ? `${path}?${returnParams}` : path;
-    return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <h1 className="text-xl font-bold text-primary">{copy.signIn}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="inline-block min-h-11 rounded-lg bg-accent-soft px-4 py-2 text-accent"
-        >
-          {copy.signInAction}
-        </Link>
-      </div>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(searchParams))

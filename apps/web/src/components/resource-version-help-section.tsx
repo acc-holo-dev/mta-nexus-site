@@ -139,7 +139,10 @@ export function ResourceVersionHelpSection({
         <h3 className="text-sm font-semibold text-primary">{copy.sections.support}</h3>
         <p className="text-sm text-secondary">{copy.supportBody}</p>
         <div className="flex flex-wrap gap-3 text-sm">
-          <Link href={`#${qaAnchorId}`} className="font-semibold text-accent hover:underline">
+          <Link
+            href={`#${qaAnchorId}`}
+            className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
             {copy.openQa}
           </Link>
           {supportContext ? (

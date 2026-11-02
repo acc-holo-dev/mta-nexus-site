@@ -151,15 +151,18 @@ export default async function Page({
           {h.export}
         </a>
         {!result.items.length && (
-          <div className="space-y-3">
-            <EmptyState title={h.empty} description={h.note} />
-            <Link
-              href="/workspace/library/collections/history"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {h.clear}
-            </Link>
-          </div>
+          <EmptyState
+            title={h.empty}
+            description={h.note}
+            action={
+              <Link
+                href="/workspace/library/collections/history"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {h.clear}
+              </Link>
+            }
+          />
         )}
         <ol className="space-y-4">
           {result.items.map((item) => {

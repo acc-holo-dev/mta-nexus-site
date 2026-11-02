@@ -55,7 +55,12 @@ vi.mock("@nexus/ui", () => ({
       {label}: {value}
     </p>
   ),
-  EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+  EmptyState: ({ title, action }: { title: string; action?: React.ReactNode }) => (
+    <div>
+      <p>{title}</p>
+      {action}
+    </div>
+  ),
 }));
 
 import Page, { generateMetadata } from "./page";
@@ -158,6 +163,7 @@ it("does not offer navigation for an empty portfolio", async () => {
   const html = renderToStaticMarkup(await Page(params()));
   expect(html).not.toContain('rel="next"');
   expect(html).not.toContain('rel="prev"');
+  expect(html).toContain('href="/market?maxPrice=0"');
 });
 it("hides personal activity links without hiding published resources", async () => {
   state.showActivity = false;

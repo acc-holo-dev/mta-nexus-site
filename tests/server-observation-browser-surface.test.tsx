@@ -16,6 +16,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/servers/server/observations",
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
@@ -31,6 +32,7 @@ import {
   serverObservationBrowserMetadata,
 } from "../apps/web/src/components/server-observation-browser-page";
 import { ServerObservationPeriodControls } from "../apps/web/src/components/server-observation-period-controls";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -127,7 +129,9 @@ it("omits adjacent links beyond the current time and ninety-day bound", () => {
 });
 it("requires session identity for managed queries and distinguishes session failures", async () => {
   state.session.mockResolvedValueOnce(null);
-  expect(renderToStaticMarkup(await page({}, true))).toContain("Войдите");
+  expect(renderToStaticMarkup(await page({}, true))).toContain(
+    getDictionary("ru").workspace.signInRequired,
+  );
   expect(state.read).not.toHaveBeenCalled();
   state.session.mockRejectedValueOnce(new Error("PRIVATE_AUTH"));
   const failed = renderToStaticMarkup(await page({}, true));

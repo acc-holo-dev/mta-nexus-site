@@ -4,10 +4,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `adc7a459b3c8c776e4cbe1e2a3ba8abd528ce44f` (`fix(web): restore history labels and Pathname mocks after PlatformSignIn`).
-- **Verified CI green on that tip:** [CI 41459069936](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41459069936) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `6387f3b08d815707d523017617ed0e257c6886db` (`fix(web): harden acquire loading a11y and moderation focus`).
+- **Verified CI green on that tip:** [CI 41460783639](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41460783639) (lint/unit/db/image + production browser smoke selected).
+- **Prior selected green:** `adc7a459…` / [CI 41459069936](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41459069936).
 - **Prior selected green:** `449f35e9…` / [CI 41454707659](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41454707659).
-- **Prior selected green:** `2d743439…` / [CI 41447511410](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41447511410).
 - **Failed tip (not baseline):** `8a06c6ce…` settings guest unit; `1b6dce50…` history labels/Pathname (fixed on `adc7a459`).
 - **Prior full selected-scope green (incl. resource-browser):** `0a034c84…` / [CI 41399812125](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41399812125).
 - **Failed tip (not baseline):** `7cd137da…` format; `4565dd8f…` compare base; `c32a4ef6…` admin guest unit contracts (fixed on `e7892ceb`).
@@ -37,11 +37,11 @@
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** tip `adc7a459…` selected green (CI 41459069936); HistorySignIn unified; continue residual a11y/empty polish.
+**Последняя локальная волна:** tip `6387f3b0…` selected green (CI 41460783639); acquire/moderation a11y shipped; continue residual free-beta polish.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; tip `adc7a459…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 в `main`; tip `6387f3b0…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.

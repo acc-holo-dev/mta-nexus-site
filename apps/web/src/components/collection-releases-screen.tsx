@@ -15,7 +15,7 @@ import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ResourceDownloadButton } from "./resource-download-button";
 export async function CollectionReleasesScreen({
   params,
@@ -45,17 +45,7 @@ export async function CollectionReleasesScreen({
     } catch {
       // Keep the releases route when filters are invalid for guests.
     }
-    return (
-      <section className="space-y-4 py-16 text-center">
-        <h1 className="font-display text-primary">{cc.signInRequired}</h1>
-        <Link
-          href={authEntryHref("login", returnPath)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {cc.signIn}
-        </Link>
-      </section>
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let query: ReturnType<typeof collectionReleasesQuery>;
   try {

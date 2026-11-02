@@ -23,7 +23,7 @@ import {
   serverStatisticsService,
 } from "../lib/services/server-statistics-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { authEntryHref } from "./auth-return-path";
+import { PlatformSignIn } from "./content-catalog-controls";
 import { ServerObservationPeriodControls } from "./server-observation-period-controls";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
 export async function serverObservationBrowserMetadata() {
@@ -74,18 +74,15 @@ export async function ServerObservationBrowserPage({
   } catch {
     return failure(copy.unavailable);
   }
-  if (managed && !actor)
-    return (
-      <div className="nexus-panel space-y-3 p-5">
-        <h1 className="text-xl font-bold text-primary">{copy.signIn}</h1>
-        <Link
-          href={authEntryHref("login", path)}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {stats.signInAction}
-        </Link>
-      </div>
-    );
+  if (managed && !actor) {
+    const returnParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(searchParams)) {
+      if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+      else if (value !== undefined) returnParams.append(key, value);
+    }
+    const returnPath = returnParams.size ? `${path}?${returnParams}` : path;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(searchParams))
     for (const item of Array.isArray(value) ? value : value === undefined ? [] : [value])

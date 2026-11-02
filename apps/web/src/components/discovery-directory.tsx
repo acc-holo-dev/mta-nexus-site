@@ -251,6 +251,23 @@ export async function DirectoryResults({
           <EmptyState
             title={copy.empty}
             description={hasActiveDiscoverFilters(state) ? copy.emptyFiltered : copy.emptyHint}
+            action={
+              hasActiveDiscoverFilters(state) ? (
+                <Link
+                  href={discoverHref({ type: state.type }, path)}
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {copy.reset}
+                </Link>
+              ) : (
+                <Link
+                  href="/market?maxPrice=0"
+                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {getDictionary(locale).home.browseResources}
+                </Link>
+              )
+            }
           />
           {hasActiveDiscoverFilters(state) && (
             <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">

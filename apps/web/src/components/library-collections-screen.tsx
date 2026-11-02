@@ -646,7 +646,7 @@ export async function LibraryCollectionsScreen({
           {c.items}: {result.total} · {c.ready}: {result.ready}
         </p>
         {!result.items.length && (
-          <div className="space-y-3 text-sm text-muted" role="status">
+          <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
             <p>{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
             {result.q && (
               <Link

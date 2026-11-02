@@ -101,7 +101,7 @@ export function SupportMessageBrowser({
         {copy.snapshot}: <time dateTime={page.until}>{date(page.until)} UTC</time>
       </p>
       {page.items.length === 0 ? (
-        <div role="status" className="nexus-panel space-y-3 p-5 text-muted">
+        <div role="status" aria-live="polite" className="nexus-panel space-y-3 p-5 text-muted">
           <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
           {filtered ? (
             <Link

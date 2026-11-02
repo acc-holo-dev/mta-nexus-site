@@ -16,6 +16,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
   },
+  usePathname: () => "/workspace/servers/server/statistics",
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -31,6 +32,7 @@ import {
   serverStatisticsMetadata,
 } from "../apps/web/src/components/server-statistics-page";
 import { ServerStatisticsPanel } from "../apps/web/src/components/server-statistics-panel";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 beforeEach(() => {
   state.locale = "ru";
@@ -104,7 +106,7 @@ it("gates private pages before reading statistics and passes only session-bound 
   const html = renderToStaticMarkup(
     await ServerStatisticsPage({ target: { id: "server" }, managed: true, searchParams: {} }),
   );
-  expect(html).toContain("Войдите");
+  expect(html).toContain(getDictionary("ru").workspace.signInRequired);
   expect(html).toContain('href="/auth/login?next=%2Fworkspace%2Fservers%2Fserver%2Fstatistics"');
   expect(state.read).not.toHaveBeenCalled();
   state.session.mockResolvedValue({ id: "manager", role: "admin" });

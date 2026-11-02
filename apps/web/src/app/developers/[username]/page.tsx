@@ -142,7 +142,18 @@ export default async function DeveloperProfilePage({
             ))}
           </div>
         ) : (
-          <EmptyState title={copy.noReleases} description={copy.bioFallback} />
+          <EmptyState
+            title={copy.noReleases}
+            description={copy.bioFallback}
+            action={
+              <Link
+                href="/market?maxPrice=0"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.home.browseResources}
+              </Link>
+            }
+          />
         )}
         <ProfileResourcePagination
           basePath={profilePath}

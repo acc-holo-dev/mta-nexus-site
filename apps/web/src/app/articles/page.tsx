@@ -6,6 +6,7 @@ import {
   ContentCatalogControls,
   ContentPageNavigation,
 } from "../../components/content-catalog-controls";
+import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { contentService } from "../../lib/services/content-service";
@@ -76,23 +77,30 @@ export default async function ArticlesPage({
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
-          <EmptyState
-            title={filtersActive ? dictionary.articles.emptyFiltered : dictionary.articles.empty}
-            description={
-              filtersActive ? dictionary.articles.clearFilters : dictionary.home.updatesDescription
-            }
-            icon={<BookOpen className="h-6 w-6" />}
-          />
-          {filtersActive ? (
-            <Link
-              href="/articles"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.articles.clearFilters}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={filtersActive ? dictionary.articles.emptyFiltered : dictionary.articles.empty}
+          description={
+            filtersActive ? dictionary.articles.clearFilters : dictionary.home.updatesDescription
+          }
+          icon={<BookOpen className="h-6 w-6" />}
+          action={
+            filtersActive ? (
+              <Link
+                href="/articles"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.articles.clearFilters}
+              </Link>
+            ) : (
+              <Link
+                href="/discover/stream"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {discoveryStreamCopy(locale).title}
+              </Link>
+            )
+          }
+        />
       )}
       {result && (
         <ContentPageNavigation

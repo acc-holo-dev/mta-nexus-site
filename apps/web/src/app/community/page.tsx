@@ -44,7 +44,7 @@ export default async function CommunityPage({
         </div>
         <Link
           href="/community/new"
-          className="inline-flex self-start items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] sm:self-auto"
+          className="inline-flex self-start items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] sm:self-auto"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           {copy.newTopic}
@@ -109,7 +109,7 @@ export default async function CommunityPage({
           action={
             <Link
               href="/community/new"
-              className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white"
+              className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
             >
               {copy.newTopic}
             </Link>
