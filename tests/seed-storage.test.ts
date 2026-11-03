@@ -1,11 +1,16 @@
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const fixture = vi.hoisted(() => ({
-  config: { NODE_ENV: "test", STORAGE_PROVIDER: "local", STORAGE_LOCAL_PATH: "" },
+  config: {
+    NODE_ENV: "test",
+    DATABASE_URL: "postgres://nexus:test@127.0.0.1:5432/mta_nexus_test",
+    STORAGE_PROVIDER: "local",
+    STORAGE_LOCAL_PATH: "",
+  },
   persist: vi.fn(async (_data: unknown, _options: unknown) => ({
     inserted: 13,
     repairedBuilds: 0,
@@ -14,6 +19,7 @@ const fixture = vi.hoisted(() => ({
 vi.mock("@nexus/config", () => ({ config: fixture.config }));
 vi.mock("@nexus/security", () => ({ hashPassword: async () => "test-only-hash" }));
 vi.mock("../packages/db/src/seed-baseline", () => ({ seedBaseline: fixture.persist }));
+
 import { runSeed } from "../packages/db/src/seed";
 
 let root: string;
@@ -28,7 +34,7 @@ afterEach(async () => {
 });
 
 it("creates a build whose metadata matches the actual downloadable archive", async () => {
-  await runSeed();
+  await runSeed({}, { NEXUS_DEMO_SEED_ACK: "development-only" });
   const data = fixture.persist.mock.calls[0][0] as {
     builds: {
       storageKey: string;
@@ -47,8 +53,16 @@ it("creates a build whose metadata matches the actual downloadable archive", asy
   expect(fixture.persist).toHaveBeenCalledOnce();
 });
 
+it("rejects a missing acknowledgement before storage or repository mutation", async () => {
+  await expect(runSeed({}, {})).rejects.toThrow("NEXUS_DEMO_SEED_ACK=development-only");
+  expect(fixture.persist).not.toHaveBeenCalled();
+  expect(await readdir(root)).toEqual([]);
+});
+
 it("rejects production before any repository mutation", async () => {
   fixture.config.NODE_ENV = "production";
-  await expect(runSeed()).rejects.toThrow("disabled in production");
+  await expect(runSeed({}, { NEXUS_DEMO_SEED_ACK: "development-only" })).rejects.toThrow(
+    "disabled in production",
+  );
   expect(fixture.persist).not.toHaveBeenCalled();
 });

@@ -926,13 +926,24 @@ unreviewed migration. Run `pnpm db:migrate` before the updated application.
 Development baseline commands (shared absolute local storage required):
 
 ```bash
-docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
-docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
+docker compose -p nexus-local -f compose.yaml exec \
+  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
+docker compose -p nexus-local -f compose.yaml exec \
+  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
 # Only after inspecting a reported legacy demo metadata mismatch:
-docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair
+docker compose -p nexus-local -f compose.yaml exec \
+  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:repair
 # Optional cleanup for exact old Unsplash/DiceBear values written by the seed:
-docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair-media
+docker compose -p nexus-local -f compose.yaml exec \
+  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:repair-media
+# Optional additive one-year history for local UI testing:
+docker compose -p nexus-local -f compose.yaml exec \
+  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:historical
 ```
+
+Every seed command fails before storage or database mutation when `NODE_ENV=production` or
+when the exact development-only acknowledgement is absent. Do not persist this acknowledgement
+in production configuration.
 
 The second normal run should report zero insertions and zero repairs. Changed
 passwords, roles, product descriptions and build moderation states stay intact.

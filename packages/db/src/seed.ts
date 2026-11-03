@@ -2,10 +2,15 @@ import { pathToFileURL } from "node:url";
 import { config } from "@nexus/config";
 import { hashPassword } from "@nexus/security";
 import { ensureSeedArchives } from "./seed-archive";
+import { type SeedOptions, seedBaseline } from "./seed-baseline";
 import { createSeedData } from "./seed-data";
-import { seedBaseline, type SeedOptions } from "./seed-baseline";
+import { assertDevelopmentSeedAllowed } from "./seed-safety";
 
-export async function runSeed(options: SeedOptions = {}) {
+export async function runSeed(
+  options: SeedOptions = {},
+  environment: Record<string, string | undefined> = process.env,
+) {
+  assertDevelopmentSeedAllowed(config, environment);
   const archives = await ensureSeedArchives(config);
   const passwordHash = await hashPassword("password123");
   const result = await seedBaseline(createSeedData(passwordHash, archives), options);

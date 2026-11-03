@@ -1,8 +1,13 @@
 import { pathToFileURL } from "node:url";
+import { config } from "@nexus/config";
 import { hashPassword } from "@nexus/security";
 import { seedHistorical } from "./historical-seed";
+import { assertDevelopmentSeedAllowed } from "./seed-safety";
 
-export async function runHistoricalSeed() {
+export async function runHistoricalSeed(
+  environment: Record<string, string | undefined> = process.env,
+) {
+  assertDevelopmentSeedAllowed(config, environment);
   const passwordHash = await hashPassword("password123");
   const result = await seedHistorical({ passwordHash });
   console.log("Historical seed completed:", result);

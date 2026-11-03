@@ -10,6 +10,7 @@
     "generate:custom": "node scripts/guard-db-generate.mjs --custom",
     "migrate": "tsx src/migrate.ts",
     "seed": "tsx src/seed.ts",
+    "seed:historical": "tsx src/seed-historical.ts",
     "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts",
     "resource:notify": "tsx scripts/run-resource-release-worker.ts",
     "license:maintain": "tsx scripts/run-license-maintenance.ts",

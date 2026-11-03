@@ -28,6 +28,7 @@
     "db:generate": "pnpm --filter @nexus/db generate",
     "db:migrate": "pnpm --filter @nexus/db migrate",
     "db:seed": "pnpm --filter @nexus/db seed",
+    "db:seed:historical": "pnpm --filter @nexus/db seed:historical",
     "format": "biome format . --write",
     "format:check": "biome format .",
     "format:push": "pnpm format && pnpm format:check",
