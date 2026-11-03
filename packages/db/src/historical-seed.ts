@@ -31,7 +31,7 @@ export interface HistoricalSeedOptions {
   passwordHash: string;
 }
 
-export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions) {
+function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions) {
   const userRows = [
     {
       id: "usr_tester_01",
@@ -79,7 +79,8 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
       id: "srv_growth_01",
       name: "MTA Test Arena",
       slug: "mta-test-arena",
-      description: "Открытая площадка для тестирования ресурсов и режимов MTA без риска для основного прогресса.",
+      description:
+        "Открытая площадка для тестирования ресурсов и режимов MTA без риска для основного прогресса.",
       mediaUrls: [],
       language: "ru",
       region: "EU",
@@ -104,7 +105,8 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
       id: "srv_growth_02",
       name: "Nexus Beta Hub",
       slug: "nexus-beta-hub",
-      description: "Тестовый сервер сообщества NEXUS для проверки бета-функций платформы и новых ресурсов.",
+      description:
+        "Тестовый сервер сообщества NEXUS для проверки бета-функций платформы и новых ресурсов.",
       mediaUrls: [],
       language: "ru",
       region: "EU",
@@ -160,8 +162,7 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
       id: "cnt_recap_2025",
       title: "Итоги года на NEXUS: что произошло в 2025",
       slug: "nexus-2025-recap",
-      body:
-        "2025 год стал для NEXUS годом роста. Мы запустили публичный каталог ресурсов, подключили первые организации и добавили проверку сборок сканером безопасности. За год платформа пережила три крупных миграции схемы и выдержала два пиковых дня с более чем десятью тысячами скачиваний.\n\nОсновные события года: открытие торговой витрины в марте, запуск лицензий в апреле, релиз Inventory Pro 3.2.0 в июне и Physics Pack 2.1.4 осенью. Комьюнити выросло: тестировщики и обозреватели помогли довести десятки бета-ресурсов до публикации.\n\nСпасибо всем, кто был с нами в 2025 году. Впереди — библиотека коллекций, история релизов и ещё больше инструментов для владельцев серверов.",
+      body: "2025 год стал для NEXUS годом роста. Мы запустили публичный каталог ресурсов, подключили первые организации и добавили проверку сборок сканером безопасности. За год платформа пережила три крупных миграции схемы и выдержала два пиковых дня с более чем десятью тысячами скачиваний.\n\nОсновные события года: открытие торговой витрины в марте, запуск лицензий в апреле, релиз Inventory Pro 3.2.0 в июне и Physics Pack 2.1.4 осенью. Комьюнити выросло: тестировщики и обозреватели помогли довести десятки бета-ресурсов до публикации.\n\nСпасибо всем, кто был с нами в 2025 году. Впереди — библиотека коллекций, история релизов и ещё больше инструментов для владельцев серверов.",
       excerpt: "Короткий обзор главных событий платформы за 2025 год.",
       type: "article",
       authorId: "usr_admin_001",
@@ -178,8 +179,7 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
       id: "cnt_roadmap_2026",
       title: "Дорожная карта NEXUS на 2026 год",
       slug: "nexus-2026-roadmap",
-      body:
-        "В 2026 году мы сосредоточимся на четырёх направлениях: библиотека коллекций с общим доступом, прозрачная история релизов, торговая витрина с проверенными продавцами и расширенный мониторинг серверов.\n\nУже доступно: сравнение коллекций, копирование элементов и экспорт истории. До лета планируем запустить автоматические релиз-вотчи и уведомления о новых сборках.\n\nКак всегда, пишите предложения в разделе вопросов — дорожная карта обновляется каждый квартал.",
+      body: "В 2026 году мы сосредоточимся на четырёх направлениях: библиотека коллекций с общим доступом, прозрачная история релизов, торговая витрина с проверенными продавцами и расширенный мониторинг серверов.\n\nУже доступно: сравнение коллекций, копирование элементов и экспорт истории. До лета планируем запустить автоматические релиз-вотчи и уведомления о новых сборках.\n\nКак всегда, пишите предложения в разделе вопросов — дорожная карта обновляется каждый квартал.",
       excerpt: "Планы платформы: библиотеки, торговая площадка и мониторинг серверов.",
       type: "article",
       authorId: "usr_admin_001",
@@ -195,27 +195,153 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
   ] satisfies (typeof content.$inferInsert)[];
 
   const followRows = [
-    { id: "flw_player_dev_01", followerId: "usr_player_001", targetType: "user", targetId: "usr_dev_001", createdAt: d("2025-08-01T12:00:00Z") },
-    { id: "flw_player_inv_01", followerId: "usr_player_001", targetType: "product", targetId: "prd_inv_pro", createdAt: d("2025-08-02T12:00:00Z") },
-    { id: "flw_player_drift_01", followerId: "usr_player_001", targetType: "product", targetId: "prd_drift_physics", createdAt: d("2025-10-20T12:00:00Z") },
-    { id: "flw_player_ui_01", followerId: "usr_player_001", targetType: "product", targetId: "prd_beta_ui", createdAt: d("2026-04-02T12:00:00Z") },
-    { id: "flw_player_driftsrv_01", followerId: "usr_player_001", targetType: "server", targetId: "srv_drift_01", createdAt: d("2025-08-05T12:00:00Z") },
-    { id: "flw_player_rpsrv_01", followerId: "usr_player_001", targetType: "server", targetId: "srv_horizon_rp", createdAt: d("2026-03-12T12:00:00Z") },
-    { id: "flw_player_arena_01", followerId: "usr_player_001", targetType: "server", targetId: "srv_growth_01", createdAt: d("2026-08-02T12:00:00Z") },
-    { id: "flw_player_art_01", followerId: "usr_player_001", targetType: "content", targetId: "cnt_art_001", createdAt: d("2025-06-01T12:00:00Z") },
-    { id: "flw_tester1_ui_01", followerId: "usr_tester_01", targetType: "product", targetId: "prd_beta_ui", createdAt: d("2026-04-05T12:00:00Z") },
-    { id: "flw_tester1_driftsrv_01", followerId: "usr_tester_01", targetType: "server", targetId: "srv_drift_01", createdAt: d("2026-01-20T12:00:00Z") },
-    { id: "flw_tester1_arena_01", followerId: "usr_tester_01", targetType: "server", targetId: "srv_growth_01", createdAt: d("2025-09-01T12:00:00Z") },
-    { id: "flw_tester1_srvuser_01", followerId: "usr_tester_01", targetType: "user", targetId: "usr_server_001", createdAt: d("2025-09-02T12:00:00Z") },
-    { id: "flw_tester1_art_01", followerId: "usr_tester_01", targetType: "content", targetId: "cnt_art_001", createdAt: d("2025-06-02T12:00:00Z") },
-    { id: "flw_tester2_inv_01", followerId: "usr_tester_02", targetType: "product", targetId: "prd_inv_pro", createdAt: d("2025-10-10T12:00:00Z") },
-    { id: "flw_tester2_rp_01", followerId: "usr_tester_02", targetType: "server", targetId: "srv_horizon_rp", createdAt: d("2026-03-15T12:00:00Z") },
-    { id: "flw_tester2_admin_01", followerId: "usr_tester_02", targetType: "user", targetId: "usr_admin_001", createdAt: d("2026-06-01T12:00:00Z") },
-    { id: "flw_reviewer_drift_01", followerId: "usr_reviewer_01", targetType: "product", targetId: "prd_drift_physics", createdAt: d("2025-11-05T12:00:00Z") },
-    { id: "flw_reviewer_driftsrv_01", followerId: "usr_reviewer_01", targetType: "server", targetId: "srv_drift_01", createdAt: d("2025-11-06T12:00:00Z") },
-    { id: "flw_reviewer_dev_01", followerId: "usr_reviewer_01", targetType: "user", targetId: "usr_dev_001", createdAt: d("2026-01-10T12:00:00Z") },
-    { id: "flw_srvowner_inv_01", followerId: "usr_server_001", targetType: "product", targetId: "prd_inv_pro", createdAt: d("2025-08-10T12:00:00Z") },
-    { id: "flw_dev_rp_01", followerId: "usr_dev_001", targetType: "server", targetId: "srv_horizon_rp", createdAt: d("2026-02-01T12:00:00Z") },
+    {
+      id: "flw_player_dev_01",
+      followerId: "usr_player_001",
+      targetType: "user",
+      targetId: "usr_dev_001",
+      createdAt: d("2025-08-01T12:00:00Z"),
+    },
+    {
+      id: "flw_player_inv_01",
+      followerId: "usr_player_001",
+      targetType: "product",
+      targetId: "prd_inv_pro",
+      createdAt: d("2025-08-02T12:00:00Z"),
+    },
+    {
+      id: "flw_player_drift_01",
+      followerId: "usr_player_001",
+      targetType: "product",
+      targetId: "prd_drift_physics",
+      createdAt: d("2025-10-20T12:00:00Z"),
+    },
+    {
+      id: "flw_player_ui_01",
+      followerId: "usr_player_001",
+      targetType: "product",
+      targetId: "prd_beta_ui",
+      createdAt: d("2026-04-02T12:00:00Z"),
+    },
+    {
+      id: "flw_player_driftsrv_01",
+      followerId: "usr_player_001",
+      targetType: "server",
+      targetId: "srv_drift_01",
+      createdAt: d("2025-08-05T12:00:00Z"),
+    },
+    {
+      id: "flw_player_rpsrv_01",
+      followerId: "usr_player_001",
+      targetType: "server",
+      targetId: "srv_horizon_rp",
+      createdAt: d("2026-03-12T12:00:00Z"),
+    },
+    {
+      id: "flw_player_arena_01",
+      followerId: "usr_player_001",
+      targetType: "server",
+      targetId: "srv_growth_01",
+      createdAt: d("2026-08-02T12:00:00Z"),
+    },
+    {
+      id: "flw_player_art_01",
+      followerId: "usr_player_001",
+      targetType: "content",
+      targetId: "cnt_art_001",
+      createdAt: d("2025-06-01T12:00:00Z"),
+    },
+    {
+      id: "flw_tester1_ui_01",
+      followerId: "usr_tester_01",
+      targetType: "product",
+      targetId: "prd_beta_ui",
+      createdAt: d("2026-04-05T12:00:00Z"),
+    },
+    {
+      id: "flw_tester1_driftsrv_01",
+      followerId: "usr_tester_01",
+      targetType: "server",
+      targetId: "srv_drift_01",
+      createdAt: d("2026-01-20T12:00:00Z"),
+    },
+    {
+      id: "flw_tester1_arena_01",
+      followerId: "usr_tester_01",
+      targetType: "server",
+      targetId: "srv_growth_01",
+      createdAt: d("2025-09-01T12:00:00Z"),
+    },
+    {
+      id: "flw_tester1_srvuser_01",
+      followerId: "usr_tester_01",
+      targetType: "user",
+      targetId: "usr_server_001",
+      createdAt: d("2025-09-02T12:00:00Z"),
+    },
+    {
+      id: "flw_tester1_art_01",
+      followerId: "usr_tester_01",
+      targetType: "content",
+      targetId: "cnt_art_001",
+      createdAt: d("2025-06-02T12:00:00Z"),
+    },
+    {
+      id: "flw_tester2_inv_01",
+      followerId: "usr_tester_02",
+      targetType: "product",
+      targetId: "prd_inv_pro",
+      createdAt: d("2025-10-10T12:00:00Z"),
+    },
+    {
+      id: "flw_tester2_rp_01",
+      followerId: "usr_tester_02",
+      targetType: "server",
+      targetId: "srv_horizon_rp",
+      createdAt: d("2026-03-15T12:00:00Z"),
+    },
+    {
+      id: "flw_tester2_admin_01",
+      followerId: "usr_tester_02",
+      targetType: "user",
+      targetId: "usr_admin_001",
+      createdAt: d("2026-06-01T12:00:00Z"),
+    },
+    {
+      id: "flw_reviewer_drift_01",
+      followerId: "usr_reviewer_01",
+      targetType: "product",
+      targetId: "prd_drift_physics",
+      createdAt: d("2025-11-05T12:00:00Z"),
+    },
+    {
+      id: "flw_reviewer_driftsrv_01",
+      followerId: "usr_reviewer_01",
+      targetType: "server",
+      targetId: "srv_drift_01",
+      createdAt: d("2025-11-06T12:00:00Z"),
+    },
+    {
+      id: "flw_reviewer_dev_01",
+      followerId: "usr_reviewer_01",
+      targetType: "user",
+      targetId: "usr_dev_001",
+      createdAt: d("2026-01-10T12:00:00Z"),
+    },
+    {
+      id: "flw_srvowner_inv_01",
+      followerId: "usr_server_001",
+      targetType: "product",
+      targetId: "prd_inv_pro",
+      createdAt: d("2025-08-10T12:00:00Z"),
+    },
+    {
+      id: "flw_dev_rp_01",
+      followerId: "usr_dev_001",
+      targetType: "server",
+      targetId: "srv_horizon_rp",
+      createdAt: d("2026-02-01T12:00:00Z"),
+    },
   ] satisfies (typeof follows.$inferInsert)[];
 
   const serverReviewRows = [
@@ -437,12 +563,54 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
   ] satisfies (typeof resourceQaThreadFollows.$inferInsert)[];
 
   const reactionRows = [
-    { id: "rct_player_inv_fire", userId: "usr_player_001", targetType: "product", targetId: "prd_inv_pro", emoji: "🔥", createdAt: d("2026-06-02T12:10:00Z") },
-    { id: "rct_tester1_ui_heart", userId: "usr_tester_01", targetType: "product", targetId: "prd_beta_ui", emoji: "❤️", createdAt: d("2026-07-12T16:50:00Z") },
-    { id: "rct_tester2_art_thumb", userId: "usr_tester_02", targetType: "content", targetId: "cnt_art_001", emoji: "👍", createdAt: d("2026-02-14T10:00:00Z") },
-    { id: "rct_reviewer_inv_party", userId: "usr_reviewer_01", targetType: "product", targetId: "prd_inv_pro", emoji: "🎉", createdAt: d("2026-06-02T11:25:00Z") },
-    { id: "rct_owner_dev_handshake", userId: "usr_server_001", targetType: "user", targetId: "usr_dev_001", emoji: "🤝", createdAt: d("2025-10-05T12:00:00Z") },
-    { id: "rct_player_reply_smile", userId: "usr_player_001", targetType: "comment", targetId: "cmt_cnt_003", emoji: "😄", createdAt: d("2025-06-23T10:00:00Z") },
+    {
+      id: "rct_player_inv_fire",
+      userId: "usr_player_001",
+      targetType: "product",
+      targetId: "prd_inv_pro",
+      emoji: "🔥",
+      createdAt: d("2026-06-02T12:10:00Z"),
+    },
+    {
+      id: "rct_tester1_ui_heart",
+      userId: "usr_tester_01",
+      targetType: "product",
+      targetId: "prd_beta_ui",
+      emoji: "❤️",
+      createdAt: d("2026-07-12T16:50:00Z"),
+    },
+    {
+      id: "rct_tester2_art_thumb",
+      userId: "usr_tester_02",
+      targetType: "content",
+      targetId: "cnt_art_001",
+      emoji: "👍",
+      createdAt: d("2026-02-14T10:00:00Z"),
+    },
+    {
+      id: "rct_reviewer_inv_party",
+      userId: "usr_reviewer_01",
+      targetType: "product",
+      targetId: "prd_inv_pro",
+      emoji: "🎉",
+      createdAt: d("2026-06-02T11:25:00Z"),
+    },
+    {
+      id: "rct_owner_dev_handshake",
+      userId: "usr_server_001",
+      targetType: "user",
+      targetId: "usr_dev_001",
+      emoji: "🤝",
+      createdAt: d("2025-10-05T12:00:00Z"),
+    },
+    {
+      id: "rct_player_reply_smile",
+      userId: "usr_player_001",
+      targetType: "comment",
+      targetId: "cmt_cnt_003",
+      emoji: "😄",
+      createdAt: d("2025-06-23T10:00:00Z"),
+    },
   ] satisfies (typeof reactions.$inferInsert)[];
 
   const notificationRows = [
@@ -524,7 +692,8 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
       id: "ntf_tester_welcome_01",
       recipientId: "usr_tester_01",
       title: "Добро пожаловать в NEXUS",
-      message: "Заполните профиль и следите за серверами, чтобы получать персональные рекомендации.",
+      message:
+        "Заполните профиль и следите за серверами, чтобы получать персональные рекомендации.",
       type: "system",
       category: "system",
       isRead: true,
@@ -533,40 +702,316 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
   ] satisfies (typeof notifications.$inferInsert)[];
 
   const auditEventRows = [
-    { id: "aev_hist_2025_01", actorId: "system", actorType: "system", action: "database.migrated", targetId: "schema", targetType: "database", details: { note: "Initial production schema migration" }, createdAt: d("2025-01-15T12:00:00Z") },
-    { id: "aev_hist_2025_02", actorId: "usr_server_001", action: "server.registered", targetId: "srv_drift_01", targetType: "server", details: { endpoint: "play.sadrift.com:22003" }, createdAt: d("2025-02-15T12:00:00Z") },
-    { id: "aev_hist_2025_03", actorId: "usr_dev_001", action: "product.published", targetId: "prd_inv_pro", targetType: "product", details: { version: "2.1.0" }, createdAt: d("2025-03-15T12:00:00Z") },
-    { id: "aev_hist_2025_04", actorId: "system", actorType: "system", action: "license.issued", targetId: "lic_user_001", targetType: "license", details: { userId: "usr_player_001" }, createdAt: d("2025-04-15T12:00:00Z") },
-    { id: "aev_hist_2025_05", actorId: "usr_admin_001", action: "content.published", targetId: "cnt_art_001", targetType: "content", details: { note: "First public guide" }, createdAt: d("2025-05-15T12:00:00Z") },
-    { id: "aev_hist_2025_06", actorId: "usr_dev_001", action: "build.released", targetId: "bld_inv_320", targetType: "build", details: { version: "3.2.0" }, createdAt: d("2025-06-15T12:00:00Z") },
-    { id: "aev_hist_2025_07", actorId: "usr_player_001", action: "user.registered", targetId: "usr_player_001", targetType: "user", details: {}, createdAt: d("2025-07-15T12:00:00Z") },
-    { id: "aev_hist_2025_08", actorId: "usr_player_001", action: "review.submitted", targetId: "cmt_prd_inv_player_01", targetType: "review", details: { rating: 5, productId: "prd_inv_pro" }, createdAt: d("2025-08-15T12:00:00Z") },
-    { id: "aev_hist_2025_09", actorId: "usr_server_001", action: "server.updated", targetId: "srv_drift_01", targetType: "server", details: { currentPlayers: 342 }, createdAt: d("2025-09-15T12:00:00Z") },
-    { id: "aev_hist_2025_10", actorId: "usr_dev_001", action: "product.updated", targetId: "prd_drift_physics", targetType: "product", details: { version: "2.1.4" }, createdAt: d("2025-10-15T12:00:00Z") },
-    { id: "aev_hist_2025_11", actorId: "usr_dev_001", action: "build.released", targetId: "bld_drift_214", targetType: "build", details: { version: "2.1.4" }, createdAt: d("2025-11-15T12:00:00Z") },
-    { id: "aev_hist_2025_12", actorId: "system", actorType: "system", action: "database.seeded", targetId: "baseline:v1", targetType: "database", details: { note: "Year-end demo refresh" }, createdAt: d("2025-12-15T12:00:00Z") },
-    { id: "aev_hist_2026_01", actorId: "system", actorType: "system", action: "server.heartbeat", targetId: "srv_drift_01", targetType: "server", details: { currentPlayers: 482 }, createdAt: d("2026-01-15T12:00:00Z") },
-    { id: "aev_hist_2026_02", actorId: "usr_admin_001", action: "product.featured", targetId: "prd_inv_pro", targetType: "product", details: {}, createdAt: d("2026-02-15T12:00:00Z") },
-    { id: "aev_hist_2026_03", actorId: "usr_tester_01", action: "review.submitted", targetId: "cmt_prd_inv_tester_01", targetType: "review", details: { rating: 4, productId: "prd_inv_pro" }, createdAt: d("2026-03-15T12:00:00Z") },
-    { id: "aev_hist_2026_04", actorId: "usr_player_001", action: "license.renewed", targetId: "lic_user_001", targetType: "license", details: { termMonths: 6 }, createdAt: d("2026-04-15T12:00:00Z") },
-    { id: "aev_hist_2026_05", actorId: "usr_admin_001", action: "content.updated", targetId: "cnt_art_001", targetType: "content", details: { note: "Expanded hosting section" }, createdAt: d("2026-05-15T12:00:00Z") },
-    { id: "aev_hist_2026_06", actorId: "usr_dev_001", action: "build.patched", targetId: "bld_inv_320", targetType: "build", details: { version: "3.2.1", note: "Hotfix: inventory sync race" }, createdAt: d("2026-06-15T12:00:00Z") },
-    { id: "aev_dl_inv_01", actorId: "usr_player_001", action: "product.download_started", targetId: "prd_inv_pro", targetType: "product", details: { version: "3.2.1" }, createdAt: d("2026-07-02T10:15:00Z") },
-    { id: "aev_dl_inv_02", actorId: "usr_tester_01", action: "product.download_started", targetId: "prd_inv_pro", targetType: "product", details: { version: "3.2.1" }, createdAt: d("2026-08-09T11:30:00Z") },
-    { id: "aev_dl_inv_03", actorId: "usr_tester_02", action: "product.download_started", targetId: "prd_inv_pro", targetType: "product", details: { version: "3.2.1" }, createdAt: d("2026-09-14T09:45:00Z") },
-    { id: "aev_dl_inv_04", actorId: "usr_player_001", action: "product.download_started", targetId: "prd_inv_pro", targetType: "product", details: { version: "3.2.1" }, createdAt: d("2026-10-01T14:20:00Z") },
-    { id: "aev_dl_inv_05", actorId: "usr_reviewer_01", action: "product.download_started", targetId: "prd_inv_pro", targetType: "product", details: { version: "3.2.1" }, createdAt: d("2026-10-25T10:50:00Z") },
-    { id: "aev_dl_drift_01", actorId: "usr_tester_02", action: "product.download_started", targetId: "prd_drift_physics", targetType: "product", details: { version: "2.1.4" }, createdAt: d("2026-07-20T12:00:00Z") },
-    { id: "aev_dl_drift_02", actorId: "usr_player_001", action: "product.download_started", targetId: "prd_drift_physics", targetType: "product", details: { version: "2.1.4" }, createdAt: d("2026-09-11T18:40:00Z") },
-    { id: "aev_dl_drift_03", actorId: "usr_tester_01", action: "product.download_started", targetId: "prd_drift_physics", targetType: "product", details: { version: "2.1.4" }, createdAt: d("2026-10-18T20:10:00Z") },
-    { id: "aev_dl_drift_04", actorId: "usr_player_001", action: "product.download_started", targetId: "prd_drift_physics", targetType: "product", details: { version: "2.1.4" }, createdAt: d("2026-10-27T21:35:00Z") },
-    { id: "aev_dl_ui_01", actorId: "usr_tester_01", action: "product.download_started", targetId: "prd_beta_ui", targetType: "product", details: { version: "0.9.0" }, createdAt: d("2026-06-25T13:00:00Z") },
-    { id: "aev_dl_ui_02", actorId: "usr_tester_02", action: "product.download_started", targetId: "prd_beta_ui", targetType: "product", details: { version: "0.9.0" }, createdAt: d("2026-08-30T15:25:00Z") },
-    { id: "aev_dl_ui_03", actorId: "usr_reviewer_01", action: "product.download_started", targetId: "prd_beta_ui", targetType: "product", details: { version: "0.9.0" }, createdAt: d("2026-10-12T19:05:00Z") },
-    { id: "aev_login_admin_01", actorId: "usr_admin_001", action: "auth.login", targetId: "usr_admin_001", targetType: "user", details: { method: "password" }, createdAt: d("2026-09-01T08:10:00Z") },
-    { id: "aev_login_admin_02", actorId: "usr_admin_001", action: "auth.login", targetId: "usr_admin_001", targetType: "user", details: { method: "password" }, createdAt: d("2026-10-15T08:05:00Z") },
-    { id: "aev_login_tester_01", actorId: "usr_tester_01", action: "auth.login", targetId: "usr_tester_01", targetType: "user", details: { method: "password" }, createdAt: d("2026-10-20T19:30:00Z") },
-    { id: "aev_login_dev_01", actorId: "usr_dev_001", action: "auth.login", targetId: "usr_dev_001", targetType: "user", details: { method: "password" }, createdAt: d("2026-10-22T10:40:00Z") },
+    {
+      id: "aev_hist_2025_01",
+      actorId: "system",
+      actorType: "system",
+      action: "database.migrated",
+      targetId: "schema",
+      targetType: "database",
+      details: { note: "Initial production schema migration" },
+      createdAt: d("2025-01-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_02",
+      actorId: "usr_server_001",
+      action: "server.registered",
+      targetId: "srv_drift_01",
+      targetType: "server",
+      details: { endpoint: "play.sadrift.com:22003" },
+      createdAt: d("2025-02-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_03",
+      actorId: "usr_dev_001",
+      action: "product.published",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: { version: "2.1.0" },
+      createdAt: d("2025-03-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_04",
+      actorId: "system",
+      actorType: "system",
+      action: "license.issued",
+      targetId: "lic_user_001",
+      targetType: "license",
+      details: { userId: "usr_player_001" },
+      createdAt: d("2025-04-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_05",
+      actorId: "usr_admin_001",
+      action: "content.published",
+      targetId: "cnt_art_001",
+      targetType: "content",
+      details: { note: "First public guide" },
+      createdAt: d("2025-05-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_06",
+      actorId: "usr_dev_001",
+      action: "build.released",
+      targetId: "bld_inv_320",
+      targetType: "build",
+      details: { version: "3.2.0" },
+      createdAt: d("2025-06-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_07",
+      actorId: "usr_player_001",
+      action: "user.registered",
+      targetId: "usr_player_001",
+      targetType: "user",
+      details: {},
+      createdAt: d("2025-07-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_08",
+      actorId: "usr_player_001",
+      action: "review.submitted",
+      targetId: "cmt_prd_inv_player_01",
+      targetType: "review",
+      details: { rating: 5, productId: "prd_inv_pro" },
+      createdAt: d("2025-08-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_09",
+      actorId: "usr_server_001",
+      action: "server.updated",
+      targetId: "srv_drift_01",
+      targetType: "server",
+      details: { currentPlayers: 342 },
+      createdAt: d("2025-09-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_10",
+      actorId: "usr_dev_001",
+      action: "product.updated",
+      targetId: "prd_drift_physics",
+      targetType: "product",
+      details: { version: "2.1.4" },
+      createdAt: d("2025-10-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_11",
+      actorId: "usr_dev_001",
+      action: "build.released",
+      targetId: "bld_drift_214",
+      targetType: "build",
+      details: { version: "2.1.4" },
+      createdAt: d("2025-11-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2025_12",
+      actorId: "system",
+      actorType: "system",
+      action: "database.seeded",
+      targetId: "baseline:v1",
+      targetType: "database",
+      details: { note: "Year-end demo refresh" },
+      createdAt: d("2025-12-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2026_01",
+      actorId: "system",
+      actorType: "system",
+      action: "server.heartbeat",
+      targetId: "srv_drift_01",
+      targetType: "server",
+      details: { currentPlayers: 482 },
+      createdAt: d("2026-01-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2026_02",
+      actorId: "usr_admin_001",
+      action: "product.featured",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: {},
+      createdAt: d("2026-02-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2026_03",
+      actorId: "usr_tester_01",
+      action: "review.submitted",
+      targetId: "cmt_prd_inv_tester_01",
+      targetType: "review",
+      details: { rating: 4, productId: "prd_inv_pro" },
+      createdAt: d("2026-03-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2026_04",
+      actorId: "usr_player_001",
+      action: "license.renewed",
+      targetId: "lic_user_001",
+      targetType: "license",
+      details: { termMonths: 6 },
+      createdAt: d("2026-04-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2026_05",
+      actorId: "usr_admin_001",
+      action: "content.updated",
+      targetId: "cnt_art_001",
+      targetType: "content",
+      details: { note: "Expanded hosting section" },
+      createdAt: d("2026-05-15T12:00:00Z"),
+    },
+    {
+      id: "aev_hist_2026_06",
+      actorId: "usr_dev_001",
+      action: "build.patched",
+      targetId: "bld_inv_320",
+      targetType: "build",
+      details: { version: "3.2.1", note: "Hotfix: inventory sync race" },
+      createdAt: d("2026-06-15T12:00:00Z"),
+    },
+    {
+      id: "aev_dl_inv_01",
+      actorId: "usr_player_001",
+      action: "product.download_started",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: { version: "3.2.1" },
+      createdAt: d("2026-07-02T10:15:00Z"),
+    },
+    {
+      id: "aev_dl_inv_02",
+      actorId: "usr_tester_01",
+      action: "product.download_started",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: { version: "3.2.1" },
+      createdAt: d("2026-08-09T11:30:00Z"),
+    },
+    {
+      id: "aev_dl_inv_03",
+      actorId: "usr_tester_02",
+      action: "product.download_started",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: { version: "3.2.1" },
+      createdAt: d("2026-09-14T09:45:00Z"),
+    },
+    {
+      id: "aev_dl_inv_04",
+      actorId: "usr_player_001",
+      action: "product.download_started",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: { version: "3.2.1" },
+      createdAt: d("2026-10-01T14:20:00Z"),
+    },
+    {
+      id: "aev_dl_inv_05",
+      actorId: "usr_reviewer_01",
+      action: "product.download_started",
+      targetId: "prd_inv_pro",
+      targetType: "product",
+      details: { version: "3.2.1" },
+      createdAt: d("2026-10-25T10:50:00Z"),
+    },
+    {
+      id: "aev_dl_drift_01",
+      actorId: "usr_tester_02",
+      action: "product.download_started",
+      targetId: "prd_drift_physics",
+      targetType: "product",
+      details: { version: "2.1.4" },
+      createdAt: d("2026-07-20T12:00:00Z"),
+    },
+    {
+      id: "aev_dl_drift_02",
+      actorId: "usr_player_001",
+      action: "product.download_started",
+      targetId: "prd_drift_physics",
+      targetType: "product",
+      details: { version: "2.1.4" },
+      createdAt: d("2026-09-11T18:40:00Z"),
+    },
+    {
+      id: "aev_dl_drift_03",
+      actorId: "usr_tester_01",
+      action: "product.download_started",
+      targetId: "prd_drift_physics",
+      targetType: "product",
+      details: { version: "2.1.4" },
+      createdAt: d("2026-10-18T20:10:00Z"),
+    },
+    {
+      id: "aev_dl_drift_04",
+      actorId: "usr_player_001",
+      action: "product.download_started",
+      targetId: "prd_drift_physics",
+      targetType: "product",
+      details: { version: "2.1.4" },
+      createdAt: d("2026-10-27T21:35:00Z"),
+    },
+    {
+      id: "aev_dl_ui_01",
+      actorId: "usr_tester_01",
+      action: "product.download_started",
+      targetId: "prd_beta_ui",
+      targetType: "product",
+      details: { version: "0.9.0" },
+      createdAt: d("2026-06-25T13:00:00Z"),
+    },
+    {
+      id: "aev_dl_ui_02",
+      actorId: "usr_tester_02",
+      action: "product.download_started",
+      targetId: "prd_beta_ui",
+      targetType: "product",
+      details: { version: "0.9.0" },
+      createdAt: d("2026-08-30T15:25:00Z"),
+    },
+    {
+      id: "aev_dl_ui_03",
+      actorId: "usr_reviewer_01",
+      action: "product.download_started",
+      targetId: "prd_beta_ui",
+      targetType: "product",
+      details: { version: "0.9.0" },
+      createdAt: d("2026-10-12T19:05:00Z"),
+    },
+    {
+      id: "aev_login_admin_01",
+      actorId: "usr_admin_001",
+      action: "auth.login",
+      targetId: "usr_admin_001",
+      targetType: "user",
+      details: { method: "password" },
+      createdAt: d("2026-09-01T08:10:00Z"),
+    },
+    {
+      id: "aev_login_admin_02",
+      actorId: "usr_admin_001",
+      action: "auth.login",
+      targetId: "usr_admin_001",
+      targetType: "user",
+      details: { method: "password" },
+      createdAt: d("2026-10-15T08:05:00Z"),
+    },
+    {
+      id: "aev_login_tester_01",
+      actorId: "usr_tester_01",
+      action: "auth.login",
+      targetId: "usr_tester_01",
+      targetType: "user",
+      details: { method: "password" },
+      createdAt: d("2026-10-20T19:30:00Z"),
+    },
+    {
+      id: "aev_login_dev_01",
+      actorId: "usr_dev_001",
+      action: "auth.login",
+      targetId: "usr_dev_001",
+      targetType: "user",
+      details: { method: "password" },
+      createdAt: d("2026-10-22T10:40:00Z"),
+    },
   ] satisfies (typeof auditEvents.$inferInsert)[];
 
   const reportRows = [
@@ -576,7 +1021,8 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
       targetType: "review",
       targetId: "cmt_prd_inv_tester_01",
       type: "review",
-      reason: "Обзор не отражает работу ресурса после патча 3.2.1: заявленные проблемы уже исправлены.",
+      reason:
+        "Обзор не отражает работу ресурса после патча 3.2.1: заявленные проблемы уже исправлены.",
       createdAt: d("2026-10-28T09:15:00Z"),
     },
     {
@@ -629,8 +1075,6 @@ export function createHistoricalSeedData({ passwordHash }: HistoricalSeedOptions
   };
 }
 
-export type HistoricalSeedData = ReturnType<typeof createHistoricalSeedData>;
-
 export async function seedHistorical(options: HistoricalSeedOptions) {
   const data = createHistoricalSeedData(options);
 
@@ -656,28 +1100,60 @@ export async function seedHistorical(options: HistoricalSeedOptions) {
       await tx.insert(users).values(data.users).onConflictDoNothing().returning({ id: users.id })
     ).length;
     counts.servers = (
-      await tx.insert(servers).values(data.servers).onConflictDoNothing().returning({ id: servers.id })
+      await tx
+        .insert(servers)
+        .values(data.servers)
+        .onConflictDoNothing()
+        .returning({ id: servers.id })
     ).length;
     counts.products = (
-      await tx.insert(products).values(data.products).onConflictDoNothing().returning({ id: products.id })
+      await tx
+        .insert(products)
+        .values(data.products)
+        .onConflictDoNothing()
+        .returning({ id: products.id })
     ).length;
     counts.content = (
-      await tx.insert(content).values(data.content).onConflictDoNothing().returning({ id: content.id })
+      await tx
+        .insert(content)
+        .values(data.content)
+        .onConflictDoNothing()
+        .returning({ id: content.id })
     ).length;
     counts.follows = (
-      await tx.insert(follows).values(data.follows).onConflictDoNothing().returning({ id: follows.id })
+      await tx
+        .insert(follows)
+        .values(data.follows)
+        .onConflictDoNothing()
+        .returning({ id: follows.id })
     ).length;
     counts.serverReviews = (
-      await tx.insert(serverReviews).values(data.serverReviews).onConflictDoNothing().returning({ id: serverReviews.id })
+      await tx
+        .insert(serverReviews)
+        .values(data.serverReviews)
+        .onConflictDoNothing()
+        .returning({ id: serverReviews.id })
     ).length;
     counts.comments = (
-      await tx.insert(comments).values(data.comments).onConflictDoNothing().returning({ id: comments.id })
+      await tx
+        .insert(comments)
+        .values(data.comments)
+        .onConflictDoNothing()
+        .returning({ id: comments.id })
     ).length;
     counts.resourceQaThreads = (
-      await tx.insert(resourceQaThreads).values(data.resourceQaThreads).onConflictDoNothing().returning({ id: resourceQaThreads.id })
+      await tx
+        .insert(resourceQaThreads)
+        .values(data.resourceQaThreads)
+        .onConflictDoNothing()
+        .returning({ id: resourceQaThreads.id })
     ).length;
     counts.resourceQaAnswers = (
-      await tx.insert(resourceQaAnswers).values(data.resourceQaAnswers).onConflictDoNothing().returning({ id: resourceQaAnswers.id })
+      await tx
+        .insert(resourceQaAnswers)
+        .values(data.resourceQaAnswers)
+        .onConflictDoNothing()
+        .returning({ id: resourceQaAnswers.id })
     ).length;
 
     // Apply the resolved state for qa_thr_003 only after its answer exists
@@ -701,16 +1177,32 @@ export async function seedHistorical(options: HistoricalSeedOptions) {
         .returning({ userId: resourceQaThreadFollows.userId })
     ).length;
     counts.reactions = (
-      await tx.insert(reactions).values(data.reactions).onConflictDoNothing().returning({ id: reactions.id })
+      await tx
+        .insert(reactions)
+        .values(data.reactions)
+        .onConflictDoNothing()
+        .returning({ id: reactions.id })
     ).length;
     counts.notifications = (
-      await tx.insert(notifications).values(data.notifications).onConflictDoNothing().returning({ id: notifications.id })
+      await tx
+        .insert(notifications)
+        .values(data.notifications)
+        .onConflictDoNothing()
+        .returning({ id: notifications.id })
     ).length;
     counts.auditEvents = (
-      await tx.insert(auditEvents).values(data.auditEvents).onConflictDoNothing().returning({ id: auditEvents.id })
+      await tx
+        .insert(auditEvents)
+        .values(data.auditEvents)
+        .onConflictDoNothing()
+        .returning({ id: auditEvents.id })
     ).length;
     counts.reports = (
-      await tx.insert(reports).values(data.reports).onConflictDoNothing().returning({ id: reports.id })
+      await tx
+        .insert(reports)
+        .values(data.reports)
+        .onConflictDoNothing()
+        .returning({ id: reports.id })
     ).length;
 
     return counts;
