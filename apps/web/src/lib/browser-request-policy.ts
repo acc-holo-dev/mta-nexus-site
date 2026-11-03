@@ -33,7 +33,7 @@ function httpUrl(value: string): URL | null {
 
 /**
  * Production trusts a configured canonical origin, never Host or forwarded headers.
- * Development without a configured URL supports local browser/Compose hostnames.
+ * Development also trusts local browser/Compose hostnames on the configured port.
  */
 export function browserRequestDecision(
   request: Pick<Request, "method" | "headers" | "url">,
@@ -56,17 +56,25 @@ export function browserRequestDecision(
   // Sibling subdomains are not trusted, even when they receive SameSite cookies.
   if (site !== null && site !== "same-origin") return reject;
 
-  const requestUrl = httpUrl(request.url);
-  const localOrigin =
+  // Next middleware does not expose the real browser host via request.url, so
+  // development trusts any local browser/Compose hostname on the target port.
+  const devLocalTarget =
     env.NODE_ENV !== "production" &&
     target.protocol === "http:" &&
-    LOCAL_DEVELOPMENT_HOSTS.has(target.hostname) &&
-    requestUrl?.protocol === "http:" &&
-    LOCAL_DEVELOPMENT_HOSTS.has(requestUrl.hostname) &&
-    requestUrl.port === target.port
-      ? requestUrl.origin
-      : null;
-  const trustedOrigin = (value: string) => value === target.origin || value === localOrigin;
+    LOCAL_DEVELOPMENT_HOSTS.has(target.hostname);
+  const trustedOrigin = (value: string) => {
+    if (value === target.origin) return true;
+    if (!devLocalTarget) return false;
+    const source = httpUrl(value);
+    return (
+      source !== null &&
+      // Round-trip equality keeps rejecting null, multiple origins, credentials and paths.
+      source.origin === value &&
+      source.protocol === "http:" &&
+      LOCAL_DEVELOPMENT_HOSTS.has(source.hostname) &&
+      source.port === target.port
+    );
+  };
 
   const origin = request.headers.get("origin");
   if (origin !== null) {
