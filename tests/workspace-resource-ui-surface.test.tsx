@@ -38,6 +38,8 @@ vi.mock("@nexus/ui", async () => {
   return {
     fieldClass: "mock-field",
     fieldClassBlock: "mock-field-block",
+    fieldControlClass: (options?: { className?: string }) =>
+      ["mock-field-control", options?.className].filter(Boolean).join(" "),
     Avatar: () => createElement("div", { "data-ui": "avatar" }),
     Button: ({
       children,
