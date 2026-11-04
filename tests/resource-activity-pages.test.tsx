@@ -43,6 +43,7 @@ import Activity, {
   metadata as activityMeta,
 } from "../apps/web/src/app/workspace/resources/[id]/activity/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getResourceActivityCopy } from "../apps/web/src/lib/resource-activity-i18n";
 import {
   acquisitionPage,
   acquisitionSource,
@@ -110,8 +111,20 @@ it("offers a clear link when acquisition history is empty under a source filter"
   const html = renderToStaticMarkup(
     await History({ searchParams: Promise.resolve({ source: "cart" }) }),
   );
+  const copy = getResourceActivityCopy("en");
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.historyNote);
   expect(html).toContain(getDictionary("en").articles.clearFilters);
   expect(html).toContain('href="/workspace/acquisitions?source=all&amp;page=1"');
+});
+it("recovers with ErrorState when acquisition history fails to load", async () => {
+  state.history.mockRejectedValue(new Error("db unavailable"));
+  const html = renderToStaticMarkup(await History(historyInput));
+  const copy = getResourceActivityCopy("en");
+  expect(html).toContain(copy.historyLoadUnavailable);
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain('href="/workspace/acquisitions?source=cart&amp;page=2"');
+  expect(html).not.toContain("PRIVATE-");
 });
 it("keeps acquisition history private and paginated without rendering withdrawn metadata", async () => {
   const html = renderToStaticMarkup(await History(historyInput));

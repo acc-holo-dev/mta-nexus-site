@@ -3,6 +3,7 @@ import type { Locale } from "./i18n";
 const copy = {
   en: {
     loadUnavailable: "Resource activity is temporarily unavailable. Please try again.",
+    historyLoadUnavailable: "Acquisition history is temporarily unavailable. Please try again.",
     history: "Acquisition history",
     analytics: "Resource activity",
     loading: "Loading acquisition history…",
@@ -48,6 +49,7 @@ const copy = {
   },
   ru: {
     loadUnavailable: "Активность ресурса временно недоступна. Попробуйте ещё раз.",
+    historyLoadUnavailable: "История приобретений временно недоступна. Попробуйте ещё раз.",
     history: "История приобретений",
     analytics: "Активность ресурса",
     loading: "Загрузка истории приобретений…",
