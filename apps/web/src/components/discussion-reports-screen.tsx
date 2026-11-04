@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -126,6 +126,9 @@ export async function DiscussionReportsScreen({
     );
   }
   const data = parsed.data;
+  const emptyFiltered = Boolean(
+    filters && (filters.query || filters.type || filters.view === "history" || filters.cursor),
+  );
   return (
     <div className={pageShellClass}>
       <header className="space-y-3">
@@ -187,14 +190,28 @@ export async function DiscussionReportsScreen({
           </Link>
         </div>
       </form>
-      <DiscussionReportBatch
-        key={`${id}:${commentId}:${filters?.query}:${filters?.view}:${filters?.type}:${filters?.cursor?.id}:${data.removed}:${data.items.map((item) => `${item.id}:${item.status}:${item.createdAt}`).join("|")}`}
-        contentId={id}
-        commentId={commentId}
-        items={data.items}
-        locale={locale}
-        allowActions={filters?.view === "pending"}
-      />
+      {data.items.length === 0 ? (
+        <EmptyState
+          title={emptyFiltered ? copy.emptyFiltered : copy.empty}
+          description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
+          action={
+            emptyFiltered ? (
+              <Link href={discussionReportsHref(id, commentId)} className={navLinkClass}>
+                {copy.clear}
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : (
+        <DiscussionReportBatch
+          key={`${id}:${commentId}:${filters?.query}:${filters?.view}:${filters?.type}:${filters?.cursor?.id}:${data.removed}:${data.items.map((item) => `${item.id}:${item.status}:${item.createdAt}`).join("|")}`}
+          contentId={id}
+          commentId={commentId}
+          items={data.items}
+          locale={locale}
+          allowActions={filters?.view === "pending"}
+        />
+      )}
       <nav className="flex flex-wrap gap-4" aria-label={copy.title}>
         <Link
           prefetch={false}
