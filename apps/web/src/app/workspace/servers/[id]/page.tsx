@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function ServerManagementPage({
   params,
 }: {
@@ -44,15 +48,12 @@ export default async function ServerManagementPage({
   if (!claimStatus) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <div>
-        <Link
-          href="/workspace/servers"
-          className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+    <div className={pageShellClass}>
+      <div className="min-w-0">
+        <Link href="/workspace/servers" className={navLinkClass}>
           ← {serverCopy.title}
         </Link>
-        <h1 className="mt-2 text-2xl font-black text-primary">{server.name}</h1>
+        <h1 className="mt-2 break-words text-2xl font-black text-primary">{server.name}</h1>
         <p className="mt-1 font-mono text-sm text-muted">
           {server.ipAddress}:{server.port}
         </p>
@@ -60,7 +61,7 @@ export default async function ServerManagementPage({
 
       <div className="nexus-panel flex items-start gap-3 p-4">
         <Server className="mt-0.5 h-5 w-5 shrink-0 text-success" aria-hidden="true" />
-        <div>
+        <div className="min-w-0">
           <h2 className="text-sm font-bold text-primary">{copy.ownerManaged}</h2>
           <p className="mt-1 text-xs leading-relaxed text-muted">{copy.ownerManagedDescription}</p>
         </div>
@@ -73,7 +74,7 @@ export default async function ServerManagementPage({
         locale={locale}
       />
 
-      <section className="nexus-panel space-y-4 p-5 shadow-nexus-sm sm:p-6">
+      <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm sm:p-6">
         <div>
           <h2 className="text-lg font-bold text-primary">{copy.listingDetails}</h2>
           <p className="mt-1 text-sm text-muted">{copy.listingDescription}</p>

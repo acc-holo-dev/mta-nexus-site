@@ -10,6 +10,10 @@ export const serverContentCopy = (locale: Locale) =>
         back: "К управлению сервером",
         author: "Автор",
         new: "Создать публикацию сервера",
+        loading: "Загрузка публикаций сервера…",
+        emptyHint: "Создайте первую публикацию сервера или дождитесь материалов команды.",
+        emptyFilteredHint:
+          "Сбросьте фильтры или измените запрос, чтобы увидеть публикации сервера.",
         uncertain:
           "Не удалось подтвердить сохранение. Проверьте публикации сервера перед повторной отправкой.",
         notice:
@@ -23,6 +27,9 @@ export const serverContentCopy = (locale: Locale) =>
         back: "Back to server management",
         author: "Author",
         new: "Create server publication",
+        loading: "Loading server publications…",
+        emptyHint: "Create the first server publication or wait for team contributions.",
+        emptyFilteredHint: "Reset filters or change the query to see server publications.",
         uncertain: "Could not confirm the save. Check server publications before submitting again.",
         notice:
           "The author and owner receive creation, edit, archive and moderation notices when content notifications are enabled. Members without management rights have no access.",

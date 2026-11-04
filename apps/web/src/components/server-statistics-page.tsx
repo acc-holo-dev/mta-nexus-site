@@ -1,5 +1,6 @@
 import type { ServerStatisticsTarget } from "@nexus/db";
 import { AppError, type User } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -17,6 +18,10 @@ import {
 } from "../lib/services/server-statistics-service";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
+
+const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export async function serverStatisticsMetadata(): Promise<Metadata> {
   const copy = serverStatisticsCopy(await getRequestLocale());
@@ -51,17 +56,16 @@ export async function ServerStatisticsPage({
       : null;
   } catch {
     return (
-      <div className="nexus-panel space-y-3 p-5">
+      <div className={pageShellClass}>
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-sm text-danger">
-          {copy.unavailable}
-        </p>
-        <a
-          href={path}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.retry}
-        </a>
+        <ErrorState
+          title={copy.unavailable}
+          action={
+            <a href={path} className={navLinkClass}>
+              {copy.retry}
+            </a>
+          }
+        />
       </div>
     );
   }
@@ -81,16 +85,15 @@ export async function ServerStatisticsPage({
   const query = parseServerStatisticsQuery(params);
   if (!query)
     return (
-      <div className="nexus-panel space-y-4 p-6">
-        <p role="alert" className="text-sm text-danger">
-          {copy.invalid}
-        </p>
-        <Link
-          href={path}
-          className="inline-block min-h-11 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.refresh}
-        </Link>
+      <div className={pageShellClass}>
+        <ErrorState
+          title={copy.invalid}
+          action={
+            <Link href={path} className={navLinkClass}>
+              {copy.refresh}
+            </Link>
+          }
+        />
       </div>
     );
   let report: ServerStatisticsResult | null;
@@ -103,31 +106,30 @@ export async function ServerStatisticsPage({
   } catch (error) {
     const code = error instanceof AppError ? error.code : "INTERNAL_ERROR";
     return (
-      <div className="nexus-panel space-y-4 p-6">
+      <div className={pageShellClass}>
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-sm text-danger">
-          {serverStatisticsError(locale, code)}
-        </p>
-        <nav className="flex flex-wrap gap-4 text-sm text-accent">
-          <Link
-            href={serverStatisticsHref(path, query)}
-            className="min-h-11 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.retry}
-          </Link>
-          <Link
-            href={serverStatisticsHref(path, { window: query.window })}
-            className="min-h-11 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.refresh}
-          </Link>
-        </nav>
+        <ErrorState
+          title={serverStatisticsError(locale, code)}
+          action={
+            <nav className="flex flex-wrap justify-center gap-4 text-sm">
+              <Link href={serverStatisticsHref(path, query)} className={navLinkClass}>
+                {copy.retry}
+              </Link>
+              <Link
+                href={serverStatisticsHref(path, { window: query.window })}
+                className={navLinkClass}
+              >
+                {copy.refresh}
+              </Link>
+            </nav>
+          }
+        />
       </div>
     );
   }
   if (!report) notFound();
   return (
-    <div className="mx-auto min-w-0 max-w-6xl py-8">
+    <div className={pageShellClass}>
       <ServerStatisticsPanel
         report={report}
         locale={locale}
@@ -143,7 +145,7 @@ export async function ServerStatisticsLoading() {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-6xl space-y-4 py-8"
+      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="server-statistics-loading-heading"
     >

@@ -26,12 +26,14 @@ export function ManagedServerCard({
     locale === "ru" ? "ru-RU" : "en-US",
     { timeZone: "UTC" },
   );
+  const linkClass =
+    "inline-flex min-h-11 items-center text-xs font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <article className="nexus-panel flex flex-wrap items-start justify-between gap-4 p-4">
+    <article className="nexus-panel flex min-w-0 flex-wrap items-start justify-between gap-4 overflow-x-clip p-4">
       <div className="min-w-0 space-y-2">
         <Link
           href={`/workspace/servers/${encodeURIComponent(server.id)}`}
-          className="break-words text-sm font-semibold text-primary hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 break-words text-sm font-semibold text-primary hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {server.name}
         </Link>
@@ -67,36 +69,30 @@ export function ManagedServerCard({
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-3 text-xs font-semibold text-accent">
+        <div className="flex flex-wrap gap-3">
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/content`}
-            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkClass}
           >
             {serverContentCopy(locale).title}
           </Link>
-          <Link
-            href={`/workspace/servers/${encodeURIComponent(server.id)}`}
-            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`/workspace/servers/${encodeURIComponent(server.id)}`} className={linkClass}>
             {copy.manage}
           </Link>
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/activity`}
-            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkClass}
           >
             {getServerActivityCopy(locale).open}
           </Link>
           {(server.visibility === "public" || server.visibility === "unlisted") && (
-            <Link
-              href={`/servers/${encodeURIComponent(server.slug)}`}
-              className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`/servers/${encodeURIComponent(server.slug)}`} className={linkClass}>
               {copy.view}
             </Link>
           )}
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/statistics`}
-            className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkClass}
           >
             {serverStatisticsCopy(locale).open}
           </Link>

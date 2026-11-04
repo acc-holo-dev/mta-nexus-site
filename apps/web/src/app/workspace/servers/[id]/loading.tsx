@@ -8,7 +8,7 @@ export default async function Loading() {
   const status = getDictionary(locale).serverDetail.loading;
   return (
     <section
-      className="mx-auto max-w-4xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="server-management-loading-heading"
     >

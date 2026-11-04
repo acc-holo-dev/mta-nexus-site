@@ -1,8 +1,9 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { serverContentCopy } from "../apps/web/src/lib/server-content-copy";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -23,8 +24,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
   serverContentService: mocks,
 }));
+
 import Page, { generateMetadata } from "../apps/web/src/app/workspace/servers/[id]/content/page";
 import { ServerContentEditorPage } from "../apps/web/src/components/server-content-editor-page";
+
 const server = { id: "srv", name: "Team", slug: "team" };
 const content = {
   id: "content",
@@ -83,6 +86,7 @@ it("shows revoked authority and recovery without creating editor actions", async
   mocks.page.mockRejectedValue(new AppError("private role details", 403, "FORBIDDEN"));
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }));
   expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
   expect(html).toContain(getUserPlatformCopy("en").retry);
   expect(html).not.toContain("private role");
   expect(html).not.toContain("/content/new");
@@ -105,12 +109,13 @@ it("loads only server context when opening a new publication and handles empty l
   expect(mocks.context).toHaveBeenCalledWith("srv", { id: "actor", role: "user" });
   expect(mocks.page).not.toHaveBeenCalled();
   mocks.page.mockResolvedValue({ server, items: [], page: 1, hasMore: false });
-  expect(renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }))).toContain(
-    getUserPlatformCopy("en").empty,
-  );
+  const empty = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }));
+  expect(empty).toContain(getUserPlatformCopy("en").empty);
+  expect(empty).toContain(serverContentCopy("en").emptyHint);
 });
 it("distinguishes an empty catalog from an empty filtered result", async () => {
   const copy = getUserPlatformCopy("en");
+  const team = serverContentCopy("en");
   mocks.page.mockResolvedValue({ server, items: [], page: 1, hasMore: false });
   const filtered = renderToStaticMarkup(
     await Page({
@@ -119,6 +124,7 @@ it("distinguishes an empty catalog from an empty filtered result", async () => {
     }),
   );
   expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(team.emptyFilteredHint);
   expect(filtered).toContain('href="/workspace/servers/srv/content"');
   expect(filtered).toContain(copy.reset);
   expect(filtered).not.toContain(copy.empty);

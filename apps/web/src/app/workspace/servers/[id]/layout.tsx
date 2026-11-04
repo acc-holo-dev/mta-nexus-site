@@ -12,7 +12,7 @@ export default async function ServerWorkspaceLayout({
   const [{ id }, locale] = await Promise.all([params, getRequestLocale()]);
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       <ServerWorkspaceNav serverId={id} locale={locale} />
       {children}
     </div>

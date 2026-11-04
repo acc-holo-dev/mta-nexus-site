@@ -1,6 +1,6 @@
 import type { ServerStatisticsTarget } from "@nexus/db";
 import { AppError, type User } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,6 +26,10 @@ import { platformFieldClass } from "../lib/user-platform-client";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ServerObservationPeriodControls } from "./server-observation-period-controls";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
+
+const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function serverObservationBrowserMetadata() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return {
@@ -53,17 +57,16 @@ export async function ServerObservationBrowserPage({
         ? `/servers/${encodeURIComponent(target.slug)}/observations`
         : "/servers";
   const failure = (text: string, href = path) => (
-    <div className="nexus-panel space-y-3 p-5">
+    <div className={pageShellClass}>
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-      <p role="alert" className="text-sm text-danger">
-        {text}
-      </p>
-      <a
-        href={href}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
-        {stats.retry}
-      </a>
+      <ErrorState
+        title={text}
+        action={
+          <a href={href} className={navLinkClass}>
+            {stats.retry}
+          </a>
+        }
+      />
     </div>
   );
   let actor: User | null = null;
@@ -158,12 +161,9 @@ function ServerObservationBrowserPanel({
   const flag = (value: boolean | null) =>
     value === null ? stats.unknown : value ? stats.yes : stats.no;
   return (
-    <div className="mx-auto max-w-6xl space-y-6 py-8">
+    <div className={pageShellClass}>
       <header className="space-y-3">
-        <Link
-          href={base}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={base} className={navLinkClass}>
           {managed ? stats.management : stats.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
@@ -175,7 +175,7 @@ function ServerObservationBrowserPanel({
             window: report.window,
             end: report.windowEnd,
           })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {copy.statistics}
         </Link>
@@ -241,7 +241,7 @@ function ServerObservationBrowserPanel({
               password: "all",
               responding: "all",
             })}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {copy.reset}
           </Link>
@@ -249,25 +249,26 @@ function ServerObservationBrowserPanel({
       </form>
       <p className="text-sm text-muted">{copy.scope}</p>
       {report.observations.length === 0 ? (
-        <div className="nexus-panel space-y-3 p-5">
-          <p className="text-sm text-muted">
-            {observationFiltersActive ? copy.emptyFiltered : copy.emptyNever}
-          </p>
-          {observationFiltersActive ? (
-            <Link
-              href={serverObservationBrowserHref(path, {
-                ...state,
-                query: "",
-                players: "all",
-                password: "all",
-                responding: "all",
-              })}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={observationFiltersActive ? copy.emptyFiltered : copy.emptyNever}
+          description={observationFiltersActive ? copy.emptyFilteredHint : copy.emptyNeverHint}
+          action={
+            observationFiltersActive ? (
+              <Link
+                href={serverObservationBrowserHref(path, {
+                  ...state,
+                  query: "",
+                  players: "all",
+                  password: "all",
+                  responding: "all",
+                })}
+                className={navLinkClass}
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
         <section
           aria-labelledby="observation-browser-table"
@@ -322,17 +323,14 @@ function ServerObservationBrowserPanel({
         </section>
       )}
       <nav aria-label={stats.navigation} className="flex flex-wrap gap-4">
-        <a
-          href={serverObservationBrowserHref(path, state)}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <a href={serverObservationBrowserHref(path, state)} className={navLinkClass}>
           {copy.latest}
         </a>
         {report.previousCursor && (
           <Link
             prefetch={false}
             href={serverObservationBrowserHref(path, state, report.previousCursor)}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {copy.newer}
           </Link>
@@ -341,7 +339,7 @@ function ServerObservationBrowserPanel({
           <Link
             prefetch={false}
             href={serverObservationBrowserHref(path, state, report.nextCursor)}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {copy.older}
           </Link>
@@ -367,7 +365,7 @@ export async function ServerObservationBrowserLoading() {
   const copy = serverObservationBrowserCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-6xl space-y-4 py-8"
+      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="server-observations-loading-heading"
     >

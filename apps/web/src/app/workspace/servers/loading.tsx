@@ -6,7 +6,7 @@ export default async function Loading() {
   const copy = getManagedServerCopy(await getRequestLocale());
   return (
     <section
-      className="space-y-6"
+      className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="managed-servers-loading-heading"
     >
