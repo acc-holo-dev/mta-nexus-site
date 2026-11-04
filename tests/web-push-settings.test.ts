@@ -13,22 +13,30 @@ describe("Web Push settings state parser", () => {
   it("accepts the exact server state contract", () => {
     expect(
       parsePushServerState({
+        actorId: "usr_1",
+        sessionId: "ses_1",
         configured: true,
         publicKey: "public-key",
         subscribed: false,
       }),
     ).toEqual({
+      actorId: "usr_1",
+      sessionId: "ses_1",
       configured: true,
       publicKey: "public-key",
       subscribed: false,
     });
     expect(
       parsePushServerState({
+        actorId: "usr_1",
+        sessionId: "ses_1",
         configured: false,
         publicKey: null,
         subscribed: false,
       }),
     ).toEqual({
+      actorId: "usr_1",
+      sessionId: "ses_1",
       configured: false,
       publicKey: null,
       subscribed: false,
@@ -40,6 +48,8 @@ describe("Web Push settings state parser", () => {
     expect(parsePushServerState([])).toBeNull();
     expect(
       parsePushServerState({
+        actorId: "usr_1",
+        sessionId: "ses_1",
         configured: "yes",
         publicKey: null,
         subscribed: false,
@@ -47,6 +57,8 @@ describe("Web Push settings state parser", () => {
     ).toBeNull();
     expect(
       parsePushServerState({
+        actorId: "usr_1",
+        sessionId: "ses_1",
         configured: true,
         publicKey: 123,
         subscribed: false,
@@ -54,10 +66,15 @@ describe("Web Push settings state parser", () => {
     ).toBeNull();
     expect(
       parsePushServerState({
+        actorId: "usr_1",
+        sessionId: "ses_1",
         configured: true,
         publicKey: "key",
         subscribed: 1,
       }),
+    ).toBeNull();
+    expect(
+      parsePushServerState({ configured: true, publicKey: "key", subscribed: false }),
     ).toBeNull();
   });
 });

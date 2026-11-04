@@ -371,6 +371,49 @@ it("confirms ending all other sessions before DELETE", async () => {
   );
 });
 
+it.each(["password", "single session", "other sessions"] as const)(
+  "blocks stale settings after %s succeeds and refresh finds another account",
+  async (operation) => {
+    harness.slots[11] = "sensitive recovery password";
+    const success =
+      operation === "password"
+        ? { success: true, revokedSessionCount: 1 }
+        : operation === "single session"
+          ? { success: true, scope: "single", sessionId: otherSession.id }
+          : { success: true, scope: "others", revokedCount: 1 };
+    harness.fetch
+      .mockResolvedValueOnce(response(success))
+      .mockResolvedValueOnce(response({ actorId: "usr_other", sessions: [] }));
+    if (operation === "password") {
+      const form = findNamed(render(), "SettingsPasswordForm");
+      await (form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>)({
+        preventDefault() {},
+      });
+    } else {
+      const sessions = findNamed(render(), "SettingsActiveSessions");
+      if (operation === "single session")
+        await (sessions.props.onRevokeSession as (id: string, label: string) => Promise<void>)(
+          otherSession.id,
+          otherSession.userAgent,
+        );
+      else await (sessions.props.onRevokeOthers as () => Promise<void>)();
+    }
+    await vi.waitFor(() => expect(harness.slots[4]).toBe(true));
+    expect(harness.slots[0]).toBeNull();
+    expect(harness.slots[1]).toBeNull();
+    expect(harness.slots[9]).toEqual({ currentPassword: "", newPassword: "" });
+    expect(harness.slots[10]).toBeNull();
+    expect(harness.slots[11]).toBe("");
+    expect(harness.slots[12]).toBeNull();
+    expect(findNamed(render(), "ErrorState").props.title).toContain(
+      getDictionary("en").settings.settingsAccountChanged,
+    );
+    expect(render().some((node) => componentName(node.type) === "SettingsPasswordForm")).toBe(
+      false,
+    );
+  },
+);
+
 it("keeps the actor from the confirmed session list if the account changes during confirmation", async () => {
   let confirm!: (value: boolean) => void;
   confirmAction.mockReturnValueOnce(new Promise<boolean>((resolve) => (confirm = resolve)));

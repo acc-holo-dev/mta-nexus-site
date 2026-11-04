@@ -226,7 +226,11 @@ describe("notification API request correlation", () => {
     expectPrivateCorrelation(read);
 
     const registered = await pushPOST(
-      request("/api/notifications/push", "POST", { endpoint: "fixture" }),
+      request("/api/notifications/push", "POST", {
+        endpoint: "fixture",
+        expectedActorId: "usr_notifications",
+        expectedSessionId: "ses_notifications",
+      }),
     );
     expect(registered.status).toBe(200);
     expectPrivateCorrelation(registered);
@@ -234,6 +238,8 @@ describe("notification API request correlation", () => {
     const removed = await pushDELETE(
       request("/api/notifications/push", "DELETE", {
         endpoint: "https://push.example.net/subscription",
+        expectedActorId: "usr_notifications",
+        expectedSessionId: "ses_notifications",
       }),
     );
     expect(removed.status).toBe(200);

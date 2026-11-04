@@ -89,6 +89,16 @@ export function SettingsPageClient() {
   const [recoveryEmail, setRecoveryEmail] = useState<SettingsRecoveryEmail | null>(null);
   const [recoveryPassword, setRecoveryPassword] = useState("");
   const [preferenceActorId, setPreferenceActorId] = useState<string | null>(null);
+  const currentSessions = sessionSnapshot?.sessions.filter((item) => item.isCurrent === true) ?? [];
+  const currentSessionId = currentSessions.length === 1 ? currentSessions[0].id : null;
+  const pushIdentity =
+    sessionSnapshot &&
+    typeof currentSessionId === "string" &&
+    currentSessionId &&
+    currentSessionId.length <= 128 &&
+    currentSessionId.trim() === currentSessionId
+      ? { actorId: sessionSnapshot.actorId, sessionId: currentSessionId }
+      : null;
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const preferenceLabels = useMemo(
@@ -255,13 +265,24 @@ export function SettingsPageClient() {
     }
   }
 
-  async function refreshAfterSuccess(text: string) {
+  async function refreshAfterSuccess(text: string, expectedActorId: string) {
     setNotice({ text, error: false });
     try {
       const data = await requestSettings<unknown>("/api/auth/sessions");
       const confirmedSessions = parseSessionSnapshot(data);
       if (!confirmedSessions) {
         throw new Error(copy.invalidSessionResponse);
+      }
+      if (confirmedSessions.actorId !== expectedActorId) {
+        setSessionSnapshot(null);
+        setPreferences(null);
+        setPreferenceActorId(null);
+        setRecoveryEmail(null);
+        setPassword({ currentPassword: "", newPassword: "" });
+        setRecoveryPassword("");
+        setLoadError(true);
+        setNotice({ text: `${text} ${copy.settingsAccountChanged}`, error: true });
+        return;
       }
       setSessionSnapshot(confirmedSessions);
     } catch {
@@ -363,6 +384,7 @@ export function SettingsPageClient() {
       setPassword({ currentPassword: "", newPassword: "" });
       await refreshAfterSuccess(
         `${copy.passwordChanged} ${copy.otherSessionsEnded}: ${data.revokedSessionCount}. ${copy.browserRemainsSignedIn}`,
+        expectedActorId,
       );
     });
   }
@@ -391,7 +413,7 @@ export function SettingsPageClient() {
       if (data.success !== true || data.scope !== "single" || data.sessionId !== sessionId) {
         throw new SettingsRequestError(copy.unconfirmedSessionRevocation, 502);
       }
-      await refreshAfterSuccess(copy.sessionEnded);
+      await refreshAfterSuccess(copy.sessionEnded, expectedActorId);
     });
   }
 
@@ -428,6 +450,7 @@ export function SettingsPageClient() {
 
       await refreshAfterSuccess(
         `${copy.otherSessionsEnded}: ${data.revokedCount}. ${copy.browserRemainsSignedIn}`,
+        expectedActorId,
       );
     });
   }
@@ -572,6 +595,7 @@ export function SettingsPageClient() {
         preferences={preferences}
         preferenceLabels={preferenceLabels}
         pending={pending}
+        pushIdentity={pushIdentity}
         onPreferenceChange={updatePreference}
       />
 

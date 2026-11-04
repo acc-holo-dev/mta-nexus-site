@@ -243,6 +243,7 @@ export const admin = {
     unavailable: "Account settings unavailable",
     retry: "Try again",
     saving: "Saving account changes...",
+    settingsAccountChanged: "The signed-in account changed. Reload settings before continuing.",
     notificationPreferences: "Notification preferences",
     preferenceAccountChanged:
       "The signed-in account changed. Reload settings before editing notifications.",
@@ -278,6 +279,8 @@ export const admin = {
       "Browser notification permission is blocked for this site. Open your browser site settings, allow notifications, then return here and enable push. Inbox and watches are unaffected.",
     webPushError: "Web Push state could not be confirmed. Try checking again.",
     webPushLoading: "Checking browser push...",
+    webPushCleanupHint:
+      "This browser has a push subscription not registered for this session. To remove it, enable push and then disable it, or manage notification permissions in your browser settings.",
     recoveryEmail: "Recovery email",
     recoveryAccountChanged:
       "The signed-in account changed. Reload settings before checking recovery email.",

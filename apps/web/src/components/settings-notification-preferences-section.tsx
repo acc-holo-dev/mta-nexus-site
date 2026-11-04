@@ -3,7 +3,7 @@
 import { Bell } from "lucide-react";
 import type { getDictionary } from "../lib/i18n";
 import type { NotificationPreferences } from "../lib/notification-preferences-confirmation";
-import { WebPushSettings } from "./web-push-settings";
+import { type PushIdentity, WebPushSettings } from "./web-push-settings";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
 
@@ -18,6 +18,7 @@ type Props = {
     description: string;
   }>;
   pending: boolean;
+  pushIdentity: PushIdentity | null;
   onPreferenceChange: (key: PreferenceKey, value: boolean) => void;
 };
 
@@ -26,6 +27,7 @@ export function SettingsNotificationPreferencesSection({
   preferences,
   preferenceLabels,
   pending,
+  pushIdentity,
   onPreferenceChange,
 }: Props) {
   return (
@@ -61,7 +63,7 @@ export function SettingsNotificationPreferencesSection({
             </label>
           ))}
       </div>
-      <WebPushSettings />
+      <WebPushSettings expectedIdentity={pushIdentity} />
     </section>
   );
 }

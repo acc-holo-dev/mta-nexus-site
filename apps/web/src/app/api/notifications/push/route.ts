@@ -41,6 +41,23 @@ async function requireSession(request: NextRequest) {
   return authService.getSessionIdentity(token);
 }
 
+function checkExpectedIdentity(
+  value: unknown,
+  authenticated: NonNullable<Awaited<ReturnType<typeof requireSession>>>,
+) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "invalid";
+  const body = value as Record<string, unknown>;
+  const valid = (id: unknown) =>
+    typeof id === "string" && id.length > 0 && id.length <= 128 && id.trim() === id;
+  if (!valid(body.expectedActorId) || !valid(body.expectedSessionId)) return "invalid";
+  if (
+    body.expectedActorId !== authenticated.user.id ||
+    body.expectedSessionId !== authenticated.sessionId
+  )
+    return "changed";
+  return "ok";
+}
+
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
 
@@ -75,6 +92,8 @@ export async function GET(request: NextRequest) {
     }
 
     return json(context, {
+      actorId: authenticated.user.id,
+      sessionId: authenticated.sessionId,
       configured: key !== null,
       publicKey: key,
       subscribed,
@@ -121,7 +140,21 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const parsed = parseWebPushSubscription(await readBoundedJson(request, 16 * 1024));
+    const body = await readBoundedJson(request, 16 * 1024);
+    const identity = checkExpectedIdentity(body, authenticated);
+    if (identity !== "ok")
+      return json(
+        context,
+        {
+          error:
+            identity === "changed"
+              ? "Account or session changed. Reload settings."
+              : "Invalid Web Push identity",
+          code: identity === "changed" ? "PUSH_IDENTITY_CHANGED" : "INVALID_PUSH_IDENTITY",
+        },
+        identity === "changed" ? 409 : 400,
+      );
+    const parsed = parseWebPushSubscription(body);
     if (!parsed) {
       return json(
         context,
@@ -159,6 +192,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     return json(context, {
       success: true,
+      actorId: authenticated.user.id,
+      sessionId: authenticated.sessionId,
       subscribed: true,
     });
   } catch (error) {
@@ -212,6 +247,19 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     }
 
     const body = await readBoundedJson(request, 16 * 1024);
+    const identity = checkExpectedIdentity(body, authenticated);
+    if (identity !== "ok")
+      return json(
+        context,
+        {
+          error:
+            identity === "changed"
+              ? "Account or session changed. Reload settings."
+              : "Invalid Web Push identity",
+          code: identity === "changed" ? "PUSH_IDENTITY_CHANGED" : "INVALID_PUSH_IDENTITY",
+        },
+        identity === "changed" ? 409 : 400,
+      );
     const endpoint =
       body &&
       typeof body === "object" &&
@@ -230,14 +278,17 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: "Invalid Web Push endpoint" }, 400);
     }
 
-    await webPushSubscriptionRepository.removeForSession(
+    const removed = await webPushSubscriptionRepository.removeForSession(
       authenticated.user.id,
       authenticated.sessionId,
       normalizedEndpoint,
     );
     return json(context, {
       success: true,
+      actorId: authenticated.user.id,
+      sessionId: authenticated.sessionId,
       subscribed: false,
+      removed,
     });
   } catch (error) {
     if (

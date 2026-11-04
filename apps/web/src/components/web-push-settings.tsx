@@ -21,6 +21,7 @@ export type PushServerState = {
   publicKey: string | null;
   subscribed: boolean;
 };
+export type PushIdentity = { actorId: string; sessionId: string };
 
 export type BrowserPushSnapshot = {
   supported: boolean;
@@ -29,12 +30,20 @@ export type BrowserPushSnapshot = {
   keyMatches: boolean | null;
 };
 
-export function parsePushServerState(value: unknown): PushServerState | null {
+export function parsePushServerState(value: unknown): (PushServerState & PushIdentity) | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
   if (
     typeof record.configured !== "boolean" ||
     typeof record.subscribed !== "boolean" ||
+    typeof record.actorId !== "string" ||
+    !record.actorId ||
+    record.actorId.length > 128 ||
+    record.actorId.trim() !== record.actorId ||
+    typeof record.sessionId !== "string" ||
+    !record.sessionId ||
+    record.sessionId.length > 128 ||
+    record.sessionId.trim() !== record.sessionId ||
     !(record.publicKey === null || typeof record.publicKey === "string")
   ) {
     return null;
@@ -43,6 +52,8 @@ export function parsePushServerState(value: unknown): PushServerState | null {
     configured: record.configured,
     publicKey: record.publicKey,
     subscribed: record.subscribed,
+    actorId: record.actorId,
+    sessionId: record.sessionId,
   };
 }
 
@@ -97,17 +108,34 @@ export function derivePushStatus(
   return "disabled";
 }
 
-async function deleteStoredEndpoint(endpoint: string): Promise<boolean> {
+function sameIdentity(left: PushIdentity, right: PushIdentity): boolean {
+  return left.actorId === right.actorId && left.sessionId === right.sessionId;
+}
+
+async function deleteStoredEndpoint(
+  endpoint: string,
+  identity: PushIdentity,
+  requireRemoved = false,
+): Promise<boolean> {
   const response = await fetch("/api/notifications/push", {
     method: "DELETE",
     cache: "no-store",
     credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ endpoint }),
+    body: JSON.stringify({
+      endpoint,
+      expectedActorId: identity.actorId,
+      expectedSessionId: identity.sessionId,
+    }),
     signal: AbortSignal.timeout(15_000),
   });
   const data = await response.json().catch(() => null);
-  return response.ok && data?.success === true;
+  return (
+    response.ok &&
+    data?.success === true &&
+    sameIdentity(data, identity) &&
+    (!requireRemoved || data.removed === true)
+  );
 }
 
 async function ensureUnsubscribed(subscription: PushSubscription, manager: PushManager) {
@@ -133,13 +161,25 @@ async function readPushState(endpoint?: string) {
   return state;
 }
 
+async function ensureCurrentIdentity(identity: PushIdentity) {
+  const state = await readPushState();
+  if (!sameIdentity(state, identity)) throw new Error("push-identity-changed");
+}
+
 async function readEffectivePushStatus(publicKeyHint?: string | null): Promise<{
   status: Exclude<PushStatus, "loading" | "error">;
   publicKey: string | null;
+  identity: PushIdentity | null;
+  unregisteredLocal: boolean;
 }> {
   const capability = readBrowserPushCapability();
   if (!capability.supported) {
-    return { status: "unsupported", publicKey: publicKeyHint ?? null };
+    return {
+      status: "unsupported",
+      publicKey: publicKeyHint ?? null,
+      identity: null,
+      unregisteredLocal: false,
+    };
   }
   const registration = await navigator.serviceWorker.getRegistration("/");
   const localSubscription = await registration?.pushManager.getSubscription();
@@ -161,10 +201,12 @@ async function readEffectivePushStatus(publicKeyHint?: string | null): Promise<{
       state,
     ),
     publicKey: state.publicKey,
+    identity: { actorId: state.actorId, sessionId: state.sessionId },
+    unregisteredLocal: Boolean(localSubscription) && !state.subscribed,
   };
 }
 
-export function WebPushSettings() {
+export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushIdentity | null }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
   const openBetaNote = notificationInboxCopy(locale).openBetaNote;
@@ -176,6 +218,10 @@ export function WebPushSettings() {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [identity, setIdentity] = useState<PushIdentity | null>(null);
+  const [unregisteredLocal, setUnregisteredLocal] = useState(false);
+  const expectedActorId = expectedIdentity?.actorId;
+  const expectedSessionId = expectedIdentity?.sessionId;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Retry restarts the state check.
   useEffect(() => {
@@ -184,34 +230,60 @@ export function WebPushSettings() {
       try {
         const effective = await readEffectivePushStatus();
         if (!active) return;
+        if (
+          !expectedActorId ||
+          !expectedSessionId ||
+          (effective.identity &&
+            !sameIdentity(effective.identity, {
+              actorId: expectedActorId,
+              sessionId: expectedSessionId,
+            }))
+        ) {
+          throw new Error("push-identity-changed");
+        }
         setPublicKey(effective.publicKey);
+        setIdentity(effective.identity);
+        setUnregisteredLocal(effective.unregisteredLocal);
         setStatus(effective.status);
       } catch {
-        if (active) setStatus("error");
+        if (active) {
+          setIdentity(null);
+          setStatus("error");
+        }
       }
     }
     void load();
     return () => {
       active = false;
     };
-  }, [attempt]);
+  }, [attempt, expectedActorId, expectedSessionId]);
+
+  const identityMatchesParent = Boolean(
+    identity && expectedIdentity && sameIdentity(identity, expectedIdentity),
+  );
+  const shownStatus = identity && !identityMatchesParent ? "error" : status;
 
   async function enable() {
-    if (!publicKey || pending) return;
+    if (!publicKey || !identity || !identityMatchesParent || pending) return;
     setPending(true);
     try {
+      // Preserve the browser's user activation for the permission prompt.
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         setStatus(permission === "denied" ? "denied" : "disabled");
         return;
       }
+      await ensureCurrentIdentity(identity);
       const registration = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+      await ensureCurrentIdentity(identity);
       let subscription = await registration.pushManager.getSubscription();
       if (
         subscription &&
         !matchesApplicationServerKey(subscription.options.applicationServerKey, publicKey)
       ) {
-        if (!(await deleteStoredEndpoint(subscription.endpoint))) throw new Error("push-cleanup");
+        if (!(await deleteStoredEndpoint(subscription.endpoint, identity)))
+          throw new Error("push-cleanup");
+        await ensureCurrentIdentity(identity);
         await ensureUnsubscribed(subscription, registration.pushManager);
         subscription = null;
       }
@@ -227,7 +299,11 @@ export function WebPushSettings() {
           cache: "no-store",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(value.toJSON()),
+          body: JSON.stringify({
+            ...value.toJSON(),
+            expectedActorId: identity.actorId,
+            expectedSessionId: identity.sessionId,
+          }),
           signal: AbortSignal.timeout(15_000),
         });
         return {
@@ -241,7 +317,9 @@ export function WebPushSettings() {
         persisted.response.status === 409 &&
         persisted.data?.code === "WEB_PUSH_ENDPOINT_CONFLICT"
       ) {
+        await ensureCurrentIdentity(identity);
         await ensureUnsubscribed(subscription, registration.pushManager);
+        await ensureCurrentIdentity(identity);
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: applicationServerKey(publicKey),
@@ -249,16 +327,28 @@ export function WebPushSettings() {
         persisted = await persistSubscription(subscription);
       }
 
-      if (!persisted.response.ok || persisted.data?.success !== true) {
-        if (persisted.response.status === 409) {
+      if (
+        !persisted.response.ok ||
+        persisted.data?.success !== true ||
+        !sameIdentity(persisted.data, identity)
+      ) {
+        if (
+          persisted.response.status === 409 &&
+          persisted.data?.code === "WEB_PUSH_ENDPOINT_CONFLICT"
+        ) {
+          await ensureCurrentIdentity(identity);
           await subscription.unsubscribe().catch(() => false);
         }
         throw new Error("push-enable");
       }
       const confirmed = await readEffectivePushStatus(publicKey);
+      if (!confirmed.identity || !sameIdentity(confirmed.identity, identity))
+        throw new Error("push-identity-changed");
       setPublicKey(confirmed.publicKey);
+      setUnregisteredLocal(confirmed.unregisteredLocal);
       setStatus(confirmed.status);
     } catch {
+      setIdentity(null);
       setStatus("error");
     } finally {
       setPending(false);
@@ -266,7 +356,8 @@ export function WebPushSettings() {
   }
 
   async function requestDisable() {
-    if (pending) return;
+    if (pending || !identity || !identityMatchesParent) return;
+    const expectedIdentity = identity;
     if (
       !(await confirmAction({
         title: copy.webPushDisableConfirmTitle,
@@ -279,26 +370,32 @@ export function WebPushSettings() {
       }))
     )
       return;
-    void disable();
+    void disable(expectedIdentity);
   }
 
-  async function disable() {
+  async function disable(expectedIdentity: PushIdentity) {
     if (pending) return;
     setPending(true);
     try {
+      await ensureCurrentIdentity(expectedIdentity);
       const registration = await navigator.serviceWorker.getRegistration("/");
       const subscription = await registration?.pushManager.getSubscription();
       if (subscription) {
-        if (!(await deleteStoredEndpoint(subscription.endpoint))) {
+        if (!(await deleteStoredEndpoint(subscription.endpoint, expectedIdentity, true))) {
           throw new Error("push-disable");
         }
         if (!registration) throw new Error("push-disable");
+        await ensureCurrentIdentity(expectedIdentity);
         await ensureUnsubscribed(subscription, registration.pushManager);
       }
       const confirmed = await readEffectivePushStatus(publicKey);
+      if (!confirmed.identity || !sameIdentity(confirmed.identity, expectedIdentity))
+        throw new Error("push-identity-changed");
       setPublicKey(confirmed.publicKey);
+      setUnregisteredLocal(confirmed.unregisteredLocal);
       setStatus(confirmed.status === "enabled" ? "error" : confirmed.status);
     } catch {
+      setIdentity(null);
       setStatus("error");
     } finally {
       setPending(false);
@@ -306,15 +403,15 @@ export function WebPushSettings() {
   }
 
   const description =
-    status === "unsupported"
+    shownStatus === "unsupported"
       ? copy.webPushUnsupported
-      : status === "unconfigured"
+      : shownStatus === "unconfigured"
         ? copy.webPushUnconfigured
-        : status === "denied"
+        : shownStatus === "denied"
           ? copy.webPushDenied
-          : status === "enabled"
+          : shownStatus === "enabled"
             ? copy.webPushEnabled
-            : status === "error"
+            : shownStatus === "error"
               ? copy.webPushError
               : copy.webPushDescription;
 
@@ -335,16 +432,19 @@ export function WebPushSettings() {
         <p id={openBetaNoteId} className="mt-1 text-xs text-muted">
           {openBetaNote}
         </p>
+        {shownStatus === "disabled" && unregisteredLocal && (
+          <p className="mt-1 text-xs text-muted">{copy.webPushCleanupHint}</p>
+        )}
         <span
-          role={status === "error" ? "alert" : "status"}
-          aria-live={status === "error" ? "assertive" : "polite"}
+          role={shownStatus === "error" ? "alert" : "status"}
+          aria-live={shownStatus === "error" ? "assertive" : "polite"}
           aria-atomic="true"
           className="sr-only"
         >
           {description}
         </span>
       </div>
-      {status === "enabled" ? (
+      {shownStatus === "enabled" ? (
         <Button
           type="button"
           size="touch"
@@ -355,7 +455,7 @@ export function WebPushSettings() {
         >
           {copy.webPushDisable}
         </Button>
-      ) : status === "disabled" ? (
+      ) : shownStatus === "disabled" ? (
         <Button
           type="button"
           size="touch"
@@ -365,7 +465,7 @@ export function WebPushSettings() {
         >
           {copy.webPushEnable}
         </Button>
-      ) : status === "error" ? (
+      ) : shownStatus === "error" ? (
         <Button
           type="button"
           size="touch"
@@ -378,7 +478,7 @@ export function WebPushSettings() {
         >
           {copy.retry}
         </Button>
-      ) : status === "loading" ? (
+      ) : shownStatus === "loading" ? (
         <span aria-hidden="true" className="text-xs text-muted">
           {copy.webPushLoading}
         </span>

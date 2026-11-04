@@ -78,6 +78,8 @@ describe("Web Push exact subscription status", () => {
     expect(matching.status).toBe(200);
     expect(matching.headers.get("Cache-Control")).toBe("private, no-store");
     expect(await matching.json()).toEqual({
+      actorId: "usr_1",
+      sessionId: "ses_1",
       configured: true,
       publicKey: "vapid-public-key",
       subscribed: true,
@@ -143,6 +145,39 @@ describe("Web Push mutation body boundaries", () => {
       expect(oversized.status).toBe(413);
       expect(await oversized.json()).toMatchObject({ code: "REQUEST_BODY_TOO_LARGE" });
       expect(oversized.headers.get("cache-control")).toBe("private, no-store");
+      expect(webPushSubscriptionRepository.upsertWithResult).not.toHaveBeenCalled();
+      expect(webPushSubscriptionRepository.removeForSession).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ["POST", POST],
+    ["DELETE", DELETE],
+  ] as const)(
+    "rejects stale actor or session identity before %s storage",
+    async (method, handler) => {
+      const call = (body: unknown) =>
+        handler(
+          new NextRequest("https://nexus.test/api/notifications/push", {
+            method,
+            headers: {
+              ...browserMutationHeaders(),
+              cookie: "nexus_session=session-token",
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }),
+        );
+      for (const body of [
+        { expectedActorId: "usr_old", expectedSessionId: "ses_1", endpoint: state.endpoints[0] },
+        { expectedActorId: "usr_1", expectedSessionId: "ses_old", endpoint: state.endpoints[0] },
+      ]) {
+        const response = await call(body);
+        expect(response.status).toBe(409);
+        expect(response.headers.get("cache-control")).toBe("private, no-store");
+        expect(await response.json()).toMatchObject({ code: "PUSH_IDENTITY_CHANGED" });
+      }
+      expect((await call({ endpoint: state.endpoints[0] })).status).toBe(400);
       expect(webPushSubscriptionRepository.upsertWithResult).not.toHaveBeenCalled();
       expect(webPushSubscriptionRepository.removeForSession).not.toHaveBeenCalled();
     },
