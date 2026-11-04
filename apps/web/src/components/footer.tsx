@@ -48,9 +48,9 @@ export function Footer({ locale }: { locale: Locale }) {
         </div>
         <FooterContribute locale={locale} />
       </div>
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl min-w-0 flex-col items-center justify-between gap-2 overflow-x-clip border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
         <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.openFreeBeta}</div>
-        <div className="flex items-center gap-3 font-caption">
+        <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 font-caption">
           <Link
             href="/support"
             className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -82,7 +82,9 @@ export function Footer({ locale }: { locale: Locale }) {
             {dictionary.footer.copyright}
           </Link>
         </div>
-        <div className="font-caption">{dictionary.footer.disclaimer}</div>
+        <div className="max-w-full break-words text-center font-caption sm:text-left">
+          {dictionary.footer.disclaimer}
+        </div>
       </div>
     </footer>
   );
