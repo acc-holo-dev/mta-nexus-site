@@ -6,11 +6,11 @@ export default async function Loading() {
   const copy = getDictionary(await getRequestLocale()).workspace;
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="workspace-loading-heading"
     >
-      <header className="space-y-2">
+      <header className="min-w-0 space-y-2">
         <h1 id="workspace-loading-heading" className="font-display text-primary">
           {copy.title}
         </h1>

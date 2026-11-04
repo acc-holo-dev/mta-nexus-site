@@ -30,8 +30,15 @@ vi.mock("next/navigation", () => ({
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {
-    default: ({ href, children }: { href: string; children: ReactNode }) =>
-      React.createElement("a", { href }, children),
+    default: ({
+      href,
+      children,
+      className,
+    }: {
+      href: string;
+      children: ReactNode;
+      className?: string;
+    }) => React.createElement("a", { href, className }, children),
   };
 });
 
@@ -63,6 +70,7 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   ),
 }));
 
+import WorkspaceLoading from "../apps/web/src/app/workspace/loading";
 import WorkspacePage from "../apps/web/src/app/workspace/page";
 
 describe("workspace live telemetry behavior", () => {
@@ -103,7 +111,14 @@ describe("workspace live telemetry behavior", () => {
     expect(repos.directory).not.toHaveBeenCalled();
     expect(html).toContain(dictionary.workspace.liveUnavailable);
     expect(html).toContain(dictionary.workspace.noServers);
+    expect(html).toContain(dictionary.workspace.noServersHint);
+    expect(html).toContain(dictionary.workspace.emptyLibrary);
+    expect(html).toContain(dictionary.workspace.emptyLibraryHint);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/library"');
+    expect(html).toContain('href="/workspace/servers/new"');
     expect(html).toContain(dictionary.workspace.libraryTitle);
   });
 
@@ -305,5 +320,63 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain('href="/auth/login?next=%2Fworkspace"');
     expect(repos.library).not.toHaveBeenCalled();
     expect(repos.managedServers).not.toHaveBeenCalled();
+  });
+
+  it("shows ErrorState retry when the library preview fails", async () => {
+    repos.library.mockRejectedValue(new Error("library-secret"));
+    const html = renderToStaticMarkup(await WorkspacePage());
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(dictionary.workspace.libraryUnavailable);
+    expect(html).toContain(dictionary.errors.retry);
+    expect(html).toContain('href="/workspace"');
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain(dictionary.workspace.noServers);
+    expect(html).not.toContain("library-secret");
+    expect(html).not.toContain(dictionary.workspace.emptyLibrary);
+  });
+
+  it("shows ErrorState retry when the managed servers preview fails", async () => {
+    repos.managedServers.mockRejectedValue(new Error("servers-secret"));
+    const html = renderToStaticMarkup(await WorkspacePage());
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(dictionary.workspace.serversUnavailable);
+    expect(html).toContain(dictionary.errors.retry);
+    expect(html).toContain('href="/workspace"');
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain(dictionary.workspace.emptyLibrary);
+    expect(html).not.toContain("servers-secret");
+    expect(html).not.toContain(dictionary.workspace.noServers);
+    expect(repos.directory).not.toHaveBeenCalled();
+  });
+
+  it.each(["en", "ru"] as const)(
+    "renders an honest workspace loading shell with clipped overflow in %s",
+    async (locale) => {
+      const { getRequestLocale } = await import("../apps/web/src/lib/i18n-server");
+      vi.mocked(getRequestLocale).mockResolvedValueOnce(locale);
+      const copy = getDictionary(locale).workspace;
+      const html = renderToStaticMarkup(await WorkspaceLoading());
+      expect(html).toContain('aria-busy="true"');
+      expect(html).toContain('id="workspace-loading-heading"');
+      expect(html).toContain(`>${copy.title}<`);
+      expect(html).toContain(copy.loading);
+      expect(html).toContain("overflow-x-clip");
+      expect(html).toContain("min-w-0");
+    },
+  );
+
+  it("keeps RU/EN workspace hub empty and unavailable copy distinct", () => {
+    const en = getDictionary("en").workspace;
+    const ru = getDictionary("ru").workspace;
+    expect(en.emptyLibrary).not.toBe(ru.emptyLibrary);
+    expect(en.emptyLibraryHint).not.toBe(ru.emptyLibraryHint);
+    expect(en.noServers).not.toBe(ru.noServers);
+    expect(en.noServersHint).not.toBe(ru.noServersHint);
+    expect(en.libraryUnavailable).not.toBe(ru.libraryUnavailable);
+    expect(en.serversUnavailable).not.toBe(ru.serversUnavailable);
+    expect(en.emptyLibraryHint.length).toBeGreaterThan(0);
+    expect(en.noServersHint.length).toBeGreaterThan(0);
   });
 });
