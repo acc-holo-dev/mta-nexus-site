@@ -16,11 +16,15 @@ export const commerceHistoryCopy = {
     purchasesDescription:
       "Orders already stored for your account. No new payments can be made here.",
     emptyPurchases: "No historical purchases for this account.",
+    emptyPurchasesHint:
+      "Historical purchases appear here after an order is stored for your account. An empty list is not a load failure.",
     orderNumber: "Order",
     details: "View order details",
     backToPurchases: "Back to purchase history",
     lineItems: "Historical order items",
     emptyItems: "No line items are stored for this order.",
+    emptyItemsHint:
+      "Line items appear when they were stored with this order. Missing items do not confirm payment or access.",
     unavailableResource: "Resource currently unavailable",
     accessReady: "Current download access is available",
     accessMissing: "No current download access",
@@ -31,6 +35,14 @@ export const commerceHistoryCopy = {
     status: "Status",
     placed: "Placed",
     total: "Order total",
+    purchasesLoadUnavailable:
+      "Purchase history is temporarily unavailable. This does not mean you have no purchases.",
+    purchasesLoadUnavailableHint:
+      "Retry keeps the same page. A temporary load failure is not a cancelled order or payment.",
+    orderLoadUnavailable:
+      "This order is temporarily unavailable. This does not mean the purchase was cancelled.",
+    orderLoadUnavailableHint:
+      "Retry reloads the same order receipt. A temporary failure does not change access or payment state.",
     licensesTitle: "License history",
     licensesDescription:
       "Older license records, shown without keys or sensitive server identifiers.",
@@ -84,11 +96,15 @@ export const commerceHistoryCopy = {
     purchasesDescription:
       "Ранее сохранённые заказы вашего аккаунта. Совершить новый платёж здесь нельзя.",
     emptyPurchases: "У этого аккаунта нет сохранённых покупок.",
+    emptyPurchasesHint:
+      "Исторические покупки появляются здесь после сохранения заказа для аккаунта. Пустой список — это не сбой загрузки.",
     orderNumber: "Заказ",
     details: "Посмотреть состав заказа",
     backToPurchases: "Вернуться к истории покупок",
     lineItems: "Сохранённые позиции заказа",
     emptyItems: "У этого заказа нет сохранённых позиций.",
+    emptyItemsHint:
+      "Позиции появляются, если они были сохранены с этим заказом. Их отсутствие не подтверждает оплату или доступ.",
     unavailableResource: "Ресурс сейчас недоступен",
     accessReady: "Есть действующий доступ к скачиванию",
     accessMissing: "Действующего доступа к скачиванию нет",
@@ -99,6 +115,13 @@ export const commerceHistoryCopy = {
     status: "Статус",
     placed: "Оформлен",
     total: "Сумма заказа",
+    purchasesLoadUnavailable:
+      "История покупок временно недоступна. Это не означает, что покупок нет.",
+    purchasesLoadUnavailableHint:
+      "Повтор сохраняет ту же страницу. Временный сбой загрузки — это не отмена заказа или платежа.",
+    orderLoadUnavailable: "Этот заказ временно недоступен. Это не означает, что покупка отменена.",
+    orderLoadUnavailableHint:
+      "Повтор загружает ту же квитанцию заказа. Временный сбой не меняет доступ и состояние платежа.",
     licensesTitle: "История лицензий",
     licensesDescription: "Ранее выданные лицензии без ключей и приватных идентификаторов серверов.",
     emptyLicenses: "У этого аккаунта нет сохранённых лицензий.",

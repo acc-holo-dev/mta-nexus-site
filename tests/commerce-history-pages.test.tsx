@@ -46,6 +46,7 @@ vi.mock("next/link", async () => {
 
 import LicensesLoading from "../apps/web/src/app/workspace/licenses/loading";
 import Licenses, { metadata as licensesMeta } from "../apps/web/src/app/workspace/licenses/page";
+import PurchasesLoading from "../apps/web/src/app/workspace/purchases/loading";
 import Purchases, { metadata as purchasesMeta } from "../apps/web/src/app/workspace/purchases/page";
 import Sales, { metadata as salesMeta } from "../apps/web/src/app/workspace/sales/page";
 import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
@@ -294,5 +295,40 @@ describe("private legacy commerce pages", () => {
     const html = renderToStaticMarkup(await LicensesLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
     expect(html).toContain("overflow-x-clip");
+  });
+
+  it("recovers with ErrorState when purchase history fails to load", async () => {
+    state.buyer.mockRejectedValue(new Error("db unavailable"));
+    const copy = getCommerceHistoryCopy("en");
+    const html = renderToStaticMarkup(await Purchases(input()));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.purchasesLoadUnavailable);
+    expect(html).toContain(copy.purchasesLoadUnavailableHint);
+    expect(html).toContain(getDictionary("en").errors.retry);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain('href="/workspace/purchases?page=2"');
+  });
+
+  it("renders EmptyState when purchase history has no orders", async () => {
+    state.buyer.mockResolvedValue({
+      orders: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      pageSize: 20,
+    });
+    const copy = getCommerceHistoryCopy("en");
+    const html = renderToStaticMarkup(await Purchases({ searchParams: Promise.resolve({}) }));
+    expect(html).toContain(copy.emptyPurchases);
+    expect(html).toContain(copy.emptyPurchasesHint);
+    expect(html).toContain("overflow-x-clip");
+  });
+
+  it("clips the honest purchases loading shell on narrow layouts", async () => {
+    const html = renderToStaticMarkup(await PurchasesLoading());
+    expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(getCommerceHistoryCopy("en").loading);
   });
 });

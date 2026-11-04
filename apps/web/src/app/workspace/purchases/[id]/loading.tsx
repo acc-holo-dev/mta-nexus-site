@@ -3,10 +3,12 @@ import { getRequestLocale } from "../../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/purchases/[id].
 export default async function Loading() {
-  const copy = getCommerceHistoryCopy(await getRequestLocale());
+  const locale = await getRequestLocale();
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const copy = getCommerceHistoryCopy(typedLocale);
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="purchase-detail-loading-heading"
     >
