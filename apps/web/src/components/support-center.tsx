@@ -1,5 +1,5 @@
 "use client";
-import { Button, Input } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
@@ -109,7 +109,8 @@ export function SupportCenter({
   const pendingCreate = useRef<{ payload: string; key: string } | null>(null);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [listError, setListError] = useState<string | null>(null);
   const [category, setCategory] = useState(
     initialDraft?.category ?? initialFilters.category ?? "account",
   );
@@ -156,7 +157,7 @@ export function SupportCenter({
     async (signal?: AbortSignal) => {
       const sequence = ++loadSequence.current;
       setLoading(true);
-      setError(null);
+      setListError(null);
       try {
         const params = new URLSearchParams({ page: String(page) });
         if (staffMode) params.set("scope", "staff");
@@ -188,7 +189,7 @@ export function SupportCenter({
       } catch {
         if (sequence !== loadSequence.current || signal?.aborted) return false;
         setCases([]);
-        setError(copy.loadError);
+        setListError(copy.loadError);
         return false;
       } finally {
         if (sequence === loadSequence.current && !signal?.aborted) setLoading(false);
@@ -219,7 +220,7 @@ export function SupportCenter({
     creatingRef.current = true;
 
     setCreating(true);
-    setError(null);
+    setFormError(null);
     setCreatedCaseId(null);
     const payloadBody: Record<string, unknown> = {
       category,
@@ -261,10 +262,12 @@ export function SupportCenter({
       setSubject("");
       setMessage("");
       setCreatedCaseId(created.id);
-      if (!(await loadCases())) setError(workspaceCopy.savedRefresh);
+      if (!(await loadCases())) setFormError(workspaceCopy.savedRefresh);
     } catch (caught) {
       // Keep subject/message/context so a lost response can retry with the same intent.
-      setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
+      setFormError(
+        caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain,
+      );
     } finally {
       creatingRef.current = false;
       setCreating(false);
@@ -281,11 +284,15 @@ export function SupportCenter({
     return <PlatformSignIn locale={locale} returnPath={currentBrowserReturnPath() || undefined} />;
   }
 
+  const filtersActive = Boolean(
+    initialFilters.q || initialFilters.category || initialFilters.status,
+  );
+
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
       <header className="space-y-2 border-b border-base pb-6">
-        <h1 className="flex items-center gap-2.5 font-display text-primary">
-          <LifeBuoy className="h-6 w-6 text-accent" aria-hidden="true" />
+        <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
+          <LifeBuoy className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
           <span>{staffMode ? copy.staffQueue : copy.title}</span>
         </h1>
         <p className="max-w-3xl text-sm text-muted">
@@ -404,28 +411,35 @@ export function SupportCenter({
         </div>
       )}
 
-      {error && (
-        <div
-          role="alert"
-          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
-        >
-          {error}
-        </div>
-      )}
+      {formError ? (
+        <ErrorState
+          title={formError}
+          action={
+            <Button
+              type="button"
+              onClick={() => void loadCases()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              variant="ghost"
+            >
+              {workspaceCopy.reload}
+            </Button>
+          }
+        />
+      ) : null}
 
       <form action={basePath} method="get">
         <fieldset
-          className="nexus-panel grid gap-4 p-4 sm:grid-cols-2"
+          className="nexus-panel grid min-w-0 gap-4 p-4 sm:grid-cols-2"
           aria-label={copy.staffFilters}
         >
-          <label className="block space-y-1.5 sm:col-span-2">
+          <label className="block min-w-0 space-y-1.5 sm:col-span-2">
             <span className="font-label text-secondary">{workspaceCopy.search}</span>
             <input
               type="search"
               name="q"
               maxLength={120}
               defaultValue={initialFilters.q}
-              className={platformFieldClass}
+              className={`${platformFieldClass} min-w-0 w-full`}
             />
           </label>
           <label className="block space-y-1.5">
@@ -493,37 +507,42 @@ export function SupportCenter({
               ))}
             </div>
           </div>
-        ) : error ? (
-          <Button
-            type="button"
-            onClick={() => void loadCases()}
-            className="h-auto min-h-10 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            variant="ghost"
-          >
-            {workspaceCopy.reload}
-          </Button>
-        ) : cases.length === 0 ? (
-          <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
-            <p>
-              {initialFilters.q || initialFilters.category || initialFilters.status
-                ? workspaceCopy.noMatches
-                : copy.empty}
-            </p>
-            {(initialFilters.q || initialFilters.category || initialFilters.status) && (
-              <Link
-                href={basePath}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        ) : listError ? (
+          <ErrorState
+            title={listError}
+            action={
+              <Button
+                type="button"
+                onClick={() => void loadCases()}
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                variant="ghost"
               >
-                {workspaceCopy.reset}
-              </Link>
-            )}
-          </div>
+                {workspaceCopy.reload}
+              </Button>
+            }
+          />
+        ) : cases.length === 0 ? (
+          <EmptyState
+            title={filtersActive ? workspaceCopy.noMatches : copy.empty}
+            description={filtersActive ? workspaceCopy.reset : copy.description}
+            icon={<LifeBuoy className="h-6 w-6" aria-hidden="true" />}
+            action={
+              filtersActive ? (
+                <Link
+                  href={basePath}
+                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {workspaceCopy.reset}
+                </Link>
+              ) : undefined
+            }
+          />
         ) : (
           cases.map((supportCase) => (
             <Link
               key={supportCase.id}
               href={`${basePath}/${encodeURIComponent(supportCase.id)}`}
-              className="nexus-panel block space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="nexus-panel block min-w-0 space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">

@@ -6,6 +6,7 @@ import {
   DataTableCell,
   DataTableEmpty,
   DataTableHeader,
+  ErrorState,
   SectionHeader,
 } from "@nexus/ui";
 import { ShieldAlert } from "lucide-react";
@@ -82,18 +83,20 @@ export default async function AdminPage({
   }
   if (!can(currentUser, "admin.access")) {
     return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-danger-soft text-danger">
-          <ShieldAlert className="h-7 w-7" aria-hidden="true" />
-        </div>
-        <h1 className="font-display text-primary">{copy.accessDenied}</h1>
-        <p className="font-caption text-muted">{copy.accessDeniedDescription}</p>
-        <Link
-          href="/"
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {dictionary.errors.home}
-        </Link>
+      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-20">
+        <ErrorState
+          title={copy.accessDenied}
+          description={copy.accessDeniedDescription}
+          icon={<ShieldAlert className="h-5 w-5" aria-hidden="true" />}
+          action={
+            <Link
+              href="/"
+              className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.home}
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -133,41 +136,41 @@ export default async function AdminPage({
   const { items: pendingContent, hasMore: moreContent } = contentPageResult;
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-8 overflow-x-clip">
       <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div>
+        <div className="min-w-0">
           <h1 className="flex items-center gap-2.5 font-display text-primary">
-            <ShieldAlert className="h-6 w-6 text-danger" aria-hidden="true" />
+            <ShieldAlert className="h-6 w-6 shrink-0 text-danger" aria-hidden="true" />
             <span>{copy.title}</span>
           </h1>
           <p className="mt-0.5 font-caption text-muted">{copy.description}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 self-start sm:self-auto">
           {currentUser.role === "admin" ? (
             <Link
               href="/admin/commerce/plans"
-              className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+              className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {getCommercialCopy(locale).admin}
             </Link>
           ) : null}
           <Link
             href="/admin/resources"
-            className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+            className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {getResourceReleaseControlCopy(locale).moderation}
           </Link>
           {currentUser.role === "admin" ? (
             <Link
               href="/admin/commerce/reconciliation"
-              className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+              className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {getFinancialCopy(locale).review}
             </Link>
           ) : null}
           <Link
             href="/admin/support"
-            className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+            className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.supportQueue}
           </Link>

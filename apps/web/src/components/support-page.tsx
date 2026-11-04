@@ -1,4 +1,5 @@
 import { can } from "@nexus/security";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../lib/i18n";
@@ -10,10 +11,12 @@ import { PlatformGuestAuthPanel } from "./platform-guest-auth-panel";
 import { PlatformSignIn } from "./platform-sign-in";
 import { SupportCaseThread } from "./support-case-thread";
 import { SupportCenter } from "./support-center";
+
 export async function supportMetadata(staff = false) {
   const copy = getDictionary(await getRequestLocale()).support;
   return { title: staff ? copy.staffQueue : copy.title, robots: { index: false, follow: false } };
 }
+
 export async function SupportPageSurface({
   searchParams,
   staff = false,
@@ -40,7 +43,7 @@ export async function SupportPageSurface({
     // Case detail uses the shared gate; the list keeps the Support H1 shell a11y asserts.
     if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={`${base}/${id}`} />;
     return (
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
         <header className="space-y-2 border-b border-base pb-6">
           <h1 className="font-display text-primary">{support.title}</h1>
           <p className="max-w-3xl text-sm text-muted">{support.description}</p>
@@ -52,31 +55,53 @@ export async function SupportPageSurface({
   }
   if (staff && !can(actor, "admin.moderation"))
     return (
-      <p role="alert" className="nexus-panel p-5 text-danger">
-        {copy.forbidden}
-      </p>
+      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+        <ErrorState
+          title={copy.forbidden}
+          action={
+            <Link
+              href="/support"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {support.title}
+            </Link>
+          }
+        />
+      </div>
     );
   if (id !== undefined)
     return /^sup_[a-f0-9]{24}$/u.test(id) ? (
       <SupportCaseThread caseId={id} staffMode={staff} />
     ) : (
-      <p role="alert" className="nexus-panel p-5 text-danger">
-        {copy.notFound}
-      </p>
+      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+        <ErrorState
+          title={copy.notFound}
+          action={
+            <Link
+              href={base}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {support.back}
+            </Link>
+          }
+        />
+      </div>
     );
   const filters = supportQuery(params);
   if (!filters)
     return (
-      <div className="space-y-3">
-        <p role="alert" className="nexus-panel p-5 text-danger">
-          {copy.queryInvalid}
-        </p>
-        <Link
-          href={base}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
+      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+        <ErrorState
+          title={copy.queryInvalid}
+          action={
+            <Link
+              href={base}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          }
+        />
       </div>
     );
   return (

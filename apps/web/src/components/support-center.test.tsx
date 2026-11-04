@@ -55,6 +55,9 @@ describe("staff support queue UI", () => {
     expect(customer).toContain(copy.allCategories);
     expect(customer).toContain("focus-visible:ring-2");
     expect(customer).toContain('action="/support"');
+    expect(customer).toContain("min-w-0 max-w-5xl");
+    expect(customer).toContain("overflow-x-clip");
     expect(staff).toContain('action="/admin/support"');
+    expect(staff).toContain("overflow-x-clip");
   });
 });

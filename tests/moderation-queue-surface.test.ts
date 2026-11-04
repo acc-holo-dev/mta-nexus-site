@@ -123,7 +123,11 @@ describe("moderation queue admin boundary", () => {
 
     const markup = renderToStaticMarkup(await AdminPage({ searchParams: Promise.resolve({}) }));
 
+    expect(markup).toContain('role="alert"');
     expect(markup).toContain(getDictionary("en").admin.accessDenied);
+    expect(markup).toContain(getDictionary("en").admin.accessDeniedDescription);
+    expect(markup).toContain("overflow-x-clip");
+    expect(markup).toContain('href="/"');
     expect(mocks.listPendingReviewPage).not.toHaveBeenCalled();
     expect(mocks.countPendingReview).not.toHaveBeenCalled();
     expect(mocks.listVerificationPage).not.toHaveBeenCalled();
@@ -154,6 +158,9 @@ describe("moderation queue admin boundary", () => {
     expect(markup).toContain(`7 ${copy.buildsAwaitingReview}`);
     expect(markup).toContain(copy.noBuilds);
     expect(markup).toContain(`${copy.reportPage} 3`);
+    expect(markup).toContain("min-w-0 space-y-8 overflow-x-clip");
+    expect(markup).toContain('href="/admin/support"');
+    expect(markup).toContain(copy.supportQueue);
   });
 
   it("normalizes invalid build page input before repository access", async () => {

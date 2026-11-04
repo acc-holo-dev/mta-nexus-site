@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { supportActivitySchema } from "../lib/support-workspace-contract";
@@ -60,19 +60,19 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
       {open && (
         <div className="space-y-3" aria-live="polite">
           {error ? (
-            <>
-              <p role="alert" className="text-sm text-danger">
-                {error}
-              </p>
-              <Button
-                type="button"
-                onClick={() => setRetry((value) => value + 1)}
-                className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                variant="ghost"
-              >
-                {copy.reload}
-              </Button>
-            </>
+            <ErrorState
+              title={error}
+              action={
+                <Button
+                  type="button"
+                  onClick={() => setRetry((value) => value + 1)}
+                  className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  variant="ghost"
+                >
+                  {copy.reload}
+                </Button>
+              }
+            />
           ) : !data ? (
             <p role="status" className="text-sm text-muted">
               {dictionary.support.historyLoading}

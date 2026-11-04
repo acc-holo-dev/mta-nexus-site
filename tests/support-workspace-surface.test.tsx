@@ -97,6 +97,8 @@ it("gates server-rendered support pages before showing private controls", async 
   expect(guest).toContain(
     `<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`,
   );
+  expect(guest).toContain("min-w-0 max-w-5xl");
+  expect(guest).toContain("overflow-x-clip");
   expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
   expect(guest).toContain('href="/auth/register?next=%2Fsupport"');
   expect(guest).toContain(getDictionary("en").workspace.createAccount);
@@ -118,20 +120,24 @@ it("gates server-rendered support pages before showing private controls", async 
   expect(caseGuest).toContain(`href="/auth/login?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
   expect(caseGuest).toContain(`href="/auth/register?next=%2Fsupport%2Fsup_${"a".repeat(24)}"`);
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
-  expect(renderToStaticMarkup(await SupportPageSurface({ staff: true }))).toContain(
-    supportWorkspaceCopy("en").forbidden,
-  );
-  expect(renderToStaticMarkup(await SupportPageSurface({ id: "../private" }))).toContain(
-    supportWorkspaceCopy("en").notFound,
-  );
+  const forbidden = renderToStaticMarkup(await SupportPageSurface({ staff: true }));
+  expect(forbidden).toContain('role="alert"');
+  expect(forbidden).toContain(supportWorkspaceCopy("en").forbidden);
+  expect(forbidden).toContain('href="/support"');
+  const missing = renderToStaticMarkup(await SupportPageSurface({ id: "../private" }));
+  expect(missing).toContain('role="alert"');
+  expect(missing).toContain(supportWorkspaceCopy("en").notFound);
+  expect(missing).toContain('href="/support"');
+  expect(missing).toContain(getDictionary("en").support.back);
 });
 it("rejects duplicate/unknown page filters and localizes no-index support metadata", async () => {
   mocks.locale = "ru";
-  expect(
-    renderToStaticMarkup(
-      await SupportPageSurface({ searchParams: Promise.resolve({ requesterId: "victim" }) }),
-    ),
-  ).toContain(supportWorkspaceCopy("ru").queryInvalid);
+  const invalidRequester = renderToStaticMarkup(
+    await SupportPageSurface({ searchParams: Promise.resolve({ requesterId: "victim" }) }),
+  );
+  expect(invalidRequester).toContain('role="alert"');
+  expect(invalidRequester).toContain(supportWorkspaceCopy("ru").queryInvalid);
+  expect(invalidRequester).toContain('href="/support"');
   expect(
     renderToStaticMarkup(
       await SupportPageSurface({ searchParams: Promise.resolve({ status: ["open", "closed"] }) }),
@@ -139,6 +145,10 @@ it("rejects duplicate/unknown page filters and localizes no-index support metada
   ).toContain(supportWorkspaceCopy("ru").queryInvalid);
   expect(await supportMetadata()).toEqual({
     title: getDictionary("ru").support.title,
+    robots: { index: false, follow: false },
+  });
+  expect(await supportMetadata(true)).toEqual({
+    title: getDictionary("ru").support.staffQueue,
     robots: { index: false, follow: false },
   });
 });
