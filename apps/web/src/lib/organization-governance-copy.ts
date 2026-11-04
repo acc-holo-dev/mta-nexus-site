@@ -34,6 +34,8 @@ const en = {
   privacy:
     "Only current owners and administrators can view this history. Private contacts and verification evidence are not shown.",
   empty: "No recorded changes yet.",
+  emptyHint: "Profile, team and ownership changes appear here after they are recorded.",
+  emptyFilteredHint: "Try another period, event group or search, or open the latest activity.",
   latest: "Latest activity",
   older: "Earlier activity",
   expired:
@@ -91,6 +93,9 @@ const ru: typeof en = {
   privacy:
     "История доступна только текущему владельцу и администраторам. Приватные контакты и доказательства верификации не показаны.",
   empty: "Сохранённых изменений пока нет.",
+  emptyHint: "Здесь появляются изменения профиля, команды и владения после их записи.",
+  emptyFilteredHint:
+    "Попробуйте другой период, группу событий или поиск либо откройте последние события.",
   latest: "Последние события",
   older: "Более ранние события",
   expired:

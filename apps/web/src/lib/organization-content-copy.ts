@@ -14,6 +14,9 @@ export const organizationContentCopy = (locale: Locale) =>
           "Автор и владелец организации получают уведомления о создании, правках, архивировании и решениях модерации, если включены уведомления о контенте.",
         uncertain:
           "Не удалось подтвердить сохранение. Проверьте публикацию в редакции перед повторной отправкой.",
+        emptyHint: "Создайте первую публикацию организации или дождитесь материалов команды.",
+        emptyFilteredHint:
+          "Сбросьте фильтры или измените запрос, чтобы увидеть публикации команды.",
       }
     : {
         title: "Organization editorial workspace",
@@ -27,6 +30,8 @@ export const organizationContentCopy = (locale: Locale) =>
           "The author and organization owner receive creation, edit, archive and moderation notices when content notifications are enabled.",
         uncertain:
           "Could not confirm the save. Check the publication in the editorial workspace before submitting again.",
+        emptyHint: "Create the first organization publication or wait for team contributions.",
+        emptyFilteredHint: "Reset filters or change the query to see team publications.",
       };
 export function organizationContentMutationError(locale: Locale, code: unknown) {
   return code === "INTERNAL_ERROR" || code === "UNCONFIRMED"

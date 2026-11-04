@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
@@ -19,6 +20,9 @@ import {
 } from "../../../../../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata() {
   return {
     title: organizationContentCopy(await getRequestLocale()).title,
@@ -49,11 +53,8 @@ export default async function OrganizationPublications({
       return null;
     });
   return (
-    <div className="space-y-6">
-      <Link
-        href={`/workspace/organizations/${encodeURIComponent(id)}`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={navLinkClass}>
         {team.back}
       </Link>
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -68,24 +69,21 @@ export default async function OrganizationPublications({
         {result && (
           <Link
             href={`${path}/new`}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
+            className="inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
           >
             {team.new}
           </Link>
         )}
       </header>
       {!result ? (
-        <div className="nexus-panel space-y-3 p-5">
-          <p role="alert" className="text-sm text-danger">
-            {failure}
-          </p>
-          <Link
-            href={path}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.retry}
-          </Link>
-        </div>
+        <ErrorState
+          title={failure}
+          action={
+            <Link href={path} className={navLinkClass}>
+              {copy.retry}
+            </Link>
+          }
+        />
       ) : (
         <>
           <ContentCatalogControls
@@ -124,22 +122,19 @@ export default async function OrganizationPublications({
                     <span>
                       {copy.comments}: {item.commentCount}
                     </span>
-                    <Link
-                      href={`${path}/${encodeURIComponent(item.id)}`}
-                      className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
+                    <Link href={`${path}/${encodeURIComponent(item.id)}`} className={navLinkClass}>
                       {copy.edit}
                     </Link>
                     <Link
                       href={`${path}/${encodeURIComponent(item.id)}/history`}
-                      className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={navLinkClass}
                     >
                       {organizationPublicationHistoryCopy(locale).history}
                     </Link>
                     {item.status === "published" && (
                       <Link
                         href={`/articles/${encodeURIComponent(item.slug)}`}
-                        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={navLinkClass}
                       >
                         {copy.publicView}
                       </Link>
@@ -149,17 +144,21 @@ export default async function OrganizationPublications({
               ))}
             </div>
           ) : (
-            <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
-              <p>{contentPageFiltered(filters) ? copy.emptyFiltered : copy.empty}</p>
-              {contentPageFiltered(filters) && (
-                <Link
-                  href={path}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.reset}
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              title={contentPageFiltered(filters) ? copy.emptyFiltered : copy.empty}
+              description={contentPageFiltered(filters) ? team.emptyFilteredHint : team.emptyHint}
+              action={
+                contentPageFiltered(filters) ? (
+                  <Link href={path} className={navLinkClass}>
+                    {copy.reset}
+                  </Link>
+                ) : (
+                  <Link href={`${path}/new`} className={navLinkClass}>
+                    {team.new}
+                  </Link>
+                )
+              }
+            />
           )}
           <ContentPageNavigation
             path={path}

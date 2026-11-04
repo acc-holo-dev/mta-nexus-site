@@ -9,6 +9,10 @@ const en = {
   description: "Manage your organization profile, team and delegated server access.",
   create: "Create organization",
   empty: "You have no organizations yet.",
+  emptyHint: "Create an organization to manage a shared profile, team and delegated server access.",
+  emptyFiltered: "No organizations match this search.",
+  emptyFilteredHint: "Try another name or clear the search to see all of your organizations.",
+  clearSearch: "Clear search",
   search: "Search organizations",
   searchTeam: "Search team members",
   filter: "Search",
@@ -54,6 +58,7 @@ const en = {
     "Remove this member from the organization? Their organizational access will be revoked.",
   updateMember: "Save member",
   noMembers: "No members match this search.",
+  noMembersHint: "Try another search or clear it to see the current team page.",
   readOnly: "You can view this team. Profile and team changes require an owner or administrator.",
   back: "All organizations",
   errorConflict: "The organization or team changed. Reload current data before saving again.",
@@ -74,6 +79,12 @@ const ru: Record<keyof typeof en, string> = {
   description: "Управляйте профилем организации, командой и доступом к серверам.",
   create: "Создать организацию",
   empty: "У вас пока нет организаций.",
+  emptyHint:
+    "Создайте организацию, чтобы вести общий профиль, команду и делегированный доступ к серверам.",
+  emptyFiltered: "По этому запросу организаций нет.",
+  emptyFilteredHint:
+    "Попробуйте другое название или сбросьте поиск, чтобы увидеть все организации.",
+  clearSearch: "Сбросить поиск",
   search: "Поиск организаций",
   searchTeam: "Поиск участников",
   filter: "Найти",
@@ -117,6 +128,8 @@ const ru: Record<keyof typeof en, string> = {
   removeConfirm: "Удалить участника из организации? Его организационный доступ будет отозван.",
   updateMember: "Сохранить участника",
   noMembers: "По этому запросу участники не найдены.",
+  noMembersHint:
+    "Попробуйте другой поиск или сбросьте его, чтобы увидеть текущую страницу команды.",
   readOnly:
     "Вы можете просматривать команду. Для изменения профиля и команды нужны права владельца или администратора.",
   back: "Все организации",

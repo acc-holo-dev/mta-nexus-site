@@ -1,8 +1,9 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { OrganizationWorkspacePanel } from "../../../../components/organization-workspace";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import {
   organizationWorkspaceSchema,
@@ -15,6 +16,9 @@ import {
 import { authService } from "../../../../lib/services/auth-service";
 import { organizationWorkspaceService } from "../../../../lib/services/organization-workspace-service";
 export const dynamic = "force-dynamic";
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
@@ -57,11 +61,8 @@ export default async function OrganizationPage({
       : null;
   const parsed = organizationWorkspaceSchema.safeParse(result);
   return (
-    <div className="space-y-5">
-      <Link
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        href="/workspace/organizations"
-      >
+    <div className={pageShellClass}>
+      <Link className={navLinkClass} href="/workspace/organizations">
         {copy.back}
       </Link>
       {parsed.success ? (
@@ -75,17 +76,17 @@ export default async function OrganizationPage({
           />
         </>
       ) : (
-        <div className="nexus-panel space-y-3 p-5">
-          <p role="alert" className="text-sm text-danger">
-            {failure}
-          </p>
-          <Link
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href={`/workspace/organizations/${encodeURIComponent(id)}`}
-          >
-            {copy.reload}
-          </Link>
-        </div>
+        <ErrorState
+          title={failure}
+          action={
+            <Link
+              className={navLinkClass}
+              href={`/workspace/organizations/${encodeURIComponent(id)}`}
+            >
+              {copy.reload}
+            </Link>
+          }
+        />
       )}
     </div>
   );

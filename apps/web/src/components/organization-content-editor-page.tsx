@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -11,6 +12,10 @@ import { parseEditableContent } from "../lib/user-platform-client";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
 import { AuthorContentForm } from "./author-content-form";
 import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function OrganizationContentEditorPage({
   id,
   contentId,
@@ -45,19 +50,13 @@ export async function OrganizationContentEditorPage({
   const initial = result?.content ? parseEditableContent(result.content) : null;
   const path = `/workspace/organizations/${encodeURIComponent(id)}/content`;
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <Link
-        href={path}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={path} className={navLinkClass}>
         {team.title}
       </Link>
       <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
       {contentId && initial && (
-        <Link
-          href={`${path}/${encodeURIComponent(contentId)}/history`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`${path}/${encodeURIComponent(contentId)}/history`} className={navLinkClass}>
           {organizationPublicationHistoryCopy(locale).history}
         </Link>
       )}
@@ -69,17 +68,17 @@ export async function OrganizationContentEditorPage({
           organization={result.organization}
         />
       ) : (
-        <div className="nexus-panel space-y-3 p-5">
-          <p role="alert" className="text-sm text-danger">
-            {failure}
-          </p>
-          <Link
-            href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.retry}
-          </Link>
-        </div>
+        <ErrorState
+          title={failure}
+          action={
+            <Link
+              href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
+              className={navLinkClass}
+            >
+              {copy.retry}
+            </Link>
+          }
+        />
       )}
     </div>
   );

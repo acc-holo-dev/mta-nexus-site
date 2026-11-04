@@ -1,9 +1,9 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { OrganizationTeamDirectory } from "../../../../../components/organization-team-directory";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
   organizationTeamHref,
@@ -19,6 +19,9 @@ import { authService } from "../../../../../lib/services/auth-service";
 import { organizationTeamService } from "../../../../../lib/services/organization-team-service";
 import { platformFieldClass } from "../../../../../lib/user-platform-client";
 export const dynamic = "force-dynamic";
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata() {
   return {
     title: organizationTeamCopy(await getRequestLocale()).title,
@@ -65,11 +68,8 @@ export default async function TeamPage({
   const parsed = organizationTeamPageSchema.safeParse(result);
   if (result && !parsed.success) error = copy.unavailable;
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={`/workspace/organizations/${encodeURIComponent(id)}`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={navLinkClass}>
         {copy.workspace}
       </Link>
       <header className="space-y-2">
@@ -127,10 +127,7 @@ export default async function TeamPage({
             <Button type="submit" className="min-h-11 font-semibold">
               {team.filter}
             </Button>
-            <Link
-              href={organizationTeamHref(id, { query: "" })}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={organizationTeamHref(id, { query: "" })} className={navLinkClass}>
               {copy.reset}
             </Link>
           </form>
@@ -144,17 +141,14 @@ export default async function TeamPage({
         </>
       )}
       {error && (
-        <div className="nexus-panel space-y-3 p-5">
-          <p role="alert" className="text-sm text-danger">
-            {error}
-          </p>
-          <a
-            href={organizationTeamHref(id, filters ?? { query: "" })}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {team.reload}
-          </a>
-        </div>
+        <ErrorState
+          title={error}
+          action={
+            <a href={organizationTeamHref(id, filters ?? { query: "" })} className={navLinkClass}>
+              {team.reload}
+            </a>
+          }
+        />
       )}
     </div>
   );

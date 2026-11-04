@@ -5,7 +5,7 @@ import {
   canManageOrganization,
   organizationTeamRoles,
 } from "@nexus/domain";
-import { Avatar, Button } from "@nexus/ui";
+import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -176,11 +176,13 @@ export function OrganizationWorkspacePanel({
       setServers(false);
     }
   }
+  const navLinkClass =
+    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       <Link
         href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {organizationTeamCopy(locale).title}
       </Link>
@@ -201,7 +203,7 @@ export function OrganizationWorkspacePanel({
       />
       {manageable && (
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}
         >
           {organizationContentCopy(locale).title}
@@ -209,7 +211,7 @@ export function OrganizationWorkspacePanel({
       )}
       {manageable && (
         <Link
-          className="inline-flex min-h-9 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/activity`}
         >
           {governanceCopy.history}
@@ -257,7 +259,7 @@ export function OrganizationWorkspacePanel({
             />
             <Link
               href={`/users/${encodeURIComponent(data.owner.username)}`}
-              className="min-w-0 break-words text-sm text-accent"
+              className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {data.owner.displayName} (@{data.owner.username})
             </Link>
@@ -302,7 +304,12 @@ export function OrganizationWorkspacePanel({
                 />
                 {copy.serverAccess}
               </label>
-              <Button type="submit" disabled={!username.trim()} isLoading={busy}>
+              <Button
+                type="submit"
+                disabled={!username.trim()}
+                isLoading={busy}
+                className="min-h-11"
+              >
                 {copy.add}
               </Button>
             </fieldset>
@@ -320,10 +327,10 @@ export function OrganizationWorkspacePanel({
               name="q"
               defaultValue={query}
               maxLength={120}
-              className={platformFieldClass}
+              className={`${platformFieldClass} min-h-11`}
             />
           </label>
-          <Button type="submit" size="sm">
+          <Button type="submit" size="sm" className="min-h-11">
             {copy.filter}
           </Button>
         </form>
@@ -386,7 +393,7 @@ export function OrganizationWorkspacePanel({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted">{copy.noMembers}</p>
+          <EmptyState title={copy.noMembers} description={copy.noMembersHint} />
         )}
         <nav
           className="flex flex-wrap items-center justify-between gap-3 text-sm"
@@ -394,7 +401,7 @@ export function OrganizationWorkspacePanel({
         >
           {data.page > 1 ? (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={teamHref(data.organization.id, data.page - 1, query)}
             >
               {copy.previous}
@@ -402,12 +409,12 @@ export function OrganizationWorkspacePanel({
           ) : (
             <span />
           )}
-          <span className="text-muted">
+          <span className="inline-flex min-h-11 items-center text-muted">
             {copy.page} {data.page}
           </span>
           {data.hasMore && (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={teamHref(data.organization.id, data.page + 1, query)}
             >
               {copy.next}
@@ -415,9 +422,20 @@ export function OrganizationWorkspacePanel({
           )}
         </nav>
         {error && (
-          <p role="alert" className="text-sm text-danger">
-            {error}
-          </p>
+          <ErrorState
+            title={error}
+            action={
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={busy}
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                onClick={() => router.refresh()}
+              >
+                {copy.reload}
+              </Button>
+            }
+          />
         )}
         {message && (
           <p
@@ -432,7 +450,7 @@ export function OrganizationWorkspacePanel({
             type="button"
             variant="ghost"
             disabled={busy}
-            className="h-auto px-0 text-sm text-danger underline"
+            className="h-auto min-h-11 px-0 text-sm text-danger underline"
             onClick={() => void leave()}
           >
             {copy.leave}
@@ -442,7 +460,7 @@ export function OrganizationWorkspacePanel({
           type="button"
           variant="ghost"
           disabled={busy}
-          className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           onClick={() => router.refresh()}
         >
           {copy.reload}

@@ -3,6 +3,7 @@ import {
   ORGANIZATION_CHANGE_GROUPS,
   type OrganizationChangeGroup,
 } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import type { OrganizationHistory } from "../lib/organization-governance-contract";
@@ -14,6 +15,10 @@ import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
 } from "./private-change-history-controls";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export function OrganizationHistoryView({
   data,
   id,
@@ -40,7 +45,7 @@ export function OrganizationHistoryView({
     teamCopy = getOrganizationCopy(locale),
     path = `/workspace/organizations/${encodeURIComponent(id)}/activity`;
   return (
-    <div className="space-y-5">
+    <div className={pageShellClass}>
       <header className="space-y-2">
         <h1 className="break-words font-display text-primary">
           {copy.history}
@@ -49,10 +54,7 @@ export function OrganizationHistoryView({
         <p className="text-sm text-muted">{copy.historyDescription}</p>
         <p className="text-xs text-muted">{copy.privacy}</p>
       </header>
-      <Link
-        className="inline-flex min-h-9 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        href={`/workspace/organizations/${encodeURIComponent(id)}`}
-      >
+      <Link className={navLinkClass} href={`/workspace/organizations/${encodeURIComponent(id)}`}>
         {copy.back}
       </Link>
       <PrivateChangeHistoryFilters
@@ -71,7 +73,7 @@ export function OrganizationHistoryView({
               filters,
               { until: data.until },
             )}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {journal.export}
           </a>
@@ -79,22 +81,27 @@ export function OrganizationHistoryView({
         </div>
       )}
       {!data && (
-        <p role="alert" className="nexus-panel p-5 text-sm text-danger">
-          {error ?? copy.unavailable}
-        </p>
+        <ErrorState
+          title={error ?? copy.unavailable}
+          action={
+            <Link href={path} className={navLinkClass}>
+              {copy.reload}
+            </Link>
+          }
+        />
       )}
       {data?.items.length === 0 && (
-        <div className="nexus-panel space-y-3 p-5 text-sm text-muted">
-          <p>{filtered ? journal.emptyFiltered : journal.empty}</p>
-          {filtered ? (
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {journal.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={filtered ? journal.emptyFiltered : copy.empty}
+          description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
+          action={
+            filtered ? (
+              <Link href={path} className={navLinkClass}>
+                {journal.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {data?.items.map((item) => (
         <article className="nexus-panel space-y-3 p-5" key={item.id}>
@@ -157,16 +164,13 @@ export function OrganizationHistoryView({
       ))}
       <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.history}>
         {(before || filters.cursor || filters.until || !data) && (
-          <Link
-            className="min-h-9 py-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href={changeHistoryHref(path, filters, { fresh: true })}
-          >
+          <Link className={navLinkClass} href={changeHistoryHref(path, filters, { fresh: true })}>
             {copy.latest}
           </Link>
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
-            className="min-h-9 py-2 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
             href={
               data.until
                 ? changeHistoryHref(path, filters, { cursor: data.nextCursor })
