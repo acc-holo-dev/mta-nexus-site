@@ -59,6 +59,11 @@ const en = {
   signIn: "Sign in",
   signInRequired: "Sign in to manage your account",
   retry: "Reload saved version",
+  checkLatestContent: "Check saved version",
+  latestContent: "Latest saved version",
+  latestContentHelp:
+    "Compare it with your draft above. Using this version as the basis keeps your draft; saving will replace the saved fields.",
+  useLatestContent: "Use this version as the basis",
   preview: "Preview text",
   editText: "Edit text",
   unavailable: "This section is temporarily unavailable. Please try again.",
@@ -135,6 +140,11 @@ const ru: typeof en = {
   signIn: "Войти",
   signInRequired: "Войдите для управления аккаунтом",
   retry: "Загрузить сохранённую версию",
+  checkLatestContent: "Проверить сохранённую версию",
+  latestContent: "Последняя сохранённая версия",
+  latestContentHelp:
+    "Сравните её с черновиком выше. Выбор этой версии сохранит ваш черновик; при сохранении поля публикации будут заменены.",
+  useLatestContent: "Использовать эту версию как основу",
   preview: "Предпросмотр текста",
   editText: "Редактировать текст",
   unavailable: "Раздел временно недоступен. Попробуйте ещё раз.",

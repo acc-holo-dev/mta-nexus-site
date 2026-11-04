@@ -76,14 +76,17 @@ function descendants(node: ReactNode): Element[] {
   return [element, ...descendants(element.props.children as ReactNode)];
 }
 
-function seedForm() {
-  // saved, busy, notice, preview, formRef, pending ref
-  harness.slots = [initial, false, null, null, { current: null }, { current: false }];
+function seedForm(content: EditableContent = initial) {
+  // saved, busy, notice, preview, latest, formRef, pending ref
+  harness.slots = [content, false, null, null, null, { current: null }, { current: false }];
 }
 
-function render() {
+function render(
+  locale: "en" | "ru" = "en",
+  scope?: { organization?: { id: string; name: string }; server?: { id: string; name: string } },
+) {
   harness.cursor = 0;
-  return descendants(AuthorContentForm({ locale: "en", initial }));
+  return descendants(AuthorContentForm({ locale, initial, ...scope }));
 }
 
 function archiveButton(nodes: Element[]) {
@@ -152,4 +155,114 @@ it("does not archive a publication when confirmation is cancelled", async () => 
   await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(harness.refresh).not.toHaveBeenCalled();
+});
+
+it.each(["en", "ru"] as const)(
+  "keeps a draft while comparing a changed saved version in %s",
+  async (locale) => {
+    for (const scopeKind of ["personal", "organization", "server"] as const) {
+      const organization =
+        scopeKind === "organization" ? { id: "org_demo", name: "Team" } : undefined;
+      const server = scopeKind === "server" ? { id: "srv_demo", name: "Server" } : undefined;
+      const scope = { organization, server };
+      const scoped = {
+        ...initial,
+        ...(organization ? { organizationId: organization.id } : {}),
+        ...(server ? { serverId: server.id } : {}),
+      };
+      const latest = {
+        ...scoped,
+        title: "Changed elsewhere",
+        body: "A changed saved publication body.",
+        updatedAt: later,
+      };
+      const expectedPath = organization
+        ? `/api/workspace/organizations/${organization.id}/content/${initial.id}`
+        : server
+          ? `/api/workspace/servers/${server.id}/content/${initial.id}`
+          : `/api/workspace/content/${initial.id}`;
+      const copy = getUserPlatformCopy(locale);
+      class DraftFormData {
+        get(name: string) {
+          return (
+            (
+              {
+                title: "My draft title",
+                body: "My unsaved publication body.",
+                excerpt: "",
+                coverImageUrl: "",
+                tags: "",
+              } as Record<string, string>
+            )[name] ?? null
+          );
+        }
+      }
+      vi.stubGlobal("FormData", DraftFormData);
+      seedForm(scoped);
+      harness.fetch.mockReset();
+      harness.fetch.mockResolvedValueOnce(response({ code: "CONFLICT" }, 409));
+      const form = render(locale, scope).find((node) => node.type === "form");
+      if (!form) throw new Error("Missing publication form");
+      await (form.props.onSubmit as (event: unknown) => Promise<void>)({
+        preventDefault() {},
+        currentTarget: {},
+      });
+      const check = render(locale, scope).find(
+        (node) => node.type === "button" && node.props.children === copy.checkLatestContent,
+      );
+      if (!check) throw new Error("Missing saved version check");
+      harness.fetch.mockResolvedValueOnce(response({ content: latest }));
+      (check.props.onClick as () => void)();
+      await vi.waitFor(() =>
+        expect(
+          render(locale, scope).some(
+            (node) => node.type === "button" && node.props.children === copy.useLatestContent,
+          ),
+        ).toBe(true),
+      );
+      expect(harness.fetch.mock.calls[1]?.[0]).toBe(expectedPath);
+      expect(harness.fetch.mock.calls[1]?.[1]).toMatchObject({ method: "GET" });
+      const accept = render(locale, scope).find(
+        (node) => node.type === "button" && node.props.children === copy.useLatestContent,
+      );
+      if (!accept) throw new Error("Missing accept button");
+      (accept.props.onClick as () => void)();
+      const nextForm = render(locale, scope).find((node) => node.type === "form");
+      if (!nextForm) throw new Error("Missing publication form");
+      expect(nextForm.key).toBe(form.key);
+      harness.fetch.mockResolvedValueOnce(response({ code: "CONFLICT" }, 409));
+      await (nextForm.props.onSubmit as (event: unknown) => Promise<void>)({
+        preventDefault() {},
+        currentTarget: {},
+      });
+      expect(JSON.parse(String(harness.fetch.mock.calls[2]?.[1]?.body))).toMatchObject({
+        title: "My draft title",
+        body: "My unsaved publication body.",
+        expectedUpdatedAt: later,
+      });
+    }
+  },
+);
+
+it("keeps an archived saved version read-only without clearing the draft", async () => {
+  const copy = getUserPlatformCopy("en");
+  harness.slots[2] = { text: copy.CONFLICT, error: true };
+  harness.fetch.mockResolvedValueOnce(
+    response({ content: { ...initial, status: "archived", updatedAt: later } }),
+  );
+  const check = render().find(
+    (node) => node.type === "button" && node.props.children === copy.checkLatestContent,
+  );
+  if (!check) throw new Error("Missing saved version check");
+  (check.props.onClick as () => void)();
+  await vi.waitFor(() => expect(harness.slots[4]).not.toBeNull());
+  const nodes = render();
+  expect(
+    nodes.some((node) => node.type === "button" && node.props.children === copy.useLatestContent),
+  ).toBe(false);
+  expect(
+    nodes.find((node) => node.type === "button" && node.props.children === copy.save)?.props
+      .disabled,
+  ).toBe(true);
+  expect(nodes.find((node) => node.type === "form")?.key).toBe(initial.id);
 });

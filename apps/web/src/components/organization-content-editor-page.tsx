@@ -62,7 +62,7 @@ export async function OrganizationContentEditorPage({
       )}
       {result && (!contentId || (initial && initial.organizationId === id)) ? (
         <AuthorContentForm
-          key={`${id}:${contentId ?? "new"}:${initial?.updatedAt ?? "new"}`}
+          key={`${id}:${contentId ?? "new"}`}
           locale={locale}
           initial={initial ?? undefined}
           organization={result.organization}

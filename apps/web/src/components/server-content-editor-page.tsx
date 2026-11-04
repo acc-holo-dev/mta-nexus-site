@@ -66,7 +66,7 @@ export async function ServerContentEditorPage({
             </Link>
           )}
           <AuthorContentForm
-            key={`${id}:${contentId ?? "new"}:${initial?.updatedAt ?? "new"}`}
+            key={`${id}:${contentId ?? "new"}`}
             locale={locale}
             initial={initial ?? undefined}
             server={result.server}

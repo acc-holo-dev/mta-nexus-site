@@ -38,6 +38,7 @@ export function AuthorContentForm({
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ text: string; error: boolean } | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [latest, setLatest] = useState<EditableContent | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const pending = useRef(false);
   const archived = saved?.status === "archived";
@@ -54,7 +55,7 @@ export function AuthorContentForm({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending.current || archived) return;
+    if (pending.current || archived || latest) return;
     const form = new FormData(event.currentTarget);
     const fields = {
       title: String(form.get("title") ?? "").trim(),
@@ -85,6 +86,7 @@ export function AuthorContentForm({
     pending.current = true;
     setBusy(true);
     setNotice(null);
+    setLatest(null);
     try {
       const result = await platformRequest(
         saved ? `${apiPath}/${encodeURIComponent(saved.id)}` : apiPath,
@@ -141,10 +143,48 @@ export function AuthorContentForm({
       setBusy(false);
     }
   }
+  async function checkSavedVersion() {
+    if (!saved || pending.current) return;
+    pending.current = true;
+    setBusy(true);
+    setLatest(null);
+    try {
+      const result = await platformRequest(
+        `${apiPath}/${encodeURIComponent(saved.id)}`,
+        locale,
+        "GET",
+        undefined,
+        undefined,
+        server
+          ? serverContentMutationError
+          : organization
+            ? organizationContentMutationError
+            : userPlatformError,
+      );
+      const next = parseEditableContent(result.content);
+      if (
+        !next ||
+        next.id !== saved.id ||
+        next.slug !== saved.slug ||
+        next.type !== saved.type ||
+        Date.parse(next.updatedAt) < Date.parse(saved.updatedAt) ||
+        (organization && next.organizationId !== organization.id) ||
+        (server && next.serverId !== server.id)
+      )
+        throw new Error(copy.UNCONFIRMED);
+      setLatest(next);
+    } catch (error) {
+      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  }
   async function archive() {
     if (
       !saved ||
       pending.current ||
+      latest ||
       !(await confirmAction({
         title: copy.archive,
         object: saved.title,
@@ -258,10 +298,10 @@ export function AuthorContentForm({
               type="button"
               variant="ghost"
               disabled={busy}
-              onClick={() => router.refresh()}
+              onClick={() => void checkSavedVersion()}
               className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
-              {copy.retry}
+              {copy.checkLatestContent}
             </Button>
           )}
           {notice.error && (organization || server) && !saved && (
@@ -274,8 +314,46 @@ export function AuthorContentForm({
           )}
         </div>
       )}
+      {latest && (
+        <section className="nexus-panel min-w-0 space-y-3 p-5" aria-label={copy.latestContent}>
+          <h2 className="font-semibold">{copy.latestContent}</h2>
+          <p className="text-sm text-muted">{copy.latestContentHelp}</p>
+          <p>
+            {copy.status}: {copy[latest.status]}
+          </p>
+          <p>
+            {copy.title}: {latest.title}
+          </p>
+          <p className="whitespace-pre-wrap break-words">
+            {copy.excerpt}: {latest.excerpt}
+          </p>
+          <p className="whitespace-pre-wrap break-words">
+            {copy.body}: {latest.body}
+          </p>
+          <p className="break-words">
+            {copy.tags}: {latest.tags.join(", ")}
+          </p>
+          <p className="break-words">
+            {copy.cover}: {latest.coverImageUrl}
+          </p>
+          {latest.status !== "archived" && (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={() => {
+                setSaved(latest);
+                setLatest(null);
+                setNotice(null);
+              }}
+            >
+              {copy.useLatestContent}
+            </Button>
+          )}
+        </section>
+      )}
       <form
-        key={saved?.updatedAt ?? "new"}
+        key={saved?.id ?? "new"}
         ref={formRef}
         onSubmit={submit}
         aria-busy={busy}
@@ -362,7 +440,7 @@ export function AuthorContentForm({
             </label>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button type="submit" isLoading={busy} className="min-h-11">
+            <Button type="submit" isLoading={busy} disabled={Boolean(latest)} className="min-h-11">
               {saved ? copy.save : copy.submit}
             </Button>
             <Button
@@ -396,7 +474,7 @@ export function AuthorContentForm({
         <Button
           type="button"
           variant="ghost"
-          disabled={busy}
+          disabled={busy || Boolean(latest)}
           onClick={() => void archive()}
           className="h-auto min-h-11 px-0 text-sm font-semibold text-danger"
         >
