@@ -24,8 +24,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `d281ac6755bd6efff7828b9ba2cc17f582c42f60` (`chore(deps): bump next from 16.4.3 to 16.4.4`).
-- **Verified CI green on that tip:** [CI 41828791678](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41828791678) (full selected scope).
+- **Tip SHA:** `774191c454691ef159d8bc73dee3a39130d92e7d` (`chore(deps): bump next from 16.4.3 to 16.4.4`).
+- **Verified CI green on that tip:** pending `774191c4` tip CI after #262–#269 wave; prior tip green [CI 41828791678](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41828791678) on `d281ac67`.
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
