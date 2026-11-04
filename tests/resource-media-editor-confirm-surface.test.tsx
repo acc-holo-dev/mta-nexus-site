@@ -31,3 +31,20 @@ it("gates gallery image removal behind confirmAction with localized copy", () =>
   expect(i18n).toContain("removeConfirmTitle");
   expect(i18n).toContain("removeConfirm:");
 });
+
+it("locks gallery cover/up/down/remove controls to size=touch min-h-11 chrome", () => {
+  const source = read("apps/web/src/components/resource-media-editor.tsx");
+  expect(source).toContain("EmptyState");
+  expect(source).not.toContain('size="sm"');
+  expect(source).not.toContain("min-h-10");
+  for (const label of ["copy.cover", "copy.up", "copy.down", "copy.remove"] as const) {
+    expect(source).toContain(label);
+  }
+  const reorderBlock = source.slice(
+    source.indexOf("{!readonly && ("),
+    source.indexOf("{dirty && ("),
+  );
+  expect(reorderBlock.match(/size="touch"/gu)?.length ?? 0).toBe(4);
+  expect(reorderBlock).toMatch(/onClick=\{\(\) => move\(index, 0\)\}/u);
+  expect(reorderBlock).toMatch(/onClick=\{\(\) => void removeItem\(item\)\}/u);
+});

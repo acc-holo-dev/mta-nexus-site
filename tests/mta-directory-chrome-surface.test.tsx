@@ -36,6 +36,34 @@ describe("MTA directory/visibility chrome", () => {
     expect(source).not.toContain("min-h-10");
   });
 
+  it("locks remaining directory Buttons to size=touch and empty results to EmptyState", () => {
+    const source = read("apps/web/src/components/mta-master-server-directory.tsx");
+    expect(source).toContain("EmptyState");
+    expect(source).toContain("copy.noMatchDescription");
+    expect(source).toContain("copy.noneDescription");
+    expect(source).toMatch(
+      /title=\{hasFilters \? copy\.noMatch : copy\.none\}/u,
+    );
+    expect(source).toMatch(
+      /description=\{hasFilters \? copy\.noMatchDescription : copy\.noneDescription\}/u,
+    );
+    expect(source).not.toContain('size="sm"');
+    expect(source).not.toContain("nexus-panel space-y-3 p-6 text-center");
+    expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(5);
+  });
+
+  it.each(["en", "ru"] as const)(
+    "keeps additive directory empty honesty descriptions in %s",
+    (locale) => {
+      const copy = getDictionary(locale).servers;
+      expect(copy.noMatchDescription.length).toBeGreaterThan(20);
+      expect(copy.noneDescription.length).toBeGreaterThan(20);
+      expect(copy.noMatchDescription).not.toBe(copy.noneDescription);
+      expect(copy.noMatchDescription).not.toBe(copy.noMatch);
+      expect(copy.noneDescription).not.toBe(copy.none);
+    },
+  );
+
   it.each(["en", "ru"] as const)(
     "renders visibility batch actions with shared Button chrome in %s",
     (locale) => {

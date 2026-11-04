@@ -191,7 +191,7 @@ export function ResourceMediaEditor({
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
+                  size="touch"
                   disabled={busy || index === 0}
                   onClick={() => move(index, 0)}
                 >
@@ -200,7 +200,7 @@ export function ResourceMediaEditor({
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
+                  size="touch"
                   disabled={busy || index === 0}
                   onClick={() => move(index, index - 1)}
                 >
@@ -209,7 +209,7 @@ export function ResourceMediaEditor({
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
+                  size="touch"
                   disabled={busy || index === items.length - 1}
                   onClick={() => move(index, index + 1)}
                 >
@@ -218,7 +218,7 @@ export function ResourceMediaEditor({
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
+                  size="touch"
                   disabled={busy || dirty}
                   onClick={() => void removeItem(item)}
                 >
