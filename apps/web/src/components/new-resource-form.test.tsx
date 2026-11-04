@@ -50,3 +50,10 @@ it("locks new resource form honesty to ErrorState without ad-hoc alerts", () => 
   expect(source).toContain("createErrorDescription");
   expect(source).not.toContain('role="alert"');
 });
+
+it("locks new resource native selects to fieldControlClass without h-10 chrome", () => {
+  expect(source).toContain("fieldControlClass");
+  expect(source).toContain('className: "min-h-11"');
+  expect(source).not.toContain("h-10");
+  expect(source).not.toMatch(/const controlClass\s*=/u);
+});

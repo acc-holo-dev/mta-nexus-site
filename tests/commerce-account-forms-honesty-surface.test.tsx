@@ -33,6 +33,15 @@ it("locks commerce and account form failures to ErrorState with touch CTAs", () 
   }
 });
 
+it("locks register server native controls to fieldControlClass without h-10 chrome", () => {
+  const source = read("apps/web/src/components/register-server-form.tsx");
+  expect(source).toContain("fieldControlClass");
+  expect(source).toContain('className: "min-h-11"');
+  expect(source).not.toContain("h-10");
+  expect(source).not.toMatch(/const controlClass\s*=/u);
+  expect(source).not.toMatch(/const textareaClass\s*=/u);
+});
+
 it("keeps additive formErrorHint / errorHint copy for commerce and account honesty", () => {
   expect(read("apps/web/src/lib/i18n/en/chrome.ts")).toContain("errorHint:");
   expect(read("apps/web/src/lib/i18n/ru/chrome.ts")).toContain("errorHint:");

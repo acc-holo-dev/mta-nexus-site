@@ -1,7 +1,7 @@
 "use client";
 
 import { PRODUCT_TYPES } from "@nexus/domain";
-import { Button, ErrorState, Input } from "@nexus/ui";
+import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useState } from "react";
 import { confirmedAuthorBuild } from "../lib/author-resource-response";
 import {
@@ -22,10 +22,6 @@ import { useNexusLocale } from "./locale-context";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
 
-const controlClass =
-  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const textareaClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
 const fileClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
@@ -332,7 +328,10 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               maxLength={10_000}
               rows={6}
               disabled={Boolean(createdProduct)}
-              className={textareaClass}
+              className={fieldControlClass({
+                disabled: Boolean(createdProduct),
+                className: "h-auto min-h-28",
+              })}
             />
           </div>
 
@@ -343,7 +342,10 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             <select
               id="resource-type"
               name="type"
-              className={controlClass}
+              className={fieldControlClass({
+                disabled: Boolean(createdProduct),
+                className: "min-h-11",
+              })}
               disabled={Boolean(createdProduct)}
             >
               {PRODUCT_TYPES.map((type) => (
@@ -418,7 +420,9 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               name="releaseNotes"
               rows={3}
               maxLength={5000}
-              className={textareaClass}
+              className={fieldControlClass({
+                className: "h-auto min-h-24",
+              })}
             />
           </div>
 

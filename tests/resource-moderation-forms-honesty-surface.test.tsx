@@ -51,6 +51,15 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
   }
 });
 
+it("locks new resource native controls to fieldControlClass without h-10 chrome", () => {
+  const source = read("apps/web/src/components/new-resource-form.tsx");
+  expect(source).toContain("fieldControlClass");
+  expect(source).toContain('className: "min-h-11"');
+  expect(source).not.toContain("h-10");
+  expect(source).not.toMatch(/const controlClass\s*=/u);
+  expect(source).not.toMatch(/const textareaClass\s*=/u);
+});
+
 it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("apps/web/src/lib/i18n/en/publishing.ts")).toContain("createErrorDescription");
   expect(read("apps/web/src/lib/i18n/ru/publishing.ts")).toContain("createErrorDescription");
