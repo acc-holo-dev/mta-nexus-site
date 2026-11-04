@@ -149,7 +149,7 @@ it("keeps operational errors safe and distinguishes a tag-filtered empty page", 
   const html = renderToStaticMarkup(
     await ServerUpdates({ params: Promise.resolve({ slug: "mta" }) }),
   );
-  expect(html).toContain(publicationCopy("en").error);
+  expect(html).toContain(publicationCopy("en").loadUnavailable);
   expect(html).not.toContain("Secret SQL");
   const empty = renderToStaticMarkup(
     <PublicationFeed

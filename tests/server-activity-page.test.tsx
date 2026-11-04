@@ -188,8 +188,14 @@ it("keeps filters in page links and blocks wrong-server acknowledgements", async
   expect(failed).toContain("temporarily unavailable");
 });
 it("renders an empty filtered history without an export of any extra rows", async () => {
-  state.page.mockResolvedValue({ ...data, events: [], nextCursor: null });
-  const html = await render();
+  state.page.mockResolvedValue({
+    ...data,
+    period: "30",
+    action: "visibility",
+    events: [],
+    nextCursor: null,
+  });
+  const html = await render({ period: "30", action: "visibility" });
   expect(html).toContain("No recorded events match");
   expect(html).toContain("activity/export");
   expect(html).not.toContain("Earlier activity");
