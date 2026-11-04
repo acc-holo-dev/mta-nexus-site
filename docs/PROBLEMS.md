@@ -12,7 +12,7 @@
 
 - `@esbuild-kit/*` ещё тянет `drizzle-kit@0.31.11`; безопасной замены нет, пока upstream не уберёт loader. Nested `esbuild` уже зафиксирован override на `0.28.2`.
 - Vite закреплён на `8.3.5` (Vitest 5 peer: `^6.4 || ^7 || ^8`); дальнейшие минорные обновления — небольшими группами с `pnpm test:unit` / tooling pins.
-- `dependency-cruiser@18.7.0` для `tsPreCompilationDeps` использует вложенный TypeScript `6.0.3` через `packageExtensions`. **Не снимать pin на beta:** на 2026-10-31 npm даёт только `18.8.0-beta-1` (TS ≥7.1 native API); стабильного 18.8 ещё нет. Корневой `typescript` сейчас резолвится в `7.0.2` (`^7.0.2`) — для снятия расширения нужны **оба**: stable dependency-cruiser ≥18.8 **и** typescript ≥7.1, затем `pnpm analyze:architecture` + `pnpm test:tooling`.
+- `dependency-cruiser@18.7.2` для `tsPreCompilationDeps` использует вложенный TypeScript `6.0.3` через `packageExtensions`. **Не снимать pin на beta:** на 2026-10-31 npm даёт только `18.8.0-beta-1` (TS ≥7.1 native API); стабильного 18.8 ещё нет. Корневой `typescript` сейчас резолвится в `7.0.2` (`^7.0.2`) — для снятия расширения нужны **оба**: stable dependency-cruiser ≥18.8 **и** typescript ≥7.1, затем `pnpm analyze:architecture` + `pnpm test:tooling`.
 
 ## Приёмка релиза
 
