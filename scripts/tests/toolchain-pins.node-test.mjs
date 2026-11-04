@@ -172,10 +172,10 @@ test("dependency-cruiser keeps a TypeScript 6 package extension until stable TS 
   // 3) drop packageExtensions entry for dependency-cruiser
   // 4) update this pin test + pnpm-workspace.yaml
   // 5) pnpm install --frozen-lockfile && pnpm analyze:architecture && pnpm test:tooling
-  assert.equal(rootPackage.devDependencies["dependency-cruiser"], "18.7.0");
-  assert.match(workspace, /"dependency-cruiser@18\.7\.0":[\s\S]*?typescript:\s*"6\.0\.3"/u);
-  const cruiserDir = pnpmPackageDir("dependency-cruiser@18.7.0");
-  assert.equal(readPkg(cruiserDir, "dependency-cruiser/package.json").version, "18.7.0");
+  assert.equal(rootPackage.devDependencies["dependency-cruiser"], "18.7.2");
+  assert.match(workspace, /"dependency-cruiser@18\.7\.2":[\s\S]*?typescript:\s*"6\.0\.3"/u);
+  const cruiserDir = pnpmPackageDir("dependency-cruiser@18.7.2");
+  assert.equal(readPkg(cruiserDir, "dependency-cruiser/package.json").version, "18.7.2");
   assert.equal(readPkg(cruiserDir, "typescript/package.json").version, "6.0.3");
   assert.match(rootPackage.devDependencies.typescript, /^\^7\./u);
   assert.doesNotMatch(

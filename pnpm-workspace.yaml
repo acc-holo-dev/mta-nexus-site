@@ -15,7 +15,7 @@ packageExtensions:
   # Stable dependency-cruiser still needs the TS 6 compiler API for tsPreCompilationDeps.
   # Native TypeScript 7 support lands in dependency-cruiser ≥18.8 with typescript ≥7.1;
   # keep this extension until that pair is installed and verified.
-  "dependency-cruiser@18.7.0":
+  "dependency-cruiser@18.7.2":
     dependencies:
       typescript: "6.0.3"
 overrides:
