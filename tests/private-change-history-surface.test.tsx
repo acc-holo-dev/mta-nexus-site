@@ -1,5 +1,11 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const mock = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -221,4 +227,10 @@ it("preserves normalized organization selectors and renders a read failure disti
   expect(html).toContain("min-h-11");
   expect(html).not.toContain("database-private");
   expect(html).not.toContain(privateChangeHistoryCopy("en").empty);
+});
+
+it("locks private change-history filter selects to min-h-11 without h-10 chrome", () => {
+  const source = read("apps/web/src/components/private-change-history-controls.tsx");
+  expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
+  expect(source).not.toContain("h-10");
 });

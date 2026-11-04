@@ -5,7 +5,7 @@ import type { Locale } from "../lib/i18n";
 import { privateChangeHistoryCopy } from "../lib/private-change-history-copy";
 
 const selectClass =
-  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+  "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const labelClass = "block font-label uppercase text-secondary";
 
 export function PrivateChangeHistoryFilters<
