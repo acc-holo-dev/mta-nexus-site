@@ -259,33 +259,35 @@ export function MtaMasterServerDirectory({
           </p>
         </div>
 
-        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="min-w-0 flex-1">
-            <SearchField
-              label={copy.search}
-              value={query}
-              maxLength={100}
-              onChange={(event) => updateQuery(event.target.value)}
-              placeholder={copy.searchPlaceholder}
-              className={`${controlClass} w-full`}
-            />
-          </div>
+        <search aria-label={copy.search}>
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="min-w-0 flex-1">
+              <SearchField
+                label={copy.search}
+                value={query}
+                maxLength={100}
+                onChange={(event) => updateQuery(event.target.value)}
+                placeholder={copy.searchPlaceholder}
+                className={`${controlClass} w-full`}
+              />
+            </div>
 
-          <label className="text-xs text-secondary">
-            {copy.minimumPlayers}
-            <select
-              value={minimumPlayers}
-              onChange={(event) => updateMinimumPlayers(Number(event.target.value))}
-              className={`${controlClass} mt-1 block w-full`}
-            >
-              <option value={0}>{copy.anyPlayers}</option>
-              <option value={1}>1+ {copy.players}</option>
-              <option value={10}>10+ {copy.players}</option>
-              <option value={50}>50+ {copy.players}</option>
-              <option value={100}>100+ {copy.players}</option>
-            </select>
-          </label>
-        </div>
+            <label className="text-xs text-secondary">
+              {copy.minimumPlayers}
+              <select
+                value={minimumPlayers}
+                onChange={(event) => updateMinimumPlayers(Number(event.target.value))}
+                className={`${controlClass} mt-1 block w-full`}
+              >
+                <option value={0}>{copy.anyPlayers}</option>
+                <option value={1}>1+ {copy.players}</option>
+                <option value={10}>10+ {copy.players}</option>
+                <option value={50}>50+ {copy.players}</option>
+                <option value={100}>100+ {copy.players}</option>
+              </select>
+            </label>
+          </div>
+        </search>
         <p className="text-xs text-secondary">{copy.connectHint}</p>
       </div>
 

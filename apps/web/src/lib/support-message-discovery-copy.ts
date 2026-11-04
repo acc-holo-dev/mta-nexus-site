@@ -6,6 +6,7 @@ const en = {
   description:
     "Find messages in this private support case. Pages contain up to 20 messages in chronological order.",
   search: "Message text",
+  filters: "Conversation filters",
   placeholder: "Search this conversation",
   apply: "Search",
   group: "Author",
@@ -41,6 +42,7 @@ const ru: typeof en = {
   description:
     "Поиск сообщений в этом личном обращении. На странице до 20 сообщений в хронологическом порядке.",
   search: "Текст сообщения",
+  filters: "Фильтры переписки",
   placeholder: "Поиск в этом обращении",
   apply: "Найти",
   group: "Автор",

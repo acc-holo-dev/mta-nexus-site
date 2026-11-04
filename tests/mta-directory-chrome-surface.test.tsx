@@ -22,10 +22,22 @@ describe("MTA directory/visibility chrome", () => {
     const copy = getDictionary("en").servers;
     const html = renderToStaticMarkup(createElement(MtaMasterServerDirectory, { locale: "en" }));
     expect(html).toContain(copy.directory);
+    expect(html).toContain(`<search aria-label="${copy.search}"`);
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain('aria-live="polite"');
     expect(html).toContain("rounded-lg");
   });
+
+  it.each(["en", "ru"] as const)(
+    "names directory client filters with a localized search landmark in %s",
+    (locale) => {
+      const copy = getDictionary(locale).servers;
+      const html = renderToStaticMarkup(createElement(MtaMasterServerDirectory, { locale }));
+      expect(html).toContain(`<search aria-label="${copy.search}"`);
+      expect(html).toContain(copy.minimumPlayers);
+      expect(html).toContain(copy.searchPlaceholder);
+    },
+  );
 
   it("locks directory resetFilters CTA to size=touch", () => {
     const source = read("apps/web/src/components/mta-master-server-directory.tsx");

@@ -75,6 +75,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("overflow-x-clip");
     expect(html).toContain(copy.focused);
     expect(html).toContain(copy.truncated);
+    expect(html).toContain(`<search aria-label="${copy.filters}"`);
     expect(html).toContain('method="get"');
     expect(html).toContain("bg-accent text-white");
     expect(html).toContain('maxLength="80"');

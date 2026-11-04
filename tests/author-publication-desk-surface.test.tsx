@@ -124,6 +124,9 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain('action="/workspace/content"');
+    expect(html).toContain(
+      `<search aria-label="${authorPublicationDeskCopy(locale).filters}"`,
+    );
     expect(html).toContain("rounded-lg");
     expect(html).toContain("bg-accent");
     expect(html).toContain("&lt;Private title&gt;");
