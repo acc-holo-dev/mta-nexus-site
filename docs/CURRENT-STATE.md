@@ -8,6 +8,9 @@
 
 - `1bb5ab2d` / #252 — browser contracts after honesty confirms (ConfirmDialog, ErrorState `id`, guest More order, login rate-limit);
 - `f3525fa5` / #249 — Dependabot biome/knip/swc/`@types/node` (full tip CI red on browsers until #252);
+- `d281ac67` / #261 — lucide-react 1.67.0;
+- `7511115c` / #260 — vitest 5.1.0;
+- `40fbd3b1` / #259 — tip baseline cefbf4e9;
 - `cefbf4e9` / #256 — next 16.4.3→16.4.4;
 - `9c31b96d` / #254 — CURRENT-STATE tip baseline after #252/#250/#251;
 - `3a696983` / #251 — tailwind 4.3.4 + dependency-cruiser 18.7.2 (TS6 packageExtensions kept);
@@ -21,8 +24,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `cefbf4e92995fba2bddb5dc6cfb4757d8c727c85` (`chore(deps): bump next from 16.4.3 to 16.4.4`).
-- **Verified CI green on that tip:** [CI 41817787691](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41817787691) (16 checks, full selected scope incl. browsers).
+- **Tip SHA:** `d281ac6755bd6efff7828b9ba2cc17f582c42f60` (`chore(deps): bump next from 16.4.3 to 16.4.4`).
+- **Verified CI green on that tip:** [CI 41828791678](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41828791678) (full selected scope).
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
@@ -64,11 +67,11 @@
 
 На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13/ARC14 + FLOW/UX/OPS/GROW-01 и UX-19/20/22. **Не** закрыты **F03/F04** (нужен live evidence), GitHub settings, deploy, реклама и GROW-пилоты.
 
-**Последний GitHub-verified baseline:** tip `cefbf4e929…` / [CI 41817787691](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41817787691) (full browsers). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+**Последний GitHub-verified baseline:** tip `d281ac6755…` / [CI 41828791678](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41817787691) (full browsers). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep (#200–#247) + browser honesty restore (#252) + deps (#249/#250) в `main`; tip `cefbf4e929…` full green. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep (#200–#247) + browser honesty restore (#252) + deps (#249/#250) в `main`; tip `d281ac6755…` full green. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
