@@ -936,6 +936,7 @@ Release applicability: before_using_maintenance_recipe.
 ### Проверки при реализации
 
 - node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs — проверяют tooling, не production schedule.
+- node --test scripts/tests/production-recovery-acceptance-evidence.node-test.mjs и node scripts/check-production-recovery-acceptance-evidence.mjs — schema/template validators (#191/#267); PASS на fixture ≠ закрытие F04/OPS-13.
 - Read-only инвентаризация существующих backup jobs и последней успешной копии только после допуска к целевому окружению.
 - Отдельно разрешённый off-host restore drill; scripts/check-backup-restore.mjs не направлять на рабочие volumes, его hosted-disposable guards сохраняются.
 
@@ -986,6 +987,7 @@ Release applicability: before_live_acceptance.
 ### Проверки при реализации
 
 - node --test scripts/tests/observability-evidence-lib.node-test.mjs scripts/tests/web-push-worker-health.node-test.mjs scripts/tests/web-push-worker-queue.node-test.mjs
+- node --test scripts/tests/observability-live-drill-evidence.node-test.mjs и node scripts/check-observability-live-drill-evidence.mjs — live-drill evidence shape (#191/#262); fixture/validator PASS ≠ закрытие F03/OPS-14.
 - pnpm test:focus tests/observability.test.ts
 - pnpm observability:ready / pnpm observability:verify проверяют локальный комплект; запись readiness требует предусмотренного ACK и сама не закрывает F03.
 - Live routing/drill — только на отдельно согласованном окружении; credentials и существующие settings не читать без допуска.
@@ -3366,7 +3368,7 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
-Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
+ Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
