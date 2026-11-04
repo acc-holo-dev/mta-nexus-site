@@ -2,6 +2,7 @@ vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
 
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -55,14 +56,30 @@ vi.mock("@nexus/ui", () => ({
       {label}: {value}
     </p>
   ),
-  EmptyState: ({ title, action }: { title: string; action?: React.ReactNode }) => (
+  EmptyState: ({
+    title,
+    description,
+    action,
+  }: {
+    title: string;
+    description: string;
+    action?: ReactNode;
+  }) => (
     <div>
       <p>{title}</p>
+      <p>{description}</p>
+      {action}
+    </div>
+  ),
+  ErrorState: ({ title, action }: { title: string; action?: ReactNode }) => (
+    <div role="alert">
+      <h2>{title}</h2>
       {action}
     </div>
   ),
 }));
 
+import { getDictionary } from "../../../lib/i18n";
 import Page, { generateMetadata } from "./page";
 
 const params = () => ({ params: Promise.resolve({ username: "creator" }) });
@@ -97,6 +114,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("published resource");
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(html).toContain("Creator");
+    expect(html).toContain("min-w-0 space-y-10 overflow-x-clip");
+    expect(html).toContain("min-h-11");
   },
 );
 
@@ -164,7 +183,28 @@ it("does not offer navigation for an empty portfolio", async () => {
   expect(html).not.toContain('rel="next"');
   expect(html).not.toContain('rel="prev"');
   expect(html).toContain('href="/market?maxPrice=0"');
+  expect(html).toContain(getDictionary("en").developers.noReleases);
+  expect(html).toContain(getDictionary("en").developers.noReleasesHint);
+  expect(html).not.toContain('role="alert"');
 });
+
+it.each(["en", "ru"] as const)(
+  "shows creator load failures as alerts instead of an empty portfolio in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = getDictionary(locale).developers;
+    state.products.mockRejectedValueOnce(new Error("private-database-detail"));
+    const html = renderToStaticMarkup(await Page(params()));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/developers/creator"');
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).not.toContain("private-database-detail");
+    expect(html).not.toContain("published resource");
+  },
+);
 it("hides personal activity links without hiding published resources", async () => {
   state.showActivity = false;
   const html = renderToStaticMarkup(await Page(params()));

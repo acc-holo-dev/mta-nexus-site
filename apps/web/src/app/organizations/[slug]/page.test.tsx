@@ -2,6 +2,7 @@ vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
 
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -40,7 +41,30 @@ vi.mock("../../../components/product-card", () => ({
 vi.mock("../../../components/article-card", () => ({
   ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
 }));
-vi.mock("@nexus/ui", () => ({ StatCard: ({ value }: { value: number }) => <p>{value}</p> }));
+vi.mock("@nexus/ui", () => ({
+  StatCard: ({ value }: { value: number }) => <p>{value}</p>,
+  EmptyState: ({
+    title,
+    description,
+    action,
+  }: {
+    title: string;
+    description: string;
+    action?: ReactNode;
+  }) => (
+    <div>
+      <p>{title}</p>
+      <p>{description}</p>
+      {action}
+    </div>
+  ),
+  ErrorState: ({ title, action }: { title: string; action?: ReactNode }) => (
+    <div role="alert">
+      <h2>{title}</h2>
+      {action}
+    </div>
+  ),
+}));
 vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NOT_FOUND");
@@ -86,6 +110,8 @@ it.each(["en", "ru"] as const)("renders a paginated portfolio and total in %s", 
   expect(html).toContain("137");
   expect(state.content).toHaveBeenCalledWith("org", 3, 12);
   expect(html).toContain('href="/organizations/team?page=2&amp;articlePage=4#articles"');
+  expect(html).toContain("min-w-0 space-y-10 overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html.match(/<h1\b/g)).toHaveLength(1);
 });
 it.each(["0", "bad", ["1", "2"]])("normalizes invalid page %j", async (page) => {
@@ -110,6 +136,43 @@ it("omits empty article sections and navigation", async () => {
   expect(html).not.toContain('id="articles"');
   expect(html).not.toContain("articlePage=");
 });
+
+it.each(["en", "ru"] as const)(
+  "shows organization load failures as alerts instead of an empty portfolio in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = getDictionary(locale).organizations;
+    state.products.mockRejectedValueOnce(new Error("private-database-detail"));
+    const html = renderToStaticMarkup(await Page(input("2", "3")));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/organizations/team"');
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).not.toContain("private-database-detail");
+    expect(html).not.toContain("Later release");
+    expect(html).not.toContain('id="resources"');
+  },
+);
+
+it.each(["en", "ru"] as const)(
+  "explains an empty organization portfolio without implying a load failure in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = getDictionary(locale).organizations;
+    state.products.mockResolvedValue({ products: [], total: 0, page: 1, totalPages: 1 });
+    state.content.mockResolvedValue({ items: [], total: 0, page: 1, totalPages: 1 });
+    const html = renderToStaticMarkup(await Page(input()));
+    expect(html).toContain(copy.emptyPortfolio);
+    expect(html).toContain(copy.emptyPortfolioHint);
+    expect(html).toContain('href="/market?maxPrice=0"');
+    expect(html).toContain("min-h-11");
+    expect(html).not.toContain('id="resources"');
+    expect(html).not.toContain('id="articles"');
+    expect(html).not.toContain('role="alert"');
+  },
+);
 
 it("uses stored organization identity and bounds its description", async () => {
   state.description = `  ${"x".repeat(200)}  `;

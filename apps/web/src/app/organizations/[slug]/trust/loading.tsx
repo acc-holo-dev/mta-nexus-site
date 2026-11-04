@@ -6,11 +6,11 @@ export default async function Loading() {
   const copy = contextTrustCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-4xl space-y-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="context-trust-loading-heading"
     >
-      <header className="nexus-panel space-y-3 p-6">
+      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
         <h1 id="context-trust-loading-heading" className="text-xl font-bold text-primary">
           {copy.title}
         </h1>
@@ -20,7 +20,7 @@ export default async function Loading() {
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
         {[1, 2, 3].map((key) => (
-          <div key={key} className="h-24 rounded bg-inset" />
+          <div key={key} className="h-24 max-w-full rounded bg-inset" />
         ))}
       </div>
     </section>

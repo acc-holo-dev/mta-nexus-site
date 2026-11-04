@@ -145,5 +145,9 @@ export const publishing = {
     public: "Public",
     releasesBy: "Public releases by",
     noReleases: "No public releases yet.",
+    noReleasesHint:
+      "Published free resources by this creator will appear here when available. An empty list is not a load failure.",
+    loadUnavailable:
+      "This creator profile is temporarily unavailable. This does not mean there are no public releases.",
   },
 };

@@ -5,7 +5,11 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 export default async function Loading() {
   const copy = getDictionary(await getRequestLocale()).developers;
   return (
-    <section className="space-y-6" aria-busy="true" aria-labelledby="developer-loading-heading">
+    <section
+      className="min-w-0 space-y-6 overflow-x-clip"
+      aria-busy="true"
+      aria-labelledby="developer-loading-heading"
+    >
       <header className="space-y-2">
         <h1 id="developer-loading-heading" className="font-display text-primary">
           {copy.creatorProfile}
@@ -15,8 +19,8 @@ export default async function Loading() {
         </p>
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
-        <div className="h-28 rounded bg-inset" />
-        <div className="h-40 rounded bg-inset" />
+        <div className="h-28 max-w-full rounded bg-inset" />
+        <div className="h-40 max-w-full rounded bg-inset" />
       </div>
     </section>
   );
