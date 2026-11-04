@@ -158,7 +158,9 @@ export function SellerSalesReportView({
           />
         </label>
         <div className="flex items-end gap-4">
-          <Button type="submit">{c.apply}</Button>
+          <Button type="submit" size="touch">
+            {c.apply}
+          </Button>
           <Link
             href={resetHref}
             className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

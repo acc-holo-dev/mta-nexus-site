@@ -165,3 +165,15 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     "loadUnavailableHint",
   );
 });
+
+it("locks order-case filter apply and selects to touch targets", () => {
+  const source = read("apps/web/src/components/order-case-page.tsx");
+  expect(source).toContain('size="touch"');
+  expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
+  expect(source).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
+  expect(
+    source.match(/min-h-11 rounded-lg border border-base bg-surface p-2 text-sm/gu)?.length,
+  ).toBe(2);
+  expect(source).not.toContain('size="sm"');
+  expect(source).not.toContain("min-h-10");
+});
