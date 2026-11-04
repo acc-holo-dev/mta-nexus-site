@@ -3,6 +3,7 @@ import { consumeRateLimit } from "@nexus/security";
 import { createProductSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { parseMarketQuery } from "../../../lib/market-query";
 import {
@@ -132,6 +133,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    requireServerJsonContentType(request);
+
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
       return privateJson(
@@ -144,7 +147,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const parsed = createProductSchema.safeParse(await request.json().catch(() => null));
+    const parsed = createProductSchema.safeParse(await readBoundedJson(request, 128 * 1024));
     if (!parsed.success) {
       return privateJson(
         context,

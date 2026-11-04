@@ -20,7 +20,7 @@ export function requireServerJsonContentType(request: Pick<Request, "headers">):
 export const SERVER_MUTATION_MAX_BODY_BYTES = 32 * 1024;
 
 function tooLarge(): AppError {
-  return new AppError("Server request body exceeds 32 KiB", 413, "REQUEST_BODY_TOO_LARGE");
+  return new AppError("Request body exceeds the allowed size", 413, "REQUEST_BODY_TOO_LARGE");
 }
 
 function timedOut(): AppError {

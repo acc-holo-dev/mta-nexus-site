@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
@@ -76,6 +76,31 @@ describe("resource creation HTTP errors", () => {
     expect(await response.json()).toMatchObject({
       code: "PRODUCT_METADATA_INVALID",
     });
+    expect(mocks.createProduct).not.toHaveBeenCalled();
+  });
+
+  it("rejects non-JSON media before consuming the creation budget", async () => {
+    const response = await POST(
+      new NextRequest("http://nexus.test/api/products", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+        body: JSON.stringify(validResourceInput),
+      }),
+    );
+    expect(response.status).toBe(415);
+    expect(await response.json()).toMatchObject({ code: "UNSUPPORTED_MEDIA_TYPE" });
+    expectPrivate(response);
+    expect(mocks.consumeRateLimit).not.toHaveBeenCalled();
+    expect(mocks.createProduct).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized streamed resource metadata without creating a resource", async () => {
+    const response = await POST(
+      request({ ...validResourceInput, description: "x".repeat(128 * 1024) }),
+    );
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({ code: "REQUEST_BODY_TOO_LARGE" });
+    expectPrivate(response);
     expect(mocks.createProduct).not.toHaveBeenCalled();
   });
 
