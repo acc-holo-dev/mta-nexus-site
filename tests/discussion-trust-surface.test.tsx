@@ -1,10 +1,11 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
 import { OwnDiscussionDetail } from "../apps/web/src/components/own-discussion-detail";
 import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
 import { ownDiscussionCopy } from "../apps/web/src/lib/discussion-workspace-copy";
 import { approvalCopy } from "../apps/web/src/lib/public-verification-history-copy";
+
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   session: vi.fn(),
@@ -29,11 +30,15 @@ vi.mock("../apps/web/src/lib/services/public-verification-history-service", () =
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
-import OwnPage, { generateMetadata } from "../apps/web/src/app/workspace/discussions/page";
-import DetailPage from "../apps/web/src/app/workspace/discussions/[id]/page";
+
 import HistoryPage, {
   generateMetadata as historyMetadata,
 } from "../apps/web/src/app/users/[username]/trust/history/page";
+import DetailPage from "../apps/web/src/app/workspace/discussions/[id]/page";
+import DiscussionsLoading from "../apps/web/src/app/workspace/discussions/loading";
+import OwnPage, { generateMetadata } from "../apps/web/src/app/workspace/discussions/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const item = {
     id: "comment",
     contentId: "content",
@@ -155,8 +160,42 @@ it("provides 404 for missing or foreign own comments and reload for persistence 
   mocks.own.mockRejectedValueOnce(new Error("secret text"));
   const html = renderToStaticMarkup(await DetailPage(detail));
   expect(html).toContain(ownDiscussionCopy("en").failed);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/workspace/discussions/comment"');
   expect(html).not.toContain("secret text");
+});
+it("shows an honest recovery state when own comments fail to load", async () => {
+  mocks.page.mockRejectedValueOnce(new Error("comments unavailable"));
+  const copy = ownDiscussionCopy("en");
+  const html = renderToStaticMarkup(await OwnPage({}));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.failed);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain('href="/workspace/discussions"');
+  expect(html).not.toContain("comments unavailable");
+});
+it("shows EmptyState descriptions for empty and filtered own comments", async () => {
+  const copy = ownDiscussionCopy("en");
+  mocks.page.mockResolvedValueOnce({ items: [], hasMore: false, nextCursor: null });
+  const empty = renderToStaticMarkup(await OwnPage({}));
+  expect(empty).toContain(copy.empty);
+  expect(empty).toContain(copy.emptyDescription);
+  mocks.page.mockResolvedValueOnce({ items: [], hasMore: false, nextCursor: null });
+  const filtered = renderToStaticMarkup(
+    await OwnPage({ searchParams: Promise.resolve({ q: "Lua" }) }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.emptyFilteredDescription);
+  expect(filtered).toContain(copy.reset);
+});
+it("clips honest discussions loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await DiscussionsLoading());
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(ownDiscussionCopy("en").loading);
 });
 it.each(["en", "ru"] as const)(
   "separates historical approvals from currently unverified flags in %s",

@@ -1,5 +1,6 @@
-import type { Locale } from "./i18n";
 import { discussionMutationError } from "./content-discussion-copy";
+import type { Locale } from "./i18n";
+
 const en = {
   title: "My comments",
   description:
@@ -14,7 +15,9 @@ const en = {
   latest: "Latest comments",
   next: "Older comments",
   empty: "You have not commented on publications yet.",
+  emptyDescription: "Comments you leave on publications appear here for private management.",
   emptyFiltered: "No comments match this page or its filters.",
+  emptyFilteredDescription: "Clear the filters or open the latest comments page to continue.",
   hidden: "Publication unavailable",
   hiddenNote:
     "The publication is no longer public. Its details are hidden; you can still remove your own comment.",
@@ -47,7 +50,11 @@ const ru: Record<keyof typeof en, string> = {
   latest: "Новые комментарии",
   next: "Старые комментарии",
   empty: "Вы пока не комментировали публикации.",
+  emptyDescription:
+    "Комментарии, которые вы оставляете к публикациям, появляются здесь для личного управления.",
   emptyFiltered: "На этой странице нет комментариев по выбранным фильтрам.",
+  emptyFilteredDescription:
+    "Сбросьте фильтры или откройте страницу новых комментариев, чтобы продолжить.",
   hidden: "Публикация недоступна",
   hiddenNote:
     "Публикация больше не публичная. Её данные скрыты; свой комментарий по-прежнему можно удалить.",

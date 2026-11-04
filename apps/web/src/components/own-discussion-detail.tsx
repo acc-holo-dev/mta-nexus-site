@@ -5,6 +5,10 @@ import type { OwnDiscussion } from "../lib/discussion-workspace-contract";
 import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import type { Locale } from "../lib/i18n";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
+
+const linkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function OwnDiscussionDetail({
   initial,
   locale,
@@ -19,21 +23,20 @@ export function OwnDiscussionDetail({
     [pending, setPending] = useState(false);
   if (removed)
     return (
-      <div className="nexus-panel space-y-4 p-6">
+      <div className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6">
         <p role="status" className="text-sm text-success">
           {copy.removed}
         </p>
-        <Link
-          href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/discussions" className={linkClass}>
           {copy.back}
         </Link>
       </div>
     );
   return (
-    <article className="nexus-panel space-y-4 p-6" aria-busy={pending}>
-      <h1 className="break-words text-xl font-bold text-primary">{comment.title ?? copy.hidden}</h1>
+    <article className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6" aria-busy={pending}>
+      <h1 className="min-w-0 break-words text-xl font-bold text-primary">
+        {comment.title ?? copy.hidden}
+      </h1>
       {!comment.available && <p className="text-sm text-muted">{copy.hiddenNote}</p>}
       {!comment.editable && <p className="text-sm text-muted">{copy.readOnly}</p>}
       <time dateTime={comment.createdAt} className="text-xs text-muted">
@@ -49,7 +52,7 @@ export function OwnDiscussionDetail({
         <Link
           prefetch={false}
           href={`/articles/${encodeURIComponent(comment.slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkClass}
         >
           {copy.discussion}
         </Link>

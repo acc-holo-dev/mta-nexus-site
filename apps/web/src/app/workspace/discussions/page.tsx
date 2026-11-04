@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
@@ -8,10 +8,17 @@ import {
   parseOwnDiscussionQuery,
 } from "../../../lib/discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../../../lib/discussion-workspace-copy";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/discussion-workspace-service";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const linkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata() {
   const copy = ownDiscussionCopy(await getRequestLocale());
   return {
@@ -20,13 +27,15 @@ export async function generateMetadata() {
     robots: { index: false, follow: false },
   };
 }
+
 export default async function OwnDiscussionsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const locale = await getRequestLocale(),
-    copy = ownDiscussionCopy(locale);
+    copy = ownDiscussionCopy(locale),
+    dictionary = getDictionary(locale);
   const rawSearchParams = (await searchParams) ?? {};
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
@@ -55,15 +64,13 @@ export default async function OwnDiscussionsPage({
         return null;
       })
     : null;
+  const filtered = Boolean(filters?.cursor || filters?.query || filters?.availability);
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href="/workspace"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace" className={linkClass}>
         {copy.workspace}
       </Link>
-      <header className="space-y-2 border-b border-base pb-6">
+      <header className="min-w-0 space-y-2 border-b border-base pb-6">
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.privacy}</p>
@@ -71,7 +78,7 @@ export default async function OwnDiscussionsPage({
       <form
         action="/workspace/discussions"
         method="get"
-        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
       >
         <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
           {copy.query}
@@ -98,46 +105,41 @@ export default async function OwnDiscussionsPage({
         <Button type="submit" className="min-h-11 font-semibold">
           {copy.search}
         </Button>
-        <Link
-          href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/discussions" className={linkClass}>
           {copy.reset}
         </Link>
       </form>
-      <a
-        href={latest}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <a href={latest} className={linkClass}>
         {copy.latest}
       </a>
-      {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
-      )}
-      {page && !page.items.length && (
-        <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
-          <p>
-            {filters?.cursor || filters?.query || filters?.availability
-              ? copy.emptyFiltered
-              : copy.empty}
-          </p>
-          {(filters?.cursor || filters?.query || filters?.availability) && (
-            <Link
-              href="/workspace/discussions"
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          )}
-        </div>
-      )}
-      {page && (
-        <ul className="space-y-3">
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <a href={latest} className={linkClass}>
+              {dictionary.errors.retry}
+            </a>
+          }
+        />
+      ) : null}
+      {page && !page.items.length ? (
+        <EmptyState
+          title={filtered ? copy.emptyFiltered : copy.empty}
+          description={filtered ? copy.emptyFilteredDescription : copy.emptyDescription}
+          action={
+            filtered ? (
+              <Link href="/workspace/discussions" className={linkClass}>
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : null}
+      {page?.items.length ? (
+        <ul className="min-w-0 space-y-3">
           {page.items.map((item) => (
-            <li key={item.id} className="nexus-panel space-y-3 p-5">
-              <h2 className="break-words font-semibold text-primary">
+            <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+              <h2 className="min-w-0 break-words font-semibold text-primary">
                 {item.title ?? copy.hidden}
               </h2>
               <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.text}</p>
@@ -147,11 +149,11 @@ export default async function OwnDiscussionsPage({
                   timeZoneName: "short",
                 })}
               </time>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex min-w-0 flex-wrap gap-3">
                 <Link
                   prefetch={false}
                   href={`/workspace/discussions/${encodeURIComponent(item.id)}`}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkClass}
                 >
                   {copy.open}
                 </Link>
@@ -159,7 +161,7 @@ export default async function OwnDiscussionsPage({
                   <Link
                     prefetch={false}
                     href={`/articles/${encodeURIComponent(item.slug)}?comment=${encodeURIComponent(item.id)}#comment-${encodeURIComponent(item.id)}`}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkClass}
                   >
                     {copy.discussion}
                   </Link>
@@ -168,8 +170,8 @@ export default async function OwnDiscussionsPage({
             </li>
           ))}
         </ul>
-      )}
-      {page?.nextCursor && filters && (
+      ) : null}
+      {page?.nextCursor && filters ? (
         <Link
           prefetch={false}
           href={ownDiscussionHref(filters, page.nextCursor)}
@@ -177,7 +179,7 @@ export default async function OwnDiscussionsPage({
         >
           {copy.next}
         </Link>
-      )}
+      ) : null}
     </div>
   );
 }

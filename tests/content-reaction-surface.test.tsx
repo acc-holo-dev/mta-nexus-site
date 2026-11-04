@@ -34,6 +34,7 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () =
 import TrustPage, {
   generateMetadata as trustMetadata,
 } from "../apps/web/src/app/users/[username]/trust/page";
+import ReactionsLoading from "../apps/web/src/app/workspace/reactions/loading";
 import ReactionsPage, { generateMetadata } from "../apps/web/src/app/workspace/reactions/page";
 
 const saved = {
@@ -159,8 +160,45 @@ it("rejects duplicate/unknown SSR parameters and provides a fresh-state recovery
   expect(html).toContain('role="alert"');
   expect(mocks.page).not.toHaveBeenCalled();
   expect(html).toContain('href="/workspace/reactions"');
+  expect(html).toContain(getDictionary("en").errors.retry);
   mocks.page.mockRejectedValue(new AppError("private filter", 400, "INVALID_CURSOR"));
   expect(renderToStaticMarkup(await ReactionsPage({}))).toContain(reactionCopy("en").invalid);
+});
+it("shows an honest recovery state when private reactions fail to load", async () => {
+  mocks.page.mockRejectedValueOnce(new Error("reactions unavailable"));
+  const copy = reactionCopy("en");
+  const html = renderToStaticMarkup(await ReactionsPage({}));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.unavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain('href="/workspace/reactions"');
+  expect(html).not.toContain("reactions unavailable");
+});
+it("shows EmptyState descriptions for empty and filtered reactions", async () => {
+  const copy = reactionCopy("en");
+  mocks.page.mockResolvedValueOnce({ items: [], hasMore: false, nextCursor: null });
+  const empty = renderToStaticMarkup(await ReactionsPage({}));
+  expect(empty).toContain(copy.empty);
+  expect(empty).toContain(copy.emptyDescription);
+  mocks.page.mockResolvedValueOnce({ items: [], hasMore: false, nextCursor: null });
+  const filtered = renderToStaticMarkup(
+    await ReactionsPage({ searchParams: Promise.resolve({ q: "Lua" }) }),
+  );
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.emptyFilteredDescription);
+  expect(filtered).toContain(copy.reset);
+});
+it("clips honest reactions loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await ReactionsLoading());
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(reactionCopy("en").loading);
+});
+it("keeps reaction removal controls at a usable touch target", async () => {
+  const html = renderToStaticMarkup(await ReactionsPage({}));
+  expect(html).toContain("min-h-11");
+  expect(html).toContain(reactionCopy("en").remove);
 });
 it.each(["en", "ru"] as const)(
   "explains current trust scope, hidden activity and absent recorded dates in %s",
