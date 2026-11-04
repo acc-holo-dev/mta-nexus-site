@@ -1,3 +1,4 @@
+import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../lib/i18n";
@@ -9,6 +10,9 @@ import { serverStatisticsIntervals } from "../lib/server-statistics-export";
 import type { ServerStatisticsResult } from "../lib/services/server-statistics-service";
 import { ServerObservationPeriodControls } from "./server-observation-period-controls";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
+
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function StatisticsScrollArea({
   labelledBy,
@@ -56,19 +60,19 @@ export function ServerStatisticsPanel({
     });
   const exportPath = `${managed ? "/api/workspace" : "/api"}/servers/${encodeURIComponent(report.server.id)}/statistics/export`;
   return (
-    <div className="space-y-6">
-      <header className="space-y-3">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
+      <header className="min-w-0 space-y-3">
         <Link
           href={
             managed
               ? `/workspace/servers/${encodeURIComponent(report.server.id)}`
               : `/servers/${encodeURIComponent(report.server.slug)}`
           }
-          className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={`${navLinkClass} font-semibold hover:underline`}
         >
           ← {managed ? copy.management : copy.back}
         </Link>
-        <h1 className="text-2xl font-black text-primary">{copy.title}</h1>
+        <h1 className="break-words text-2xl font-black text-primary">{copy.title}</h1>
         <p className="break-words text-lg font-semibold text-primary">{report.server.name}</p>
         <p className="text-sm text-muted">{copy.description}</p>
         {managed && <p className="text-xs text-muted">{copy.private}</p>}
@@ -83,7 +87,7 @@ export function ServerStatisticsPanel({
         </p>
         <p className="text-xs text-muted">{copy.snapshotScope}</p>
       </header>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <h2 id="server-statistics-comparison" className="text-lg font-bold text-primary">
           {copy.comparison}
         </h2>
@@ -145,16 +149,19 @@ export function ServerStatisticsPanel({
             : ` (${report.averagePlayerPercentChange > 0 ? "+" : ""}${report.averagePlayerPercentChange}%)`}
         </p>
       </section>
-      <section className="nexus-panel space-y-3 p-5" aria-labelledby="server-statistics-chart">
+      <section
+        className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
+        aria-labelledby="server-statistics-chart"
+      >
         <h2 id="server-statistics-chart" className="text-lg font-bold text-primary">
           {copy.chart}
         </h2>
         {report.summary.observationCount === 0 ? (
-          <p className="text-sm text-muted">{copy.empty}</p>
+          <EmptyState title={copy.empty} description={copy.emptyHint} />
         ) : (
           <>
             <ol
-              className="flex h-36 items-end gap-1 rounded-lg bg-inset p-3"
+              className="flex h-36 items-end gap-1 overflow-x-auto rounded-lg bg-inset p-3"
               aria-label={copy.chart}
             >
               {intervals.map((interval) => (
@@ -182,7 +189,7 @@ export function ServerStatisticsPanel({
         </div>
       </section>
       <section
-        className="nexus-panel space-y-3 p-5"
+        className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
         aria-labelledby="server-statistics-observations"
       >
         <h2 id="server-statistics-observations" className="text-lg font-bold text-primary">
@@ -190,7 +197,7 @@ export function ServerStatisticsPanel({
         </h2>
         <p className="text-sm text-muted">{copy.observationsScope}</p>
         <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
           href={serverStatisticsHref(
             `${managed ? `/workspace/servers/${encodeURIComponent(report.server.id)}` : `/servers/${encodeURIComponent(report.server.slug)}`}/observations`,
             state,
@@ -199,7 +206,10 @@ export function ServerStatisticsPanel({
           {serverObservationBrowserCopy(locale).open}
         </Link>
         {report.observations.length === 0 ? (
-          <p className="text-sm text-muted">{before ? copy.endOfPage : copy.empty}</p>
+          <EmptyState
+            title={before ? copy.endOfPage : copy.empty}
+            description={before ? copy.endOfPageHint : copy.emptyHint}
+          />
         ) : (
           <StatisticsScrollArea labelledBy="server-statistics-observations">
             <table className="w-full text-left text-sm">
@@ -248,27 +258,24 @@ export function ServerStatisticsPanel({
         )}
         <nav
           aria-label={copy.navigation}
-          className="flex flex-wrap gap-4 text-sm font-semibold text-accent"
+          className="flex min-w-0 flex-wrap gap-4 text-sm font-semibold text-accent"
         >
           {before && (
-            <Link
-              href={serverStatisticsHref(path, state)}
-              className="min-h-11 py-2 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={serverStatisticsHref(path, state)} className={navLinkClass}>
               {copy.latest}
             </Link>
           )}
           {report.nextCursor && (
             <Link
               href={serverStatisticsHref(path, { ...state, before: report.nextCursor })}
-              className="min-h-11 py-2 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.earlier} →
             </Link>
           )}
         </nav>
       </section>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <div className="flex flex-wrap gap-3">
           <ServerStatisticsExportButton
             url={serverStatisticsHref(exportPath, { ...state, format: "buckets" })}

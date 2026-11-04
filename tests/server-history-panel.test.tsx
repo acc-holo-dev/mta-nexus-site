@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
 import { ServerHistoryPanel } from "../apps/web/src/components/server-history-panel";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const history = {
   server: { id: "server", name: "Server", slug: "server" },
@@ -48,34 +49,46 @@ it.each(["en", "ru"] as const)(
       /<a\b[^>]*href="\/servers\/server\?history=30d#server-history-title"[^>]*>/,
     )?.[0];
     expect(selectedLink).toContain('aria-current="true"');
+    expect(selectedLink).toContain("min-h-11");
     expect(html.match(/class="flex h-full min-w-0 flex-1 items-end"/g) ?? []).toHaveLength(31);
     expect(html).toContain(locale === "ru" ? "число игроков неизвестно" : "player count unknown");
     expect(html).not.toContain("NaN");
   },
 );
-it("renders an empty period without fabricated chart observations", () => {
-  const empty = {
-    ...history,
-    buckets: [],
-    summary: {
-      ...history.summary,
-      observationCount: 0,
-      knownPlayerCount: 0,
-      peakPlayers: null,
-      averagePlayers: null,
-      latestPlayers: null,
-    },
-  };
-  const html = renderToStaticMarkup(<ServerHistoryPanel history={empty} />);
-  expect(html).toContain("selected period");
-  expect(html).not.toContain("<ol");
-});
-it("keeps an unavailable history separate from live status", () => {
+it.each(["en", "ru"] as const)(
+  "renders an EmptyState for empty periods without fabricated chart observations in %s",
+  (locale) => {
+    const copy = getDictionary(locale).serverHistory;
+    const empty = {
+      ...history,
+      buckets: [],
+      summary: {
+        ...history.summary,
+        observationCount: 0,
+        knownPlayerCount: 0,
+        peakPlayers: null,
+        averagePlayers: null,
+        latestPlayers: null,
+      },
+    };
+    const html = renderToStaticMarkup(<ServerHistoryPanel history={empty} locale={locale} />);
+    expect(html).toContain(copy.empty);
+    expect(html).toContain(copy.emptyHint);
+    expect(copy.emptyHint).not.toBe(copy.empty);
+    expect(html).not.toContain("<ol");
+    expect(html).not.toContain(copy.unavailable);
+  },
+);
+it("keeps an unavailable history separate from live status and empty periods", () => {
+  const copy = getDictionary("en").serverHistory;
   const html = renderToStaticMarkup(
     <ServerHistoryPanel history={null} retryHref="/servers/server" />,
   );
-  expect(html).toContain("temporarily unavailable");
+  expect(html).toContain(copy.unavailable);
   expect(html).toContain('role="alert"');
   expect(html).toContain('href="/servers/server"');
   expect(html).toContain("Try again");
+  expect(html).toContain("min-h-11");
+  expect(html).not.toContain(copy.empty);
+  expect(html).not.toContain(copy.emptyHint);
 });

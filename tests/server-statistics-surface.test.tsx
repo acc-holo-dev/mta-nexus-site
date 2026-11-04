@@ -33,6 +33,7 @@ import {
 } from "../apps/web/src/components/server-statistics-page";
 import { ServerStatisticsPanel } from "../apps/web/src/components/server-statistics-panel";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { serverStatisticsCopy } from "../apps/web/src/lib/server-statistics-copy";
 
 beforeEach(() => {
   state.locale = "ru";
@@ -99,8 +100,37 @@ it("distinguishes unavailable, invalid and genuinely empty periods", async () =>
       managed={false}
     />,
   );
-  expect(empty).toContain("нет сохранённых наблюдений");
+  const copy = serverStatisticsCopy("ru");
+  expect(empty).toContain(copy.empty);
+  expect(empty).toContain(copy.emptyHint);
+  expect(copy.emptyHint).not.toBe(copy.empty);
   expect(empty).toContain('disabled=""');
+  expect(empty).toContain("min-h-11");
+  expect(empty).toContain("overflow-x-clip");
+  expect(empty).not.toContain('role="alert"');
+});
+
+it("keeps end-of-page observations distinct from a never-stored empty period", () => {
+  const copy = serverStatisticsCopy("en");
+  const report = statisticsFixture();
+  report.summary.observationCount = 12;
+  report.observations = [];
+  report.nextCursor = null;
+  const html = renderToStaticMarkup(
+    <ServerStatisticsPanel
+      report={report}
+      locale="en"
+      path="/servers/server/statistics"
+      managed={false}
+      before="obs_1"
+    />,
+  );
+  expect(html).toContain(copy.endOfPage);
+  expect(html).toContain(copy.endOfPageHint);
+  expect(copy.endOfPageHint).not.toBe(copy.endOfPage);
+  expect(html).not.toContain(copy.empty);
+  expect(html).toContain('href="/servers/server/statistics?window=24h');
+  expect(html).toContain("min-h-11");
 });
 it("gates private pages before reading statistics and passes only session-bound managed scope", async () => {
   state.session.mockResolvedValue(null);

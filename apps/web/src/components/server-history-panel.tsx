@@ -1,5 +1,5 @@
-import { ErrorState } from "@nexus/ui";
-import { Activity, BarChart3, Clock3 } from "lucide-react";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import { Activity, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
 import {
@@ -13,6 +13,9 @@ import type { ServerHistoryResult } from "../lib/services/server-history-service
 function metric(value: number | null) {
   return value == null ? "—" : String(value);
 }
+
+const periodLinkClass =
+  "inline-flex min-h-11 items-center rounded-lg border border-base px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
 
 export function ServerHistoryPanel({
   history,
@@ -28,7 +31,7 @@ export function ServerHistoryPanel({
 
   if (!history) {
     return (
-      <section aria-labelledby="server-history-title" className="space-y-3">
+      <section aria-labelledby="server-history-title" className="min-w-0 space-y-3 overflow-x-clip">
         <h2
           id="server-history-title"
           className="text-sm font-bold uppercase tracking-wider text-primary"
@@ -61,9 +64,12 @@ export function ServerHistoryPanel({
   const peak = history.summary.peakPlayers;
 
   return (
-    <section className="nexus-panel space-y-5 p-5 md:p-6" aria-labelledby="server-history-title">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="space-y-1">
+    <section
+      className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 md:p-6"
+      aria-labelledby="server-history-title"
+    >
+      <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 space-y-1">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-accent" aria-hidden="true" />
             <h2
@@ -80,7 +86,7 @@ export function ServerHistoryPanel({
         </span>
       </div>
 
-      <nav aria-label={copy.chooseWindow} className="flex flex-wrap gap-2">
+      <nav aria-label={copy.chooseWindow} className="flex min-w-0 flex-wrap gap-2">
         {(
           [
             ["24h", copy.period24h],
@@ -92,14 +98,14 @@ export function ServerHistoryPanel({
             key={window}
             href={`/servers/${encodeURIComponent(history.server.slug)}?history=${window}#server-history-title`}
             aria-current={history.window === window ? "true" : undefined}
-            className={`rounded-lg border border-base px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${history.window === window ? "bg-accent-soft text-accent" : "bg-inset text-secondary"}`}
+            className={`${periodLinkClass} ${history.window === window ? "bg-accent-soft text-accent" : "bg-inset text-secondary"}`}
           >
             {label}
           </Link>
         ))}
         <Link
           href={`/servers/${encodeURIComponent(history.server.slug)}/statistics?window=${history.window}`}
-          className="rounded-lg border border-base px-3 py-2 text-xs font-semibold text-accent"
+          className={`${periodLinkClass} text-accent`}
         >
           {serverStatisticsCopy(locale).open}
         </Link>
@@ -113,22 +119,17 @@ export function ServerHistoryPanel({
           [copy.averagePlayers, metric(history.summary.averagePlayers)],
           [copy.latestStored, metric(history.summary.latestPlayers)],
         ].map(([label, value]) => (
-          <div key={String(label)} className="rounded-lg border border-base bg-inset p-3">
+          <div key={String(label)} className="min-w-0 rounded-lg border border-base bg-inset p-3">
             <div className="font-label uppercase text-faint">{label}</div>
-            <div className="mt-1 text-xl font-black text-primary">{value}</div>
+            <div className="mt-1 break-words text-xl font-black text-primary">{value}</div>
           </div>
         ))}
       </div>
 
       {history.summary.observationCount === 0 || points.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-base bg-inset p-5 text-xs text-muted">
-          <div className="flex items-start gap-2">
-            <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-faint" aria-hidden="true" />
-            <p>{copy.empty}</p>
-          </div>
-        </div>
+        <EmptyState title={copy.empty} description={copy.emptyHint} />
       ) : (
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3">
           <div className="flex items-center justify-between text-[11px] text-faint">
             <span>
               {copy.window}:{" "}
@@ -141,7 +142,7 @@ export function ServerHistoryPanel({
             <span>UTC</span>
           </div>
           <ol
-            className="flex h-32 items-end gap-1 rounded-lg border border-base bg-inset px-3 pb-2 pt-4"
+            className="flex h-32 items-end gap-1 overflow-x-auto rounded-lg border border-base bg-inset px-3 pb-2 pt-4"
             aria-label={copy.chartLabel}
           >
             {points.map((point) => {
