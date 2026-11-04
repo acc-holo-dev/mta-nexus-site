@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
 import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 import { getResourceCommerceCopy } from "../apps/web/src/lib/resource-commerce-i18n";
+import { resourceMediaCopy } from "../apps/web/src/lib/resource-media-i18n";
 
 const locales = ["en", "ru"] as const;
 
@@ -33,6 +35,24 @@ describe("destructive client confirm copy", () => {
     const copy = getResourceCommerceCopy(locale);
     expect(copy.removeConfirmTitle.length).toBeGreaterThan(0);
     expect(copy.removeConfirm.length).toBeGreaterThan(0);
+    expect(copy.cancel.length).toBeGreaterThan(0);
+  });
+
+  it.each(locales)("defines discussion comment removal confirm strings (%s)", (locale) => {
+    const copy = getDiscussionCopy(locale);
+    expect(copy.removeConfirmTitle.length).toBeGreaterThan(0);
+    expect(copy.moderateRemoveConfirmTitle.length).toBeGreaterThan(0);
+    expect(copy.removeNote.length).toBeGreaterThan(0);
+    expect(copy.moderateRemoveNote.length).toBeGreaterThan(0);
+    expect(copy.confirmRemove.length).toBeGreaterThan(0);
+    expect(copy.cancelEdit.length).toBeGreaterThan(0);
+  });
+
+  it.each(locales)("defines resource gallery removal confirm strings (%s)", (locale) => {
+    const copy = resourceMediaCopy(locale);
+    expect(copy.removeConfirmTitle.length).toBeGreaterThan(0);
+    expect(copy.removeConfirm.length).toBeGreaterThan(0);
+    expect(copy.confirm.length).toBeGreaterThan(0);
     expect(copy.cancel.length).toBeGreaterThan(0);
   });
 });

@@ -18,6 +18,9 @@ const copies = {
     up: "Move up",
     down: "Move down",
     remove: "Remove image",
+    removeConfirmTitle: "Remove this gallery image?",
+    removeConfirm:
+      "The image is deleted from the gallery. Cover and order update after the server confirms the change, and publication needs review again.",
     confirm: "Confirm image removal",
     cancel: "Cancel",
     reload: "Reload gallery",
@@ -70,6 +73,9 @@ const copies = {
     up: "Переместить выше",
     down: "Переместить ниже",
     remove: "Удалить изображение",
+    removeConfirmTitle: "Удалить это изображение галереи?",
+    removeConfirm:
+      "Изображение будет удалено из галереи. Обложка и порядок обновятся после подтверждения сервером, а для публикации снова нужна проверка.",
     confirm: "Подтвердить удаление изображения",
     cancel: "Отмена",
     reload: "Обновить галерею",

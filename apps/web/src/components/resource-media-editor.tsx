@@ -7,6 +7,7 @@ import {
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
+import { confirmAction } from "./confirm-action";
 import { ResourcePreview } from "./resource-preview";
 
 export function ResourceMediaEditor({
@@ -22,7 +23,6 @@ export function ResourceMediaEditor({
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [error, setError] = useState("");
-  const [removing, setRemoving] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null),
     inFlight = useRef(false);
   useEffect(() => () => abort.current?.abort(), []);
@@ -62,7 +62,6 @@ export function ResourceMediaEditor({
         throw new Error("Invalid gallery response");
       setCurrent(payload);
       setItems(payload.items);
-      setRemoving(null);
       form?.reset();
       if (method !== "GET") setMessage(copy.saved);
     } catch {
@@ -93,6 +92,29 @@ export function ResourceMediaEditor({
     }
     body.set("expectedUpdatedAt", current.product.updatedAt);
     void execute("POST", body, form);
+  }
+  async function removeItem(item: ManagedResourceMedia["items"][number]) {
+    if (busy || readonly || dirty) return;
+    if (
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: item.caption || current.product.title,
+        consequences: copy.removeConfirm,
+        confirmLabel: copy.confirm,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    void execute(
+      "PATCH",
+      JSON.stringify({
+        action: "remove",
+        mediaId: item.id,
+        expectedUpdatedAt: current.product.updatedAt,
+      }),
+    );
   }
   return (
     <div className="space-y-5" aria-busy={busy}>
@@ -198,39 +220,9 @@ export function ResourceMediaEditor({
                   variant="outline"
                   size="sm"
                   disabled={busy || dirty}
-                  onClick={() => setRemoving(item.id)}
+                  onClick={() => void removeItem(item)}
                 >
                   {copy.remove}
-                </Button>
-              </div>
-            )}
-            {removing === item.id && (
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  disabled={busy || dirty || readonly}
-                  onClick={() =>
-                    void execute(
-                      "PATCH",
-                      JSON.stringify({
-                        action: "remove",
-                        mediaId: item.id,
-                        expectedUpdatedAt: current.product.updatedAt,
-                      }),
-                    )
-                  }
-                >
-                  {copy.confirm}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={busy}
-                  onClick={() => setRemoving(null)}
-                >
-                  {copy.cancel}
                 </Button>
               </div>
             )}

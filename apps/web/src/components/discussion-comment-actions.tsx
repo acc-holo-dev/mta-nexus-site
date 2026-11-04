@@ -6,6 +6,7 @@ import { discussionMutationError, getDiscussionCopy } from "../lib/content-discu
 import { confirmsDiscussionMutation } from "../lib/discussion-mutation-confirmation";
 import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import { confirmAction } from "./confirm-action";
 export function DiscussionCommentActions({
   comment,
   own,
@@ -52,23 +53,14 @@ export function DiscussionCommentActions({
       controller.current?.abort();
     };
   }, []);
-  async function submit() {
-    if (
-      busy.current ||
-      disabled ||
-      blocked ||
-      !mode ||
-      !revision ||
-      stale ||
-      (mode === "edit" && !editable)
-    )
-      return;
-    const value = mode === "edit" ? text.trim() : undefined;
+  async function mutateComment(next: "edit" | "remove", expectedRevision: string, value?: string) {
+    if (busy.current || disabled || blocked || !expectedRevision) return;
+    if (next === "edit" && !editable) return;
     if (value !== undefined && (value.length < 2 || value.length > 5000)) {
       setError(copy.invalid);
       return;
     }
-    if (!own && !reason.trim()) {
+    if (next === "remove" && !own && !reason.trim()) {
       setError(copy.reasonRequired);
       return;
     }
@@ -83,9 +75,9 @@ export function DiscussionCommentActions({
         endpoint ??
           `/api/content/${encodeURIComponent(slug)}/comments/${encodeURIComponent(comment.id)}`,
         locale,
-        mode === "edit" ? "PATCH" : "DELETE",
+        next === "edit" ? "PATCH" : "DELETE",
         {
-          expectedRevision: revision,
+          expectedRevision,
           ...(value !== undefined ? { text: value } : !own ? { reason: reason.trim() } : {}),
         },
         request.signal,
@@ -106,6 +98,44 @@ export function DiscussionCommentActions({
       onPending(false);
       if (alive.current) setPending(false);
     }
+  }
+  async function submit() {
+    if (!mode || stale || !revision || (mode === "edit" && !editable)) return;
+    if (mode === "remove") {
+      if (
+        !(await confirmAction({
+          title: own ? copy.removeConfirmTitle : copy.moderateRemoveConfirmTitle,
+          object: comment.text,
+          consequences: own ? copy.removeNote : copy.moderateRemoveNote,
+          confirmLabel: own ? copy.confirmRemove : copy.confirmModerateRemove,
+          cancelLabel: copy.cancelEdit,
+          closeLabel: copy.cancelEdit,
+          danger: true,
+        }))
+      )
+        return;
+    }
+    const value = mode === "edit" ? text.trim() : undefined;
+    await mutateComment(mode, revision, value);
+  }
+  async function removeOwn() {
+    if (busy.current || disabled || blocked || !comment.revision) return;
+    if (
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: comment.text,
+        consequences: copy.removeNote,
+        confirmLabel: copy.confirmRemove,
+        cancelLabel: copy.cancelEdit,
+        closeLabel: copy.cancelEdit,
+        danger: true,
+      }))
+    )
+      return;
+    setRevision(comment.revision);
+    setError("");
+    setDraftNotice("");
+    await mutateComment("remove", comment.revision);
   }
   async function copyDraft() {
     try {
@@ -141,6 +171,10 @@ export function DiscussionCommentActions({
             className="min-h-11 text-xs"
             disabled={disabled || blocked}
             onClick={() => {
+              if (own) {
+                void removeOwn();
+                return;
+              }
               setRevision(comment.revision);
               setError("");
               setDraftNotice("");
@@ -175,23 +209,19 @@ export function DiscussionCommentActions({
             </label>
           ) : (
             <>
-              <p className="text-sm text-secondary">
-                {own ? copy.removeNote : copy.moderateRemoveNote}
-              </p>
-              {!own && (
-                <label className="block space-y-1 text-xs text-secondary">
-                  {copy.reason}
-                  <textarea
-                    rows={2}
-                    maxLength={1000}
-                    required
-                    disabled={pending || disabled}
-                    value={reason}
-                    onChange={(event) => setReason(event.target.value)}
-                    className={platformFieldClass}
-                  />
-                </label>
-              )}
+              <p className="text-sm text-secondary">{copy.moderateRemoveNote}</p>
+              <label className="block space-y-1 text-xs text-secondary">
+                {copy.reason}
+                <textarea
+                  rows={2}
+                  maxLength={1000}
+                  required
+                  disabled={pending || disabled}
+                  value={reason}
+                  onChange={(event) => setReason(event.target.value)}
+                  className={platformFieldClass}
+                />
+              </label>
             </>
           )}
           <div className="flex flex-wrap gap-3">
@@ -201,11 +231,7 @@ export function DiscussionCommentActions({
               disabled={pending || disabled || stale || blocked}
               variant="outline"
             >
-              {mode === "edit"
-                ? copy.saveEdit
-                : own
-                  ? copy.confirmRemove
-                  : copy.confirmModerateRemove}
+              {mode === "edit" ? copy.saveEdit : copy.confirmModerateRemove}
             </Button>
             <Button
               type="button"
