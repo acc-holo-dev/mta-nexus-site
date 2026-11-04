@@ -5,6 +5,9 @@ import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels
 import type { getDictionary, Locale } from "../../lib/i18n";
 import { BuildQuarantineControls } from "../build-quarantine-controls";
 
+const touchLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
 type PendingBuild = {
@@ -99,7 +102,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
                       <Link
-                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={touchLinkClass}
                         href={`/market/${encodeURIComponent(build.productSlug)}`}
                       >
                         {build.productTitle}
@@ -113,7 +116,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-muted">
                     {copy.resourcePublisher}:{" "}
                     <Link
-                      className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={touchLinkClass}
                       href={`/users/${encodeURIComponent(build.publisherUsername)}`}
                     >
                       @{build.publisherUsername}
@@ -142,7 +145,7 @@ export function AdminBuildsQuarantineSection({
                   />
                   <Link
                     href={`/admin/resources/${build.productId}/builds/${build.id}`}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] text-xs"
+                    className={`${touchLinkClass} text-xs`}
                   >
                     {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
                   </Link>
@@ -160,10 +163,7 @@ export function AdminBuildsQuarantineSection({
         {(buildPage > 1 || moreBuilds) && (
           <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
             {buildPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ buildPage: buildPage - 1 })}
-              >
+              <Link className={touchLinkClass} href={adminHref({ buildPage: buildPage - 1 })}>
                 {copy.previous}
               </Link>
             )}
@@ -171,10 +171,7 @@ export function AdminBuildsQuarantineSection({
               {copy.reportPage} {buildPage}
             </span>
             {moreBuilds && buildPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ buildPage: buildPage + 1 })}
-              >
+              <Link className={touchLinkClass} href={adminHref({ buildPage: buildPage + 1 })}>
                 {copy.next}
               </Link>
             )}
@@ -209,7 +206,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
                       <Link
-                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={touchLinkClass}
                         href={`/market/${encodeURIComponent(build.productSlug)}`}
                       >
                         {build.productTitle}
@@ -223,7 +220,7 @@ export function AdminBuildsQuarantineSection({
                   <p className="font-caption text-muted">
                     {copy.resourcePublisher}:{" "}
                     <Link
-                      className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={touchLinkClass}
                       href={`/users/${encodeURIComponent(build.publisherUsername)}`}
                     >
                       @{build.publisherUsername}
@@ -251,7 +248,7 @@ export function AdminBuildsQuarantineSection({
                   {build.scanStatus === "clean" && build.scanner?.trim() && build.scannedAt && (
                     <a
                       href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
-                      className="inline-block text-xs font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={`${touchLinkClass} text-xs font-semibold`}
                     >
                       {copy.reviewArtifact}
                     </a>
@@ -274,10 +271,7 @@ export function AdminBuildsQuarantineSection({
         {(riskBuildPage > 1 || moreRiskBuilds) && (
           <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
             {riskBuildPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ riskBuildPage: riskBuildPage - 1 })}
-              >
+              <Link className={touchLinkClass} href={adminHref({ riskBuildPage: riskBuildPage - 1 })}>
                 {copy.previous}
               </Link>
             )}
@@ -285,10 +279,7 @@ export function AdminBuildsQuarantineSection({
               {copy.reportPage} {riskBuildPage}
             </span>
             {moreRiskBuilds && riskBuildPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ riskBuildPage: riskBuildPage + 1 })}
-              >
+              <Link className={touchLinkClass} href={adminHref({ riskBuildPage: riskBuildPage + 1 })}>
                 {copy.next}
               </Link>
             )}
