@@ -1,4 +1,4 @@
-import { Avatar, Button, ErrorState, FilterBar, SearchField } from "@nexus/ui";
+import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -12,6 +12,10 @@ import {
 import { publicationCopy, publicationError } from "../lib/publication-feed-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
+
+const actionLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function PublicationFeed({
   initial,
   filters,
@@ -49,18 +53,27 @@ export function PublicationFeed({
     "min-h-11 rounded-lg border border-base px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) => types[type];
   const Root = sectionLabelledBy ? "section" : "div";
+  const emptyCopy = (() => {
+    if (filters.target && !filters.cursor)
+      return { title: copy.emptyTarget, description: copy.emptyTargetHint };
+    if (filters.cursor) return { title: copy.emptyPage, description: copy.emptyPageHint };
+    if (emptyFollowingHonest)
+      return { title: copy.emptyFollowing, description: copy.emptyFollowingHint };
+    if (filtered) return { title: copy.emptyFiltered, description: copy.emptyFilteredHint };
+    return { title: copy.empty, description: copy.emptyHint };
+  })();
   return (
     <Root
       {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
-      className="space-y-5"
+      className="min-w-0 space-y-5 overflow-x-clip"
     >
       {following && filters.target && (
-        <p className="nexus-panel flex flex-wrap items-center gap-3 p-4 text-sm text-muted">
+        <p className="nexus-panel flex min-w-0 flex-wrap items-center gap-3 p-4 text-sm text-muted">
           <span>{copy.targetSelected}</span>
           <Link
             prefetch={false}
             href={publicationHref(path, { ...filters, target: undefined, cursor: undefined })}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={actionLinkClass}
           >
             {copy.clearTarget}
           </Link>
@@ -134,10 +147,7 @@ export function PublicationFeed({
         <Button type="submit" variant="outline" className="min-h-11 font-semibold text-accent">
           {copy.search}
         </Button>
-        <Link
-          href={path}
-          className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={path} className={actionLinkClass}>
           {copy.reset}
         </Link>
       </FilterBar>
@@ -158,10 +168,10 @@ export function PublicationFeed({
           }
         />
       )}
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4">
         {page?.items.map((item) => (
-          <article key={item.id} className="nexus-panel space-y-3 p-5">
-            <header className="flex flex-wrap items-center gap-3">
+          <article key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <header className="flex min-w-0 flex-wrap items-center gap-3">
               <Avatar
                 src={item.author.avatar ?? undefined}
                 alt={item.author.name}
@@ -188,7 +198,7 @@ export function PublicationFeed({
                 })}
               </time>
             </header>
-            <div className="flex flex-wrap gap-3 text-xs text-muted">
+            <div className="flex min-w-0 flex-wrap gap-3 text-xs text-muted">
               <span>{typeLabel(item.type)}</span>
               {[item.organization, item.server, item.product].map(
                 (context) =>
@@ -215,7 +225,7 @@ export function PublicationFeed({
             </h2>
             <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.excerpt}</p>
             {item.tags?.length > 0 && (
-              <ul className="flex flex-wrap gap-2" aria-label={copy.tag}>
+              <ul className="flex min-w-0 flex-wrap gap-2" aria-label={copy.tag}>
                 {Array.from(new Set(item.tags)).map((tag) => (
                   <li key={tag}>
                     <Link
@@ -239,69 +249,61 @@ export function PublicationFeed({
           </article>
         ))}
         {page && !page.items.length && (
-          <div className="nexus-panel space-y-3 p-8 text-center text-sm text-muted">
-            <p>
-              {filters.target && !filters.cursor
-                ? copy.emptyTarget
-                : filters.cursor
-                  ? copy.emptyPage
-                  : emptyFollowingHonest
-                    ? copy.emptyFollowing
-                    : filtered
-                      ? copy.emptyFiltered
-                      : copy.empty}
-            </p>
-            {filters.target && !filters.cursor && (
-              <Link
-                prefetch={false}
-                href={publicationHref(path, {
-                  ...filters,
-                  target: undefined,
-                  cursor: undefined,
-                })}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.clearTarget}
-              </Link>
-            )}
-            {filtered && !filters.cursor && (
-              <Link
-                prefetch={false}
-                href={publicationHref(path, {
-                  ...filters,
-                  query: "",
-                  type: undefined,
-                  source: undefined,
-                  author: undefined,
-                  tag: undefined,
-                  cursor: undefined,
-                })}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.reset}
-              </Link>
-            )}
-            {filters.cursor && (
-              <Link
-                prefetch={false}
-                href={publicationHref(path, { ...filters, cursor: undefined })}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.latest}
-              </Link>
-            )}
-            {emptyFollowingHonest && (
-              <Link
-                href="/discover"
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.discover}
-              </Link>
-            )}
-          </div>
+          <EmptyState
+            title={emptyCopy.title}
+            description={emptyCopy.description}
+            action={
+              <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
+                {filters.target && !filters.cursor && (
+                  <Link
+                    prefetch={false}
+                    href={publicationHref(path, {
+                      ...filters,
+                      target: undefined,
+                      cursor: undefined,
+                    })}
+                    className={actionLinkClass}
+                  >
+                    {copy.clearTarget}
+                  </Link>
+                )}
+                {filtered && !filters.cursor && (
+                  <Link
+                    prefetch={false}
+                    href={publicationHref(path, {
+                      ...filters,
+                      query: "",
+                      type: undefined,
+                      source: undefined,
+                      author: undefined,
+                      tag: undefined,
+                      cursor: undefined,
+                    })}
+                    className={actionLinkClass}
+                  >
+                    {copy.reset}
+                  </Link>
+                )}
+                {filters.cursor && (
+                  <Link
+                    prefetch={false}
+                    href={publicationHref(path, { ...filters, cursor: undefined })}
+                    className={actionLinkClass}
+                  >
+                    {copy.latest}
+                  </Link>
+                )}
+                {emptyFollowingHonest && (
+                  <Link href="/discover" className={actionLinkClass}>
+                    {copy.discover}
+                  </Link>
+                )}
+              </div>
+            }
+          />
         )}
       </div>
-      <nav aria-label={copy.activity} className="flex flex-wrap gap-3">
+      <nav aria-label={copy.activity} className="flex min-w-0 flex-wrap gap-3">
         {page?.previousCursor && (
           <Link
             href={publicationHref(path, filters, page.previousCursor)}
@@ -327,10 +329,7 @@ export function PublicationFeed({
           </Link>
         )}
         {following && (
-          <Link
-            href="/workspace/saved"
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/saved" className={actionLinkClass}>
             {copy.manage}
           </Link>
         )}
