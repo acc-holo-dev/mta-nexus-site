@@ -70,105 +70,107 @@ export function SellerSalesReportView({
       >
         {c.finance}
       </Link>
-      <form
-        action="/workspace/sales/report"
-        method="get"
-        className="nexus-panel grid gap-4 p-5 sm:grid-cols-3"
-      >
-        <label className="space-y-1 text-sm">
-          <span>{c.attribution}</span>
-          <select
-            name="attribution"
-            defaultValue={query.attribution ?? "portfolio"}
-            className="block w-full rounded border border-base bg-surface p-2"
-          >
-            <option value="portfolio">{c.portfolio}</option>
-            <option value="recorded">{c.recorded}</option>
-          </select>
-        </label>
-        {query.organizationId ? (
-          <input type="hidden" name="organizationId" value={query.organizationId} />
-        ) : null}
-        <label className="space-y-1 text-sm">
-          <span>{c.days}</span>
-          <select
-            name="days"
-            defaultValue={String(query.days)}
-            className="block w-full rounded border border-base bg-surface p-2"
-          >
-            <option value="all">{c.allTime}</option>
-            {[7, 30, 90, 365].map((days) => (
-              <option key={days} value={days}>
-                {days} {locale === "ru" ? "дней" : "days"}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{c.status}</span>
-          <select
-            name="status"
-            defaultValue={query.status}
-            className="block w-full rounded border border-base bg-surface p-2"
-          >
-            {(["completed", "refunded", "all"] as const).map((status) => (
-              <option key={status} value={status}>
-                {c.statuses[status]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{c.evidenceTitle}</span>
-          <select
-            name="evidence"
-            defaultValue={query.evidence}
-            className="block w-full rounded border border-base bg-surface p-2"
-          >
-            {(["all", ...SELLER_SALES_EVIDENCE] as const).map((value) => (
-              <option key={value} value={value}>
-                {c.evidence[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{c.currency}</span>
-          <select
-            name="currency"
-            defaultValue={query.currency ?? "all"}
-            className="block w-full rounded border border-base bg-surface p-2"
-          >
-            <option value="all">{c.all}</option>
-            {["USD", "EUR", "RUB"].map((currency) => (
-              <option key={currency} value={currency}>
-                {currency}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{c.product}</span>
-          <input
-            name="productId"
-            defaultValue={query.productId ?? ""}
-            maxLength={128}
-            pattern="[A-Za-z0-9_-]+"
-            className="block w-full rounded border border-base bg-surface p-2"
-          />
-        </label>
-        <div className="flex items-end gap-4">
-          <Button type="submit" size="touch">
-            {c.apply}
-          </Button>
-          <Link
-            href={resetHref}
-            className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.reset}
-          </Link>
-        </div>
-      </form>
+      <search aria-label={c.filters}>
+        <form
+          action="/workspace/sales/report"
+          method="get"
+          className="nexus-panel grid gap-4 p-5 sm:grid-cols-3"
+        >
+          <label className="space-y-1 text-sm">
+            <span>{c.attribution}</span>
+            <select
+              name="attribution"
+              defaultValue={query.attribution ?? "portfolio"}
+              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+            >
+              <option value="portfolio">{c.portfolio}</option>
+              <option value="recorded">{c.recorded}</option>
+            </select>
+          </label>
+          {query.organizationId ? (
+            <input type="hidden" name="organizationId" value={query.organizationId} />
+          ) : null}
+          <label className="space-y-1 text-sm">
+            <span>{c.days}</span>
+            <select
+              name="days"
+              defaultValue={String(query.days)}
+              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+            >
+              <option value="all">{c.allTime}</option>
+              {[7, 30, 90, 365].map((days) => (
+                <option key={days} value={days}>
+                  {days} {locale === "ru" ? "дней" : "days"}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-sm">
+            <span>{c.status}</span>
+            <select
+              name="status"
+              defaultValue={query.status}
+              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+            >
+              {(["completed", "refunded", "all"] as const).map((status) => (
+                <option key={status} value={status}>
+                  {c.statuses[status]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-sm">
+            <span>{c.evidenceTitle}</span>
+            <select
+              name="evidence"
+              defaultValue={query.evidence}
+              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+            >
+              {(["all", ...SELLER_SALES_EVIDENCE] as const).map((value) => (
+                <option key={value} value={value}>
+                  {c.evidence[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-sm">
+            <span>{c.currency}</span>
+            <select
+              name="currency"
+              defaultValue={query.currency ?? "all"}
+              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+            >
+              <option value="all">{c.all}</option>
+              {["USD", "EUR", "RUB"].map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-sm">
+            <span>{c.product}</span>
+            <input
+              name="productId"
+              defaultValue={query.productId ?? ""}
+              maxLength={128}
+              pattern="[A-Za-z0-9_-]+"
+              className="block min-h-11 w-full rounded border border-base bg-surface p-2"
+            />
+          </label>
+          <div className="flex items-end gap-4">
+            <Button type="submit" size="touch">
+              {c.apply}
+            </Button>
+            <Link
+              href={resetHref}
+              className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.reset}
+            </Link>
+          </div>
+        </form>
+      </search>
       {report.product ? (
         <h2 className="break-words text-lg text-primary">
           {report.product.title} · {report.product.id}

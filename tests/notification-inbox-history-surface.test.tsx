@@ -49,6 +49,7 @@ it.each(["en", "ru"] as const)(
     expect(html).not.toContain(`<nav aria-label="${copy.title}"`);
     expect(html).toContain(`aria-label="${copy.pageNavigation}"`);
     expect(html).toContain(`<section class="space-y-4" aria-label="${copy.title}"`);
+    expect(html).toContain(`<search aria-label="${copy.filters}"`);
     expect(html).toContain('action="/notifications"');
     expect(html).toContain(`>${copy.reset}<`);
     expect(html).toContain('name="q"');
