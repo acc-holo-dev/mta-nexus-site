@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   clickTestButton,
   findTestButton,
+  flatTreeHasErrorText,
   flattenReactTestTree,
 } from "./helpers/flatten-react-test-tree";
 
@@ -496,11 +497,7 @@ it.each([
     const browser = browserDownload();
     harness.fetch.mockReset().mockResolvedValueOnce(reply).mockResolvedValueOnce(exportResponse());
     exportClick();
-    await vi.waitFor(() =>
-      expect(
-        render().some((node) => node.props.role === "alert" && node.props.children === message),
-      ).toBe(true),
-    );
+    await vi.waitFor(() => expect(flatTreeHasErrorText(render(), message)).toBe(true));
     expect(browser.createObjectURL).not.toHaveBeenCalled();
     expect(button(render(), "Mark as read").props.disabled).toBe(false);
     exportClick();
@@ -565,13 +562,7 @@ it("cancels a stalled export on timeout and shows a retryable message", async ()
     await new Promise((resolve) => setImmediate(resolve));
     timeout.abort(new DOMException("Timed out", "TimeoutError"));
     await vi.waitFor(() =>
-      expect(
-        render().some(
-          (node) =>
-            node.props.role === "alert" &&
-            node.props.children === "The export took too long. Try again.",
-        ),
-      ).toBe(true),
+      expect(flatTreeHasErrorText(render(), "The export took too long. Try again.")).toBe(true),
     );
     expect(cancel).toHaveBeenCalledTimes(1);
     expect(browser.createObjectURL).not.toHaveBeenCalled();

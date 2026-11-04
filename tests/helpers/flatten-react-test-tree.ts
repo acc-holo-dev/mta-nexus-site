@@ -68,6 +68,18 @@ export function findTestButton(nodes: FlatTestElement[], label: string): FlatTes
   return found;
 }
 
+/** True when a flattened tree surfaces `message` via ErrorState title/description or string children. */
+export function flatTreeHasErrorText(nodes: FlatTestElement[], message: string): boolean {
+  return nodes.some((node) => {
+    const title = node.props.title;
+    const description = node.props.description;
+    if (typeof title === "string" && title.includes(message)) return true;
+    if (typeof description === "string" && description.includes(message)) return true;
+    const children = node.props.children;
+    return typeof children === "string" && children.includes(message);
+  });
+}
+
 export function clickTestButton(nodes: FlatTestElement[], label: string) {
   return (findTestButton(nodes, label).props.onClick as () => void)();
 }

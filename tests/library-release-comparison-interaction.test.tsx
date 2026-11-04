@@ -44,6 +44,7 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
 import { LibraryReleaseComparisonSelection } from "../apps/web/src/components/library-release-comparison-selection";
 import { libraryReleaseComparisonCopy } from "../apps/web/src/lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+import { flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
 
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {
@@ -147,11 +148,9 @@ it("requires a new comparison after archive or preference conflict", async () =>
   });
   await click(libraryReleaseComparisonCopy("en").chooseCompared);
   expect(
-    render().some(
-      (n) =>
-        n.props.role === "alert" &&
-        n.props.children ===
-          "The reviewed archive changed. Reload the comparison before choosing it.",
+    flatTreeHasErrorText(
+      render(),
+      "The reviewed archive changed. Reload the comparison before choosing it.",
     ),
   ).toBe(true);
   expect(
