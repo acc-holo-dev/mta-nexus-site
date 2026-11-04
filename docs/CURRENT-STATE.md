@@ -6,18 +6,18 @@
 
 Опубликовано на `main` и подтверждено CI на exact tip:
 
-- `4c09a3fa` / #182 — resource mobile primary + shell 320px overflow;
-- `3eb8dad6` — integrate Discover → Library → Notifications → Server/Profile/Community → Support → Admin journeys;
-- `95e3c124` / #192 — Admin storage honesty;
-- `2d0bae1a` / #189 — Admin licenses honesty;
-- `657f1f03` / #190 — Admin hub EmptyState polish;
+- `30b3a1b9` / #247 — knip: drop unused subscription recovery exports;
+- `e724f9dc` / #246 — interaction tests aligned with ErrorState honesty;
+- `8e79c135` / #245 — discussion/notification forms honesty;
+- UI honesty sweep #200–#245 (workspace/admin/public shells, EmptyState/ErrorState, clip, touch) landed in prior tip series;
 - `320db223` / #191 — F03/F04 evidence schemas (local prep only; gates remain open);
 - `931e4963` / #181 — Cloud Agent toolchain note in AGENTS.md.
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `931e4963663a94d6fb69a791f5eb0c74d7b5206c` (`docs(agents): record Cloud Agent toolchain and Compose startup`).
-- **Verified CI green on that tip:** [CI 41772235893](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41772235893) (15 checks, selected scope).
+- **Tip SHA:** `30b3a1b931a1c01b9c399320f2ccbd08ccf17867` (`fix(web): drop unused subscription recovery exports for knip`).
+- **Verified CI green on that tip:** [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793) (15 checks, selected scope).
+- **Prior selected green:** `931e496366…` / [CI 41772235893](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41772235893).
 - **Prior selected green:** `98d245f0…` / [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990).
 - **Prior selected green:** `8163c0c5…` / [CI 41507032591](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41507032591).
 - **Prior selected green:** `748df327…` / [CI 41503267385](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41503267385).
@@ -55,11 +55,11 @@
 
 На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13/ARC14 + FLOW/UX/OPS/GROW-01 и UX-19/20/22. **Не** закрыты **F03/F04** (нужен live evidence), GitHub settings, deploy, реклама и GROW-пилоты.
 
-**Последний GitHub-verified baseline:** `931e496366…` / [CI 41772235893](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41772235893). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+**Последний GitHub-verified baseline:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep волна в `main`; verified tip `931e496366…` selected green. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep (#200–#247) в `main`; verified tip `30b3a1b931…` selected green. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
