@@ -1,6 +1,9 @@
 import { readFileSync, statSync } from "node:fs";
+
 try {
-  const path = "/tmp/nexus-resource-release-worker-health.json";
+  const path =
+    process.env.NEXUS_RESOURCE_RELEASE_HEALTH_FILE ||
+    "/tmp/nexus-resource-release-worker-health.json";
   if (statSync(path).size > 4096) throw new Error("Invalid heartbeat");
   const value = JSON.parse(readFileSync(path, "utf8")),
     now = Date.now();
