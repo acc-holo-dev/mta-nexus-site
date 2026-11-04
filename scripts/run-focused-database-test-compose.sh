@@ -13,6 +13,7 @@ PROJECT="${COMPOSE_PROJECT_NAME:-nexus-local}"
 COMPOSE=(docker compose -p "$PROJECT" -f compose.yaml)
 DB_NAME="nexus_focus_$(date +%s)_${RANDOM}"
 DATABASE_URL="postgres://nexus:nexus_secret@postgres:5432/${DB_NAME}"
+database_created=0
 
 for arg in "$@"; do
   if [[ "$arg" == -* || ! -f "$arg" || "$arg" != tests/* ]]; then
@@ -22,6 +23,8 @@ for arg in "$@"; do
 done
 
 cleanup() {
+  # Never remove a pre-existing database if creation failed (e.g. a name collision).
+  [[ "$database_created" == 1 ]] || return 0
   "${COMPOSE[@]}" exec -T postgres \
     psql -U nexus -d postgres -v ON_ERROR_STOP=1 \
     -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${DB_NAME}' AND pid <> pg_backend_pid();" \
@@ -52,6 +55,7 @@ echo "Creating disposable database ${DB_NAME}…"
 "${COMPOSE[@]}" exec -T postgres \
   psql -U nexus -d postgres -v ON_ERROR_STOP=1 \
   -c "CREATE DATABASE \"${DB_NAME}\" OWNER nexus;"
+database_created=1
 
 echo "Applying migrations…"
 "${COMPOSE[@]}" run --rm --no-deps \
