@@ -30,8 +30,12 @@ const en = {
   empty: "No reviews yet.",
   emptyHint:
     "Published reviews from readers with acquired access will appear here. An empty list is not a load failure.",
+  ownEmptyHint:
+    "Reviews you publish for resources in your library appear here. An empty list is not a load failure.",
   pageUnavailable:
     "Resource reviews are temporarily unavailable. This does not mean there are no reviews.",
+  pageUnavailableDescription:
+    "A load failure is not an empty review list. Retry to fetch the latest saved reviews.",
   access:
     "Current library access and a safe published version are required to publish. Access is not proof of install or gameplay. Publishers and managers cannot review their own resources.",
   ownerConflict:
@@ -113,7 +117,11 @@ const ru: typeof en = {
   empty: "Отзывов пока нет.",
   emptyHint:
     "Опубликованные отзывы читателей с доступом появятся здесь. Пустой список — не сбой загрузки.",
+  ownEmptyHint:
+    "Опубликованные вами отзывы о ресурсах библиотеки появятся здесь. Пустой список — не сбой загрузки.",
   pageUnavailable: "Отзывы о ресурсе временно недоступны. Это не означает, что отзывов нет.",
+  pageUnavailableDescription:
+    "Ошибка загрузки — это не пустой список отзывов. Повторите запрос, чтобы получить сохранённые отзывы.",
   access:
     "Для публикации нужен действующий доступ в библиотеке и безопасная опубликованная версия. Доступ не доказывает установку или игру. Издатели и управляющие не могут оценивать свои ресурсы.",
   ownerConflict:

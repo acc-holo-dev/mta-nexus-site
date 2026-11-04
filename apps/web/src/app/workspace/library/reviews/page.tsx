@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -10,6 +10,11 @@ import { resourceReviewCopy, resourceReviewState } from "../../../../lib/resourc
 import { resourceReviewPageQuery } from "../../../../lib/resource-review-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceReviewService } from "../../../../lib/services/resource-review-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -28,8 +33,10 @@ export default async function Page({
     cookies(),
     searchParams,
   ]);
-  const copy = resourceReviewCopy(locale),
-    workspace = getDictionary(locale).workspace,
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const copy = resourceReviewCopy(typedLocale),
+    workspace = getDictionary(typedLocale).workspace,
+    dictionary = getDictionary(typedLocale),
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -40,36 +47,50 @@ export default async function Page({
     ? `/workspace/library/reviews?${returnParams}`
     : "/workspace/library/reviews";
   if (!actor) {
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
   }
-  const result = await resourceReviewService.ownPage(actor, resourceReviewPageQuery(params).page);
+  const query = resourceReviewPageQuery(params);
+  const result = await resourceReviewService.ownPage(actor, query.page).catch(() => null);
+  if (!result) {
+    return (
+      <section className={pageShellClass}>
+        <Link href="/workspace/library" className={navLinkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.pageUnavailable}
+          description={copy.pageUnavailableDescription}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
+    );
+  }
   return (
-    <section className="mx-auto max-w-4xl space-y-5 py-8">
-      <Link
-        href="/workspace/library"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <section className={pageShellClass}>
+      <Link href="/workspace/library" className={navLinkClass}>
         {copy.back}
       </Link>
-      <h1 className="font-display">{copy.own}</h1>
+      <h1 className="min-w-0 break-words font-display">{copy.own}</h1>
       <p className="text-sm text-secondary">{copy.subtitle}</p>
-      <Link
-        href="/workspace/review-reports"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/review-reports" className={navLinkClass}>
         {copy.reports}
       </Link>
       {result.items.length ? (
         result.items.map((review) => (
-          <article key={review.id} className="nexus-panel space-y-3 p-5">
-            <h2>{review.title ?? copy.unavailable}</h2>
+          <article key={review.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+            <h2 className="min-w-0 break-words">{review.title ?? copy.unavailable}</h2>
             <p>
-              {resourceReviewState(locale, review.status)} · {copy.rating}: {review.rating ?? "—"}/5
+              {resourceReviewState(typedLocale, review.status)} · {copy.rating}:{" "}
+              {review.rating ?? "—"}/5
             </p>
             <p className="line-clamp-4 whitespace-pre-wrap break-words text-sm">{review.text}</p>
             <Link
               href={`/workspace/library/review/${encodeURIComponent(review.productId)}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.write}
             </Link>
@@ -78,19 +99,13 @@ export default async function Page({
       ) : (
         <EmptyState
           title={copy.empty}
-          description={copy.subtitle}
+          description={copy.ownEmptyHint}
           action={
             <>
-              <Link
-                href="/market?maxPrice=0"
-                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/market?maxPrice=0" className={navLinkClass}>
                 {workspace.browseResources}
               </Link>
-              <Link
-                href="/workspace/review-reports"
-                className="mt-3 block text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/workspace/review-reports" className={`${navLinkClass} mt-3`}>
                 {copy.reports}
               </Link>
             </>
@@ -101,7 +116,7 @@ export default async function Page({
         base="/workspace/library/reviews"
         page={result.page}
         totalPages={result.totalPages}
-        locale={locale}
+        locale={typedLocale}
       />
     </section>
   );

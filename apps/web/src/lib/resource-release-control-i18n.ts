@@ -9,6 +9,10 @@ const copy = {
     moderationLoading: "Loading resource moderation…",
     loadUnavailable: "Resource moderation is temporarily unavailable. Please try again.",
     updatesLoadUnavailable: "Library updates are temporarily unavailable. Please try again.",
+    versionsLoadUnavailable:
+      "Library version selection is temporarily unavailable. Please try again.",
+    versionsLoadUnavailableDescription:
+      "A load failure is not an empty version list. Retry to fetch the current download preference and approved releases.",
     clearFilters: "Clear filters",
     moderationHistory: "Publication restrictions",
     all: "All resources",
@@ -44,6 +48,8 @@ const copy = {
     emptyFiltered: "No resources match this filter.",
     emptyFilteredHint: "Try another filter or show all library resources.",
     noVersions: "No approved version is currently available.",
+    noVersionsHint:
+      "An empty version list is not a load failure. Approved publications appear here when available.",
     privateResource: "Resource unavailable",
     back: "Back",
     library: "Library",
@@ -103,6 +109,9 @@ const copy = {
     moderationLoading: "Загрузка модерации ресурсов…",
     loadUnavailable: "Модерация ресурсов временно недоступна. Попробуйте ещё раз.",
     updatesLoadUnavailable: "Обновления библиотеки временно недоступны. Попробуйте ещё раз.",
+    versionsLoadUnavailable: "Выбор версии библиотеки временно недоступен. Попробуйте ещё раз.",
+    versionsLoadUnavailableDescription:
+      "Ошибка загрузки — это не пустой список версий. Повторите запрос, чтобы получить текущую настройку скачивания и одобренные выпуски.",
     clearFilters: "Сбросить фильтры",
     moderationHistory: "Ограничения публикации",
     all: "Все ресурсы",
@@ -138,6 +147,8 @@ const copy = {
     emptyFiltered: "Нет ресурсов по этому фильтру.",
     emptyFilteredHint: "Выберите другой фильтр или покажите все ресурсы библиотеки.",
     noVersions: "Одобренных доступных версий сейчас нет.",
+    noVersionsHint:
+      "Пустой список версий — не ошибка загрузки. Одобренные публикации появятся здесь, когда будут доступны.",
     privateResource: "Ресурс недоступен",
     back: "Назад",
     library: "Библиотека",

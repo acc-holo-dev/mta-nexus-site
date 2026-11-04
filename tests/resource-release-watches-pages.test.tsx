@@ -1,7 +1,8 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { ResourceReleaseWatchControl } from "../apps/web/src/components/resource-release-watch-control";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   locale: "en" as "en" | "ru",
@@ -19,8 +20,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { page: state.page },
 }));
+
 import Page, { generateMetadata } from "../apps/web/src/app/workspace/library/watches/page";
 import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
+
 beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a" };
@@ -95,12 +98,32 @@ it("authenticates early and invalid duplicate filters never reach the repository
   ).toContain('href="/auth/login?next=%2Fworkspace%2Flibrary%2Fwatches"');
   expect(state.page).not.toHaveBeenCalled();
   state.user = { id: "usr_a" };
-  expect(
-    renderToStaticMarkup(
-      await Page({ searchParams: Promise.resolve({ filter: ["enabled", "disabled"] }) }),
-    ),
-  ).toContain("Invalid watch filters");
+  const invalid = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ filter: ["enabled", "disabled"] }) }),
+  );
+  const copy = resourceReleaseWatchesCopy("en");
+  expect(invalid).toContain(copy.invalid);
+  expect(invalid).toContain(copy.invalidDescription);
+  expect(invalid).toContain('role="alert"');
+  expect(invalid).toContain("overflow-x-clip");
   expect(state.page).not.toHaveBeenCalled();
+});
+
+it("shows an honest recovery state when release watches fail to load", async () => {
+  state.page.mockRejectedValue(new Error("watches unavailable"));
+  const copy = resourceReleaseWatchesCopy("en");
+  const html = renderToStaticMarkup(
+    <LocaleProvider locale="en">
+      {await Page({ searchParams: Promise.resolve({ filter: "enabled", page: "2" }) })}
+    </LocaleProvider>,
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("filter=enabled");
+  expect(html).toContain("page=2");
+  expect(html).not.toContain("watches unavailable");
 });
 
 it.each(["en", "ru"] as const)(
@@ -122,6 +145,8 @@ it.each(["en", "ru"] as const)(
       </LocaleProvider>,
     );
     expect(lifetime).toContain(copy.empty);
+    expect(lifetime).toContain(copy.emptyHint);
+    expect(lifetime).toContain("overflow-x-clip");
     expect(lifetime).not.toContain(copy.emptyFiltered);
     state.page.mockResolvedValueOnce({
       items: [],
@@ -136,6 +161,7 @@ it.each(["en", "ru"] as const)(
       </LocaleProvider>,
     );
     expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).toContain(copy.emptyFilteredHint);
     expect(filtered).not.toContain(copy.empty);
     expect(filtered).toContain(copy.reset);
     expect(filtered).toContain('href="/workspace/library/watches"');

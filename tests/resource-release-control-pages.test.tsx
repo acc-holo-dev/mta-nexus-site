@@ -245,6 +245,42 @@ it("shows an honest recovery state when library updates fail", async () => {
   expect(html).toContain("filter=all");
   expect(html).toContain("page=2");
 });
+it("shows an honest recovery state when library versions fail", async () => {
+  state.versions.mockRejectedValue(new Error("versions unavailable"));
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await Versions(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.versionsLoadUnavailable);
+  expect(html).toContain(copy.versionsLoadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("page=2");
+  expect(html).not.toContain("versions unavailable");
+});
+it("shows EmptyState honesty when no approved versions are available", async () => {
+  const detail = await state.versions();
+  state.versions.mockResolvedValue({
+    ...detail,
+    latest: null,
+    selected: null,
+    versions: [],
+  });
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await Versions(input));
+  expect(html).toContain(copy.noVersions);
+  expect(html).toContain(copy.noVersionsHint);
+  expect(html).toContain("overflow-x-clip");
+});
+it("clips the library versions loading shell", async () => {
+  const { default: VersionsLoading } = await import(
+    "../apps/web/src/app/workspace/library/[id]/versions/loading"
+  );
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await VersionsLoading());
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(copy.versions);
+  expect(html).toContain(copy.updatesLoading);
+});
 it("requires sign-in before reading the buyer library", async () => {
   state.user = null;
   expect(renderToStaticMarkup(await Updates(input))).toContain(

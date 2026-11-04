@@ -196,3 +196,14 @@ it("clips honest loading shells on narrow layouts", async () => {
   expect(html).toContain("min-w-0 max-w-5xl");
   expect(html).toContain("overflow-x-clip");
 });
+it("clips the library requirements loading shell with honest copy", async () => {
+  const { default: LibraryRequirementsLoading } = await import(
+    "../apps/web/src/app/workspace/library/[id]/requirements/loading"
+  );
+  const copy = resourceRequirementsCopy("en");
+  const html = renderToStaticMarkup(await LibraryRequirementsLoading());
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(copy.title);
+  expect(html).toContain(copy.loading);
+});
