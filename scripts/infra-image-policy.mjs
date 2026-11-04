@@ -25,9 +25,14 @@ export const INFRA_IMAGE_REFS = Object.freeze({
 export const DOCKERFILE_NODE_STAGES = Object.freeze(["development", "build", "runtime"]);
 
 const DIGEST_RE = /^sha256:[a-f0-9]{64}$/u;
+const PLATFORM_RE = /^[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9._-]*(?:\/[a-z0-9][a-z0-9._-]*)?$/u;
 
 export function isImageDigest(value) {
   return typeof value === "string" && DIGEST_RE.test(value);
+}
+
+export function isImagePlatform(value) {
+  return typeof value === "string" && PLATFORM_RE.test(value);
 }
 
 export function parseImageRef(raw) {
@@ -162,8 +167,8 @@ export function evaluateInfraImagePins(document, { requireResolved = false } = {
       if (!isImageDigest(entry.digest)) {
         problems.push(`Role ${role} resolved status requires a sha256 digest.`);
       }
-      if (typeof entry.platform !== "string" || !entry.platform.includes("/")) {
-        problems.push(`Role ${role} resolved status requires platform (os/arch).`);
+      if (!isImagePlatform(entry.platform)) {
+        problems.push(`Role ${role} resolved status requires platform (os/arch[/variant]).`);
       }
     } else if (entry.status !== "unresolved") {
       problems.push(`Role ${role} status must be resolved or unresolved.`);

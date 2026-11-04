@@ -5,51 +5,60 @@
  * change Compose tags, or set productionAuthorized.
  *
  * Usage:
- *   node scripts/resolve-infra-image-digests.mjs [--platform linux/amd64] [--dry-run]
+ *   node scripts/resolve-infra-image-digests.mjs [--platform os/arch[/variant]] [--dry-run]
  */
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { evaluateInfraImagePins, INFRA_IMAGE_REFS, isImageDigest } from "./infra-image-policy.mjs";
+import {
+  evaluateInfraImagePins,
+  INFRA_IMAGE_REFS,
+  isImageDigest,
+  isImagePlatform,
+} from "./infra-image-policy.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const pinPath = join(root, "deploy/infra-image-pins.json");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const platformIndex = args.indexOf("--platform");
-const platform =
-  platformIndex >= 0 && args[platformIndex + 1] ? args[platformIndex + 1] : "linux/amd64";
-const [osName, arch] = platform.split("/");
+const platform = platformIndex >= 0 ? args[platformIndex + 1] : "linux/amd64";
+if (!isImagePlatform(platform)) {
+  console.error("Platform must have the form os/arch or os/arch/variant.");
+  process.exit(1);
+}
+const [osName, arch, variant] = platform.split("/");
 
 function resolveDigest(ref) {
-  const result = spawnSync(
-    "docker",
-    [
-      "buildx",
-      "imagetools",
-      "inspect",
-      ref,
-      "--format",
-      '{{range .Manifest.Manifests}}{{if and (eq .Platform.OS "' +
-        osName +
-        '") (eq .Platform.Architecture "' +
-        arch +
-        '")}}{{.Digest}}{{println}}{{end}}{{end}}',
-    ],
-    { encoding: "utf8" },
-  );
+  const result = spawnSync("docker", ["buildx", "imagetools", "inspect", ref, "--raw"], {
+    encoding: "utf8",
+  });
   if (result.status !== 0) {
     throw new Error(`imagetools inspect failed for ${ref}: ${result.stderr || result.stdout}`);
   }
-  const digest = result.stdout
-    .split(/\r?\n/u)
-    .map((line) => line.trim())
-    .find((line) => isImageDigest(line));
-  if (!digest) {
+  let index;
+  try {
+    index = JSON.parse(result.stdout);
+  } catch {
+    throw new Error(`Invalid manifest index for ${ref}`);
+  }
+  if (!Array.isArray(index?.manifests)) {
+    throw new Error(`No manifest index for ${ref}`);
+  }
+  const matches = index.manifests.filter(
+    (entry) =>
+      entry?.platform?.os === osName &&
+      entry.platform.architecture === arch &&
+      (variant === undefined || entry.platform.variant === variant),
+  );
+  if (matches.length === 0) {
     throw new Error(`No ${platform} digest found for ${ref}`);
   }
-  return digest;
+  if (matches.length !== 1 || !isImageDigest(matches[0].digest)) {
+    throw new Error(`Ambiguous or invalid ${platform} digest for ${ref}`);
+  }
+  return matches[0].digest;
 }
 
 const document = JSON.parse(readFileSync(pinPath, "utf8"));
