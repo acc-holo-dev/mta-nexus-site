@@ -35,10 +35,18 @@ export const product = {
     scanUnavailable: "Scan: unavailable",
     scanBlocked: "Scan: blocked",
     noBuilds: "No public builds recorded yet.",
+    noBuildsHint:
+      "Empty build history is not a catalog outage. Published builds appear here when recorded.",
+    detailUnavailable:
+      "This resource page is temporarily unavailable. This does not mean the resource is missing.",
+    detailUnavailableDescription:
+      "A load failure is not a missing product. Retry to fetch the latest published detail.",
     usedBy: "Used by published resources",
     reviews: "Community reviews",
     verifiedAcquisition: "Verified acquisition",
     noReviews: "No reviews yet for this resource.",
+    noReviewsHint:
+      "Published reviews from readers with acquired access will appear here. An empty list is not a load failure.",
     free: "Free",
     licenseModel: "Access model",
     managementAccess: "Management access",

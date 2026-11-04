@@ -1,4 +1,7 @@
 import { LibraryCollectionsScreen } from "../../../../components/library-collections-screen";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Resource collections | MTA NEXUS",
@@ -7,5 +10,9 @@ export const metadata = {
 export default function Page(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <LibraryCollectionsScreen {...props} view="list" />;
+  return (
+    <div className={pageShellClass}>
+      <LibraryCollectionsScreen {...props} view="list" />
+    </div>
+  );
 }

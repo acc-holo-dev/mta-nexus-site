@@ -38,7 +38,7 @@ export default async function ArticlesPage({
   const filtersActive = Boolean(filters.query || filters.type);
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-8 overflow-x-clip">
       <PageHeader
         title={dictionary.articles.title}
         description={dictionary.articles.description}
