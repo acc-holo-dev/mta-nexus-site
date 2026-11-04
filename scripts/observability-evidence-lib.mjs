@@ -44,7 +44,9 @@ export const OBSERVABILITY_LIVE_DRILL_SIGNAL_NAMES = Object.freeze(
 );
 
 /** Threshold keys a live drill may exercise (same set as readiness alert env). */
-export const OBSERVABILITY_LIVE_DRILL_THRESHOLD_KEYS = OBSERVABILITY_ALERT_ENV_KEYS;
+export const OBSERVABILITY_LIVE_DRILL_THRESHOLD_KEYS = Object.freeze([
+  ...OBSERVABILITY_ALERT_ENV_KEYS,
+]);
 
 const REPLACE_WITH_PLACEHOLDER = /REPLACE_WITH_/u;
 
