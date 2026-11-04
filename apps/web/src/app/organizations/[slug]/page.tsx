@@ -1,5 +1,5 @@
 import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
-import { StatCard } from "@nexus/ui";
+import { EmptyState, ErrorState, StatCard } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { Building2, ExternalLink, Globe, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -18,6 +18,10 @@ import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { productService } from "../../../lib/services/product-service";
 
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
@@ -62,7 +66,9 @@ export default async function OrganizationProfilePage({
   const logoUrl = safeExternalWebUrl(organization.logoUrl);
   const websiteUrl = safeExternalWebUrl(organization.websiteUrl);
   const query = await searchParams;
-  const [resourcePage, articlePage] = await Promise.all([
+  const profileHref = `/organizations/${encodeURIComponent(organization.slug)}`;
+  let loadError = false;
+  const loaded = await Promise.all([
     productRepository.pagePublishedFreeByOrganization(
       organization.id,
       parseProfilePage(query?.page),
@@ -73,14 +79,35 @@ export default async function OrganizationProfilePage({
       parseProfilePage(query?.articlePage),
       12,
     ),
-  ]);
+  ]).catch(() => {
+    loadError = true;
+    return null;
+  });
+
+  if (loadError || !loaded) {
+    return (
+      <div className="min-w-0 space-y-6 overflow-x-clip">
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={profileHref} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
+  const [resourcePage, articlePage] = loaded;
   const products = resourcePage.products;
-  const attributions = await productService.getPublicAttributions(products);
+  const attributions = await productService.getPublicAttributions(products).catch(() => new Map());
   const articles = articlePage.items;
+  const portfolioEmpty = resourcePage.total === 0 && articlePage.total === 0;
 
   return (
-    <div className="space-y-10">
-      <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+    <div className={pageShellClass}>
+      <section className="nexus-panel flex min-w-0 flex-col justify-between gap-6 overflow-x-clip p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
             {logoUrl ? (
@@ -124,16 +151,10 @@ export default async function OrganizationProfilePage({
               targetId={organization.id}
               targetName={organization.name}
             />
-            <Link
-              href={`/organizations/${encodeURIComponent(organization.slug)}/activity`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`${profileHref}/activity`} className={actionLinkClass}>
               {publicationCopy(locale).activity}
             </Link>
-            <Link
-              href={`/organizations/${encodeURIComponent(organization.slug)}/trust`}
-              className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`${profileHref}/trust`} className={actionLinkClass}>
               {contextTrustCopy(locale).title}
             </Link>
             {websiteUrl && (
@@ -141,7 +162,7 @@ export default async function OrganizationProfilePage({
                 href={websiteUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex max-w-full items-center gap-1.5 pt-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="inline-flex min-h-11 max-w-full items-center gap-1.5 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 <span className="truncate">{websiteUrl}</span>
@@ -156,12 +177,24 @@ export default async function OrganizationProfilePage({
         </div>
       </section>
 
+      {portfolioEmpty ? (
+        <EmptyState
+          title={copy.emptyPortfolio}
+          description={copy.emptyPortfolioHint}
+          action={
+            <Link href="/market?maxPrice=0" className={actionLinkClass}>
+              {dictionary.home.browseResources}
+            </Link>
+          }
+        />
+      ) : null}
+
       {resourcePage.total > 0 && (
-        <section id="resources" className="space-y-4">
+        <section id="resources" className="min-w-0 space-y-4 overflow-x-clip">
           <h2 className="font-heading text-primary">
             {copy.marketplaceReleases} ({resourcePage.total})
           </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
               <ProductCard
                 key={product.id}
@@ -172,7 +205,7 @@ export default async function OrganizationProfilePage({
             ))}
           </div>
           <ProfileResourcePagination
-            basePath={`/organizations/${encodeURIComponent(organization.slug)}`}
+            basePath={profileHref}
             page={resourcePage.page}
             totalPages={resourcePage.totalPages}
             locale={locale}
@@ -183,17 +216,17 @@ export default async function OrganizationProfilePage({
       )}
 
       {articlePage.total > 0 && (
-        <section id="articles" className="space-y-4">
+        <section id="articles" className="min-w-0 space-y-4 overflow-x-clip">
           <h2 className="font-heading text-primary">
             {copy.articles} ({articlePage.total})
           </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip md:grid-cols-3">
             {articles.map((article) => (
               <ArticleCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
           <ProfileResourcePagination
-            basePath={`/organizations/${encodeURIComponent(organization.slug)}`}
+            basePath={profileHref}
             page={articlePage.page}
             totalPages={articlePage.totalPages}
             locale={locale}

@@ -1,5 +1,5 @@
 import { productRepository } from "@nexus/db";
-import { Avatar, EmptyState, StatCard } from "@nexus/ui";
+import { Avatar, EmptyState, ErrorState, StatCard } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -20,6 +20,10 @@ import { profilePrivacyService } from "../../../lib/services/profile-privacy-ser
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
 
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 const getProfile = cache((username: string) => authService.getUserByUsername(username));
 
@@ -59,18 +63,41 @@ export default async function DeveloperProfilePage({
 
   const query = await searchParams;
   const requestedPage = parseProfilePage(query?.page);
-  const [result, professional, visibility] = await Promise.all([
+  const profilePath = `/developers/${encodeURIComponent(user.username)}`;
+  let loadError = false;
+  const loaded = await Promise.all([
     productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24),
     verificationWorkspaceService.publicProfile(user.id).catch(() => null),
     profilePrivacyService.visibility(user.id),
-  ]);
+  ]).catch(() => {
+    loadError = true;
+    return null;
+  });
+
+  if (loadError || !loaded) {
+    return (
+      <div className="min-w-0 space-y-6 overflow-x-clip">
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={profilePath} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
+  const [result, professional, visibility] = loaded;
   const authorProducts = result.products;
-  const attributions = await productService.getPublicAttributions(authorProducts);
-  const profilePath = `/developers/${encodeURIComponent(user.username)}`;
+  const attributions = await productService
+    .getPublicAttributions(authorProducts)
+    .catch(() => new Map());
 
   return (
-    <div className="space-y-10">
-      <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+    <div className={pageShellClass}>
+      <section className="nexus-panel flex min-w-0 flex-col justify-between gap-6 overflow-x-clip p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <Avatar
             src={user.avatarUrl || undefined}
@@ -99,14 +126,14 @@ export default async function DeveloperProfilePage({
             >
               <Link
                 href={`/users/${encodeURIComponent(user.username)}/trust`}
-                className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={actionLinkClass}
               >
                 {trustCopy(locale).title}
               </Link>
               {visibility.showActivity && (
                 <Link
                   href={`/users/${encodeURIComponent(user.username)}/activity`}
-                  className="inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={actionLinkClass}
                 >
                   {publicationCopy(locale).activity}
                 </Link>
@@ -126,12 +153,12 @@ export default async function DeveloperProfilePage({
       </section>
 
       <DeveloperExperience profile={professional} locale={locale} />
-      <section id="resources" className="space-y-6">
+      <section id="resources" className="min-w-0 space-y-6 overflow-x-clip">
         <h2 className="font-heading text-primary">
           {copy.releasesBy} {user.displayName}
         </h2>
         {authorProducts.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
             {authorProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -144,12 +171,9 @@ export default async function DeveloperProfilePage({
         ) : (
           <EmptyState
             title={copy.noReleases}
-            description={copy.bioFallback}
+            description={copy.noReleasesHint}
             action={
-              <Link
-                href="/market?maxPrice=0"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/market?maxPrice=0" className={actionLinkClass}>
                 {dictionary.home.browseResources}
               </Link>
             }

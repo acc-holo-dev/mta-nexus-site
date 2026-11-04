@@ -17,7 +17,7 @@ export default async function OrganizationsPage({
   const state = parseDiscoverQuery({ ...(await searchParams), type: "organizations" });
   const results = await DirectoryResults({ state, locale, path: "/organizations" });
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       <header className="border-b border-base pb-6">
         <h1 className="text-2xl font-extrabold text-primary">{copy.organizationsTitle}</h1>
         <p className="mt-2 text-sm text-muted">{copy.organizationsDescription}</p>

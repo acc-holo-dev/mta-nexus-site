@@ -1,11 +1,12 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
-import { contextTrustCopy } from "../apps/web/src/lib/public-context-trust-copy";
-import { approvalCopy } from "../apps/web/src/lib/public-verification-history-copy";
+import { OrganizationTeamDirectory } from "../apps/web/src/components/organization-team-directory";
 import { organizationTeamCopy } from "../apps/web/src/lib/organization-team-copy";
 import { getOrganizationCopy } from "../apps/web/src/lib/organization-workspace-copy";
-import { OrganizationTeamDirectory } from "../apps/web/src/components/organization-team-directory";
+import { contextTrustCopy } from "../apps/web/src/lib/public-context-trust-copy";
+import { approvalCopy } from "../apps/web/src/lib/public-verification-history-copy";
+
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   session: vi.fn(),
@@ -29,13 +30,15 @@ vi.mock("../apps/web/src/lib/services/public-context-trust-service", () => ({
 vi.mock("../apps/web/src/lib/services/organization-team-service", () => ({
   organizationTeamService: { page: mocks.team },
 }));
-import {
-  PublicContextTrustPage,
-  contextTrustMetadata,
-} from "../apps/web/src/components/public-context-trust-page";
+
 import TeamPage, {
   generateMetadata,
 } from "../apps/web/src/app/workspace/organizations/[id]/team/page";
+import {
+  contextTrustMetadata,
+  PublicContextTrustPage,
+} from "../apps/web/src/components/public-context-trust-page";
+
 const time = "2026-10-11T00:00:00.000Z",
   context = { params: Promise.resolve({ slug: "team" }) },
   teamParams = { params: Promise.resolve({ id: "org" }) };
@@ -104,6 +107,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/organizations/team/activity"');
     expect(html).toContain('href="/organizations/team/trust?cursor=next"');
     expect(html).toContain(copy.verifiedServers);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
     expect(html).not.toContain("secret");
     expect(await contextTrustMetadata("organization", context)).toMatchObject({
       title: copy.title,
@@ -134,6 +139,7 @@ it("shows a server's current organization and public activity without personal i
   expect(html).toContain('href="/organizations/org-team/trust"');
   expect(html).toContain('href="/servers/team/updates"');
   expect(html).toContain(contextTrustCopy("en").empty);
+  expect(html).toContain(contextTrustCopy("en").emptyHint);
   expect(html).not.toContain(contextTrustCopy("en").verifiedServers);
 });
 it("rejects proof/identity query overrides before service and provides a fresh-state recovery", async () => {
@@ -144,8 +150,10 @@ it("rejects proof/identity query overrides before service and provides a fresh-s
       searchParams: Promise.resolve({ includeProof: "true" }),
     }),
   );
+  expect(html).toContain('role="alert"');
   expect(html).toContain(approvalCopy("en").invalid);
   expect(html).toContain('href="/servers/team/trust"');
+  expect(html).toContain("min-h-11");
   expect(mocks.trust).not.toHaveBeenCalled();
 });
 it("uses 404 for missing/nonpublic contexts and does not show empty records on failures", async () => {
@@ -155,8 +163,12 @@ it("uses 404 for missing/nonpublic contexts and does not show empty records on f
   const html = renderToStaticMarkup(
     await PublicContextTrustPage({ ...context, kind: "organization" }),
   );
+  expect(html).toContain('role="alert"');
   expect(html).toContain(contextTrustCopy("en").unavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).not.toContain(contextTrustCopy("en").empty);
+  expect(html).not.toContain(contextTrustCopy("en").emptyHint);
   expect(html).not.toContain("secret evidence");
 });
 it.each(["en", "ru"] as const)(

@@ -1,6 +1,8 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
   type ContextKind,
@@ -14,6 +16,9 @@ export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function contextTrustMetadata(kind: ContextKind, props: ContextTrustPageProps) {
   const { slug } = await props.params,
     copy = contextTrustCopy(await getRequestLocale());
@@ -31,6 +36,7 @@ export async function PublicContextTrustPage({
   const { slug } = await params,
     locale = await getRequestLocale(),
     copy = contextTrustCopy(locale),
+    dictionary = getDictionary(locale),
     approvals = approvalCopy(locale),
     query = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {})) {
@@ -52,14 +58,11 @@ export async function PublicContextTrustPage({
     : null;
   const base = `/${kind === "organization" ? "organizations" : "servers"}/${encodeURIComponent(slug)}`;
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={base}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={base} className={actionLinkClass}>
         {copy.back}
       </Link>
-      <header className="nexus-panel space-y-3 p-6">
+      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         {page && <p className="break-words font-semibold text-primary">{page.subject.name}</p>}
         <p className="text-sm text-muted">{copy.description}</p>
@@ -68,7 +71,7 @@ export async function PublicContextTrustPage({
         </p>
       </header>
       {page && (
-        <section className="nexus-panel space-y-4 p-5">
+        <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
           <h2 className="font-heading text-primary">{copy.current}</h2>
           <p
             className={`text-sm font-semibold ${page.subject.verified ? "text-success" : "text-muted"}`}
@@ -128,33 +131,35 @@ export async function PublicContextTrustPage({
           </dl>
           <Link
             href={`${base}/${kind === "organization" ? "activity" : "updates"}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={actionLinkClass}
           >
             {copy.activity}
           </Link>
         </section>
       )}
-      <section className="space-y-4">
+      <section className="min-w-0 space-y-4 overflow-x-clip">
         <h2 className="font-heading text-primary">{copy.history}</h2>
         <p className="text-sm text-muted">{approvals.scope}</p>
-        <a
-          href={latest}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <a href={latest} className={actionLinkClass}>
           {copy.latest}
         </a>
         {error && (
-          <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-            {error}
-          </p>
+          <ErrorState
+            title={error}
+            action={
+              <a href={latest} className={actionLinkClass}>
+                {dictionary.errors.retry}
+              </a>
+            }
+          />
         )}
         {page && !page.items.length && (
-          <p className="nexus-panel p-5 text-sm text-muted">{copy.empty}</p>
+          <EmptyState title={copy.empty} description={copy.emptyHint} />
         )}
         {page && (
           <ol className="space-y-3">
             {page.items.map((record) => (
-              <li key={record.key} className="nexus-panel space-y-2 p-5">
+              <li key={record.key} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
                 <p className="text-sm text-secondary">{copy.approved}</p>
                 <time dateTime={record.approvedAt} className="text-sm text-muted">
                   {new Date(record.approvedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
@@ -170,7 +175,7 @@ export async function PublicContextTrustPage({
           <Link
             prefetch={false}
             href={contextTrustHref(kind, slug, page.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={actionLinkClass}
           >
             {copy.older}
           </Link>

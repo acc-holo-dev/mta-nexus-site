@@ -75,10 +75,15 @@ export const community = {
     verified: "Verified organization",
     community: "Community",
     loading: "Loading organization…",
+    loadUnavailable:
+      "This organization is temporarily unavailable. This does not mean the team has no public work.",
     fallback: "MTA community, creator collective, or resource publisher.",
     releases: "Releases",
     marketplaceReleases: "Marketplace releases",
     articles: "Technical articles & devlogs",
+    emptyPortfolio: "No public releases or articles yet.",
+    emptyPortfolioHint:
+      "Published free resources and editorial posts will appear here when available. An empty portfolio is not a load failure.",
   },
   support: {
     title: "Support",

@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { approvalError } from "./public-verification-history-copy";
+
 const en = {
   title: "Verification and public activity",
   description:
@@ -24,6 +25,8 @@ const en = {
   latest: "Latest records",
   older: "Older records",
   empty: "No dated approvals are recorded on this page.",
+  emptyHint:
+    "An empty approval history is a confirmed result for this context, not a verification outage.",
   loading: "Loading public verification…",
   unavailable: "Public verification could not be loaded. Try again.",
   organizationScope:
@@ -55,6 +58,8 @@ const ru: Record<keyof typeof en, string> = {
   latest: "Новые записи",
   older: "Старые записи",
   empty: "На этой странице нет записанных одобрений с датами.",
+  emptyHint:
+    "Пустая история одобрений — подтверждённый результат для этого контекста, а не сбой верификации.",
   loading: "Загрузка публичной верификации…",
   unavailable: "Не удалось загрузить публичную верификацию. Попробуйте ещё раз.",
   organizationScope:
