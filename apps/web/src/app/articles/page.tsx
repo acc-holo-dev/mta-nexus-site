@@ -1,4 +1,4 @@
-import { EmptyState, PageHeader } from "@nexus/ui";
+import { EmptyState, ErrorState, PageHeader } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { ArticleCard } from "../../components/article-card";
@@ -10,7 +10,11 @@ import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { contentService } from "../../lib/services/content-service";
-import { editorialTypes, parseContentPage } from "../../lib/user-platform-contract";
+import {
+  contentPageHref,
+  editorialTypes,
+  parseContentPage,
+} from "../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
 export const dynamic = "force-dynamic";
@@ -64,9 +68,17 @@ export default async function ArticlesPage({
       />
 
       {!result ? (
-        <p role="alert" className="text-sm text-danger">
-          {platformCopy.unavailable}
-        </p>
+        <ErrorState
+          title={platformCopy.unavailable}
+          action={
+            <Link
+              href={contentPageHref("/articles", filters, filters.page)}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       ) : articles.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (

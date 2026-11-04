@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Avatar } from "../packages/ui/src/avatar";
 import { EmptyState } from "../packages/ui/src/empty-state";
+import { ErrorState } from "../packages/ui/src/error-state";
 import { fieldControlClass } from "../packages/ui/src/field-classes";
 import { Field, Input } from "../packages/ui/src/input";
 import {
@@ -164,6 +165,22 @@ describe("SearchField semantics", () => {
     expect(markup).toContain('name="q"');
     expect(markup).toContain('aria-hidden="true"');
     expect(markup).toContain("inventory");
+  });
+});
+
+describe("ErrorState semantics", () => {
+  it("announces a failure and keeps recovery adjacent", () => {
+    const markup = renderToStaticMarkup(
+      <ErrorState
+        title="Каталог временно недоступен"
+        action={<button type="button">Повторить</button>}
+      />,
+    );
+
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain("Каталог временно недоступен");
+    expect(markup).toContain("Повторить");
+    expect(markup).toContain('aria-hidden="true"');
   });
 });
 

@@ -1,4 +1,4 @@
-import { Avatar, Button, SearchField } from "@nexus/ui";
+import { Avatar, Button, ErrorState, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -136,9 +136,21 @@ export function PublicationFeed({
         </Link>
       </form>
       {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
+        <ErrorState
+          title={error}
+          action={
+            <a
+              href={publicationHref(
+                path,
+                filters,
+                filters.cursor ? JSON.stringify(filters.cursor) : null,
+              )}
+              className={`${linkControl} inline-flex items-center`}
+            >
+              {copy.retry}
+            </a>
+          }
+        />
       )}
       <div className="space-y-4">
         {page?.items.map((item) => (
@@ -299,18 +311,6 @@ export function PublicationFeed({
         >
           {copy.latest}
         </a>
-        {error && (
-          <a
-            href={publicationHref(
-              path,
-              filters,
-              filters.cursor ? JSON.stringify(filters.cursor) : null,
-            )}
-            className={`${linkControl} inline-flex items-center`}
-          >
-            {copy.retry}
-          </a>
-        )}
         {page?.hasMore && (
           <Link
             href={publicationHref(path, filters, page.nextCursor)}

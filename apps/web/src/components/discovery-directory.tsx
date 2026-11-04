@@ -1,6 +1,6 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { Avatar, Button, EmptyState, SearchField } from "@nexus/ui";
+import { Avatar, Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -167,15 +167,17 @@ export async function DirectoryResults({
   });
   if (!result)
     return (
-      <div role="alert" className="nexus-panel space-y-3 p-5 text-danger">
-        <p>{loadError}</p>
-        <Link
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
-        >
-          {dictionary.searchButton}
-        </Link>
-      </div>
+      <ErrorState
+        title={loadError}
+        action={
+          <Link
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
+          >
+            {getDictionary(locale).errors.retry}
+          </Link>
+        }
+      />
     );
   const targetType =
     result.type === "creators"

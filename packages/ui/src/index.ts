@@ -4,6 +4,7 @@ export * from "./button";
 export * from "./card";
 export * from "./dialog";
 export * from "./empty-state";
+export * from "./error-state";
 export * from "./field-classes";
 export * from "./input";
 export * from "./list-keys";

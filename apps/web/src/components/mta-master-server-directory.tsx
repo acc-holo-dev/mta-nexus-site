@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, SearchField } from "@nexus/ui";
+import { Button, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
@@ -272,17 +272,19 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
       )}
 
       {error && (
-        <div role="alert" className="nexus-panel space-y-3 p-6 text-sm text-secondary">
-          <p>{error}</p>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={() => setAttempt((current) => current + 1)}
-          >
-            {copy.tryAgain}
-          </Button>
-        </div>
+        <ErrorState
+          title={error}
+          action={
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setAttempt((current) => current + 1)}
+            >
+              {copy.tryAgain}
+            </Button>
+          }
+        />
       )}
 
       {!error && !loading && directory && (
