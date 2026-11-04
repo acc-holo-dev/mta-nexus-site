@@ -1,3 +1,4 @@
+import { PageHeader } from "@nexus/ui";
 import {
   Building2,
   Code2,
@@ -52,13 +53,11 @@ export default async function DiscoverPage({
 
   return (
     <div className="space-y-7">
-      <div className="border-b border-base pb-6">
-        <h1 className="flex items-center gap-2.5 text-2xl font-extrabold text-primary sm:text-3xl">
-          <Compass className="h-7 w-7 text-accent" aria-hidden="true" />
-          <span>{copy.title}</span>
-        </h1>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{copy.description}</p>
-      </div>
+      <PageHeader
+        title={copy.title}
+        description={copy.description}
+        icon={<Compass className="h-7 w-7 text-accent" aria-hidden="true" />}
+      />
 
       <nav
         aria-label={copy.tabsLabel}

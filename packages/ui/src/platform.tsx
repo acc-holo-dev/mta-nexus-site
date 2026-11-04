@@ -4,6 +4,50 @@ import { withOccurrenceKeys } from "./list-keys";
 import { cn } from "./utils";
 
 /* ============================================================
+   PageHeader — page identity, context and primary actions
+   ============================================================ */
+export interface PageHeaderProps {
+  title: string;
+  description?: string;
+  icon?: React.ReactNode;
+  action?: React.ReactNode;
+  className?: string;
+  titleId?: string;
+}
+
+export function PageHeader({
+  title,
+  description,
+  icon,
+  action,
+  className,
+  titleId,
+}: PageHeaderProps) {
+  return (
+    <header
+      className={cn(
+        "flex flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-start",
+        className,
+      )}
+    >
+      <div className="min-w-0 max-w-3xl">
+        <h1
+          id={titleId}
+          className="flex items-start gap-2.5 break-words text-2xl font-extrabold text-primary sm:text-3xl"
+        >
+          {icon && <span className="mt-0.5 shrink-0">{icon}</span>}
+          <span className="min-w-0">{title}</span>
+        </h1>
+        {description && (
+          <p className="mt-1 break-words text-sm leading-relaxed text-muted">{description}</p>
+        )}
+      </div>
+      {action && <div className="flex max-w-full flex-wrap gap-4 md:justify-end">{action}</div>}
+    </header>
+  );
+}
+
+/* ============================================================
    StatCard — unified dashboard metric card (TASK-018)
    ============================================================ */
 export interface StatCardProps {

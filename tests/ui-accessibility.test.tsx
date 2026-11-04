@@ -8,9 +8,10 @@ import {
   DataTable,
   DataTableCell,
   DataTableHeader,
+  PageHeader,
   SectionHeader,
 } from "../packages/ui/src/platform";
-import { Tabs, nextTabIndex } from "../packages/ui/src/tabs";
+import { nextTabIndex, Tabs } from "../packages/ui/src/tabs";
 
 describe("Input accessibility wiring", () => {
   it("auto-generates a stable field id for labels and errors", () => {
@@ -99,7 +100,24 @@ describe("Input accessibility wiring", () => {
   });
 });
 
-describe("SectionHeader and DataTable overflow chrome", () => {
+describe("PageHeader, SectionHeader and DataTable overflow chrome", () => {
+  it("keeps page identity and actions usable with long localized text", () => {
+    const header = renderToStaticMarkup(
+      <PageHeader
+        title="Очень длинный заголовок каталога сообщества"
+        description="Контекст страницы остаётся читаемым на узком экране."
+        icon={<span aria-hidden="true">◆</span>}
+        action={<a href="/create">Создать публикацию</a>}
+      />,
+    );
+
+    expect(header).toContain("<header");
+    expect(header).toContain("flex-col");
+    expect(header).toContain("break-words");
+    expect(header).toContain("Очень длинный заголовок");
+    expect(header).toContain('href="/create"');
+  });
+
   it("wraps long section titles and names overflow regions", () => {
     const header = renderToStaticMarkup(
       <SectionHeader

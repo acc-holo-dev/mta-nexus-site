@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, PageHeader } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { ArticleCard } from "../../components/article-card";
@@ -35,30 +35,27 @@ export default async function ArticlesPage({
 
   return (
     <div className="space-y-8">
-      <div className="border-b border-base pb-6">
-        <h1 className="flex items-center gap-2.5 text-2xl font-extrabold text-primary sm:text-3xl">
-          <BookOpen className="h-7 w-7 text-warning" aria-hidden="true" />
-          <span>{dictionary.articles.title}</span>
-        </h1>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          {dictionary.articles.description}
-        </p>
-      </div>
-
-      <div className="flex flex-wrap gap-4 text-sm">
-        <Link
-          href="/workspace/content/new"
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {platformCopy.create}
-        </Link>
-        <Link
-          href="/workspace/content"
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {platformCopy.studio}
-        </Link>
-      </div>
+      <PageHeader
+        title={dictionary.articles.title}
+        description={dictionary.articles.description}
+        icon={<BookOpen className="h-7 w-7 text-warning" aria-hidden="true" />}
+        action={
+          <>
+            <Link
+              href="/workspace/content/new"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {platformCopy.create}
+            </Link>
+            <Link
+              href="/workspace/content"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {platformCopy.studio}
+            </Link>
+          </>
+        }
+      />
       <ContentCatalogControls
         path="/articles"
         filters={filters}
