@@ -10,6 +10,7 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     const page = values.length === 0 ? 1 : Number(values[0]);
     if (values.length > 1 || !Number.isSafeInteger(page) || page < 1 || page > 1000)
       throw new AppError("Invalid candidate page", 400, "RESOURCE_VARIANTS_INVALID");
-    return resourceManagementService.variantCandidates(id, actor, page);
+    const value = await resourceManagementService.variantCandidates(id, actor, page);
+    return Response.json(value, { headers: { "X-Nexus-Actor-Id": actor.id } });
   });
 }

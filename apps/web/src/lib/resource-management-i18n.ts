@@ -54,6 +54,18 @@ const copy = {
       "The signed-in account changed. The previous account's draft was closed.",
     compatibilityCheckFailed:
       "Could not verify the saved version or access. Check again before saving.",
+    variantsChanged: "The saved variant group changed. Compare it with your draft before saving.",
+    variantsLatest: "Latest saved variant group",
+    variantsNone: "There is no saved variant group now.",
+    variantsCheck: "Check saved variant group",
+    variantsUseLatest: "Use this group version as the basis for my draft",
+    variantsDraftHelp:
+      "Your selections, labels and reason are kept. Saving after accepting this version will replace the saved group.",
+    variantsAnchorChanged:
+      "This resource is no longer the group's anchor. Copy your draft before opening the anchor resource.",
+    variantsIdentityChanged:
+      "The signed-in account changed. The previous account's draft was closed.",
+    variantsCheckFailed: "Could not verify the saved group or access. Check again before saving.",
     browse: "Choose a variant",
     version: "Version",
     independent: "Each variant is added to your library separately.",
@@ -123,6 +135,19 @@ const copy = {
     compatibilityIdentityChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
     compatibilityCheckFailed:
       "Не удалось проверить сохранённую версию или доступ. Повторите проверку перед сохранением.",
+    variantsChanged:
+      "Сохранённая группа вариантов изменилась. Сравните её с черновиком перед сохранением.",
+    variantsLatest: "Последняя сохранённая группа вариантов",
+    variantsNone: "Сохранённой группы вариантов сейчас нет.",
+    variantsCheck: "Проверить сохранённую группу",
+    variantsUseLatest: "Использовать эту версию группы как основу черновика",
+    variantsDraftHelp:
+      "Выбранные ресурсы, подписи и причина сохранены. После выбора этой версии сохранение заменит группу.",
+    variantsAnchorChanged:
+      "Этот ресурс больше не является основным в группе. Скопируйте черновик перед переходом к основному ресурсу.",
+    variantsIdentityChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
+    variantsCheckFailed:
+      "Не удалось проверить группу или доступ. Повторите проверку перед сохранением.",
     browse: "Выберите вариант",
     version: "Версия",
     independent: "Каждый вариант добавляется в библиотеку отдельно.",

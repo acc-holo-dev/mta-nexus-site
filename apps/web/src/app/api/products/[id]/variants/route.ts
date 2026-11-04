@@ -9,12 +9,17 @@ import { resourceManagementService } from "../../../../../lib/services/resource-
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const { id } = await params;
-    return resourceManagementService.managedVariants(id, actor);
+    const value = await resourceManagementService.managedVariants(id, actor);
+    return Response.json(value, { headers: { "X-Nexus-Actor-Id": actor.id } });
   });
 }
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return resourceCommerceRequest(request, true, async (actor) => {
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (expectedActor !== actor.id) throw new AppError("Actor changed", 409, "ACTOR_CHANGED");
       const { id } = await params;
       const parsed = resourceVariantCommandSchema.safeParse(await readBoundedJson(request, 16_384));
       if (!parsed.success)

@@ -74,7 +74,9 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
           headers: {
             ...browserMutationHeaders(),
             "content-type": "application/json",
-            ...(path.includes("/compatibility") ? { "x-nexus-actor-id": "usr_a" } : {}),
+            ...(path.includes("/compatibility") || path.endsWith("/variants")
+              ? { "x-nexus-actor-id": "usr_a" }
+              : {}),
             ...headers,
           },
         },
@@ -166,6 +168,45 @@ it("rejects missing or changed actor preconditions before compatibility writes",
   expect(changed.status).toBe(409);
   expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
   expect(state.compatibility).not.toHaveBeenCalled();
+});
+
+it("binds variant reads and writes to the active actor", async () => {
+  state.managed.mockResolvedValue({ anchorProductId: "prd_a", group: null });
+  const read = await managed(request("/api/products/prd_a/variants"), context);
+  expect(read.status).toBe(200);
+  expect(read.headers.get("x-nexus-actor-id")).toBe("usr_a");
+  expect(read.headers.get("cache-control")).toBe("private, no-store");
+  expect(await read.json()).toEqual({ anchorProductId: "prd_a", group: null });
+  state.candidates.mockResolvedValue({ candidates: [], page: 1, hasMore: false });
+  const candidateRead = await candidates(
+    request("/api/products/prd_a/variants/candidates"),
+    context,
+  );
+  expect(candidateRead.headers.get("x-nexus-actor-id")).toBe("usr_a");
+  expect(candidateRead.headers.get("cache-control")).toBe("private, no-store");
+  const missing = new NextRequest("https://nexus.test/api/products/prd_a/variants", {
+    method: "POST",
+    body: JSON.stringify(command),
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+  });
+  expect((await variants(missing, context)).status).toBe(428);
+  const changed = await variants(
+    request("/api/products/prd_a/variants", command, { "x-nexus-actor-id": "usr_other" }),
+    context,
+  );
+  expect(changed.status).toBe(409);
+  expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
+  expect(state.command).not.toHaveBeenCalled();
+});
+
+it("rate-limits private variant and candidate reads before repository access", async () => {
+  state.allowed = false;
+  expect((await managed(request("/api/products/prd_a/variants"), context)).status).toBe(429);
+  expect(
+    (await candidates(request("/api/products/prd_a/variants/candidates"), context)).status,
+  ).toBe(429);
+  expect(state.managed).not.toHaveBeenCalled();
+  expect(state.candidates).not.toHaveBeenCalled();
 });
 it("rejects cross-site writes and incompatible media before parsing or mutation", async () => {
   expect(

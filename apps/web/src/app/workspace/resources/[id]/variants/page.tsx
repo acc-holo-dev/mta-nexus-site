@@ -73,7 +73,8 @@ export default async function ResourceVariantsPage({
       </header>
       {candidates ? (
         <ResourceVariantsForm
-          key={`${product.id}:${managed.group?.id ?? "new"}:${managed.group?.revision ?? 0}`}
+          key={`${actor.id}:${product.id}`}
+          actorId={actor.id}
           product={{ id: product.id, title: product.title }}
           managed={managed}
           initialCandidates={candidates}
