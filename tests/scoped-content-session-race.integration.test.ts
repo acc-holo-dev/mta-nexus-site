@@ -62,15 +62,13 @@ it.each(["organization", "server"] as const)(
           .insert(organizations)
           .values({ id: parentId, ownerId: actorId, name: "Fixture", slug: parentId });
       else
-        await db
-          .insert(servers)
-          .values({
-            id: parentId,
-            ownerId: actorId,
-            name: "Fixture",
-            slug: parentId,
-            ipAddress: `${key}.example.invalid`,
-          });
+        await db.insert(servers).values({
+          id: parentId,
+          ownerId: actorId,
+          name: "Fixture",
+          slug: parentId,
+          ipAddress: `${key}.example.invalid`,
+        });
       await sessionRepository.create({
         id: sessionId,
         userId: actorId,

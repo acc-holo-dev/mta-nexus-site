@@ -26,32 +26,28 @@ it("rolls back issuance if the session expires while the audit insert waits", as
     displayName: "Claimant",
   });
   await sessionRepository.create({ id: `ses_late_${suffix}`, userId: actorId, token, expiresAt });
-  await db
-    .insert(servers)
-    .values({
-      id: serverId,
-      name: "Server",
-      slug: serverId,
-      ipAddress: `${suffix}.example.invalid`,
-      port: 22003,
-      visibility: "public",
-    });
+  await db.insert(servers).values({
+    id: serverId,
+    name: "Server",
+    slug: serverId,
+    ipAddress: `${suffix}.example.invalid`,
+    port: 22003,
+    visibility: "public",
+  });
   const locked = deferred(),
     release = deferred();
   let blockerPid = 0;
   const blocker = db.transaction(async (tx) => {
     const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
     blockerPid = Number(row.pid);
-    await tx
-      .insert(auditEvents)
-      .values({
-        id: auditId,
-        actorId,
-        actorType: "user",
-        action: "fixture",
-        targetId: serverId,
-        targetType: "server",
-      });
+    await tx.insert(auditEvents).values({
+      id: auditId,
+      actorId,
+      actorType: "user",
+      action: "fixture",
+      targetId: serverId,
+      targetType: "server",
+    });
     locked.resolve();
     await release.promise;
     throw new Error("rollback fixture");

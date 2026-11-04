@@ -48,16 +48,14 @@ async function fixture() {
     token,
     expiresAt: new Date(Date.now() + 60_000),
   });
-  await db
-    .insert(servers)
-    .values({
-      id: serverId,
-      name: "Server",
-      slug: serverId,
-      ipAddress: `${suffix}.example.invalid`,
-      port: 22003,
-      visibility: "public",
-    });
+  await db.insert(servers).values({
+    id: serverId,
+    name: "Server",
+    slug: serverId,
+    ipAddress: `${suffix}.example.invalid`,
+    port: 22003,
+    visibility: "public",
+  });
   const issue = (auditId: string) =>
     serverClaimChallengeRepository.issue({
       serverId,

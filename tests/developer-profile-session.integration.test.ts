@@ -33,15 +33,13 @@ it.each(["revoke", "expire"] as const)(
       token,
       expiresAt: new Date(Date.now() + 60_000),
     });
-    await db
-      .insert(developerProfiles)
-      .values({
-        id: `dev_dps_${suffix}`,
-        userId: actorId,
-        specialties: ["Lua"],
-        githubUrl: "https://example.test/old",
-        verifiedDeveloper: true,
-      });
+    await db.insert(developerProfiles).values({
+      id: `dev_dps_${suffix}`,
+      userId: actorId,
+      specialties: ["Lua"],
+      githubUrl: "https://example.test/old",
+      verifiedDeveloper: true,
+    });
     const locked = deferred(),
       release = deferred();
     let pid = 0;
@@ -130,31 +128,27 @@ it("rolls back profile changes if the session expires while the audit insert wai
     role: "developer",
   });
   await sessionRepository.create({ id: `ses_dpl_${suffix}`, userId: actorId, token, expiresAt });
-  await db
-    .insert(developerProfiles)
-    .values({
-      id: `dev_dpl_${suffix}`,
-      userId: actorId,
-      specialties: ["Lua"],
-      githubUrl: "https://example.test/old",
-      verifiedDeveloper: true,
-    });
+  await db.insert(developerProfiles).values({
+    id: `dev_dpl_${suffix}`,
+    userId: actorId,
+    specialties: ["Lua"],
+    githubUrl: "https://example.test/old",
+    verifiedDeveloper: true,
+  });
   const locked = deferred(),
     release = deferred();
   let pid = 0;
   const blocker = db.transaction(async (tx) => {
     const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
     pid = Number(row.pid);
-    await tx
-      .insert(auditEvents)
-      .values({
-        id: auditId,
-        actorId,
-        actorType: "user",
-        action: "fixture",
-        targetId: actorId,
-        targetType: "user",
-      });
+    await tx.insert(auditEvents).values({
+      id: auditId,
+      actorId,
+      actorType: "user",
+      action: "fixture",
+      targetId: actorId,
+      targetType: "user",
+    });
     locked.resolve();
     await release.promise;
     throw new Error("rollback fixture");
