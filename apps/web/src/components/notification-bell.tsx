@@ -1,7 +1,7 @@
 "use client";
 
 import type { Notification } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -283,7 +283,12 @@ export function NotificationBell() {
                 </article>
               ))
             ) : (
-              <div className="py-6 text-center font-caption text-muted">{copy.empty}</div>
+              <EmptyState
+                title={copy.empty}
+                description={copy.emptyHint}
+                icon={<Bell className="h-6 w-6" aria-hidden="true" />}
+                className="rounded-none border-x-0 border-y-0 py-6"
+              />
             )}
           </section>
 

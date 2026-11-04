@@ -261,7 +261,7 @@ export function LicenseControlPanel({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                    size="touch"
                     className={ghostLinkClass}
                     disabled={loadingServers || servers.page <= 1}
                     onClick={() => void loadServers(servers.page - 1)}
@@ -274,7 +274,7 @@ export function LicenseControlPanel({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                    size="touch"
                     className={ghostLinkClass}
                     disabled={loadingServers || servers.page >= servers.totalPages}
                     onClick={() => void loadServers(servers.page + 1)}
@@ -284,7 +284,7 @@ export function LicenseControlPanel({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                    size="touch"
                     className={ghostLinkClass}
                     disabled={loadingServers}
                     onClick={() => void loadServers(servers.page)}
@@ -345,6 +345,7 @@ export function LicenseControlPanel({
       <Button
         type="button"
         variant="ghost"
+        size="touch"
         disabled={busy}
         onClick={() => router.refresh()}
         className={ghostLinkClass}
@@ -377,7 +378,7 @@ export function LicenseControlPanel({
             <Button
               type="button"
               variant="ghost"
-              size="sm"
+              size="touch"
               className={ghostLinkClass}
               onClick={() => {
                 void navigator.clipboard
@@ -391,7 +392,7 @@ export function LicenseControlPanel({
             <Button
               type="button"
               variant="ghost"
-              size="sm"
+              size="touch"
               className={ghostLinkClass}
               onClick={() => setSecret(null)}
             >
