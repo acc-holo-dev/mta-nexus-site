@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@nexus/ui";
-import { CheckCircle2, Library, ShieldCheck } from "lucide-react";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import { CheckCircle2, Library, PackageOpen, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useState } from "react";
@@ -21,6 +21,15 @@ interface ProductInfo {
   licenseModel: string;
   currentVersion: string;
 }
+
+const shellClass = "mx-auto min-w-0 max-w-2xl space-y-6 overflow-x-clip py-8";
+const narrowShellClass = "mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16";
+const primaryLinkClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg bg-accent px-5 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+const secondaryLinkClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg border border-base bg-surface px-5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const ghostActionClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function AcquireContent() {
   const searchParams = useSearchParams();
@@ -131,12 +140,12 @@ function AcquireContent() {
 
   if (productId && claimedProductId === productId) {
     return (
-      <div className="mx-auto max-w-xl py-12">
+      <div className="mx-auto min-w-0 max-w-xl overflow-x-clip py-12">
         <section
           role="status"
           aria-live="polite"
           aria-atomic="true"
-          className="nexus-panel space-y-5 p-8 text-center shadow-nexus"
+          className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-8 text-center shadow-nexus"
         >
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success-soft text-success">
             <CheckCircle2 className="h-9 w-9" aria-hidden="true" />
@@ -169,16 +178,10 @@ function AcquireContent() {
           </div>
 
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">
-            <Link
-              href={`/market/${product?.slug ?? ""}`}
-              className="rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
+            <Link href={`/market/${product?.slug ?? ""}`} className={primaryLinkClass}>
               {copy.openResource}
             </Link>
-            <Link
-              href="/workspace/library"
-              className="rounded-lg border border-base bg-surface px-5 py-2.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
-            >
+            <Link href="/workspace/library" className={secondaryLinkClass}>
               {copy.openLibrary}
             </Link>
           </div>
@@ -187,33 +190,58 @@ function AcquireContent() {
     );
   }
 
-  if (!productId || productError) {
+  if (!productId) {
     return (
-      <div
-        role={productError ? "alert" : undefined}
-        aria-live={productError ? "assertive" : undefined}
-        className="mx-auto max-w-xl space-y-4 py-16 text-center"
-      >
-        <h1 className="font-display text-primary">{productId ? productError : copy.noProduct}</h1>
-        {(!productId || productError === copy.productNotFound) && (
-          <p className="text-sm text-muted">{copy.chooseResource}</p>
-        )}
-        <Link
-          href="/market"
-          className="inline-block rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
-        >
-          {copy.browse}
-        </Link>
-        {productId && productError && productError !== copy.productNotFound && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setLoadRevision((value) => value + 1)}
-            className="ml-3 font-semibold"
-          >
-            {copy.retry}
-          </Button>
+      <div className={narrowShellClass}>
+        <EmptyState
+          title={copy.noProduct}
+          description={copy.chooseResource}
+          icon={<PackageOpen className="h-6 w-6" aria-hidden="true" />}
+          action={
+            <Link href="/market" className={primaryLinkClass}>
+              {copy.browse}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
+  if (productError) {
+    const notFound = productError === copy.productNotFound;
+    return (
+      <div className={narrowShellClass}>
+        {notFound ? (
+          <EmptyState
+            title={productError}
+            description={copy.chooseResource}
+            icon={<PackageOpen className="h-6 w-6" aria-hidden="true" />}
+            action={
+              <Link href="/market" className={primaryLinkClass}>
+                {copy.browse}
+              </Link>
+            }
+          />
+        ) : (
+          <ErrorState
+            title={productError}
+            description={dictionary.errors.message}
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className={ghostActionClass}
+                  onClick={() => setLoadRevision((value) => value + 1)}
+                >
+                  {dictionary.errors.retry}
+                </Button>
+                <Link href="/market" className={ghostActionClass}>
+                  {copy.browse}
+                </Link>
+              </div>
+            }
+          />
         )}
       </div>
     );
@@ -225,7 +253,7 @@ function AcquireContent() {
         role="status"
         aria-live="polite"
         aria-busy="true"
-        className="mx-auto max-w-2xl py-12 text-center text-sm text-muted"
+        className="mx-auto min-w-0 max-w-2xl overflow-x-clip py-12 text-center text-sm text-muted"
       >
         {copy.loadingProduct}
       </div>
@@ -241,36 +269,35 @@ function AcquireContent() {
         }).format(product.price / 100);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
-      <header className="border-b border-base pb-5">
-        <h1 className="flex items-center gap-2.5 font-display text-primary">
-          <Library className="h-6 w-6 text-accent" aria-hidden="true" />
-          <span>{copy.title}</span>
+    <div className={shellClass}>
+      <header className="min-w-0 border-b border-base pb-5">
+        <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
+          <Library className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+          <span className="min-w-0 break-words">{copy.title}</span>
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </header>
 
-      {error && (
-        <div
-          role="alert"
-          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
-        >
-          <p>{error}</p>
-          {needsSignIn && acquireReturnPath ? (
-            <GuestAuthLinks
-              loginHref={authEntryHref("login", acquireReturnPath)}
-              registerHref={authEntryHref("register", acquireReturnPath)}
-              signInLabel={authCopy.signIn}
-              createAccountLabel={authCopy.create}
-              className="mt-3 justify-center"
-            />
-          ) : null}
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            needsSignIn && acquireReturnPath ? (
+              <GuestAuthLinks
+                loginHref={authEntryHref("login", acquireReturnPath)}
+                registerHref={authEntryHref("register", acquireReturnPath)}
+                signInLabel={authCopy.signIn}
+                createAccountLabel={authCopy.create}
+                className="justify-center"
+              />
+            ) : undefined
+          }
+        />
+      ) : null}
 
       <section
         aria-labelledby={summaryHeadingId}
-        className="nexus-panel space-y-4 p-6 shadow-nexus-sm"
+        className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6 shadow-nexus-sm"
       >
         <h2 id={summaryHeadingId} className="font-label uppercase text-muted">
           {copy.orderSummary}
@@ -278,7 +305,9 @@ function AcquireContent() {
         <dl className="divide-y divide-[color:var(--nexus-border)] text-sm">
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.resource}</dt>
-            <dd className="text-right font-semibold text-primary">{product.title}</dd>
+            <dd className="min-w-0 break-words text-right font-semibold text-primary">
+              {product.title}
+            </dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.price}</dt>
@@ -286,7 +315,7 @@ function AcquireContent() {
           </div>
           <div className="flex items-center justify-between gap-4 py-2">
             <dt className="text-muted">{copy.licenseModel}</dt>
-            <dd className="text-right text-primary">
+            <dd className="min-w-0 break-words text-right text-primary">
               {licenseModelLabel(locale, product.licenseModel)}
             </dd>
           </div>
@@ -307,7 +336,7 @@ function AcquireContent() {
         aria-atomic={product.price > 0 ? "true" : undefined}
         aria-labelledby={accessHeadingId}
         aria-describedby={accessDescriptionId}
-        className="nexus-panel space-y-2 p-6"
+        className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-6"
       >
         <h2 id={accessHeadingId} className="text-sm font-bold text-primary">
           {product.price === 0 ? copy.freeResource : copy.paidCheckout}
@@ -319,6 +348,7 @@ function AcquireContent() {
 
       <Button
         type="button"
+        size="touch"
         onClick={() => void handleClaim()}
         disabled={product.price > 0}
         aria-describedby={accessDescriptionId}
@@ -346,7 +376,7 @@ export default function AcquirePage() {
           role="status"
           aria-live="polite"
           aria-busy="true"
-          className="mx-auto max-w-2xl py-12 text-center text-sm text-muted"
+          className="mx-auto min-w-0 max-w-2xl overflow-x-clip py-12 text-center text-sm text-muted"
         >
           {dictionary.checkout.loadingSession}
         </div>
