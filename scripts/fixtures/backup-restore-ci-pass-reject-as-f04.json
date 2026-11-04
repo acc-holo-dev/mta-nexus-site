@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "sha": "3eb8dad6bafdc71492574cf4db023f05fc2e431b",
+  "sourceDestroyedBeforeRestore": true,
+  "backupChecksumsVerified": true,
+  "databaseRowsRestored": true,
+  "applicationSchemaRestored": true,
+  "applicationRowsRestored": true,
+  "migrationLedgerRestored": true,
+  "uploadFilesRestored": true,
+  "cleanupComplete": true
+}

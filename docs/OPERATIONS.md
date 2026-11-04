@@ -1121,6 +1121,15 @@ pnpm observability:verify
 env keys, and OPERATIONS runbook needles—including delivery-failure alert names such as
 `publication_delivery_failed` and `build_incident_delivery_failed`. They do **not** prove
 production host alert routing to humans or any third-party monitoring vendor contract.
+**Operator readiness ≠ live routing proof (F03 / OPS-14):** validated
+`artifacts/observability-readiness-evidence.json` never closes the operational gate; only
+owner-filled `observability_live_drill` evidence with real owner/channel/thresholds and
+`signalAt → alertAt → humanReceivedAt → recoveryAt` timestamps on the target environment
+does. Validate with
+[`validateObservabilityLiveDrillEvidence`](../scripts/observability-evidence-lib.mjs) /
+`node scripts/check-observability-live-drill-evidence.mjs`; fixture shape in
+[`scripts/fixtures/observability-live-drill-accept.json`](../scripts/fixtures/observability-live-drill-accept.json).
+Mis-submitting readiness JSON to the live-drill validator is rejected.
 
 Offline queue-probe drill (disposable fixture; exit code 2 means alert, same pattern as
 [`scripts/tests/web-push-worker-queue.node-test.mjs`](../scripts/tests/web-push-worker-queue.node-test.mjs)):
@@ -1173,6 +1182,22 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build                                                                                          |
 | `release-upgrade-<sha>-<attempt>`       | Drizzle upgrade from the configured baseline to the current migration target; failed DDL and ledger rollback; retry, idempotency and preservation checks               |
 | `backup-restore-<sha>-<attempt>`        | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
+
+**F04 / OPS-13 production recovery acceptance (not CI disposable rehearsal):** retained
+`backup-restore-<sha>` JSON with `status: "PASS"` proves ROADMAP 19 synthetic restore on a
+GitHub-hosted disposable runner only. It is **not** operational backup/recovery acceptance.
+Owner acceptance uses `production_recovery_acceptance` evidence
+([`production-recovery-acceptance-evidence.mjs`](../scripts/production-recovery-acceptance-evidence.mjs))
+with agreed RPO/RTO (minutes), retention + verified off-host location, restore access/break-glass,
+and measured restore timestamps/data loss checked against those targets. Validate with
+`node scripts/check-production-recovery-acceptance-evidence.mjs`. Checklist before recording
+acceptance:
+
+1. Owner documents RPO/RTO, retention, off-host independence from the primary host, and who may restore.
+2. Confirm fresh backup copies exist off-host; do not store dump secrets in GitHub artifacts.
+3. On a separately authorized protected copy (not production volumes), measure restore duration and data loss vs targets.
+4. Write `artifacts/production-recovery-acceptance-evidence.json` with `verdict.passed: true` only after the drill.
+5. Keep [`check-backup-restore.mjs`](../scripts/check-backup-restore.mjs) on disposable hosted runners only; do not retarget it at live volumes.
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
 to be true in the upgrade and restore reports. A downloaded report alone is not
