@@ -1,11 +1,13 @@
 import { AppError, ORDER_CASE_REVIEW_STATUSES, type OrderCaseEvidence } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import { LifeBuoy } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatHistoryAmount, formatHistoryDate } from "../lib/commerce-history-format";
 import { financialOrderLabel, financialPaymentLabel } from "../lib/financial-i18n";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
   orderCaseCopy,
@@ -16,8 +18,8 @@ import {
 import { orderCasePageQuery } from "../lib/order-case-query";
 import { authService } from "../lib/services/auth-service";
 import { orderCaseService } from "../lib/services/order-case-service";
-import { PlatformSignIn } from "./platform-sign-in";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "./order-case-forms";
+import { PlatformSignIn } from "./platform-sign-in";
 import { SupportCaseThread } from "./support-case-thread";
 
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
@@ -28,9 +30,41 @@ export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   };
 }
 type Query = Record<string, string | string[] | undefined>;
-function scopedError(error: unknown): never {
-  if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-  throw error;
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+function orderCaseAccessError(error: unknown): "missing" | "failed" {
+  if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
+  return "failed";
+}
+function OrderCaseLoadError({
+  locale,
+  backHref,
+  backLabel,
+  retryHref,
+}: {
+  locale: string;
+  backHref: string;
+  backLabel: string;
+  retryHref: string;
+}) {
+  const copy = orderCaseCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <div className={pageShellClass}>
+      <Link href={backHref} className={navLinkClass}>
+        {backLabel}
+      </Link>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </div>
+  );
 }
 function Evidence({
   data,
@@ -106,10 +140,7 @@ function Pagination({
   return (
     <nav aria-label={copy.page} className="flex gap-4 text-sm">
       {page > 1 && (
-        <Link
-          href={href(page - 1)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(page - 1)} className={navLinkClass}>
           {copy.previous}
         </Link>
       )}
@@ -117,10 +148,7 @@ function Pagination({
         {copy.page} {page} / {totalPages}
       </span>
       {page < totalPages && (
-        <Link
-          href={href(page + 1)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(page + 1)} className={navLinkClass}>
           {copy.next}
         </Link>
       )}
@@ -138,13 +166,25 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
         returnPath={`/workspace/purchases/${encodeURIComponent(orderId)}/support`}
       />
     );
-  const result = await orderCaseService.orderDetail(orderId, actor).catch(scopedError);
+  const orderPath = `/workspace/purchases/${encodeURIComponent(orderId)}`;
+  const retryHref = `${orderPath}/support`;
+  let result: Awaited<ReturnType<typeof orderCaseService.orderDetail>> | null = null;
+  try {
+    result = await orderCaseService.orderDetail(orderId, actor);
+  } catch (error) {
+    if (orderCaseAccessError(error) === "missing") notFound();
+    return (
+      <OrderCaseLoadError
+        locale={locale}
+        backHref={orderPath}
+        backLabel={copy.order}
+        retryHref={retryHref}
+      />
+    );
+  }
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href={`/workspace/purchases/${encodeURIComponent(orderId)}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={orderPath} className={navLinkClass}>
         {copy.order}: {result.order.orderNumber}
       </Link>
       <h1 className="font-display text-primary">{copy.create}</h1>
@@ -156,7 +196,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       {result.existingCase ? (
         <Link
           href={`/workspace/order-cases/${encodeURIComponent(result.existingCase.id)}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {copy.existing} · {orderCaseStatusLabel(locale, result.existingCase.reviewStatus)}
         </Link>
@@ -198,24 +238,37 @@ export async function OrderCaseListPage({
     return (
       <p className="py-8">
         {copy.invalidQuery}{" "}
-        <Link
-          href={base}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={base} className={navLinkClass}>
           {copy.clear}
         </Link>
       </p>
     );
   }
-  const result = await orderCaseService
-    .page(actor, staff, filters.page, filters)
-    .catch(scopedError);
+  const result = await orderCaseService.page(actor, staff, filters.page, filters).catch((error) => {
+    if (orderCaseAccessError(error) === "missing") notFound();
+    return null;
+  });
+  const filtersActive = Boolean(filters.reviewStatus || filters.threadStatus);
+  const retryHref = (() => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string" && value) params.set(key, value);
+    }
+    return `${base}${params.size ? `?${params}` : ""}`;
+  })();
+  if (!result) {
+    return (
+      <OrderCaseLoadError
+        locale={locale}
+        backHref={staff ? "/admin" : "/workspace/purchases"}
+        backLabel={staff ? copy.review : copy.order}
+        retryHref={retryHref}
+      />
+    );
+  }
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href={staff ? "/admin" : "/workspace/purchases"}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={staff ? "/admin" : "/workspace/purchases"} className={navLinkClass}>
         {staff ? copy.review : copy.order}
       </Link>
       <h1 className="font-display text-primary">{staff ? copy.queue : copy.buyerCases}</h1>
@@ -256,10 +309,7 @@ export async function OrderCaseListPage({
         <Button type="submit" variant="outline" size="sm">
           {copy.apply}
         </Button>
-        <Link
-          href={base}
-          className="rounded p-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={base} className={navLinkClass}>
           {copy.clear}
         </Link>
       </form>
@@ -269,7 +319,7 @@ export async function OrderCaseListPage({
             <li key={item.id} className="nexus-panel space-y-2 p-5">
               <Link
                 href={`${base}/${encodeURIComponent(item.id)}`}
-                className="break-words rounded font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={`break-words font-semibold ${navLinkClass}`}
               >
                 {item.subject}
               </Link>
@@ -293,15 +343,16 @@ export async function OrderCaseListPage({
           ))}
         </ol>
       ) : (
-        <div className="space-y-3">
-          <p className="text-secondary">{copy.empty}</p>
-          <Link
-            href={base}
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.clear}
-          </Link>
-        </div>
+        <EmptyState
+          title={copy.empty}
+          description={filtersActive ? copy.clear : copy.financeNote}
+          icon={<LifeBuoy className="h-6 w-6" aria-hidden="true" />}
+          action={
+            <Link href={base} className={navLinkClass}>
+              {copy.clear}
+            </Link>
+          }
+        />
       )}
       <Pagination page={result.page} totalPages={result.totalPages} locale={locale} query={query} />
     </div>
@@ -337,8 +388,32 @@ export async function OrderCaseDetailPage({
     if (!(error instanceof AppError) || error.statusCode !== 400) throw error;
     notFound();
   }
-  const result = await orderCaseService.detail(caseId, actor, staff, page).catch(scopedError),
-    current = result.current;
+  const detailBase = staff
+    ? `/admin/commerce/order-cases/${encodeURIComponent(caseId)}`
+    : `/workspace/order-cases/${encodeURIComponent(caseId)}`;
+  const listBase = staff ? "/admin/commerce/order-cases" : "/workspace/order-cases";
+  const retryHref = (() => {
+    const pageParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string") pageParams.set(key, value);
+    }
+    return `${detailBase}${pageParams.size ? `?${pageParams}` : ""}`;
+  })();
+  const result = await orderCaseService.detail(caseId, actor, staff, page).catch((error) => {
+    if (orderCaseAccessError(error) === "missing") notFound();
+    return null;
+  });
+  if (!result) {
+    return (
+      <OrderCaseLoadError
+        locale={locale}
+        backHref={listBase}
+        backLabel={copy.back}
+        retryHref={retryHref}
+      />
+    );
+  }
+  const current = result.current;
   const monetary =
     ["refund_request", "dispute"].includes(result.case.kind) &&
     result.case.requestedAmount !== null;
@@ -352,11 +427,8 @@ export async function OrderCaseDetailPage({
     current.refundedRecordCount === 0 &&
     current.disputedRecordCount === 0;
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href={staff ? "/admin/commerce/order-cases" : "/workspace/order-cases"}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={listBase} className={navLinkClass}>
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">{result.case.subject}</h1>
@@ -386,7 +458,7 @@ export async function OrderCaseDetailPage({
       {staff && actor.role === "admin" && (
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(result.order.id)}`}
-          className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {copy.reconcile}
         </Link>

@@ -75,6 +75,8 @@ const en = {
   author: "Author",
   all: "All reviews",
   detail: "Open report",
+  loadUnavailable:
+    "Review reports are temporarily unavailable. This does not mean there are no reports.",
 };
 const ru: typeof en = {
   title: "Отзывы о ресурсах",
@@ -151,6 +153,7 @@ const ru: typeof en = {
   author: "Автор",
   all: "Все отзывы",
   detail: "Открыть жалобу",
+  loadUnavailable: "Жалобы на отзывы временно недоступны. Это не означает, что жалоб нет.",
 };
 export const resourceReviewCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function resourceReviewError(locale: Locale, code: unknown) {

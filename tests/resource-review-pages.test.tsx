@@ -50,12 +50,15 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
+import ReviewDetailLoading from "../apps/web/src/app/admin/commerce/reviews/[id]/loading";
+import ReviewsLoading from "../apps/web/src/app/admin/commerce/reviews/loading";
 import Public from "../apps/web/src/app/market/[slug]/reviews/page";
 import Editor from "../apps/web/src/app/workspace/library/review/[id]/page";
 import Own from "../apps/web/src/app/workspace/library/reviews/page";
 import { ResourceReviewEditor } from "../apps/web/src/components/resource-review-controls";
 import { ResourceReviewReportScreen } from "../apps/web/src/components/resource-review-report-screen";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { resourceReviewCopy } from "../apps/web/src/lib/resource-review-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };
@@ -251,4 +254,31 @@ it("current staff get removal only with an existing published revision", async (
   html = renderToStaticMarkup(await ResourceReviewReportScreen({ staff: true, id: "rpt_a" }));
   expect(html).not.toContain("remove_review");
   expect(html).toContain("dismiss");
+});
+it("shows an honest recovery state when the report queue fails", async () => {
+  state.reportsPage.mockRejectedValue(new Error("queue unavailable"));
+  const copy = resourceReviewCopy("en");
+  const html = renderToStaticMarkup(
+    await ResourceReviewReportScreen({ staff: false, query: { view: "history", page: "2" } }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("view=history&amp;page=2");
+});
+it("shows an honest recovery state when a report detail fails", async () => {
+  state.actor = { id: "usr_staff", role: "moderator" };
+  state.reportDetail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = resourceReviewCopy("en");
+  const html = renderToStaticMarkup(await ResourceReviewReportScreen({ staff: true, id: "rpt_a" }));
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain('href="/admin/commerce/reviews/rpt_a"');
+  expect(html).not.toContain("INTERNAL_STAFF_NOTE");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
+  }
 });

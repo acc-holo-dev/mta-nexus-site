@@ -69,6 +69,8 @@ const en = {
   date: "Created",
   buyerCases: "My purchase cases",
   invalidQuery: "Invalid filters. Clear the filters to continue.",
+  loadUnavailable:
+    "Purchase cases are temporarily unavailable. This does not mean you have no cases.",
 };
 const ru: typeof en = {
   title: "Поддержка покупки",
@@ -134,6 +136,7 @@ const ru: typeof en = {
   date: "Создано",
   buyerCases: "Мои обращения по покупкам",
   invalidQuery: "Недопустимые фильтры. Сбросьте их, чтобы продолжить.",
+  loadUnavailable: "Обращения по покупкам временно недоступны. Это не означает, что обращений нет.",
 };
 export function orderCaseCopy(locale: string) {
   return locale === "ru" ? ru : en;
