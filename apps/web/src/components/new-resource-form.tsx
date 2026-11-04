@@ -252,7 +252,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           <Button
             type="button"
             variant="outline"
-            size="sm"
+            size="touch"
             onClick={startNewSubmission}
             disabled={loading}
             className="min-h-11 shrink-0"

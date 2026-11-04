@@ -32,6 +32,15 @@ it("locks discussion and notification form failures to ErrorState with touch CTA
   }
 });
 
+it("locks MTA meta inspector apply CTA to size=touch without min-h-8", () => {
+  const source = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
+  expect(source).toMatch(
+    /onApplyMinimumVersion[\s\S]{0,120}?size="touch"|size="touch"[\s\S]{0,120}?onApplyMinimumVersion/u,
+  );
+  expect(source).toContain("min-h-11");
+  expect(source).not.toContain("min-h-8");
+});
+
 it("locks context switcher native select to fieldControlClass without h-10 chrome", () => {
   const source = read("apps/web/src/components/context-switcher.tsx");
   expect(source).toContain("fieldControlClass");

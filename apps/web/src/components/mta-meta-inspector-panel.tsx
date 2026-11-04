@@ -291,10 +291,10 @@ export function MtaMetaInspectorPanel({
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
+                      size="touch"
                       disabled={minimumVersionLocked}
                       onClick={() => onApplyMinimumVersion(versionSuggestion)}
-                      className="h-auto min-h-8 px-2.5 py-1 text-[11px] font-semibold text-accent"
+                      className="h-auto min-h-11 px-2.5 py-1 text-[11px] font-semibold text-accent"
                     >
                       {copy.applyMinimumVersion}
                     </Button>

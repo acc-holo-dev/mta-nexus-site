@@ -19,6 +19,8 @@ const copy = {
     selected: "Selected variants",
     candidates: "Resources from this publisher",
     noCandidates: "No eligible resources on this page.",
+    noCandidatesHint:
+      "An empty page is a confirmed result, not a load failure. Try another page or publish more resources from this publisher before linking variants.",
     add: "Add",
     remove: "Remove",
     up: "Move up",
@@ -77,6 +79,8 @@ const copy = {
     selected: "Выбранные варианты",
     candidates: "Ресурсы этого издателя",
     noCandidates: "На этой странице нет доступных ресурсов.",
+    noCandidatesHint:
+      "Пустая страница — подтверждённый результат, а не ошибка загрузки. Откройте другую страницу или опубликуйте больше ресурсов этого издателя, прежде чем связывать варианты.",
     add: "Добавить",
     remove: "Убрать",
     up: "Переместить выше",
