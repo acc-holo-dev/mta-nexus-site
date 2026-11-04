@@ -67,6 +67,20 @@ it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipp
   expect(history).not.toContain('role="alert"');
 });
 
+it("locks settings password and recovery native controls to fieldControlClass without h-10 chrome", () => {
+  for (const path of [
+    "apps/web/src/components/settings-password-form.tsx",
+    "apps/web/src/components/settings-recovery-email-section.tsx",
+  ] as const) {
+    const source = read(path);
+    expect(source, path).toContain("fieldControlClass");
+    expect(source, path).toContain('className: "min-h-11"');
+    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).not.toContain("h-10");
+    expect(source, path).not.toContain("fieldClassBlock");
+  }
+});
+
 it("wraps settings history guest and authenticated returns in the clipped page shell", () => {
   const source = read("apps/web/src/app/settings/history/page.tsx");
   expect(source).toContain("PlatformSignIn");

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, fieldControlClass } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../lib/i18n";
@@ -80,11 +80,14 @@ export function SettingsRecoveryEmailSection({
                   value={recoveryPassword}
                   onChange={(event) => onRecoveryPasswordChange(event.target.value)}
                   aria-describedby="recovery-email-policy"
-                  className={`${fieldClassBlock} h-10`}
+                  className={fieldControlClass({
+                    disabled: pending,
+                    className: "min-h-11",
+                  })}
                 />
               </div>
 
-              <Button type="submit" size="sm" isLoading={pending}>
+              <Button type="submit" size="touch" isLoading={pending}>
                 {copy.sendVerification}
               </Button>
             </form>
