@@ -77,13 +77,18 @@ export async function DiscussionReportsScreen({
     return <PlatformSignIn locale={locale} returnPath={path} />;
   }
   if (!can(actor, "admin.moderation")) {
+    const dictionary = getDictionary(locale);
     return (
-      <section className="nexus-panel space-y-3 p-5">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-danger">
-          {general.denied}
-        </p>
-      </section>
+      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+        <ErrorState
+          title={general.denied}
+          action={
+            <Link href="/admin" className={navLinkClass}>
+              {dictionary.admin.title}
+            </Link>
+          }
+        />
+      </div>
     );
   }
   const filters = parseDiscussionReportsQuery(params);
@@ -112,17 +117,16 @@ export async function DiscussionReportsScreen({
       return <DiscussionReportsLoadError locale={locale} retryHref={path} />;
     }
     return (
-      <section className="nexus-panel space-y-3 p-5">
-        <p role="alert" className="text-danger">
-          {failure || copy.unavailable}
-        </p>
-        <a
-          href={path}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {general.reload}
-        </a>
-      </section>
+      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+        <ErrorState
+          title={failure || copy.unavailable}
+          action={
+            <a href={path} className={navLinkClass}>
+              {general.reload}
+            </a>
+          }
+        />
+      </div>
     );
   }
   const data = parsed.data;
