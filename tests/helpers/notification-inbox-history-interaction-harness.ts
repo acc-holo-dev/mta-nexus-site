@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, vi, type Mock } from "vitest";
 import {
   clickTestButton,
@@ -14,10 +15,11 @@ export type NotificationInboxHarness = {
   announce: Mock;
 };
 
+/** Props match the fixture literals so real NotificationInbox stays assignable (contravariant). */
 export type NotificationInboxComponent = (props: {
   initialPage: typeof initialPage;
-  filters: typeof filters | { query: string; state: string; category: string };
-}) => unknown;
+  filters: typeof filters;
+}) => ReactNode;
 
 export const filters = {
   query: "topic",
