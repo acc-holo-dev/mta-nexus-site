@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -7,10 +8,10 @@ import { PlanReviewTerms } from "../../../../components/plan-review-terms";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { SubscriptionControls } from "../../../../components/subscription-controls";
 import {
-  SubscriptionLoadError,
   subscriptionNavLinkClass,
   subscriptionPageShellClass,
 } from "../../../../components/subscription-workspace-recovery";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
@@ -31,6 +32,7 @@ export default async function SubscriptionActivationPage({
 }) {
   const [store, locale, raw] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = subscriptionsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const params = subscriptionPageParams(raw);
@@ -76,10 +78,16 @@ export default async function SubscriptionActivationPage({
           scope={plan.scope}
           scopes={scopes.scopes}
         />
-        <nav className="flex gap-4" aria-label={c.organization}>
-          {scopes.page > 1 && <Link href={href(scopes.page - 1)}>{c.previous}</Link>}
+        <nav className="flex flex-wrap gap-4" aria-label={c.organization}>
+          {scopes.page > 1 && (
+            <Link href={href(scopes.page - 1)} className={subscriptionNavLinkClass}>
+              {c.previous}
+            </Link>
+          )}
           {scopes.page < scopes.totalPages && (
-            <Link href={href(scopes.page + 1)}>{c.scopeMore}</Link>
+            <Link href={href(scopes.page + 1)} className={subscriptionNavLinkClass}>
+              {c.scopeMore}
+            </Link>
           )}
         </nav>
       </section>
@@ -88,18 +96,33 @@ export default async function SubscriptionActivationPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{subscriptionError(locale, error.code)}</p>
-          <Link href="/subscriptions">{c.catalog}</Link>
+        <section className={subscriptionPageShellClass}>
+          <ErrorState
+            title={subscriptionError(locale, error.code)}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/subscriptions" className={subscriptionNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     return (
-      <SubscriptionLoadError
-        locale={locale}
-        backHref="/subscriptions"
-        backLabel={c.catalog}
-        retryHref={recoveryRetry}
-      />
+      <section className={subscriptionPageShellClass}>
+        <Link href="/subscriptions" className={subscriptionNavLinkClass}>
+          {c.catalog}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={subscriptionNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
     );
   }
 }

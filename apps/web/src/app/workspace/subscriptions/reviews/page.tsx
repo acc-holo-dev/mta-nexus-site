@@ -1,16 +1,16 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  PlanReviewLoadError,
   planReviewNavLinkClass,
   planReviewPageShellClass,
 } from "../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { formatHistoryAmount, formatHistoryDate } from "../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../lib/plan-reviews-i18n";
 import {
@@ -32,6 +32,7 @@ export default async function PlanReviewsPage({
 }) {
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = planReviewsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const query = planReviewsPageParams(params);
@@ -101,26 +102,22 @@ export default async function PlanReviewsPage({
             </select>
           </label>
           <input type="hidden" name="scopePage" value={scopes.page} />
-          <Button type="submit">{c.apply}</Button>
+          <Button type="submit" size="touch" variant="outline">
+            {c.apply}
+          </Button>
         </form>
         {scopes.totalPages > 1 ? (
-          <nav aria-label={c.scopeNext} className="flex gap-4 text-sm">
+          <nav aria-label={c.scopeNext} className="flex flex-wrap gap-4 text-sm">
             {scopes.page > 1 ? (
-              <Link
-                href={href(result.page, scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(result.page, scopes.page - 1)} className={planReviewNavLinkClass}>
                 {c.previous}
               </Link>
             ) : null}
-            <span>
+            <span className="inline-flex min-h-11 items-center">
               {c.scopeNext} · {scopes.page} / {scopes.totalPages}
             </span>
             {scopes.page < scopes.totalPages ? (
-              <Link
-                href={href(result.page, scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(result.page, scopes.page + 1)} className={planReviewNavLinkClass}>
                 {c.next}
               </Link>
             ) : null}
@@ -132,7 +129,7 @@ export default async function PlanReviewsPage({
               <li key={r.id} className="nexus-panel space-y-3 p-5">
                 <Link
                   href={planReviewHref(r.id, query.organizationId)}
-                  className="break-words text-lg text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={`${planReviewNavLinkClass} break-words text-lg`}
                 >
                   {locale === "ru" ? r.terms.titleRu : r.terms.titleEn}
                 </Link>
@@ -150,26 +147,20 @@ export default async function PlanReviewsPage({
             ))}
           </ol>
         ) : (
-          <p>{c.empty}</p>
+          <EmptyState title={c.empty} description={c.emptyHint} />
         )}
         {result.totalPages > 1 ? (
-          <nav aria-label={c.page} className="flex gap-4 text-sm">
+          <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
             {result.page > 1 ? (
-              <Link
-                href={href(result.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(result.page - 1)} className={planReviewNavLinkClass}>
                 {c.previous}
               </Link>
             ) : null}
-            <span>
+            <span className="inline-flex min-h-11 items-center">
               {c.page} {result.page} {c.of} {result.totalPages}
             </span>
             {result.page < result.totalPages ? (
-              <Link
-                href={href(result.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(result.page + 1)} className={planReviewNavLinkClass}>
                 {c.next}
               </Link>
             ) : null}
@@ -181,23 +172,33 @@ export default async function PlanReviewsPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{c.invalid}</p>
-          <Link
-            href="/workspace/subscriptions/reviews"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.title}
-          </Link>
+        <section className={planReviewPageShellClass}>
+          <ErrorState
+            title={c.invalid}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/workspace/subscriptions/reviews" className={planReviewNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     return (
-      <PlanReviewLoadError
-        locale={locale}
-        backHref="/subscriptions"
-        backLabel={c.back}
-        retryHref={recoveryRetry}
-      />
+      <section className={planReviewPageShellClass}>
+        <Link href="/subscriptions" className={planReviewNavLinkClass}>
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={planReviewNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
     );
   }
 }

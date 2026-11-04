@@ -49,6 +49,7 @@ import Activate from "../apps/web/src/app/workspace/subscriptions/activate/page"
 import History from "../apps/web/src/app/workspace/subscriptions/history/page";
 import SubscriptionsLoading from "../apps/web/src/app/workspace/subscriptions/loading";
 import Account from "../apps/web/src/app/workspace/subscriptions/page";
+import ReceiptLoading from "../apps/web/src/app/workspace/subscriptions/receipts/[id]/loading";
 import Detail from "../apps/web/src/app/workspace/subscriptions/receipts/[id]/page";
 import { subscriptionsCopy } from "../apps/web/src/lib/subscriptions-i18n";
 import { activation, date, expiresAt, plan, receipt, subscription } from "./subscriptions-fixtures";
@@ -125,9 +126,37 @@ it("offers activation only for a current free plan", async () => {
   expect(html).toContain(subscriptionsCopy("en").notice);
   expect(state.scopes).not.toHaveBeenCalled();
   state.plan.mockResolvedValue({ ...plan, price: 100 });
-  expect(renderToStaticMarkup(await Activate(activateContext))).toContain(
-    subscriptionsCopy("en").paymentRequired,
-  );
+  const paid = renderToStaticMarkup(await Activate(activateContext));
+  expect(paid).toContain(subscriptionsCopy("en").paymentRequired);
+  expect(paid).toContain(subscriptionsCopy("en").selectionRecoverHint);
+  expect(paid).toContain('role="alert"');
+});
+it("shows EmptyState when the account has no subscription", async () => {
+  state.dashboard.mockResolvedValue({
+    scope: { id: "user:usr_a", name: null },
+    subscription: null,
+    commissionBps: 750,
+    initialHoldDays: 7,
+    observedAt: date,
+  });
+  const copy = subscriptionsCopy("en");
+  const html = renderToStaticMarkup(await Account(context));
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.emptyHint);
+  expect(html).toContain('href="/subscriptions"');
+});
+it("shows EmptyState when subscription history has no operations", async () => {
+  state.history.mockResolvedValue({
+    scope: { id: "user:usr_a", name: null },
+    receipts: [],
+    page: 1,
+    totalPages: 1,
+    total: 0,
+  });
+  const copy = subscriptionsCopy("en");
+  const html = renderToStaticMarkup(await History(context));
+  expect(html).toContain(copy.historyEmpty);
+  expect(html).toContain(copy.historyEmptyHint);
 });
 it("supports organization selection and bounded scope pagination", async () => {
   state.plan.mockResolvedValue({ ...plan, scope: "organization" });
@@ -203,6 +232,7 @@ it("escapes plan descriptions and rejects ambiguous selectors before data access
     }),
   );
   expect(invalid).toContain('role="alert"');
+  expect(invalid).toContain(subscriptionsCopy("en").selectionRecoverHint);
   expect(state.plan).not.toHaveBeenCalled();
 });
 it("shows an honest recovery state when subscription data fails to load", async () => {
@@ -211,27 +241,35 @@ it("shows an honest recovery state when subscription data fails to load", async 
   const html = renderToStaticMarkup(await Account(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/subscriptions"');
 });
 it("shows honest recovery when history or receipt loads fail", async () => {
   const copy = subscriptionsCopy("en");
   state.history.mockRejectedValue(new Error("history unavailable"));
-  expect(renderToStaticMarkup(await History(context))).toContain(copy.loadUnavailable);
+  const history = renderToStaticMarkup(await History(context));
+  expect(history).toContain(copy.loadUnavailable);
+  expect(history).toContain(copy.loadUnavailableHint);
   state.detail.mockRejectedValue(new Error("receipt unavailable"));
-  expect(renderToStaticMarkup(await Detail(context))).toContain(copy.loadUnavailable);
+  const detail = renderToStaticMarkup(await Detail(context));
+  expect(detail).toContain(copy.loadUnavailable);
+  expect(detail).toContain(copy.loadUnavailableHint);
 });
 it("shows honest recovery when activation prerequisites fail unexpectedly", async () => {
   state.plan.mockRejectedValue(new Error("plan unavailable"));
   const copy = subscriptionsCopy("en");
   const html = renderToStaticMarkup(await Activate(activateContext));
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain('href="/subscriptions"');
 });
 it("clips honest subscription loading shells on narrow layouts", async () => {
-  for (const Loading of [SubscriptionsLoading, ActivateLoading]) {
+  for (const Loading of [SubscriptionsLoading, ActivateLoading, ReceiptLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
     expect(html).toContain(subscriptionsCopy("en").loading);
   }
 });

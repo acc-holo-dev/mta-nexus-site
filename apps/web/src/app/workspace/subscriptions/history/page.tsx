@@ -1,15 +1,15 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import {
-  SubscriptionLoadError,
   subscriptionNavLinkClass,
   subscriptionPageShellClass,
 } from "../../../../components/subscription-workspace-recovery";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
@@ -33,6 +33,7 @@ export default async function SubscriptionHistoryPage({
 }) {
   const [store, locale, raw] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = subscriptionsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const params = subscriptionPageParams(raw);
@@ -62,7 +63,7 @@ export default async function SubscriptionHistoryPage({
         <h1 className="font-display">
           {c.history}: {result.scope.name ?? c.personal}
         </h1>
-        <form method="get" className="flex gap-4">
+        <form method="get" className="flex flex-wrap gap-4">
           {query.organizationId && (
             <input type="hidden" name="organizationId" value={query.organizationId} />
           )}
@@ -82,11 +83,7 @@ export default async function SubscriptionHistoryPage({
               ))}
             </select>
           </label>
-          <Button
-            type="submit"
-            variant="ghost"
-            className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Button type="submit" size="touch" variant="outline">
             {c.filter}
           </Button>
         </form>
@@ -99,7 +96,7 @@ export default async function SubscriptionHistoryPage({
               <li key={r.id} className="nexus-panel space-y-2 p-4">
                 <Link
                   href={subscriptionReceiptHref(r.id, query.organizationId)}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={subscriptionNavLinkClass}
                 >
                   {c.actions[r.action]}: {locale === "ru" ? r.titleRu : r.titleEn}
                 </Link>
@@ -110,14 +107,22 @@ export default async function SubscriptionHistoryPage({
             ))}
           </ul>
         ) : (
-          <p>{c.historyEmpty}</p>
+          <EmptyState title={c.historyEmpty} description={c.historyEmptyHint} />
         )}
-        <nav className="flex gap-4" aria-label={c.history}>
-          {result.page > 1 && <Link href={href(result.page - 1)}>{c.previous}</Link>}
-          <span>
+        <nav className="flex flex-wrap gap-4" aria-label={c.history}>
+          {result.page > 1 && (
+            <Link href={href(result.page - 1)} className={subscriptionNavLinkClass}>
+              {c.previous}
+            </Link>
+          )}
+          <span className="inline-flex min-h-11 items-center">
             {result.page} / {result.totalPages}
           </span>
-          {result.page < result.totalPages && <Link href={href(result.page + 1)}>{c.next}</Link>}
+          {result.page < result.totalPages && (
+            <Link href={href(result.page + 1)} className={subscriptionNavLinkClass}>
+              {c.next}
+            </Link>
+          )}
         </nav>
       </section>
     );
@@ -125,18 +130,33 @@ export default async function SubscriptionHistoryPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{subscriptionError(locale, error.code)}</p>
-          <Link href="/workspace/subscriptions">{c.title}</Link>
+        <section className={subscriptionPageShellClass}>
+          <ErrorState
+            title={subscriptionError(locale, error.code)}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/workspace/subscriptions" className={subscriptionNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     return (
-      <SubscriptionLoadError
-        locale={locale}
-        backHref={subscriptionAccountHref(undefined)}
-        backLabel={c.title}
-        retryHref={recoveryRetry}
-      />
+      <section className={subscriptionPageShellClass}>
+        <Link href={subscriptionAccountHref(undefined)} className={subscriptionNavLinkClass}>
+          {c.title}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={subscriptionNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
     );
   }
 }

@@ -1,15 +1,16 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewForm } from "../../../../../components/plan-review-form";
 import {
-  PlanReviewLoadError,
   planReviewNavLinkClass,
   planReviewPageShellClass,
 } from "../../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
 import { planReviewNewQuery, planReviewsPageParams } from "../../../../../lib/plan-reviews-query";
@@ -27,6 +28,7 @@ export default async function NewPlanReview({
 }) {
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = planReviewsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const query = planReviewsPageParams(params);
@@ -46,14 +48,16 @@ export default async function NewPlanReview({
     if (!plan) notFound();
     if (plan.revision !== query.revision)
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{c.planChanged}</p>
-          <Link
-            href="/subscriptions"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.back}
-          </Link>
+        <section className={planReviewPageShellClass}>
+          <ErrorState
+            title={c.planChanged}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/subscriptions" className={planReviewNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     const scopes = await planReviewsService.scopes(actor, query.scopePage);
@@ -73,34 +77,27 @@ export default async function NewPlanReview({
           actorId={actor.id}
           scopes={scopes.scopes}
         />
-        {plan.scope === "organization" && !scopes.scopes.length ? <p>{c.noOrganizations}</p> : null}
+        {plan.scope === "organization" && !scopes.scopes.length ? (
+          <EmptyState title={c.noOrganizations} description={c.noOrganizationsHint} />
+        ) : null}
         {plan.scope === "organization" && scopes.totalPages > 1 ? (
-          <nav aria-label={c.scopeNext} className="flex gap-4 text-sm">
+          <nav aria-label={c.scopeNext} className="flex flex-wrap gap-4 text-sm">
             {scopes.page > 1 ? (
-              <Link
-                href={href(scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(scopes.page - 1)} className={planReviewNavLinkClass}>
                 {c.previous}
               </Link>
             ) : null}
-            <span>
+            <span className="inline-flex min-h-11 items-center">
               {c.page} {scopes.page} {c.of} {scopes.totalPages}
             </span>
             {scopes.page < scopes.totalPages ? (
-              <Link
-                href={href(scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(scopes.page + 1)} className={planReviewNavLinkClass}>
                 {c.next}
               </Link>
             ) : null}
           </nav>
         ) : null}
-        <Link
-          href="/workspace/subscriptions/reviews"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/subscriptions/reviews" className={planReviewNavLinkClass}>
           {c.history}
         </Link>
       </div>
@@ -109,23 +106,33 @@ export default async function NewPlanReview({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{c.invalid}</p>
-          <Link
-            href="/subscriptions"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.back}
-          </Link>
+        <section className={planReviewPageShellClass}>
+          <ErrorState
+            title={c.invalid}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/subscriptions" className={planReviewNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     return (
-      <PlanReviewLoadError
-        locale={locale}
-        backHref="/subscriptions"
-        backLabel={c.back}
-        retryHref={recoveryRetry}
-      />
+      <section className={planReviewPageShellClass}>
+        <Link href="/subscriptions" className={planReviewNavLinkClass}>
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={planReviewNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
     );
   }
 }
