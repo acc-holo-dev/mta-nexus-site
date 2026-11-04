@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Field } from "@nexus/ui";
+import { Button, ErrorState, Field } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useState } from "react";
 import {
@@ -112,7 +112,7 @@ export function CommunityTopicForm() {
       onSubmit={submit}
       aria-busy={busy}
       aria-describedby={error ? formErrorId : undefined}
-      className="nexus-panel grid gap-4 p-5 shadow-nexus-sm sm:p-6"
+      className="nexus-panel grid min-w-0 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:p-6"
     >
       {busy && (
         <p role="status" className="text-xs text-muted">
@@ -181,13 +181,13 @@ export function CommunityTopicForm() {
         )}
       </Field>
 
-      {error && (
-        <p id={formErrorId} role="alert" className="text-xs text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <div id={formErrorId}>
+          <ErrorState title={error} description={copy.createErrorDescription} />
+        </div>
+      ) : null}
 
-      <Button type="submit" isLoading={busy} disabled={busy}>
+      <Button type="submit" isLoading={busy} disabled={busy} className="min-h-11">
         {busy ? copy.publishing : copy.publish}
       </Button>
     </form>

@@ -85,10 +85,14 @@ it("passes normalized search to server paging and renders a localized empty resu
     query: "Lua",
     focusId: undefined,
   });
-  expect(html).toContain(getDiscussionCopy("en").noMatches);
+  const copy = getDiscussionCopy("en");
+  expect(html).toContain(copy.noMatches);
+  expect(html).toContain(copy.noMatchesDescription);
+  expect(html).toContain(copy.clearSearch);
+  expect(html).toContain("overflow-x-clip");
   expect(html).toContain('value="Lua"');
 });
-it("offers latest-discussion recovery after a deleted focused comment without rendering internal errors", async () => {
+it("offers ErrorState recovery after a deleted focused comment without rendering internal errors", async () => {
   mocks.pageDiscussion.mockRejectedValue(
     new AppError("private details", 404, "COMMENT_FOCUS_NOT_FOUND"),
   );
@@ -98,7 +102,12 @@ it("offers latest-discussion recovery after a deleted focused comment without re
       searchParams: Promise.resolve({ comment: "deleted" }),
     }),
   );
-  expect(html).toContain(getDiscussionCopy("en").focusMissing);
+  const copy = getDiscussionCopy("en");
+  expect(html).toContain(copy.focusMissing);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.returnDiscussion);
+  expect(html).toContain(copy.retry);
+  expect(html).toContain("overflow-x-clip");
   expect(html).not.toContain("private details");
 });
 it("does not query comments for malformed or repeated discussion selectors", async () => {
@@ -110,8 +119,11 @@ it("does not query comments for malformed or repeated discussion selectors", asy
   );
   expect(mocks.pageDiscussion).not.toHaveBeenCalled();
   expect(html).toContain(getDiscussionCopy("en").invalidCursor);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
 });
-it("renders standalone search error and empty states without requiring browser effects", () => {
+it("renders standalone search EmptyState without requiring browser effects", () => {
+  const copy = getDiscussionCopy("ru");
   const html = renderToStaticMarkup(
     <ContentDiscussion
       slug="article"
@@ -122,8 +134,10 @@ it("renders standalone search error and empty states without requiring browser e
       initialQuery="Lua"
     />,
   );
-  expect(html).toContain(getDiscussionCopy("ru").noMatches);
-  expect(html).toContain(getDiscussionCopy("ru").applySearch);
+  expect(html).toContain(copy.noMatches);
+  expect(html).toContain(copy.noMatchesDescription);
+  expect(html).toContain(copy.applySearch);
+  expect(html).toContain("overflow-x-clip");
 });
 it.each(["en", "ru"] as const)(
   "renders working discussion subscription entry points and settings in %s",
@@ -141,6 +155,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/workspace/saved?type=content"');
     expect(html).toContain('href="/settings#notification-heading"');
     expect(html).toContain('href="/auth/login?next=%2Farticles%2Farticle"');
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("overflow-x-clip");
     expect(html).not.toContain("Checking");
   },
 );

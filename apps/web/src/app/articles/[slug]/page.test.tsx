@@ -89,3 +89,9 @@ it("supports omitted or cleared covers", async () => {
   expect(createContentSchema.safeParse(article()).success).toBe(true);
   expect(renderToStaticMarkup(await Page(input()))).not.toContain("<img");
 });
+it("clips the article detail shell and keeps a touch-sized back control", async () => {
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(html).toContain("min-w-0 max-w-4xl space-y-8 overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/articles"');
+});
