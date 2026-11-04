@@ -4,6 +4,7 @@ import {
   canManageOrganization,
   type OrganizationTeamRole,
 } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
@@ -21,6 +22,9 @@ import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { confirmAction } from "./confirm-action";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
+
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export function OrganizationTeamDirectory({
   initial,
   filters,
@@ -106,15 +110,16 @@ export function OrganizationTeamDirectory({
       if (alive.current) setPending(false);
     }
   }
+  const filtered = !!filters.query || filters.role !== undefined || filters.access !== undefined;
   return (
-    <section className="nexus-panel space-y-5 p-5" aria-busy={pending}>
+    <section className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5" aria-busy={pending}>
       <p className="text-xs text-muted">{copy.private}</p>
       {data.owner && (
         <div className="space-y-2 rounded-lg border border-base p-4">
           <p className="text-xs text-muted">{team.owner}</p>
           <Link
             href={`/users/${encodeURIComponent(data.owner.username)}`}
-            className="inline-flex min-h-11 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={`${navLinkClass} break-words`}
           >
             {data.owner.displayName} (@{data.owner.username})
           </Link>
@@ -126,7 +131,7 @@ export function OrganizationTeamDirectory({
       {canManageOrganization(data.role) ? (
         <Link
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {copy.management}
         </Link>
@@ -230,7 +235,7 @@ export function OrganizationTeamDirectory({
               {data.role === "owner" && ["admin", "developer", "member"].includes(member.role) && (
                 <Link
                   href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}?${new URLSearchParams({ q: member.username })}`}
-                  className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={`${navLinkClass} text-xs`}
                 >
                   {copy.transfer}
                 </Link>
@@ -239,46 +244,43 @@ export function OrganizationTeamDirectory({
           ))}
         </ul>
       ) : (
-        <div className="space-y-3">
-          <p className="text-sm text-muted">{copy.empty}</p>
-          <Link
-            href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reset}
-          </Link>
-        </div>
+        <EmptyState
+          title={copy.empty}
+          description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
+          action={
+            <Link
+              href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
+              className={navLinkClass}
+            >
+              {copy.reset}
+            </Link>
+          }
+        />
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
+      {(error || blocked) && (
+        <ErrorState
+          title={error || copy.uncertain}
+          action={
+            <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
+              {copy.uncertain}
+            </a>
+          }
+        />
       )}
       {message && (
         <p role="status" className="text-sm text-success">
           {message}
         </p>
       )}
-      {blocked && (
-        <a
-          href={organizationTeamHref(data.organization.id, filters)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.uncertain}
-        </a>
-      )}
       <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-        <a
-          href={organizationTeamHref(data.organization.id, filters)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
           {copy.latest}
         </a>
         {data.nextCursor && (
           <Link
             prefetch={false}
             href={organizationTeamHref(data.organization.id, filters, data.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {copy.older}
           </Link>

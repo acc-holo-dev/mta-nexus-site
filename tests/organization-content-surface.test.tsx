@@ -89,6 +89,7 @@ it("shows revoked authority and recovery without creating editor actions", async
   mocks.page.mockRejectedValue(new AppError("private role details", 403, "FORBIDDEN"));
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }));
   expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
   expect(html).toContain(getUserPlatformCopy("en").retry);
   expect(html).not.toContain("private role");
   expect(html).not.toContain("/content/new");
@@ -111,12 +112,13 @@ it("loads only organization context when opening a new publication and handles e
   expect(mocks.context).toHaveBeenCalledWith("org", { id: "actor", role: "user" });
   expect(mocks.page).not.toHaveBeenCalled();
   mocks.page.mockResolvedValue({ organization, items: [], page: 1, hasMore: false });
-  expect(renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }))).toContain(
-    getUserPlatformCopy("en").empty,
-  );
+  const empty = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "org" }) }));
+  expect(empty).toContain(getUserPlatformCopy("en").empty);
+  expect(empty).toContain(organizationContentCopy("en").emptyHint);
 });
 it("distinguishes an empty catalog from an empty filtered result", async () => {
   const copy = getUserPlatformCopy("en");
+  const team = organizationContentCopy("en");
   mocks.page.mockResolvedValue({ organization, items: [], page: 1, hasMore: false });
   const filtered = renderToStaticMarkup(
     await Page({
@@ -125,6 +127,7 @@ it("distinguishes an empty catalog from an empty filtered result", async () => {
     }),
   );
   expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(team.emptyFilteredHint);
   expect(filtered).toContain('href="/workspace/organizations/org/content"');
   expect(filtered).toContain(copy.reset);
   expect(filtered).not.toContain(copy.empty);

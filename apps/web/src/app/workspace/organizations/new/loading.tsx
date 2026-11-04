@@ -6,7 +6,7 @@ export default async function Loading() {
   const copy = getOrganizationCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-3xl space-y-5"
+      className="mx-auto min-w-0 max-w-3xl space-y-5 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="org-new-loading-heading"
     >
@@ -19,9 +19,10 @@ export default async function Loading() {
         </p>
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
-        <div className="h-10 w-64 rounded bg-inset" />
-        <div className="h-40 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className="h-10 w-2/3 max-w-md rounded bg-inset" />
+        {[1, 2, 3].map((key) => (
+          <div key={key} className="h-24 rounded bg-inset" />
+        ))}
       </div>
     </section>
   );

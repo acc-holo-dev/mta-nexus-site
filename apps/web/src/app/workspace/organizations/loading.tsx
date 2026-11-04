@@ -5,7 +5,11 @@ import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
 export default async function Loading() {
   const copy = getOrganizationCopy(await getRequestLocale());
   return (
-    <section className="space-y-6" aria-busy="true" aria-labelledby="organizations-loading-heading">
+    <section
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
+      aria-busy="true"
+      aria-labelledby="organizations-loading-heading"
+    >
       <header className="space-y-2">
         <h1 id="organizations-loading-heading" className="font-display text-primary">
           {copy.title}

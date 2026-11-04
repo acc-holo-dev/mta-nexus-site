@@ -176,7 +176,19 @@ it.each(["ru", "en"] as const)(
       <OrganizationHistoryView data={null} id="org" locale={locale} />,
     );
     expect(failed).toContain('role="alert"');
+    expect(failed).toContain("overflow-x-clip");
+    expect(failed).toContain(organizationGovernanceCopy(locale).unavailable);
+    expect(failed).toContain(organizationGovernanceCopy(locale).reload);
     expect(failed).not.toContain(organizationGovernanceCopy(locale).empty);
+    const empty = renderToStaticMarkup(
+      <OrganizationHistoryView
+        data={{ ...data, items: [], hasMore: false, nextCursor: null }}
+        id="org"
+        locale={locale}
+      />,
+    );
+    expect(empty).toContain(organizationGovernanceCopy(locale).empty);
+    expect(empty).toContain(organizationGovernanceCopy(locale).emptyHint);
   },
 );
 it("requires exact recipient/organization/role/newer revision before accepting saved transfer state", () => {

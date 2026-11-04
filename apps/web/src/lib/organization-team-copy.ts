@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { organizationError } from "./organization-workspace-copy";
+
 const en = {
   legacyOwner: "Legacy owner role without ownership rights",
   title: "Team directory",
@@ -17,6 +18,9 @@ const en = {
   ownerNote: "The current owner is shown separately and is not affected by member filters.",
   loading: "Loading team directory…",
   empty: "No team members match this page and its filters.",
+  emptyHint:
+    "Add members from the organization workspace or clear filters to see the current team.",
+  emptyFilteredHint: "Try another search, role or access filter, or reset to the latest members.",
   invalid: "Invalid team page. Open the latest members to continue.",
   unavailable: "The team directory could not be loaded. Try again.",
   uncertain: "Reload the saved team before making another change.",
@@ -43,6 +47,10 @@ const ru: Record<keyof typeof en, string> = {
   ownerNote: "Текущий владелец показан отдельно и не зависит от фильтров участников.",
   loading: "Загрузка каталога команды…",
   empty: "На этой странице нет участников по выбранным фильтрам.",
+  emptyHint:
+    "Добавьте участников в кабинете организации или сбросьте фильтры, чтобы увидеть текущую команду.",
+  emptyFilteredHint:
+    "Попробуйте другой поиск, роль или доступ либо откройте список новых участников.",
   invalid: "Некорректная страница команды. Откройте список новых участников.",
   unavailable: "Не удалось загрузить каталог команды. Попробуйте ещё раз.",
   uncertain: "Загрузите сохранённую команду перед следующим изменением.",

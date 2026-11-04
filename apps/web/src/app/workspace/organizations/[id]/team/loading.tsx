@@ -5,7 +5,7 @@ export default async function Loading() {
   const copy = organizationTeamCopy(await getRequestLocale());
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="organization-team-loading-heading"
     >

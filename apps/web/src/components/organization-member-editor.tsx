@@ -48,7 +48,7 @@ export function OrganizationMemberEditor({
           fallback={member.username}
         />
         <Link
-          className="min-w-0 break-words text-sm text-accent"
+          className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={`/users/${encodeURIComponent(member.username)}`}
         >
           {member.displayName} (@{member.username})
@@ -87,13 +87,13 @@ export function OrganizationMemberEditor({
             />
             {copy.serverAccess}
           </label>
-          <Button type="submit" size="sm">
+          <Button type="submit" size="sm" className="min-h-11">
             {copy.updateMember}
           </Button>
           <Button
             type="button"
             variant="ghost"
-            className="h-auto px-0 text-sm text-danger underline"
+            className="h-auto min-h-11 px-0 text-sm text-danger underline"
             onClick={onRemove}
           >
             {copy.remove}
@@ -106,7 +106,7 @@ export function OrganizationMemberEditor({
           variant="ghost"
           disabled={busy}
           onClick={onSelectOwner}
-          className="h-auto min-h-9 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {organizationGovernanceCopy(locale).choose}
         </Button>
