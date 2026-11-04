@@ -58,3 +58,16 @@ it("keeps additive formErrorHint / errorHint copy for commerce and account hones
   expect(read("apps/web/src/lib/i18n/en/product.ts")).toContain("downloadErrorHint:");
   expect(read("apps/web/src/lib/i18n/ru/product.ts")).toContain("downloadErrorHint:");
 });
+
+it("locks license bind noServers empty to EmptyState with honesty hint copy", () => {
+  const panel = read("apps/web/src/components/license-control-panel.tsx");
+  expect(panel).toContain("EmptyState");
+  expect(panel).toContain("copy.noServers");
+  expect(panel).toContain("copy.noServersHint");
+  expect(panel).not.toMatch(/<p className="text-sm text-muted">\{copy\.noServers\}<\/p>/u);
+
+  const i18n = read("apps/web/src/lib/license-control-i18n.ts");
+  expect(i18n).toContain("noServers:");
+  expect(i18n).toContain("noServersHint:");
+  expect(i18n.match(/noServersHint:/gu)?.length).toBe(2);
+});

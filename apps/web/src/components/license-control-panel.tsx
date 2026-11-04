@@ -5,8 +5,9 @@ import {
   type LicenseModerationAction,
   type LicenseOwnerAction,
 } from "@nexus/domain";
-import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexus/validation";
+import { Server } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { confirmedLicenseControl } from "../lib/license-control-confirmation";
@@ -249,9 +250,13 @@ export function LicenseControlPanel({
                     ))}
                   </select>
                 </label>
-                {servers.servers.length === 0 && (
-                  <p className="text-sm text-muted">{copy.noServers}</p>
-                )}
+                {servers.servers.length === 0 ? (
+                  <EmptyState
+                    title={copy.noServers}
+                    description={copy.noServersHint}
+                    icon={<Server className="h-6 w-6" aria-hidden="true" />}
+                  />
+                ) : null}
                 <div className="flex min-w-0 flex-wrap gap-4 text-sm">
                   <Button
                     type="button"
