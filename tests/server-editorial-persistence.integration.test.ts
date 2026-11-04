@@ -1,22 +1,23 @@
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, inArray } from "drizzle-orm";
-import { afterEach, expect, it } from "vitest";
 import {
-  db,
-  sessionRepository,
-  userRepository,
-  serverContentRepository as editorial,
-  authorContentRepository as author,
-  contentRepository,
   auditEvents,
+  authorContentRepository as author,
   content,
-  notifications,
+  contentRepository,
+  db,
+  serverContentRepository as editorial,
   notificationPreferences,
+  notifications,
   organizationMembers,
   organizations,
   servers,
+  sessionRepository,
+  userRepository,
   users,
 } from "@nexus/db";
+import { and, eq, inArray } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
+
 const actors: string[] = [],
   serverIds: string[] = [],
   orgs: string[] = [];
@@ -55,6 +56,12 @@ async function fixture() {
     id: `ses_${moderator.id}`,
     userId: moderator.id,
     token: `tok_${moderator.id}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
+  await sessionRepository.create({
+    id: `ses_${manager.id}`,
+    userId: manager.id,
+    token: `tok_${manager.id}`,
     expiresAt: new Date(Date.now() + 60 * 60 * 1000),
   });
   orgs.push(orgId);
@@ -135,6 +142,7 @@ it("persists delegated server drafts, current organization context and an owner'
       commentCount: 3,
     },
     audit(f.manager.id, id, "content.created_by_server"),
+    `tok_${f.manager.id}`,
   );
   expect(saved).toMatchObject({
     serverId: f.serverId,

@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ create: vi.fn(), mutate: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   serverContentRepository: { create: mocks.create },
@@ -8,7 +9,9 @@ vi.mock("@nexus/db", () => ({
   contentRepository: {},
 }));
 vi.mock("@nexus/security", () => ({ generateId: (prefix: string) => `${prefix}_generated` }));
+
 import { serverContentService as service } from "../apps/web/src/lib/services/server-content-service";
+
 const actor = { id: "editor" } as User;
 const input = {
   title: " Server publication ",
@@ -35,7 +38,7 @@ beforeEach(() => {
   mocks.mutate.mockResolvedValue(row);
 });
 it("creates a normalized editorial draft with trusted server and author and a narrow editable response", async () => {
-  const result = await service.create("srv", actor, input);
+  const result = await service.create("srv", actor, input, "session-token");
   expect(mocks.create).toHaveBeenCalledWith(
     "srv",
     "editor",
@@ -49,6 +52,7 @@ it("creates a normalized editorial draft with trusted server and author and a na
       action: "content.created_by_server",
       details: { status: "draft", type: "article", serverId: "srv" },
     }),
+    "session-token",
   );
   expect(result).toMatchObject({
     serverId: "srv",
@@ -61,7 +65,9 @@ it("creates a normalized editorial draft with trusted server and author and a na
 it.each(["post", "question", "review"])(
   "rejects non-editorial server creation %s",
   async (type) => {
-    await expect(service.create("srv", actor, { ...input, type })).rejects.toMatchObject({
+    await expect(
+      service.create("srv", actor, { ...input, type }, "session-token"),
+    ).rejects.toMatchObject({
       code: "VALIDATION_FAILED",
     });
     expect(mocks.create).not.toHaveBeenCalled();
@@ -71,7 +77,7 @@ it.each(["serverId", "organizationId", "authorId", "status", "productId"])(
   "rejects injected authority %s",
   async (key) => {
     await expect(
-      service.create("srv", actor, { ...input, [key]: "foreign" }),
+      service.create("srv", actor, { ...input, [key]: "foreign" }, "session-token"),
     ).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
     expect(mocks.create).not.toHaveBeenCalled();
   },

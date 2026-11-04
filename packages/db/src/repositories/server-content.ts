@@ -4,6 +4,7 @@ import { and, desc, eq, exists, ilike, or } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, content, servers, users } from "../schema";
 import { type ContentPageFilters, contentSummaryColumns } from "./content-summary";
+import { lockInitiatingSession } from "./initiating-session";
 import { publicationNotice } from "./publication-notice";
 import { containsPattern } from "./search-pattern";
 import { lockServerManagementGrants, managedServerScope } from "./server-management-scope";
@@ -98,10 +99,12 @@ class ServerContentRepository {
     actorId: string,
     data: Omit<Content, "createdAt" | "updatedAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ) {
     return db.transaction(async (tx) => {
       const server = await serverContentAccess(tx, serverId, actorId),
         now = new Date();
+      await lockInitiatingSession(tx, actorId, currentToken);
       const [row] = await tx
         .insert(content)
         .values({
@@ -122,6 +125,7 @@ class ServerContentRepository {
       if (!row) throw new Error("Content insert did not return a row");
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
       await publicationNotice(tx, row as unknown as Content, actorId, "created", audit.id);
+      await lockInitiatingSession(tx, actorId, currentToken);
       return row as unknown as Content;
     });
   }

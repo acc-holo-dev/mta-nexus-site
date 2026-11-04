@@ -41,7 +41,7 @@ beforeEach(() => {
   mocks.mutate.mockResolvedValue(row);
 });
 it("creates a normalized draft using trusted actor and organization scope and returns only editable fields", async () => {
-  const saved = await service.create("org", actor, input);
+  const saved = await service.create("org", actor, input, "session-token");
   expect(mocks.create).toHaveBeenCalledWith(
     "org",
     "editor",
@@ -56,6 +56,7 @@ it("creates a normalized draft using trusted actor and organization scope and re
       action: "content.created_by_organization",
       details: { organizationId: "org", status: "draft", type: "article" },
     }),
+    "session-token",
   );
   expect(saved).toMatchObject({
     id: "content",
@@ -86,7 +87,7 @@ it("passes the initiating session to personal creation and reports rolled-back d
 it.each(["post", "question"])(
   "publishes community type %s immediately using existing policy",
   async (type) => {
-    await service.create("org", actor, { ...input, type });
+    await service.create("org", actor, { ...input, type }, "session-token");
     expect(mocks.create.mock.calls[0][2]).toMatchObject({
       status: "published",
       publishedAt: expect.any(Date),
@@ -97,7 +98,7 @@ it.each(["authorId", "organizationId", "status", "productId"])(
   "rejects injected publication authority %s",
   async (key) => {
     await expect(
-      service.create("org", actor, { ...input, [key]: "injected" }),
+      service.create("org", actor, { ...input, [key]: "injected" }, "session-token"),
     ).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
     expect(mocks.create).not.toHaveBeenCalled();
   },
@@ -130,9 +131,11 @@ it("uses the same versioned mutation for cross-author editing and archiving with
 });
 it("maps duplicate slugs but preserves live authorization failures", async () => {
   mocks.create.mockRejectedValue({ cause: { code: "23505" } });
-  await expect(service.create("org", actor, input)).rejects.toMatchObject({
+  await expect(service.create("org", actor, input, "session-token")).rejects.toMatchObject({
     code: "SLUG_CONFLICT",
   });
   mocks.create.mockRejectedValue({ code: "FORBIDDEN" });
-  await expect(service.create("org", actor, input)).rejects.toMatchObject({ code: "FORBIDDEN" });
+  await expect(service.create("org", actor, input, "session-token")).rejects.toMatchObject({
+    code: "FORBIDDEN",
+  });
 });

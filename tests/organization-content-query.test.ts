@@ -190,7 +190,14 @@ it.each([
   expect(writes()).toHaveLength(0);
 });
 it("creates in the requested organization and current actor regardless of supplied persistence fields", async () => {
-  state.rows = [[org()], [publication({ authorId: "actor", status: "draft" })]];
+  const expiry = new Date(Date.now() + 60_000).toISOString();
+  state.rows = [
+    [org()],
+    [["actor"]],
+    [["ses", expiry]],
+    [publication({ authorId: "actor", status: "draft" })],
+    [["ses", expiry]],
+  ];
   await team.create(
     "org",
     "actor",
@@ -207,6 +214,7 @@ it("creates in the requested organization and current actor regardless of suppli
       commentCount: 0,
     },
     audit,
+    "session-token",
   );
   expect(state.queries[0].sql).toContain("for update");
   expect(writes()[0].params).toContain("actor");

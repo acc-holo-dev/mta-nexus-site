@@ -1,12 +1,14 @@
-import { and, desc, eq, ilike, or } from "drizzle-orm";
-import { AppError, canManageOrganization, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content } from "@nexus/domain";
+import { AppError, canManageOrganization, NotFoundError, UnauthorizedError } from "@nexus/domain";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, content, users } from "../schema";
+import { type ContentPageFilters, contentSummaryColumns } from "./content-summary";
+import { lockInitiatingSession } from "./initiating-session";
 import { organizationWorkspaceAccess } from "./organization-workspace";
-import { contentSummaryColumns, type ContentPageFilters } from "./content-summary";
-import { containsPattern } from "./search-pattern";
 import { publicationNotice } from "./publication-notice";
+import { containsPattern } from "./search-pattern";
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 async function access(tx: Transaction, organizationId: string, actorId: string, lock = false) {
   const result = await organizationWorkspaceAccess(tx, organizationId, actorId, lock);
@@ -85,9 +87,17 @@ class OrganizationContentRepository {
     actorId: string,
     data: Omit<Content, "createdAt" | "updatedAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ) {
     return db.transaction(async (tx) => {
       await access(tx, organizationId, actorId, true);
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, actorId, currentToken);
       const now = new Date();
       const [created] = await tx
         .insert(content)
@@ -104,6 +114,7 @@ class OrganizationContentRepository {
       if (!created) throw new Error("Content insert did not return a row");
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
       await publicationNotice(tx, created as unknown as Content, actorId, "created", audit.id);
+      await lockInitiatingSession(tx, actorId, currentToken);
       return created as unknown as Content;
     });
   }

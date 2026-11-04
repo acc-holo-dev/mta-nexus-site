@@ -1,7 +1,8 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   rate: vi.fn(),
@@ -17,12 +18,14 @@ vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
   serverContentService: mocks,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-import { GET as list, POST } from "../apps/web/src/app/api/workspace/servers/[id]/content/route";
+
 import {
+  DELETE,
   GET,
   PATCH,
-  DELETE,
 } from "../apps/web/src/app/api/workspace/servers/[id]/content/[contentId]/route";
+import { GET as list, POST } from "../apps/web/src/app/api/workspace/servers/[id]/content/route";
+
 const actor = { id: "actor", role: "user" },
   context = { params: Promise.resolve({ id: "srv", contentId: "content" }) };
 const input = {
@@ -73,7 +76,7 @@ it("binds collection, detail and mutation scope to the current actor and path, w
     type: "news",
   });
   expect(mocks.get).toHaveBeenCalledWith("srv", actor, "content");
-  expect(mocks.create).toHaveBeenCalledWith("srv", actor, input);
+  expect(mocks.create).toHaveBeenCalledWith("srv", actor, input, "session");
   expect(mocks.update).toHaveBeenCalledWith("srv", actor, "content", {}, false);
   expect(mocks.update).toHaveBeenCalledWith("srv", actor, "content", {}, true);
   for (const response of responses) {

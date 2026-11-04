@@ -43,12 +43,12 @@ class ServerContentService {
       content: editablePublication(result.content as unknown as Content),
     };
   }
-  async create(serverId: string, actor: User, input: unknown) {
+  async create(serverId: string, actor: User, input: unknown, currentToken: string) {
     const parsed = writerCreateSchema.safeParse(input);
     if (!parsed.success || !editorialTypes.some((type) => type === parsed.data.type))
       throw new ValidationError("Server editorial publication required");
     return editablePublication(
-      await authorContentService.create(parsed.data, actor, undefined, serverId),
+      await authorContentService.create(parsed.data, actor, undefined, serverId, currentToken),
     );
   }
   async update(serverId: string, actor: User, id: string, input: unknown, archive = false) {

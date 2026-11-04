@@ -183,12 +183,19 @@ class AuthorContentService {
         ? (
             data: Parameters<typeof contentRepository.createWithAudit>[0],
             audit: Parameters<typeof contentRepository.createWithAudit>[1],
-          ) => serverContentRepository.create(serverId, actor.id, data, audit)
+          ) => serverContentRepository.create(serverId, actor.id, data, audit, currentToken ?? "")
         : organizationId
           ? (
               data: Parameters<typeof contentRepository.createWithAudit>[0],
               audit: Parameters<typeof contentRepository.createWithAudit>[1],
-            ) => organizationContentRepository.create(organizationId, actor.id, data, audit)
+            ) =>
+              organizationContentRepository.create(
+                organizationId,
+                actor.id,
+                data,
+                audit,
+                currentToken ?? "",
+              )
           : (
               data: Parameters<typeof contentRepository.createWithAudit>[0],
               audit: Parameters<typeof contentRepository.createWithAudit>[1],

@@ -32,6 +32,7 @@ export const POST = withBrowserMutation((request: NextRequest, context: Context)
           id,
           actor,
           await readBoundedJson(request, 128 * 1024),
+          request.cookies.get("nexus_session")?.value ?? "",
         ),
       };
     },

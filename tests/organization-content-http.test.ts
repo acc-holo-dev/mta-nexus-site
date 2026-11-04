@@ -79,7 +79,7 @@ it("binds collection, detail and mutation scope to the current actor and path, w
     type: "news",
   });
   expect(mocks.get).toHaveBeenCalledWith("org", actor, "content");
-  expect(mocks.create).toHaveBeenCalledWith("org", actor, input);
+  expect(mocks.create).toHaveBeenCalledWith("org", actor, input, "session");
   expect(mocks.update).toHaveBeenCalledWith("org", actor, "content", {}, false);
   expect(mocks.update).toHaveBeenCalledWith("org", actor, "content", {}, true);
   for (const response of responses) {

@@ -34,8 +34,10 @@ class OrganizationContentService {
       content: editable(result.content as unknown as Content),
     };
   }
-  async create(organizationId: string, actor: User, input: unknown) {
-    return editable(await authorContentService.create(input, actor, organizationId));
+  async create(organizationId: string, actor: User, input: unknown, currentToken: string) {
+    return editable(
+      await authorContentService.create(input, actor, organizationId, undefined, currentToken),
+    );
   }
   async update(organizationId: string, actor: User, id: string, input: unknown, archive = false) {
     return editable(await authorContentService.update(id, input, actor, archive, organizationId));

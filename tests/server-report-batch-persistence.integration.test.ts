@@ -119,6 +119,7 @@ async function fixture() {
       commentCount: 0,
     },
     audit(writer.id, itemId, "content.created_by_server", server.id),
+    writer.currentToken,
   );
   // Tests start from a retained public editorial publication, as moderator approval would establish.
   const [published] = await db

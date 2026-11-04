@@ -171,7 +171,9 @@ it("allows delegated server creation and forces current server context, actor, r
     [["user"]],
     [["org", "owner"]],
     [["org", "member", ["manage_servers"]]],
+    [["ses", new Date(Date.now() + 60_000).toISOString()]],
     [row({ authorId: "actor", organizationId: "org", status: "draft" })],
+    [["ses", new Date(Date.now() + 60_000).toISOString()]],
   ];
   await repository.create(
     "srv",
@@ -190,6 +192,7 @@ it("allows delegated server creation and forces current server context, actor, r
       likeCount: 3,
     },
     audit,
+    "session-token",
   );
   const insert = state.queries.find((q) => q.sql.startsWith('insert into "content"'));
   expect(insert?.params).toContain("srv");
