@@ -1,15 +1,15 @@
+import { RELEASE_HISTORY_PAGE_SIZE, releaseHistoryPageBounds } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
-import { releaseHistoryPageBounds, RELEASE_HISTORY_PAGE_SIZE } from "@nexus/domain";
-import {
-  parseReleaseHistoryPage,
-  releaseHistoryHref,
-  releaseHistoryCopy,
-} from "../apps/web/src/lib/public-release-history";
 import {
   parseDownloadBuildSelection,
   resourceDownloadUrl,
   validDownloadBuildId,
 } from "../apps/web/src/lib/build-download-selection";
+import {
+  parseReleaseHistoryPage,
+  releaseHistoryCopy,
+  releaseHistoryHref,
+} from "../apps/web/src/lib/public-release-history";
 
 describe("bounded published build archive", () => {
   it("clamps excessive pages and never allows unbounded page sizes", () => {
@@ -87,6 +87,9 @@ describe("bounded published build archive", () => {
     expect(copy.warning.length).toBeGreaterThan(20);
     expect(copy.scan.length).toBeGreaterThan(2);
     expect(copy.checksum).toBe("SHA-256");
+    expect(copy.noBuildsHint.length).toBeGreaterThan(20);
+    expect(copy.loadUnavailable.length).toBeGreaterThan(20);
+    expect(copy.loading.length).toBeGreaterThan(5);
     expect(copy.title).not.toBe(releaseHistoryCopy[locale === "en" ? "ru" : "en"].title);
   });
 });

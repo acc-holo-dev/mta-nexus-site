@@ -1,5 +1,5 @@
 import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { ProductCard } from "../../components/product-card";
@@ -27,6 +27,9 @@ const SORTS = [
   { id: "rating", key: "rating" },
 ] as const;
 
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function MarketPage({
   searchParams,
 }: {
@@ -40,21 +43,33 @@ export default async function MarketPage({
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const { type, sort, query, page } = parseMarketQuery(await searchParams);
-  const { products, hasMore } = await productService.listPublicPage({
-    type: type === "all" ? undefined : type,
-    sort,
-    query,
-    page,
-    pageSize: MARKET_PAGE_SIZE,
-  });
-  const attributions = await productService.getPublicAttributions(products);
-
   const buildHref = (
     nextType: typeof type,
     nextSort: typeof sort,
     nextQuery = query,
     nextPage = 1,
   ) => marketHref({ type: nextType, sort: nextSort, query: nextQuery, page: nextPage });
+  const catalogHref = buildHref(type, sort, query, page);
+
+  let catalog: {
+    products: Awaited<ReturnType<typeof productService.listPublicPage>>["products"];
+    hasMore: boolean;
+    attributions: Awaited<ReturnType<typeof productService.getPublicAttributions>>;
+  } | null = null;
+  try {
+    const { products, hasMore } = await productService.listPublicPage({
+      type: type === "all" ? undefined : type,
+      sort,
+      query,
+      page,
+      pageSize: MARKET_PAGE_SIZE,
+    });
+    const attributions = await productService.getPublicAttributions(products);
+    catalog = { products, hasMore, attributions };
+  } catch {
+    catalog = null;
+  }
+
   const filtersActive = type !== "all" || sort !== "popular" || Boolean(query) || page > 1;
   const activeCategoryLabel =
     type !== "all"
@@ -76,7 +91,7 @@ export default async function MarketPage({
             <span className="min-w-0 break-words">{dictionary.market.title}</span>
           </h1>
           <p className="mt-0.5 font-caption text-muted">
-            {dictionary.market.showing} {products.length}
+            {dictionary.market.showing} {catalog?.products.length ?? "—"}
           </p>
         </div>
       </div>
@@ -102,10 +117,7 @@ export default async function MarketPage({
             {dictionary.market.searchButton}
           </Button>
           {query ? (
-            <Link
-              href={buildHref(type, sort, "")}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={buildHref(type, sort, "")} className={actionLinkClass}>
               {dictionary.market.clearQuery}
             </Link>
           ) : null}
@@ -158,77 +170,88 @@ export default async function MarketPage({
         })}
       </nav>
 
-      {products.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((product) => (
+      {!catalog ? (
+        <ErrorState
+          title={dictionary.market.loadUnavailable}
+          action={
+            <Link href={catalogHref} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : catalog.products.length > 0 ? (
+        <div className="grid min-w-0 grid-cols-1 gap-5 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
+          {catalog.products.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
               locale={locale}
-              attribution={attributions.get(product.id) ?? null}
+              attribution={catalog.attributions.get(product.id) ?? null}
             />
           ))}
         </div>
       ) : (
-        <div className="nexus-panel space-y-4 py-12 text-center">
-          <p className="font-caption text-muted">
-            {page > 1
+        <EmptyState
+          title={
+            page > 1
               ? dictionary.market.endOfResults
               : filtersActive
                 ? dictionary.market.emptyFiltered
-                : dictionary.market.empty}
-          </p>
-          {filtersActive && (
-            <div className="mx-auto max-w-lg space-y-2 text-left text-sm text-secondary">
-              <p className="font-semibold text-primary">{dictionary.market.activeFilters}</p>
-              <ul className="list-inside list-disc space-y-1">
-                {activeCategoryLabel ? <li>{activeCategoryLabel}</li> : null}
-                {activeSortLabel ? <li>{activeSortLabel}</li> : null}
-                {activeQueryLabel ? <li>{activeQueryLabel}</li> : null}
+                : dictionary.market.empty
+          }
+          description={
+            page > 1
+              ? dictionary.market.endOfResultsHint
+              : filtersActive
+                ? dictionary.market.emptyFilteredHint
+                : dictionary.market.emptyHint
+          }
+          action={
+            <div className="mx-auto max-w-lg space-y-4">
+              {filtersActive ? (
+                <div className="space-y-2 text-left text-sm text-secondary">
+                  <p className="font-semibold text-primary">{dictionary.market.activeFilters}</p>
+                  <ul className="list-inside list-disc space-y-1">
+                    {activeCategoryLabel ? <li>{activeCategoryLabel}</li> : null}
+                    {activeSortLabel ? <li>{activeSortLabel}</li> : null}
+                    {activeQueryLabel ? <li>{activeQueryLabel}</li> : null}
+                    {page > 1 ? (
+                      <li>
+                        {dictionary.market.pageLabel} {page}
+                      </li>
+                    ) : null}
+                  </ul>
+                </div>
+              ) : null}
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 {page > 1 ? (
-                  <li>
-                    {dictionary.market.pageLabel} {page}
-                  </li>
+                  <Link
+                    href={buildHref(type, sort, query)}
+                    className="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {dictionary.market.firstPageSameFilters}
+                  </Link>
                 ) : null}
-              </ul>
+                {query ? (
+                  <Link href={buildHref(type, sort, "")} className={actionLinkClass}>
+                    {dictionary.market.clearQuery}
+                  </Link>
+                ) : null}
+                {type !== "all" ? (
+                  <Link href={buildHref("all", sort, query)} className={actionLinkClass}>
+                    {dictionary.market.clearCategory}
+                  </Link>
+                ) : null}
+                <Link href="/market" className={actionLinkClass}>
+                  {dictionary.market.clear}
+                </Link>
+              </div>
             </div>
-          )}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {page > 1 ? (
-              <Link
-                href={buildHref(type, sort, query)}
-                className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {dictionary.market.firstPageSameFilters}
-              </Link>
-            ) : null}
-            {query ? (
-              <Link
-                href={buildHref(type, sort, "")}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {dictionary.market.clearQuery}
-              </Link>
-            ) : null}
-            {type !== "all" ? (
-              <Link
-                href={buildHref("all", sort, query)}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {dictionary.market.clearCategory}
-              </Link>
-            ) : null}
-            <Link
-              href="/market"
-              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.market.clear}
-            </Link>
-          </div>
-        </div>
+          }
+        />
       )}
 
-      {(page > 1 || hasMore) && (
+      {catalog && (page > 1 || catalog.hasMore) && (
         <nav
           aria-label={dictionary.market.paginationLabel}
           className="flex items-center justify-between gap-4 border-t border-base pt-4"
@@ -247,7 +270,7 @@ export default async function MarketPage({
           <span className="text-sm text-muted">
             {dictionary.market.pageLabel} {page}
           </span>
-          {hasMore && page < MAX_MARKET_PAGE ? (
+          {catalog.hasMore && page < MAX_MARKET_PAGE ? (
             <Link
               href={buildHref(type, sort, query, page + 1)}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-base px-4 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"

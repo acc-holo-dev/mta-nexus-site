@@ -73,9 +73,16 @@ export const discovery = {
     previousPage: "Previous",
     nextPage: "Next",
     endOfResults: "There are no resources on this page.",
+    endOfResultsHint:
+      "Try an earlier page or clear filters. This page number is beyond the available results, not a catalog outage.",
     empty: "No resources found in this category.",
-    emptyFiltered:
-      "Nothing matches the active Market filters. This is an empty result for the current URL, not a catalog outage.",
+    emptyHint:
+      "Published free resources will appear here when available. An empty list is not a load failure.",
+    emptyFiltered: "Nothing matches the active Market filters.",
+    emptyFilteredHint:
+      "This is an empty result for the current URL, not a catalog outage. Adjust search, category, or sort and try again.",
+    loadUnavailable:
+      "The free resource catalog is temporarily unavailable. This does not mean there are no resources.",
     activeFilters: "Active filters",
     clear: "Clear all filters",
     clearQuery: "Clear search only",

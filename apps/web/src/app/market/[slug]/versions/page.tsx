@@ -1,4 +1,5 @@
 import { buildRepository } from "@nexus/db";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -26,6 +27,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-7 overflow-x-clip py-8";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 function formatBuildSize(bytes: number): string {
   if (!Number.isSafeInteger(bytes) || bytes <= 0) return "—";
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.ceil(bytes / 1024))} KiB`;
@@ -45,42 +50,93 @@ export default async function PublicResourceVersionsPage({
     getRequestLocale(),
     cookies(),
   ]);
+  const copy = getReleaseHistoryCopy(locale);
+  const dictionary = getDictionary(locale);
+  const workspace = dictionary.workspace;
+  const requestedPage = parseReleaseHistoryPage(query.page);
+
   // Unlike private publisher history, this selector rejects unpublished,
   // paid, and missing resources *before* querying build rows.
-  const product = await productService.getProductBySlug(slug);
+  let product: Awaited<ReturnType<typeof productService.getProductBySlug>> | null = null;
+  try {
+    product = await productService.getProductBySlug(slug);
+  } catch {
+    return (
+      <div className={pageShellClass}>
+        <header className="space-y-3 border-b border-base pb-6">
+          <h1 className="font-display text-primary">{copy.title}</h1>
+          <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+        </header>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={releaseHistoryHref(slug, requestedPage)} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   if (!product) notFound();
 
-  const user = await authService.getSession(cookieStore.get("nexus_session")?.value);
-  const [history, canDownload] = await Promise.all([
-    buildRepository.pagePublishedReleases(product.id, parseReleaseHistoryPage(query.page)),
-    user
-      ? user.role === "admin"
-        ? Promise.resolve(true)
-        : productService
-            .canManageProduct(product, user)
-            .then(
-              async (canManage) =>
-                canManage ||
-                commerceService.checkEntitlement(
-                  { type: "user", id: user.id },
-                  product.id,
-                  "product.download",
-                ),
-            )
-      : Promise.resolve(false),
-  ]);
-  const copy = getReleaseHistoryCopy(locale);
-  const workspace = getDictionary(locale).workspace;
+  const user = await authService
+    .getSession(cookieStore.get("nexus_session")?.value)
+    .catch(() => null);
+  const history = await buildRepository
+    .pagePublishedReleases(product.id, requestedPage)
+    .catch(() => null);
   const back = `/market/${encodeURIComponent(product.slug)}`;
+
+  if (!history) {
+    return (
+      <div className={pageShellClass}>
+        <header className="space-y-3 border-b border-base pb-6">
+          <Link href={back} className={actionLinkClass}>
+            {copy.back}
+          </Link>
+          <h1 className="font-display text-primary">
+            {product.title} — {copy.title}
+          </h1>
+          <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+        </header>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link
+              href={releaseHistoryHref(product.slug, requestedPage)}
+              className={actionLinkClass}
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
   const returnPath = releaseHistoryHref(product.slug, history.page);
+  const canDownload = user
+    ? user.role === "admin"
+      ? true
+      : await productService
+          .canManageProduct(product, user)
+          .then(
+            async (canManage) =>
+              canManage ||
+              commerceService.checkEntitlement(
+                { type: "user", id: user.id },
+                product.id,
+                "product.download",
+              ),
+          )
+          .catch(() => false)
+    : false;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-7 py-8">
+    <div className={pageShellClass}>
       <header className="space-y-3 border-b border-base pb-6">
-        <Link
-          href={back}
-          className="text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={back} className={actionLinkClass}>
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">
@@ -94,13 +150,13 @@ export default async function PublicResourceVersionsPage({
       </p>
 
       {history.releases.length === 0 ? (
-        <p className="py-10 text-sm text-secondary">{copy.noBuilds}</p>
+        <EmptyState title={copy.noBuilds} description={copy.noBuildsHint} />
       ) : (
-        <ol className="space-y-4">
+        <ol className="min-w-0 space-y-4 overflow-x-clip">
           {history.releases.map((release) => (
-            <li key={release.id} className="nexus-panel space-y-4 p-5">
+            <li key={release.id} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
               <header className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-1">
+                <div className="min-w-0 space-y-1">
                   <h2 className="text-base font-semibold text-primary">
                     {copy.version} {release.version}
                   </h2>
@@ -143,7 +199,7 @@ export default async function PublicResourceVersionsPage({
                 </div>
               </dl>
 
-              <div className="space-y-1">
+              <div className="min-w-0 space-y-1">
                 <p className="text-xs text-muted">{copy.checksum}</p>
                 <code className="block select-all break-all rounded-md border border-base bg-inset px-3 py-2 text-xs text-secondary">
                   {release.sha256Hash}
@@ -197,7 +253,7 @@ export default async function PublicResourceVersionsPage({
           {user ? (
             <Link
               href={`/acquire?productId=${encodeURIComponent(product.id)}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={actionLinkClass}
             >
               {copy.acquire}
             </Link>
@@ -213,10 +269,13 @@ export default async function PublicResourceVersionsPage({
       )}
 
       {history.totalPages > 1 && (
-        <nav aria-label={copy.title} className="flex items-center justify-between gap-4 text-sm">
+        <nav
+          aria-label={copy.title}
+          className="flex min-w-0 items-center justify-between gap-4 overflow-x-clip text-sm"
+        >
           {history.page > 1 ? (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={actionLinkClass}
               href={releaseHistoryHref(product.slug, history.page - 1)}
             >
               {copy.previous}
@@ -229,7 +288,7 @@ export default async function PublicResourceVersionsPage({
           </span>
           {history.page < history.totalPages ? (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={actionLinkClass}
               href={releaseHistoryHref(product.slug, history.page + 1)}
             >
               {copy.next}

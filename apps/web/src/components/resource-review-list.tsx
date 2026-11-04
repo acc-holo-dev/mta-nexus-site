@@ -1,8 +1,13 @@
 import type { ResourceReviewView } from "@nexus/domain";
+import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import { resourceReviewCopy } from "../lib/resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
+
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function ResourceReviewList({
   reviews,
   productId,
@@ -16,19 +21,19 @@ export function ResourceReviewList({
 }) {
   const copy = resourceReviewCopy(locale);
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4 overflow-x-clip">
       {reviews.length ? (
         reviews.map((review) => (
           <article
             key={review.id}
             id={`review-${review.id}`}
-            className="space-y-3 rounded-lg border border-base bg-inset p-4"
+            className="min-w-0 space-y-3 rounded-lg border border-base bg-inset p-4"
           >
             <div className="flex flex-wrap justify-between gap-2 text-sm">
               {review.author && (
                 <Link
                   href={`/users/${encodeURIComponent(review.author.username)}`}
-                  className="text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={actionLinkClass}
                 >
                   {review.author.displayName || review.author.username}
                 </Link>
@@ -61,7 +66,7 @@ export function ResourceReviewList({
           </article>
         ))
       ) : (
-        <p className="text-sm text-muted">{copy.empty}</p>
+        <EmptyState title={copy.empty} description={copy.emptyHint} />
       )}
     </div>
   );
@@ -83,12 +88,12 @@ export function ResourceReviewPager({
     href = (value: number) =>
       `${base}?page=${value}${view ? `&view=${encodeURIComponent(view)}` : ""}`;
   return (
-    <nav aria-label={copy.title} className="flex items-center gap-4 text-sm">
+    <nav
+      aria-label={copy.title}
+      className="flex min-w-0 items-center gap-4 overflow-x-clip text-sm"
+    >
       {page > 1 && (
-        <Link
-          href={href(page - 1)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(page - 1)} className={actionLinkClass}>
           {copy.previous}
         </Link>
       )}
@@ -96,10 +101,7 @@ export function ResourceReviewPager({
         {page}/{totalPages}
       </span>
       {page < totalPages && (
-        <Link
-          href={href(page + 1)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(page + 1)} className={actionLinkClass}>
           {copy.next}
         </Link>
       )}

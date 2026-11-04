@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -16,7 +17,13 @@ import { resourceReviewPageQuery } from "../../../../lib/resource-review-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { resourceReviewService } from "../../../../lib/services/resource-review-service";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata(): Promise<Metadata> {
   return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
 }
@@ -34,29 +41,73 @@ export default async function Page({
     params,
     searchParams,
   ]);
-  const [product, actor] = await Promise.all([
-    productService.getProductBySlug(target.slug),
-    authService.getSession(cookieStore.get("nexus_session")?.value),
-  ]);
+  const copy = resourceReviewCopy(locale);
+  const dictionary = getDictionary(locale);
+  const workspace = dictionary.workspace;
+  const pageQuery = resourceReviewPageQuery(query);
+
+  let product: Awaited<ReturnType<typeof productService.getProductBySlug>> | null = null;
+  try {
+    product = await productService.getProductBySlug(target.slug);
+  } catch {
+    return (
+      <section className={pageShellClass}>
+        <h1 className="font-display">{copy.title}</h1>
+        <ErrorState
+          title={copy.pageUnavailable}
+          action={
+            <Link
+              href={`/market/${encodeURIComponent(target.slug)}/reviews`}
+              className={actionLinkClass}
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
+    );
+  }
   if (product?.status !== "published") notFound();
+
+  const actor = await authService
+    .getSession(cookieStore.get("nexus_session")?.value)
+    .catch(() => null);
   const result = await resourceReviewService
-      .publicPage(product.id, resourceReviewPageQuery(query).page)
-      .catch((error) => {
-        if (error instanceof AppError && error.statusCode === 404) notFound();
-        throw error;
-      }),
-    copy = resourceReviewCopy(locale),
-    workspace = getDictionary(locale).workspace,
-    reviewsPath =
-      result.page > 1
-        ? `/market/${encodeURIComponent(product.slug)}/reviews?page=${result.page}`
-        : `/market/${encodeURIComponent(product.slug)}/reviews`;
+    .publicPage(product.id, pageQuery.page)
+    .catch((error) => {
+      if (error instanceof AppError && error.statusCode === 404) notFound();
+      return null;
+    });
+  const reviewsPath =
+    pageQuery.page > 1
+      ? `/market/${encodeURIComponent(product.slug)}/reviews?page=${pageQuery.page}`
+      : `/market/${encodeURIComponent(product.slug)}/reviews`;
+
+  if (!result) {
+    return (
+      <section className={pageShellClass}>
+        <Link href={`/market/${encodeURIComponent(product.slug)}`} className={actionLinkClass}>
+          {copy.back}
+        </Link>
+        <h1 className="font-display">
+          {copy.title} · {product.title}
+        </h1>
+        <p className="text-sm text-secondary">{copy.subtitle}</p>
+        <ErrorState
+          title={copy.pageUnavailable}
+          action={
+            <Link href={reviewsPath} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
+    );
+  }
+
   return (
-    <section className="mx-auto max-w-4xl space-y-5 py-8">
-      <Link
-        href={`/market/${encodeURIComponent(product.slug)}`}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <section className={pageShellClass}>
+      <Link href={`/market/${encodeURIComponent(product.slug)}`} className={actionLinkClass}>
         {copy.back}
       </Link>
       <h1 className="font-display">
@@ -66,7 +117,7 @@ export default async function Page({
       {actor ? (
         <Link
           href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={actionLinkClass}
         >
           {copy.write}
         </Link>
