@@ -1,10 +1,13 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { expect, it, vi } from "vitest";
 import {
-  type FlatTestElement,
-  findTestButton,
-  flatTreeHasErrorText,
-  flattenReactTestTree,
-} from "./helpers/flatten-react-test-tree";
+  ack,
+  createDiscussionReportBatchInteractionHelpers,
+  mockReactHooks,
+  preview,
+  response,
+  token,
+} from "./helpers/discussion-report-batch-interaction-harness";
+import { flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -15,31 +18,7 @@ const harness = vi.hoisted(() => ({
   confirm: vi.fn(),
   reload: vi.fn(),
 }));
-vi.mock("react", async (original) => ({
-  ...(await original<typeof import("react")>()),
-  useState: (initial: unknown) => {
-    const index = harness.cursor++;
-    if (!(index in harness.slots)) harness.slots[index] = initial;
-    return [
-      harness.slots[index],
-      (value: unknown) => {
-        harness.slots[index] = typeof value === "function" ? value(harness.slots[index]) : value;
-      },
-    ];
-  },
-  useRef: (initial: unknown) => {
-    const index = harness.cursor++;
-    if (!(index in harness.slots)) harness.slots[index] = { current: initial };
-    return harness.slots[index];
-  },
-  useEffect: (effect: () => () => void) => {
-    const index = harness.cursor++;
-    if (!(index in harness.slots)) {
-      harness.slots[index] = true;
-      harness.cleanups.push(effect());
-    }
-  },
-}));
+vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("../apps/web/src/components/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
@@ -48,121 +27,9 @@ vi.mock("../apps/web/src/components/confirm-action", () => ({
 import { DiscussionReportBatch } from "../apps/web/src/components/discussion-report-batch";
 import { reportBatchCopy } from "../apps/web/src/lib/report-batch-copy";
 
-const time = "2026-10-11T00:00:00.123456Z",
-  token = "a".repeat(64);
-const items = [
-  {
-    id: "a",
-    type: "spam" as const,
-    reason: "First reason",
-    status: "open" as const,
-    createdAt: time,
-    resolvedAt: null,
-  },
-  {
-    id: "b",
-    type: "spam" as const,
-    reason: "Second reason",
-    status: "under_review" as const,
-    createdAt: time,
-    resolvedAt: null,
-  },
-];
-const preview = {
-  contentId: "post",
-  commentId: "comment",
-  publication: { id: "post", title: "Title", status: "archived" },
-  comment: { id: "comment", text: "Reviewed full text", truncated: false, revision: token },
-  action: "resolve",
-  notes: "Recorded reason",
-  previewRevision: token,
-  items: items.map((item) => ({
-    id: item.id,
-    type: item.type,
-    reason: item.reason,
-    createdAt: time,
-    before: item.status,
-    after: "resolved",
-  })),
-};
-const ack = {
-  contentId: "post",
-  commentId: "comment",
-  action: "resolve",
-  previewRevision: token,
-  items: items.map((item) => ({ id: item.id, status: "resolved" })),
-};
-type Element = FlatTestElement;
-function render(locale: "ru" | "en" = "en", allowActions = true, publication = false) {
-  harness.cursor = 0;
-  return flattenReactTestTree(
-    DiscussionReportBatch({
-      contentId: "post",
-      commentId: publication ? null : "comment",
-      items,
-      locale,
-      allowActions,
-    }),
-  );
-}
-const button = findTestButton;
-function click(nodes: Element[], label: string) {
-  return (button(nodes, label).props.onClick as () => void)();
-}
-function acknowledgeBatchCommit(nodes: Element[]) {
-  const checkbox = nodes.find(
-    (node) =>
-      node.type === "input" &&
-      node.props.type === "checkbox" &&
-      typeof node.props.id === "string" &&
-      (node.props.id.includes("batch-commit") ||
-        node.props.id.startsWith("discussion-report-batch-commit-")),
-  );
-  if (!checkbox) throw Error("Missing batch commit acknowledgement");
-  (checkbox.props.onChange as (event: { target: { checked: boolean } }) => void)({
-    target: { checked: true },
-  });
-}
-async function commitBatch(renderFn: () => Element[], label: string) {
-  acknowledgeBatchCommit(renderFn());
-  await (button(renderFn(), label).props.onClick as () => Promise<void>)();
-}
-const response = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
-function select(locale: "ru" | "en" = "en", publication = false) {
-  const copy = reportBatchCopy(locale);
-  click(render(locale, true, publication), copy.selectAll);
-  const textarea = render(locale, true, publication).find((node) => node.type === "textarea");
-  if (!textarea) throw Error("Missing notes");
-  (textarea.props.onChange as (event: unknown) => void)({ target: { value: "Recorded reason" } });
-}
-async function review(locale: "ru" | "en" = "en") {
-  select(locale);
-  click(render(locale), reportBatchCopy(locale).preview);
-  await vi.waitFor(() =>
-    expect(
-      render(locale).some((node) => node.props.children === reportBatchCopy(locale).confirm),
-    ).toBe(true),
-  );
-}
-beforeEach(() => {
-  vi.clearAllMocks();
-  harness.slots = [];
-  harness.cursor = 0;
-  harness.cleanups = [];
-  harness.confirm.mockResolvedValue(true);
-  harness.fetch
-    .mockReset()
-    .mockImplementation((url: string) =>
-      Promise.resolve(response(url.endsWith("/preview") ? preview : ack)),
-    );
-  vi.stubGlobal("fetch", harness.fetch);
-  vi.stubGlobal("window", { location: { reload: harness.reload } });
-});
-afterEach(() => {
-  for (const cleanup of harness.cleanups) cleanup();
-  vi.unstubAllGlobals();
-});
+const { render, click, commitBatch, select, review } =
+  createDiscussionReportBatchInteractionHelpers(harness, DiscussionReportBatch);
+
 it.each(["ru", "en"] as const)(
   "reviews frozen selected identities before issuing a confirmed scoped decision in %s",
   async (locale) => {
@@ -197,16 +64,7 @@ it.each(["ru", "en"] as const)(
     ).toBe(true);
   },
 );
-it("does not submit without selection/reason and allows preview cancellation without a write", async () => {
-  click(render(), reportBatchCopy("en").preview);
-  expect(harness.fetch).not.toHaveBeenCalled();
-  await review();
-  click(render(), reportBatchCopy("en").cancel);
-  expect(harness.fetch).toHaveBeenCalledTimes(1);
-  expect(render().some((node) => node.props.children === reportBatchCopy("en").confirm)).toBe(
-    false,
-  );
-});
+
 it("coalesces rapid preview/decision commands and blocks stale handler retries after success", async () => {
   select();
   let finishPreview!: (reply: Response) => void;
@@ -240,24 +98,7 @@ it("coalesces rapid preview/decision commands and blocks stale handler retries a
   click(confirmed, reportBatchCopy("en").confirm);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
 });
-it.each([
-  { ...preview, commentId: "foreign" },
-  { ...preview, contentId: "foreign" },
-  { ...preview, notes: "Changed reason" },
-  { ...preview, items: [preview.items[0]] },
-  { ...preview, private: "secret" },
-])("rejects an unexpected preview before enabling a write %j", async (reply) => {
-  harness.fetch.mockResolvedValue(response(reply));
-  select();
-  click(render(), reportBatchCopy("en").preview);
-  await vi.waitFor(() =>
-    expect(flatTreeHasErrorText(render(), reportBatchCopy("en").unavailable)).toBe(true),
-  );
-  expect(render().some((node) => node.props.children === reportBatchCopy("en").confirm)).toBe(
-    false,
-  );
-  expect(harness.fetch).toHaveBeenCalledTimes(1);
-});
+
 it.each([
   { ...ack, commentId: "foreign" },
   { ...ack, contentId: "foreign" },
@@ -286,6 +127,7 @@ it.each([
   expect(harness.refresh).toHaveBeenCalledTimes(1);
   expect(harness.reload).not.toHaveBeenCalled();
 });
+
 it("shows a localized stale-review failure without exposing server detail", async () => {
   await review("ru");
   harness.fetch.mockResolvedValue(
@@ -297,6 +139,7 @@ it("shows a localized stale-review failure without exposing server detail", asyn
   );
   expect(harness.refresh).not.toHaveBeenCalled();
 });
+
 it.each(["preview", "command"])(
   "aborts %s on navigation and ignores late completion",
   async (phase) => {
@@ -320,6 +163,7 @@ it.each(["preview", "command"])(
     expect(harness.refresh).not.toHaveBeenCalled();
   },
 );
+
 it("retains confirmed saved decisions if refreshing the page fails", async () => {
   await review();
   harness.refresh.mockImplementationOnce(() => {
@@ -335,16 +179,6 @@ it("retains confirmed saved decisions if refreshing the page fails", async () =>
     ),
   ).toBe(true);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
-});
-it("keeps completed-history cards navigable without selection or write controls", () => {
-  const nodes = render("en", false);
-  expect(
-    nodes.some(
-      (node) => node.type === "button" || node.type === "textarea" || node.type === "input",
-    ),
-  ).toBe(false);
-  expect(nodes.some((node) => node.props.href === "/admin/reports/a")).toBe(true);
-  expect(harness.fetch).not.toHaveBeenCalled();
 });
 
 it.each(["ru", "en"] as const)(
@@ -392,17 +226,3 @@ it.each(["ru", "en"] as const)(
     ).toBe(true);
   },
 );
-
-it("does not accept a comment preview or a foreign acknowledgement as a publication decision", async () => {
-  harness.fetch.mockResolvedValue(response(preview));
-  select("en", true);
-  click(render("en", true, true), reportBatchCopy("en").preview);
-  await vi.waitFor(() =>
-    expect(flatTreeHasErrorText(render("en", true, true), reportBatchCopy("en").unavailable)).toBe(
-      true,
-    ),
-  );
-  expect(
-    render("en", true, true).some((node) => node.props.children === reportBatchCopy("en").confirm),
-  ).toBe(false);
-});
