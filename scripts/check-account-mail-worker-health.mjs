@@ -6,36 +6,37 @@ const HEALTH_FILE =
 try {
   const raw = await readFile(HEALTH_FILE, "utf8");
   const data = JSON.parse(raw);
+  const now = Date.now();
 
   const heartbeatAt = Date.parse(data?.heartbeatAt);
-  const staleAfterMs = Number(data?.staleAfterMs);
+  const staleAfterMs = data?.staleAfterMs;
   const progressAt = Date.parse(data?.progressAt);
-  const progressStaleAfterMs = Number(data?.progressStaleAfterMs);
-  const pid = Number(data?.pid);
+  const progressStaleAfterMs = data?.progressStaleAfterMs;
+  const pid = data?.pid;
 
   const providerBlocked = data?.providerBlocked;
-  const providerFailureStreak = Number(data?.providerFailureStreak);
+  const providerFailureStreak = data?.providerFailureStreak;
   const providerBlockedUntil = data?.providerBlockedUntil;
   const providerBlockedUntilAt =
     providerBlockedUntil === null ? null : Date.parse(providerBlockedUntil);
 
-  const queuePending = Number(data?.queuePending);
-  const queueDue = Number(data?.queueDue);
-  const queueLeased = Number(data?.queueLeased);
-  const queueCapacity = Number(data?.queueCapacity);
-  const queueOldestAgeSeconds = Number(data?.queueOldestAgeSeconds);
+  const queuePending = data?.queuePending;
+  const queueDue = data?.queueDue;
+  const queueLeased = data?.queueLeased;
+  const queueCapacity = data?.queueCapacity;
+  const queueOldestAgeSeconds = data?.queueOldestAgeSeconds;
   const queuePressure = data?.queuePressure;
 
-  const deliveryWindowMinutes = Number(data?.deliveryWindowMinutes);
-  const deliveryAccepted = Number(data?.deliveryAccepted);
-  const deliveryRetried = Number(data?.deliveryRetried);
-  const deliveryDiscarded = Number(data?.deliveryDiscarded);
-  const deliveryProviderDeferred = Number(data?.deliveryProviderDeferred);
-  const deliveryUncertain = Number(data?.deliveryUncertain);
+  const deliveryWindowMinutes = data?.deliveryWindowMinutes;
+  const deliveryAccepted = data?.deliveryAccepted;
+  const deliveryRetried = data?.deliveryRetried;
+  const deliveryDiscarded = data?.deliveryDiscarded;
+  const deliveryProviderDeferred = data?.deliveryProviderDeferred;
+  const deliveryUncertain = data?.deliveryUncertain;
 
   const providerStateValid =
     typeof providerBlocked === "boolean" &&
-    Number.isInteger(providerFailureStreak) &&
+    Number.isSafeInteger(providerFailureStreak) &&
     providerFailureStreak >= 0 &&
     providerFailureStreak <= 10 &&
     ((providerFailureStreak === 0 && providerBlockedUntil === null) ||
@@ -44,7 +45,7 @@ try {
 
   const queueStateValid =
     [queuePending, queueDue, queueLeased, queueCapacity, queueOldestAgeSeconds].every(
-      (value) => Number.isInteger(value) && value >= 0,
+      (value) => Number.isSafeInteger(value) && value >= 0,
     ) &&
     queueCapacity >= 1 &&
     queueCapacity <= 1000 &&
@@ -61,15 +62,17 @@ try {
       deliveryDiscarded,
       deliveryProviderDeferred,
       deliveryUncertain,
-    ].every((value) => Number.isInteger(value) && value >= 0);
+    ].every((value) => Number.isSafeInteger(value) && value >= 0);
 
   if (
     data?.status !== "ready" ||
     !Number.isFinite(heartbeatAt) ||
+    heartbeatAt > now + 5_000 ||
     !Number.isInteger(staleAfterMs) ||
     staleAfterMs < 30_000 ||
     staleAfterMs > 120_000 ||
     !Number.isFinite(progressAt) ||
+    progressAt > now + 5_000 ||
     !Number.isSafeInteger(progressStaleAfterMs) ||
     progressStaleAfterMs < 120_000 ||
     progressStaleAfterMs > 7_200_000 ||
@@ -79,8 +82,8 @@ try {
     !providerStateValid ||
     !queueStateValid ||
     !deliveryStateValid ||
-    Date.now() - heartbeatAt > staleAfterMs ||
-    Date.now() - progressAt > progressStaleAfterMs
+    now - heartbeatAt > staleAfterMs ||
+    now - progressAt > progressStaleAfterMs
   ) {
     process.exitCode = 1;
   }

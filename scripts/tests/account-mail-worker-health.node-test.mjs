@@ -94,3 +94,25 @@ test("rejects invalid or future progress metadata", () => {
     0,
   );
 });
+
+test("rejects a future heartbeat even when progress has the same timestamp", () => {
+  const future = new Date(Date.now() + 60_000).toISOString();
+  assert.notEqual(run(healthy({ heartbeatAt: future, progressAt: future })), 0);
+});
+
+test("rejects null and string counters instead of treating them as numbers", () => {
+  for (const field of [
+    "providerFailureStreak",
+    "queuePending",
+    "queueDue",
+    "queueLeased",
+    "queueOldestAgeSeconds",
+    "deliveryRetried",
+    "deliveryDiscarded",
+    "deliveryProviderDeferred",
+    "deliveryUncertain",
+  ]) {
+    assert.notEqual(run(healthy({ [field]: null })), 0, field);
+    assert.notEqual(run(healthy({ [field]: "0" })), 0, field);
+  }
+});
