@@ -11,6 +11,7 @@ assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
 const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
 const { discoveryCopy } = await import("../../apps/web/src/lib/discovery-copy.ts");
+const { notificationInboxCopy } = await import("../../apps/web/src/lib/notification-inbox-copy.ts");
 assert(process.env.NEXUS_BROWSER_TOOLS);
 assert(process.env.NEXUS_BROWSER_REPORT_DIR);
 assert(process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
@@ -628,60 +629,18 @@ for (const locale of ["en", "ru"]) {
         `${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`,
       );
     }
-    await loginFixture(page);
-    await page.goto("/notifications");
-    await waitForReadyCapture(page);
-    const notificationFilters = page.getByRole("navigation", {
-      name: dictionary.notifications.title,
-      exact: true,
-    });
-    const allNotificationsLink = notificationFilters.getByRole("link", {
-      name: dictionary.notifications.all,
-      exact: true,
-    });
-    const unreadNotificationsLink = notificationFilters.getByRole("link", {
-      name: dictionary.notifications.unread,
-      exact: true,
-    });
-    await expect(allNotificationsLink).toHaveAttribute("aria-current", "page");
-    await expect(unreadNotificationsLink).toHaveAttribute("href", "/notifications?state=unread");
-    await unreadNotificationsLink.focus();
-    await assertVisibleFocusIndicator(
-      unreadNotificationsLink,
-      `${locale} unread notification filter`,
-    );
-    await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/\/notifications\?state=unread$/u);
-    await waitForReadyCapture(page);
-    await expect(unreadNotificationsLink).toHaveAttribute("aria-current", "page");
-    await expect(allNotificationsLink).not.toHaveAttribute("aria-current", "page");
-    // List composition follows the same URL state as the select/service (no second local filter).
-    // Signed-in inbox filter links compose URL state without a second local filter.
-    const stateLinks = await notificationFilters.evaluate((nav) =>
-      [...nav.querySelectorAll("a")].map((link) => ({
-        href: link.getAttribute("href"),
-        current: link.getAttribute("aria-current"),
-        label: link.textContent?.trim() ?? "",
-      })),
-    );
-    assert.deepEqual(
-      stateLinks.map((link) => link.href),
-      ["/notifications", "/notifications?state=unread", "/notifications?state=read"],
-      `${locale}: notification All/Unread/Read links must encode the real inbox state query`,
-    );
-    assert.equal(
-      stateLinks.filter((link) => link.current === "page").length,
-      1,
-      `${locale}: exactly one reading-state filter may be current`,
-    );
-    assert.equal(stateLinks[1]?.current, "page");
-    evidence.push(
-      `${locale}: notification All/Unread/Read links sync URL state, restore aria-current, and compose the inbox filter without fake local tabs`,
-    );
 
+    // Guest More/Discover before loginFixture so Sign in stays visible (UX-23 A).
     await page.setViewportSize({ width: 390, height: 480 });
     await page.goto("/market");
     await waitForReadyCapture(page);
+    // Account chrome Sign in is outside More; More still keeps its own guest CTA.
+    await expect(
+      page.getByRole("banner").getByRole("link", {
+        name: dictionary.accountControls.signIn,
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/auth/login?next=%2Fmarket");
     const mobileNavigation = page.getByRole("navigation", {
       name: dictionary.nav.ecosystem,
       exact: true,
@@ -800,26 +759,85 @@ for (const locale of ["en", "ru"]) {
     evidence.push(
       `${locale}: ordinary Discover search remains keyboard reachable and fits a short mobile viewport; no uncaught browser errors`,
     );
+
+    await loginFixture(page);
+    await page.goto("/notifications");
+    await waitForReadyCapture(page);
+    const inboxCopy = notificationInboxCopy(locale);
+    // Reading filters use a distinct landmark from the page title (notifications primary journey).
+    const notificationFilters = page.getByRole("navigation", {
+      name: inboxCopy.readingState,
+      exact: true,
+    });
+    const allNotificationsLink = notificationFilters.getByRole("link", {
+      name: inboxCopy.all,
+      exact: true,
+    });
+    const unreadNotificationsLink = notificationFilters.getByRole("link", {
+      name: inboxCopy.unread,
+      exact: true,
+    });
+    await expect(allNotificationsLink).toHaveAttribute("aria-current", "page");
+    await expect(unreadNotificationsLink).toHaveAttribute("href", "/notifications?state=unread");
+    await unreadNotificationsLink.focus();
+    await assertVisibleFocusIndicator(
+      unreadNotificationsLink,
+      `${locale} unread notification filter`,
+    );
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/notifications\?state=unread$/u);
+    await waitForReadyCapture(page);
+    await expect(unreadNotificationsLink).toHaveAttribute("aria-current", "page");
+    await expect(allNotificationsLink).not.toHaveAttribute("aria-current", "page");
+    // List composition follows the same URL state as the select/service (no second local filter).
+    // Signed-in inbox filter links compose URL state without a second local filter.
+    const stateLinks = await notificationFilters.evaluate((nav) =>
+      [...nav.querySelectorAll("a")].map((link) => ({
+        href: link.getAttribute("href"),
+        current: link.getAttribute("aria-current"),
+        label: link.textContent?.trim() ?? "",
+      })),
+    );
+    assert.deepEqual(
+      stateLinks.map((link) => link.href),
+      ["/notifications", "/notifications?state=unread", "/notifications?state=read"],
+      `${locale}: notification All/Unread/Read links must encode the real inbox state query`,
+    );
+    assert.equal(
+      stateLinks.filter((link) => link.current === "page").length,
+      1,
+      `${locale}: exactly one reading-state filter may be current`,
+    );
+    assert.equal(stateLinks[1]?.current, "page");
+    evidence.push(
+      `${locale}: notification All/Unread/Read links sync URL state, restore aria-current, and compose the inbox filter without fake local tabs`,
+    );
   });
 }
 
 async function loginFixture(page) {
   await page.goto("/auth/login");
-  const status = await page.evaluate(
-    async (account) => {
+  const account = {
+    email: process.env.NEXUS_AUTHOR_BROWSER_EMAIL,
+    password: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD,
+  };
+  // Shared author fixture + intentional wrong-password UI checks can exhaust the
+  // login rate window; wait out 429 before treating login as broken.
+  let status = 0;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    status = await page.evaluate(async (body) => {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(account),
+        body: JSON.stringify(body),
       });
       return response.status;
-    },
-    {
-      email: process.env.NEXUS_AUTHOR_BROWSER_EMAIL,
-      password: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD,
-    },
-  );
-  assert.equal(status, 200);
+    }, account);
+    if (status === 200) return;
+    if (status !== 429) break;
+    await page.waitForTimeout(1_000 * (attempt + 1));
+  }
+  assert.equal(status, 200, `loginFixture expected 200 after retries, got ${status}`);
 }
 
 async function logoutFixture(page) {
@@ -896,16 +914,30 @@ for (const locale of ["en", "ru"]) {
     await page.keyboard.press("Tab");
     await expect(loginSubmit).toBeFocused();
     await assertVisibleFocusIndicator(loginSubmit, `${locale} login submit`);
-    await loginEmail.fill("a11y-unknown@example.invalid");
-    await loginPassword.fill("not-the-right-password");
-    await loginSubmit.click();
-    await expect(page.locator("#auth-error")).toHaveAttribute("role", "alert");
-    await assertAxeAccessibility(page, testInfo, `${locale}-login-error`);
-    await assertNoVisibleUnlabeledFields(page, "/auth/login");
-    await assertNoHorizontalOverflow(page, `${locale} /auth/login at 320px`);
-    evidence.push(
-      `${locale}: login has logical keyboard order, labeled controls, live error semantics and 320px reflow`,
-    );
+    // Mock the intentional wrong-password POST so a11y error chrome does not burn
+    // the shared login rate window needed by loginFixture later in this suite.
+    await page.route("**/api/auth/login", async (route) => {
+      assert.equal(route.request().method(), "POST");
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ code: "INVALID_CREDENTIALS" }),
+      });
+    });
+    try {
+      await loginEmail.fill("a11y-unknown@example.invalid");
+      await loginPassword.fill("not-the-right-password");
+      await loginSubmit.click();
+      await expect(page.locator("#auth-error")).toHaveAttribute("role", "alert");
+      await assertAxeAccessibility(page, testInfo, `${locale}-login-error`);
+      await assertNoVisibleUnlabeledFields(page, "/auth/login");
+      await assertNoHorizontalOverflow(page, `${locale} /auth/login at 320px`);
+      evidence.push(
+        `${locale}: login has logical keyboard order, labeled controls, live error semantics and 320px reflow`,
+      );
+    } finally {
+      await page.unroute("**/api/auth/login");
+    }
 
     await page.route("**/api/auth/password-reset", async (route) => {
       assert.equal(route.request().method(), "POST");

@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { before, after, test } from "node:test";
-import { createRequire } from "node:module";
-import { mkdir, writeFile } from "node:fs/promises";
-import { randomBytes } from "node:crypto";
-import { join, resolve } from "node:path";
 import { execFile } from "node:child_process";
+import { randomBytes } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { join, resolve } from "node:path";
+import { after, before, test } from "node:test";
 import { promisify } from "node:util";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
@@ -195,6 +195,11 @@ check("P2 wrong current password changes neither credentials nor sessions", asyn
     (r) => r.url().endsWith("/api/auth/password") && r.request().method() === "POST",
   );
   await alice.page.getByRole("button", { name: "Update password", exact: true }).click();
+  // Settings confirms password change before POST (same confirmLabel as the form submit).
+  await alice.page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Update password", exact: true })
+    .click();
   assert.equal((await response).status(), 401);
   await expect(alice.page.locator("#settings-notice")).toContainText(
     "Current password is incorrect",
@@ -240,6 +245,10 @@ check(
       (r) => r.url().endsWith("/api/auth/password") && r.request().method() === "POST",
     );
     await alice.page.getByRole("button", { name: "Update password", exact: true }).click();
+    await alice.page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Update password", exact: true })
+      .click();
     const changed = await response;
     assert.equal(changed.status(), 200);
     const data = await changed.json();

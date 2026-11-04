@@ -446,6 +446,7 @@ export function SettingsPageClient() {
 
       {notice?.error ? (
         <ErrorState
+          id="settings-notice"
           title={notice.text}
           action={
             <Button
