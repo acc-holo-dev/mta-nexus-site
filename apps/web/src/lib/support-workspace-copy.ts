@@ -26,7 +26,11 @@ export function supportWorkspaceCopy(locale: Locale) {
           "Ответ сервера не подтверждён. Загрузите актуальное состояние. Повторная отправка того же сообщения использует сохранённый ключ запроса.",
         history: "История статусов",
         historyEmpty: "Изменений статуса пока нет.",
+        historyEmptyHint:
+          "Изменения статуса появятся здесь после обновления обращения вами или сотрудником. Пустая история — не ошибка загрузки.",
         historyUnavailable: "Не удалось загрузить историю статусов.",
+        historyUnavailableDescription:
+          "Ошибка загрузки — это не пустая история. Повторите запрос, чтобы получить актуальные события статуса.",
         historyExpired: "Страница истории больше недоступна. Откройте последние события.",
         older: "Ранее",
         latest: "Последние события",
@@ -67,7 +71,11 @@ export function supportWorkspaceCopy(locale: Locale) {
           "The server response is unconfirmed. Load the current state. Retrying the same message reuses its saved request key.",
         history: "Status history",
         historyEmpty: "No status changes yet.",
+        historyEmptyHint:
+          "Status changes appear here after you or staff update this case. An empty history is not a load failure.",
         historyUnavailable: "Could not load status history.",
+        historyUnavailableDescription:
+          "A load failure is not an empty history. Retry to fetch the latest status events for this case.",
         historyExpired: "This history page is no longer available. Open the latest events.",
         older: "Older",
         latest: "Latest events",

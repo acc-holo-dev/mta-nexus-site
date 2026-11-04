@@ -42,6 +42,8 @@ it("shows a public-read notice for guests and stale build context in the list", 
   expect(html).toContain(copy.signIn);
   expect(html).toContain(copy.buildUnavailable);
   expect(html).not.toContain(copy.ask);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
 });
 
 it("explains when a signed-in reader cannot ask", () => {
@@ -59,4 +61,43 @@ it("explains when a signed-in reader cannot ask", () => {
   expect(html).toContain(copy.unavailable);
   expect(html).not.toContain(copy.publicRead);
   expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.emptyHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).not.toContain('role="alert"');
+});
+
+it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
+  const copy = resourceQaCopy("en");
+  const failure = renderToStaticMarkup(
+    <ResourceQaPanel
+      productId="prd_aaaaaaaaaaaaaaaaaaaaaaaa"
+      locale="en"
+      authenticated={false}
+      canManage={false}
+      builds={[]}
+      initial={null}
+    />,
+  );
+  expect(failure).toContain('role="alert"');
+  expect(failure).toContain(copy.unavailable);
+  expect(failure).toContain(copy.unavailableDescription);
+  expect(failure).toContain(copy.retry);
+  expect(failure).toContain("overflow-x-clip");
+  expect(failure).toContain("min-h-11");
+  expect(failure).not.toContain(copy.emptyHint);
+
+  const empty = renderToStaticMarkup(
+    <ResourceQaPanel
+      productId="prd_aaaaaaaaaaaaaaaaaaaaaaaa"
+      locale="en"
+      authenticated
+      canManage={false}
+      builds={[]}
+      initial={{ threads: [], capabilities }}
+    />,
+  );
+  expect(empty).toContain(copy.empty);
+  expect(empty).toContain(copy.emptyHint);
+  expect(empty).toContain("overflow-x-clip");
+  expect(empty).not.toContain('role="alert"');
 });
