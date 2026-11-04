@@ -136,6 +136,7 @@ it.each(["en", "ru"] as const)(
     const copy = reactionCopy(locale);
     expect(html).toContain(copy.hidden);
     expect(html).toContain(copy.remove);
+    expect(html).toContain(`<search aria-label="${copy.query}"`);
     expect(html).toContain('name="q"');
     expect(html).toContain('name="reaction"');
     expect(html).toContain("cursor=next");

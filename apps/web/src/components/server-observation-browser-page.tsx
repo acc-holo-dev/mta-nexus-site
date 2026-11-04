@@ -194,59 +194,61 @@ function ServerObservationBrowserPanel({
       />
       {report.server.endpointRevision > 0 && <p className="text-sm text-muted">{stats.lifetime}</p>}
       {!report.collectionEligible && <p className="text-sm text-muted">{stats.paused}</p>}
-      <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
-        <input type="hidden" name="window" value={report.window} />
-        <input type="hidden" name="end" value={report.windowEnd} />
-        <label className="min-w-48 flex-1 space-y-1 text-xs text-muted">
-          {copy.search}
-          <input
-            type="search"
-            name="q"
-            maxLength={100}
-            defaultValue={query.query}
-            className={field}
-          />
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {copy.players}
-          <select name="players" defaultValue={query.players} className={field}>
-            {(["all", "known", "unknown", "zero"] as const).map((value) => (
-              <option key={value} value={value}>
-                {copy[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        {(["password", "responding"] as const).map((key) => (
-          <label key={key} className="space-y-1 text-xs text-muted">
-            {copy[key]}
-            <select name={key} defaultValue={query[key]} className={field}>
-              {(["all", "yes", "no", "unknown"] as const).map((value) => (
+      <search aria-label={copy.search}>
+        <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+          <input type="hidden" name="window" value={report.window} />
+          <input type="hidden" name="end" value={report.windowEnd} />
+          <label className="min-w-48 flex-1 space-y-1 text-xs text-muted">
+            {copy.search}
+            <input
+              type="search"
+              name="q"
+              maxLength={100}
+              defaultValue={query.query}
+              className={field}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.players}
+            <select name="players" defaultValue={query.players} className={field}>
+              {(["all", "known", "unknown", "zero"] as const).map((value) => (
                 <option key={value} value={value}>
                   {copy[value]}
                 </option>
               ))}
             </select>
           </label>
-        ))}
-        <Button type="submit" className="min-h-11 font-semibold">
-          {copy.apply}
-        </Button>
-        {observationFiltersActive ? (
-          <Link
-            href={serverObservationBrowserHref(path, {
-              ...state,
-              query: "",
-              players: "all",
-              password: "all",
-              responding: "all",
-            })}
-            className={navLinkClass}
-          >
-            {copy.reset}
-          </Link>
-        ) : null}
-      </form>
+          {(["password", "responding"] as const).map((key) => (
+            <label key={key} className="space-y-1 text-xs text-muted">
+              {copy[key]}
+              <select name={key} defaultValue={query[key]} className={field}>
+                {(["all", "yes", "no", "unknown"] as const).map((value) => (
+                  <option key={value} value={value}>
+                    {copy[value]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+          <Button type="submit" className="min-h-11 font-semibold">
+            {copy.apply}
+          </Button>
+          {observationFiltersActive ? (
+            <Link
+              href={serverObservationBrowserHref(path, {
+                ...state,
+                query: "",
+                players: "all",
+                password: "all",
+                responding: "all",
+              })}
+              className={navLinkClass}
+            >
+              {copy.reset}
+            </Link>
+          ) : null}
+        </form>
+      </search>
       <p className="text-sm text-muted">{copy.scope}</p>
       {report.observations.length === 0 ? (
         <EmptyState

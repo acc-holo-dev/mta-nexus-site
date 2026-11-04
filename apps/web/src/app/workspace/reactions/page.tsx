@@ -68,43 +68,45 @@ export default async function ReactionsPage({
         <h1 className="text-2xl font-extrabold text-primary">{copy.my}</h1>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
-      <form
-        action="/workspace/reactions"
-        method="get"
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-      >
-        <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-          {copy.query}
-          <input
-            type="search"
-            name="q"
-            maxLength={100}
-            defaultValue={filters?.query ?? ""}
-            className={`${fieldClass} block min-h-11 w-full`}
-          />
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {copy.title}
-          <select
-            name="reaction"
-            defaultValue={filters?.reaction ?? ""}
-            className={`${fieldClass} block min-h-11`}
-          >
-            <option value="">{copy.all}</option>
-            {CONTENT_REACTIONS.map((reaction) => (
-              <option key={reaction} value={reaction}>
-                {copy[reaction]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Button type="submit" className="min-h-11 font-semibold">
-          {copy.search}
-        </Button>
-        <Link href="/workspace/reactions" className={linkClass}>
-          {copy.reset}
-        </Link>
-      </form>
+      <search aria-label={copy.query}>
+        <form
+          action="/workspace/reactions"
+          method="get"
+          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+        >
+          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+            {copy.query}
+            <input
+              type="search"
+              name="q"
+              maxLength={100}
+              defaultValue={filters?.query ?? ""}
+              className={`${fieldClass} block min-h-11 w-full`}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.title}
+            <select
+              name="reaction"
+              defaultValue={filters?.reaction ?? ""}
+              className={`${fieldClass} block min-h-11`}
+            >
+              <option value="">{copy.all}</option>
+              {CONTENT_REACTIONS.map((reaction) => (
+                <option key={reaction} value={reaction}>
+                  {copy[reaction]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button type="submit" className="min-h-11 font-semibold">
+            {copy.search}
+          </Button>
+          <Link href="/workspace/reactions" className={linkClass}>
+            {copy.reset}
+          </Link>
+        </form>
+      </search>
       <a href={latest} className={linkClass}>
         {copy.latest}
       </a>

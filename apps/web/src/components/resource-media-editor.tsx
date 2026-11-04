@@ -4,7 +4,7 @@ import {
   RESOURCE_MEDIA_INPUT_BYTES,
   RESOURCE_MEDIA_LIMIT,
 } from "@nexus/domain";
-import { Button, ErrorState, Input } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { confirmAction } from "./confirm-action";
@@ -159,7 +159,7 @@ export function ResourceMediaEditor({
       >
         {copy.reload}
       </Button>
-      {!items.length && <p className="text-muted">{copy.empty}</p>}
+      {!items.length ? <EmptyState title={copy.empty} description={copy.emptyDescription} /> : null}
       <ol className="grid gap-5 sm:grid-cols-2">
         {items.map((item, index) => (
           <li key={item.id} className="nexus-panel space-y-3 p-4">

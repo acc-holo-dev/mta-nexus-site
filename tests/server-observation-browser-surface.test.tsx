@@ -68,6 +68,7 @@ it.each(["ru", "en"] as const)(
     expect(html).toContain('name="endUtc"');
     expect(html).toContain('type="datetime-local"');
     expect(html).toContain('value="2026-10-11T00:00:00.000"');
+    expect(html).toContain("<search aria-label=");
     expect(html).toContain('name="q"');
     expect(html).toContain('name="players"');
     expect(html).toContain('name="password"');
