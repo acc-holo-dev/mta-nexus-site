@@ -62,6 +62,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <h1 className="min-w-0 break-words font-display">{copy.write}</h1>
       <p className="min-w-0 break-words">{detail.product.title ?? copy.unavailable}</p>
       <ResourceReviewEditor
+        key={`${actor.id}:${target.id}`}
         productId={target.id}
         review={detail.review}
         canReview={detail.canReview}

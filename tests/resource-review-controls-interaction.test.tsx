@@ -105,6 +105,69 @@ it.each(["en", "ru"] as const)(
     });
   },
 );
+
+it("unlocks after the confirmed review revision is visible on refresh", async () => {
+  const original = { text: "Original review", rating: 4, status: "published", revision: 2 };
+  const saved = { ...original, text: "Saved draft", revision: 3 };
+  const copy = resourceReviewCopy("en");
+  function renderEditor(review: typeof original) {
+    harness.cursor = 0;
+    return descendants(
+      ResourceReviewEditor({ productId: "prd_a", review, canReview: true, locale: "en" }),
+    );
+  }
+  const editor = renderEditor(original).find((node) => node.type === "textarea");
+  if (!editor) throw new Error("Missing editor");
+  (editor.props.onChange as (event: unknown) => void)({ target: { value: "Saved draft" } });
+  harness.fetch.mockResolvedValueOnce(response({ id: "review", status: "published", revision: 3 }));
+  submit(renderEditor(original));
+  await vi.waitFor(() =>
+    expect(
+      renderEditor(original).find(
+        (node) => node.type === "button" && node.props.children === copy.save,
+      )?.props.disabled,
+    ).toBe(true),
+  );
+  const refreshed = renderEditor(saved);
+  expect(
+    refreshed.find((node) => node.type === "button" && node.props.children === copy.save)?.props
+      .disabled,
+  ).toBe(false);
+  expect(refreshed.find((node) => node.type === "textarea")?.props.value).toBe("Saved draft");
+  harness.fetch.mockResolvedValueOnce(response({ code: "REVIEW_CHANGED" }, 409));
+  submit(refreshed);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
+  expect(JSON.parse(harness.fetch.mock.calls[1][1].body).expectedRevision).toBe(3);
+});
+
+it("waits for the confirmed status when withdrawal does not advance the revision", async () => {
+  const published = { text: "Published review", rating: 4, status: "published", revision: 2 };
+  function renderEditor(review: typeof published) {
+    harness.cursor = 0;
+    return descendants(
+      ResourceReviewEditor({ productId: "prd_a", review, canReview: true, locale: "en" }),
+    );
+  }
+  harness.fetch.mockResolvedValueOnce(response({ id: "review", status: "withdrawn", revision: 2 }));
+  const withdraw = renderEditor(published).find(
+    (node) => node.type === "button" && node.props.children === resourceReviewCopy("en").withdraw,
+  );
+  if (!withdraw) throw new Error("Missing withdraw control");
+  (withdraw.props.onClick as () => void)();
+  await vi.waitFor(() =>
+    expect(
+      renderEditor(published).find(
+        (node) => node.type === "button" && node.props.children === resourceReviewCopy("en").save,
+      )?.props.disabled,
+    ).toBe(true),
+  );
+  const refreshed = renderEditor({ ...published, status: "withdrawn" });
+  expect(
+    refreshed.find(
+      (node) => node.type === "button" && node.props.children === resourceReviewCopy("en").save,
+    )?.props.disabled,
+  ).toBe(false);
+});
 it("skips confirmation for non-destructive decisions", async () => {
   submit(renderDecision("en", "dismiss"));
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
@@ -139,3 +202,49 @@ it("confirms withdrawal before posting a withdraw command", async () => {
     }),
   );
 });
+
+it.each(["en", "ru"] as const)(
+  "preserves a draft and requires an explicit new revision after refresh in %s",
+  async (locale) => {
+    const copy = resourceReviewCopy(locale);
+    const initial = { text: "Original review", rating: 4, status: "published", revision: 2 };
+    const latest = { text: "Changed elsewhere", rating: 3, status: "published", revision: 3 };
+    function renderEditor(review: typeof initial, canReview = true) {
+      harness.cursor = 0;
+      return descendants(ResourceReviewEditor({ productId: "prd_a", review, canReview, locale }));
+    }
+    const textarea = renderEditor(initial).find((node) => node.type === "textarea");
+    if (!textarea) throw new Error("Missing editor");
+    (textarea.props.onChange as (event: unknown) => void)({
+      target: { value: "My unsaved draft" },
+    });
+    const changed = renderEditor(latest);
+    expect(changed.find((node) => node.type === "textarea")?.props.value).toBe("My unsaved draft");
+    expect(
+      changed.find((node) => node.type === "button" && node.props.children === copy.save)?.props
+        .disabled,
+    ).toBe(true);
+    expect(changed.some((node) => node.props.children === copy.latestReview)).toBe(true);
+    submit(changed);
+    expect(harness.fetch).not.toHaveBeenCalled();
+    const accept = renderEditor(latest).find(
+      (node) => node.type === "button" && node.props.children === copy.useLatest,
+    );
+    if (!accept) throw new Error("Missing accept control");
+    (accept.props.onClick as () => void)();
+    harness.fetch.mockResolvedValueOnce(response({ code: "REVIEW_CHANGED" }, 409));
+    submit(renderEditor(latest));
+    await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledOnce());
+    expect(JSON.parse(harness.fetch.mock.calls[0][1].body)).toMatchObject({
+      action: "save",
+      text: "My unsaved draft",
+      rating: 4,
+      expectedRevision: 3,
+    });
+    const revoked = renderEditor(latest, false);
+    const retained = revoked.find((node) => node.type === "textarea");
+    expect(retained?.props.value).toBe("My unsaved draft");
+    expect(retained?.props.readOnly).toBe(true);
+    expect(revoked.some((node) => node.props.children === copy.retainedDraft)).toBe(true);
+  },
+);

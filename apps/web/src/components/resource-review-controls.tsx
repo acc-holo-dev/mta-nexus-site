@@ -78,24 +78,40 @@ export function ResourceReviewEditor({
     [rating, setRating] = useState(review?.rating ?? 5),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
+  const [confirmation, setConfirmation] = useState<{ revision: number; status: string } | null>(
+    null,
+  );
+  const [dirty, setDirty] = useState(false);
+  const [draftRevision, setDraftRevision] = useState(review?.revision ?? 0);
+  const currentRevision = review?.revision ?? 0;
+  const reflected =
+    confirmation !== null &&
+    currentRevision === confirmation.revision &&
+    review?.status === confirmation.status;
+  const confirmed =
+    confirmation !== null && !(reflected || currentRevision > confirmation.revision);
+  const effectiveDraftRevision = reflected ? currentRevision : draftRevision;
+  const changed = dirty && effectiveDraftRevision !== currentRevision;
+  const draftText = dirty ? text : (review?.text ?? "");
+  const draftRating = dirty ? rating : (review?.rating ?? 5);
   async function submit(action: "save" | "withdraw") {
-    if (busy || confirmed) return;
+    if (busy || confirmed || (action === "save" && (changed || !canReview))) return;
+    const expectedRevision = action === "save" && dirty ? effectiveDraftRevision : currentRevision;
     setBusy(true);
     setMessage("");
     try {
       const result = await post(`/api/library/review/${encodeURIComponent(productId)}`, {
         action,
-        expectedRevision: review?.revision ?? 0,
-        ...(action === "save" ? { text, rating } : {}),
+        expectedRevision,
+        ...(action === "save" ? { text: draftText, rating: draftRating } : {}),
       });
       if (!result.response.ok) {
         setMessage(resourceReviewError(locale, result.value?.code));
         return;
       }
-      if (!confirmedReview(result.value, review?.revision ?? 0, action))
+      if (!confirmedReview(result.value, expectedRevision, action))
         throw new Error("Unconfirmed review");
-      setConfirmed(true);
+      setConfirmation({ revision: result.value.revision, status: result.value.status });
       setMessage(copy.saved);
     } catch {
       setMessage(copy.unknown);
@@ -146,8 +162,16 @@ export function ResourceReviewEditor({
           <label className="block text-sm">
             {copy.rating}
             <select
-              value={rating}
-              onChange={(event) => setRating(Number(event.target.value))}
+              value={draftRating}
+              onChange={(event) => {
+                setMessage("");
+                if (!dirty) {
+                  setDraftRevision(currentRevision);
+                  setText(review?.text ?? "");
+                  setDirty(true);
+                }
+                setRating(Number(event.target.value));
+              }}
               disabled={busy || confirmed}
               className={`${nativeFieldClass} ml-3 p-2`}
             >
@@ -161,8 +185,16 @@ export function ResourceReviewEditor({
           <label className="block text-sm">
             {copy.text}
             <textarea
-              value={text}
-              onChange={(event) => setText(event.target.value)}
+              value={draftText}
+              onChange={(event) => {
+                setMessage("");
+                if (!dirty) {
+                  setDraftRevision(currentRevision);
+                  setRating(review?.rating ?? 5);
+                  setDirty(true);
+                }
+                setText(event.target.value);
+              }}
               minLength={3}
               maxLength={4000}
               required
@@ -170,7 +202,12 @@ export function ResourceReviewEditor({
               className={`${nativeFieldClass} mt-2 block min-h-36 w-full p-3`}
             />
           </label>
-          <Button type="submit" size="touch" disabled={busy || confirmed} isLoading={busy}>
+          <Button
+            type="submit"
+            size="touch"
+            disabled={busy || confirmed || changed}
+            isLoading={busy}
+          >
             {busy ? copy.busy : copy.save}
           </Button>
         </form>
@@ -181,12 +218,50 @@ export function ResourceReviewEditor({
           </p>
         )
       )}
+      {dirty && !canReview && (
+        <label className="block space-y-2 text-sm">
+          <span>{copy.retainedDraft}</span>
+          <textarea
+            readOnly
+            value={text}
+            rows={4}
+            className={`${nativeFieldClass} block w-full p-3`}
+          />
+        </label>
+      )}
+      {changed && (
+        <div className="space-y-2 rounded-lg border border-base p-3 text-sm">
+          <p role="status">{copy.draftChanged}</p>
+          <p className="font-semibold">{copy.latestReview}</p>
+          {review ? (
+            <p className="whitespace-pre-wrap break-words">
+              {copy.rating}: {review.rating ?? "—"}/5 · {review.text}
+            </p>
+          ) : (
+            <p>{copy.noLatestReview}</p>
+          )}
+          {canReview && !confirmed && (
+            <Button
+              type="button"
+              size="touch"
+              variant="outline"
+              disabled={busy}
+              onClick={() => {
+                setDraftRevision(currentRevision);
+                setConfirmation(null);
+              }}
+            >
+              {copy.useLatest}
+            </Button>
+          )}
+        </div>
+      )}
       {review?.status === "published" && (
         <Button
           type="button"
           variant="ghost"
           className="h-auto px-0 text-sm text-danger underline"
-          disabled={busy || confirmed}
+          disabled={busy || confirmed || changed}
           onClick={() => void withdrawReview()}
         >
           {copy.withdraw}
