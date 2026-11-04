@@ -41,9 +41,7 @@ describe("MTA directory/visibility chrome", () => {
     expect(source).toContain("EmptyState");
     expect(source).toContain("copy.noMatchDescription");
     expect(source).toContain("copy.noneDescription");
-    expect(source).toMatch(
-      /title=\{hasFilters \? copy\.noMatch : copy\.none\}/u,
-    );
+    expect(source).toMatch(/title=\{hasFilters \? copy\.noMatch : copy\.none\}/u);
     expect(source).toMatch(
       /description=\{hasFilters \? copy\.noMatchDescription : copy\.noneDescription\}/u,
     );
