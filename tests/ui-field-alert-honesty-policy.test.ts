@@ -12,8 +12,7 @@ const ALLOWED_ALERT_SOURCES = [
 ] as const;
 
 /** Literal alert role bindings apps must not invent outside the allowed UI chrome. */
-const RAW_ROLE_ALERT =
-  /role\s*=\s*(?:"alert"|'alert'|\{(?:"alert"|'alert'|`alert`)\})/u;
+const RAW_ROLE_ALERT = /role\s*=\s*(?:"alert"|'alert'|\{(?:"alert"|'alert'|`alert`)\})/u;
 
 function listAppSourceFiles(dir: string): string[] {
   const out: string[] = [];
