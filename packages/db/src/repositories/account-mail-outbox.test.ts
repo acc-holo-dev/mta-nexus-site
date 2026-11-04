@@ -479,7 +479,11 @@ describe("D2a atomic encrypted mail enqueue on disposable PostgreSQL", () => {
         // its session lock while that producer holds the user/session locks.
         await db
           .update(sessions)
-          .set({ expiresAt: sql`clock_timestamp() + interval '100 milliseconds'` })
+          // TTL must outlive producer setup (user/session locks, challenge insert,
+          // audit) so the gate wait is observed before checkSessionExpiry can
+          // abort. 100ms raced under CI load after the suite-time cut; 1s keeps
+          // most of that win without false "must wait" failures.
+          .set({ expiresAt: sql`clock_timestamp() + interval '1 second'` })
           .where(eq(sessions.token, digestSessionToken(a.currentToken)));
         const [backend] = await tx.execute(sql`select pg_backend_pid() as pid`);
         operation = settled(queue.enqueue(verification(a), cipher)).then((v) => {
