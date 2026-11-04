@@ -45,7 +45,11 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
 import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
 import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
 import { getDictionary } from "../apps/web/src/lib/i18n";
-import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
+import {
+  type FlatTestElement,
+  flatTreeHasErrorText,
+  flattenReactTestTree,
+} from "./helpers/flatten-react-test-tree";
 
 const previous = "2026-10-11T00:00:00.000Z";
 const ack = {
@@ -166,9 +170,8 @@ it.each([
   harness.fetch.mockResolvedValueOnce(reply);
   click(ready(), "Publish");
   await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
-  const nodes = render(),
-    alert = nodes.find((node) => node.props.role === "alert");
-  expect(alert?.props.children).toContain(message);
+  const nodes = render();
+  expect(flatTreeHasErrorText(nodes, message)).toBe(true);
   expect(harness.refresh).not.toHaveBeenCalled();
   click(nodes, "Archive");
   expect(harness.fetch).toHaveBeenCalledTimes(1);

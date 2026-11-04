@@ -151,9 +151,12 @@ it.each(["en", "ru"] as const)(
       robots: { index: false, follow: false },
     });
     expect(dynamic).toBe("force-dynamic");
-    expect(Page({ searchParams: Promise.resolve({}) }).type).toBe(LibraryMembershipHistoryScreen);
+    expect(Page({ searchParams: Promise.resolve({}) }).props.children.type).toBe(
+      LibraryMembershipHistoryScreen,
+    );
     expect(
-      Detail({ searchParams: Promise.resolve({}), params: Promise.resolve({ id: "lmb_a" }) }).type,
+      Detail({ searchParams: Promise.resolve({}), params: Promise.resolve({ id: "lmb_a" }) }).props
+        .children.type,
     ).toBe(LibraryMembershipHistoryScreen);
   },
 );

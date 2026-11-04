@@ -47,7 +47,7 @@ import { VerificationApplicationAmend } from "../apps/web/src/components/verific
 import { VerificationModerationControls } from "../apps/web/src/components/verification-moderation-controls";
 import { verificationApplicationsCopy } from "../apps/web/src/lib/verification-applications-copy";
 import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
-import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
+import { flatTreeHasErrorText, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 const revision = "a".repeat(64),
   next = "b".repeat(64);
@@ -258,9 +258,7 @@ it("shows a reload action after evidence changes without retrying an old decisio
   await vi.waitFor(() =>
     expect(moderation().some((node) => node.props.role === "alert")).toBe(true),
   );
-  expect(moderation().find((node) => node.props.role === "alert")?.props.children).toBe(
-    verificationCopy("en").stateChanged,
-  );
+  expect(flatTreeHasErrorText(moderation(), verificationCopy("en").stateChanged)).toBe(true);
   expect(harness.refresh).not.toHaveBeenCalled();
   expect(
     moderation().some(

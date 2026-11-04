@@ -136,11 +136,10 @@ it("does not confirm partial or foreign acknowledgements", async () => {
   expect(h.refresh).not.toHaveBeenCalled();
   expect(
     render().some((n) => {
-      const type = n.type as { displayName?: string; name?: string } | string;
-      return (
-        typeof type === "function" &&
-        (type.displayName === "ErrorState" || type.name === "ErrorState")
-      );
+      const type = n.type;
+      if (typeof type !== "function") return false;
+      const fn = type as { displayName?: string; name?: string };
+      return fn.displayName === "ErrorState" || fn.name === "ErrorState";
     }),
   ).toBe(true);
 });

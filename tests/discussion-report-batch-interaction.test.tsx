@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   type FlatTestElement,
   findTestButton,
+  flatTreeHasErrorText,
   flattenReactTestTree,
 } from "./helpers/flatten-react-test-tree";
 
@@ -290,9 +291,7 @@ it("shows a localized stale-review failure without exposing server detail", asyn
   await vi.waitFor(() =>
     expect(render("ru").some((node) => node.props.role === "alert")).toBe(true),
   );
-  expect(render("ru").find((node) => node.props.role === "alert")?.props.children).toBe(
-    reportBatchCopy("ru").changed,
-  );
+  expect(flatTreeHasErrorText(render("ru"), reportBatchCopy("ru").changed)).toBe(true);
   expect(harness.refresh).not.toHaveBeenCalled();
 });
 it.each(["preview", "command"])(
@@ -330,9 +329,7 @@ it("retains confirmed saved decisions if refreshing the page fails", async () =>
       (node) => node.props.role === "status" && node.props.children === reportBatchCopy("en").saved,
     ),
   ).toBe(true);
-  expect(render().find((node) => node.props.role === "alert")?.props.children).toBe(
-    reportBatchCopy("en").unavailable,
-  );
+  expect(flatTreeHasErrorText(render(), reportBatchCopy("en").unavailable)).toBe(true);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
 });
 it("keeps completed-history cards navigable without selection or write controls", () => {
