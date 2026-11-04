@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, fieldControlClass } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../lib/i18n";
@@ -69,7 +69,10 @@ export function SettingsPasswordForm({
                 currentPassword: event.target.value,
               })
             }
-            className={`${fieldClassBlock} h-10`}
+            className={fieldControlClass({
+              disabled: pending,
+              className: "min-h-11",
+            })}
           />
         </div>
 
@@ -94,7 +97,10 @@ export function SettingsPasswordForm({
               })
             }
             aria-describedby="password-length"
-            className={`${fieldClassBlock} h-10`}
+            className={fieldControlClass({
+              disabled: pending,
+              className: "min-h-11",
+            })}
           />
           <p id="password-length" className="text-xs text-muted">
             {copy.passwordHint}
@@ -103,7 +109,7 @@ export function SettingsPasswordForm({
 
         <Button
           type="submit"
-          size="sm"
+          size="touch"
           isLoading={pending}
           className="justify-self-start sm:col-span-2"
         >
