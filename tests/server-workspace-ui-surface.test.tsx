@@ -144,6 +144,7 @@ describe("server workspace UI surface", () => {
     const copy = getDictionary("en").serverManagement;
     const html = renderToStaticMarkup(
       createElement(ServerDetailsForm, {
+        actorId: "usr_owner",
         server: {
           id: "srv_surface",
           name: "Surface Server",

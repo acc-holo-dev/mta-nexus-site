@@ -76,6 +76,7 @@ describe("server forms use the same editable MTA metadata", () => {
   it("renders persisted HTTP port and map in the owner editor", () => {
     const html = renderToStaticMarkup(
       createElement(ServerDetailsForm, {
+        actorId: "usr_owner",
         server: {
           id: "srv_1",
           name: "Nexus Racing",
@@ -99,6 +100,7 @@ describe("server forms use the same editable MTA metadata", () => {
   it("defaults a legacy unfilled HTTP port without hiding map editing", () => {
     const html = renderToStaticMarkup(
       createElement(ServerDetailsForm, {
+        actorId: "usr_owner",
         server: {
           id: "srv_2",
           name: "Legacy",

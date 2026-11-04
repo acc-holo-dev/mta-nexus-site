@@ -79,7 +79,7 @@ export default async function ServerManagementPage({
           <h2 className="text-lg font-bold text-primary">{copy.listingDetails}</h2>
           <p className="mt-1 text-sm text-muted">{copy.listingDescription}</p>
         </div>
-        <ServerDetailsForm server={server} />
+        <ServerDetailsForm key={`${user.id}:${server.id}`} actorId={user.id} server={server} />
       </section>
     </div>
   );

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
@@ -26,7 +27,9 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { ServerRepository } from "../packages/db/src/repositories/servers";
+
 const repository = new ServerRepository();
 beforeEach(() => {
   state.queries = [];
@@ -52,6 +55,21 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.restoreAllMocks();
+});
+it("reads private server details and current authority in one bounded query", async () => {
+  state.results = [[]];
+  expect(await repository.findManagedDetails("srv_a", "actor")).toBeNull();
+  expect(state.queries).toHaveLength(1);
+  const query = state.queries[0];
+  expect(query.params).toEqual(expect.arrayContaining(["srv_a", "actor", "admin"]));
+  expect(query.sql).toContain('"organization_members"');
+  expect(query.sql).toContain('"users"');
+  expect(query.sql).toContain('"servers"."owner_id"');
+  expect(query.sql).toContain("limit");
+  const projection = query.sql.slice(0, query.sql.indexOf(' from "servers"'));
+  expect(projection).not.toContain("owner_id");
+  expect(projection).not.toContain("organization_id");
+  expect(projection).not.toContain("endpoint_revision");
 });
 it("uses user-scoped EXISTS checks without multiplying organization matches", async () => {
   const result = await repository.pageManagedByUser("actor", 2);

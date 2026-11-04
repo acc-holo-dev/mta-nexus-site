@@ -1,6 +1,6 @@
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import { NextRequest } from "next/server";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -16,6 +16,7 @@ const updateServer = vi.hoisted(() =>
     ...input,
   })),
 );
+const getManagedServerDetails = vi.hoisted(() => vi.fn());
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -26,6 +27,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/server-service", () => ({
   serverService: {
     updateServer,
+    getManagedServerDetails,
   },
 }));
 
@@ -35,15 +37,16 @@ vi.mock("@nexus/security", () => ({
   })),
 }));
 
-import { PATCH } from "../apps/web/src/app/api/servers/[id]/route";
+import { GET, PATCH } from "../apps/web/src/app/api/servers/[id]/route";
 
-function request(body: unknown) {
+function request(body: unknown, headers: Record<string, string> = {}) {
   return new NextRequest("https://nexus.test/api/servers/srv_1", {
     method: "PATCH",
     headers: {
       ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: "nexus_session=server-owner-token",
+      ...headers,
     },
     body: JSON.stringify(body),
   });
@@ -68,10 +71,58 @@ describe("server owner update HTTP contract", () => {
       role: "developer",
     };
     state.allowed = true;
+    getManagedServerDetails.mockReset();
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  it("returns only managed details to the authenticated actor", async () => {
+    const input = new NextRequest("https://nexus.test/api/servers/srv_1");
+    getManagedServerDetails
+      .mockResolvedValueOnce({
+        id: "srv_1",
+        name: "Server",
+        updatedAt: new Date("2026-10-10T02:15:00.000Z"),
+        ipAddress: "203.0.113.7",
+        port: 22003,
+        visibility: "public",
+        privateField: "secret",
+      })
+      .mockResolvedValueOnce(null);
+    const response = await GET(input, routeContext);
+    expect(response.status).toBe(200);
+    expectPrivateCorrelation(response);
+    const body = await response.json();
+    expect(getManagedServerDetails).toHaveBeenCalledWith("srv_1", state.user);
+    expect(body.actorId).toBe("usr_server_owner");
+    expect(body.server).toMatchObject({
+      id: "srv_1",
+      name: "Server",
+      updatedAt: "2026-10-10T02:15:00.000Z",
+    });
+    expect(body.server).not.toHaveProperty("privateField");
+    expect((await GET(input, routeContext)).status).toBe(404);
+    state.user = null;
+    expect((await GET(input, routeContext)).status).toBe(401);
+  });
+
+  it("rejects a changed actor precondition before a server update", async () => {
+    const response = await PATCH(
+      request({ name: "Draft" }, { "x-nexus-actor-id": "usr_other" }),
+      routeContext,
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({ code: "ACTOR_CHANGED" });
+    expect(updateServer).not.toHaveBeenCalled();
+  });
+
+  it("rate-limits private server detail reads before lookup", async () => {
+    state.allowed = false;
+    const input = new NextRequest("https://nexus.test/api/servers/srv_1");
+    expect((await GET(input, routeContext)).status).toBe(429);
+    expect(getManagedServerDetails).not.toHaveBeenCalled();
   });
 
   it("updates only the strict public-card schema", async () => {

@@ -90,6 +90,10 @@ class ServerService {
     return serverRepository.findById(id);
   }
 
+  async getManagedServerDetails(id: string, actor: User) {
+    return serverRepository.findManagedDetails(id, actor.id);
+  }
+
   async createServer(
     input: Omit<
       Server,

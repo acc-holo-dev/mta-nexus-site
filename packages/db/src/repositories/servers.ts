@@ -36,6 +36,27 @@ const managedServerFields = {
   updatedAt: servers.updatedAt,
 };
 
+const managedServerDetailsFields = {
+  id: servers.id,
+  name: servers.name,
+  description: servers.description,
+  websiteUrl: servers.websiteUrl,
+  discordUrl: servers.discordUrl,
+  rulesUrl: servers.rulesUrl,
+  mediaUrls: servers.mediaUrls,
+  language: servers.language,
+  region: servers.region,
+  gameplayTags: servers.gameplayTags,
+  ipAddress: servers.ipAddress,
+  port: servers.port,
+  httpPort: servers.httpPort,
+  gameMode: servers.gameMode,
+  mapName: servers.mapName,
+  maxPlayers: servers.maxPlayers,
+  visibility: servers.visibility,
+  updatedAt: servers.updatedAt,
+};
+
 export type ManagedServerItem = Pick<typeof servers.$inferSelect, keyof typeof managedServerFields>;
 
 // Full database reads include the durable revision introduced in migration 0034.
@@ -99,6 +120,29 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
 }
 
 export class ServerRepository {
+  async findManagedDetails(id: string, actorId: string) {
+    if (!id || !actorId) throw new RangeError("Server and actor IDs are required");
+    const [row] = await db
+      .select(managedServerDetailsFields)
+      .from(servers)
+      .where(
+        and(
+          eq(servers.id, id),
+          exists(db.select({ id: users.id }).from(users).where(eq(users.id, actorId))),
+          or(
+            managedServerScope(actorId),
+            exists(
+              db
+                .select({ id: users.id })
+                .from(users)
+                .where(and(eq(users.id, actorId), eq(users.role, "admin"))),
+            ),
+          ),
+        ),
+      )
+      .limit(1);
+    return row ?? null;
+  }
   private async visibilityPlan(
     tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
     actorId: string,

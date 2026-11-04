@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
+
 const active = vi.hoisted(() => ({ db: null as unknown }));
 vi.mock("../packages/db/src/client", async (importOriginal) => {
   const original = await importOriginal<typeof import("../packages/db/src/client")>();
@@ -14,8 +15,10 @@ vi.mock("../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
-import { ServerRepository } from "../packages/db/src/repositories/servers";
+
 import { OrganizationRepository } from "../packages/db/src/repositories/organizations";
+import { ServerRepository } from "../packages/db/src/repositories/servers";
+
 it("checks personal and organization management scope with bounded pages on PostgreSQL", async () => {
   const { db } = await vi.importActual<typeof import("../packages/db/src/client")>(
     "../packages/db/src/client",
@@ -24,13 +27,17 @@ it("checks personal and organization management scope with bounded pages on Post
     async (tx) => {
       active.db = tx;
       try {
-        for (const table of ["servers", "organizations", "organization_members"]) {
+        for (const table of ["users", "servers", "organizations", "organization_members"]) {
           await tx.execute(
             sql.raw(
               `CREATE TEMP TABLE ${table} (LIKE public.${table} INCLUDING DEFAULTS INCLUDING CONSTRAINTS) ON COMMIT DROP`,
             ),
           );
         }
+        await tx.execute(sql`INSERT INTO users (id, email, username, display_name, role) VALUES
+        ('actor', 'actor@example.test', 'actor', 'Actor', 'developer'),
+        ('outsider', 'outsider@example.test', 'outsider', 'Outsider', 'user'),
+        ('admin-user', 'admin@example.test', 'admin-user', 'Admin', 'admin')`);
         await tx.execute(sql`INSERT INTO organizations (id, name, slug, owner_id) VALUES
         ('org-owned', 'Owned', 'owned', 'actor'), ('org-admin', 'Admin', 'admin', 'other'),
         ('org-role-owner', 'Role owner', 'role-owner', 'other'), ('org-permission', 'Permission', 'permission', 'other'),
@@ -73,6 +80,23 @@ it("checks personal and organization management scope with bounded pages on Post
         expect(await organizationRepository.listServerManageableByUser("actor", 2)).toHaveLength(2);
 
         const repository = new ServerRepository();
+        expect(await repository.findManagedDetails("org-permission-server", "actor")).toMatchObject(
+          { id: "org-permission-server" },
+        );
+        expect(await repository.findManagedDetails("org-permission-server", "outsider")).toBeNull();
+        expect(
+          await repository.findManagedDetails("org-permission-server", "admin-user"),
+        ).toMatchObject({ id: "org-permission-server" });
+        await tx.execute(sql`UPDATE users SET role = 'user' WHERE id = 'admin-user'`);
+        expect(
+          await repository.findManagedDetails("org-permission-server", "admin-user"),
+        ).toBeNull();
+        expect(await repository.findManagedDetails("personal-0001", "actor")).toMatchObject({
+          id: "personal-0001",
+        });
+        await tx.execute(sql`UPDATE servers SET owner_id = 'other' WHERE id = 'personal-0001'`);
+        expect(await repository.findManagedDetails("personal-0001", "actor")).toBeNull();
+        await tx.execute(sql`UPDATE servers SET owner_id = 'actor' WHERE id = 'personal-0001'`);
         const first = await repository.pageManagedByUser("actor");
         expect(first).toMatchObject({ total: 134, page: 1, pageSize: 12, totalPages: 12 });
         expect(first.servers).toHaveLength(12);
@@ -115,6 +139,7 @@ it("checks personal and organization management scope with bounded pages on Post
         ).toEqual(["unrelated-server"]);
         // The following request reads fresh rights; earlier HTML cannot retain a revoked membership.
         await tx.execute(sql`DELETE FROM organization_members WHERE id = 'permission-member'`);
+        expect(await repository.findManagedDetails("org-permission-server", "actor")).toBeNull();
         expect((await repository.pageManagedByUser("actor")).total).toBe(133);
         expect(
           (await organizationRepository.listServerManageableByUser("actor")).map((item) => item.id),
