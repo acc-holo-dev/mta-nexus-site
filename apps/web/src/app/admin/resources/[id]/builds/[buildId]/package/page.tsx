@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { BuildPackageScreen } from "../../../../../../../components/build-package-screen";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Review package files | MTA NEXUS",
@@ -13,5 +16,9 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id, buildId } = await params;
-  return <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} staff />;
+  return (
+    <div className={pageShellClass}>
+      <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} staff />
+    </div>
+  );
 }

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { ResourceBuildScreen } from "../../../../../../components/resource-build-screen";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../../../lib/resource-build-workspace-i18n";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -15,5 +18,9 @@ export default async function Page({
   params: Promise<{ id: string; buildId: string }>;
 }) {
   const { id, buildId } = await params;
-  return <ResourceBuildScreen productId={id} buildId={buildId} staff />;
+  return (
+    <div className={pageShellClass}>
+      <ResourceBuildScreen productId={id} buildId={buildId} staff />
+    </div>
+  );
 }
