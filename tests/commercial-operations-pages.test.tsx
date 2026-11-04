@@ -51,11 +51,13 @@ import Admin from "../apps/web/src/app/admin/commerce/plans/[id]/page";
 import PlansLoading from "../apps/web/src/app/admin/commerce/plans/loading";
 import PlanNewLoading from "../apps/web/src/app/admin/commerce/plans/new/loading";
 import Plans from "../apps/web/src/app/admin/commerce/plans/page";
+import CatalogLoading from "../apps/web/src/app/subscriptions/loading";
 import Catalog from "../apps/web/src/app/subscriptions/page";
 import OperationsLoading from "../apps/web/src/app/workspace/purchases/[id]/operations/loading";
 import Operations, { metadata } from "../apps/web/src/app/workspace/purchases/[id]/operations/page";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { getCommercialCopy } from "../apps/web/src/lib/commercial-i18n";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const now = new Date("2026-10-10T12:00:00Z"),
   input = {
@@ -167,9 +169,40 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(locale === "ru" ? "Активация недоступна" : "Activation unavailable");
     expect(html).toContain("disabled");
     expect(html).toContain("scope=organization&amp;page=1");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
     expect(html).not.toContain("PRIVATE");
   },
 );
+it("shows an honest recovery state when the public catalog fails", async () => {
+  state.catalog.mockRejectedValue(new Error("catalog unavailable"));
+  const copy = getCommercialCopy("en");
+  const dictionary = getDictionary("en");
+  const html = markup(
+    await Catalog({ searchParams: Promise.resolve({ scope: "organization", page: "2" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(dictionary.errors.retry);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/subscriptions?scope=organization&amp;page=2"');
+  expect(html).not.toContain(copy.empty);
+});
+it("renders an empty public catalog with EmptyState title and description", async () => {
+  state.catalog.mockResolvedValue({ plans: [], total: 0, totalPages: 1, page: 1 });
+  const copy = getCommercialCopy("en");
+  const html = markup(await Catalog({ searchParams: Promise.resolve({ scope: "user" }) }));
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.planNote);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).not.toContain('role="alert"');
+});
+it("clips honest public catalog loading on narrow layouts", async () => {
+  const copy = getCommercialCopy("en");
+  const html = renderToStaticMarkup(await CatalogLoading());
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(copy.catalog);
+});
 it("preserves immutable draft editor semantics and escapes historical reasons", async () => {
   const html = markup(await Admin({ ...input, params: Promise.resolve({ id: "cplan_a" }) }));
   expect(state.adminDetail).toHaveBeenCalledWith(state.user, "cplan_a", 2);

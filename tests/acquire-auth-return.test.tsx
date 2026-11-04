@@ -23,4 +23,20 @@ describe("acquire guest auth return (FLOW-01)", () => {
     expect(handleClaimIndex).toBeGreaterThan(-1);
     expect(claimIndex).toBeGreaterThan(handleClaimIndex);
   });
+
+  it("locks ErrorState load failures, EmptyState empties, touch CTAs, and clipped shells", () => {
+    const page = read("apps/web/src/app/acquire/page.tsx");
+    const loading = read("apps/web/src/app/acquire/loading.tsx");
+
+    expect(page).toContain("ErrorState");
+    expect(page).toContain("EmptyState");
+    expect(page).toContain("dictionary.errors.retry");
+    expect(page).toContain('size="touch"');
+    expect(page).toContain("overflow-x-clip");
+    expect(page).toContain("min-w-0");
+    expect(page).toContain("min-h-11");
+    expect(page).not.toContain('role="alert"');
+    expect(loading).toContain("overflow-x-clip");
+    expect(loading).toContain("min-w-0");
+  });
 });
