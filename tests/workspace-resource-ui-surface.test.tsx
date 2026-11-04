@@ -241,6 +241,7 @@ describe("workspace and resource UI surface", () => {
     const management = getResourceManagementCopy("en");
     const compatibility = renderToStaticMarkup(
       createElement(ResourceCompatibilityForm, {
+        actorId: "usr_a",
         product: {
           id: "prd_a",
           updatedAt: "2026-10-10T12:00:00.000Z",

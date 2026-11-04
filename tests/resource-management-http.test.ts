@@ -17,6 +17,7 @@ const state = vi.hoisted(() => ({
   authorize: vi.fn(),
   download: vi.fn(),
   findBuild: vi.fn(),
+  findManagedProduct: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({
   resourceVariantsRepository: {
@@ -36,10 +37,16 @@ vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.do
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
+vi.mock("../apps/web/src/lib/services/product-service", () => ({
+  productService: { getManagedProduct: state.findManagedProduct },
+}));
 
 import { consumeRateLimit } from "@nexus/security";
 import { GET as reviewer } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
-import { POST as compatibility } from "../apps/web/src/app/api/products/[id]/compatibility/route";
+import {
+  POST as compatibility,
+  GET as readCompatibility,
+} from "../apps/web/src/app/api/products/[id]/compatibility/route";
 import { GET as candidates } from "../apps/web/src/app/api/products/[id]/variants/candidates/route";
 import {
   GET as managed,
@@ -64,7 +71,12 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
       : {
           method: "POST",
           body: JSON.stringify(body),
-          headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+          headers: {
+            ...browserMutationHeaders(),
+            "content-type": "application/json",
+            ...(path.includes("/compatibility") ? { "x-nexus-actor-id": "usr_a" } : {}),
+            ...headers,
+          },
         },
   );
 }
@@ -84,6 +96,7 @@ beforeEach(() => {
     state.authorize,
     state.download,
     state.findBuild,
+    state.findManagedProduct,
   ])
     mock.mockReset();
 });
@@ -94,6 +107,7 @@ it("requires an account for all private management APIs", async () => {
     () => managed(request("/api/products/prd_a/variants"), context),
     () => candidates(request("/api/products/prd_a/variants/candidates"), context),
     () => compatibility(request("/api/products/prd_a/compatibility", {}), context),
+    () => readCompatibility(request("/api/products/prd_a/compatibility"), context),
   ]) {
     const response = await run();
     expect(response.status).toBe(401);
@@ -101,6 +115,57 @@ it("requires an account for all private management APIs", async () => {
   }
   expect(state.command).not.toHaveBeenCalled();
   expect(state.managed).not.toHaveBeenCalled();
+});
+
+it("returns only the authorized actor's current compatibility and denies lost access", async () => {
+  state.findManagedProduct
+    .mockResolvedValueOnce({
+      id: "prd_a",
+      updatedAt: new Date(revision),
+      status: "published",
+      compatibility: { mtaMinVersion: "1.6.0", dependencies: ["resource-b"], secret: "private" },
+      privateField: "must-not-serialize",
+    })
+    .mockResolvedValueOnce(null);
+  const response = await readCompatibility(request("/api/products/prd_a/compatibility"), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(await response.json()).toEqual({
+    actorId: "usr_a",
+    product: {
+      id: "prd_a",
+      updatedAt: revision,
+      suspended: false,
+      compatibility: { mtaMinVersion: "1.6.0", dependencies: ["resource-b"] },
+    },
+  });
+  expect(state.findManagedProduct).toHaveBeenCalledWith("prd_a", state.user);
+  const denied = await readCompatibility(request("/api/products/prd_a/compatibility"), context);
+  expect(denied.status).toBe(404);
+});
+
+it("rate-limits private compatibility reads before fetching managed details", async () => {
+  state.allowed = false;
+  const response = await readCompatibility(request("/api/products/prd_a/compatibility"), context);
+  expect(response.status).toBe(429);
+  expect(state.findManagedProduct).not.toHaveBeenCalled();
+});
+
+it("rejects missing or changed actor preconditions before compatibility writes", async () => {
+  const body = { expectedUpdatedAt: revision, compatibility: { dependencies: [] } };
+  const missing = new NextRequest("https://nexus.test/api/products/prd_a/compatibility", {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+  });
+  expect((await compatibility(missing, context)).status).toBe(428);
+  const changed = await compatibility(
+    request("/api/products/prd_a/compatibility", body, { "x-nexus-actor-id": "usr_other" }),
+    context,
+  );
+  expect(changed.status).toBe(409);
+  expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
+  expect(state.compatibility).not.toHaveBeenCalled();
 });
 it("rejects cross-site writes and incompatible media before parsing or mutation", async () => {
   expect(

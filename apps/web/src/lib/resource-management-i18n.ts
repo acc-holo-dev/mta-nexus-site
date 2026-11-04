@@ -36,13 +36,24 @@ const copy = {
     working: "Saving…",
     saved: "Changes saved.",
     actionFailedDescription:
-      "A failed save is not an updated compatibility or variant group. Reload before retrying.",
+      "The result could not be confirmed. Check the saved state before retrying.",
     mta: "Minimum MTA version",
     dependencies: "Dependency resource slugs",
     dependencyHint:
       "One slug per line, up to 25. Missing or private dependencies remain unresolved; this setting never grants access to their files.",
     compatibilityNote:
       "This describes the resource's requirements. It does not change the target version recorded for existing builds.",
+    compatibilityChanged:
+      "The saved compatibility changed. Compare it with your draft before saving.",
+    compatibilityLatest: "Latest saved compatibility",
+    compatibilityCheck: "Check saved compatibility",
+    compatibilityUseLatest: "Use this version as the basis for my draft",
+    compatibilityDraftHelp:
+      "Your draft is kept. Saving after accepting this version will replace the saved compatibility fields.",
+    compatibilityIdentityChanged:
+      "The signed-in account changed. The previous account's draft was closed.",
+    compatibilityCheckFailed:
+      "Could not verify the saved version or access. Check again before saving.",
     browse: "Choose a variant",
     version: "Version",
     independent: "Each variant is added to your library separately.",
@@ -95,13 +106,23 @@ const copy = {
     working: "Сохранение…",
     saved: "Изменения сохранены.",
     actionFailedDescription:
-      "Неуспешное сохранение не обновляет совместимость или группу вариантов. Обновите страницу перед повтором.",
+      "Результат не подтверждён. Проверьте сохранённое состояние перед повторной попыткой.",
     mta: "Минимальная версия MTA",
     dependencies: "Slug зависимых ресурсов",
     dependencyHint:
       "Один slug на строку, не более 25. Недоступные и приватные зависимости остаются неразрешёнными; эта настройка не предоставляет доступ к их файлам.",
     compatibilityNote:
       "Это требования ресурса. Настройка не меняет целевую версию, записанную для существующих сборок.",
+    compatibilityChanged:
+      "Сохранённая совместимость изменилась. Сравните её с черновиком перед сохранением.",
+    compatibilityLatest: "Последняя сохранённая совместимость",
+    compatibilityCheck: "Проверить сохранённую совместимость",
+    compatibilityUseLatest: "Использовать эту версию как основу черновика",
+    compatibilityDraftHelp:
+      "Черновик сохранён. После выбора этой версии сохранение заменит поля совместимости.",
+    compatibilityIdentityChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
+    compatibilityCheckFailed:
+      "Не удалось проверить сохранённую версию или доступ. Повторите проверку перед сохранением.",
     browse: "Выберите вариант",
     version: "Версия",
     independent: "Каждый вариант добавляется в библиотеку отдельно.",

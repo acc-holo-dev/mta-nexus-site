@@ -73,7 +73,8 @@ export default async function ResourceCompatibilityPage({
         {resourceRequirementsCopy(locale).title}
       </Link>
       <ResourceCompatibilityForm
-        key={`${product.id}:${new Date(product.updatedAt).toISOString()}`}
+        key={`${actor.id}:${product.id}`}
+        actorId={actor.id}
         product={{
           id: product.id,
           updatedAt: new Date(product.updatedAt).toISOString(),
