@@ -1,4 +1,6 @@
 import type { User } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
@@ -7,8 +9,14 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { publicationFeedView } from "../../../lib/publication-feed-view";
 import { authService } from "../../../lib/services/auth-service";
+
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const retryLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function generateMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -35,17 +43,19 @@ export default async function FollowingFeedPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="nexus-panel space-y-4 p-8">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-sm text-danger">
-          {copy.error}
-        </p>
-        <Link
-          href="/workspace/feed"
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.retry}
-        </Link>
+      <div className={pageShellClass}>
+        <header>
+          <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+          <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        </header>
+        <ErrorState
+          title={copy.error}
+          action={
+            <Link href={returnPath} className={retryLinkClass}>
+              {copy.retry}
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -55,7 +65,7 @@ export default async function FollowingFeedPage({
     await searchParams,
   );
   return (
-    <div className="space-y-6">
+    <div className={pageShellClass}>
       <header>
         <h1 id="following-feed-heading" className="text-2xl font-bold text-primary">
           {copy.title}

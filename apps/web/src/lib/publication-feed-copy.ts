@@ -7,6 +7,7 @@ const en = {
   clearTarget: "Show all follows of this type",
   emptyTarget:
     "No public publications from this selected follow. It may be unavailable or no longer followed.",
+  emptyTargetHint: "Clear the selected follow to see publications from every follow of this type.",
   title: "Following feed",
   description: "Public publications from the people, teams, servers and resources you follow.",
   activity: "Publications",
@@ -42,9 +43,13 @@ const en = {
     "Public activity is temporarily unavailable. This does not mean there are no publications.",
   error: "Unable to load publications. Try again.",
   empty: "No publications here yet.",
+  emptyHint: "New public publications will appear here when authors publish them.",
   emptyFollowing: "Follow people, teams, servers or resources to see their public updates here.",
+  emptyFollowingHint: "Open Discover to find creators and teams worth following.",
   emptyFiltered: "No publications match these filters.",
+  emptyFilteredHint: "Clear the search, type, source, author or tag filters to see more results.",
   emptyPage: "This page has no publications now. Show the latest page to continue.",
+  emptyPageHint: "Open the latest page to continue from current publications.",
   comments: "Comments",
   invalid: "Invalid publication filters or page. Reload the feed.",
 };
@@ -54,6 +59,8 @@ const ru: Record<keyof typeof en, string> = {
   clearTarget: "Показать все подписки этого типа",
   emptyTarget:
     "У выбранной подписки нет доступных публичных публикаций. Источник может быть недоступен или вы уже отписались от него.",
+  emptyTargetHint:
+    "Сбросьте выбранную подписку, чтобы увидеть публикации всех подписок этого типа.",
   title: "Лента подписок",
   description:
     "Публичные публикации авторов, команд, серверов и ресурсов, на которые вы подписаны.",
@@ -90,10 +97,15 @@ const ru: Record<keyof typeof en, string> = {
   loadUnavailable: "Публичная активность временно недоступна. Это не означает, что публикаций нет.",
   error: "Не удалось загрузить публикации. Попробуйте ещё раз.",
   empty: "Публикаций пока нет.",
+  emptyHint: "Новые публичные публикации появятся здесь, когда авторы их опубликуют.",
   emptyFollowing:
     "Подпишитесь на авторов, команды, серверы или ресурсы, чтобы видеть их публичные новости.",
+  emptyFollowingHint: "Откройте Discover, чтобы найти авторов и команды для подписки.",
   emptyFiltered: "По этим фильтрам публикаций нет.",
+  emptyFilteredHint:
+    "Сбросьте поиск, тип, источник, автора или тег, чтобы увидеть больше результатов.",
   emptyPage: "На этой странице больше нет публикаций. Откройте новые, чтобы продолжить.",
+  emptyPageHint: "Откройте страницу с новыми публикациями, чтобы продолжить.",
   comments: "Комментарии",
   invalid: "Некорректные фильтры или страница. Перезагрузите ленту.",
 };
