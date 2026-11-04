@@ -24,6 +24,8 @@
 
 Input уже умеет связывать label/error. Общая оболочка Field должна переиспользовать это поведение и native controls, а не заменять системную клавиатуру, required или maxlength. Причина отключённого действия видна без hover; readOnly значение можно прочитать и скопировать. [Существующий field chrome](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/packages/ui/src/field-classes.ts#L1-L9).
 
+**Alert tier.** Полевая ошибка — `role="alert"` у Input; отказ экрана/секции — один `ErrorState` с `role="alert"`. В `apps/web/src` не изобретают сырой `role="alert"`; только эти `@nexus/ui` поверхности. Политика: `tests/ui-field-alert-honesty-policy.test.ts`.
+
 После нажатия отправляется определённая редакция. Пока запрос идёт, поля либо временно блокируются, либо последующие изменения явно остаются новой несохранённой редакцией. Переход после успеха не должен молча уничтожать позднюю правку. При ошибке сохраняется ввод и доступен безопасный повтор. Success появляется после подтверждения ожидаемого объекта и состояния; timeout, пустой ответ или несовпадающая квитанция не означают успех. У FollowButton уже есть полезный образец checking/error/confirmed success; сохраняем существующие guards. [Follow states](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/follow-button.tsx#L139-L218).
 
 ## Диалоги таблицы и короткие экраны
