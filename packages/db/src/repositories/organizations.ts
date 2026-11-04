@@ -1,12 +1,56 @@
-import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
-import { containsPattern } from "./search-pattern";
-import { db } from "../client";
-import { organizations, organizationMembers } from "../schema";
 import type { Organization, OrganizationMember } from "@nexus/domain";
+import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
+import { db } from "../client";
+import { organizationMembers, organizations } from "../schema";
+import { containsPattern } from "./search-pattern";
 
 export type ServerManageableOrganization = Pick<Organization, "id" | "name" | "slug">;
 
 export class OrganizationRepository {
+  /** Resolve one active context with current ownership or membership in one query. */
+  async findUserContext(
+    organizationId: string,
+    userId: string,
+  ): Promise<{
+    id: string;
+    name: string;
+    slug: string;
+    role: string;
+  } | null> {
+    const [row] = await db
+      .select({
+        id: organizations.id,
+        name: organizations.name,
+        slug: organizations.slug,
+        ownerId: organizations.ownerId,
+        memberRole: organizationMembers.role,
+      })
+      .from(organizations)
+      .leftJoin(
+        organizationMembers,
+        and(
+          eq(organizationMembers.organizationId, organizations.id),
+          eq(organizationMembers.userId, userId),
+        ),
+      )
+      .where(
+        and(
+          eq(organizations.id, organizationId),
+          or(eq(organizations.ownerId, userId), eq(organizationMembers.userId, userId)),
+        ),
+      )
+      .limit(1);
+    if (!row) return null;
+    const role = row.ownerId === userId ? "owner" : row.memberRole;
+    if (!role) return null;
+    return {
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+      role,
+    };
+  }
+
   /**
    * Access checks for one server should never load a user's entire
    * organization membership history. The write path separately rechecks

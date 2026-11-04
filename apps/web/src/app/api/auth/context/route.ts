@@ -94,9 +94,22 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const organizationContexts = Array.from(contextsById.values()).slice(0, 50);
-
     const requestedActiveContextId = user.activeContextId ?? "personal";
+    if (requestedActiveContextId !== "personal" && !contextsById.has(requestedActiveContextId)) {
+      const active = await organizationRepository.findUserContext(
+        requestedActiveContextId,
+        user.id,
+      );
+      if (active) {
+        // Keep the currently active organization visible even outside the first page.
+        if (contextsById.size >= 50) {
+          const last = Array.from(contextsById.keys()).at(-1);
+          if (last) contextsById.delete(last);
+        }
+        contextsById.set(active.id, { ...active, type: "organization" });
+      }
+    }
+    const organizationContexts = Array.from(contextsById.values()).slice(0, 50);
     const activeContextId =
       requestedActiveContextId === "personal" ||
       organizationContexts.some((organization) => organization.id === requestedActiveContextId)

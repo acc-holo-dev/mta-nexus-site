@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -64,6 +64,14 @@ const findSummaries = vi.hoisted(() =>
         .map((id) => ({ id, name: "Member Org", slug: "member-org" })),
   ),
 );
+const findUserContext = vi.hoisted(() =>
+  vi.fn(
+    async (
+      _id: string,
+      _userId: string,
+    ): Promise<{ id: string; name: string; slug: string; role: string } | null> => null,
+  ),
+);
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -79,6 +87,7 @@ vi.mock("@nexus/db", () => ({
     listUserMemberships: memberships,
     findById: findOrganization,
     findSummariesByIds: findSummaries,
+    findUserContext,
   },
 }));
 
@@ -242,6 +251,56 @@ describe("account context switching HTTP contract", () => {
       "org_member",
     ]);
     expect(findSummaries).toHaveBeenCalledExactlyOnceWith(["org_member", "org_missing"]);
+  });
+
+  it.each(["owner", "admin"])(
+    "preserves an active %s context beyond the 50-item list",
+    async (role) => {
+      state.user = {
+        id: "usr_context",
+        displayName: "Context User",
+        activeContextId: "org_active",
+      };
+      owned.mockResolvedValueOnce(
+        Array.from({ length: 50 }, (_, index) => ({
+          id: `org_${index}`,
+          name: `Org ${index}`,
+          slug: `org-${index}`,
+        })),
+      );
+      memberships.mockResolvedValueOnce([]);
+      findUserContext.mockResolvedValueOnce({
+        id: "org_active",
+        name: "Active",
+        slug: "active",
+        role,
+      });
+
+      const response = await GET(getRequest());
+      const body = await response.json();
+      expect(response.status).toBe(200);
+      expect(body.activeContextId).toBe("org_active");
+      expect(body.contexts).toHaveLength(51);
+      expect(body.contexts).toContainEqual({
+        id: "org_active",
+        name: "Active",
+        slug: "active",
+        role,
+        type: "organization",
+      });
+      expect(findUserContext).toHaveBeenCalledExactlyOnceWith("org_active", "usr_context");
+    },
+  );
+
+  it("does not expose an active context after access is revoked", async () => {
+    state.user = { id: "usr_context", displayName: "Context User", activeContextId: "org_revoked" };
+    const response = await GET(getRequest());
+    const body = await response.json();
+    expect(body.activeContextId).toBe("personal");
+    expect(body.contexts.some((context: { id: string }) => context.id === "org_revoked")).toBe(
+      false,
+    );
+    expect(findUserContext).toHaveBeenCalledExactlyOnceWith("org_revoked", "usr_context");
   });
 
   it("returns a correlated private 503 if the batch read fails", async () => {
