@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldClass, SearchField } from "@nexus/ui";
+import { Button, FilterBar, fieldClass, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -26,52 +26,50 @@ export function ContentCatalogControls({
 }) {
   const copy = getUserPlatformCopy(locale);
   return (
-    <search aria-label={copy.search}>
-      <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
-        <div className="min-w-0 flex-1">
-          <SearchField
-            label={copy.search}
-            name="q"
-            maxLength={120}
-            defaultValue={filters.query}
-            className={`min-w-40 ${fieldClass}`}
-          />
-        </div>
+    <FilterBar action={path} label={copy.search}>
+      <div className="min-w-0 flex-1">
+        <SearchField
+          label={copy.search}
+          name="q"
+          maxLength={120}
+          defaultValue={filters.query}
+          className={`min-w-40 ${fieldClass}`}
+        />
+      </div>
+      <label className="flex flex-col gap-1 text-xs text-secondary">
+        <span>{copy.type}</span>
+        <select name="type" defaultValue={filters.type ?? "all"} className={fieldClass}>
+          <option value="all">{copy.all}</option>
+          {types.map((type) => (
+            <option key={type} value={type}>
+              {copy[type]}
+            </option>
+          ))}
+        </select>
+      </label>
+      {showStatus && (
         <label className="flex flex-col gap-1 text-xs text-secondary">
-          <span>{copy.type}</span>
-          <select name="type" defaultValue={filters.type ?? "all"} className={fieldClass}>
+          <span>{copy.status}</span>
+          <select name="status" defaultValue={filters.status ?? "all"} className={fieldClass}>
             <option value="all">{copy.all}</option>
-            {types.map((type) => (
-              <option key={type} value={type}>
-                {copy[type]}
+            {(["draft", "published", "archived"] as const).map((status) => (
+              <option key={status} value={status}>
+                {copy[status]}
               </option>
             ))}
           </select>
         </label>
-        {showStatus && (
-          <label className="flex flex-col gap-1 text-xs text-secondary">
-            <span>{copy.status}</span>
-            <select name="status" defaultValue={filters.status ?? "all"} className={fieldClass}>
-              <option value="all">{copy.all}</option>
-              {(["draft", "published", "archived"] as const).map((status) => (
-                <option key={status} value={status}>
-                  {copy[status]}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        <Button type="submit">{copy.apply}</Button>
-        {(filters.query || filters.type || filters.status) && (
-          <Link
-            href={path}
-            className="py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reset}
-          </Link>
-        )}
-      </form>
-    </search>
+      )}
+      <Button type="submit">{copy.apply}</Button>
+      {(filters.query || filters.type || filters.status) && (
+        <Link
+          href={path}
+          className="py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.reset}
+        </Link>
+      )}
+    </FilterBar>
   );
 }
 

@@ -6,6 +6,7 @@ export * from "./dialog";
 export * from "./empty-state";
 export * from "./error-state";
 export * from "./field-classes";
+export * from "./filter-bar";
 export * from "./input";
 export * from "./list-keys";
 export * from "./platform";

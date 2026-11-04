@@ -1,6 +1,6 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { Avatar, Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
+import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -46,94 +46,87 @@ export function DirectoryFilters({
   const names =
     state.type === "servers" || state.type === "creators" || state.type === "organizations";
   return (
-    <search aria-label={copy.filter}>
-      <form
-        key={discoverHref(state, path)}
-        action={path}
-        method="get"
-        className="nexus-panel space-y-4 p-4"
-      >
-        {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-48 flex-1">
-            <SearchField
-              className={field}
-              label={dictionary.searchLabel}
-              name="q"
-              maxLength={100}
-              defaultValue={state.query}
-              placeholder={dictionary.searchPlaceholder}
-            />
-          </div>
-          {names && !stream && (
-            <label className="space-y-1 text-xs text-secondary">
-              {copy.sort}
-              <select name="sort" defaultValue={state.sort} className={field}>
-                <option value="newest">{copy.newest}</option>
-                <option value="name">{copy.name}</option>
-              </select>
-            </label>
-          )}
-          {state.type === "content" && (
-            <label className="space-y-1 text-xs text-secondary">
-              {copy.contentType}
-              <select name="contentType" defaultValue={state.contentType} className={field}>
-                <option value="">{copy.any}</option>
-                {DISCOVER_CONTENT_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {copy[type]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          <Button type="submit" className="min-h-11 font-semibold">
-            {dictionary.searchButton}
-          </Button>
-          {state.query ? (
-            <Link
-              href={
-                stream
-                  ? discoveryStreamHref({
-                      type: state.type as "servers" | "creators" | "organizations",
-                      query: "",
-                      verified: state.verified,
-                      language: state.language,
-                      region: state.region,
-                      gameMode: state.gameMode,
-                    })
-                  : discoverHref({ ...state, query: "", page: 1 }, path)
-              }
-              className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.clearQuery}
-            </Link>
-          ) : null}
-          <Link
-            href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reset}
-          </Link>
+    <FilterBar key={discoverHref(state, path)} action={path} label={copy.filter} layout="stacked">
+      {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-48 flex-1">
+          <SearchField
+            className={field}
+            label={dictionary.searchLabel}
+            name="q"
+            maxLength={100}
+            defaultValue={state.query}
+            placeholder={dictionary.searchPlaceholder}
+          />
         </div>
-        {state.type === "servers" && (
-          <div className="grid gap-3 sm:grid-cols-3">
-            {(["language", "region", "gameMode"] as const).map((key) => (
-              <label key={key} className="space-y-1 text-xs text-secondary">
-                {copy[key]}
-                <input name={key} defaultValue={state[key]} maxLength={60} className={field} />
-              </label>
-            ))}
-          </div>
-        )}
-        {names && (
-          <label className="flex min-h-8 items-center gap-2 text-sm text-secondary">
-            <input type="checkbox" name="verified" value="1" defaultChecked={state.verified} />
-            {copy.verified}
+        {names && !stream && (
+          <label className="space-y-1 text-xs text-secondary">
+            {copy.sort}
+            <select name="sort" defaultValue={state.sort} className={field}>
+              <option value="newest">{copy.newest}</option>
+              <option value="name">{copy.name}</option>
+            </select>
           </label>
         )}
-      </form>
-    </search>
+        {state.type === "content" && (
+          <label className="space-y-1 text-xs text-secondary">
+            {copy.contentType}
+            <select name="contentType" defaultValue={state.contentType} className={field}>
+              <option value="">{copy.any}</option>
+              {DISCOVER_CONTENT_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {copy[type]}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <Button type="submit" className="min-h-11 font-semibold">
+          {dictionary.searchButton}
+        </Button>
+        {state.query ? (
+          <Link
+            href={
+              stream
+                ? discoveryStreamHref({
+                    type: state.type as "servers" | "creators" | "organizations",
+                    query: "",
+                    verified: state.verified,
+                    language: state.language,
+                    region: state.region,
+                    gameMode: state.gameMode,
+                  })
+                : discoverHref({ ...state, query: "", page: 1 }, path)
+            }
+            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.clearQuery}
+          </Link>
+        ) : null}
+        <Link
+          href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
+          className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.reset}
+        </Link>
+      </div>
+      {state.type === "servers" && (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {(["language", "region", "gameMode"] as const).map((key) => (
+            <label key={key} className="space-y-1 text-xs text-secondary">
+              {copy[key]}
+              <input name={key} defaultValue={state[key]} maxLength={60} className={field} />
+            </label>
+          ))}
+        </div>
+      )}
+      {names && (
+        <label className="flex min-h-8 items-center gap-2 text-sm text-secondary">
+          <input type="checkbox" name="verified" value="1" defaultChecked={state.verified} />
+          {copy.verified}
+        </label>
+      )}
+    </FilterBar>
   );
 }
 

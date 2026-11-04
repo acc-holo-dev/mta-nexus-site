@@ -49,6 +49,21 @@ vi.mock("@nexus/ui", () => ({
     </button>
   ),
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+  FilterBar: ({
+    action,
+    children,
+    label,
+  }: {
+    action?: string;
+    children?: React.ReactNode;
+    label: string;
+  }) => (
+    <search aria-label={label}>
+      <form action={action} method="get">
+        {children}
+      </form>
+    </search>
+  ),
   SearchField: ({ label, ...props }: { label: string; [key: string]: unknown }) => (
     <label>
       {label}

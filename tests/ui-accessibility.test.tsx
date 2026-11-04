@@ -4,6 +4,7 @@ import { Avatar } from "../packages/ui/src/avatar";
 import { EmptyState } from "../packages/ui/src/empty-state";
 import { ErrorState } from "../packages/ui/src/error-state";
 import { fieldControlClass } from "../packages/ui/src/field-classes";
+import { FilterBar } from "../packages/ui/src/filter-bar";
 import { Field, Input } from "../packages/ui/src/input";
 import {
   DataTable,
@@ -181,6 +182,22 @@ describe("ErrorState semantics", () => {
     expect(markup).toContain("Каталог временно недоступен");
     expect(markup).toContain("Повторить");
     expect(markup).toContain('aria-hidden="true"');
+  });
+});
+
+describe("FilterBar semantics", () => {
+  it("groups URL-backed filters in a named search landmark", () => {
+    const markup = renderToStaticMarkup(
+      <FilterBar label="Фильтры каталога" action="/discover">
+        <input name="q" />
+        <button type="submit">Найти</button>
+      </FilterBar>,
+    );
+
+    expect(markup).toContain('<search aria-label="Фильтры каталога"');
+    expect(markup).toContain('action="/discover"');
+    expect(markup).toContain('method="get"');
+    expect(markup).toContain("flex-wrap");
   });
 });
 

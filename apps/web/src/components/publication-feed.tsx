@@ -1,4 +1,4 @@
-import { Avatar, Button, ErrorState, SearchField } from "@nexus/ui";
+import { Avatar, Button, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -60,7 +60,7 @@ export function PublicationFeed({
           </Link>
         </p>
       )}
-      <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <FilterBar action={path} label={copy.search}>
         {following && filters.target && (
           <>
             <input type="hidden" name="target" value={filters.target} />
@@ -134,7 +134,7 @@ export function PublicationFeed({
         >
           {copy.reset}
         </Link>
-      </form>
+      </FilterBar>
       {error && (
         <ErrorState
           title={error}
