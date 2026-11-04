@@ -29,8 +29,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `2753d4acd2dd266d32923c855723f2086b53d39c` (`test: split discussion-report-batch interaction suite`).
-- **Verified CI green on that tip:** [CI 41883150247](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41883150247) on `2753d4ac`; prior code tip `607c3fcc` / [CI 41881699105](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41881699105).
+- **Tip SHA:** `efa78a4e804ec15b2c25309f2c40b2c052a47eb7` (`test: split discussion-report-batch interaction suite`).
+- **Verified CI green on that tip:** tip `efa78a4e` (#309) pending tip CI; prior verified [CI 41883150247](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41883150247) on `2753d4ac` and [CI 41881699105](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41881699105) on `607c3fcc`.
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
