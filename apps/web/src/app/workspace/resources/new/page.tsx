@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { NewResourceForm } from "../../../../components/new-resource-form";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 
@@ -15,5 +15,9 @@ export default async function NewResourcePage() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const actor = await authService.getSession(store.get("nexus_session")?.value).catch(() => null);
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/resources/new" />;
-  return <NewResourceForm key={actor.id} actorId={actor.id} />;
+  return (
+    <div className="min-w-0 overflow-x-clip">
+      <NewResourceForm key={actor.id} actorId={actor.id} />
+    </div>
+  );
 }

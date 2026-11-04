@@ -141,6 +141,21 @@ it("shows an honest recovery state when variant management fails", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain("overflow-x-clip");
 });
+it("shows an honest recovery state when compatibility resolution fails", async () => {
+  state.resolution.mockRejectedValue(new Error("compatibility unavailable"));
+  const { getResourceManagementCopy } = await import(
+    "../apps/web/src/lib/resource-management-i18n"
+  );
+  const copy = getResourceManagementCopy("en");
+  const html = renderToStaticMarkup(await CompatibilityPage(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain("/workspace/resources/prd_a/compatibility");
+  expect(state.compatibilityForm).not.toHaveBeenCalled();
+});
 it("routes member management to the authorized anchor and skips candidates", async () => {
   state.managed.mockResolvedValue({
     anchorProductId: "prd_anchor",

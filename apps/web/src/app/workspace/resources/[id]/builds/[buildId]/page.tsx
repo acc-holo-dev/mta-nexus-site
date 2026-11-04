@@ -15,5 +15,9 @@ export default async function Page({
   params: Promise<{ id: string; buildId: string }>;
 }) {
   const { id, buildId } = await params;
-  return <ResourceBuildScreen productId={id} buildId={buildId} />;
+  return (
+    <div className="min-w-0 overflow-x-clip">
+      <ResourceBuildScreen productId={id} buildId={buildId} />
+    </div>
+  );
 }

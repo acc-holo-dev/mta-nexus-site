@@ -6,7 +6,7 @@ export default async function Loading() {
   const copy = getDictionary(await getRequestLocale()).authorResources;
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl overflow-x-clip space-y-6 py-8"
       aria-busy="true"
       aria-labelledby="author-resources-loading-heading"
     >
