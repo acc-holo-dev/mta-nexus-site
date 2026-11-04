@@ -141,7 +141,7 @@ export function NotificationBell() {
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-controls={isOpen ? "notification-popover" : undefined}
-        aria-busy={!loaded || marking || undefined}
+        aria-busy={(!loaded && !error) || marking || undefined}
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
         {confirmedUnread !== null && confirmedUnread > 0 && (
@@ -220,7 +220,10 @@ export function NotificationBell() {
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setAttempt((value) => value + 1)}
+                  onClick={() => {
+                    setError(null);
+                    setAttempt((value) => value + 1);
+                  }}
                   className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {copy.retry}
@@ -231,14 +234,14 @@ export function NotificationBell() {
 
           <section
             aria-label={copy.previewList}
-            aria-busy={!loaded}
+            aria-busy={!loaded && !error}
             className="min-h-0 max-h-80 divide-y divide-[color:var(--nexus-border)] overflow-y-auto"
           >
-            {!loaded ? (
+            {!loaded && !error ? (
               <div role="status" className="py-6 text-center font-caption text-muted">
                 {copy.loading}
               </div>
-            ) : notifications.length > 0 ? (
+            ) : !loaded ? null : notifications.length > 0 ? (
               notifications.map((notification) => (
                 <article
                   key={notification.id}

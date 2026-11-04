@@ -208,7 +208,8 @@ it("keeps a first-load failure distinct from empty and does not confirm a zero b
   openPopover();
   await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
   expect(render().some((node) => textOf(node).includes("No notifications yet"))).toBe(false);
-  expect(render().some((node) => textOf(node).includes("Loading notifications..."))).toBe(true);
+  expect(render().some((node) => textOf(node).includes("Loading notifications..."))).toBe(false);
+  expect(bellButton().props["aria-busy"]).toBeUndefined();
   expect(bellButton().props["aria-label"]).toBe("Notifications");
   expect(
     render().some(
@@ -218,6 +219,11 @@ it("keeps a first-load failure distinct from empty and does not confirm a zero b
         textOf(node) === "0",
     ),
   ).toBe(false);
+  const retry = render().find((node) => node.type === "button" && textOf(node) === "Retry");
+  if (!retry) throw Error("Missing retry");
+  (retry.props.onClick as () => void)();
+  expect(render().some((node) => textOf(node).includes("Loading notifications..."))).toBe(true);
+  expect(bellButton().props["aria-busy"]).toBe(true);
 });
 
 it("does not treat opening the popover as mark-all-read", async () => {
