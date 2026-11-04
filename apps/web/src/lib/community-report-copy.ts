@@ -87,6 +87,7 @@ const en = {
   mutationUnavailable: "The result could not be confirmed. Check your reports before trying again.",
   decisionUnavailable:
     "The result could not be confirmed. Load the current report before trying again.",
+  formErrorHint: "The report was not saved. Fix the fields above and submit the same form again.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Мои жалобы в сообществе",
@@ -173,6 +174,7 @@ const ru: Record<keyof typeof en, string> = {
     "Результат не удалось подтвердить. Проверьте свои жалобы перед повторной отправкой.",
   decisionUnavailable:
     "Результат не удалось подтвердить. Загрузите актуальную жалобу перед повторным действием.",
+  formErrorHint: "Жалоба не сохранена. Исправьте поля выше и отправьте ту же форму снова.",
 };
 export const communityReportCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function communityReportError(locale: Locale, code: unknown) {

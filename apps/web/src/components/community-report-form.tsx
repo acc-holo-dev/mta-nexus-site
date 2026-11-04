@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -183,21 +183,22 @@ export function CommunityReportForm({
             />
           </label>
           <div className="flex flex-wrap items-center gap-3">
-            <Button type="submit" isLoading={pending} disabled={reason.trim().length < 10}>
+            <Button
+              type="submit"
+              isLoading={pending}
+              disabled={reason.trim().length < 10}
+              className="min-h-11"
+            >
               {pending ? copy.submitting : copy.submit}
             </Button>
             <Link
-              className="text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               href="/workspace/reports"
             >
               {copy.myReports}
             </Link>
           </div>
-          {error && (
-            <p role="alert" className="text-sm text-danger">
-              {error}
-            </p>
-          )}
+          {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
         </form>
       )}
     </section>

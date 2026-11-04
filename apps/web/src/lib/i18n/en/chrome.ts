@@ -31,6 +31,7 @@ export const chrome = {
     loadError: "Could not load notifications.",
     markError: "Could not mark notifications as read.",
     retry: "Retry",
+    errorHint: "Retry refreshes this preview only. It does not mark notifications as read.",
   },
   theme: {
     switchToLight: "Switch to light theme",

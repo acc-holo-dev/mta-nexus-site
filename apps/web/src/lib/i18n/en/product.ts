@@ -252,6 +252,8 @@ export const product = {
     includedResources: "Included resources",
     structuralNotes: "Structural notes",
     note: "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
+    formErrorHint:
+      "Inspection did not finish. Choose the same meta.xml again or pick another file, then retry.",
   },
   checkout: {
     title: "Add resource to library",

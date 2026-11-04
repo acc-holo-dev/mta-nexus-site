@@ -470,6 +470,7 @@ export function ContentDiscussion({
           registerHref={registerHref}
           registerLabel={workspaceCopy.createAccount}
           onPersistDraft={() => persistComposeDraft()}
+          locale={locale}
         />
         {published && (
           <p

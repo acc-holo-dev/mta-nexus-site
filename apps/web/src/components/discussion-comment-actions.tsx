@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { DiscussionPage } from "../lib/content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../lib/content-discussion-copy";
@@ -122,7 +122,7 @@ export function DiscussionCommentActions({
           {own && editable && (
             <Button
               type="button"
-              className="min-h-9 text-xs"
+              className="min-h-11 text-xs"
               disabled={disabled || blocked}
               onClick={() => {
                 setText(comment.text);
@@ -138,7 +138,7 @@ export function DiscussionCommentActions({
           )}
           <Button
             type="button"
-            className="min-h-9 text-xs"
+            className="min-h-11 text-xs"
             disabled={disabled || blocked}
             onClick={() => {
               setRevision(comment.revision);
@@ -197,7 +197,7 @@ export function DiscussionCommentActions({
           <div className="flex flex-wrap gap-3">
             <Button
               type="submit"
-              className="min-h-9 text-xs"
+              className="min-h-11 text-xs"
               disabled={pending || disabled || stale || blocked}
               variant="outline"
             >
@@ -209,7 +209,7 @@ export function DiscussionCommentActions({
             </Button>
             <Button
               type="button"
-              className="min-h-9 text-xs"
+              className="min-h-11 text-xs"
               disabled={pending}
               onClick={() => setMode(null)}
               variant="outline"
@@ -219,17 +219,31 @@ export function DiscussionCommentActions({
           </div>
         </form>
       )}
-      {(error || stale) && (
-        <p role="alert" className="text-sm text-danger">
-          {stale ? copy.changed : error}
-        </p>
-      )}
+      {error || stale ? (
+        <ErrorState
+          title={stale ? copy.changed : error}
+          description={copy.formErrorHint}
+          action={
+            blocked || stale ? (
+              <a
+                href={
+                  recoveryHref ??
+                  `/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`
+                }
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reloadSaved}
+              </a>
+            ) : undefined
+          }
+        />
+      ) : null}
       {stale && mode === "edit" && (
         <div className="space-y-2">
           <p className="text-xs text-muted">{copy.draftKept}</p>
           <Button
             type="button"
-            className="min-h-9 text-xs"
+            className="min-h-11 text-xs"
             variant="outline"
             onClick={() => void copyDraft()}
           >
@@ -241,17 +255,6 @@ export function DiscussionCommentActions({
             </p>
           )}
         </div>
-      )}
-      {(blocked || stale) && (
-        <a
-          href={
-            recoveryHref ??
-            `/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`
-          }
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reloadSaved}
-        </a>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, withOccurrenceKeys } from "@nexus/ui";
+import { Button, ErrorState, withOccurrenceKeys } from "@nexus/ui";
 import { FileSearch } from "lucide-react";
 import { useState } from "react";
 import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
@@ -175,20 +175,30 @@ export function MtaMetaInspectorPanel({
           disabled={!file || loading}
           isLoading={loading}
           onClick={() => void inspect()}
-          className="min-h-10 text-xs font-bold"
+          className="min-h-11 text-xs font-bold"
         >
           {loading ? copy.inspecting : copy.inspect}
         </Button>
       </div>
 
-      {result?.error && (
-        <p
-          role="alert"
-          className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-3 text-xs text-warning"
-        >
-          {result.error}
-        </p>
-      )}
+      {result?.error ? (
+        <ErrorState
+          title={result.error}
+          description={copy.formErrorHint}
+          className="items-stretch py-4"
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={!file || loading}
+              onClick={() => void inspect()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.inspect}
+            </Button>
+          }
+        />
+      ) : null}
 
       {inspection && (
         <div className="space-y-4">

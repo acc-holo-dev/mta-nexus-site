@@ -60,6 +60,7 @@ vi.mock("./locale-context", () => ({
         loadError: "Could not load notifications.",
         markError: "Could not mark notifications as read.",
         retry: "Retry",
+        errorHint: "Retry refreshes this preview only. It does not mark notifications as read.",
       },
       buildReviewNotifications: {
         approved: "Resource version approved",
@@ -86,8 +87,22 @@ function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
-  const type = element.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
+  const type = element.type as
+    | { displayName?: string; name?: string }
+    | (((props: unknown) => ReactNode) & { displayName?: string; name?: string })
+    | string;
+  if (typeof type === "function") {
+    const name = type.displayName || type.name;
+    if (name === "ErrorState") {
+      return descendants(type(element.props));
+    }
+    if (name === "Button") {
+      return [
+        { ...element, type: "button" } as Element,
+        ...descendants(element.props.children as ReactNode),
+      ];
+    }
+  } else if (typeof type === "object" && type?.displayName === "Button") {
     return [
       { ...element, type: "button" } as Element,
       ...descendants(element.props.children as ReactNode),

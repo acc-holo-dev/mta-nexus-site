@@ -6,7 +6,7 @@ import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-fee
 
 describe("discussion compose write feedback", () => {
   it.each(["en", "ru"] as const)(
-    "surfaces a prominent sign-in action after unauthorized publish in %s",
+    "surfaces ErrorState with a prominent sign-in action after unauthorized publish in %s",
     (locale) => {
       const copy = getDiscussionCopy(locale);
       const html = renderToStaticMarkup(
@@ -18,10 +18,13 @@ describe("discussion compose write feedback", () => {
           registerHref: "/auth/register?next=%2Farticles%2Fguide",
           registerLabel: "Create account",
           onPersistDraft: () => undefined,
+          locale,
         }),
       );
       expect(html).toContain('role="alert"');
+      expect(html).toContain("bg-danger-soft");
       expect(html).toContain(copy.invalid);
+      expect(html).toContain(copy.formErrorHint);
       expect(html).toContain('href="/auth/login?next=%2Farticles%2Fguide"');
       expect(html).toContain('href="/auth/register?next=%2Farticles%2Fguide"');
       expect(html).toContain(copy.signIn);
@@ -30,7 +33,8 @@ describe("discussion compose write feedback", () => {
     },
   );
 
-  it("keeps generic write failures text-only", () => {
+  it("keeps generic write failures on ErrorState without sign-in links", () => {
+    const copy = getDiscussionCopy("en");
     const html = renderToStaticMarkup(
       createElement(DiscussionComposeWriteFeedback, {
         error: "Could not confirm the comment.",
@@ -41,6 +45,8 @@ describe("discussion compose write feedback", () => {
       }),
     );
     expect(html).toContain('role="alert"');
+    expect(html).toContain("bg-danger-soft");
+    expect(html).toContain(copy.formErrorHint);
     expect(html).not.toContain('href="/auth/login"');
   });
 });

@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
 import { serverStatisticsCopy, serverStatisticsError } from "../lib/server-statistics-copy";
@@ -16,6 +16,7 @@ export function ServerStatisticsExportButton({
   locale: Locale;
   disabled?: boolean;
 }) {
+  const copy = serverStatisticsCopy(locale);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const pending = useRef<AbortController | null>(null);
@@ -61,13 +62,26 @@ export function ServerStatisticsExportButton({
         isLoading={busy}
         className="min-h-11 font-semibold text-accent"
       >
-        {busy ? serverStatisticsCopy(locale).downloading : label}
+        {busy ? copy.downloading : label}
       </Button>
-      {error && (
-        <p role="alert" className="max-w-md text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.exportErrorHint}
+          className="items-stretch py-4"
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={disabled || busy}
+              onClick={() => void download()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
+      ) : null}
     </div>
   );
 }

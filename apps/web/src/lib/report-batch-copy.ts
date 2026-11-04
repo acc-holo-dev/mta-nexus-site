@@ -35,6 +35,8 @@ const en = {
   transition: "Recorded status change",
   noRemoval:
     "This decision records report states. Comment removal is available in the individual moderation context.",
+  formErrorHint:
+    "The batch decision was not saved. Reload the saved reports before applying another decision.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Решение по выбранным жалобам",
@@ -70,6 +72,8 @@ const ru: Record<keyof typeof en, string> = {
   transition: "Записанное изменение статуса",
   noRemoval:
     "Решение меняет состояния жалоб. Удаление комментария доступно в отдельном контексте модерации.",
+  formErrorHint:
+    "Пакетное решение не сохранено. Загрузите сохранённые жалобы перед следующим решением.",
 };
 export const reportBatchCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function reportBatchError(locale: Locale, code: unknown) {

@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportRateLimit } from "../lib/community-report-api";
@@ -14,8 +14,8 @@ import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./platform-sign-in";
 import { DiscussionReportBatch } from "./discussion-report-batch";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function publicationReportsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).publicationTitle,
@@ -137,7 +137,7 @@ export async function PublicationReportsPage({
           {filters.page > 1 && (
             <Link
               href={href(filters.page - 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {labels.previous}
             </Link>
@@ -148,7 +148,7 @@ export async function PublicationReportsPage({
           {data.hasMore && filters.page < 9999 && (
             <Link
               href={href(filters.page + 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {labels.next}
             </Link>
@@ -158,17 +158,21 @@ export async function PublicationReportsPage({
     );
   } catch (error) {
     return (
-      <div className="space-y-4">
-        <p role="alert" className="nexus-panel p-5 text-danger">
-          {communityReportError(locale, error instanceof AppError ? error.code : "INTERNAL_ERROR")}
-        </p>
-        <Link
-          href={path}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {labels.reload}
-        </Link>
-      </div>
+      <ErrorState
+        title={communityReportError(
+          locale,
+          error instanceof AppError ? error.code : "INTERNAL_ERROR",
+        )}
+        description={labels.formErrorHint}
+        action={
+          <Link
+            href={path}
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {labels.reload}
+          </Link>
+        }
+      />
     );
   }
 }

@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -290,17 +290,30 @@ export function DiscussionReportBatch({
           {copy.busy}
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.formErrorHint}
+          action={
+            blocked && !busy ? (
+              <Button
+                type="button"
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                onClick={() => router.refresh()}
+                variant="ghost"
+              >
+                {copy.reload}
+              </Button>
+            ) : undefined
+          }
+        />
+      ) : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}
         </p>
       )}
-      {blocked && !busy && (
+      {blocked && !busy && !error ? (
         <Button
           type="button"
           className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -309,7 +322,7 @@ export function DiscussionReportBatch({
         >
           {copy.reload}
         </Button>
-      )}
+      ) : null}
       {preview && (
         <div className="nexus-panel space-y-4 p-5">
           <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
