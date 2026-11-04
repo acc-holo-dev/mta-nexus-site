@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import "../register-ts-directory-resolve.mjs";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 import { waitForReadyCapture } from "../browser-page-ready.mjs";
@@ -12,6 +14,20 @@ assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
 const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
 const { discoveryCopy } = await import("../../apps/web/src/lib/discovery-copy.ts");
 const { notificationInboxCopy } = await import("../../apps/web/src/lib/notification-inbox-copy.ts");
+// Strip-types cannot execute notification-inbox-contract (zod/@nexus graph); keep the
+// category list synced by reading the exported INBOX_CATEGORIES source of truth.
+const inboxCategoriesMatch = readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../apps/web/src/lib/notification-inbox-contract.ts",
+  ),
+  "utf8",
+).match(/export const INBOX_CATEGORIES = \[([^\]]*)\] as const;/u);
+assert(inboxCategoriesMatch, "INBOX_CATEGORIES export required in notification-inbox-contract.ts");
+const INBOX_CATEGORIES = [...inboxCategoriesMatch[1].matchAll(/"([^"]+)"/gu)].map(
+  (match) => match[1],
+);
+assert.notEqual(INBOX_CATEGORIES.length, 0, "INBOX_CATEGORIES must list categories");
 assert(process.env.NEXUS_BROWSER_TOOLS);
 assert(process.env.NEXUS_BROWSER_REPORT_DIR);
 assert(process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
@@ -764,6 +780,19 @@ for (const locale of ["en", "ru"]) {
     await page.goto("/notifications");
     await waitForReadyCapture(page);
     const inboxCopy = notificationInboxCopy(locale);
+    const categorySelect = page.getByLabel(inboxCopy.category, { exact: true });
+    await expect(categorySelect).toBeVisible();
+    const categoryValues = await categorySelect
+      .locator("option")
+      .evaluateAll((options) => options.map((option) => option.value));
+    assert.deepEqual(
+      categoryValues,
+      ["all", ...INBOX_CATEGORIES],
+      `${locale}: notification category option values must match INBOX_CATEGORIES`,
+    );
+    evidence.push(
+      `${locale}: signed-in /notifications category select option values match ["all", ...INBOX_CATEGORIES]`,
+    );
     // Reading filters use a distinct landmark from the page title (notifications primary journey).
     const notificationFilters = page.getByRole("navigation", {
       name: inboxCopy.readingState,
