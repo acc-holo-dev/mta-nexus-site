@@ -8,6 +8,7 @@
 
 - `1bb5ab2d` / #252 — browser contracts after honesty confirms (ConfirmDialog, ErrorState `id`, guest More order, login rate-limit);
 - `f3525fa5` / #249 — Dependabot biome/knip/swc/`@types/node` (full tip CI red on browsers until #252);
+- `9c31b96d` / #254 — CURRENT-STATE tip baseline after #252/#250/#251;
 - `3a696983` / #251 — tailwind 4.3.4 + dependency-cruiser 18.7.2 (TS6 packageExtensions kept);
 - `6cc16b11` / #250 — `docker/login-action` v3→v4 (rebased #177; land after #252);
 - `30b3a1b9` / #247 — knip: drop unused subscription recovery exports;
@@ -19,9 +20,9 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA (full, incl. browsers):** `1bb5ab2dddd17faf19518ab3c06f3a6172c26a27` (`fix(web): restore browser contracts after honesty confirms`).
-- **Verified CI green on that tip:** [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647) (full selected scope; auth/resource/directory browser PASS).
-- **Later tip (deps only, post-#252):** `6cc16b11…` / #250 — see tip CI for that SHA; PR CI was green before squash.
+- **Tip SHA:** `9c31b96dea0a03c3c4ecef36dddf6196eea5ca92` (`docs(state): record #252 full-green tip and deps landings`).
+- **Verified CI green on that tip:** [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471) (selected/docs scope).
+- **Last full browsers green:** `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647); also `6cc16b11…` / #250 tip CI success (17 checks).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
 - **Prior selected green:** `931e496366…` / [CI 41772235893](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41772235893).
@@ -62,11 +63,11 @@
 
 На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13/ARC14 + FLOW/UX/OPS/GROW-01 и UX-19/20/22. **Не** закрыты **F03/F04** (нужен live evidence), GitHub settings, deploy, реклама и GROW-пилоты.
 
-**Последний GitHub-verified baseline:** `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647) (full browsers). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+**Последний GitHub-verified baseline:** tip `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471) (selected); last full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep (#200–#247) + browser honesty restore (#252) + deps (#249/#250) в `main`; verified full tip `1bb5ab2ddd…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep (#200–#247) + browser honesty restore (#252) + deps (#249/#250) в `main`; tip `9c31b96dea…` selected green; last full browsers `1bb5ab2ddd…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
