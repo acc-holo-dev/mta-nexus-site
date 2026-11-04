@@ -5,7 +5,12 @@ const copy = {
     title: "Questions & answers",
     help: "Ask about using this resource. Questions are not reviews and do not change the rating. Thread follow is not a release watch.",
     empty: "No public questions yet.",
+    emptyHint:
+      "Questions stay with this resource. An empty list is not a load failure — ask when you need clarification.",
     unavailable: "Questions are unavailable for this resource right now.",
+    unavailableDescription:
+      "A load failure is not an empty question list. Retry to fetch the latest questions for this resource.",
+    retry: "Try again",
     ask: "Ask a question",
     asking: "Posting…",
     answer: "Post answer",
@@ -23,6 +28,8 @@ const copy = {
     resolved: "Resolved",
     open: "Open",
     noAnswers: "No answers yet.",
+    noAnswersHint:
+      "Answers appear here after someone replies. An empty answer list is not a load failure.",
     loadThread: "Open thread",
     loadingThread: "Loading thread…",
     back: "Back to questions",
@@ -46,7 +53,12 @@ const copy = {
     title: "Вопросы и ответы",
     help: "Спрашивайте об использовании ресурса. Вопрос — не отзыв и не меняет оценку. Подписка на ветку — не слежение за релизами.",
     empty: "Публичных вопросов пока нет.",
+    emptyHint:
+      "Вопросы остаются у этого ресурса. Пустой список — не ошибка загрузки; задайте вопрос, когда нужно уточнение.",
     unavailable: "Вопросы по этому ресурсу сейчас недоступны.",
+    unavailableDescription:
+      "Ошибка загрузки — это не пустой список вопросов. Повторите запрос, чтобы получить актуальные вопросы по ресурсу.",
+    retry: "Повторить",
     ask: "Задать вопрос",
     asking: "Отправка…",
     answer: "Ответить",
@@ -64,6 +76,8 @@ const copy = {
     resolved: "Решено",
     open: "Открыт",
     noAnswers: "Ответов пока нет.",
+    noAnswersHint:
+      "Ответы появятся здесь после ответа. Пустой список ответов — не ошибка загрузки.",
     loadThread: "Открыть ветку",
     loadingThread: "Загрузка ветки…",
     back: "К списку вопросов",

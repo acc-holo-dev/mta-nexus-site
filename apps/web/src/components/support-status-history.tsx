@@ -1,10 +1,15 @@
 "use client";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import { Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { supportActivitySchema } from "../lib/support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
+
+const ghostActionClass =
+  "h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function SupportStatusHistory({ caseId, revision }: { caseId: string; revision?: string }) {
   const { locale, dictionary } = useNexusLocale(),
     copy = supportWorkspaceCopy(locale);
@@ -53,20 +58,23 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
         : dictionary.support.closed;
   return (
     <details
-      className="nexus-panel space-y-3 p-4"
+      className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4"
       onToggle={(event) => setOpen(event.currentTarget.open)}
     >
-      <summary className="min-h-9 cursor-pointer font-heading text-primary">{copy.history}</summary>
+      <summary className="min-h-11 cursor-pointer font-heading text-primary">
+        {copy.history}
+      </summary>
       {open && (
-        <div className="space-y-3" aria-live="polite">
+        <div className="min-w-0 space-y-3 overflow-x-clip" aria-live="polite">
           {error ? (
             <ErrorState
               title={error}
+              description={copy.historyUnavailableDescription}
               action={
                 <Button
                   type="button"
                   onClick={() => setRetry((value) => value + 1)}
-                  className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={ghostActionClass}
                   variant="ghost"
                 >
                   {copy.reload}
@@ -78,13 +86,17 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               {dictionary.support.historyLoading}
             </p>
           ) : data.items.length === 0 ? (
-            <p className="text-sm text-muted">{copy.historyEmpty}</p>
+            <EmptyState
+              title={copy.historyEmpty}
+              description={copy.historyEmptyHint}
+              icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
+            />
           ) : (
-            <ol className="space-y-3">
+            <ol className="min-w-0 space-y-3 overflow-x-clip">
               {data.items.map((item) => (
                 <li
                   key={item.id}
-                  className="flex flex-wrap gap-x-3 gap-y-1 border-b border-base pb-2 text-sm text-secondary"
+                  className="flex min-w-0 flex-wrap gap-x-3 gap-y-1 overflow-x-clip border-b border-base pb-2 text-sm text-secondary"
                 >
                   <span>
                     {label(item.from)} → {label(item.to)}
@@ -99,12 +111,12 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               ))}
             </ol>
           )}
-          <nav className="flex flex-wrap gap-4" aria-label={copy.history}>
+          <nav className="flex min-w-0 flex-wrap gap-4" aria-label={copy.history}>
             {before && (
               <Button
                 type="button"
                 onClick={() => setBefore(undefined)}
-                className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={ghostActionClass}
                 variant="ghost"
               >
                 {copy.latest}
@@ -114,7 +126,7 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
               <Button
                 type="button"
                 onClick={() => setBefore(data.nextCursor ?? undefined)}
-                className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={ghostActionClass}
                 variant="ghost"
               >
                 {copy.older}

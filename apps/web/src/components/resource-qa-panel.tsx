@@ -5,7 +5,8 @@ import type {
   ResourceQaThreadDetail,
   ResourceQaThreadSummary,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import { CircleHelp, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
@@ -28,6 +29,12 @@ type DetailPayload = {
   thread: ResourceQaThreadDetail;
   capabilities: ResourceQaCapabilities;
 };
+
+const shellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6";
+const ghostActionClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const textActionClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function readCode(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
@@ -54,8 +61,10 @@ export function ResourceQaPanel({
   const [page, setPage] = useState<PagePayload | null>(initial);
   const [readError, setReadError] = useState(initial ? "" : copy.unavailable);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pendingThreadId, setPendingThreadId] = useState<string | null>(null);
   const [detail, setDetail] = useState<DetailPayload | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(false);
   const [question, setQuestion] = useState("");
   const [buildId, setBuildId] = useState("");
   const [answer, setAnswer] = useState("");
@@ -80,8 +89,32 @@ export function ResourceQaPanel({
   const canAnswer = Boolean(capabilities?.canAnswer || canManage);
   const canResolve = Boolean(capabilities?.canResolve || canManage);
 
+  async function loadPage() {
+    setLoadingPage(true);
+    setWriteError("");
+    setReadError("");
+    try {
+      const response = await fetch(base, privateApiRequest({ timeoutMs: 15_000 })).catch(
+        () => null,
+      );
+      const payload: unknown = response ? await response.json().catch(() => null) : null;
+      if (!response?.ok || !payload || typeof payload !== "object") {
+        setPage(null);
+        setReadError(
+          response ? resourceQaError(locale, readCode(payload) ?? "UNCONFIRMED") : copy.unavailable,
+        );
+        return;
+      }
+      setPage(payload as PagePayload);
+      setPendingThreadId(null);
+    } finally {
+      setLoadingPage(false);
+    }
+  }
+
   async function loadThread(threadId: string) {
     setLoadingDetail(true);
+    setPendingThreadId(threadId);
     setWriteError("");
     setReadError("");
     try {
@@ -255,33 +288,59 @@ export function ResourceQaPanel({
     if (ok) await loadThread(detail.thread.id);
   }
 
+  function retryRead() {
+    if (pendingThreadId) {
+      void loadThread(pendingThreadId);
+      return;
+    }
+    void loadPage();
+  }
+
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className={shellClass}
       data-testid="resource-qa-panel"
-      aria-busy={loadingDetail || undefined}
+      aria-busy={loadingDetail || loadingPage || undefined}
     >
-      <div className="space-y-1 border-b border-base pb-3">
-        <h2 className="text-base font-bold text-primary">{copy.title}</h2>
+      <div className="min-w-0 space-y-1 border-b border-base pb-3">
+        <h2 className="min-w-0 break-words text-base font-bold text-primary">{copy.title}</h2>
         <p className="text-xs text-muted">{copy.help}</p>
       </div>
 
-      {readError ? <p className="text-xs text-warning">{readError}</p> : null}
-      {writeError ? <p className="text-xs text-warning">{writeError}</p> : null}
+      {readError ? (
+        <ErrorState
+          title={readError}
+          description={copy.unavailableDescription}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              className={ghostActionClass}
+              disabled={busy || loadingDetail || loadingPage}
+              onClick={retryRead}
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
+      ) : null}
+      {writeError ? <ErrorState title={writeError} /> : null}
 
       {selectedId && detail ? (
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4 overflow-x-clip">
           <button
             type="button"
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={textActionClass}
             onClick={() => {
               setSelectedId(null);
               setDetail(null);
+              setPendingThreadId(null);
+              setReadError("");
             }}
           >
             {copy.back}
           </button>
-          <article className="space-y-2 rounded-lg border border-base bg-surface p-3">
+          <article className="min-w-0 space-y-2 overflow-x-clip rounded-lg border border-base bg-surface p-3">
             <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase text-muted">
               <span>{detail.thread.status === "resolved" ? copy.resolved : copy.open}</span>
               {detail.thread.buildContext ? (
@@ -291,7 +350,7 @@ export function ResourceQaPanel({
                 </span>
               ) : null}
             </div>
-            <p className="text-sm text-secondary">{detail.thread.body}</p>
+            <p className="break-words text-sm text-secondary">{detail.thread.body}</p>
             <p className="text-xs text-faint">
               {detail.thread.author?.displayName ?? detail.thread.author?.username ?? "—"}
             </p>
@@ -303,6 +362,7 @@ export function ResourceQaPanel({
                 type="button"
                 variant="secondary"
                 size="sm"
+                className="min-h-11"
                 disabled={busy}
                 onClick={() => void onFollow(!detail.thread.following)}
               >
@@ -312,27 +372,31 @@ export function ResourceQaPanel({
             </div>
           ) : null}
 
-          <div className="space-y-3">
+          <div className="min-w-0 space-y-3 overflow-x-clip">
             {detail.thread.answers.length === 0 ? (
-              <p className="text-xs text-faint">{copy.noAnswers}</p>
+              <EmptyState
+                title={copy.noAnswers}
+                description={copy.noAnswersHint}
+                icon={<MessageCircle className="h-6 w-6" aria-hidden="true" />}
+              />
             ) : (
               detail.thread.answers.map((item) => (
                 <article
                   key={item.id}
-                  className={`space-y-2 rounded-lg border p-3 ${
+                  className={`min-w-0 space-y-2 overflow-x-clip rounded-lg border p-3 ${
                     item.isResolved
                       ? "border-[color:var(--nexus-success)]/30 bg-success-soft"
                       : "border-base bg-surface"
                   }`}
                 >
-                  <p className="text-sm text-secondary">{item.body}</p>
+                  <p className="break-words text-sm text-secondary">{item.body}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-faint">
                     <span>{item.author?.displayName ?? item.author?.username ?? "—"}</span>
                     {item.isResolved ? <span>{copy.resolved}</span> : null}
                     {canResolve && detail.thread.status !== "resolved" ? (
                       <button
                         type="button"
-                        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={textActionClass}
                         disabled={busy}
                         onClick={() => void onResolve(item.id)}
                       >
@@ -350,6 +414,7 @@ export function ResourceQaPanel({
               type="button"
               variant="secondary"
               size="sm"
+              className="min-h-11"
               disabled={busy}
               onClick={() => void onReopen()}
             >
@@ -358,8 +423,8 @@ export function ResourceQaPanel({
           ) : null}
 
           {canAnswer ? (
-            <form className="space-y-2" onSubmit={onAnswer}>
-              <label className="block space-y-1 text-xs text-muted">
+            <form className="min-w-0 space-y-2" onSubmit={onAnswer}>
+              <label className="block min-w-0 space-y-1 text-xs text-muted">
                 <span>{copy.answer}</span>
                 <textarea
                   className="min-h-24 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -370,14 +435,19 @@ export function ResourceQaPanel({
                   disabled={busy}
                 />
               </label>
-              <Button type="submit" size="sm" disabled={busy || answer.trim().length < 3}>
+              <Button
+                type="submit"
+                size="sm"
+                className="min-h-11"
+                disabled={busy || answer.trim().length < 3}
+              >
                 {busy ? copy.answering : copy.answer}
               </Button>
             </form>
           ) : null}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4 overflow-x-clip">
           {!authenticated ? (
             <div className="space-y-2">
               <p className="text-xs text-muted">{copy.publicRead}</p>
@@ -391,8 +461,8 @@ export function ResourceQaPanel({
           ) : capabilities?.askReason === "access_required" ? (
             <p className="text-xs text-muted">{copy.accessRequired}</p>
           ) : canAsk ? (
-            <form className="space-y-2" onSubmit={onAsk}>
-              <label className="block space-y-1 text-xs text-muted">
+            <form className="min-w-0 space-y-2" onSubmit={onAsk}>
+              <label className="block min-w-0 space-y-1 text-xs text-muted">
                 <span>{copy.ask}</span>
                 <textarea
                   className="min-h-24 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -404,10 +474,10 @@ export function ResourceQaPanel({
                 />
               </label>
               {builds.length > 0 ? (
-                <label className="block space-y-1 text-xs text-muted">
+                <label className="block min-w-0 space-y-1 text-xs text-muted">
                   <span>{copy.optionalBuild}</span>
                   <select
-                    className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
+                    className="min-h-11 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
                     value={buildId}
                     onChange={(event) => setBuildId(event.target.value)}
                     disabled={busy}
@@ -421,13 +491,18 @@ export function ResourceQaPanel({
                   </select>
                 </label>
               ) : null}
-              <Button type="submit" size="sm" disabled={busy || question.trim().length < 3}>
+              <Button
+                type="submit"
+                size="sm"
+                className="min-h-11"
+                disabled={busy || question.trim().length < 3}
+              >
                 {busy ? copy.asking : copy.ask}
               </Button>
             </form>
-          ) : (
+          ) : !readError ? (
             <p className="text-xs text-muted">{copy.unavailable}</p>
-          )}
+          ) : null}
 
           {loadingDetail ? (
             <p role="status" className="text-xs text-faint">
@@ -435,12 +510,20 @@ export function ResourceQaPanel({
             </p>
           ) : null}
 
-          {!page || page.threads.length === 0 ? (
-            <p className="text-xs text-faint">{copy.empty}</p>
-          ) : (
-            <ul className="space-y-3">
+          {!readError && (!page || page.threads.length === 0) ? (
+            <EmptyState
+              title={copy.empty}
+              description={copy.emptyHint}
+              icon={<CircleHelp className="h-6 w-6" aria-hidden="true" />}
+            />
+          ) : null}
+          {!readError && page && page.threads.length > 0 ? (
+            <ul className="min-w-0 space-y-3 overflow-x-clip">
               {page.threads.map((thread) => (
-                <li key={thread.id} className="rounded-lg border border-base bg-surface p-3">
+                <li
+                  key={thread.id}
+                  className="min-w-0 overflow-x-clip rounded-lg border border-base bg-surface p-3"
+                >
                   <div className="mb-1 flex flex-wrap gap-2 text-[11px] uppercase text-muted">
                     <span>{thread.status === "resolved" ? copy.resolved : copy.open}</span>
                     <span>{thread.answerCount}</span>
@@ -451,10 +534,10 @@ export function ResourceQaPanel({
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-sm text-secondary">{thread.body}</p>
+                  <p className="break-words text-sm text-secondary">{thread.body}</p>
                   <button
                     type="button"
-                    className="mt-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={`mt-2 ${textActionClass}`}
                     onClick={() => void loadThread(thread.id)}
                   >
                     {copy.loadThread}
@@ -462,7 +545,7 @@ export function ResourceQaPanel({
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </div>
       )}
     </section>
