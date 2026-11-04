@@ -73,7 +73,16 @@ function descendants(node: ReactNode): Element[] {
 
 function seedCart() {
   // cart, review, busy, error, receiptId, active ref, lock ref, pending ref
-  harness.slots = [initialCart, null, false, "", null, { current: null }, { current: false }, { current: null }];
+  harness.slots = [
+    initialCart,
+    null,
+    false,
+    "",
+    null,
+    { current: null },
+    { current: false },
+    { current: null },
+  ];
 }
 
 function render() {
