@@ -40,6 +40,12 @@ describe("deterministic development startup contract", () => {
     expect(compose).toContain("./packages/validation/src:/app/packages/validation/src:ro");
     expect(pkg.scripts["dev:docker:check"]).toContain("scripts/check-local-readiness.mjs");
     expect(pkg.scripts["dev:docker:check"]).toContain("check-web-push-worker-health.mjs");
+    expect(pkg.scripts["dev:docker:check"]).toContain(
+      "exec license-worker node /app/scripts/check-license-worker-health.mjs",
+    );
+    expect(pkg.scripts["dev:docker:check"]).toContain(
+      "exec resource-release-worker node /app/scripts/check-resource-release-worker-health.mjs",
+    );
     expect(pkg.scripts["dev:docker:down"]).toContain("docker compose");
   });
 
@@ -52,9 +58,12 @@ describe("deterministic development startup contract", () => {
       expect(document).toContain("pnpm dev:host");
     }
     expect(readme).toContain("full Docker development stack");
+    expect(readme).toContain("push / license / resource-release");
     expect(operations).toContain("starts only the Next.js development server");
     expect(operations).toContain("distinguish process heartbeat from dispatcher progress");
     expect(operations).toContain("pnpm dev:docker:check");
+    expect(operations).toContain("license-worker and");
+    expect(operations).toContain("resource-release-worker liveness");
     expect(operations).toContain("pnpm dev:docker:down");
   });
 });

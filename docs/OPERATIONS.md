@@ -63,11 +63,11 @@ Readiness:
 docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
-`pnpm dev:docker:check` requires both app readiness and push-worker liveness.
-The app half checks HTTP health, database reachability and writable private storage;
-the worker half validates heartbeat/progress and queue counters. With no VAPID triplet it remains
-healthy-idle and performs queue maintenance; with all three VAPID values set it
-dispatches durable Web Push jobs.
+`pnpm dev:docker:check` requires app readiness plus push-worker, license-worker and
+resource-release-worker liveness. The app half checks HTTP health, database reachability
+and writable private storage; each worker half validates its heartbeat/progress probe.
+With no VAPID triplet the push worker remains healthy-idle and performs queue maintenance;
+with all three VAPID values set it dispatches durable Web Push jobs.
 
 `pnpm dev:docker:down` (or `docker compose … stop`) sends SIGTERM. App and workers use
 `init: true` so the signal reaches the Node process; the push worker gets a 30-second
@@ -106,12 +106,13 @@ links are allowed only for an explicitly configured `NODE_ENV=development` and
 `localhost`, `127.0.0.1` or `::1`; production and other environments still require
 HTTPS. This exception changes the link origin, not SMTP TLS verification.
 
-`pnpm dev:mail:check` checks the app, push-worker and mail-worker, then sends a
-synthetic message through the actual SMTP transport, verifies its captured body
-through the Mailpit API and deletes only that probe. It does not verify the entire
-account recovery flow. For that, log into a regular password-based development account without 2FA,
-verify its existing email in security settings using the captured link, then
-request a password reset and follow the captured reset link.
+`pnpm dev:mail:check` runs `dev:docker:check` (app + push / license / resource-release
+workers) then the mail-worker, sends a synthetic message through the actual SMTP
+transport, verifies its captured body through the Mailpit API and deletes only that
+probe. It does not verify the entire account recovery flow. For that, log into a
+regular password-based development account without 2FA, verify its existing email in
+security settings using the captured link, then request a password reset and follow
+the captured reset link.
 
 Mailpit keeps at most 200 messages for 24 hours in its temporary database;
 container replacement discards captures. Database outbox data and encryption keys
