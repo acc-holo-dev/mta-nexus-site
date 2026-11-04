@@ -142,7 +142,7 @@ it.each(["en", "ru"] as const)(
     expect(page?.searchParams.get("status")).toBe("archived");
     expect(page?.searchParams.get("tag")).toBe("MTA");
     expect(page?.searchParams.has("page")).toBe(false);
-    expect((await deskMetadata()).robots.index).toBe(false);
+    expect(await deskMetadata()).toMatchObject({ robots: { index: false, follow: false } });
     const loadingCopy = authorPublicationDeskCopy(locale);
     const loadingHtml = renderToStaticMarkup(await Loading());
     expect(loadingHtml).toContain('aria-busy="true"');
@@ -169,7 +169,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(`dateTime="${revision}"`);
     expect(html).toContain('href="/workspace/content/article"');
     expect(html).toContain("cursor=");
-    expect((await historyMetadata()).robots.index).toBe(false);
+    expect(await historyMetadata()).toMatchObject({ robots: { index: false, follow: false } });
   },
 );
 it("never offers restoration for an unproven archive", async () => {
