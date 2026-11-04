@@ -364,7 +364,34 @@ it("renders staff decisions with resource revision controls and bounded history"
   expect(html).toContain('data-status="suspended"');
   expect(html).toContain("&lt;Evidence&gt;");
   expect(html).toContain("page=3");
+  expect(html).toContain("overflow-x-clip");
   expect(state.staffDetail).toHaveBeenCalledWith(state.user, "prd_a", 2);
+});
+it("shows an honest recovery state when staff resource detail fails", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.staffDetail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await StaffDetail(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(`/admin/resources/prd_a?page=2`);
+  expect(html).not.toContain("data-status");
+});
+it("renders empty staff moderation history without inventing events", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  const detail = await state.staffDetail();
+  state.staffDetail.mockResolvedValue({ ...detail, events: [], page: 1, totalPages: 1, total: 0 });
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(
+    await StaffDetail({
+      params: Promise.resolve({ id: "prd_a" }),
+      searchParams: Promise.resolve({ page: "1" }),
+    }),
+  );
+  expect(html).toContain(copy.empty);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).not.toContain("&lt;Evidence&gt;");
 });
 it("shows the author a reason and review requirement without staff action controls", async () => {
   const html = renderToStaticMarkup(await Publisher(input));

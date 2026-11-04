@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportId, reportRateLimit } from "../lib/community-report-api";
@@ -49,16 +50,21 @@ export async function CommunityReportHistoryPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto max-w-4xl space-y-4">
-        <p role="alert" className="nexus-panel p-5 text-danger">
-          {reportHistoryError(locale, error instanceof AppError ? error.code : "INTERNAL_ERROR")}
-        </p>
-        <Link
-          href={path}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
+      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
+        <ErrorState
+          title={reportHistoryError(
+            locale,
+            error instanceof AppError ? error.code : "INTERNAL_ERROR",
+          )}
+          action={
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          }
+        />
       </div>
     );
   }

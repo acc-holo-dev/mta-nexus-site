@@ -1,5 +1,6 @@
 import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
+import { Flag } from "lucide-react";
 import Link from "next/link";
 import { REPORT_TYPES } from "../lib/community-report-contract";
 import { communityReportCopy } from "../lib/community-report-copy";
@@ -35,19 +36,23 @@ export function CommunityReportGroups({
   if (filters.type) contextQuery.set("type", filters.type);
   if (filters.query) contextQuery.set("q", filters.query);
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip">
       <Link
         href="/admin/reports"
         className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
-      <header className="space-y-2">
+      <header className="min-w-0 space-y-2">
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.order}</p>
       </header>
-      <form method="get" action={path} className="nexus-panel grid gap-3 p-4 sm:grid-cols-2">
+      <form
+        method="get"
+        action={path}
+        className="nexus-panel grid min-w-0 gap-3 p-4 sm:grid-cols-2"
+      >
         <label className="space-y-1 text-sm text-secondary">
           <span>{copy.search}</span>
           <input
@@ -108,21 +113,28 @@ export function CommunityReportGroups({
       </form>
       <PrivateChangeHistoryCutoff until={page.until} locale={locale} />
       {page.items.length === 0 ? (
-        <div role="status" className="nexus-panel space-y-3 p-5 text-muted">
-          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
-          {filtered ? (
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={filtered ? copy.emptyFiltered : copy.empty}
+          description={filtered ? copy.reset : copy.description}
+          icon={<Flag className="h-6 w-6" aria-hidden="true" />}
+          action={
+            filtered ? (
+              <Link
+                href={path}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
-        <ol className="space-y-3">
+        <ol className="min-w-0 space-y-3">
           {page.items.map((item) => (
-            <li key={`${item.targetType}:${item.targetId}`} className="nexus-panel space-y-3 p-5">
+            <li
+              key={`${item.targetType}:${item.targetId}`}
+              className="nexus-panel min-w-0 space-y-3 p-5"
+            >
               <h2 className="break-words text-base font-semibold text-primary">
                 {labels[item.targetType]} · {item.target?.title ?? item.targetId}
               </h2>
