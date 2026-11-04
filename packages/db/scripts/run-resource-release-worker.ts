@@ -1,6 +1,7 @@
-import { rename, rm, writeFile } from "node:fs/promises";
+import { rename, writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { resourceReleaseWorkerOptions } from "../src/resource-release-worker-config";
+import { cleanupWorkerHealth } from "./worker-health-cleanup";
 
 // Health state stays on tmpfs /tmp under production read_only (OPS-15).
 const healthFile = "/tmp/nexus-resource-release-worker-health.json",
@@ -67,9 +68,11 @@ async function main() {
     process.removeListener("SIGINT", stop);
     process.removeListener("SIGTERM", stop);
     status = "stopping";
-    await closeDatabaseConnection();
-    await rm(temporary, { force: true });
-    await rm(healthFile, { force: true });
+    try {
+      await closeDatabaseConnection();
+    } finally {
+      await cleanupWorkerHealth(writing, temporary, healthFile);
+    }
   }
   if (failure) throw failure;
 }
