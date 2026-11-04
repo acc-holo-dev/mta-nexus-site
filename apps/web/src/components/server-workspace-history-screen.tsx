@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +16,11 @@ import { authService } from "../lib/services/auth-service";
 import { serverWorkspaceHistoryService } from "../lib/services/server-workspace-history-service";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function ServerWorkspaceHistoryScreen({
   id,
   searchParams,
@@ -72,13 +77,11 @@ export async function ServerWorkspaceHistoryScreen({
   const exportParams = new URLSearchParams(params);
   if (data) exportParams.set("until", data.until);
   const exportPath = `/api/workspace/servers/${encodeURIComponent(id)}/activity/export${exportParams.size ? `?${exportParams}` : ""}`;
+  const filtered = query.period !== "all" || query.action !== "all";
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className={pageShellClass}>
       <header className="space-y-2">
-        <Link
-          href={`/workspace/servers/${encodeURIComponent(id)}`}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={navLinkClass}>
           {history.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">{history.title}</h1>
@@ -89,7 +92,11 @@ export async function ServerWorkspaceHistoryScreen({
       <form action={base} method="get" className="nexus-panel flex flex-wrap items-end gap-4 p-5">
         <label className="flex flex-col gap-2 text-sm text-primary">
           <span>{copy.period}</span>
-          <select name="period" defaultValue={query.period} className={platformFieldClass}>
+          <select
+            name="period"
+            defaultValue={query.period}
+            className={`${platformFieldClass} min-h-11`}
+          >
             {(["all", "7", "30", "90", "365"] as const).map((period) => (
               <option key={period} value={period}>
                 {period === "all" ? copy.all : copy[`days${period}`]}
@@ -99,7 +106,11 @@ export async function ServerWorkspaceHistoryScreen({
         </label>
         <label className="flex flex-col gap-2 text-sm text-primary">
           <span>{copy.action}</span>
-          <select name="action" defaultValue={query.action} className={platformFieldClass}>
+          <select
+            name="action"
+            defaultValue={query.action}
+            className={`${platformFieldClass} min-h-11`}
+          >
             {(["all", "listing", "visibility", "control", "verification"] as const).map(
               (action) => (
                 <option key={action} value={action}>
@@ -112,34 +123,43 @@ export async function ServerWorkspaceHistoryScreen({
         <Button type="submit" variant="outline" className="min-h-11 text-accent">
           {copy.apply}
         </Button>
-        <Link
-          href={base}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={base} className={navLinkClass}>
           {copy.reset}
         </Link>
       </form>
       {!data ? (
-        <p role="alert" className="nexus-panel p-5 text-sm text-danger">
-          {failure || copy.historyUnavailable}
-        </p>
+        <ErrorState
+          title={failure || copy.historyUnavailable}
+          action={
+            <Link href={serverWorkspaceHistoryHref(id, query)} className={navLinkClass}>
+              {copy.reload}
+            </Link>
+          }
+        />
       ) : (
         <>
           <div className="space-y-2">
-            <a
-              href={exportPath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <a href={exportPath} className={navLinkClass}>
               {copy.export}
             </a>
             <p className="text-xs text-muted">{copy.exportHelp}</p>
           </div>
           {!data.events.length ? (
-            <p className="nexus-panel p-5 text-sm text-muted">{copy.historyEmpty}</p>
+            <EmptyState
+              title={filtered ? copy.historyEmpty : copy.historyEmptyNever}
+              description={filtered ? copy.historyEmptyHint : copy.historyEmptyNeverHint}
+              action={
+                filtered ? (
+                  <Link href={base} className={navLinkClass}>
+                    {copy.reset}
+                  </Link>
+                ) : undefined
+              }
+            />
           ) : (
             <ol className="space-y-3">
               {data.events.map((event) => (
-                <li key={event.id} className="nexus-panel space-y-2 p-5">
+                <li key={event.id} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
                   <h2 className="text-sm font-bold text-primary">
                     {history.actions[event.action]}
                   </h2>
@@ -164,7 +184,7 @@ export async function ServerWorkspaceHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className="inline-flex min-h-11 text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={navLinkClass}
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>
@@ -189,7 +209,7 @@ export async function ServerWorkspaceHistoryScreen({
             <Link
               prefetch={false}
               href={serverWorkspaceHistoryHref(id, query)}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {history.latest}
             </Link>
@@ -197,7 +217,7 @@ export async function ServerWorkspaceHistoryScreen({
               <Link
                 prefetch={false}
                 href={serverWorkspaceHistoryHref(id, query, data.nextCursor)}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {history.older}
               </Link>

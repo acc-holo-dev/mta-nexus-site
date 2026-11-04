@@ -1,7 +1,7 @@
 "use client";
 
 import { normalizeMtaAddress } from "@nexus/domain";
-import { Button, Field, Input, fieldControlClass } from "@nexus/ui";
+import { Button, ErrorState, Field, fieldControlClass, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
@@ -358,15 +358,13 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         <Button type="submit" isLoading={loading} disabled={loading} className="min-h-11">
           {loading ? copy.saving : copy.save}
         </Button>
-        {notice && (
-          <span
-            role={notice.error ? "alert" : "status"}
-            className={`text-xs ${notice.error ? "text-danger" : "text-success"}`}
-          >
+        {notice && !notice.error && (
+          <span role="status" className="text-xs text-success">
             {notice.text}
           </span>
         )}
       </div>
+      {notice?.error ? <ErrorState title={notice.text} className="sm:col-span-2" /> : null}
     </form>
   );
 }

@@ -19,7 +19,10 @@ const en = {
   apply: "Apply filters",
   reset: "Clear filters",
   emptyNever: "No observations were stored in this period.",
+  emptyNeverHint:
+    "Stored MTA master-list observations for this period will appear here once they are collected.",
   emptyFiltered: "No observations match these filters in this period.",
+  emptyFilteredHint: "Clear filters or choose another period to see stored observations.",
   scope:
     "Each page contains up to 25 stored observations, newest first. Unknown values and missing records do not establish that a server was offline.",
   export: "Download this filtered page as CSV",
@@ -52,7 +55,11 @@ const ru: Record<keyof typeof en, string> = {
   apply: "Применить фильтры",
   reset: "Сбросить фильтры",
   emptyNever: "В этом периоде сохранённых наблюдений нет.",
+  emptyNeverHint:
+    "Сохранённые наблюдения официального списка MTA за этот период появятся здесь после сбора.",
   emptyFiltered: "В этом периоде нет наблюдений с выбранными фильтрами.",
+  emptyFilteredHint:
+    "Сбросьте фильтры или выберите другой период, чтобы увидеть сохранённые наблюдения.",
   scope:
     "До 25 сохранённых наблюдений на странице, сначала новые. Неизвестные значения и отсутствие записей не доказывают, что сервер был отключён.",
   export: "Скачать эту страницу с фильтрами в CSV",

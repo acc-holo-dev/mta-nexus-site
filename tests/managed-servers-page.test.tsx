@@ -122,6 +122,7 @@ it("avoids directory work for empty filters and offers a reset", async () => {
   state.page.mockResolvedValue({ servers: [], total: 0, page: 1, pageSize: 12, totalPages: 1 });
   const html = await render({ q: "missing" });
   expect(html).toContain("No servers match these filters");
+  expect(html).toContain("Try other filters or reset them to see all managed servers.");
   expect(html).toContain("Reset filters");
   expect(state.directory).not.toHaveBeenCalled();
 });
@@ -129,6 +130,9 @@ it("links to server registration when the managed list is empty without filters"
   state.page.mockResolvedValue({ servers: [], total: 0, page: 1, pageSize: 12, totalPages: 1 });
   const html = await render();
   expect(html).toContain("You have no servers to manage yet.");
+  expect(html).toContain(
+    "Register a personal server or manage an organization server to see it here.",
+  );
   expect(html).toContain('href="/workspace/servers/new"');
 });
 it.each(["missing", "stale", "failure"])(
@@ -173,6 +177,7 @@ it("does not disguise a failed database read as an empty workspace", async () =>
   state.page.mockRejectedValue(new Error("Database unavailable"));
   const html = await render();
   expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
   expect(html).toContain("temporarily unavailable");
   expect(html).not.toContain("Database unavailable");
   expect(state.directory).not.toHaveBeenCalled();

@@ -1,11 +1,11 @@
-import { authorPublicationDeskCopy } from "../../../../../../../lib/author-publication-desk-copy";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
+import { serverPublicationHistoryCopy } from "../../../../../../../lib/server-publication-history-copy";
 
 export default async function Loading() {
-  const copy = authorPublicationDeskCopy(await getRequestLocale());
+  const copy = serverPublicationHistoryCopy(await getRequestLocale());
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="content-history-loading-heading"
     >

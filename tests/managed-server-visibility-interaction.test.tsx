@@ -83,6 +83,16 @@ function render(locale: "en" | "ru" = "en", rows = items) {
   harness.cursor = 0;
   return flattenReactTestTree(ManagedServerVisibilityBatch({ items: rows, locale }));
 }
+function hasCopy(nodes: Element[], text: string) {
+  return nodes.some(
+    (node) =>
+      node.props.children === text ||
+      node.props.title === text ||
+      (typeof node.type !== "string" &&
+        (node.type as { name?: string }).name === "ErrorState" &&
+        node.props.title === text),
+  );
+}
 const button = findTestButton;
 function click(nodes: Element[], label: string) {
   return (button(nodes, label).props.onClick as () => void)();
@@ -246,9 +256,7 @@ it.each(["foreign", "duplicate", "extra", "changed"])(
     selected();
     click(render(), serverWorkspaceCopy("en").preview);
     await vi.waitFor(() =>
-      expect(
-        render().some((node) => node.props.children === serverWorkspaceCopy("en").unavailable),
-      ).toBe(true),
+      expect(hasCopy(render(), serverWorkspaceCopy("en").unavailable)).toBe(true),
     );
     expect(render().some((node) => node.props.children === serverWorkspaceCopy("en").confirm)).toBe(
       false,
@@ -277,9 +285,7 @@ it.each(["revision", "scope", "network"])(
       button(render(), serverWorkspaceCopy("en").confirm).props.onClick as () => Promise<void>
     )();
     await vi.waitFor(() =>
-      expect(
-        render().some((node) => node.props.children === serverWorkspaceCopy("en").uncertain),
-      ).toBe(true),
+      expect(hasCopy(render(), serverWorkspaceCopy("en").uncertain)).toBe(true),
     );
     await (retainedCommit.props.onClick as () => Promise<void>)();
     expect(harness.fetch).toHaveBeenCalledTimes(2);
@@ -298,11 +304,7 @@ it("shows a safe stale-review error and does not retry it automatically", async 
     response({ code: "SERVER_BATCH_CHANGED", error: "Sensitive server information" }, 409),
   );
   await commitBatch(() => render(), serverWorkspaceCopy("en").confirm);
-  await vi.waitFor(() =>
-    expect(render().some((node) => node.props.children === serverWorkspaceCopy("en").changed)).toBe(
-      true,
-    ),
-  );
+  await vi.waitFor(() => expect(hasCopy(render(), serverWorkspaceCopy("en").changed)).toBe(true));
   expect(harness.fetch).toHaveBeenCalledTimes(2);
   expect(harness.refresh).not.toHaveBeenCalled();
 });
@@ -346,7 +348,5 @@ it("retains confirmed success if refreshing the page fails", async () => {
       true,
     ),
   );
-  expect(
-    render().some((node) => node.props.children === serverWorkspaceCopy("en").unavailable),
-  ).toBe(true);
+  expect(hasCopy(render(), serverWorkspaceCopy("en").unavailable)).toBe(true);
 });

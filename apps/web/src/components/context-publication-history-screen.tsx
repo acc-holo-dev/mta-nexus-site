@@ -1,5 +1,6 @@
 import type { User } from "@nexus/domain";
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { parseAuthorPublicationHistoryQuery } from "../lib/author-publication-desk-contract";
@@ -22,6 +23,11 @@ import { publicationSupportHref } from "../lib/support-workspace-contract";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { AuthorPublicationRestore } from "./author-publication-restore";
 import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
@@ -81,12 +87,11 @@ export async function ContextPublicationHistoryScreen({
   const data =
     result.success && context?.id === id && result.data.item.id === contentId ? result.data : null;
   const base = `/workspace/${kind}/${encodeURIComponent(id)}/content`;
+  const emptyDescription =
+    kind === "servers" ? serverPublicationHistoryCopy(locale).historyEmptyHint : copy.description;
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={base}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={base} className={navLinkClass}>
         {workspaceTitle}
       </Link>
       <header className="space-y-2">
@@ -99,26 +104,20 @@ export async function ContextPublicationHistoryScreen({
         )}
       </header>
       {!data ? (
-        <section className="nexus-panel space-y-3 p-5">
-          <p role="alert" className="text-sm text-danger">
-            {failure || copy.unavailable}
-          </p>
-          <a
-            href={path}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {history.reload}
-          </a>
-        </section>
+        <ErrorState
+          title={failure || copy.unavailable}
+          action={
+            <a href={path} className={navLinkClass}>
+              {history.reload}
+            </a>
+          }
+        />
       ) : (
         <>
           <p className="text-sm text-muted">
             {labels.status}: {labels[data.item.status]}
           </p>
-          <Link
-            href={`${base}/${encodeURIComponent(contentId)}`}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`${base}/${encodeURIComponent(contentId)}`} className={navLinkClass}>
             {labels.edit}
           </Link>
           {data.item.recoverable && (
@@ -133,20 +132,17 @@ export async function ContextPublicationHistoryScreen({
           {data.item.status === "archived" && !data.item.recoverable && (
             <section className="nexus-panel space-y-2 p-4">
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
-              <Link
-                href={publicationSupportHref(data.item.title)}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={publicationSupportHref(data.item.title)} className={navLinkClass}>
                 {history.support}
               </Link>
             </section>
           )}
           {!data.events.length ? (
-            <p className="nexus-panel p-5 text-muted">{history.historyEmpty}</p>
+            <EmptyState title={history.historyEmpty} description={emptyDescription} />
           ) : (
             <ol className="space-y-3">
               {data.events.map((event) => (
-                <li key={event.id} className="nexus-panel space-y-2 p-4">
+                <li key={event.id} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-4">
                   <p className="font-semibold text-primary">{history[event.kind]}</p>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
@@ -164,7 +160,7 @@ export async function ContextPublicationHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className="inline-flex min-h-11 items-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={navLinkClass}
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>
@@ -181,18 +177,14 @@ export async function ContextPublicationHistoryScreen({
             </ol>
           )}
           <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-            <Link
-              prefetch={false}
-              href={path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link prefetch={false} href={path} className={navLinkClass}>
               {history.historyLatest}
             </Link>
             {data.olderCursor && (
               <Link
                 prefetch={false}
                 href={`${path}?${new URLSearchParams({ cursor: data.olderCursor })}`}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {history.historyOlder}
               </Link>

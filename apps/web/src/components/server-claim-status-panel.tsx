@@ -20,10 +20,10 @@ export function ServerClaimStatusPanel({
   const waiting = request?.status === "pending";
   const dateLabel = (date: Date) => `${date.toISOString().replace("T", " ").slice(0, 16)} UTC`;
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4 overflow-x-clip">
       {(status.isVerified || request) && (
         <section
-          className="nexus-panel space-y-3 p-5"
+          className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
           aria-labelledby="server-claim-status-heading"
         >
           <h2 id="server-claim-status-heading" className="text-sm font-bold text-primary">
@@ -64,7 +64,7 @@ export function ServerClaimStatusPanel({
           )}
           <Link
             href={`/workspace/servers/${encodeURIComponent(serverId)}`}
-            className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.refresh}
           </Link>

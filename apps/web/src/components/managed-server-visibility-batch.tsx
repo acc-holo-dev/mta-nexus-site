@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -179,7 +179,7 @@ export function ManagedServerVisibilityBatch({
     }
   }
   return (
-    <section className="space-y-4" aria-busy={busy}>
+    <section className="min-w-0 space-y-4 overflow-x-clip" aria-busy={busy}>
       <div className="nexus-panel space-y-4 p-5">
         <h2 className="text-lg font-semibold text-primary">{copy.batchTitle}</h2>
         <p className="text-sm text-muted">{copy.batchHelp}</p>
@@ -209,7 +209,7 @@ export function ManagedServerVisibilityBatch({
             <span>{labels.visibility}</span>
             <select
               value={visibility}
-              className={platformFieldClass}
+              className={`${platformFieldClass} min-h-11`}
               onChange={(event) => {
                 if (!pending.current && !locked.current) {
                   setError("");
@@ -241,11 +241,7 @@ export function ManagedServerVisibilityBatch({
           {copy.busy}
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} /> : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}

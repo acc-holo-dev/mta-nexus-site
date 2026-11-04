@@ -1,5 +1,5 @@
 import { serverRepository } from "@nexus/db";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { platformSignInFocusClass } from "../../../components/guest-auth-links";
 import { ManagedServerCard } from "../../../components/managed-server-card";
 import { ManagedServerVisibilityBatch } from "../../../components/managed-server-visibility-batch";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   getManagedServerCopy,
@@ -21,6 +22,11 @@ import {
 } from "../../../lib/services/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${getManagedServerCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -39,45 +45,49 @@ export default async function ManagedServersPage({
     searchParams,
   ]);
   const copy = getManagedServerCopy(locale);
+  const dictionary = getDictionary(locale);
+  const workspace = serverWorkspaceCopy(locale);
   const { filters, page } = parseManagedServerQuery(query);
-  let failure = "";
+  let sessionFailed = false;
   const user = await authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => {
-    failure = serverWorkspaceCopy(locale).unavailable;
+    sessionFailed = true;
     return null;
   });
-  if (!user) {
-    const returnPath = managedServerHref(filters, page);
+  if (sessionFailed) {
     return (
-      <>
-        {failure ? (
-          <div className="mx-auto max-w-xl pt-8 text-center">
-            <p role="alert" className="text-sm text-danger">
-              {failure}
-            </p>
-          </div>
-        ) : null}
-        <PlatformSignIn locale={locale} returnPath={returnPath} />
-      </>
+      <div className={pageShellClass}>
+        <ErrorState
+          title={workspace.unavailable}
+          action={
+            <Link href={managedServerHref(filters, page)} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
     );
+  }
+  if (!user) {
+    return <PlatformSignIn locale={locale} returnPath={managedServerHref(filters, page)} />;
   }
   const result = await serverRepository
     .pageManagedByUser(user.id, page, filters, 20)
     .catch(() => null);
-  if (!result)
+  if (!result) {
     return (
-      <section className="nexus-panel space-y-3 p-5">
+      <div className={pageShellClass}>
         <h1 className="font-display text-primary">{copy.title}</h1>
-        <p role="alert" className="text-sm text-danger">
-          {serverWorkspaceCopy(locale).unavailable}
-        </p>
-        <a
-          href={managedServerHref(filters, page)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {serverWorkspaceCopy(locale).reload}
-        </a>
-      </section>
+        <ErrorState
+          title={workspace.unavailable}
+          action={
+            <Link href={managedServerHref(filters, page)} className={navLinkClass}>
+              {workspace.reload}
+            </Link>
+          }
+        />
+      </div>
     );
+  }
   const directory =
     result.servers.length > 0
       ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
@@ -88,13 +98,10 @@ export default async function ManagedServersPage({
     filters.query || filters.status || filters.visibility || filters.verification,
   );
   return (
-    <div className="space-y-6">
+    <div className={pageShellClass}>
       <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
-          <Link
-            href="/workspace"
-            className="text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <div className="min-w-0 space-y-2">
+          <Link href="/workspace" className={navLinkClass}>
             ← {copy.back}
           </Link>
           <h1 className="font-display text-primary">{copy.title}</h1>
@@ -102,7 +109,7 @@ export default async function ManagedServersPage({
         </div>
         <Link
           href="/workspace/servers/new"
-          className={`rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white ${platformSignInFocusClass}`}
+          className={`inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white ${platformSignInFocusClass}`}
         >
           {copy.register}
         </Link>
@@ -120,7 +127,7 @@ export default async function ManagedServersPage({
               name="q"
               maxLength={120}
               defaultValue={filters.query ?? ""}
-              className={fieldClass}
+              className={`${fieldClass} min-h-11`}
             />
           </label>
           <label className="flex flex-col gap-1.5 text-xs text-secondary">
@@ -128,7 +135,7 @@ export default async function ManagedServersPage({
             <select
               name="visibility"
               defaultValue={filters.visibility ?? "all"}
-              className={fieldClass}
+              className={`${fieldClass} min-h-11`}
             >
               <option value="all">{copy.all}</option>
               {(["public", "unlisted", "private"] as const).map((value) => (
@@ -143,7 +150,7 @@ export default async function ManagedServersPage({
             <select
               name="verification"
               defaultValue={filters.verification ?? "all"}
-              className={fieldClass}
+              className={`${fieldClass} min-h-11`}
             >
               <option value="all">{copy.all}</option>
               {(["verified", "unverified"] as const).map((value) => (
@@ -155,7 +162,11 @@ export default async function ManagedServersPage({
           </label>
           <label className="flex flex-col gap-1.5 text-xs text-secondary">
             {copy.listingStatus}
-            <select name="status" defaultValue={filters.status ?? "all"} className={fieldClass}>
+            <select
+              name="status"
+              defaultValue={filters.status ?? "all"}
+              className={`${fieldClass} min-h-11`}
+            >
               <option value="all">{copy.all}</option>
               {(["active", "inactive", "maintenance", "suspended"] as const).map((value) => (
                 <option key={value} value={value}>
@@ -164,14 +175,11 @@ export default async function ManagedServersPage({
               ))}
             </select>
           </label>
-          <Button type="submit" className="font-semibold">
+          <Button type="submit" className="min-h-11 font-semibold">
             {copy.apply}
           </Button>
           {filtered && (
-            <Link
-              href="/workspace/servers"
-              className="py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/workspace/servers" className={navLinkClass}>
               {copy.reset}
             </Link>
           )}
@@ -186,24 +194,21 @@ export default async function ManagedServersPage({
         {copy.of} {result.total}
       </p>
       {result.servers.length === 0 ? (
-        <div className="nexus-panel space-y-3 p-8 text-center text-sm text-muted">
-          <p>{filtered ? copy.emptyFilter : copy.empty}</p>
-          {filtered ? (
-            <Link
-              href="/workspace/servers"
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : (
-            <Link
-              href="/workspace/servers/new"
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.register}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          title={filtered ? copy.emptyFilter : copy.empty}
+          description={filtered ? copy.emptyFilterHint : copy.emptyHint}
+          action={
+            filtered ? (
+              <Link href="/workspace/servers" className={navLinkClass}>
+                {copy.reset}
+              </Link>
+            ) : (
+              <Link href="/workspace/servers/new" className={navLinkClass}>
+                {copy.register}
+              </Link>
+            )
+          }
+        />
       ) : (
         <ManagedServerVisibilityBatch
           key={`${result.page}:${JSON.stringify(filters)}:${result.servers.map((server) => `${server.id}:${server.visibility}:${server.updatedAt.toISOString()}`).join(":")}`}
@@ -226,21 +231,15 @@ export default async function ManagedServersPage({
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4 text-sm">
           {result.page > 1 && (
-            <Link
-              href={managedServerHref(filters, result.page - 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={managedServerHref(filters, result.page - 1)} className={navLinkClass}>
               {copy.previous}
             </Link>
           )}
-          <span>
+          <span className="inline-flex min-h-11 items-center">
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link
-              href={managedServerHref(filters, result.page + 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={managedServerHref(filters, result.page + 1)} className={navLinkClass}>
               {copy.next}
             </Link>
           )}

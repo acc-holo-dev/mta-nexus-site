@@ -73,7 +73,9 @@ const copy = {
     liveNote:
       "Live status comes from the official MTA directory. Listing status is shown separately; unavailable or stale observations remain unknown.",
     empty: "You have no servers to manage yet.",
+    emptyHint: "Register a personal server or manage an organization server to see it here.",
     emptyFilter: "No servers match these filters.",
+    emptyFilterHint: "Try other filters or reset them to see all managed servers.",
     showing: "Showing",
     of: "of",
     page: "Page",
@@ -121,7 +123,11 @@ const copy = {
     liveNote:
       "Живой статус получен из официального каталога MTA. Статус страницы показан отдельно; недоступные или устаревшие наблюдения остаются неизвестными.",
     empty: "У вас пока нет серверов для управления.",
+    emptyHint:
+      "Зарегистрируйте личный сервер или управляйте сервером организации, чтобы увидеть его здесь.",
     emptyFilter: "Нет серверов с выбранными фильтрами.",
+    emptyFilterHint:
+      "Попробуйте другие фильтры или сбросьте их, чтобы увидеть все управляемые серверы.",
     showing: "Показано",
     of: "из",
     page: "Страница",

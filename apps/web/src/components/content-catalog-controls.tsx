@@ -11,6 +11,10 @@ import {
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 
 type Filters = ReturnType<typeof parseContentPage>;
+
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function ContentCatalogControls({
   path,
   filters,
@@ -33,12 +37,16 @@ export function ContentCatalogControls({
           name="q"
           maxLength={120}
           defaultValue={filters.query}
-          className={`min-w-40 ${fieldClass}`}
+          className={`min-h-11 min-w-40 ${fieldClass}`}
         />
       </div>
       <label className="flex flex-col gap-1 text-xs text-secondary">
         <span>{copy.type}</span>
-        <select name="type" defaultValue={filters.type ?? "all"} className={fieldClass}>
+        <select
+          name="type"
+          defaultValue={filters.type ?? "all"}
+          className={`${fieldClass} min-h-11`}
+        >
           <option value="all">{copy.all}</option>
           {types.map((type) => (
             <option key={type} value={type}>
@@ -50,7 +58,11 @@ export function ContentCatalogControls({
       {showStatus && (
         <label className="flex flex-col gap-1 text-xs text-secondary">
           <span>{copy.status}</span>
-          <select name="status" defaultValue={filters.status ?? "all"} className={fieldClass}>
+          <select
+            name="status"
+            defaultValue={filters.status ?? "all"}
+            className={`${fieldClass} min-h-11`}
+          >
             <option value="all">{copy.all}</option>
             {(["draft", "published", "archived"] as const).map((status) => (
               <option key={status} value={status}>
@@ -60,21 +72,17 @@ export function ContentCatalogControls({
           </select>
         </label>
       )}
-      <Button type="submit">{copy.apply}</Button>
+      <Button type="submit" className="min-h-11">
+        {copy.apply}
+      </Button>
       {(filters.query || filters.type || filters.status) && (
-        <Link
-          href={path}
-          className="py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={path} className={navLinkClass}>
           {copy.reset}
         </Link>
       )}
     </FilterBar>
   );
 }
-
-const pageNavFocusClass =
-  "text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ContentPageNavigation({
   path,
@@ -92,27 +100,22 @@ export function ContentPageNavigation({
   const copy = getUserPlatformCopy(locale);
   if (page === 1 && !hasMore) return null;
   return (
-    <nav aria-label={copy.page} className="flex items-center justify-between gap-3 text-sm">
+    <nav
+      aria-label={copy.page}
+      className="flex min-w-0 items-center justify-between gap-3 overflow-x-clip text-sm"
+    >
       {page > 1 ? (
-        <Link
-          href={contentPageHref(path, filters, page - 1)}
-          rel="prev"
-          className={pageNavFocusClass}
-        >
+        <Link href={contentPageHref(path, filters, page - 1)} rel="prev" className={navLinkClass}>
           {copy.previous}
         </Link>
       ) : (
         <span />
       )}
-      <span className="text-secondary">
+      <span className="inline-flex min-h-11 items-center text-secondary">
         {copy.page} {page}
       </span>
       {hasMore ? (
-        <Link
-          href={contentPageHref(path, filters, page + 1)}
-          rel="next"
-          className={pageNavFocusClass}
-        >
+        <Link href={contentPageHref(path, filters, page + 1)} rel="next" className={navLinkClass}>
           {copy.next}
         </Link>
       ) : (

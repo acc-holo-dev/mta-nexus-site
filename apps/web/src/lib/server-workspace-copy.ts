@@ -54,6 +54,10 @@ const en = {
   team: "Server team",
   identity: "Public account",
   historyEmpty: "No recorded events match these filters.",
+  historyEmptyHint: "Try another period or event group, or reset filters to see the latest events.",
+  historyEmptyNever: "No recorded events yet for this server.",
+  historyEmptyNeverHint:
+    "Listing, visibility, control and verification changes appear here after they are saved.",
 };
 const ru: typeof en = {
   batchTitle: "Изменить видимость вместе",
@@ -111,6 +115,11 @@ const ru: typeof en = {
   team: "Команда сервера",
   identity: "Публичный аккаунт",
   historyEmpty: "С выбранными фильтрами сохранённых событий нет.",
+  historyEmptyHint:
+    "Выберите другой период или группу событий либо сбросьте фильтры, чтобы увидеть последние записи.",
+  historyEmptyNever: "Для этого сервера пока нет сохранённых событий.",
+  historyEmptyNeverHint:
+    "Изменения карточки, видимости, контроля и верификации появятся здесь после сохранения.",
 };
 export function serverWorkspaceCopy(locale: Locale) {
   return locale === "ru" ? ru : en;

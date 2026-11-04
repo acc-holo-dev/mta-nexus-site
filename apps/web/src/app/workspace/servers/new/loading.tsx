@@ -9,7 +9,7 @@ export default async function Loading() {
   const platform = getUserPlatformCopy(locale);
   return (
     <section
-      className="mx-auto max-w-2xl space-y-5 px-4 py-8 sm:px-0"
+      className="mx-auto min-w-0 max-w-2xl space-y-5 overflow-x-clip px-4 py-8 sm:px-0"
       aria-busy="true"
       aria-labelledby="server-new-loading-heading"
     >
