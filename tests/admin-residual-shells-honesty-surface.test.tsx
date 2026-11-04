@@ -123,3 +123,11 @@ it("keeps admin support messages and report history loadings as clipped re-expor
     "overflow-x-clip",
   );
 });
+
+it("locks admin builds quarantine actionable links to min-h-11 touch targets", () => {
+  const source = read("apps/web/src/components/admin/admin-builds-quarantine-section.tsx");
+  expect(source).toContain("touchLinkClass");
+  expect(source).toContain("inline-flex min-h-11 items-center");
+  expect(source).not.toContain('className="text-accent underline');
+  expect(source).not.toContain('className="inline-block text-xs font-semibold text-accent');
+});
