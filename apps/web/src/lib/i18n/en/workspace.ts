@@ -5,7 +5,13 @@ export const workspace = {
     subtitle: "Manage personal resources and resources you can administer for an organization.",
     all: "All statuses",
     empty: "You have not created any resources yet.",
+    emptyHint:
+      "An empty publisher list is not a load failure. Create a resource to manage drafts and releases here.",
     emptyFilter: "No resources match these filters.",
+    emptyFilterHint: "Try another status filter or clear filters to see all of your resources.",
+    loadUnavailable: "Your resource workspace is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "A load failure is not an empty inventory. Retry to fetch the latest private publisher state.",
     back: "Back to my resources",
     edit: "Resource details",
     save: "Save details",

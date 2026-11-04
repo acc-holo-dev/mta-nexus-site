@@ -9,5 +9,9 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ id }, raw] = await Promise.all([params, searchParams]);
-  return ResourceRequirementsScreen({ productId: id, scope: "publisher", raw });
+  return (
+    <div className="min-w-0 overflow-x-clip">
+      {await ResourceRequirementsScreen({ productId: id, scope: "publisher", raw })}
+    </div>
+  );
 }

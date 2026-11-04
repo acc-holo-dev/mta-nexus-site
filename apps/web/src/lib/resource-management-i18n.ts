@@ -3,6 +3,8 @@ import type { Locale } from "./i18n";
 const copy = {
   en: {
     loadUnavailable: "Resource variant management is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "A load failure is not an empty compatibility view. Retry to fetch the latest private dependency state.",
     variants: "Resource variants",
     compatibility: "Compatibility and dependencies",
     back: "Back to resource",
@@ -57,6 +59,8 @@ const copy = {
   },
   ru: {
     loadUnavailable: "Управление вариантами ресурса временно недоступно. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Ошибка загрузки — это не пустой экран совместимости. Повторите запрос, чтобы получить актуальное состояние зависимостей.",
     variants: "Варианты ресурса",
     compatibility: "Совместимость и зависимости",
     back: "Назад к ресурсу",

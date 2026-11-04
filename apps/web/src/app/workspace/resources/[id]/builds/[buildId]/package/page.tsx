@@ -13,5 +13,9 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id, buildId } = await params;
-  return <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} />;
+  return (
+    <div className="min-w-0 overflow-x-clip">
+      <BuildPackageScreen productId={id} buildId={buildId} searchParams={searchParams} />
+    </div>
+  );
 }

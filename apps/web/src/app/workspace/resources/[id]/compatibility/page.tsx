@@ -1,9 +1,11 @@
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ProductDependencyList } from "../../../../../components/product-dependency-list";
 import { ResourceCompatibilityForm } from "../../../../../components/resource-compatibility-form";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceManagementCopy } from "../../../../../lib/resource-management-i18n";
 import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
@@ -15,6 +17,11 @@ export const metadata = {
   title: "Resource compatibility | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function ResourceCompatibilityPage({
   params,
 }: {
@@ -26,17 +33,33 @@ export default async function ResourceCompatibilityPage({
     params,
   ]);
   const copy = getResourceManagementCopy(locale);
+  const dictionary = getDictionary(locale);
   const returnPath = `/workspace/resources/${encodeURIComponent(id)}/compatibility`;
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
-  const resolution = await productService.getDependencyResolution(product);
+  const resolution = await productService.getDependencyResolution(product).catch(() => null);
+  if (!resolution) {
+    return (
+      <div className={pageShellClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   return (
-    <div className="space-y-6">
-      <Link
-        href={`/workspace/resources/${product.id}`}
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/workspace/resources/${product.id}`} className={navLinkClass}>
         {copy.back}
       </Link>
       <header>
@@ -45,7 +68,7 @@ export default async function ResourceCompatibilityPage({
       </header>
       <Link
         href={`/workspace/resources/${encodeURIComponent(id)}/requirements`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {resourceRequirementsCopy(locale).title}
       </Link>

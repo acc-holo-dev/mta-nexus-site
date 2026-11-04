@@ -25,6 +25,7 @@ vi.mock("../apps/web/src/lib/services/resource-publisher-service", () => ({
 
 import HistoryPage from "../apps/web/src/app/workspace/resources/[id]/history/page";
 import InventoryPage from "../apps/web/src/app/workspace/resources/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
 
 const context = {
@@ -157,11 +158,31 @@ it.each([
       await InventoryPage({ searchParams: Promise.resolve(searchParams) }),
     );
     expect(html).toContain(expectText);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("min-h-11");
     if (Object.keys(statusCounts).length === 0 && Object.keys(searchParams).length === 0) {
       expect(html).toContain("/workspace/resources/new");
+      expect(html).toContain(getDictionary(locale).authorResources.emptyHint);
+    } else {
+      expect(html).toContain(getDictionary(locale).authorResources.emptyFilterHint);
+      expect(html).toContain("/workspace/resources");
     }
   },
 );
+it("shows an honest recovery state when publisher inventory fails", async () => {
+  state.inventory.mockRejectedValue(new Error("inventory unavailable"));
+  const copy = getDictionary("en").authorResources;
+  const html = renderToStaticMarkup(
+    await InventoryPage({ searchParams: Promise.resolve({ status: "draft", page: "2" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("status=draft");
+  expect(html).not.toContain("DO_NOT_RENDER");
+});
 it.each(["en", "ru"] as const)(
   "distinguishes lifetime-empty resource history from kind-filtered empty results in %s",
   async (locale) => {
