@@ -240,6 +240,49 @@ it("does not treat opening the popover as mark-all-read", async () => {
   ).toBe(false);
 });
 
+it("opens only one confirmation for repeated mark-all clicks and allows retry after cancel", async () => {
+  harness.fetch.mockResolvedValue(response(sample));
+  openPopover();
+  await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
+  let finish!: (confirmed: boolean) => void;
+  confirmAction
+    .mockReturnValueOnce(new Promise<boolean>((resolve) => (finish = resolve)))
+    .mockResolvedValueOnce(false);
+  const mark = render().find(
+    (node) => node.type === "button" && textOf(node).includes("Mark entire inbox as read"),
+  );
+  if (!mark) throw Error("Missing mark all");
+  const click = mark.props.onClick as () => void;
+  click();
+  click();
+  expect(confirmAction).toHaveBeenCalledTimes(1);
+  finish(false);
+  await vi.waitFor(() => {
+    click();
+    expect(confirmAction).toHaveBeenCalledTimes(2);
+  });
+});
+
+it("ignores repeated mark-all clicks while the confirmed request is pending", async () => {
+  harness.fetch.mockResolvedValueOnce(response(sample));
+  openPopover();
+  await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
+  let finish!: (value: Response) => void;
+  harness.fetch.mockReturnValueOnce(new Promise<Response>((resolve) => (finish = resolve)));
+  const mark = render().find(
+    (node) => node.type === "button" && textOf(node).includes("Mark entire inbox as read"),
+  );
+  if (!mark) throw Error("Missing mark all");
+  const click = mark.props.onClick as () => void;
+  click();
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
+  click();
+  expect(confirmAction).toHaveBeenCalledTimes(1);
+  expect(harness.fetch).toHaveBeenCalledTimes(2);
+  finish(response({ success: true, scope: "all" }));
+  await vi.waitFor(() => expect(harness.announce).toHaveBeenCalledOnce());
+});
+
 it("preserves confirmed unread counts when account-wide mark-all fails", async () => {
   harness.fetch
     .mockResolvedValueOnce(response(sample))

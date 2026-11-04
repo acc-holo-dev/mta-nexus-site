@@ -31,6 +31,7 @@ export function NotificationBell() {
   const [attempt, setAttempt] = useState(0);
   const dialogRef = useModalDialog(isOpen);
   const mutationGeneration = useRef(0);
+  const markPending = useRef(false);
   const stopPolling = useRef<(() => void) | null>(null);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
@@ -76,46 +77,51 @@ export function NotificationBell() {
   }, [attempt, copy.loadError, marking]);
 
   async function markAllRead() {
-    if (marking || !loaded || unreadCount === 0) return;
-    if (
-      !(await confirmAction({
-        title: inboxCopy.markAllRead,
-        object: inboxCopy.title,
-        scope: String(unreadCount),
-        consequences: inboxCopy.allConfirm,
-        confirmLabel: inboxCopy.markAllRead,
-        cancelLabel: inboxCopy.reset,
-        closeLabel: inboxCopy.reset,
-        danger: false,
-      }))
-    )
-      return;
-
-    mutationGeneration.current += 1;
-    stopPolling.current?.();
-    setMarking(true);
-    setError(null);
-    setAnnouncement(null);
+    if (markPending.current || marking || !loaded || unreadCount === 0) return;
+    markPending.current = true;
     try {
-      const response = await fetch(
-        "/api/notifications/mark-read",
-        privateApiRequest({ method: "POST" }),
-      );
-      const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true || data?.scope !== "all") {
-        throw new Error(copy.markError);
-      }
+      if (
+        !(await confirmAction({
+          title: inboxCopy.markAllRead,
+          object: inboxCopy.title,
+          scope: String(unreadCount),
+          consequences: inboxCopy.allConfirm,
+          confirmLabel: inboxCopy.markAllRead,
+          cancelLabel: inboxCopy.reset,
+          closeLabel: inboxCopy.reset,
+          danger: false,
+        }))
+      )
+        return;
 
-      // Read the server state again; a notification may arrive during this request.
-      // Do not zero local counters until the next confirmed poll.
-      setAnnouncement(copy.markedAllRead);
-      announceNotificationInboxChange();
-    } catch {
-      // Recheck the server after an ambiguous response or timeout; keep last confirmed counts.
-      setAttempt((value) => value + 1);
-      setError(copy.markError);
+      mutationGeneration.current += 1;
+      stopPolling.current?.();
+      setMarking(true);
+      setError(null);
+      setAnnouncement(null);
+      try {
+        const response = await fetch(
+          "/api/notifications/mark-read",
+          privateApiRequest({ method: "POST" }),
+        );
+        const data = await response.json().catch(() => null);
+        if (!response.ok || data?.success !== true || data?.scope !== "all") {
+          throw new Error(copy.markError);
+        }
+
+        // Read the server state again; a notification may arrive during this request.
+        // Do not zero local counters until the next confirmed poll.
+        setAnnouncement(copy.markedAllRead);
+        announceNotificationInboxChange();
+      } catch {
+        // Recheck the server after an ambiguous response or timeout; keep last confirmed counts.
+        setAttempt((value) => value + 1);
+        setError(copy.markError);
+      } finally {
+        setMarking(false);
+      }
     } finally {
-      setMarking(false);
+      markPending.current = false;
     }
   }
 
