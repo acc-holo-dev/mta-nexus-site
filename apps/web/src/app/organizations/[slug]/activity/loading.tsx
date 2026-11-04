@@ -1,5 +1,9 @@
 import { PublicationFeedLoading } from "../../../../components/publication-feed-loading";
 
-export default function Loading() {
-  return PublicationFeedLoading({ heading: "activity" });
+const pageShellClass = "min-w-0 overflow-x-clip";
+
+export default async function Loading() {
+  return (
+    <div className={pageShellClass}>{await PublicationFeedLoading({ heading: "activity" })}</div>
+  );
 }
