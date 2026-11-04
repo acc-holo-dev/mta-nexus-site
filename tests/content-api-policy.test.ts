@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
@@ -92,6 +92,33 @@ describe("community content API behavior", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  it("rejects unsupported media and oversized content before persistence", async () => {
+    const unsupported = await POST(
+      new NextRequest("http://nexus.test/api/content", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+        body: "{}",
+      }),
+    );
+    expect(unsupported.status).toBe(415);
+    expect(unsupported.headers.get("cache-control")).toBe("private, no-store");
+    expect(mocks.rateLimit).not.toHaveBeenCalled();
+    const oversized = await POST(request(body({ body: "x".repeat(128 * 1024) })));
+    expect(oversized.status).toBe(413);
+    expect(oversized.headers.get("cache-control")).toBe("private, no-store");
+    expect(mocks.createWithAudit).not.toHaveBeenCalled();
+  });
+
+  it("accepts a 20,000-character Unicode article within the workspace byte budget", async () => {
+    const article = "😀".repeat(20_000);
+    const response = await POST(request(body({ body: article })));
+    expect(response.status).toBe(201);
+    expect(mocks.createWithAudit).toHaveBeenCalledWith(
+      expect.objectContaining({ body: article }),
+      expect.anything(),
+    );
   });
 
   it("bounds public reads and returns explicitly public cache headers", async () => {

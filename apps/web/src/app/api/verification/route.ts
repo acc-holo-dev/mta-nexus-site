@@ -4,6 +4,7 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 import { externalWebUrlSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
@@ -75,6 +76,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: "Authentication required" }, 401);
     }
 
+    requireServerJsonContentType(request);
     const rateLimit = await consumeRateLimit("verification", user.id);
     if (!rateLimit.success) {
       return json(
@@ -86,7 +88,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    const body = await readBoundedJson(request);
     const parsed = verificationRequestSchema.safeParse(body);
 
     if (!parsed.success) {

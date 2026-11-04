@@ -5,9 +5,11 @@ import {
   serverRepository,
   userRepository,
 } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createReportSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
@@ -73,6 +75,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    requireServerJsonContentType(request);
     // Abuse protection: limit report spam per user
     const rl = await consumeRateLimit("report", user.id);
     if (!rl.success) {
@@ -83,7 +86,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    const body = await readBoundedJson(request);
     const parsed = createReportSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -145,6 +148,21 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     return privateJson(context, { success: true, report }, { status: 201 });
   } catch (error: unknown) {
+    if (
+      error instanceof AppError &&
+      [
+        "UNSUPPORTED_MEDIA_TYPE",
+        "INVALID_BODY_LENGTH",
+        "REQUEST_BODY_TOO_LARGE",
+        "REQUEST_BODY_TIMEOUT",
+      ].includes(error.code)
+    ) {
+      return privateJson(
+        context,
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     logRequestEvent({
       level: "error",
       event: "moderation.report.submit_failed",

@@ -1,7 +1,9 @@
 import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createContentSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
@@ -74,6 +76,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(context, { error: "Authentication required" }, 401);
     }
 
+    requireServerJsonContentType(request);
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
       return privateJson(
@@ -85,7 +88,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const parsed = createContentSchema.safeParse(await request.json().catch(() => null));
+    const parsed = createContentSchema.safeParse(await readBoundedJson(request, 128 * 1024));
     if (!parsed.success) {
       return privateJson(
         context,
@@ -211,6 +214,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       201,
     );
   } catch (error: unknown) {
+    if (
+      error instanceof AppError &&
+      [
+        "UNSUPPORTED_MEDIA_TYPE",
+        "INVALID_BODY_LENGTH",
+        "REQUEST_BODY_TOO_LARGE",
+        "REQUEST_BODY_TIMEOUT",
+      ].includes(error.code)
+    ) {
+      return privateJson(context, { error: error.message, code: error.code }, error.statusCode);
+    }
     logRequestEvent({
       level: "error",
       event: "content.create_failed",

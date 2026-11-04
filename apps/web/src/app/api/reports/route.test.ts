@@ -60,6 +60,40 @@ afterEach(() => {
 });
 
 describe("report privacy and durable success", () => {
+  it("treats malformed JSON as invalid without creating a report", async () => {
+    mocks.session.mockResolvedValue({ id: "member_1" });
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        body: "{",
+      }),
+    );
+    expect(response.status).toBe(400);
+    privateResponse(response);
+    expect(mocks.createWithAudit).not.toHaveBeenCalled();
+  });
+
+  it("rejects unsupported media and oversized bodies before creating a report", async () => {
+    mocks.session.mockResolvedValue({ id: "member_1" });
+    const request = (type: string, body: string) =>
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": type },
+        body,
+      });
+    const unsupported = await POST(request("text/plain", "{}"));
+    expect(unsupported.status).toBe(415);
+    privateResponse(unsupported);
+    expect(mocks.rate).not.toHaveBeenCalled();
+    const oversized = await POST(
+      request("application/json", JSON.stringify({ reason: "x".repeat(32768) })),
+    );
+    expect(oversized.status).toBe(413);
+    privateResponse(oversized);
+    expect(mocks.createWithAudit).not.toHaveBeenCalled();
+  });
+
   it("keeps both denied and authorized moderation reads private", async () => {
     const request = new NextRequest("https://nexus.test/api/reports");
     const denied = await GET(request);

@@ -89,6 +89,24 @@ afterEach(() => {
 });
 
 describe("verification HTTP behavior", () => {
+  it("rejects unsupported media and oversized bodies before creating a request", async () => {
+    const wrongType = new NextRequest("https://nexus.test/api/verification", {
+      method: "POST",
+      headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+      body: "{}",
+    });
+    const unsupported = await POST(wrongType);
+    expect(unsupported.status).toBe(415);
+    expectPrivate(unsupported);
+    expect(mocks.rate).not.toHaveBeenCalled();
+    const oversized = await POST(
+      postRequest({ targetType: "user", targetId: "u_1", notes: "x".repeat(32768) }),
+    );
+    expect(oversized.status).toBe(413);
+    expectPrivate(oversized);
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
   it("keeps unauthenticated and authenticated history reads private", async () => {
     state.user = null;
     const denied = await GET(getRequest());
