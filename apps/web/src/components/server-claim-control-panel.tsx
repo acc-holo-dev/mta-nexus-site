@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { KeyRound, ShieldCheck } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -138,9 +138,9 @@ export function ServerClaimControlPanel({
         <Button
           type="button"
           variant="secondary"
+          size="touch"
           isLoading={state === "issuing"}
           onClick={() => void issue()}
-          className="min-h-10"
         >
           {state === "issuing" ? copy.creating : copy.create}
         </Button>
@@ -170,22 +170,22 @@ export function ServerClaimControlPanel({
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
+              size="touch"
               isLoading={state === "verifying"}
               onClick={() => void verify()}
-              className="min-h-10"
             >
               {state === "verifying" ? copy.checking : copy.verify}
             </Button>
             <Button
               type="button"
               variant="outline"
+              size="touch"
               disabled={state === "verifying"}
               onClick={() => {
                 setChallenge(null);
                 setState("idle");
                 setError(null);
               }}
-              className="min-h-10"
             >
               {copy.startOver}
             </Button>
@@ -205,11 +205,7 @@ export function ServerClaimControlPanel({
         </div>
       )}
 
-      {error && (
-        <p role="alert" className="text-xs text-warning">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} /> : null}
 
       <p className="text-[10px] leading-relaxed text-faint">{copy.exactEndpoint}</p>
     </section>

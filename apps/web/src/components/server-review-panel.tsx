@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { getDictionary } from "../lib/i18n";
@@ -15,6 +15,9 @@ import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
 import { useNexusLocale } from "./locale-context";
+
+const ghostActionClass =
+  "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 type Review = {
   id: string;
@@ -240,25 +243,28 @@ export function ServerReviewPanel({
       </header>
 
       {unavailable || !page ? (
-        <div className="nexus-panel space-y-3 p-5" role="alert">
-          <p className="text-sm text-warning">{loadCopy.unavailable}</p>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={retrying}
-            isLoading={retrying}
-            onClick={() => void retryLoad()}
-          >
-            {retrying ? copy.busy : loadCopy.retry}
-          </Button>
-        </div>
+        <ErrorState
+          title={loadCopy.unavailable}
+          action={
+            <Button
+              type="button"
+              variant="secondary"
+              size="touch"
+              disabled={retrying}
+              isLoading={retrying}
+              onClick={() => void retryLoad()}
+            >
+              {retrying ? copy.busy : loadCopy.retry}
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-primary">
             {copy.all} ({page.total})
           </h3>
           {page.reviews.length === 0 ? (
-            <p className="text-sm text-muted">{copy.empty}</p>
+            <EmptyState title={copy.empty} description={copy.emptyHint} />
           ) : (
             <ul className="space-y-3">
               {page.reviews.map((review) => (
@@ -337,7 +343,7 @@ export function ServerReviewPanel({
                     className={`${fieldClassBlock} mt-2 min-h-28`}
                   />
                 </label>
-                <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
+                <Button type="submit" size="touch" disabled={busy || confirmed} isLoading={busy}>
                   {busy ? copy.busy : copy.save}
                 </Button>
               </form>
@@ -352,7 +358,7 @@ export function ServerReviewPanel({
               <Button
                 type="button"
                 variant="ghost"
-                className="h-auto px-0 text-sm text-danger underline"
+                className={`${ghostActionClass} text-danger`}
                 disabled={busy || confirmed}
                 onClick={() => void withdrawReview()}
               >
@@ -374,7 +380,7 @@ export function ServerReviewPanel({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={`${ghostActionClass} text-accent`}
             onClick={() => router.refresh()}
           >
             {copy.reload}

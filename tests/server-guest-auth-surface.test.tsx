@@ -78,7 +78,13 @@ vi.mock("@nexus/ui", async () => {
     );
   }
   Button.displayName = "Button";
-  return { fieldClassBlock: "field-block", Button };
+  function EmptyState({ title, description }: { title: string; description?: string }) {
+    return createElement("div", { "data-ui": "empty-state" }, title, description);
+  }
+  function ErrorState({ title, action }: { title: string; action?: ReactNode }) {
+    return createElement("div", { role: "alert", "data-ui": "error-state" }, title, action);
+  }
+  return { fieldClassBlock: "field-block", Button, EmptyState, ErrorState };
 });
 
 vi.stubGlobal("fetch", harness.fetch);
