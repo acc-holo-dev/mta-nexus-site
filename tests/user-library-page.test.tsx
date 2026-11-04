@@ -224,7 +224,55 @@ describe("private resource library", () => {
     const filtered = renderToStaticMarkup(await LibraryPage(pageProps({ filter: "ready" })));
     expect(filtered).toContain(copy.emptyFilter);
     expect(filtered).toContain(copy.emptyFilterHint);
+    expect(filtered).toContain(copy.clearFilters);
+    expect(filtered).toContain('href="/workspace/library"');
     expect(filtered).not.toContain(copy.emptyHint);
     expect(copy.emptyFilterHint).not.toBe(copy.subtitle);
+  });
+
+  it.each(["en", "ru"] as const)(
+    "opens a ready library resource on the public market detail in %s",
+    async (locale) => {
+      state.locale = locale;
+      const copy = getLibraryCopy(locale);
+      const html = renderToStaticMarkup(await LibraryPage(pageProps()));
+      expect(html).toContain('href="/market/resource-a"');
+      expect(html).toContain(copy.open);
+      expect(html).toContain("min-w-0 max-w-5xl");
+      expect(html).toContain("overflow-x-clip");
+      expect(html).not.toContain(copy.loadUnavailable);
+    },
+  );
+
+  it.each(["en", "ru"] as const)(
+    "shows library load failures as alerts instead of an empty catalog in %s",
+    async (locale) => {
+      state.locale = locale;
+      const copy = getLibraryCopy(locale);
+      state.page.mockRejectedValueOnce(new Error("private-database-detail"));
+      const html = renderToStaticMarkup(await LibraryPage(pageProps({ filter: "ready" })));
+      expect(html).toContain('role="alert"');
+      expect(html).toContain(copy.loadUnavailable);
+      expect(html).toContain('href="/workspace/library?filter=ready"');
+      expect(html).not.toContain(copy.empty);
+      expect(html).not.toContain(copy.emptyFilter);
+      expect(html).not.toContain("private-database-detail");
+      expect(html).not.toContain('href="/market/resource-a"');
+    },
+  );
+
+  it("keeps guest return paths filter-aware before any library lookup", async () => {
+    state.user = null;
+    const html = renderToStaticMarkup(await LibraryPage(pageProps({ filter: "ready", page: "2" })));
+    expect(html).toContain(
+      'href="/auth/login?next=%2Fworkspace%2Flibrary%3Ffilter%3Dready%26page%3D2"',
+    );
+    expect(state.page).not.toHaveBeenCalled();
+  });
+
+  it("clips the honest loading shell on narrow layouts", async () => {
+    const html = renderToStaticMarkup(await LibraryLoading());
+    expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
   });
 });

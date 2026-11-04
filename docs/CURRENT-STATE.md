@@ -50,9 +50,9 @@
 4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
-7. Следующий разрешённый продуктовый результат — **Workspace/Library primary journey**. Discover resources journey (поиск → `/market/[slug]` или honest empty/error + mobile clip) уходит отдельным PR поверх resource-mobile. После merge: один сценарий Library (список entitlements / open resource / empty|error; mobile; RU/EN).
-8. Приёмка: focused library suites + typecheck/lint/build; browser evidence только на exact SHA. Сначала CI tip после merge — красный tip важнее новой UI-работы.
-9. Дальше: Workspace/Library → Notifications → Server → Profile → Community → Support → Admin. Gates **OPS-09…20**, ads **UX-24–26**, пилоты **GROW-02…09** без активации.
+7. Следующий разрешённый продуктовый результат — **Notifications primary journey**. Library (list → open `/market/[slug]` / empty|error + overflow clip) уходит отдельным PR. После merge: один сценарий inbox (список/фильтр → open destination или honest empty/error; mobile; RU/EN). Не дублировать Notification center landmarks.
+8. Приёмка: focused notification suites + typecheck/lint/build; browser evidence только на exact SHA. Сначала CI tip после merge — красный tip важнее новой UI-работы.
+9. Дальше: Notifications → Server → Profile → Community → Support → Admin. Gates **OPS-09…20**, ads **UX-24–26**, пилоты **GROW-02…09** без активации.
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
