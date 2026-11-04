@@ -58,6 +58,7 @@ vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => n
 vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
 
 import { generateMetadata as moderationMetadata } from "../apps/web/src/app/admin/community/page";
+import StreamLoading from "../apps/web/src/app/discover/stream/loading";
 import StreamPage, {
   generateMetadata as streamMetadata,
 } from "../apps/web/src/app/discover/stream/page";
@@ -137,6 +138,8 @@ it.each(["ru", "en"] as const)(
       }),
     );
     expect(html).toContain(discoveryStreamCopy(locale).title);
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
     expect(html).toContain('action="/discover/stream"');
     expect(html).toContain('name="type"');
     expect(html).not.toContain('name="sort"');
@@ -150,22 +153,43 @@ it.each(["ru", "en"] as const)(
     });
   },
 );
-it("rejects repeated/incompatible SSR stream filters without selecting a different catalog", async () => {
+it("rejects repeated/incompatible SSR stream filters with ErrorState retry", async () => {
   const html = renderToStaticMarkup(
     await StreamPage({ searchParams: Promise.resolve({ type: ["servers", "resources"] }) }),
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain(discoveryStreamCopy("en").invalid);
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-w-0");
   expect(mocks.stream).not.toHaveBeenCalled();
 });
-it("displays mismatched continuation as an error with a matching latest-results recovery link", async () => {
+it("displays mismatched continuation as ErrorState with a matching retry recovery link", async () => {
   mocks.stream.mockRejectedValueOnce(new AppError("PRIVATE", 400, "INVALID_CURSOR"));
   const html = renderToStaticMarkup(
     await StreamPage({ searchParams: Promise.resolve({ type: "organizations", q: "Team" }) }),
   );
   expect(html).toContain(discoveryStreamCopy("en").invalid);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/discover/stream?type=organizations&amp;q=Team"');
+  expect(html).toContain("overflow-x-clip");
   expect(html).not.toContain("PRIVATE");
 });
+it.each(["ru", "en"] as const)(
+  "keeps the %s stream loading shell clipped without inventing results",
+  async (locale) => {
+    mocks.locale = locale;
+    const copy = discoveryStreamCopy(locale);
+    const html = renderToStaticMarkup(await StreamLoading());
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain('id="discover-stream-loading-heading"');
+    expect(html).toContain(`>${copy.title}<`);
+    expect(html).toContain(copy.loading);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+  },
+);
 it.each(["ru", "en"] as const)(
   "renders private %s moderation queue/detail without public draft links or raw HTML",
   async (locale) => {
