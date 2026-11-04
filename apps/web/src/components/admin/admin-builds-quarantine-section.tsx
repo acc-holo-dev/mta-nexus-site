@@ -271,7 +271,10 @@ export function AdminBuildsQuarantineSection({
         {(riskBuildPage > 1 || moreRiskBuilds) && (
           <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
             {riskBuildPage > 1 && (
-              <Link className={touchLinkClass} href={adminHref({ riskBuildPage: riskBuildPage - 1 })}>
+              <Link
+                className={touchLinkClass}
+                href={adminHref({ riskBuildPage: riskBuildPage - 1 })}
+              >
                 {copy.previous}
               </Link>
             )}
@@ -279,7 +282,10 @@ export function AdminBuildsQuarantineSection({
               {copy.reportPage} {riskBuildPage}
             </span>
             {moreRiskBuilds && riskBuildPage < 99_999 && (
-              <Link className={touchLinkClass} href={adminHref({ riskBuildPage: riskBuildPage + 1 })}>
+              <Link
+                className={touchLinkClass}
+                href={adminHref({ riskBuildPage: riskBuildPage + 1 })}
+              >
                 {copy.next}
               </Link>
             )}
