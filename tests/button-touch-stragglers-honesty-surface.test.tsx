@@ -49,3 +49,12 @@ it("locks seller-sales apply and support create-case submit to size=touch", () =
     /onClick=\{resetFilters\}[\s\S]{0,40}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{resetFilters\}/u,
   );
 });
+
+it("locks MTA directory empty chrome to EmptyState without size=sm stragglers", () => {
+  const source = read("apps/web/src/components/mta-master-server-directory.tsx");
+  expect(source).toContain("EmptyState");
+  expect(source).toContain("noMatchDescription");
+  expect(source).toContain("noneDescription");
+  expect(source).not.toContain('size="sm"');
+  expect(source).not.toContain("min-h-10");
+});

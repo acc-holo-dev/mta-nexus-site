@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ErrorState, SearchField } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -116,11 +116,11 @@ function ServerCard({
           <Button
             type="button"
             variant="secondary"
-            size="sm"
+            size="touch"
             aria-label={`${copy.copyAddress}: ${name}`}
             disabled={copying}
             onClick={() => void copyAddress()}
-            className="min-h-11 gap-1.5"
+            className="gap-1.5"
           >
             <Copy className="h-4 w-4" aria-hidden="true" />
             {copying ? copy.copying : copy.copyAddress}
@@ -302,7 +302,7 @@ export function MtaMasterServerDirectory({
             <Button
               type="button"
               variant="secondary"
-              size="sm"
+              size="touch"
               onClick={() => setAttempt((current) => current + 1)}
             >
               {copy.tryAgain}
@@ -322,23 +322,26 @@ export function MtaMasterServerDirectory({
             />
           ))}
           {directory.servers.length === 0 && (
-            <div className="nexus-panel space-y-3 p-6 text-center text-sm text-secondary">
-              <p>{hasFilters ? copy.noMatch : copy.none}</p>
-              {hasFilters ? (
-                <Button type="button" variant="secondary" size="touch" onClick={resetFilters}>
-                  {copy.resetFilters}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setAttempt((current) => current + 1)}
-                >
-                  {copy.tryAgain}
-                </Button>
-              )}
-            </div>
+            <EmptyState
+              title={hasFilters ? copy.noMatch : copy.none}
+              description={hasFilters ? copy.noMatchDescription : copy.noneDescription}
+              action={
+                hasFilters ? (
+                  <Button type="button" variant="secondary" size="touch" onClick={resetFilters}>
+                    {copy.resetFilters}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="touch"
+                    onClick={() => setAttempt((current) => current + 1)}
+                  >
+                    {copy.tryAgain}
+                  </Button>
+                )
+              }
+            />
           )}
         </div>
       )}
@@ -351,7 +354,7 @@ export function MtaMasterServerDirectory({
           <Button
             type="button"
             variant="secondary"
-            size="sm"
+            size="touch"
             onClick={() => setPage((current) => Math.max(0, current - 1))}
             disabled={page === 0}
             className="gap-1"
@@ -365,7 +368,7 @@ export function MtaMasterServerDirectory({
           <Button
             type="button"
             variant="secondary"
-            size="sm"
+            size="touch"
             onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}
             disabled={page >= totalPages - 1}
             className="gap-1"

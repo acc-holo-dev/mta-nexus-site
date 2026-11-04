@@ -51,6 +51,14 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
   }
 });
 
+it("locks resource media editor reorder/remove CTAs to size=touch", () => {
+  const source = read("apps/web/src/components/resource-media-editor.tsx");
+  expect(source).toContain("EmptyState");
+  expect(source).toContain('size="touch"');
+  expect(source).not.toContain('size="sm"');
+  expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(4);
+});
+
 it("locks new resource native controls to fieldControlClass without h-10 chrome", () => {
   const source = read("apps/web/src/components/new-resource-form.tsx");
   expect(source).toContain("fieldControlClass");
