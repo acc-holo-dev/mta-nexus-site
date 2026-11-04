@@ -1,5 +1,7 @@
 const en = {
   title: "Resources across my collections",
+  loadUnavailable:
+    "Resources across your collections are temporarily unavailable. Please try again.",
   note: "Find resources and version changes across all private collections. Each result retains every collection containing it. Availability means a safe published release exists under current access; a missing pinned version never falls back to the latest release. Downloads recheck access and the exact build.",
   search: "Search accessible names or recorded resource IDs",
   status: "Collection status",
@@ -12,6 +14,7 @@ const en = {
   apply: "Apply filters",
   clear: "Clear filters",
   empty: "No matching resource references.",
+  emptyHint: "Adjust filters or clear them to see references across your collections.",
   resources: "Distinct resources",
   references: "Collection references",
   memberships: "Collections containing this resource",
@@ -48,6 +51,7 @@ const en = {
 };
 const ru: typeof en = {
   title: "Ресурсы во всех моих коллекциях",
+  loadUnavailable: "Ресурсы во всех коллекциях временно недоступны. Попробуйте ещё раз.",
   note: "Поиск ресурсов и изменений версий во всех приватных коллекциях. Результат показывает все коллекции с каждой ссылкой. Доступность означает наличие безопасной публикации при текущих правах; недоступная закреплённая версия не заменяется последней. Загрузка заново проверяет права и точную сборку.",
   search: "Поиск по доступным названиям или записанным ID ресурсов",
   status: "Состояние коллекций",
@@ -60,6 +64,7 @@ const ru: typeof en = {
   apply: "Применить фильтры",
   clear: "Сбросить фильтры",
   empty: "Подходящих ссылок на ресурсы нет.",
+  emptyHint: "Измените фильтры или сбросьте их, чтобы увидеть ссылки во всех коллекциях.",
   resources: "Разных ресурсов",
   references: "Ссылок в коллекциях",
   memberships: "Коллекции с этим ресурсом",

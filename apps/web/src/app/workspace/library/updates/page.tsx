@@ -1,14 +1,23 @@
 import { LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { parseHistoryPage } from "../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../lib/services/resource-release-control-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterNavClass =
+  "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Library updates | MTA NEXUS",
@@ -21,20 +30,35 @@ export default async function LibraryUpdatesPage({
 }) {
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getResourceReleaseControlCopy(locale),
+    dictionary = getDictionary(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
   const filter = LIBRARY_RELEASE_FILTERS.find((value) => value === query.filter) ?? "all";
   const page = Math.min(parseHistoryPage(query.page), 1000);
   const returnPath = `/workspace/library/updates?${new URLSearchParams({ filter, page: String(page) })}`;
   if (!user) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-  const result = await libraryReleaseService.page(user, page, filter);
+  const result = await libraryReleaseService.page(user, page, filter).catch(() => null);
   const href = (page: number, value = filter) =>
     `/workspace/library/updates?${new URLSearchParams({ filter: value, page: String(page) })}`;
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <Link href="/workspace/library" className={navLinkClass}>
+          {copy.library}
+        </Link>
+        <ErrorState
+          title={copy.updatesLoadUnavailable}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link
-        href="/workspace/library"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace/library" className={navLinkClass}>
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.updates}</h1>
@@ -50,7 +74,7 @@ export default async function LibraryUpdatesPage({
             key={value}
             href={href(1, value)}
             aria-current={filter === value ? "page" : undefined}
-            className="rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white"
+            className={filterNavClass}
           >
             {value === "updates" ? copy.update_available : copy[value]} ({result.counts[value]})
           </Link>
@@ -91,7 +115,7 @@ export default async function LibraryUpdatesPage({
                 ) : null}
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={navLinkClass}
                 >
                   {copy.manage}
                 </Link>
@@ -100,36 +124,30 @@ export default async function LibraryUpdatesPage({
           })}
         </ul>
       ) : (
-        <div className="space-y-3 text-secondary">
-          <p>{result.counts.all === 0 ? copy.emptyInventory : copy.emptyFiltered}</p>
-          {filter !== "all" && result.counts.all > 0 ? (
-            <Link
-              href={href(1, "all")}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.all}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={result.counts.all === 0 ? copy.emptyInventory : copy.emptyFiltered}
+          description={result.counts.all === 0 ? copy.emptyInventoryHint : copy.emptyFilteredHint}
+          action={
+            filter !== "all" && result.counts.all > 0 ? (
+              <Link href={href(1, "all")} className={navLinkClass}>
+                {copy.all}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={href(result.page - 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page - 1)} className={navLinkClass}>
               {copy.previous}
             </Link>
           ) : null}
-          <span>
+          <span className="inline-flex min-h-11 items-center">
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={href(result.page + 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page + 1)} className={navLinkClass}>
               {copy.next}
             </Link>
           ) : null}

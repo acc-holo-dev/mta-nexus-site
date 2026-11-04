@@ -3,13 +3,14 @@ import {
   LIBRARY_COLLECTION_INVENTORY_FILTERS,
   LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../../../lib/library-collection-inventory-i18n";
 import {
@@ -24,6 +25,11 @@ import {
 import { collectionHref, collectionPageParams } from "../../../../../lib/library-collections-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -39,6 +45,7 @@ export default async function Page({
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
     c = libraryCollectionsCopy(locale),
     v = libraryCollectionInventoryCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     let returnPath = "/workspace/library/collections/resources";
@@ -51,22 +58,39 @@ export default async function Page({
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   try {
-    const query = libraryCollectionInventoryQuery(collectionPageParams(raw)),
-      report = await libraryCollectionsService.inventory(actor, query),
-      suffix = (page: number) => libraryCollectionInventorySuffix({ ...query, page });
-    return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
-        <nav className="flex flex-wrap gap-4">
-          <Link
-            href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+    const query = libraryCollectionInventoryQuery(collectionPageParams(raw));
+    const report = await libraryCollectionsService.inventory(actor, query).catch((error) => {
+      if (error instanceof AppError) throw error;
+      return null;
+    });
+    if (!report) {
+      return (
+        <div className={pageShellClass}>
+          <Link href={collectionHref()} className={navLinkClass}>
             {c.title}
           </Link>
-          <Link
-            href="/workspace/library"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <ErrorState
+            title={v.loadUnavailable}
+            action={
+              <Link
+                href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix(query)}`}
+                className={navLinkClass}
+              >
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
+    const suffix = (page: number) => libraryCollectionInventorySuffix({ ...query, page });
+    return (
+      <div className={pageShellClass}>
+        <nav className="flex flex-wrap gap-4">
+          <Link href={collectionHref()} className={navLinkClass}>
+            {c.title}
+          </Link>
+          <Link href="/workspace/library" className={navLinkClass}>
             {c.library}
           </Link>
         </nav>
@@ -143,13 +167,10 @@ export default async function Page({
               ))}
             </select>
           </label>
-          <Button type="submit" variant="outline" className="px-3">
+          <Button type="submit" variant="outline" className="min-h-11 px-3">
             {v.apply}
           </Button>
-          <Link
-            href={collectionInventoryHref()}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={collectionInventoryHref()} className={navLinkClass}>
             {v.clear}
           </Link>
         </form>
@@ -171,7 +192,7 @@ export default async function Page({
                 key={release}
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix({ ...query, page: 1, release })}`}
                 aria-current={release === report.release ? "page" : undefined}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {v.releaseFilters[release]} (
                 {
@@ -190,22 +211,22 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/resources/export?${suffix(report.page)}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {v.export}
         </a>
         <p className="text-sm text-secondary">{v.snapshotNote}</p>
-        {!report.items.length && (
-          <div className="space-y-3">
-            <p>{v.empty}</p>
-            <Link
-              href={collectionInventoryHref()}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {v.clear}
-            </Link>
-          </div>
-        )}
+        {!report.items.length ? (
+          <EmptyState
+            title={v.empty}
+            description={v.emptyHint}
+            action={
+              <Link href={collectionInventoryHref()} className={navLinkClass}>
+                {v.clear}
+              </Link>
+            }
+          />
+        ) : null}
         <ol className="space-y-4">
           {report.items.map((item) => {
             const first = item.memberships[0],
@@ -243,7 +264,7 @@ export default async function Page({
                         {release.canReviewRequirements && (
                           <Link
                             href={`${resourceHref}/requirements?${new URLSearchParams({ previewBuildId: release.effective.buildId })}`}
-                            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                            className={navLinkClass}
                           >
                             {v.preparation}
                           </Link>
@@ -251,7 +272,7 @@ export default async function Page({
                         {release.effective.buildId !== release.latest.buildId && (
                           <Link
                             href={`${resourceHref}/versions/compare?${new URLSearchParams({ from: release.effective.buildId, to: release.latest.buildId })}`}
-                            className="block text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                            className={`block ${navLinkClass}`}
                           >
                             {v.compareVersions}
                           </Link>
@@ -269,24 +290,18 @@ export default async function Page({
                   </section>
                 )}
                 <div className="flex flex-wrap gap-4">
-                  <Link
-                    href={`${resourceHref}/collections`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={`${resourceHref}/collections`} className={navLinkClass}>
                     {v.manage}
                   </Link>
                   {item.available && (
-                    <Link
-                      href={`${resourceHref}/versions`}
-                      className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
+                    <Link href={`${resourceHref}/versions`} className={navLinkClass}>
                       {c.versions}
                     </Link>
                   )}
                   {first && second && (
                     <Link
                       href={collectionHref(first.id, "compare", { to: second.id })}
-                      className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={navLinkClass}
                     >
                       {v.compare}
                     </Link>
@@ -297,7 +312,7 @@ export default async function Page({
                     <li key={membership.id} className="border-t border-base pt-2">
                       <Link
                         href={collectionHref(membership.id)}
-                        className="break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={`break-words ${navLinkClass}`}
                       >
                         {membership.name}
                       </Link>{" "}
@@ -317,18 +332,18 @@ export default async function Page({
             {report.page > 1 && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page - 1)}`}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {c.previous}
               </Link>
             )}
-            <span>
+            <span className="inline-flex min-h-11 items-center">
               {c.page} {report.page} {c.of} {report.totalPages}
             </span>
             {report.page < report.totalPages && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page + 1)}`}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {c.next}
               </Link>
@@ -341,14 +356,15 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className="space-y-4 py-16">
-        <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link
-          href={collectionInventoryHref()}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.reload}
-        </Link>
+      <section className={pageShellClass}>
+        <ErrorState
+          title={libraryCollectionError(locale, error.code)}
+          action={
+            <Link href={collectionInventoryHref()} className={navLinkClass}>
+              {c.reload}
+            </Link>
+          }
+        />
       </section>
     );
   }

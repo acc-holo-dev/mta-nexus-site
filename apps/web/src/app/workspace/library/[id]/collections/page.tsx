@@ -1,11 +1,13 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { LibraryCollectionCommandForm } from "../../../../../components/library-collection-command";
 import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import {
@@ -17,6 +19,10 @@ import { libraryMembershipHistoryCopy } from "../../../../../lib/library-members
 import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,6 +45,7 @@ export default async function ResourceCollectionsPage({
     searchParams,
   ]);
   const c = libraryCollectionsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
@@ -50,33 +57,50 @@ export default async function ResourceCollectionsPage({
   try {
     if (collectionPageParams(query).size)
       throw new AppError("Unexpected resource collections query", 400, "COLLECTION_INVALID");
-    const result = await libraryCollectionsService.resourceMemberships(actor, id);
+    const result = await libraryCollectionsService.resourceMemberships(actor, id).catch((error) => {
+      if (error instanceof AppError) throw error;
+      return null;
+    });
+    if (!result) {
+      return (
+        <div className={pageShellClass}>
+          <Link href={collectionHref()} className={navLinkClass}>
+            {c.title}
+          </Link>
+          <ErrorState
+            title={c.loadUnavailable}
+            action={
+              <Link
+                href={`/workspace/library/${encodeURIComponent(id)}/collections`}
+                className={navLinkClass}
+              >
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
     const href = `/workspace/library/${encodeURIComponent(id)}/collections`;
     return (
-      <div className="mx-auto max-w-4xl space-y-6 py-8">
+      <div className={pageShellClass}>
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.library}>
-          <Link
-            href="/workspace/library"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/library" className={navLinkClass}>
             {c.library}
           </Link>
           <Link
             href={`${membershipHistoryHref()}?productId=${encodeURIComponent(id)}`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {libraryMembershipHistoryCopy(locale).history}
           </Link>
-          <Link
-            href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={collectionHref()} className={navLinkClass}>
             {c.title}
           </Link>
           {result.resource.available && (
             <Link
               href={`/workspace/library/${encodeURIComponent(id)}/versions`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {c.versions}
             </Link>
@@ -85,7 +109,7 @@ export default async function ResourceCollectionsPage({
         <h1 className="font-display text-primary">{c.resourceCollections}</h1>
         <Link
           href={`/workspace/library/collections/history?${new URLSearchParams({ productId: id })}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {libraryCollectionHistoryCopy(locale).title}
         </Link>
@@ -107,7 +131,17 @@ export default async function ResourceCollectionsPage({
             {c.noAddAccess}
           </p>
         )}
-        {!result.collections.length && <p>{c.empty}</p>}
+        {!result.collections.length ? (
+          <EmptyState
+            title={c.empty}
+            description={c.emptyHint}
+            action={
+              <Link href={collectionHref()} className={navLinkClass}>
+                {c.title}
+              </Link>
+            }
+          />
+        ) : null}
         <LibraryMembershipBatchForm key={id} report={result} locale={locale} />
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.collections.map((collection) => {
@@ -120,10 +154,7 @@ export default async function ResourceCollectionsPage({
             return (
               <li key={collection.id} className="nexus-panel space-y-3 p-5">
                 <h3 className="break-words font-semibold">
-                  <Link
-                    href={collectionHref(collection.id)}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={collectionHref(collection.id)} className={navLinkClass}>
                     {collection.name}
                   </Link>
                 </h3>
@@ -154,10 +185,7 @@ export default async function ResourceCollectionsPage({
             );
           })}
         </ol>
-        <a
-          href={`/api/library/${encodeURIComponent(id)}/collections`}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <a href={`/api/library/${encodeURIComponent(id)}/collections`} className={navLinkClass}>
           {c.json}
         </a>
       </div>
@@ -166,14 +194,15 @@ export default async function ResourceCollectionsPage({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className="mx-auto max-w-xl space-y-4 py-16">
-        <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link
-          href={collectionHref()}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.title}
-        </Link>
+      <section className={`${pageShellClass} max-w-xl`}>
+        <ErrorState
+          title={libraryCollectionError(locale, error.code)}
+          action={
+            <Link href={collectionHref()} className={navLinkClass}>
+              {c.title}
+            </Link>
+          }
+        />
       </section>
     );
   }

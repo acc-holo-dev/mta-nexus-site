@@ -215,6 +215,8 @@ it("distinguishes empty library inventory from filtered updates", async () => {
     await Updates({ searchParams: Promise.resolve({ filter: "all", page: "1" }) }),
   );
   expect(never).toContain(copy.emptyInventory);
+  expect(never).toContain(copy.emptyInventoryHint);
+  expect(never).toContain("overflow-x-clip");
   expect(never).not.toContain(copy.emptyFiltered);
 
   state.updates.mockResolvedValueOnce({
@@ -229,8 +231,19 @@ it("distinguishes empty library inventory from filtered updates", async () => {
     await Updates({ searchParams: Promise.resolve({ filter: "updates", page: "1" }) }),
   );
   expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.emptyFilteredHint);
   expect(filtered).toContain(copy.all);
   expect(filtered).not.toContain(copy.emptyInventory);
+});
+it("shows an honest recovery state when library updates fail", async () => {
+  state.updates.mockRejectedValue(new Error("updates unavailable"));
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await Updates(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.updatesLoadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("filter=all");
+  expect(html).toContain("page=2");
 });
 it("requires sign-in before reading the buyer library", async () => {
   state.user = null;

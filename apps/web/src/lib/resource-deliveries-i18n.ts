@@ -19,6 +19,8 @@ const en = {
   signIn: "Sign in",
   empty: "No delivery receipts match these filters.",
   emptyNever: "You have no delivery receipts yet.",
+  emptyNeverHint:
+    "Authorized download starts appear here after they are recorded for your account.",
   publisherEmptyNever: "No delivery activity has been recorded for this resource yet.",
   publisherEmptyNeverHint:
     "Authorized download starts for this resource appear here after they are recorded.",
@@ -75,6 +77,7 @@ const ru: typeof en = {
   signIn: "Войти",
   empty: "Нет передач по выбранным фильтрам.",
   emptyNever: "Записей о передачах пока нет.",
+  emptyNeverHint: "Разрешённые начала скачивания появятся здесь после записи для вашего аккаунта.",
   publisherEmptyNever: "Для этого ресурса передачи пока не зафиксированы.",
   publisherEmptyNeverHint:
     "Разрешённые начала скачивания этого ресурса появятся здесь после их записи.",

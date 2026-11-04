@@ -164,9 +164,20 @@ it("maps unknown and foreign resources to a missing page", async () => {
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
 });
 it("links empty collection state to creation", async () => {
+  const copy = libraryCollectionsCopy("en");
   state.report.mockResolvedValue({ ...report(), collections: [] });
   const html = await screen();
-  expect(html).toContain(libraryCollectionsCopy("en").empty);
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.emptyHint);
+  expect(html).toContain("overflow-x-clip");
   expect(html).toContain('href="/workspace/library/collections"');
   expect(html).not.toContain('data-action="');
+});
+it("shows an honest recovery state when resource collections fail", async () => {
+  state.report.mockRejectedValue(new Error("memberships unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(libraryCollectionsCopy("en").loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/workspace/library/prd_a/collections");
 });
