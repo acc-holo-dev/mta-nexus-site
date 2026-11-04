@@ -87,7 +87,7 @@ export default async function HomePage() {
   const spotlight = directory?.servers.slice(0, 6) ?? [];
 
   return (
-    <div className="space-y-14">
+    <div className="min-w-0 space-y-14 overflow-x-clip">
       <section className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
         <div
           aria-hidden="true"
@@ -146,9 +146,12 @@ export default async function HomePage() {
             description: dictionary.home.personalDescription,
             scopeNote: dictionary.home.personalScopeNote,
             empty: dictionary.home.personalEmpty,
+            emptyHint: dictionary.home.personalEmptyHint,
             error: dictionary.home.personalError,
+            retry: dictionary.home.personalRetry,
             partial: dictionary.home.personalPartial,
             hidden: dictionary.home.personalHidden,
+            hiddenHint: dictionary.home.personalHiddenHint,
             hidePreference: dictionary.home.personalHide,
             showPreference: dictionary.home.personalShow,
             reasonReleaseWatch: dictionary.home.personalReasonReleaseWatch,

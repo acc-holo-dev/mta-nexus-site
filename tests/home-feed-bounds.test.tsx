@@ -160,11 +160,36 @@ describe("bounded home feed reads", () => {
     expect(mocks.loadPersonal).toHaveBeenCalledOnce();
     expect(html).toContain(copy.personalScopeNote);
     expect(html).toContain(copy.personalTitle);
+    expect(html).toContain(copy.personalEmpty);
+    expect(html).toContain(copy.personalEmptyHint);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("min-h-11");
+  });
+
+  it("clips the Home shell and recovers personal load failure with ErrorState retry", async () => {
+    mocks.getSession.mockResolvedValue({ id: "actor" });
+    mocks.loadPersonal.mockRejectedValue(new Error("personal-secret"));
+
+    const html = renderToStaticMarkup(await HomePage());
+    const copy = getDictionary("en").home;
+
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.personalError);
+    expect(html).toContain(copy.personalRetry);
+    expect(html).toContain('href="/"');
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("min-h-11");
+    expect(html).not.toContain("personal-secret");
+    expect(html).not.toContain(copy.personalEmpty);
   });
 
   it("names public home feed sections for assistive landmarks", async () => {
     const html = renderToStaticMarkup(await HomePage());
 
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
     expect(html).toContain('aria-labelledby="home-network-heading"');
     expect(html).toContain('id="home-network-heading"');
     expect(html).toContain('aria-labelledby="home-free-resources-heading"');
