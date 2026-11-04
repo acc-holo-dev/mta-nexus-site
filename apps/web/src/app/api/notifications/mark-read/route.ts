@@ -1,6 +1,8 @@
 import { notificationRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { readBoundedText } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { parseNotificationReadTarget } from "../../../../lib/notification-read";
 import {
@@ -44,7 +46,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const target = parseNotificationReadTarget(await request.text());
+    const target = parseNotificationReadTarget(await readBoundedText(request, 4096));
     if (!target) {
       return json(context, { error: "Invalid notification target" }, 400);
     }
@@ -73,6 +75,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       scope: "all",
     });
   } catch (error: unknown) {
+    if (
+      error instanceof AppError &&
+      ["INVALID_BODY_LENGTH", "REQUEST_BODY_TOO_LARGE", "REQUEST_BODY_TIMEOUT"].includes(error.code)
+    ) {
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
+    }
     logRequestEvent({
       level: "error",
       event: "notifications.mark_read_failed",

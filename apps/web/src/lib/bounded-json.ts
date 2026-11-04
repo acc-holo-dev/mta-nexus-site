@@ -32,11 +32,11 @@ function timedOut(): AppError {
  * Content-Length. Body cancellation is intentionally fire-and-forget:
  * a malicious upstream stream can stall forever during cancel().
  */
-export async function readBoundedJson(
+async function readBoundedBytes(
   request: Request,
-  maxBytes = SERVER_MUTATION_MAX_BODY_BYTES,
-  timeoutMs = 10_000,
-): Promise<unknown> {
+  maxBytes: number,
+  timeoutMs: number,
+): Promise<Uint8Array> {
   if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
     throw new RangeError("Invalid JSON request byte limit");
   }
@@ -58,7 +58,7 @@ export async function readBoundedJson(
     }
   }
 
-  if (!request.body) return null;
+  if (!request.body) return new Uint8Array();
   const reader = request.body.getReader();
   const timeoutSignal = AbortSignal.timeout(timeoutMs);
   const signal = AbortSignal.any([request.signal, timeoutSignal]);
@@ -99,6 +99,25 @@ export async function readBoundedJson(
     bytes.set(chunk, offset);
     offset += chunk.byteLength;
   }
+  return bytes;
+}
+
+/** Reads text with a byte ceiling and timeout, including when Content-Length is absent. */
+export async function readBoundedText(
+  request: Request,
+  maxBytes = SERVER_MUTATION_MAX_BODY_BYTES,
+  timeoutMs = 10_000,
+): Promise<string> {
+  const bytes = await readBoundedBytes(request, maxBytes, timeoutMs);
+  return new TextDecoder().decode(bytes);
+}
+
+export async function readBoundedJson(
+  request: Request,
+  maxBytes = SERVER_MUTATION_MAX_BODY_BYTES,
+  timeoutMs = 10_000,
+): Promise<unknown> {
+  const bytes = await readBoundedBytes(request, maxBytes, timeoutMs);
   try {
     return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
   } catch {

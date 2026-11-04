@@ -200,6 +200,16 @@ describe("social and notification HTTP state contract", () => {
     expect(markSingle).not.toHaveBeenCalled();
   });
 
+  it("rejects oversized mark-read bodies before any mutation", async () => {
+    const response = await markRead(
+      makeRequest("/api/notifications/mark-read", "POST", " ".repeat(4097)),
+    );
+    expect(response.status).toBe(413);
+    expectPrivate(response);
+    expect(markAll).not.toHaveBeenCalled();
+    expect(markSingle).not.toHaveBeenCalled();
+  });
+
   it("reports the global unread total beyond the 100-item inbox window", async () => {
     const response = await listNotifications(makeRequest("/api/notifications?limit=100", "GET"));
     const data = await response.json();

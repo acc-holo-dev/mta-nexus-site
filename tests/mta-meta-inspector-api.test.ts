@@ -1,8 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { metaInspectionLimits } from "../apps/web/src/lib/mta-meta-inspector";
 import { getRateLimitPolicy } from "../packages/security/src/rate-limit-policy";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: null as null | {
@@ -120,6 +120,17 @@ describe("resource meta inspector HTTP behavior", () => {
       maxBytes: metaInspectionLimits.maxBytes,
     });
     expect(oversizedRead).not.toHaveBeenCalled();
+  });
+
+  it("rejects an oversized streamed body even with a misleading Content-Length", async () => {
+    const response = await POST(
+      request("x".repeat(metaInspectionLimits.maxBytes + 1), "text/plain", {
+        "content-length": "1",
+      }),
+    );
+    expect(response.status).toBe(413);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ maxBytes: metaInspectionLimits.maxBytes });
   });
 
   it("returns structural inspection only and never a trust verdict", async () => {

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseBoundedJson, SUPPORT_JSON_MAX_BYTES } from "../apps/web/src/lib/bounded-json";
+import {
+  parseBoundedJson,
+  readBoundedText,
+  SUPPORT_JSON_MAX_BYTES,
+} from "../apps/web/src/lib/bounded-json";
 
 const url = "https://nexus.test/api/support";
 const encode = (text: string) => new TextEncoder().encode(text);
@@ -107,5 +111,27 @@ describe("bounded JSON body parsing", () => {
     await expect(
       parseBoundedJson(new Request(url, { method: "POST", body: "{}" }), Number.NaN),
     ).rejects.toThrow(RangeError);
+  });
+});
+
+describe("bounded text reading", () => {
+  it("counts streamed bytes independently of the declared length and preserves split UTF-8", async () => {
+    const data = encode("Привет 🌍");
+    expect(await readBoundedText(streamed([data.slice(0, 3), data.slice(3)]), data.length)).toBe(
+      "Привет 🌍",
+    );
+    await expect(
+      readBoundedText(streamed([data], { "content-length": "1" }), data.length - 1),
+    ).rejects.toMatchObject({ code: "REQUEST_BODY_TOO_LARGE" });
+  });
+
+  it("times out a stream that does not finish", async () => {
+    const body = new ReadableStream<Uint8Array>({ start() {} });
+    const request = new Request(url, { method: "POST", body, duplex: "half" } as RequestInit & {
+      duplex: "half";
+    });
+    await expect(readBoundedText(request, 128, 10)).rejects.toMatchObject({
+      code: "REQUEST_BODY_TIMEOUT",
+    });
   });
 });

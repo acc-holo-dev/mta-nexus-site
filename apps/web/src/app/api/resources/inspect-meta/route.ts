@@ -1,5 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { readBoundedText } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   inspectMtaMetaXml,
@@ -24,13 +26,6 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
     status,
     headers: privateHeaders,
   });
-}
-
-function contentLengthTooLarge(request: NextRequest): boolean {
-  const header = request.headers.get("content-length");
-  if (!header) return false;
-  const value = Number(header);
-  return Number.isFinite(value) && value > metaInspectionLimits.maxBytes;
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
@@ -60,7 +55,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
-    if (!contentType.startsWith("text/plain")) {
+    if (contentType.split(";", 1)[0]?.trim() !== "text/plain") {
       return json(
         context,
         {
@@ -70,18 +65,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    if (contentLengthTooLarge(request)) {
-      return json(
-        context,
-        {
-          error: "meta.xml exceeds the inspection limit",
-          maxBytes: metaInspectionLimits.maxBytes,
-        },
-        413,
-      );
-    }
-
-    const metaXml = await request.text();
+    const metaXml = await readBoundedText(request, metaInspectionLimits.maxBytes);
     const inspection = inspectMtaMetaXml(metaXml);
 
     return json(context, {
@@ -90,6 +74,22 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       note: "Static manifest inspection only. This result is not a malware, trust, or archive-integrity verdict.",
     });
   } catch (error: unknown) {
+    if (
+      error instanceof AppError &&
+      ["INVALID_BODY_LENGTH", "REQUEST_BODY_TOO_LARGE", "REQUEST_BODY_TIMEOUT"].includes(error.code)
+    ) {
+      if (error.code === "REQUEST_BODY_TOO_LARGE") {
+        return json(
+          context,
+          {
+            error: "meta.xml exceeds the inspection limit",
+            maxBytes: metaInspectionLimits.maxBytes,
+          },
+          413,
+        );
+      }
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
+    }
     if (error instanceof MetaInspectionInputError) {
       return json(
         context,
