@@ -65,6 +65,7 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 
 import { LibraryCollectionsScreen } from "../apps/web/src/components/library-collections-screen";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   collection = {
@@ -354,3 +355,13 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("/move-items?");
   },
 );
+it("shows an honest recovery state when the collections list fails to load", async () => {
+  state.page.mockRejectedValueOnce(new Error("collections unavailable"));
+  const copy = libraryCollectionsCopy("en");
+  const html = await screen("list");
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/library/collections?status=active&amp;page=1"');
+  expect(html).not.toContain("collections unavailable");
+});

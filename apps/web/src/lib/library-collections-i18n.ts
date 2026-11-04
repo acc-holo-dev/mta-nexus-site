@@ -1,4 +1,6 @@
 const en = {
+  loadUnavailable:
+    "Your resource collections are temporarily unavailable. Please try again.",
   title: "My resource collections",
   library: "Resource library",
   resourceCollections: "Collections containing this resource",
@@ -106,6 +108,7 @@ const en = {
   created: "Time (UTC)",
 };
 const ru: typeof en = {
+  loadUnavailable: "Коллекции ресурсов временно недоступны. Попробуйте ещё раз.",
   title: "Мои коллекции ресурсов",
   library: "Библиотека ресурсов",
   resourceCollections: "Коллекции с этим ресурсом",

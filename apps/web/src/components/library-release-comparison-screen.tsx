@@ -1,7 +1,9 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { collectionPageParams } from "../lib/library-collections-query";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
@@ -23,6 +25,7 @@ export async function LibraryReleaseComparisonScreen({
     params,
     searchParams,
   ]);
+  const dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const compareBase = `/workspace/library/${encodeURIComponent(path.id)}/versions/compare`;
   if (!actor) {
@@ -45,14 +48,40 @@ export async function LibraryReleaseComparisonScreen({
   } catch {
     notFound();
   }
-  const result = await libraryReleaseService
-    .compare(actor, path.id, query)
-    .catch((error: unknown) => {
-      if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-      throw error;
-    });
-  const c = libraryReleaseComparisonCopy(locale),
-    base = `/workspace/library/${encodeURIComponent(path.id)}/versions`;
+  const c = libraryReleaseComparisonCopy(locale);
+  const retryHref = `${compareBase}?${new URLSearchParams({
+    from: query.from,
+    to: query.to,
+    returnPage: String(query.returnPage),
+  })}`;
+  const result = await libraryReleaseService.compare(actor, path.id, query).catch((error: unknown) => {
+    if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
+    return null;
+  });
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <Link
+          href={`/workspace/library/${encodeURIComponent(path.id)}/versions?page=${query.returnPage}`}
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link
+              href={retryHref}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  const base = `/workspace/library/${encodeURIComponent(path.id)}/versions`;
   const values = { from: query.from, to: query.to, returnPage: String(query.returnPage) },
     suffix = new URLSearchParams(values).toString();
   const rows: [string, unknown, unknown][] = [
@@ -66,7 +95,7 @@ export async function LibraryReleaseComparisonScreen({
     [c.signed, result.from.isSigned ? c.yes : c.no, result.to.isSigned ? c.yes : c.no],
   ];
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
       <Link
         href={`${base}?page=${query.returnPage}`}
         className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

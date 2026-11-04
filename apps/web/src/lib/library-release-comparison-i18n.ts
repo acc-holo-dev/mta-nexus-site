@@ -1,4 +1,5 @@
 const en = {
+  loadUnavailable: "Release comparison is temporarily unavailable. Please try again.",
   title: "Compare releases",
   chooseCompared: "Fix the compared release for downloads",
   alreadySelected: "This release is already your fixed download choice.",
@@ -49,6 +50,7 @@ const en = {
   generated: "Snapshot time (UTC)",
 };
 const ru: typeof en = {
+  loadUnavailable: "Сравнение выпусков временно недоступно. Попробуйте ещё раз.",
   title: "Сравнить выпуски",
   chooseCompared: "Закрепить сравниваемый выпуск для скачивания",
   alreadySelected: "Этот выпуск уже закреплён для скачивания.",

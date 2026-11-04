@@ -1,6 +1,8 @@
 export function collectionRequirementsCopy(locale: string) {
   return locale === "ru"
     ? {
+        loadUnavailable:
+          "Проверка готовности коллекции временно недоступна. Попробуйте ещё раз.",
         title: "Готовность коллекции",
         back: "К коллекции",
         revision: "Ревизия",
@@ -15,6 +17,8 @@ export function collectionRequirementsCopy(locale: string) {
         note: "Общие зависимости проверяются один раз. Отчёт учитывает выбранные версии из библиотеки. Добавление ресурса в коллекцию не выдаёт права доступа.",
       }
     : {
+        loadUnavailable:
+          "Collection readiness check is temporarily unavailable. Please try again.",
         title: "Collection readiness",
         back: "Back to collection",
         revision: "Revision",

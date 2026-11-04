@@ -1,7 +1,9 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import {
@@ -30,6 +32,7 @@ export async function LibrarySelectionBatchScreen({
     params,
     searchParams,
   ]);
+  const dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const c = librarySelectionBatchesCopy(locale),
     cc = libraryCollectionsCopy(locale);
@@ -45,14 +48,36 @@ export async function LibrarySelectionBatchScreen({
     }
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
+  const loadFailure = (retryHref: string) => (
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <ErrorState
+        title={c.loadUnavailable}
+        action={
+          <Link
+            href={retryHref}
+            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </div>
+  );
   try {
     const id = collectionId(path.id),
       query = collectionsQuery(collectionPageParams(raw), history ? "history" : "detail"),
-      base = `/workspace/library/collections/${encodeURIComponent(id)}/versions`;
+      base = `/workspace/library/collections/${encodeURIComponent(id)}/versions`,
+      retryHref = `${base}${history ? "/history" : ""}?${new URLSearchParams({ page: String(query.page), ...(query.q ? { q: query.q } : {}) })}`;
     if (history) {
-      const result = await librarySelectionBatchesService.history(actor, id, query.page);
+      const result = await librarySelectionBatchesService
+        .history(actor, id, query.page)
+        .catch((error: unknown) => {
+          if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
+          return null;
+        });
+      if (!result) return loadFailure(retryHref);
       return (
-        <div className="mx-auto max-w-5xl space-y-6 py-8">
+        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
           <Link
             href={base}
             className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -63,7 +88,7 @@ export async function LibrarySelectionBatchScreen({
             {c.history}: {result.collection.name}
           </h1>
           <p>{c.privacy}</p>
-          {!result.items.length && <p>{c.empty}</p>}
+          {!result.items.length && <EmptyState title={c.empty} description={c.privacy} />}
           <ol className="space-y-4">
             {result.items.map((receipt) => (
               <li key={receipt.id} className="nexus-panel space-y-3 p-4">
@@ -124,11 +149,15 @@ export async function LibrarySelectionBatchScreen({
         </div>
       );
     }
-    const result = await libraryCollectionsService.detail(actor, id, query);
+    const result = await libraryCollectionsService.detail(actor, id, query).catch((error: unknown) => {
+      if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
+      return null;
+    });
+    if (!result) return loadFailure(retryHref);
     const pageHref = (page: number) =>
       `${base}?${new URLSearchParams({ page: String(page), ...(result.q ? { q: result.q } : {}) })}`;
     return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(id)}`}
           className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -184,6 +213,7 @@ export async function LibrarySelectionBatchScreen({
     );
   } catch (error) {
     if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-    throw error;
+    const retryHref = versionsBase;
+    return loadFailure(retryHref);
   }
 }

@@ -1,4 +1,6 @@
 const en = {
+  loadUnavailable:
+    "Version selection history is temporarily unavailable. Please try again.",
   title: "My version selection history",
   loading: "Loading version selection history…",
   note: "Recorded choices from individual and group operations. Resource names are current labels; release labels require current access and safe publication. Lost access preserves your own recorded IDs. History does not restore versions or grant files.",
@@ -25,6 +27,7 @@ const en = {
   of: "of",
 };
 const ru: typeof en = {
+  loadUnavailable: "История выбора версий временно недоступна. Попробуйте ещё раз.",
   title: "Моя история выбора версий",
   loading: "Загрузка истории выбора версий…",
   note: "Выборы, записанные при одиночных и групповых операциях. Названия ресурсов показаны в текущем виде; подписи выпусков требуют действующего доступа и безопасной публикации. При потере доступа сохраняются идентификаторы ваших действий. История не восстанавливает версии и не выдаёт файлы.",

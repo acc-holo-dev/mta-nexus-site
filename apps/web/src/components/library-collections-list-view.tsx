@@ -1,4 +1,6 @@
+import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
+import { getDictionary } from "../lib/i18n";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
@@ -29,10 +31,32 @@ export async function LibraryCollectionsListView({
   queryValues: LibraryCollectionsQuery;
 }) {
   const c = libraryCollectionsCopy(locale);
+  const dictionary = getDictionary(locale);
   const query = collectionsQuery(collectionPageParams(queryValues), "list");
-  const result = await service.page(actor, query);
+  const retryHref = collectionHref(undefined, "", { status: query.status, page: String(query.page) });
+  const result = await service.page(actor, query).catch(() => null);
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+        <Link href="/workspace/library" className={libraryCollectionsLinkClass}>
+          {c.library}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link
+              href={retryHref}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
       <Link href="/workspace/library" className={libraryCollectionsLinkClass}>
         {c.library}
       </Link>
@@ -67,24 +91,27 @@ export async function LibraryCollectionsListView({
         ))}
       </nav>
       {!result.items.length && (
-        <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
-          <p>{result.status === "active" ? c.empty : c.emptyFiltered}</p>
-          {result.status !== "active" ? (
-            <Link
-              href={collectionHref()}
-              className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
-            >
-              {c.clear}
-            </Link>
-          ) : (
-            <Link
-              href="/market?maxPrice=0"
-              className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
-            >
-              {c.browseLibrary}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          title={result.status === "active" ? c.empty : c.emptyFiltered}
+          description={c.subtitle}
+          action={
+            result.status !== "active" ? (
+              <Link
+                href={collectionHref()}
+                className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
+              >
+                {c.clear}
+              </Link>
+            ) : (
+              <Link
+                href="/market?maxPrice=0"
+                className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
+              >
+                {c.browseLibrary}
+              </Link>
+            )
+          }
+        />
       )}
       <ol className="grid gap-4 sm:grid-cols-2">
         {result.items.map((item) => (

@@ -1,6 +1,8 @@
 export function librarySelectionBatchesCopy(locale: string) {
   return locale === "ru"
     ? {
+        loadUnavailable:
+          "Групповой выбор версий временно недоступен. Попробуйте ещё раз.",
         title: "Версии группы ресурсов",
         history: "История выбора версий",
         back: "К коллекции",
@@ -38,6 +40,8 @@ export function librarySelectionBatchesCopy(locale: string) {
         receipt: "Операция",
       }
     : {
+        loadUnavailable:
+          "Resource version batch is temporarily unavailable. Please try again.",
         title: "Resource version batch",
         history: "Version selection history",
         back: "Back to collection",

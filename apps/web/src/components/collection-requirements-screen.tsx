@@ -1,11 +1,12 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
-import { collectionPageParams } from "../lib/library-collections-query";
+import { collectionHref, collectionPageParams } from "../lib/library-collections-query";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
 import { authService } from "../lib/services/auth-service";
@@ -26,6 +27,7 @@ export async function CollectionRequirementsScreen({
     params,
     searchParams,
   ]);
+  const dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const requirementsBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/requirements`;
   if (!actor) {
@@ -46,17 +48,43 @@ export async function CollectionRequirementsScreen({
   } catch {
     notFound();
   }
+  const c = collectionRequirementsCopy(locale);
+  const retrySuffix = query.targetMta
+    ? `?${new URLSearchParams({ targetMta: query.targetMta })}`
+    : "";
   const result = await resourceRequirementsService
     .collectionReport(actor.id, path.id, query)
     .catch((error: unknown) => {
       if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-      throw error;
+      return null;
     });
-  const c = collectionRequirementsCopy(locale),
-    copy = resourceRequirementsCopy(locale);
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <Link
+          href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
+          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link
+              href={`${requirementsBase}${retrySuffix}`}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  const copy = resourceRequirementsCopy(locale);
   const suffix = query.targetMta ? `?${new URLSearchParams({ targetMta: query.targetMta })}` : "";
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
         className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -87,9 +115,13 @@ export async function CollectionRequirementsScreen({
           {copy.check}
         </Button>
       </form>
-      <p role="status" className="font-semibold">
-        {result.state === "empty" ? c.empty : copy.states[result.state]}
-      </p>
+      {result.state === "empty" ? (
+        <EmptyState title={c.empty} description={c.note} />
+      ) : (
+        <p role="status" className="font-semibold">
+          {copy.states[result.state]}
+        </p>
+      )}
       <dl className="nexus-panel grid gap-2 p-4 sm:grid-cols-2">
         <dt>{c.items}</dt>
         <dd>{result.itemCount}</dd>
