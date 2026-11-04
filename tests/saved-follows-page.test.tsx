@@ -94,16 +94,31 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('data-query="Team"');
     expect(html).toContain('id="saved-follows-heading"');
     expect(html).toContain('aria-labelledby="saved-follows-heading"');
-    expect((await generateMetadata()).robots.index).toBe(false);
+    expect(html).toContain("overflow-x-clip");
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
   },
 );
-it("distinguishes a failed initial read from an empty saved list", async () => {
-  state.actor = { id: "actor" };
-  state.page.mockRejectedValue(new Error("database-secret"));
-  const html = renderToStaticMarkup(await SavedPage({}));
-  expect(html).toContain('data-loaded="false"');
-  expect(html).not.toContain("database-secret");
-});
+it.each(["en", "ru"] as const)(
+  "shows ErrorState recovery when the initial saved read fails in %s",
+  async (locale) => {
+    state.actor = { id: "actor" };
+    state.locale = locale;
+    state.page.mockRejectedValue(new Error("database-secret"));
+    const copy = followCopy(locale);
+    const html = renderToStaticMarkup(
+      await SavedPage({
+        searchParams: Promise.resolve({ type: "organization", q: "Team" }),
+      }),
+    );
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.pageError);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain('href="/workspace/saved?type=organization&amp;q=Team"');
+    expect(html).not.toContain("database-secret");
+    expect(html).not.toContain("data-loaded");
+  },
+);
 it.each(["en", "ru"] as const)(
   "renders an honest saved loading shell with visible title in %s",
   async (locale) => {
@@ -115,5 +130,21 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('aria-labelledby="saved-follows-loading-heading"');
     expect(html).toContain(`>${copy.title}<`);
     expect(html).toContain(copy.loading);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+  },
+);
+it.each(["en", "ru"] as const)(
+  "clips the authenticated saved page shell and keeps EmptyState copy distinct in %s",
+  async (locale) => {
+    state.actor = { id: "actor" };
+    state.locale = locale;
+    const copy = followCopy(locale);
+    const html = renderToStaticMarkup(await SavedPage({}));
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+    expect(html).toContain('data-loaded="true"');
+    expect(copy.emptyFiltered).not.toBe(copy.empty);
+    expect(copy.emptyHint.length).toBeGreaterThan(0);
   },
 );

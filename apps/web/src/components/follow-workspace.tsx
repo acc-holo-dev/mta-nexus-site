@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, Button } from "@nexus/ui";
+import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +16,9 @@ import { publicationHref } from "../lib/publication-feed-contract";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { platformRequest } from "../lib/user-platform-client";
 import { confirmAction } from "./confirm-action";
+
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function FollowWorkspace({
   initial,
@@ -153,7 +156,7 @@ export function FollowWorkspace({
   return (
     <Root
       {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
-      className="min-w-0 space-y-5"
+      className="min-w-0 space-y-5 overflow-x-clip"
     >
       <nav aria-label={copy.title} className="flex min-w-0 gap-2 overflow-x-auto">
         {[undefined, ...FOLLOW_TYPES].map((value) => (
@@ -186,10 +189,7 @@ export function FollowWorkspace({
         >
           {copy.submit}
         </Button>
-        <Link
-          href={href(type, "")}
-          className="min-h-11 content-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(type, "")} className={actionLinkClass}>
           {copy.clear}
         </Link>
         <Button
@@ -203,9 +203,20 @@ export function FollowWorkspace({
         </Button>
       </form>
       {error && (
-        <p role="alert" className="rounded-lg border border-base p-3 text-sm text-danger">
-          {error}
-        </p>
+        <ErrorState
+          title={error}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={!!pending}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              onClick={() => void load("latest")}
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
       )}
       {success && (
         <p role="status" className="text-sm text-success">
@@ -213,29 +224,21 @@ export function FollowWorkspace({
         </p>
       )}
       {page && !page.items.length && (
-        <div className="nexus-panel space-y-3 p-8 text-center">
-          <h2 id="saved-follows-empty-heading" className="text-lg font-bold text-primary">
-            {type || query ? copy.emptyFiltered : copy.empty}
-          </h2>
-          <p className="text-sm text-muted">
-            {type || query ? copy.emptyFilteredHint : copy.emptyHint}
-          </p>
-          {type || query ? (
-            <Link
-              href={href(undefined, "")}
-              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.clear}
-            </Link>
-          ) : (
-            <Link
-              href="/discover"
-              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.discover}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          title={type || query ? copy.emptyFiltered : copy.empty}
+          description={type || query ? copy.emptyFilteredHint : copy.emptyHint}
+          action={
+            type || query ? (
+              <Link href={href(undefined, "")} className={actionLinkClass}>
+                {copy.clear}
+              </Link>
+            ) : (
+              <Link href="/discover" className={actionLinkClass}>
+                {copy.discover}
+              </Link>
+            )
+          }
+        />
       )}
       <div aria-busy={!!pending} className="grid gap-4 md:grid-cols-2">
         {page?.items.map((item) => (
