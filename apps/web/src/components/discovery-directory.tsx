@@ -1,6 +1,6 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { Avatar, Button, EmptyState } from "@nexus/ui";
+import { Avatar, Button, EmptyState, SearchField } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -55,17 +55,16 @@ export function DirectoryFilters({
       >
         {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
         <div className="flex flex-wrap items-end gap-3">
-          <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
-            {dictionary.searchLabel}
-            <input
+          <div className="min-w-48 flex-1">
+            <SearchField
               className={field}
+              label={dictionary.searchLabel}
               name="q"
-              type="search"
               maxLength={100}
               defaultValue={state.query}
               placeholder={dictionary.searchPlaceholder}
             />
-          </label>
+          </div>
           {names && !stream && (
             <label className="space-y-1 text-xs text-secondary">
               {copy.sort}

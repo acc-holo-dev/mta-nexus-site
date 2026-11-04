@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, fieldClass, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -28,16 +28,15 @@ export function ContentCatalogControls({
   return (
     <search aria-label={copy.search}>
       <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
-        <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-secondary">
-          <span>{copy.search}</span>
-          <input
-            type="search"
+        <div className="min-w-0 flex-1">
+          <SearchField
+            label={copy.search}
             name="q"
             maxLength={120}
             defaultValue={filters.query}
             className={`min-w-40 ${fieldClass}`}
           />
-        </label>
+        </div>
         <label className="flex flex-col gap-1 text-xs text-secondary">
           <span>{copy.type}</span>
           <select name="type" defaultValue={filters.type ?? "all"} className={fieldClass}>

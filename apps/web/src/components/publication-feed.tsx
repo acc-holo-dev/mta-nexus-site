@@ -1,4 +1,4 @@
-import { Avatar, Button } from "@nexus/ui";
+import { Avatar, Button, SearchField } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -67,17 +67,16 @@ export function PublicationFeed({
             <input type="hidden" name="source" value={filters.source} />
           </>
         )}
-        <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
-          {copy.query}
-          <input
+        <div className="min-w-48 flex-1">
+          <SearchField
             className={platformFieldClass}
+            label={copy.query}
             name="q"
-            type="search"
             maxLength={100}
             defaultValue={filters.query}
             placeholder={copy.queryHint}
           />
-        </label>
+        </div>
         <label className="space-y-1 text-xs text-secondary">
           {copy.type}
           <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>

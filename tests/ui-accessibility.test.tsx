@@ -11,6 +11,7 @@ import {
   PageHeader,
   SectionHeader,
 } from "../packages/ui/src/platform";
+import { SearchField } from "../packages/ui/src/search-field";
 import { nextTabIndex, Tabs } from "../packages/ui/src/tabs";
 
 describe("Input accessibility wiring", () => {
@@ -149,6 +150,20 @@ describe("PageHeader, SectionHeader and DataTable overflow chrome", () => {
     expect(table).toContain('tabindex="0"');
     expect(table).toContain("font-numeric");
     expect(table).toContain("text-right");
+  });
+});
+
+describe("SearchField semantics", () => {
+  it("provides a visible label, native search semantics and a decorative icon", () => {
+    const markup = renderToStaticMarkup(
+      <SearchField label="Поиск ресурсов" name="q" defaultValue="inventory" />,
+    );
+
+    expect(markup).toContain("Поиск ресурсов");
+    expect(markup).toContain('type="search"');
+    expect(markup).toContain('name="q"');
+    expect(markup).toContain('aria-hidden="true"');
+    expect(markup).toContain("inventory");
   });
 });
 

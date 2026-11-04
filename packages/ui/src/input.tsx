@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fieldControlClass, type FieldSize } from "./field-classes";
+import { type FieldSize, fieldControlClass } from "./field-classes";
 import { cn } from "./utils";
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
@@ -10,6 +10,8 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   disabledReason?: string;
   pending?: boolean;
   size?: FieldSize;
+  /** Decorative control affordance rendered inside the leading edge of the input. */
+  leadingIcon?: React.ReactNode;
 }
 
 function useFieldIds(id: string | undefined) {
@@ -115,6 +117,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       disabledReason,
       pending = false,
       size = "md",
+      leadingIcon,
       id,
       disabled,
       readOnly,
@@ -140,26 +143,36 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
-        <input
-          id={fieldId}
-          type={type}
-          ref={ref}
-          disabled={disabled}
-          readOnly={readOnly}
-          aria-invalid={error ? true : ariaInvalid}
-          aria-describedby={describedBy}
-          aria-errormessage={error ? errorId : undefined}
-          aria-busy={pending || undefined}
-          className={fieldControlClass({
-            size,
-            error: Boolean(error),
-            pending,
-            readOnly: Boolean(readOnly),
-            disabled: Boolean(disabled),
-            className,
-          })}
-          {...props}
-        />
+        <div className="relative">
+          {leadingIcon && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 text-muted"
+            >
+              {leadingIcon}
+            </span>
+          )}
+          <input
+            id={fieldId}
+            type={type}
+            ref={ref}
+            disabled={disabled}
+            readOnly={readOnly}
+            aria-invalid={error ? true : ariaInvalid}
+            aria-describedby={describedBy}
+            aria-errormessage={error ? errorId : undefined}
+            aria-busy={pending || undefined}
+            className={fieldControlClass({
+              size,
+              error: Boolean(error),
+              pending,
+              readOnly: Boolean(readOnly),
+              disabled: Boolean(disabled),
+              className: cn(leadingIcon && "pl-9", className),
+            })}
+            {...props}
+          />
+        </div>
         {hint && !error && (
           <p id={hintId} className="text-xs text-muted">
             {hint}

@@ -1,6 +1,6 @@
-import type * as React from "react";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
+import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -49,6 +49,12 @@ vi.mock("@nexus/ui", () => ({
     </button>
   ),
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+  SearchField: ({ label, ...props }: { label: string; [key: string]: unknown }) => (
+    <label>
+      {label}
+      <input type="search" {...props} />
+    </label>
+  ),
 }));
 
 vi.mock("../packages/db/src/client", () => ({

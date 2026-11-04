@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@nexus/ui";
-import { ChevronLeft, ChevronRight, Copy, Search, Users } from "lucide-react";
+import { Button, SearchField } from "@nexus/ui";
+import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
 import type { MtaMasterServer } from "../lib/services/mta-master-directory-service";
@@ -236,23 +236,16 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
         </div>
 
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="min-w-0 flex-1 text-xs text-secondary">
-            {copy.search}
-            <div className="relative mt-1">
-              <Search
-                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-                aria-hidden="true"
-              />
-              <input
-                type="search"
-                value={query}
-                maxLength={100}
-                onChange={(event) => updateQuery(event.target.value)}
-                placeholder={copy.searchPlaceholder}
-                className={`${controlClass} w-full pl-9`}
-              />
-            </div>
-          </label>
+          <div className="min-w-0 flex-1">
+            <SearchField
+              label={copy.search}
+              value={query}
+              maxLength={100}
+              onChange={(event) => updateQuery(event.target.value)}
+              placeholder={copy.searchPlaceholder}
+              className={`${controlClass} w-full`}
+            />
+          </div>
 
           <label className="text-xs text-secondary">
             {copy.minimumPlayers}
