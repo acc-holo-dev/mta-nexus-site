@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import { Monitor } from "lucide-react";
 import type { getDictionary } from "../lib/i18n";
 import type { SettingsSession } from "../lib/settings-client-api";
@@ -41,7 +41,7 @@ export function SettingsActiveSessions({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
+          size="touch"
           disabled={pending}
           onClick={onReload}
           className="h-auto px-0 font-semibold text-accent"
@@ -56,7 +56,7 @@ export function SettingsActiveSessions({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
+          size="touch"
           disabled={pending}
           onClick={() => void onRevokeOthers()}
           className="h-auto px-0 font-semibold text-danger"
@@ -88,7 +88,7 @@ export function SettingsActiveSessions({
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="touch"
                 disabled={pending}
                 onClick={() =>
                   void onRevokeSession(session.id, session.userAgent || copy.deviceUnavailable)
@@ -103,7 +103,9 @@ export function SettingsActiveSessions({
 
         {sessions === null && <p className="text-sm text-muted">{copy.sessionUnavailable}</p>}
 
-        {sessions?.length === 0 && <p className="text-sm text-muted">{copy.noSessions}</p>}
+        {sessions?.length === 0 ? (
+          <EmptyState title={copy.noSessions} description={copy.sessionsDescription} />
+        ) : null}
       </div>
     </section>
   );
