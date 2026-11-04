@@ -1,6 +1,9 @@
 import { DiscussionReportsScreen } from "../../../../../../../components/discussion-reports-screen";
 import { discussionReportsCopy } from "../../../../../../../lib/discussion-reports-copy";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -17,10 +20,12 @@ export default async function Page({
 }) {
   const scope = await params;
   return (
-    <DiscussionReportsScreen
-      id={scope.id}
-      commentId={scope.commentId}
-      searchParams={searchParams}
-    />
+    <div className={pageShellClass}>
+      <DiscussionReportsScreen
+        id={scope.id}
+        commentId={scope.commentId}
+        searchParams={searchParams}
+      />
+    </div>
   );
 }
