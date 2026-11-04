@@ -817,21 +817,27 @@ for (const locale of ["en", "ru"]) {
 
 async function loginFixture(page) {
   await page.goto("/auth/login");
-  const status = await page.evaluate(
-    async (account) => {
+  const account = {
+    email: process.env.NEXUS_AUTHOR_BROWSER_EMAIL,
+    password: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD,
+  };
+  // Shared author fixture + intentional wrong-password UI checks can exhaust the
+  // login rate window; wait out 429 before treating login as broken.
+  let status = 0;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    status = await page.evaluate(async (body) => {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(account),
+        body: JSON.stringify(body),
       });
       return response.status;
-    },
-    {
-      email: process.env.NEXUS_AUTHOR_BROWSER_EMAIL,
-      password: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD,
-    },
-  );
-  assert.equal(status, 200);
+    }, account);
+    if (status === 200) return;
+    if (status !== 429) break;
+    await page.waitForTimeout(1_000 * (attempt + 1));
+  }
+  assert.equal(status, 200, `loginFixture expected 200 after retries, got ${status}`);
 }
 
 async function logoutFixture(page) {
@@ -908,16 +914,30 @@ for (const locale of ["en", "ru"]) {
     await page.keyboard.press("Tab");
     await expect(loginSubmit).toBeFocused();
     await assertVisibleFocusIndicator(loginSubmit, `${locale} login submit`);
-    await loginEmail.fill("a11y-unknown@example.invalid");
-    await loginPassword.fill("not-the-right-password");
-    await loginSubmit.click();
-    await expect(page.locator("#auth-error")).toHaveAttribute("role", "alert");
-    await assertAxeAccessibility(page, testInfo, `${locale}-login-error`);
-    await assertNoVisibleUnlabeledFields(page, "/auth/login");
-    await assertNoHorizontalOverflow(page, `${locale} /auth/login at 320px`);
-    evidence.push(
-      `${locale}: login has logical keyboard order, labeled controls, live error semantics and 320px reflow`,
-    );
+    // Mock the intentional wrong-password POST so a11y error chrome does not burn
+    // the shared login rate window needed by loginFixture later in this suite.
+    await page.route("**/api/auth/login", async (route) => {
+      assert.equal(route.request().method(), "POST");
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ code: "INVALID_CREDENTIALS" }),
+      });
+    });
+    try {
+      await loginEmail.fill("a11y-unknown@example.invalid");
+      await loginPassword.fill("not-the-right-password");
+      await loginSubmit.click();
+      await expect(page.locator("#auth-error")).toHaveAttribute("role", "alert");
+      await assertAxeAccessibility(page, testInfo, `${locale}-login-error`);
+      await assertNoVisibleUnlabeledFields(page, "/auth/login");
+      await assertNoHorizontalOverflow(page, `${locale} /auth/login at 320px`);
+      evidence.push(
+        `${locale}: login has logical keyboard order, labeled controls, live error semantics and 320px reflow`,
+      );
+    } finally {
+      await page.unroute("**/api/auth/login");
+    }
 
     await page.route("**/api/auth/password-reset", async (route) => {
       assert.equal(route.request().method(), "POST");
