@@ -142,7 +142,7 @@ export function DiscussionCommentActions({
       await navigator.clipboard.writeText(text);
       setDraftNotice(copy.draftCopied);
     } catch {
-      setDraftNotice(copy.draftKept);
+      setDraftNotice(copy.draftCopyFailed);
     }
   }
   return (
@@ -264,7 +264,7 @@ export function DiscussionCommentActions({
           }
         />
       ) : null}
-      {stale && mode === "edit" && (
+      {(stale || blocked) && mode === "edit" && (
         <div className="space-y-2">
           <p className="text-xs text-muted">{copy.draftKept}</p>
           <Button

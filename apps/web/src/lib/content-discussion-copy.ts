@@ -33,6 +33,8 @@ const en = {
   draftKept: "Local draft kept. Copy it if you need the text after reload.",
   copyDraft: "Copy local draft",
   draftCopied: "Local draft copied.",
+  draftCopyFailed:
+    "Could not copy automatically. Select and copy the draft above before reloading.",
   reason: "Moderation reason",
   reasonRequired: "Provide a moderation reason.",
   invalidCommand: "Invalid comment action. Reload the discussion and try again.",
@@ -68,7 +70,7 @@ const en = {
   signIn: "Sign in to join the discussion",
   latest: "Show latest comments",
   searchKeepsDraft: "Search does not clear your draft comment.",
-  formErrorHint: "The comment action was not saved. Reload the saved comment before trying again.",
+  formErrorHint: "The result could not be confirmed. Check the saved comment before trying again.",
 };
 const ru: Record<keyof typeof en, string> = {
   reloadSaved: "Загрузить сохранённый комментарий",
@@ -102,6 +104,8 @@ const ru: Record<keyof typeof en, string> = {
   draftKept: "Локальный черновик сохранён. Скопируйте текст, если он нужен после перезагрузки.",
   copyDraft: "Скопировать локальный черновик",
   draftCopied: "Локальный черновик скопирован.",
+  draftCopyFailed:
+    "Не удалось скопировать автоматически. Выделите и скопируйте черновик выше перед перезагрузкой.",
   reason: "Причина модерации",
   reasonRequired: "Укажите причину модерации.",
   invalidCommand:
@@ -139,7 +143,7 @@ const ru: Record<keyof typeof en, string> = {
   latest: "Показать новые комментарии",
   searchKeepsDraft: "Поиск не очищает черновик комментария.",
   formErrorHint:
-    "Действие с комментарием не сохранено. Загрузите сохранённый комментарий перед повторной попыткой.",
+    "Результат не подтверждён. Проверьте сохранённый комментарий перед повторной попыткой.",
 };
 export const getDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function discussionError(locale: Locale, code: unknown) {

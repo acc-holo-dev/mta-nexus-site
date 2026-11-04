@@ -113,7 +113,7 @@ function seedModeratorRemove() {
   ];
 }
 
-function render(own: boolean) {
+function render(own: boolean, locale: "en" | "ru" = "en") {
   harness.cursor = 0;
   return descendants(
     DiscussionCommentActions({
@@ -121,7 +121,7 @@ function render(own: boolean) {
       own,
       slug,
       contentId,
-      locale: "en",
+      locale,
       disabled: false,
       onPending: harness.onPending,
       onSaved: harness.onSaved,
@@ -195,6 +195,37 @@ it("keeps the own comment when confirmation is cancelled", async () => {
   expect(harness.request).not.toHaveBeenCalled();
   expect(harness.onSaved).not.toHaveBeenCalled();
 });
+
+it.each(["en", "ru"] as const)(
+  "preserves an edit draft after an unconfirmed save and gives a manual copy fallback in %s",
+  async (locale) => {
+    const copy = getDiscussionCopy(locale);
+    const writeText = vi.fn().mockRejectedValue(new Error("clipboard denied"));
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    (control(render(true, locale), copy.edit).props.onClick as () => void)();
+    const textarea = render(true, locale).find((node) => node.type === "textarea");
+    if (!textarea) throw new Error("Missing comment editor");
+    (textarea.props.onChange as (event: unknown) => void)({ target: { value: "Unsaved draft" } });
+    harness.request.mockRejectedValueOnce(new Error("response lost"));
+    await submit(render(true, locale));
+    await vi.waitFor(() => expect(control(render(true, locale), copy.copyDraft)).toBeDefined());
+    expect(render(true, locale).find((node) => node.type === "textarea")?.props.value).toBe(
+      "Unsaved draft",
+    );
+    (control(render(true, locale), copy.copyDraft).props.onClick as () => void)();
+    await vi.waitFor(() =>
+      expect(
+        render(true, locale).some((node) => node.props.children === copy.draftCopyFailed),
+      ).toBe(true),
+    );
+    expect(writeText).toHaveBeenCalledWith("Unsaved draft");
+    expect(copy.formErrorHint).toBe(
+      locale === "ru"
+        ? "Результат не подтверждён. Проверьте сохранённый комментарий перед повторной попыткой."
+        : "The result could not be confirmed. Check the saved comment before trying again.",
+    );
+  },
+);
 
 it("confirms moderator comment removal before DELETE", async () => {
   const copy = getDiscussionCopy("en");
