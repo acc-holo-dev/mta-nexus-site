@@ -28,12 +28,15 @@ vi.mock("../apps/web/src/components/support-case-thread", () => ({
   ),
 }));
 
+import OrderCaseDetailLoading from "../apps/web/src/app/admin/commerce/order-cases/[id]/loading";
+import OrderCasesLoading from "../apps/web/src/app/admin/commerce/order-cases/loading";
 import {
   OrderCaseCreatePage,
   OrderCaseDetailPage,
   OrderCaseListPage,
   orderCaseMetadata,
 } from "../apps/web/src/components/order-case-page";
+import { orderCaseCopy } from "../apps/web/src/lib/order-case-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const evidence = {
@@ -161,4 +164,48 @@ it("hides staff controls for self-review and scopes inaccessible case details", 
   expect(html).not.toContain("Review message");
   state.detail.mockRejectedValue(new AppError("private", 403, "FORBIDDEN"));
   await expect(OrderCaseDetailPage({ caseId: "sup_a", query: {} })).rejects.toThrow("NOT_FOUND");
+});
+it("shows an honest recovery state when the case queue fails", async () => {
+  state.page.mockRejectedValue(new Error("queue unavailable"));
+  const copy = orderCaseCopy("en");
+  const html = renderToStaticMarkup(
+    await OrderCaseListPage({
+      staff: true,
+      query: { reviewStatus: "refund_recommended", page: "2" },
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("reviewStatus=refund_recommended&amp;page=2");
+  expect(html).not.toContain("&lt;Private order&gt;");
+});
+it("renders an empty queue with clear-filters recovery when filters are active", async () => {
+  state.page.mockResolvedValue({ items: [], page: 1, totalPages: 1 });
+  const copy = orderCaseCopy("en");
+  const html = renderToStaticMarkup(
+    await OrderCaseListPage({
+      staff: true,
+      query: { reviewStatus: "resolved", threadStatus: "open" },
+    }),
+  );
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.clear);
+  expect(html).toContain('href="/admin/commerce/order-cases"');
+  expect(html).toContain("overflow-x-clip");
+});
+it("shows an honest recovery state when intake evidence fails to load", async () => {
+  state.orderDetail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = orderCaseCopy("en");
+  const html = renderToStaticMarkup(await OrderCaseCreatePage({ orderId: "ord_a" }));
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/workspace/purchases/ord_a/support");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  for (const Loading of [OrderCasesLoading, OrderCaseDetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
+  }
 });
