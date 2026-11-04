@@ -4,16 +4,17 @@
 
 ## Текущая интеграционная волна — ожидает CI на опубликованном exact SHA
 
-Локально проверенная цепочка поверх `41330d89a607ea501d2868f73355136c01d742ae`:
+Локально проверенная цепочка поверх `41330d89a607ea501d2868f73355136c01d742ae` (включая docs handoff `4e3b1214`):
 
 - `70e372f2` — development seed и historical seed отказываются работать без явного acknowledgement и против production-конфигурации;
 - `739723af` — восстановлены historical-seed проверки и зелёный локальный code gate;
 - `3f32b3d6` — общий `PageHeader` применён к публичным каталогам серверов, статей и Discover;
 - `6cbe787e` — общий `SearchField` применён к публичному поиску, публикациям и каталогу MTA-серверов;
 - `54c6b674` — общий `ErrorState` отделяет сбой загрузки от подтверждённого empty state и держит retry рядом;
-- `d235ba9b` — общий GET-only `FilterBar` сохраняет URL-backed фильтры и search-landmark семантику.
+- `d235ba9b` — общий GET-only `FilterBar` сохраняет URL-backed фильтры и search-landmark семантику;
+- resource mobile primary + shell a11y restore (эта ветка): footer legal links wrap at 320px RU; inbox pagination landmark ≠ center title; `/market/[slug]` acquisition aside precedes deep content in DOM (`lg:order` keeps desktop sticky two-column).
 
-На `d235ba9b` локально прошли `pnpm check:code`, production `next build` (123 страницы) и focused UI suites. PostgreSQL 18 migrations + seed integration прошли на `739723af`; это не DB-доказательство для более нового SHA. GitHub CI нового опубликованного tip ещё нужно проверить; не переносить статус verified green со старого commit.
+Локально на этой ветке: focused acquisition/footer/notification suites, `pnpm lint` / `format:check` / `typecheck`, production `next build` (123 страницы), browser measure 320 RU без overflow и mobile/desktop order на live bind-mounted app. Tip `4e3b1214` resource-browser красный из‑за footer overflow + duplicate Notification center nav; auth-browser timeouts на том SHA считать отдельно. Не переносить verified green со старого commit.
 
 ## Verified green baseline (bullets)
 
@@ -49,9 +50,9 @@
 4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
-7. Следующий разрешённый продуктовый результат — **mobile primary action публичного Resource**. На текущем коде `/market/[slug]` рендерит основной content-column раньше acquisition-aside, поэтому на узком экране получение/скачивание оказывается после gallery, overview, истории версий, reviews и Q&A. Исправьте порядок без второго экземпляра интерактивных controls: guest/free acquire, доступный download, переход в Library и release-watch должны появляться до глубокого контента на mobile; desktop sticky two-column layout должен сохраниться.
-8. Приёмка следующего результата: RU/EN; guest, free signed-in/no-access и entitled/owner состояния; ширины 320/390 и desktop; keyboard/focus; одно состояние каждого client control; никакого скрытого изменения selected/latest version; focused component/page tests, typecheck, lint и production build. Визуальный browser evidence заявлять только если он реально снят на exact SHA.
-9. После этого проходить key journeys последовательно: Resource → Discover → Workspace/Library → Notifications → Server → Profile → Community → Support → Admin. Для каждого брать один завершённый человеческий сценарий (primary action, сохранение контекста, mobile, loading/error/empty), а не выполнять массовую механическую замену разметки. Очередь внешних gates остаётся **OPS-09…20**, ads proposals — **UX-24–26**, пилоты — **GROW-02…09**; не активировать ads/commerce без нового поручения.
+7. Следующий разрешённый продуктовый результат — **Discover primary journey**. После merge resource mobile primary: один завершённый сценарий на `/discover` (поиск/фильтр → результат → переход в ресурс или честный empty/error; mobile 320/390; RU/EN; keyboard). Не массовая замена каталожной разметки.
+8. Приёмка: focused Discover/search suites + typecheck/lint/build; browser evidence только если снят на exact SHA. Сначала проверьте CI tip после merge этой ветки — красный tip снова важнее новой UI-работы.
+9. Дальше key journeys последовательно: Discover → Workspace/Library → Notifications → Server → Profile → Community → Support → Admin. Очередь внешних gates остаётся **OPS-09…20**, ads proposals — **UX-24–26**, пилоты — **GROW-02…09**; не активировать ads/commerce без нового поручения.
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
