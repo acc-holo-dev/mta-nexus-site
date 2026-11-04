@@ -50,6 +50,8 @@ const en = {
   export: "Export this page as JSON",
   exportHelp: "Exports up to 20 recorded events with the same filters and current permissions.",
   historyUnavailable: "Server history is temporarily unavailable.",
+  historyUnavailableHint:
+    "This does not change recorded events. Reload the activity page after the service recovers.",
   moderation: "Platform moderation",
   team: "Server team",
   identity: "Public account",
@@ -111,6 +113,8 @@ const ru: typeof en = {
   export: "Экспорт страницы в JSON",
   exportHelp: "Экспортирует до 20 сохранённых событий с теми же фильтрами и текущими правами.",
   historyUnavailable: "История сервера временно недоступна.",
+  historyUnavailableHint:
+    "Это не меняет сохранённые события. Перезагрузите страницу истории после восстановления сервиса.",
   moderation: "Модерация платформы",
   team: "Команда сервера",
   identity: "Публичный аккаунт",

@@ -29,6 +29,8 @@ const en = {
     "An empty approval history is a confirmed result for this context, not a verification outage.",
   loading: "Loading public verification…",
   unavailable: "Public verification could not be loaded. Try again.",
+  unavailableHint:
+    "This does not change verification status. Retry after the public trust service recovers.",
   organizationScope:
     "The organization flag is separate from personal verification and team permissions. Counts include current public publications and active public servers; private team membership and commercial records are excluded.",
   serverScope:
@@ -62,6 +64,8 @@ const ru: Record<keyof typeof en, string> = {
     "Пустая история одобрений — подтверждённый результат для этого контекста, а не сбой верификации.",
   loading: "Загрузка публичной верификации…",
   unavailable: "Не удалось загрузить публичную верификацию. Попробуйте ещё раз.",
+  unavailableHint:
+    "Это не меняет статус верификации. Повторите после восстановления публичного сервиса доверия.",
   organizationScope:
     "Подтверждение организации отделено от личной верификации и прав команды. Счётчики включают текущие публичные публикации и активные публичные серверы; приватный состав команды и коммерческие записи исключены.",
   serverScope:

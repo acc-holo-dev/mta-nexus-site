@@ -1,6 +1,9 @@
 import { ServerContentEditorPage } from "../../../../../../components/server-content-editor-page";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -13,5 +16,5 @@ export default async function Page({
 }: {
   params: Promise<{ id: string; contentId: string }>;
 }) {
-  return ServerContentEditorPage(await params);
+  return <div className={pageShellClass}>{await ServerContentEditorPage(await params)}</div>;
 }

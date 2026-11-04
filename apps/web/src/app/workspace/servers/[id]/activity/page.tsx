@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { ServerWorkspaceHistoryScreen } from "../../../../../components/server-workspace-history-screen";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getServerActivityCopy } from "../../../../../lib/server-activity-view";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -16,5 +19,9 @@ export default async function ServerActivityPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return ServerWorkspaceHistoryScreen({ id: (await params).id, searchParams });
+  return (
+    <div className={pageShellClass}>
+      {await ServerWorkspaceHistoryScreen({ id: (await params).id, searchParams })}
+    </div>
+  );
 }

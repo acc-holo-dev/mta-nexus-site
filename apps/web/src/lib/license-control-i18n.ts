@@ -54,7 +54,11 @@ const copy = {
     refresh: "Refresh",
     history: "Recent license actions",
     noHistory: "No recorded actions.",
+    noHistoryHint:
+      "An empty history is a confirmed result for this license, not a load failure. Actions appear here after they are retained.",
     fullHistory: "Complete license history",
+    loadUnavailableHint:
+      "This does not change the license. Reload the history page after the service recovers.",
     recoveryNote:
       "Reconfirm the displayed endpoint revision of the same verified server. This records missing historical ownership or a changed address, revokes the old token and preserves the license expiry.",
     staff: "Staff",
@@ -81,6 +85,7 @@ const copy = {
     clearFilters: "Clear filters",
     checkEndpoint:
       'Check API: POST /api/licenses/check; Authorization: Bearer <token>; JSON body: {"serverId":"bound server ID"}. Reject failed checks and recheck every 60 seconds.',
+
     errors: {
       LICENSE_CONFLICT: "The license changed. Reload and review its current state.",
       LICENSE_INACTIVE: "This action is unavailable in the current license state.",
@@ -159,7 +164,11 @@ const copy = {
     refresh: "Обновить",
     history: "Последние действия с лицензией",
     noHistory: "Действий пока нет.",
+    noHistoryHint:
+      "Пустая история — подтверждённый результат для этой лицензии, а не сбой загрузки. Действия появятся здесь после сохранения.",
     fullHistory: "Полная история лицензии",
+    loadUnavailableHint:
+      "Это не меняет лицензию. Перезагрузите страницу истории после восстановления сервиса.",
     recoveryNote:
       "Подтвердите показанную ревизию адреса того же проверенного сервера. Это сохраняет недостающие исторические данные владельца или новый адрес, отзывает старый токен и не меняет срок лицензии.",
     staff: "Сотрудник",

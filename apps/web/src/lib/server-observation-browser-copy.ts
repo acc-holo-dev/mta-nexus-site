@@ -37,6 +37,8 @@ const en = {
   signIn: "Sign in to view managed observations",
   loading: "Loading saved observations…",
   unavailable: "Saved observations could not be loaded. Retry the selected period.",
+  unavailableHint:
+    "This does not invent observations. Retry the selected period after the observation service recovers.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Поиск по наблюдениям",
@@ -73,6 +75,8 @@ const ru: Record<keyof typeof en, string> = {
   signIn: "Войдите, чтобы открыть наблюдения управляемого сервера",
   loading: "Загрузка сохранённых наблюдений…",
   unavailable: "Не удалось загрузить сохранённые наблюдения. Повторите выбранный период.",
+  unavailableHint:
+    "Это не создаёт наблюдения. Повторите выбранный период после восстановления сервиса наблюдений.",
 };
 export const serverObservationBrowserCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function serverObservationBrowserError(locale: Locale, code: unknown) {

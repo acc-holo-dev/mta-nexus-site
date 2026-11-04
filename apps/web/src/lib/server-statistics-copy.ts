@@ -66,6 +66,8 @@ const en = {
   snapshotScope:
     "Period boundaries stay fixed across pages. Later saved observations may change the results.",
   unavailable: "Statistics are temporarily unavailable. Retry this period.",
+  unavailableHint:
+    "This does not invent observations. Retry the selected period after the statistics service recovers.",
   retry: "Retry",
   invalid: "Invalid period or page link. Open the latest period to continue.",
   expired: "This observation page is no longer available. Return to the newest observations.",
@@ -143,6 +145,8 @@ const ru: typeof en = {
   snapshotScope:
     "Границы периода сохраняются при переходе между страницами. Позже сохранённые наблюдения могут изменить результат.",
   unavailable: "Статистика временно недоступна. Повторите загрузку этого периода.",
+  unavailableHint:
+    "Это не создаёт наблюдения. Повторите выбранный период после восстановления сервиса статистики.",
   retry: "Повторить",
   invalid: "Некорректная ссылка на период или страницу. Откройте последний период для продолжения.",
   expired: "Эта страница наблюдений больше недоступна. Вернитесь к новым наблюдениям.",
