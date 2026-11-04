@@ -9,7 +9,7 @@ import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
-type Account = { username: string };
+type Account = { id: string; username: string };
 
 export function AccountControls() {
   const pathname = usePathname();
@@ -47,13 +47,20 @@ export function AccountControls() {
         if (
           !response.ok ||
           typeof data?.authenticated !== "boolean" ||
-          (data.authenticated && typeof data.user?.username !== "string")
+          (data.authenticated &&
+            (typeof data.user?.username !== "string" ||
+              typeof data.user?.id !== "string" ||
+              !data.user.id ||
+              data.user.id.length > 128 ||
+              data.user.id.trim() !== data.user.id))
         ) {
           throw new Error(copy.checkError);
         }
 
         if (active) {
-          setAccount(data.authenticated ? { username: data.user.username } : null);
+          setAccount(
+            data.authenticated ? { id: data.user.id, username: data.user.username } : null,
+          );
         }
       })
       .catch(() => {
@@ -104,6 +111,8 @@ export function AccountControls() {
     try {
       const response = await fetch("/api/auth/session", {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expectedActorId: account.id }),
         cache: "no-store",
         credentials: "same-origin",
         signal: AbortSignal.timeout(10_000),

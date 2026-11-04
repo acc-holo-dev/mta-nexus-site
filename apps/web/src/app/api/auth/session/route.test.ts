@@ -35,13 +35,15 @@ vi.mock("../../../../lib/services/auth-service", () => ({
 
 import { DELETE, GET } from "./route";
 
-function request(method = "GET") {
+function request(method = "GET", body?: unknown) {
   return new NextRequest("https://nexus.test/api/auth/session", {
     method,
     headers: {
       origin: "https://nexus.test",
       cookie: "nexus_session=session-token",
+      ...(body === undefined ? {} : { "content-type": "application/json" }),
     },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 }
 
@@ -92,7 +94,7 @@ describe("current auth session HTTP contract", () => {
   });
 
   it("clears the cookie only after confirmed logout", async () => {
-    const response = await DELETE(request("DELETE"));
+    const response = await DELETE(request("DELETE", { expectedActorId: "usr_session" }));
     expect(response.status).toBe(200);
     expectPrivateCorrelation(response);
     expect(response.headers.get("set-cookie")).toContain("nexus_session=");
@@ -100,9 +102,29 @@ describe("current auth session HTTP contract", () => {
     expect(logout).toHaveBeenCalledWith("session-token");
 
     state.logoutFails = true;
-    const failed = await DELETE(request("DELETE"));
+    const failed = await DELETE(request("DELETE", { expectedActorId: "usr_session" }));
     expect(failed.status).toBe(503);
     expectPrivateCorrelation(failed);
     expect(failed.headers.get("set-cookie")).toBeNull();
+  });
+
+  it("does not revoke or clear the cookie after an account switch", async () => {
+    const response = await DELETE(request("DELETE", { expectedActorId: "usr_previous" }));
+    expect(response.status).toBe(409);
+    expectPrivateCorrelation(response);
+    expect(response.headers.get("set-cookie")).toBeNull();
+    expect(logout).not.toHaveBeenCalled();
+    const oldClient = await DELETE(request("DELETE"));
+    expect(oldClient.status).toBe(415);
+    expect(oldClient.headers.get("set-cookie")).toBeNull();
+    expect(logout).not.toHaveBeenCalled();
+  });
+
+  it("keeps logout of an expired session idempotent without a request body", async () => {
+    state.user = null;
+    const response = await DELETE(request("DELETE"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
+    expect(logout).toHaveBeenCalledWith("session-token");
   });
 });

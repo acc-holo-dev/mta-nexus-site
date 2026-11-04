@@ -58,7 +58,7 @@ function render() {
 beforeEach(() => {
   // account, checking, signingOut, error, attempt, loginHref, login effect, session effect, focus effect
   harness.slots = [
-    { username: "alice" },
+    { id: "usr_alice", username: "alice" },
     false,
     false,
     null,
@@ -104,4 +104,24 @@ it("renders signed-in sign-out control on shared Button chrome", () => {
   expect(String(control?.props.className)).toContain("rounded-md");
   expect(String(control?.props.className)).toContain("bg-elevated");
   expect(String(control?.props.className)).toContain("border-base");
+});
+
+it("binds a confirmed sign-out to the account shown in the dialog", async () => {
+  harness.fetch.mockResolvedValueOnce(
+    new Response(JSON.stringify({ code: "ACTOR_CHANGED" }), { status: 409 }),
+  );
+  const copy = getDictionary("en").accountControls;
+  const control = render().find(
+    (node) => node.type === "button" && node.props["aria-label"] === copy.signOut,
+  );
+  if (!control) throw new Error("Missing sign-out control");
+  await (control.props.onClick as () => Promise<void>)();
+  expect(harness.fetch).toHaveBeenCalledWith(
+    "/api/auth/session",
+    expect.objectContaining({
+      method: "DELETE",
+      body: JSON.stringify({ expectedActorId: "usr_alice" }),
+    }),
+  );
+  expect(harness.confirm).toHaveBeenCalledOnce();
 });

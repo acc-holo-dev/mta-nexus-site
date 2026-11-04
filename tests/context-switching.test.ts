@@ -142,6 +142,7 @@ describe("account context switching HTTP contract", () => {
     expectPrivateCorrelation(response);
 
     await expect(response.json()).resolves.toEqual({
+      actorId: "usr_context",
       activeContextId: "org_owned",
       contexts: [
         {
@@ -342,6 +343,7 @@ describe("account context switching HTTP contract", () => {
     const malformed = await POST(
       postRequest({
         contextId: "org_member",
+        expectedActorId: "usr_context",
         extra: true,
       }),
     );
@@ -350,19 +352,24 @@ describe("account context switching HTTP contract", () => {
     expect(switchContext).not.toHaveBeenCalled();
 
     state.allowed = false;
-    const limited = await POST(postRequest({ contextId: "org_member" }));
+    const limited = await POST(
+      postRequest({ contextId: "org_member", expectedActorId: "usr_context" }),
+    );
     expect(limited.status).toBe(429);
     expectPrivateCorrelation(limited);
     expect(switchContext).not.toHaveBeenCalled();
   });
 
   it("returns the authoritative switched context with request correlation", async () => {
-    const response = await POST(postRequest({ contextId: "org_member" }));
+    const response = await POST(
+      postRequest({ contextId: "org_member", expectedActorId: "usr_context" }),
+    );
 
     expect(response.status).toBe(200);
     expectPrivateCorrelation(response);
     await expect(response.json()).resolves.toMatchObject({
       success: true,
+      actorId: "usr_context",
       activeContextId: "org_member",
     });
     expect(getSessionIdentity).toHaveBeenCalledOnce();
@@ -373,10 +380,25 @@ describe("account context switching HTTP contract", () => {
 
   it("does not switch context without a session identity", async () => {
     state.user = null;
-    const response = await POST(postRequest({ contextId: "org_member" }));
+    const response = await POST(
+      postRequest({ contextId: "org_member", expectedActorId: "usr_context" }),
+    );
     expect(response.status).toBe(401);
     expectPrivateCorrelation(response);
     expect(getSessionIdentity).toHaveBeenCalledWith("context-token");
+    expect(switchContext).not.toHaveBeenCalled();
+  });
+
+  it("rejects context selection made for a previous account", async () => {
+    const response = await POST(
+      postRequest({ contextId: "personal", expectedActorId: "usr_previous" }),
+    );
+    expect(response.status).toBe(409);
+    expectPrivateCorrelation(response);
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+    expect(switchContext).not.toHaveBeenCalled();
+    const oldClient = await POST(postRequest({ contextId: "personal" }));
+    expect(oldClient.status).toBe(400);
     expect(switchContext).not.toHaveBeenCalled();
   });
 });

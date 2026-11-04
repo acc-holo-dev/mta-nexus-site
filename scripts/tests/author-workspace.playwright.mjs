@@ -54,9 +54,20 @@ async function login(page, email) {
   assert.equal(status, 200);
 }
 async function logout(page) {
-  const status = await page.evaluate(
-    async () => (await fetch("/api/auth/session", { method: "DELETE" })).status,
-  );
+  const status = await page.evaluate(async () => {
+    const session = await (await fetch("/api/auth/session")).json();
+    return (
+      await fetch("/api/auth/session", {
+        method: "DELETE",
+        ...(session.user?.id
+          ? {
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ expectedActorId: session.user.id }),
+            }
+          : {}),
+      })
+    ).status;
+  });
   assert.equal(status, 200);
 }
 async function moderate(page, buildId, action, notes, expectedRevision) {

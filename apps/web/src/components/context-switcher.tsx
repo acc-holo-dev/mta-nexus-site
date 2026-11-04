@@ -20,6 +20,7 @@ export function ContextSwitcher() {
   const loadingLabel = dictionary.workspace.loading;
   const [contexts, setContexts] = useState<ContextOption[]>([]);
   const [activeContextId, setActiveContextId] = useState("personal");
+  const [actorId, setActorId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,20 +39,32 @@ export function ContextSwitcher() {
     })
       .then(async (response) => {
         const data = await response.json().catch(() => null);
-        if (!response.ok || !data) {
+        if (
+          !response.ok ||
+          !data ||
+          typeof data.actorId !== "string" ||
+          !data.actorId ||
+          data.actorId.length > 128 ||
+          data.actorId.trim() !== data.actorId
+        ) {
           throw new Error(copy.loadError);
         }
         return data;
       })
       .then((data) => {
         if (cancelled) return;
+        setActorId(data.actorId);
         setContexts(Array.isArray(data.contexts) ? data.contexts : []);
         setActiveContextId(
           typeof data.activeContextId === "string" ? data.activeContextId : "personal",
         );
       })
       .catch(() => {
-        if (!cancelled) setError(copy.loadError);
+        if (!cancelled) {
+          setActorId(null);
+          setContexts([]);
+          setError(copy.loadError);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -63,7 +76,7 @@ export function ContextSwitcher() {
   }, [copy.loadError, reload]);
 
   async function switchContext(contextId: string) {
-    if (saving || contextId === activeContextId) return;
+    if (saving || !actorId || contextId === activeContextId) return;
 
     setSaving(true);
     setError(null);
@@ -74,7 +87,7 @@ export function ContextSwitcher() {
         cache: "no-store",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contextId }),
+        body: JSON.stringify({ contextId, expectedActorId: actorId }),
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
@@ -82,10 +95,18 @@ export function ContextSwitcher() {
       if (
         !response.ok ||
         data?.success !== true ||
+        data.actorId !== actorId ||
         typeof data.activeContextId !== "string" ||
         data.activeContextId !== contextId
       ) {
-        setError(data?.error || copy.switchError);
+        if (
+          data?.code === "ACTOR_CHANGED" ||
+          (data?.success === true && data.actorId !== actorId)
+        ) {
+          setActorId(null);
+          setContexts([]);
+        }
+        setError(copy.switchError);
         return;
       }
 

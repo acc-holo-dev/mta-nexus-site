@@ -16,6 +16,11 @@ import { authService } from "../../../../lib/services/auth-service";
 const contextSchema = z
   .object({
     contextId: z.string().trim().min(1).max(128),
+    expectedActorId: z
+      .string()
+      .min(1)
+      .max(128)
+      .refine((value) => value.trim() === value),
   })
   .strict();
 
@@ -117,6 +122,7 @@ export async function GET(request: NextRequest) {
         : "personal";
 
     return json(context, {
+      actorId: user.id,
       activeContextId,
       contexts: [
         {
@@ -180,10 +186,19 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    if (parsed.data.expectedActorId !== user.id) {
+      return json(
+        context,
+        { error: "Account changed. Reload contexts.", code: "ACTOR_CHANGED" },
+        409,
+      );
+    }
+
     const updated = await authService.switchContext(user.id, parsed.data.contextId, token);
 
     return json(context, {
       success: true,
+      actorId: user.id,
       activeContextId: updated.activeContextId ?? "personal",
       user: updated,
     });
