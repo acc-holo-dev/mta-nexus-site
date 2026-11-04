@@ -179,6 +179,42 @@ it("does not read private reports for ordinary users or history for anonymous se
   expect(failed).not.toContain(organizationPublicationHistoryCopy("en").title);
   expect(state.history).not.toHaveBeenCalled();
 });
+it.each(["en", "ru"] as const)(
+  "shows EmptyState descriptions for empty and filtered comment reports in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = discussionReportsCopy(locale);
+    state.discussionReports.mockResolvedValueOnce({
+      ...reports,
+      removed: false,
+      items: [],
+      hasMore: false,
+      nextCursor: null,
+    });
+    const empty = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
+    expect(empty).toContain(copy.empty);
+    expect(empty).toContain(copy.emptyDescription);
+    expect(empty).not.toContain(copy.emptyFiltered);
+    state.discussionReports.mockResolvedValueOnce({
+      ...reports,
+      removed: false,
+      items: [],
+      hasMore: false,
+      nextCursor: null,
+    });
+    const filtered = renderToStaticMarkup(
+      await Reports({
+        id: "post",
+        commentId: "comment",
+        searchParams: Promise.resolve({ q: "word", view: "history", type: "spam" }),
+      }),
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).toContain(copy.emptyFilteredDescription);
+    expect(filtered).toContain(copy.clear);
+    expect(filtered).not.toContain(copy.emptyDescription);
+  },
+);
 it("shows an honest recovery state when comment reports fail to load", async () => {
   state.discussionReports.mockRejectedValue(new Error("reports unavailable"));
   const copy = discussionReportsCopy("en");

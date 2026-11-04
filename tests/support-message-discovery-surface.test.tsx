@@ -90,6 +90,7 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("shows a localized empty state and retains staff paths", () => {
+  const copy = supportMessageCopy("ru");
   const html = renderToStaticMarkup(
     <SupportMessageBrowser
       page={{ ...page, items: [], olderCursor: null, newerCursor: null }}
@@ -98,8 +99,10 @@ it("shows a localized empty state and retains staff paths", () => {
       staff
     />,
   );
-  expect(html).toContain(supportMessageCopy("ru").empty);
-  expect(html).not.toContain(supportMessageCopy("ru").emptyFiltered);
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.emptyDescription);
+  expect(html).not.toContain(copy.emptyFiltered);
+  expect(html).not.toContain(copy.emptyFilteredDescription);
   expect(html).toContain(`/admin/support/${id}`);
   expect(html).not.toContain("?cursor=");
 });
@@ -108,6 +111,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const copy = supportMessageCopy(locale);
     expect(copy.emptyFiltered).not.toBe(copy.empty);
+    expect(copy.emptyFilteredDescription).not.toBe(copy.emptyDescription);
     const filtered = renderToStaticMarkup(
       <SupportMessageBrowser
         page={{ ...page, items: [], olderCursor: null, newerCursor: null }}
@@ -116,7 +120,10 @@ it.each(["en", "ru"] as const)(
       />,
     );
     expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).toContain(copy.emptyFilteredDescription);
+    expect(filtered).toContain(copy.reset);
     expect(filtered).not.toContain(copy.empty);
+    expect(filtered).not.toContain(copy.emptyDescription);
   },
 );
 it("gates anonymous reads and validates duplicate filters before loading data", async () => {

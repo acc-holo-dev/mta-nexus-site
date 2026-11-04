@@ -26,10 +26,11 @@ vi.mock("../apps/web/src/components/moderated-discussion-removal", () => ({
   ModeratedDiscussionRemoval: () => <div data-removal="available" />,
 }));
 
-import { ModeratedDiscussionScreen } from "../apps/web/src/components/moderated-discussion-screen";
-import { moderatedDiscussionCopy } from "../apps/web/src/lib/moderated-discussion-copy";
-import DiscussionLoading from "../apps/web/src/app/admin/community/[id]/discussion/loading";
 import DiscussionReportsLoading from "../apps/web/src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
+import DiscussionLoading from "../apps/web/src/app/admin/community/[id]/discussion/loading";
+import { ModeratedDiscussionScreen } from "../apps/web/src/components/moderated-discussion-screen";
+import { moderationCopy } from "../apps/web/src/lib/community-moderation-copy";
+import { moderatedDiscussionCopy } from "../apps/web/src/lib/moderated-discussion-copy";
 
 const time = "2026-10-11T00:00:00.000Z",
   publication = {
@@ -172,6 +173,52 @@ it("shows an honest recovery state when the session cannot be read", async () =>
   expect(html).toContain(copy.loadUnavailable);
   expect(html).not.toContain("/auth/login");
 });
+it.each(["en", "ru"] as const)(
+  "shows EmptyState descriptions for empty and filtered discussion comments in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = moderatedDiscussionCopy(locale);
+    state.discussion.mockResolvedValueOnce({
+      ...page,
+      items: [],
+      hasMore: false,
+      nextCursor: null,
+    });
+    const empty = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
+    expect(empty).toContain(copy.empty);
+    expect(empty).toContain(copy.emptyDescription);
+    expect(empty).not.toContain(copy.emptyFiltered);
+    state.discussion.mockResolvedValueOnce({
+      ...page,
+      items: [],
+      hasMore: false,
+      nextCursor: null,
+    });
+    const filtered = renderToStaticMarkup(
+      await ModeratedDiscussionScreen({
+        id: "post",
+        searchParams: Promise.resolve({ q: "word", author: "writer" }),
+      }),
+    );
+    expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).toContain(copy.emptyFilteredDescription);
+    expect(filtered).toContain(moderationCopy(locale).reset);
+    expect(filtered).not.toContain(copy.emptyDescription);
+  },
+);
+it.each(["en", "ru"] as const)(
+  "shows EmptyState description for empty retained comment history in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = moderatedDiscussionCopy(locale);
+    state.discussionDetail.mockResolvedValueOnce({ ...detail, history: [] });
+    const html = renderToStaticMarkup(
+      await ModeratedDiscussionScreen({ id: "post", commentId: "comment" }),
+    );
+    expect(html).toContain(copy.emptyHistory);
+    expect(html).toContain(copy.emptyHistoryDescription);
+  },
+);
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [DiscussionLoading, DiscussionReportsLoading]) {
     const html = renderToStaticMarkup(await Loading());

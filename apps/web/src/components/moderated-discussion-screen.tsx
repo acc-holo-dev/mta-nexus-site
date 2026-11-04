@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -145,6 +145,13 @@ export async function ModeratedDiscussionScreen({
   }
   const data = parsed.data,
     publication = data.publication;
+  const listFilters =
+    !commentId && filters && "query" in filters
+      ? (filters as NonNullable<ReturnType<typeof parseModeratedDiscussionQuery>>)
+      : null;
+  const emptyFiltered = Boolean(
+    listFilters && (listFilters.query || listFilters.author || listFilters.cursor),
+  );
   const date = (value: string) => (
     <time dateTime={value}>
       {new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
@@ -252,7 +259,17 @@ export async function ModeratedDiscussionScreen({
               ))}
             </ul>
           ) : (
-            <p className="nexus-panel p-5 text-muted">{copy.empty}</p>
+            <EmptyState
+              title={emptyFiltered ? copy.emptyFiltered : copy.empty}
+              description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
+              action={
+                emptyFiltered ? (
+                  <Link href={moderatedDiscussionHref(id)} className={navLinkClass}>
+                    {general.reset}
+                  </Link>
+                ) : undefined
+              }
+            />
           )}
         </>
       ) : (
@@ -312,7 +329,7 @@ export async function ModeratedDiscussionScreen({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted">{copy.emptyHistory}</p>
+              <EmptyState title={copy.emptyHistory} description={copy.emptyHistoryDescription} />
             )}
           </section>
         </>

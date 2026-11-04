@@ -244,6 +244,46 @@ it("preserves explicit whole-inbox reading with a scope warning, cancellation an
   expect(harness.fetch.mock.calls[0][1]).toMatchObject({ method: "POST" });
   expect(harness.fetch.mock.calls[0][1]).not.toHaveProperty("body");
 });
+it("shows EmptyState descriptions for empty and filtered notification pages", () => {
+  const emptyPage = {
+    items: [],
+    unreadCount: 0,
+    olderCursor: null,
+    newerCursor: null,
+  };
+  harness.slots = [];
+  harness.cursor = 0;
+  const unfiltered = flattenReactTestTree(
+    NotificationInbox({
+      initialPage: emptyPage,
+      filters: { query: "", state: "all", category: "all" },
+    }),
+  );
+  expect(
+    unfiltered.some(
+      (node) =>
+        node.props.title === "No notifications yet." &&
+        node.props.description ===
+          "New notifications appear here when activity reaches your account.",
+    ),
+  ).toBe(true);
+  harness.slots = [];
+  harness.cursor = 0;
+  const filtered = flattenReactTestTree(NotificationInbox({ initialPage: emptyPage, filters }));
+  const filteredEmpty = filtered.find(
+    (node) =>
+      node.props.title ===
+      "No matching notifications on this page. Try another filter or return to the latest page.",
+  );
+  expect(filteredEmpty?.props.description).toBe(
+    "Clear the filters or return to the latest page to continue.",
+  );
+  const reset = filteredEmpty?.props.action as
+    | { props: { href?: string; children?: unknown } }
+    | undefined;
+  expect(reset?.props.href).toBe("/notifications");
+  expect(reset?.props.children).toBe("Reset");
+});
 it("hides empty copy while a refresh is in flight and restores it only after success", async () => {
   harness.slots = [];
   harness.cursor = 0;
@@ -263,11 +303,11 @@ it("hides empty copy while a refresh is in flight and restores it only after suc
     }),
   );
   click(render(), "Reload saved inbox");
-  expect(render().some((node) => node.props.children === emptyFiltered)).toBe(false);
+  expect(render().some((node) => node.props.title === emptyFiltered)).toBe(false);
   expect(render().some((node) => node.props.children === "Refreshing notifications…")).toBe(true);
   complete(response(emptyPage));
   await vi.waitFor(() =>
-    expect(render().some((node) => node.props.children === emptyFiltered)).toBe(true),
+    expect(render().some((node) => node.props.title === emptyFiltered)).toBe(true),
   );
 });
 it("does not send a page selection larger than twenty-five notifications", async () => {

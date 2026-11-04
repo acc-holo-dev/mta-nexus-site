@@ -1,5 +1,5 @@
 import type { SupportMessageFilters } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -101,17 +101,20 @@ export function SupportMessageBrowser({
         {copy.snapshot}: <time dateTime={page.until}>{date(page.until)} UTC</time>
       </p>
       {page.items.length === 0 ? (
-        <div role="status" aria-live="polite" className="nexus-panel space-y-3 p-5 text-muted">
-          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
-          {filtered ? (
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={filtered ? copy.emptyFiltered : copy.empty}
+          description={filtered ? copy.emptyFilteredDescription : copy.emptyDescription}
+          action={
+            filtered ? (
+              <Link
+                href={path}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
         <section aria-label={copy.title} className="space-y-3">
           {page.items.map((message) => (

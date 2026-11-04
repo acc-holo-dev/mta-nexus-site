@@ -47,8 +47,10 @@ const en = {
   pageNavigation: "Notification page",
   view: "View",
   empty: "No notifications yet.",
+  emptyDescription: "New notifications appear here when activity reaches your account.",
   emptyFiltered:
     "No matching notifications on this page. Try another filter or return to the latest page.",
+  emptyFilteredDescription: "Clear the filters or return to the latest page to continue.",
   selectPage: "Select this page",
   select: "Select notification",
   selected: "Selected",
@@ -123,8 +125,11 @@ const ru: typeof en = {
   pageNavigation: "Страница уведомлений",
   view: "Открыть",
   empty: "Уведомлений пока нет.",
+  emptyDescription: "Новые уведомления появятся здесь, когда активность затронет ваш аккаунт.",
   emptyFiltered:
     "На этой странице нет подходящих уведомлений. Измените фильтры или вернитесь к последним сообщениям.",
+  emptyFilteredDescription:
+    "Сбросьте фильтры или вернитесь к последней странице, чтобы продолжить.",
   selectPage: "Выбрать эту страницу",
   select: "Выбрать уведомление",
   selected: "Выбрано",

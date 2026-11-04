@@ -19,7 +19,9 @@ const en = {
   newer: "Later messages",
   navigation: "Conversation pages",
   empty: "No messages in this case yet.",
+  emptyDescription: "Messages appear here after the requester or support team writes in this case.",
   emptyFiltered: "No messages match these filters.",
+  emptyFilteredDescription: "Clear the filters to see the full conversation on this case.",
   download: "Download this page (JSON)",
   exportHelp:
     "The download includes the private message text on this page. Share it only with people you trust.",
@@ -52,7 +54,10 @@ const ru: typeof en = {
   newer: "Более поздние",
   navigation: "Страницы переписки",
   empty: "В этом обращении пока нет сообщений.",
+  emptyDescription:
+    "Сообщения появятся здесь после того, как заявитель или поддержка напишут в этом обращении.",
   emptyFiltered: "По этим фильтрам сообщения не найдены.",
+  emptyFilteredDescription: "Сбросьте фильтры, чтобы увидеть всю переписку по этому обращению.",
   download: "Скачать эту страницу (JSON)",
   exportHelp:
     "Выгрузка содержит личный текст сообщений этой страницы. Передавайте её только людям, которым доверяете.",
