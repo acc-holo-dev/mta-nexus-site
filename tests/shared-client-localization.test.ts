@@ -56,6 +56,6 @@ describe("shared client localization and request hardening", () => {
     expect(source).toContain('cache: "no-store"');
     expect(source).toContain('credentials: "same-origin"');
     expect(source).toContain("AbortSignal.timeout(15_000)");
-    expect(source).toContain("bg-danger-soft");
+    expect(source).toContain("ErrorState");
   });
 });
