@@ -26,10 +26,10 @@ export type DiscussionReportBatchComponent = (props: {
   allowActions: boolean;
 }) => ReactNode;
 
-export const time = "2026-10-11T00:00:00.123456Z";
+const time = "2026-10-11T00:00:00.123456Z";
 export const token = "a".repeat(64);
 
-export const items = [
+const items = [
   {
     id: "a",
     type: "spam" as const,
