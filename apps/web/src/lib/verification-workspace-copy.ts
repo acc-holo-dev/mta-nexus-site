@@ -46,6 +46,7 @@ const en = {
     "Save at least one specialty in your professional profile before applying for experience verification.",
   teamPending: "This organization already has a pending application.",
   alreadyPending: "An application for this target is already pending.",
+  retryApplication: "The application was not saved. Please try again.",
   alreadyVerified: "This target is already verified.",
   serverHint: "Server control is verified through an MTA control challenge, not an evidence URL.",
   servers: "Manage MTA servers",
@@ -133,6 +134,7 @@ const ru: Record<keyof typeof en, string> = {
     "Сохраните хотя бы одну специализацию в профессиональном профиле перед заявкой на подтверждение опыта.",
   teamPending: "Для этой организации уже есть заявка на рассмотрении.",
   alreadyPending: "Для этой цели уже есть заявка на рассмотрении.",
+  retryApplication: "Заявка не сохранена. Попробуйте ещё раз.",
   alreadyVerified: "Эта цель уже подтверждена.",
   serverHint:
     "Контроль сервера подтверждается через MTA-проверку управления, а не ссылкой на доказательства.",
@@ -184,6 +186,7 @@ export function verificationError(locale: Locale, code: unknown) {
     return copy.invalid;
   if (code === "VERIFICATION_ALREADY_VERIFIED") return copy.alreadyVerified;
   if (code === "VERIFICATION_PENDING") return copy.alreadyPending;
+  if (code === "VERIFICATION_RETRY") return copy.retryApplication;
   if (code === "VERIFICATION_AUTHORITY_CHANGED") return copy.authorityChanged;
   if (code === "VERIFICATION_PROFILE_REQUIRED") return copy.requiresProfile;
   if (code === "VERIFICATION_PROFILE_CHANGED") return copy.profileChanged;

@@ -188,10 +188,14 @@ it("stores a private profile revision with the serialized developer application"
     [["developer", true]],
     [[["Lua"], "https://github.com/example", false]],
     [],
+    [["developer"]],
+    [["ses_developer", "2099-01-01T00:00:00.000Z"]],
     [request({ status: "pending" })],
+    [["ses_developer", "2099-01-01T00:00:00.000Z"]],
   ];
   await new VerificationRepository().createRequest({
     requesterId: "developer",
+    currentToken: "tok_developer",
     targetType: "developer",
     targetId: "developer",
     proofUrl: "https://example.test/evidence",

@@ -8,6 +8,7 @@ import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
+import { isPostgresDeadlock } from "../postgres-error";
 import {
   type VerificationApplicationsQuery,
   verificationApplicationAmendSchema,
@@ -151,13 +152,17 @@ class VerificationWorkspaceService {
         }
       : null;
   }
-  async apply(actor: User, input: z.infer<typeof verificationApplicationSchema>) {
+  async apply(
+    actor: User,
+    input: z.infer<typeof verificationApplicationSchema>,
+    currentToken: string,
+  ) {
     if (input.targetType !== "organization" && input.targetId !== actor.id)
       throw new ForbiddenError();
     let row: Awaited<ReturnType<typeof verificationRepository.createRequest>>;
     try {
       row = await verificationRepository.createRequest(
-        { ...input, requesterId: actor.id },
+        { ...input, requesterId: actor.id, currentToken },
         {
           id: generateId("aud"),
           actorId: actor.id,
@@ -167,6 +172,8 @@ class VerificationWorkspaceService {
         },
       );
     } catch (error) {
+      if (isPostgresDeadlock(error))
+        throw new AppError("Please retry the application", 409, "VERIFICATION_RETRY");
       if (error instanceof AppError && error.code === "CONFLICT")
         throw new AppError("Pending application", 409, "VERIFICATION_PENDING");
       throw error;

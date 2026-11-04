@@ -1,15 +1,15 @@
-import { describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
 import {
   db,
-  organizations,
+  notificationRepository,
   organizationRepository,
+  organizations,
   sessionRepository,
   userRepository,
-  notificationRepository,
   verificationRepository,
   verificationRequests,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("verification stale target approval", () => {
   it("rolls back approval when an organization target disappeared", async () => {
@@ -32,6 +32,12 @@ describe("verification stale target approval", () => {
       displayName: "Verification Reviewer",
       role: "moderator",
     });
+    await sessionRepository.create({
+      id: `ses_${requesterId}`,
+      userId: requesterId,
+      token: `tok_${requesterId}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
     const reviewerToken = `tok_${reviewerId}`;
     await sessionRepository.create({
       id: `ses_${reviewerId}`,
@@ -48,6 +54,7 @@ describe("verification stale target approval", () => {
 
     const request = await verificationRepository.createRequest({
       requesterId,
+      currentToken: `tok_${requesterId}`,
       targetType: "organization",
       targetId: organizationId,
       notes: "Target will be removed before moderation.",

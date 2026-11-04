@@ -1,19 +1,19 @@
-import { describe, it, expect, beforeAll } from "vitest";
 import {
-  userRepository,
-  productRepository,
-  notificationRepository,
-  contentRepository,
-  socialRepository,
-  verificationRepository,
-  sessionRepository,
-  licenseRepository,
   buildRepository,
-  orderRepository,
+  contentRepository,
   developerProfileRepository,
+  licenseRepository,
+  notificationRepository,
+  orderRepository,
+  productRepository,
+  sessionRepository,
+  socialRepository,
+  userRepository,
+  verificationRepository,
 } from "@nexus/db";
+import type { Product, User } from "@nexus/domain";
+import { beforeAll, describe, expect, it } from "vitest";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import type { User, Product } from "@nexus/domain";
 
 describe("Nexus 1.3 Security & Trust Hardening", () => {
   const ts = Date.now().toString(36);
@@ -46,6 +46,13 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       username: `sec_auth_${ts}`,
       displayName: "Security Author",
       role: "developer",
+    });
+
+    await sessionRepository.create({
+      id: `ses_${author.id}`,
+      userId: author.id,
+      token: `tok_${author.id}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
     });
 
     admin = await userRepository.create({
@@ -244,6 +251,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     });
     const request = await verificationRepository.createRequest({
       requesterId: author.id,
+      currentToken: `tok_${author.id}`,
       targetType: "developer",
       targetId: author.id,
       proofUrl: "https://example.test/developer-portfolio",
@@ -273,6 +281,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     // New request approved => verified flag applied
     const request2 = await verificationRepository.createRequest({
       requesterId: author.id,
+      currentToken: `tok_${author.id}`,
       targetType: "developer",
       targetId: author.id,
       proofUrl: "https://example.test/developer-portfolio-resubmit",

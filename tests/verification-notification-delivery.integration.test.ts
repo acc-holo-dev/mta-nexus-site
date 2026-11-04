@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { db, verificationRepository } from "@nexus/db";
+import { db, sessionRepository, verificationRepository } from "@nexus/db";
 import { asc, eq, inArray, ne, sql } from "drizzle-orm";
 import { afterEach, expect, it, vi } from "vitest";
 import {
@@ -52,6 +52,12 @@ async function actor(role = "user", prefix = "usr") {
     role,
     createdAt: new Date("2000-01-01T00:00:00Z"),
   });
+  await sessionRepository.create({
+    id: `ses_${userId}`,
+    userId,
+    token: `tok_${userId}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   actors.push(userId);
   return userId;
 }
@@ -60,6 +66,7 @@ async function apply(requesterId: string) {
   const request = await verificationRepository.createRequest(
     {
       requesterId,
+      currentToken: `tok_${requesterId}`,
       targetType: "user",
       targetId: requesterId,
       notes: "PRIVATE_NOTES",

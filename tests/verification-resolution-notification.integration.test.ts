@@ -1,6 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   db,
   notificationRepository,
@@ -10,6 +8,8 @@ import {
   webPushOutbox,
   webPushSubscriptionRepository,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("verification resolution notifications", () => {
   it.each(["approved", "rejected"] as const)(
@@ -60,6 +60,7 @@ describe("verification resolution notifications", () => {
 
       const request = await verificationRepository.createRequest({
         requesterId,
+        currentToken: `verify-result-session-${suffix}`,
         targetType: "user",
         targetId: requesterId,
         notes: "Verification result integration fixture.",

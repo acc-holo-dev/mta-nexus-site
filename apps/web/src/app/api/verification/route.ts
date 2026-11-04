@@ -12,6 +12,7 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
+import { isPostgresDeadlock } from "../../../lib/postgres-error";
 import { authService } from "../../../lib/services/auth-service";
 
 const privateHeaders = {
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
-    if (!user) {
+    if (!token || !user) {
       return json(context, { error: "Unauthorized" }, 401);
     }
 
@@ -72,7 +73,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
-    if (!user) {
+    if (!token || !user) {
       return json(context, { error: "Authentication required" }, 401);
     }
 
@@ -191,6 +192,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const verificationRequest = await verificationRepository.createRequest(
       {
         requesterId: user.id,
+        currentToken: token,
         targetType: parsed.data.targetType,
         targetId: parsed.data.targetId,
         proofUrl: parsed.data.proofUrl || undefined,
@@ -217,6 +219,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       201,
     );
   } catch (error: unknown) {
+    if (isPostgresDeadlock(error))
+      return json(
+        context,
+        { code: "VERIFICATION_RETRY", error: "Please retry the application" },
+        409,
+      );
     if (error instanceof AppError) {
       return json(
         context,

@@ -146,6 +146,7 @@ describe("audited creation atomicity", () => {
       verificationRepository.createRequest(
         {
           requesterId: userId,
+          currentToken: token,
           targetType: "user",
           targetId: userId,
           notes: "Must roll back with audit.",

@@ -26,17 +26,16 @@ async function user(role: "developer" | "moderator" = "developer") {
     displayName: "Evidence fixture",
     role,
   });
+  await sessionRepository.create({
+    id: `ses_${id}`,
+    userId: id,
+    token: `tok_${id}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   return id;
 }
 async function staffSession(reviewerId: string) {
-  const token = `tok_${reviewerId}`;
-  await sessionRepository.create({
-    id: `ses_${reviewerId}`,
-    userId: reviewerId,
-    token,
-    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
-  });
-  return token;
+  return `tok_${reviewerId}`;
 }
 async function profile(actorId: string, specialties = ["Lua"]) {
   const previous = await developerProfileRepository.own(actorId);
@@ -54,6 +53,7 @@ async function request(actorId: string) {
   await profile(actorId);
   return verificationRepository.createRequest({
     requesterId: actorId,
+    currentToken: `tok_${actorId}`,
     targetType: "developer",
     targetId: actorId,
     proofUrl: "https://example.test/old",
@@ -225,6 +225,7 @@ it("denies foreign access and rechecks revoked organization administration befor
     .values({ id: `member_${randomUUID()}`, organizationId, userId: actorId, role: "admin" });
   const application = await verificationRepository.createRequest({
       requesterId: actorId,
+      currentToken: `tok_${actorId}`,
       targetType: "organization",
       targetId: organizationId,
       notes: "Original evidence",

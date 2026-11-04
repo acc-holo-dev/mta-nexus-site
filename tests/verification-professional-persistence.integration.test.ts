@@ -1,6 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
   auditEvents,
   db,
@@ -10,10 +8,13 @@ import {
   organizationMembers,
   organizationRepository,
   sessionRepository,
-  users,
   userRepository,
+  users,
   verificationRepository,
 } from "@nexus/db";
+import { and, eq } from "drizzle-orm";
+import { expect, it } from "vitest";
+
 async function fixture(role: "developer" | "moderator" = "developer") {
   const suffix = randomUUID().replaceAll("-", "").slice(0, 16),
     id = `usr_vprof_${suffix}`;
@@ -24,17 +25,16 @@ async function fixture(role: "developer" | "moderator" = "developer") {
     displayName: "Verification fixture",
     role,
   });
+  await sessionRepository.create({
+    id: `ses_${id}`,
+    userId: id,
+    token: `tok_${id}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   return id;
 }
 async function staffSession(reviewerId: string) {
-  const token = `tok_${reviewerId}`;
-  await sessionRepository.create({
-    id: `ses_${reviewerId}`,
-    userId: reviewerId,
-    token,
-    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
-  });
-  return token;
+  return `tok_${reviewerId}`;
 }
 async function save(
   actorId: string,
@@ -55,6 +55,7 @@ async function save(
 const application = (id: string) =>
   verificationRepository.createRequest({
     requesterId: id,
+    currentToken: `tok_${id}`,
     targetType: "developer",
     targetId: id,
     proofUrl: "https://example.test/evidence",
@@ -169,6 +170,7 @@ it("rejects own approval and current-role revocation without committing the pend
     token = await staffSession(reviewerId);
   const request = await verificationRepository.createRequest({
     requesterId: id,
+    currentToken: `tok_${id}`,
     targetType: "user",
     targetId: id,
   });
@@ -211,6 +213,7 @@ it("rechecks revoked organization administration at approval and allows an indep
     .values({ id: `member_${randomUUID()}`, organizationId, userId: managerId, role: "admin" });
   const request = await verificationRepository.createRequest({
     requesterId: managerId,
+    currentToken: `tok_${managerId}`,
     targetType: "organization",
     targetId: organizationId,
   });

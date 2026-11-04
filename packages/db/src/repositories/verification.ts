@@ -4,6 +4,7 @@ import {
   ConflictError,
   ForbiddenError,
   serverClaimMatchesOwnershipScope,
+  UnauthorizedError,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { and, asc, count, desc, eq, getTableColumns, inArray, isNotNull, sql } from "drizzle-orm";
@@ -36,6 +37,7 @@ export class VerificationRepository {
   async createRequest(
     input: {
       requesterId: string;
+      currentToken: string;
       targetType: VerificationTargetType;
       targetId: string;
       proofUrl?: string;
@@ -90,6 +92,16 @@ export class VerificationRepository {
         .limit(1);
       if (pending) throw new ConflictError("A verification request is already pending");
 
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.requesterId))
+        .for("share")
+        .limit(1);
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      if (audit && audit.actorId !== actor.id) throw new ForbiddenError();
+      await lockInitiatingSession(tx, actor.id, input.currentToken);
+
       const rows = await tx.insert(verificationRequests).values(values).returning();
       const request = rows[0];
       if (!request) {
@@ -121,6 +133,8 @@ export class VerificationRepository {
         event: "application",
         createdAt,
       });
+
+      await lockInitiatingSession(tx, actor.id, input.currentToken);
 
       return request;
     });

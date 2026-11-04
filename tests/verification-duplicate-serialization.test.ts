@@ -27,9 +27,11 @@ vi.mock("../packages/db/src/client", () => ({
                     ? [{ ownerId: "manager_1", verified: false }]
                     : table === organizationMembers
                       ? [{ role: "admin" }]
-                      : captured.pending
-                        ? [{ id: "ver_existing" }]
-                        : [],
+                      : table === users
+                        ? [{ id: "manager_1" }]
+                        : captured.pending
+                          ? [{ id: "ver_existing" }]
+                          : [],
               };
               return query;
             },
@@ -44,12 +46,16 @@ vi.mock("../packages/db/src/client", () => ({
       }),
   },
 }));
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: vi.fn(),
+}));
 
 import { VerificationRepository } from "../packages/db/src/repositories/verification";
 import {
   auditEvents,
   organizationMembers,
   organizations,
+  users,
   verificationNotificationDeliveries,
   verificationRequests,
 } from "../packages/db/src/schema";
@@ -61,6 +67,7 @@ describe("verification application serialization", () => {
     await expect(
       new VerificationRepository().createRequest({
         requesterId: "manager_2",
+        currentToken: "tok_manager",
         targetType: "organization",
         targetId: "org_1",
       }),
@@ -85,6 +92,7 @@ describe("verification application serialization", () => {
     const request = await new VerificationRepository().createRequest(
       {
         requesterId: "manager_1",
+        currentToken: "tok_manager",
         targetType: "organization",
         targetId: "org_1",
       },

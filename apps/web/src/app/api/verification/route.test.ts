@@ -92,7 +92,11 @@ describe("verification HTTP behavior", () => {
   it("rejects unsupported media and oversized bodies before creating a request", async () => {
     const wrongType = new NextRequest("https://nexus.test/api/verification", {
       method: "POST",
-      headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+      headers: {
+        ...browserMutationHeaders(),
+        cookie: "nexus_session=test",
+        "content-type": "text/plain",
+      },
       body: "{}",
     });
     const unsupported = await POST(wrongType);
@@ -132,6 +136,7 @@ describe("verification HTTP behavior", () => {
     expect(mocks.create).toHaveBeenCalledWith(
       expect.objectContaining({
         requesterId: "u_1",
+        currentToken: "session",
         targetType: "user",
         targetId: "u_1",
       }),
@@ -143,6 +148,14 @@ describe("verification HTTP behavior", () => {
       success: true,
       request: { id: "ver_test" },
     });
+  });
+
+  it("returns a private retryable conflict after a rolled-back deadlock", async () => {
+    mocks.create.mockRejectedValueOnce({ cause: { code: "40P01" } });
+    const response = await POST(postRequest());
+    expect(response.status).toBe(409);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "VERIFICATION_RETRY" });
   });
 
   it("rejects verification of another user profile before duplicate or write checks", async () => {

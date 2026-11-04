@@ -123,12 +123,38 @@ it("refuses forged self targets before creating a request and reports duplicate 
     proofUrl: "https://example.test/",
     notes: "My evidence",
   };
-  await expect(service.apply(actor, input)).rejects.toMatchObject({ code: "FORBIDDEN" });
+  await expect(service.apply(actor, input, "token")).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(mocks.createRequest).not.toHaveBeenCalled();
   mocks.createRequest.mockRejectedValue(new AppError("duplicate", 409, "CONFLICT"));
-  await expect(service.apply(actor, { ...input, targetId: "actor" })).rejects.toMatchObject({
+  await expect(
+    service.apply(actor, { ...input, targetId: "actor" }, "token"),
+  ).rejects.toMatchObject({
     code: "VERIFICATION_PENDING",
   });
+  mocks.createRequest.mockRejectedValueOnce({ cause: { code: "40P01" } });
+  await expect(
+    service.apply(actor, { ...input, targetId: "actor" }, "token"),
+  ).rejects.toMatchObject({
+    code: "VERIFICATION_RETRY",
+    statusCode: 409,
+  });
+});
+
+it("passes the initiating session to the transactional application", async () => {
+  mocks.createRequest.mockResolvedValueOnce({
+    id: "ver_1",
+    targetType: "user",
+    targetId: "actor",
+    status: "pending",
+  });
+  const input = { targetType: "user" as const, targetId: "actor", proofUrl: "", notes: "" };
+  await expect(service.apply(actor, input, "current-session")).resolves.toMatchObject({
+    id: "ver_1",
+  });
+  expect(mocks.createRequest).toHaveBeenCalledWith(
+    expect.objectContaining({ requesterId: "actor", currentToken: "current-session" }),
+    expect.objectContaining({ actorId: "actor" }),
+  );
 });
 it("gates moderation in the service and propagates pending-state conflicts without false confirmations", async () => {
   await expect(
