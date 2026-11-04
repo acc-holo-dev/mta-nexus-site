@@ -93,6 +93,14 @@ it("locks sales report honesty chrome with ErrorState recovery and no plain aler
   expect(source).toContain(".catch(() => null)");
 });
 
+it("locks seller sales report apply CTA to size=touch", () => {
+  const source = read("apps/web/src/components/seller-sales-report.tsx");
+  expect(source).toContain('size="touch"');
+  expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
+  expect(source).toContain("min-h-11");
+  expect(source).not.toContain("min-h-10");
+});
+
 it("locks additive seller sales honesty copy for report recovery", () => {
   const i18n = read("apps/web/src/lib/seller-sales-i18n.ts");
   expect(i18n).toContain("loadUnavailableHint");

@@ -154,3 +154,13 @@ it("locks support case/filter/message controls to touch targets without min-h-10
   );
   expect(read("apps/web/src/components/support-message-browser.tsx")).toContain('size="touch"');
 });
+
+it("locks support-center create-case primary submit to size=touch", () => {
+  const source = read("apps/web/src/components/support-center.tsx");
+  expect(source).toMatch(
+    /type="submit"[\s\S]{0,120}?size="touch"[\s\S]{0,80}?variant="primary"|variant="primary"[\s\S]{0,80}?size="touch"/u,
+  );
+  const touchSubmitMatches =
+    source.match(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/gu) ?? [];
+  expect(touchSubmitMatches.length).toBeGreaterThanOrEqual(2);
+});

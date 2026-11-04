@@ -170,7 +170,7 @@ export function ResourceReviewEditor({
               className={`${nativeFieldClass} mt-2 block min-h-36 w-full p-3`}
             />
           </label>
-          <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
+          <Button type="submit" size="touch" disabled={busy || confirmed} isLoading={busy}>
             {busy ? copy.busy : copy.save}
           </Button>
         </form>
@@ -269,7 +269,7 @@ export function ResourceReviewReportForm({
           disabled={busy || !!id}
           className={`${nativeFieldClass} block min-h-24 w-full p-3`}
         />
-        <Button type="submit" disabled={busy || !!id} isLoading={busy}>
+        <Button type="submit" size="touch" disabled={busy || !!id} isLoading={busy}>
           {busy ? copy.busy : copy.send}
         </Button>
       </form>
@@ -395,7 +395,7 @@ export function ResourceReviewDecisionForm({
           className={`${nativeFieldClass} mt-2 block min-h-24 w-full p-3`}
         />
       </label>
-      <Button type="submit" disabled={busy || confirmed} isLoading={busy}>
+      <Button type="submit" size="touch" disabled={busy || confirmed} isLoading={busy}>
         {busy ? copy.busy : copy.decide}
       </Button>
       <p role="status">{message}</p>

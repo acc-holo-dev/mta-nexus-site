@@ -325,7 +325,7 @@ export function MtaMasterServerDirectory({
             <div className="nexus-panel space-y-3 p-6 text-center text-sm text-secondary">
               <p>{hasFilters ? copy.noMatch : copy.none}</p>
               {hasFilters ? (
-                <Button type="button" variant="secondary" size="sm" onClick={resetFilters}>
+                <Button type="button" variant="secondary" size="touch" onClick={resetFilters}>
                   {copy.resetFilters}
                 </Button>
               ) : (

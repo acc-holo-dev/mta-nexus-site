@@ -1,7 +1,13 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
@@ -19,6 +25,15 @@ describe("MTA directory/visibility chrome", () => {
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain('aria-live="polite"');
     expect(html).toContain("rounded-lg");
+  });
+
+  it("locks directory resetFilters CTA to size=touch", () => {
+    const source = read("apps/web/src/components/mta-master-server-directory.tsx");
+    expect(source).toContain("onClick={resetFilters}");
+    expect(source).toMatch(
+      /size="touch"[\s\S]{0,80}?onClick=\{resetFilters\}|onClick=\{resetFilters\}[\s\S]{0,80}?size="touch"/u,
+    );
+    expect(source).not.toContain("min-h-10");
   });
 
   it.each(["en", "ru"] as const)(
