@@ -92,7 +92,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           locale={locale}
         />
       )}
-      {item.resultCode && <p className="text-danger">{copy.error}</p>}
+      {item.resultCode ? <ErrorState title={copy.error} description={item.resultCode} /> : null}
     </div>
   );
 }
