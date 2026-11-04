@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
@@ -19,6 +19,10 @@ type State =
   | { kind: "invalid" }
   | { kind: "error"; proof?: Proof; message: string }
   | { kind: "success" };
+
+const pageShellClass = "mx-auto min-w-0 max-w-md overflow-x-clip py-12";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default function ResetPasswordPage() {
   const { dictionary } = useNexusLocale();
@@ -84,10 +88,10 @@ export default function ResetPasswordPage() {
       : undefined;
 
   return (
-    <div className="mx-auto max-w-md py-12">
+    <div className={pageShellClass}>
       <section
         aria-labelledby="reset-heading"
-        className="nexus-panel space-y-5 p-6 shadow-nexus-sm"
+        className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-6 shadow-nexus-sm"
       >
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-5 w-5 text-accent" aria-hidden="true" />
@@ -103,17 +107,14 @@ export default function ResetPasswordPage() {
         )}
 
         {state.kind === "invalid" && (
-          <>
-            <p role="alert" className="text-sm text-muted">
-              {copy.invalidReset}
-            </p>
-            <Link
-              href="/auth/forgot-password"
-              className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.requestNew}
-            </Link>
-          </>
+          <ErrorState
+            title={copy.invalidReset}
+            action={
+              <Link href="/auth/forgot-password" className={navLinkClass}>
+                {copy.requestNew}
+              </Link>
+            }
+          />
         )}
 
         {proof && state.kind !== "success" && (
@@ -125,14 +126,7 @@ export default function ResetPasswordPage() {
           >
             <p className="text-sm leading-relaxed text-muted">{copy.resetDescription}</p>
 
-            {state.kind === "error" && (
-              <p
-                role="alert"
-                className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-3 text-sm text-danger"
-              >
-                {state.message}
-              </p>
-            )}
+            {state.kind === "error" && <ErrorState title={state.message} />}
 
             <Input
               id="reset-new-password"
@@ -181,10 +175,7 @@ export default function ResetPasswordPage() {
             <p role="status" className="text-sm text-success">
               {copy.resetSuccess}
             </p>
-            <Link
-              href="/auth/login"
-              className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/auth/login" className={navLinkClass}>
               {copy.signIn}
             </Link>
           </>

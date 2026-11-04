@@ -6,7 +6,7 @@ export default async function SettingsLoading() {
   const copy = getDictionary(locale).settings;
   return (
     <section
-      className="max-w-3xl space-y-8"
+      className="mx-auto min-w-0 max-w-3xl space-y-8 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="settings-loading-heading"
     >

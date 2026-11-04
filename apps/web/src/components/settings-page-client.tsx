@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -31,6 +31,12 @@ type Notice = {
   text: string;
   error: boolean;
 };
+
+const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-8 overflow-x-clip";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const retryButtonClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function SettingsPageClient() {
   const pathname = usePathname();
@@ -379,7 +385,7 @@ export function SettingsPageClient() {
   if (loading) {
     return (
       <section
-        className="max-w-3xl space-y-8"
+        className={pageShellClass}
         aria-busy="true"
         aria-labelledby="settings-loading-heading"
       >
@@ -409,39 +415,60 @@ export function SettingsPageClient() {
 
   if (loadError) {
     return (
-      <div className="mx-auto max-w-md space-y-4 py-20">
-        <h1 className="font-display text-primary">{copy.unavailable}</h1>
-        <p role="alert" className="text-sm text-muted">
-          {notice?.text}
-        </p>
-        <Button type="button" onClick={() => setRevision((current) => current + 1)}>
-          {copy.retry}
-        </Button>
+      <div className={`${pageShellClass} py-12`}>
+        <header>
+          <h1 className="font-display text-primary">{copy.unavailable}</h1>
+          <p className="mt-1 font-caption text-muted">{copy.description}</p>
+        </header>
+        <ErrorState
+          title={notice?.text ?? copy.loadFailed}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              className={retryButtonClass}
+              onClick={() => setRevision((current) => current + 1)}
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl space-y-8" aria-busy={pending || undefined}>
+    <div className={pageShellClass} aria-busy={pending || undefined}>
       <div>
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="mt-1 font-caption text-muted">{copy.description}</p>
       </div>
 
-      {notice && (
+      {notice?.error ? (
+        <ErrorState
+          title={notice.text}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              className={retryButtonClass}
+              onClick={() => setRevision((current) => current + 1)}
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
+      ) : notice ? (
         <p
           id="settings-notice"
-          role={notice.error ? "alert" : "status"}
-          aria-live={notice.error ? undefined : "polite"}
-          className={`rounded-md border px-4 py-3 text-sm ${
-            notice.error
-              ? "border-[color:var(--nexus-danger)]/25 bg-danger-soft text-danger"
-              : "border-base bg-surface text-primary"
-          }`}
+          role="status"
+          aria-live="polite"
+          className="rounded-md border border-base bg-surface px-4 py-3 text-sm text-primary"
         >
           {notice.text}
         </p>
-      )}
+      ) : null}
 
       {pending && (
         <p role="status" aria-live="polite" className="text-sm text-muted">
@@ -452,10 +479,7 @@ export function SettingsPageClient() {
       <ContextSwitcher />
       <PublicProfileForm />
       <ProfileChangeHistoryLink locale={locale} />
-      <Link
-        href="/settings/privacy"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/settings/privacy" className={navLinkClass}>
         {profilePrivacyCopy(locale).title}
       </Link>
 

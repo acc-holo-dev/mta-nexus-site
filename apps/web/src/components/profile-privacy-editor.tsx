@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -16,6 +16,11 @@ import {
 } from "../lib/profile-privacy-copy";
 import { platformRequest } from "../lib/user-platform-client";
 import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
+
+const retryButtonClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ProfilePrivacyEditor({
   initial,
@@ -137,7 +142,7 @@ export function ProfilePrivacyEditor({
 
   return (
     <section
-      className="nexus-panel space-y-5 p-5 sm:p-6"
+      className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6"
       aria-busy={pending ? true : undefined}
       aria-label={copy.title}
     >
@@ -183,7 +188,7 @@ export function ProfilePrivacyEditor({
             type="submit"
             isLoading={pending}
             disabled={pending || !profile}
-            className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.save}
           </Button>
@@ -191,6 +196,7 @@ export function ProfilePrivacyEditor({
             type="button"
             variant="secondary"
             disabled={pending}
+            className="min-h-11"
             onClick={() => void loadPreferences("revision")}
             aria-describedby="privacy-refresh-description"
           >
@@ -200,6 +206,7 @@ export function ProfilePrivacyEditor({
             type="button"
             variant="secondary"
             disabled={pending}
+            className="min-h-11"
             onClick={() => void loadPreferences("replace")}
             aria-describedby="privacy-reload-description"
           >
@@ -218,17 +225,29 @@ export function ProfilePrivacyEditor({
           {copy.loading}
         </p>
       )}
-      {notice && (
-        <p
-          role={notice.error ? "alert" : "status"}
-          className={`text-sm ${notice.error ? "text-danger" : "text-success"}`}
-        >
+      {notice?.error ? (
+        <ErrorState
+          title={notice.text}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              className={retryButtonClass}
+              onClick={() => void loadPreferences("replace")}
+            >
+              {copy.reload}
+            </Button>
+          }
+        />
+      ) : notice ? (
+        <p role="status" className="text-sm text-success">
           {notice.text}
         </p>
-      )}
+      ) : null}
       {profile && (
         <section
-          className="space-y-3 rounded-lg border border-base p-4"
+          className="min-w-0 space-y-3 overflow-x-clip rounded-lg border border-base p-4"
           aria-label={copy.guestPreview}
         >
           <h2 className="text-sm font-semibold text-primary">{copy.guestPreview}</h2>
@@ -241,14 +260,11 @@ export function ProfilePrivacyEditor({
           <div className="flex flex-wrap gap-4">
             <Link
               href={`/users/${encodeURIComponent(profile.username)}?preview=guest`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.openGuestPreview}
             </Link>
-            <Link
-              href={`/users/${encodeURIComponent(profile.username)}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`/users/${encodeURIComponent(profile.username)}`} className={navLinkClass}>
               {copy.publicProfile}
             </Link>
           </div>

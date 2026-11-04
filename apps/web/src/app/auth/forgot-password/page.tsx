@@ -1,11 +1,15 @@
 "use client";
 
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { useNexusLocale } from "../../../components/locale-context";
 import { recoveryJsonRequest } from "../../../lib/account-recovery-browser";
+
+const pageShellClass = "mx-auto min-w-0 max-w-md overflow-x-clip py-12";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default function ForgotPasswordPage() {
   const { dictionary } = useNexusLocale();
@@ -44,10 +48,10 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md py-12">
+    <div className={pageShellClass}>
       <section
         aria-labelledby="forgot-heading"
-        className="nexus-panel space-y-5 p-6 shadow-nexus-sm"
+        className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-6 shadow-nexus-sm"
       >
         <div className="flex items-center gap-3">
           <KeyRound className="h-5 w-5 text-accent" aria-hidden="true" />
@@ -79,23 +83,18 @@ export default function ForgotPasswordPage() {
           </Button>
         </form>
 
-        {notice && (
+        {notice?.error ? (
+          <ErrorState title={notice.text} />
+        ) : notice ? (
           <p
-            role={notice.error ? "alert" : "status"}
-            className={`rounded-lg border p-3 text-sm ${
-              notice.error
-                ? "border-[color:var(--nexus-danger)]/25 bg-danger-soft text-danger"
-                : "border-[color:var(--nexus-success)]/25 bg-success-soft text-success"
-            }`}
+            role="status"
+            className="rounded-lg border border-[color:var(--nexus-success)]/25 bg-success-soft p-3 text-sm text-success"
           >
             {notice.text}
           </p>
-        )}
+        ) : null}
 
-        <Link
-          href="/auth/login"
-          className="text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/auth/login" className={navLinkClass}>
           {copy.backToSignIn}
         </Link>
       </section>

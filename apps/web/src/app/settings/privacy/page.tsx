@@ -9,6 +9,11 @@ import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 import { authService } from "../../../lib/services/auth-service";
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata() {
   return {
     title: profilePrivacyCopy(await getRequestLocale()).title,
@@ -25,13 +30,10 @@ export default async function PrivacySettingsPage() {
     .then((row) => editablePrivacySchema.parse(row))
     .catch(() => null);
   return (
-    <div className="space-y-6">
+    <div className={pageShellClass}>
       <ProfileChangeHistoryLink locale={locale} />
       <header className="space-y-2">
-        <Link
-          href="/settings"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/settings" className={navLinkClass}>
           {copy.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
@@ -39,10 +41,7 @@ export default async function PrivacySettingsPage() {
       </header>
       <ProfilePrivacyEditor key={actor.id} initial={initial} locale={locale} />
       {["developer", "admin"].includes(actor.role) && (
-        <Link
-          href="/settings/developer"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/settings/developer" className={navLinkClass}>
           {copy.professional}
         </Link>
       )}

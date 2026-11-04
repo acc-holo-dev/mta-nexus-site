@@ -185,6 +185,8 @@ it.each(["en", "ru"] as const)(
       />,
     );
     expect(lifetime).toContain(copy.empty);
+    expect(lifetime).toContain(copy.emptyHint);
+    expect(lifetime).toContain("overflow-x-clip");
     expect(lifetime).not.toContain(copy.emptyFiltered);
     const filtered = renderToStaticMarkup(
       <ProfileChangeHistoryView
@@ -194,6 +196,8 @@ it.each(["en", "ru"] as const)(
       />,
     );
     expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).toContain(copy.emptyFilteredHint);
+    expect(filtered).toContain(copy.reset);
     expect(filtered).not.toContain(copy.empty);
   },
 );
@@ -211,6 +215,10 @@ it("preserves normalized organization selectors and renders a read failure disti
   mock.profile.mockRejectedValue(Error("database-private-contact"));
   const html = renderToStaticMarkup(await ProfilePage({}));
   expect(html).toContain('role="alert"');
+  expect(html).toContain(privateChangeHistoryCopy("en").unavailable);
+  expect(html).toContain(privateChangeHistoryCopy("en").reload);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).not.toContain("database-private");
   expect(html).not.toContain(privateChangeHistoryCopy("en").empty);
 });

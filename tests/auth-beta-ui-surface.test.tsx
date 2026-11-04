@@ -94,7 +94,7 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
     }
   });
 
-  it("uses shared @nexus/ui Input/Button on auth and recovery screens", () => {
+  it("uses shared @nexus/ui Input/Button/ErrorState on auth and recovery screens", () => {
     const auth = read("apps/web/src/components/auth-form.tsx");
     const forgot = read("apps/web/src/app/auth/forgot-password/page.tsx");
     const reset = read("apps/web/src/app/auth/reset-password/page.tsx");
@@ -102,21 +102,23 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
     for (const source of [auth, forgot, reset]) {
       expect(source).toContain('from "@nexus/ui"');
       expect(source).toContain("Button");
-      expect(source).toContain("Input");
+      expect(source).toContain("ErrorState");
       expect(source).toContain("isLoading");
       expect(source).toContain("min-h-11");
+      expect(source).toContain("min-w-0");
+      expect(source).toContain("overflow-x-clip");
     }
 
-    expect(auth).toContain('role="alert"');
+    expect(auth).toContain("Input");
     expect(auth).toContain("aria-busy={loading}");
-    expect(auth).toContain("bg-danger-soft");
     expect(auth).toContain("initialReturnPath");
     expect(auth).toContain("resolveAuthReturnPath");
     expect(auth).toContain("window.location.replace(next)");
     expect(auth).not.toContain('window.location.replace("/workspace")');
-    expect(forgot).toContain('role={notice.error ? "alert" : "status"}');
+    expect(forgot).toContain("Input");
+    expect(forgot).toContain('role="status"');
+    expect(reset).toContain("Input");
     expect(reset).toContain('role="status"');
-    expect(reset).toContain('role="alert"');
     expect(reset).toContain("copy.checkingReset");
     expect(reset).toContain("copy.resetSuccess");
   });
