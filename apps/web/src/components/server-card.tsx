@@ -65,7 +65,7 @@ function CopyAddressControl({
       <Button
         type="button"
         variant="secondary"
-        size="sm"
+        size="touch"
         aria-label={`${copy.copyAddress}: ${name}`}
         disabled={copying}
         onClick={() => void copyAddress()}
