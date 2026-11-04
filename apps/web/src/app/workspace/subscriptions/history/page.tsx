@@ -5,10 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
-import {
-  subscriptionNavLinkClass,
-  subscriptionPageShellClass,
-} from "../../../../components/subscription-workspace-recovery";
+import { subscriptionNavLinkClass } from "../../../../components/subscription-workspace-recovery";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
@@ -21,6 +18,8 @@ import {
   subscriptionReceiptHref,
   subscriptionsQuery,
 } from "../../../../lib/subscriptions-query";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Subscription history | MTA NEXUS",
@@ -53,7 +52,7 @@ export default async function SubscriptionHistoryPage({
     const href = (page: number) =>
       `/workspace/subscriptions/history?${new URLSearchParams({ page: String(page), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
-      <section className={subscriptionPageShellClass}>
+      <section className={pageShellClass}>
         <Link
           href={subscriptionAccountHref(query.organizationId)}
           className={subscriptionNavLinkClass}
@@ -130,7 +129,7 @@ export default async function SubscriptionHistoryPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={subscriptionPageShellClass}>
+        <section className={pageShellClass}>
           <ErrorState
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
@@ -143,7 +142,7 @@ export default async function SubscriptionHistoryPage({
         </section>
       );
     return (
-      <section className={subscriptionPageShellClass}>
+      <section className={pageShellClass}>
         <Link href={subscriptionAccountHref(undefined)} className={subscriptionNavLinkClass}>
           {c.title}
         </Link>

@@ -8,10 +8,7 @@ import { PlanReviewTerms } from "../../../components/plan-review-terms";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { SubscriptionControls } from "../../../components/subscription-controls";
 import { SubscriptionFeeEstimator } from "../../../components/subscription-fee-estimator";
-import {
-  subscriptionNavLinkClass,
-  subscriptionPageShellClass,
-} from "../../../components/subscription-workspace-recovery";
+import { subscriptionNavLinkClass } from "../../../components/subscription-workspace-recovery";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
@@ -23,6 +20,8 @@ import {
   subscriptionPageParams,
   subscriptionsQuery,
 } from "../../../lib/subscriptions-query";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "My subscription | MTA NEXUS",
@@ -61,7 +60,7 @@ export default async function SubscriptionAccountPage({
       "/workspace/subscriptions/history",
     );
     return (
-      <section className={subscriptionPageShellClass}>
+      <section className={pageShellClass}>
         <h1 className="font-display">{c.title}</h1>
         <nav className="flex flex-wrap gap-4">
           <Link href="/subscriptions" className={subscriptionNavLinkClass}>
@@ -172,7 +171,7 @@ export default async function SubscriptionAccountPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={subscriptionPageShellClass}>
+        <section className={pageShellClass}>
           <ErrorState
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
@@ -185,7 +184,7 @@ export default async function SubscriptionAccountPage({
         </section>
       );
     return (
-      <section className={subscriptionPageShellClass}>
+      <section className={pageShellClass}>
         <Link href="/subscriptions" className={subscriptionNavLinkClass}>
           {c.catalog}
         </Link>

@@ -1,7 +1,11 @@
 import { OrganizationContentEditorPage } from "../../../../../../components/organization-content-editor-page";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { getUserPlatformCopy } from "../../../../../../lib/user-platform-copy";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export async function generateMetadata() {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
@@ -13,5 +17,5 @@ export default async function Page({
 }: {
   params: Promise<{ id: string; contentId: string }>;
 }) {
-  return OrganizationContentEditorPage(await params);
+  return <div className={pageShellClass}>{await OrganizationContentEditorPage(await params)}</div>;
 }

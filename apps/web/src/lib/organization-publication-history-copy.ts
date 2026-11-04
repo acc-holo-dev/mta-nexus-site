@@ -6,6 +6,7 @@ const en = {
   description:
     "Current owners and administrators can review retained editorial activity for this organization's publication.",
   history: "Publication history",
+  loading: "Loading publication history…",
   restoreHelp:
     "Restore only an archive recorded by this organization's editors for the current saved version. Restoration creates a draft for renewed review. Moderator archives and legacy archives without current proof stay protected.",
   restoreConfirm:
@@ -15,12 +16,15 @@ const en = {
   restoredNotice: "The publication was restored as an organization draft.",
   identity: "Team member",
   unavailable: "Publication history could not be loaded. Reload the organization workspace.",
+  historyEmptyHint:
+    "Editorial status changes for this organization publication appear here after they are retained.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "История публикации организации",
   description:
     "Действующие владельцы и администраторы могут проверить сохранённые действия редакции с публикацией своей организации.",
   history: "История публикации",
+  loading: "Загрузка истории публикации…",
   restoreHelp:
     "Восстановить можно только архив, записанный редакцией организации для текущей версии. Материал возвращается в черновики для повторной проверки. Архив модератора и старый архив без актуального подтверждения защищены.",
   restoreConfirm:
@@ -30,6 +34,8 @@ const ru: Record<keyof typeof en, string> = {
   restoredNotice: "Публикация возвращена в черновики организации.",
   identity: "Участник команды",
   unavailable: "Не удалось загрузить историю публикации. Загрузите кабинет организации.",
+  historyEmptyHint:
+    "Изменения статуса этой публикации организации появляются здесь после сохранения в журнале.",
 };
 export const organizationPublicationHistoryCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function organizationPublicationHistoryError(locale: Locale, code: unknown) {

@@ -5,10 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewForm } from "../../../../../components/plan-review-form";
-import {
-  planReviewNavLinkClass,
-  planReviewPageShellClass,
-} from "../../../../../components/plan-review-workspace-recovery";
+import { planReviewNavLinkClass } from "../../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -16,6 +13,8 @@ import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
 import { planReviewNewQuery, planReviewsPageParams } from "../../../../../lib/plan-reviews-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Review a plan | MTA NEXUS",
@@ -48,7 +47,7 @@ export default async function NewPlanReview({
     if (!plan) notFound();
     if (plan.revision !== query.revision)
       return (
-        <section className={planReviewPageShellClass}>
+        <section className={pageShellClass}>
           <ErrorState
             title={c.planChanged}
             description={c.selectionRecoverHint}
@@ -66,7 +65,7 @@ export default async function NewPlanReview({
     const href = (page: number) =>
       `/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
-      <div className={planReviewPageShellClass}>
+      <div className={pageShellClass}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>
@@ -106,7 +105,7 @@ export default async function NewPlanReview({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={planReviewPageShellClass}>
+        <section className={pageShellClass}>
           <ErrorState
             title={c.invalid}
             description={c.selectionRecoverHint}
@@ -119,7 +118,7 @@ export default async function NewPlanReview({
         </section>
       );
     return (
-      <section className={planReviewPageShellClass}>
+      <section className={pageShellClass}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>

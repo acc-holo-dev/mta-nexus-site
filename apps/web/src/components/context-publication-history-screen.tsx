@@ -87,8 +87,7 @@ export async function ContextPublicationHistoryScreen({
   const data =
     result.success && context?.id === id && result.data.item.id === contentId ? result.data : null;
   const base = `/workspace/${kind}/${encodeURIComponent(id)}/content`;
-  const emptyDescription =
-    kind === "servers" ? serverPublicationHistoryCopy(locale).historyEmptyHint : copy.description;
+  const emptyDescription = copy.historyEmptyHint;
   return (
     <div className={pageShellClass}>
       <Link href={base} className={navLinkClass}>
