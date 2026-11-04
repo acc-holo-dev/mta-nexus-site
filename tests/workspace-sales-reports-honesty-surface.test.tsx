@@ -104,8 +104,12 @@ it("locks seller sales report apply CTA to size=touch", () => {
 it("locks seller sales report filter panel as a localized search landmark with touch select chrome", () => {
   const source = read("apps/web/src/components/seller-sales-report.tsx");
   expect(source).toContain("<search aria-label={c.filters}>");
-  expect(source).toMatch(/<select[\s\S]*?className="block min-h-11 w-full rounded border border-base bg-surface p-2"/u);
-  expect(source).not.toMatch(/<select[\s\S]*?className="block w-full rounded border border-base bg-surface p-2"/u);
+  expect(source).toMatch(
+    /<select[\s\S]*?className="block min-h-11 w-full rounded border border-base bg-surface p-2"/u,
+  );
+  expect(source).not.toMatch(
+    /<select[\s\S]*?className="block w-full rounded border border-base bg-surface p-2"/u,
+  );
   const en = sellerSalesCopy("en");
   const ru = sellerSalesCopy("ru");
   expect(en.filters).toBe("Sales filters");
