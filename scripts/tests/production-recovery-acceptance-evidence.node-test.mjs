@@ -23,6 +23,8 @@ function fixture(name) {
   return JSON.parse(readFileSync(join(process.cwd(), "scripts/fixtures", name), "utf8"));
 }
 
+const fixtureNow = Date.parse("2026-11-05T00:00:00.000Z");
+
 function acceptance(overrides = {}) {
   const core = {
     schemaVersion: 1,
@@ -55,7 +57,26 @@ function acceptance(overrides = {}) {
 
 test("fixture accept: production-recovery-acceptance-accept.json validates", () => {
   const body = fixture("production-recovery-acceptance-accept.json");
-  assert.equal(validateProductionRecoveryAcceptanceEvidence(body).ok, true);
+  assert.equal(validateProductionRecoveryAcceptanceEvidence(body, { now: fixtureNow }).ok, true);
+});
+
+test("accepts old and clock-skewed restore evidence but rejects a future drill", () => {
+  const now = Date.parse("2030-01-01T00:00:00.000Z");
+  assert.equal(validateProductionRecoveryAcceptanceEvidence(acceptance(), { now }).ok, true);
+  const at = (ms) =>
+    acceptance({
+      measuredRestore: {
+        startedAt: new Date(ms - 60_000).toISOString(),
+        completedAt: new Date(ms).toISOString(),
+        dataLossMinutes: 15,
+        withinRpo: true,
+        withinRto: true,
+      },
+    });
+  assert.equal(validateProductionRecoveryAcceptanceEvidence(at(now + 300_000), { now }).ok, true);
+  const future = validateProductionRecoveryAcceptanceEvidence(at(now + 300_001), { now });
+  assert.equal(future.ok, false);
+  assert.match(future.reason, /future/u);
 });
 
 test("fixture reject: CI backup-restore PASS is not F04 acceptance", () => {
@@ -76,7 +97,10 @@ test("fixture reject: REPLACE_WITH_* leftovers fail even when verdict.passed", (
 });
 
 test("acceptance validator rejects missing owner targets and out-of-band restore", () => {
-  assert.equal(validateProductionRecoveryAcceptanceEvidence(acceptance()).ok, true);
+  assert.equal(
+    validateProductionRecoveryAcceptanceEvidence(acceptance(), { now: fixtureNow }).ok,
+    true,
+  );
   assert.equal(
     validateProductionRecoveryAcceptanceEvidence(
       acceptance({

@@ -5,6 +5,7 @@ import { BACKUP_RESTORE_EVIDENCE_FLAGS, BACKUP_RESTORE_LABEL } from "./backup-re
 export const PRODUCTION_RECOVERY_ACCEPTANCE_KIND = "production_recovery_acceptance";
 
 const REPLACE_WITH_PLACEHOLDER = /REPLACE_WITH_/u;
+const CLOCK_SKEW_MS = 5 * 60_000;
 
 function readJson(path) {
   try {
@@ -84,7 +85,7 @@ function rejectReplaceWithFields(fields) {
  * Never treats CI disposable backup-restore PASS as operational acceptance.
  * Rejects REPLACE_WITH_* leftovers even when verdict.passed is true.
  */
-export function validateProductionRecoveryAcceptanceEvidence(evidence) {
+export function validateProductionRecoveryAcceptanceEvidence(evidence, { now = Date.now() } = {}) {
   if (!evidence || typeof evidence !== "object") {
     return { ok: false, reason: "missing or invalid evidence JSON" };
   }
@@ -148,6 +149,9 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence) {
       ok: false,
       reason: "measured restore requires ordered startedAt/completedAt timestamps",
     };
+  }
+  if (!Number.isFinite(now) || completedMs > now + CLOCK_SKEW_MS) {
+    return { ok: false, reason: "measured restore completion is in the future" };
   }
   if (
     typeof measured?.dataLossMinutes !== "number" ||

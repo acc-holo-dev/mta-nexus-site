@@ -1132,6 +1132,8 @@ does. Validate with
 `node scripts/check-observability-live-drill-evidence.mjs`); fixture shape in
 [`scripts/fixtures/observability-live-drill-accept.json`](../scripts/fixtures/observability-live-drill-accept.json).
 Mis-submitting readiness JSON to the live-drill validator is rejected.
+The validator allows up to five minutes of clock skew for `recoveryAt`; it rejects a
+later future timestamp and does not impose an expiration on older evidence.
 
 Offline queue-probe drill (disposable fixture; exit code 2 means alert, same pattern as
 [`scripts/tests/web-push-worker-queue.node-test.mjs`](../scripts/tests/web-push-worker-queue.node-test.mjs)):
@@ -1193,8 +1195,9 @@ Owner acceptance uses `production_recovery_acceptance` evidence
 with agreed RPO/RTO (minutes), retention + verified off-host location, restore access/break-glass,
 and measured restore timestamps/data loss checked against those targets. Validate with
 `pnpm recovery:acceptance:verify` (or
-`node scripts/check-production-recovery-acceptance-evidence.mjs`). Checklist before recording
-acceptance:
+`node scripts/check-production-recovery-acceptance-evidence.mjs`). The validator allows up to
+five minutes of clock skew for `completedAt`; it rejects a later future timestamp and does not
+impose an expiration on older evidence. Checklist before recording acceptance:
 
 1. Owner documents RPO/RTO, retention, off-host independence from the primary host, and who may restore.
 2. Confirm fresh backup copies exist off-host; do not store dump secrets in GitHub artifacts.

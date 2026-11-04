@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 
 export const OBSERVABILITY_READINESS_KIND = "observability_operator_readiness";
 export const OBSERVABILITY_LIVE_DRILL_KIND = "observability_live_drill";
+const CLOCK_SKEW_MS = 5 * 60_000;
 
 /** Required in-repo operator scripts that prove alert/health probes exist. */
 export const OBSERVABILITY_REQUIRED_SCRIPTS = Object.freeze([
@@ -257,7 +258,7 @@ export function isObservabilityReadinessEvidence(evidence) {
  * Rejects observability-readiness payloads mis-submitted as live proof.
  * Rejects REPLACE_WITH_* leftovers even when verdict.passed is true.
  */
-export function validateObservabilityLiveDrillEvidence(evidence) {
+export function validateObservabilityLiveDrillEvidence(evidence, { now = Date.now() } = {}) {
   if (!evidence || typeof evidence !== "object") {
     return { ok: false, reason: "missing or invalid evidence JSON" };
   }
@@ -344,6 +345,9 @@ export function validateObservabilityLiveDrillEvidence(evidence) {
       reason:
         "timeline requires signalAt → alertAt → humanReceivedAt → recoveryAt in chronological order",
     };
+  }
+  if (!Number.isFinite(now) || recoveryMs > now + CLOCK_SKEW_MS) {
+    return { ok: false, reason: "live drill recovery is in the future" };
   }
   if (!nonEmptyString(evidence?.drill?.signalName)) {
     return { ok: false, reason: "drill.signalName must identify the injected or observed failure" };

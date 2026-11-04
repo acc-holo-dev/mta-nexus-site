@@ -24,6 +24,8 @@ function fixture(name) {
   return JSON.parse(readFileSync(join(process.cwd(), "scripts/fixtures", name), "utf8"));
 }
 
+const fixtureNow = Date.parse("2026-11-05T00:00:00.000Z");
+
 function liveDrill(overrides = {}) {
   const core = {
     schemaVersion: 1,
@@ -52,7 +54,25 @@ function liveDrill(overrides = {}) {
 
 test("fixture accept: observability-live-drill-accept.json validates", () => {
   const body = fixture("observability-live-drill-accept.json");
-  assert.equal(validateObservabilityLiveDrillEvidence(body).ok, true);
+  assert.equal(validateObservabilityLiveDrillEvidence(body, { now: fixtureNow }).ok, true);
+});
+
+test("accepts old and clock-skewed live drills but rejects a future drill", () => {
+  const now = Date.parse("2030-01-01T00:00:00.000Z");
+  assert.equal(validateObservabilityLiveDrillEvidence(liveDrill(), { now }).ok, true);
+  const at = (ms) =>
+    liveDrill({
+      timeline: {
+        signalAt: new Date(ms - 60_000).toISOString(),
+        alertAt: new Date(ms - 40_000).toISOString(),
+        humanReceivedAt: new Date(ms - 20_000).toISOString(),
+        recoveryAt: new Date(ms).toISOString(),
+      },
+    });
+  assert.equal(validateObservabilityLiveDrillEvidence(at(now + 300_000), { now }).ok, true);
+  const future = validateObservabilityLiveDrillEvidence(at(now + 300_001), { now });
+  assert.equal(future.ok, false);
+  assert.match(future.reason, /future/u);
 });
 
 test("fixture reject: readiness evidence is not F03 live proof", () => {
@@ -95,7 +115,7 @@ test("fixture reject: unknown threshold key is not whitelisted", () => {
 });
 
 test("live drill validator rejects broken timeline and failed verdict", () => {
-  assert.equal(validateObservabilityLiveDrillEvidence(liveDrill()).ok, true);
+  assert.equal(validateObservabilityLiveDrillEvidence(liveDrill(), { now: fixtureNow }).ok, true);
   assert.equal(
     validateObservabilityLiveDrillEvidence(
       liveDrill({
