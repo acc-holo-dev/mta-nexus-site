@@ -26,9 +26,11 @@ const navLinkClass =
 export function DeveloperProfileEditor({
   initial,
   locale,
+  actorId,
 }: {
   initial: EditableDeveloperProfile | null;
   locale: Locale;
+  actorId: string;
 }) {
   const copy = verificationCopy(locale),
     [profile, setProfile] = useState(initial);
@@ -65,7 +67,11 @@ export function DeveloperProfileEditor({
           verificationError,
         ),
       );
-      if (!parsed.success || (profile && parsed.data.id !== profile.id))
+      if (
+        !parsed.success ||
+        parsed.data.id !== actorId ||
+        (profile && parsed.data.id !== profile.id)
+      )
         throw new Error(copy.unavailable);
       apply(parsed.data);
     } catch (caught) {
@@ -77,7 +83,7 @@ export function DeveloperProfileEditor({
   }
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (guard.current || !profile) return;
+    if (guard.current || !profile || profile.id !== actorId) return;
     const parsed = developerProfileUpdateSchema.safeParse({
       specialties: specialties
         .split(/\r?\n/u)
@@ -86,6 +92,7 @@ export function DeveloperProfileEditor({
       githubUrl: github,
       discordTag: discord,
       expectedUpdatedAt: profile.updatedAt,
+      expectedActorId: profile.id,
     });
     if (!parsed.success) {
       setError(copy.invalid);

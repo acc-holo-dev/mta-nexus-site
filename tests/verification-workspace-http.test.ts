@@ -48,6 +48,7 @@ const profile = {
   githubUrl: "https://github.com/example",
   discordTag: " dev ",
   expectedUpdatedAt: "2026-10-10T00:00:00.000Z",
+  expectedActorId: "actor",
 };
 const decision = { decision: "approved", reviewNotes: " Reviewed evidence " };
 function request(method = "GET", body?: unknown, query = "", headers = {}) {
@@ -121,7 +122,11 @@ it("blocks anonymous requests and forged/repeated/unbounded filters before servi
 });
 it("normalizes saved fields and submits proof without accepting trust/role/scope injection", async () => {
   expect((await update(request("PATCH", profile))).status).toBe(200);
-  expect(mocks.updateProfile).toHaveBeenCalledWith(actor, { ...profile, discordTag: "dev" });
+  expect(mocks.updateProfile).toHaveBeenCalledWith(
+    actor,
+    { ...profile, discordTag: "dev" },
+    "test",
+  );
   expect((await POST(request("POST", application))).status).toBe(201);
   expect(mocks.apply).toHaveBeenCalledWith(
     actor,

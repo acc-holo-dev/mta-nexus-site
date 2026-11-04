@@ -99,15 +99,21 @@ it("sends a shared profile version and server-owned actor/audit identifiers to s
     updatedAt: time,
     email: "PRIVATE",
   });
-  const result = await service.updateProfile(actor, {
-    specialties: ["Lua"],
-    githubUrl: "https://example.test/",
-    discordTag: "contact",
-    expectedUpdatedAt: time.toISOString(),
-  });
+  const result = await service.updateProfile(
+    actor,
+    {
+      specialties: ["Lua"],
+      githubUrl: "https://example.test/",
+      discordTag: "contact",
+      expectedUpdatedAt: time.toISOString(),
+      expectedActorId: "actor",
+    },
+    "session-token",
+  );
   expect(mocks.update).toHaveBeenCalledWith(
     expect.objectContaining({
       actorId: "actor",
+      currentToken: "session-token",
       expectedUpdatedAt: time,
       profileId: expect.any(String),
       auditId: expect.any(String),
@@ -115,6 +121,23 @@ it("sends a shared profile version and server-owned actor/audit identifiers to s
   );
   expect(result.githubUrl).toBe("https://example.test/");
   expect(JSON.stringify(result)).not.toContain("PRIVATE");
+});
+
+it("rejects a changed signed-in actor before storage even when profile revisions match", async () => {
+  await expect(
+    service.updateProfile(
+      { ...actor, id: "different-account" },
+      {
+        specialties: ["Lua"],
+        githubUrl: "",
+        discordTag: "",
+        expectedUpdatedAt: time.toISOString(),
+        expectedActorId: "actor",
+      },
+      "other-session",
+    ),
+  ).rejects.toMatchObject({ code: "ACCOUNT_CHANGED", statusCode: 409 });
+  expect(mocks.update).not.toHaveBeenCalled();
 });
 it("refuses forged self targets before creating a request and reports duplicate application conflicts", async () => {
   const input = {

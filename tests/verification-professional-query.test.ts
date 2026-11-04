@@ -61,6 +61,7 @@ const request = (extra = {}) =>
   });
 const profileInput = {
   actorId: "developer",
+  currentToken: "tok_developer",
   expectedUpdatedAt: new Date(time),
   specialties: ["Lua"],
   githubUrl: "https://github.com/example",
@@ -90,7 +91,9 @@ it("preserves experience for Discord-only edits, bumps shared CAS and never over
   state.rows = [
     [["developer", time]],
     [[["Lua"], "https://github.com/example", "old", true]],
+    [["ses_developer", "2099-01-01T00:00:00.000Z"]],
     [[later]],
+    [["ses_developer", "2099-01-01T00:00:00.000Z"]],
   ];
   const result = await developerProfileRepository.update(profileInput);
   expect(result.verifiedDeveloper).toBe(true);
@@ -116,7 +119,9 @@ it.each([{ specialties: ["TypeScript"] }, { githubUrl: "https://github.com/chang
     state.rows = [
       [["developer", time]],
       [[["Lua"], "https://github.com/example", "old", true]],
+      [["ses_developer", "2099-01-01T00:00:00.000Z"]],
       [[later]],
+      [["ses_developer", "2099-01-01T00:00:00.000Z"]],
     ];
     expect(
       (await developerProfileRepository.update({ ...profileInput, ...extra })).verifiedDeveloper,
@@ -139,7 +144,12 @@ it.each([
   },
 );
 it("propagates audit failures instead of confirming an unaudited edit", async () => {
-  state.rows = [[["developer", time]], [], [[later]]];
+  state.rows = [
+    [["developer", time]],
+    [],
+    [["ses_developer", "2099-01-01T00:00:00.000Z"]],
+    [[later]],
+  ];
   state.failAudit = true;
   await expect(developerProfileRepository.update(profileInput)).rejects.toMatchObject({
     cause: expect.objectContaining({ message: "audit failure" }),

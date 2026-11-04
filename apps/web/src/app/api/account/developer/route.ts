@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
@@ -29,7 +29,9 @@ export const PATCH = withBrowserMutation((request: NextRequest) => {
       const parsed = developerProfileUpdateSchema.safeParse(await readBoundedJson(request));
       if (!parsed.success) throw new AppError("Invalid profile", 400, "VALIDATION_ERROR");
       await verificationRate(actor.id, "profileEditing");
-      return verificationWorkspaceService.updateProfile(actor, parsed.data);
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      if (!currentToken) throw new UnauthorizedError();
+      return verificationWorkspaceService.updateProfile(actor, parsed.data, currentToken);
     },
     200,
     verificationMutationError,

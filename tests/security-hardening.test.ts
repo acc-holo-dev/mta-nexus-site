@@ -242,6 +242,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     const previous = await developerProfileRepository.own(author.id);
     await developerProfileRepository.update({
       actorId: author.id,
+      currentToken: `tok_${author.id}`,
       expectedUpdatedAt: previous.updatedAt,
       specialties: ["Lua"],
       githubUrl: "https://example.test/github",

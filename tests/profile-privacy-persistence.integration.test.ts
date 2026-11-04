@@ -1,21 +1,23 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray } from "drizzle-orm";
-import { afterEach, expect, it } from "vitest";
 import {
   auditEvents,
   content,
   db,
   developerProfileRepository,
   developerProfiles,
+  publicationFeedRepository as feed,
   follows,
   organizationRepository,
   organizations,
   profilePrivacyRepository as privacy,
-  publicationFeedRepository as feed,
+  sessionRepository,
   userProfilePreferences,
   userRepository,
   users,
 } from "@nexus/db";
+import { and, eq, inArray } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
+
 const userIds: string[] = [],
   orgIds: string[] = [];
 afterEach(async () => {
@@ -194,6 +196,12 @@ it("closes direct and followed-user activity while retaining published content a
 it("serializes privacy, ordinary and professional profile writers against the same revision without losing another writer's changes", async () => {
   const actor = await fixture(),
     previous = await privacy.own(actor.id);
+  await sessionRepository.create({
+    id: `ses_${actor.id}`,
+    userId: actor.id,
+    token: `tok_${actor.id}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   const results = await Promise.allSettled([
     privacy.update({
       actorId: actor.id,
@@ -210,6 +218,7 @@ it("serializes privacy, ordinary and professional profile writers against the sa
     ),
     developerProfileRepository.update({
       actorId: actor.id,
+      currentToken: `tok_${actor.id}`,
       expectedUpdatedAt: previous.updatedAt,
       specialties: ["Lua"],
       githubUrl: "https://portfolio.test",

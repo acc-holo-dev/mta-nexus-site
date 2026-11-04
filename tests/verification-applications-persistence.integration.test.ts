@@ -41,6 +41,7 @@ async function profile(actorId: string, specialties = ["Lua"]) {
   const previous = await developerProfileRepository.own(actorId);
   return developerProfileRepository.update({
     actorId,
+    currentToken: `tok_${actorId}`,
     expectedUpdatedAt: previous.updatedAt,
     specialties,
     githubUrl: "https://example.test",

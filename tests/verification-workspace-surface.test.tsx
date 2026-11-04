@@ -167,7 +167,9 @@ it("shows errors without presenting a failed read as empty history or editable d
   expect(html).toContain("min-h-11");
   expect(html).toContain("overflow-x-clip");
   expect(html).not.toContain(copy.noApplications);
-  const editor = renderToStaticMarkup(<DeveloperProfileEditor initial={null} locale="en" />);
+  const editor = renderToStaticMarkup(
+    <DeveloperProfileEditor actorId="actor" initial={null} locale="en" />,
+  );
   expect(editor).toContain('role="alert"');
   expect(editor).toContain("disabled");
 });

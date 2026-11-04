@@ -1,22 +1,26 @@
 import { expect, it } from "vitest";
+import { formatNotification } from "../apps/web/src/lib/notification-copy";
+import { userPlatformError } from "../apps/web/src/lib/user-platform-copy";
 import {
   developerProfileUpdateSchema,
+  editableDeveloperSchema,
   parseVerificationQuery,
   verificationApplicationSchema,
   verificationDecisionSchema,
 } from "../apps/web/src/lib/verification-workspace-contract";
 import {
   verificationCopy,
+  verificationDecisionError,
   verificationError,
   verificationMutationError,
-  verificationDecisionError,
 } from "../apps/web/src/lib/verification-workspace-copy";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+
 const profile = {
   specialties: [" Lua ", "Lua", "TypeScript"],
   githubUrl: "https://github.com/example",
   discordTag: " developer ",
   expectedUpdatedAt: "2026-10-10T00:00:00.000Z",
+  expectedActorId: "usr_dev",
 };
 const application = {
   targetType: "developer",
@@ -29,6 +33,18 @@ it("normalizes professional fields and rejects forged trust/counter/identity upd
     specialties: ["Lua", "TypeScript"],
     discordTag: "developer",
   });
+  const { expectedActorId, expectedUpdatedAt, ...fields } = profile;
+  expect(developerProfileUpdateSchema.safeParse({ ...fields, expectedUpdatedAt }).success).toBe(
+    false,
+  );
+  expect(
+    editableDeveloperSchema.safeParse({
+      ...fields,
+      id: expectedActorId,
+      verifiedDeveloper: false,
+      updatedAt: expectedUpdatedAt,
+    }).success,
+  ).toBe(true);
   for (const extra of [
     { verifiedDeveloper: true },
     { reputationScore: 999 },
@@ -110,6 +126,10 @@ it.each(["ru", "en"] as const)(
     for (const value of Object.values(copy)) expect(value.trim().length).toBeGreaterThan(0);
     expect(copy.user).not.toBe(copy.developer);
     expect(verificationError(locale, "VERIFICATION_PROFILE_CHANGED")).toBe(copy.profileChanged);
+    expect(verificationMutationError(locale, "ACCOUNT_CHANGED")).toBe(
+      userPlatformError(locale, "ACCOUNT_CHANGED"),
+    );
+    expect(verificationMutationError(locale, "PROFILE_SAVE_RETRY")).toBe(copy.retryProfile);
     expect(verificationMutationError(locale, "INTERNAL_ERROR")).toBe(copy.mutationUnavailable);
     expect(verificationDecisionError(locale, "INTERNAL_ERROR")).toBe(copy.decisionUnavailable);
     expect(

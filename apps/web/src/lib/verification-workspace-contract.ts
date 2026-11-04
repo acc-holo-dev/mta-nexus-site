@@ -17,10 +17,11 @@ export const developerProfileUpdateSchema = z
       // biome-ignore lint/suspicious/noControlCharactersInRegex: Public contact text must reject literal control characters.
       .refine((value) => !/[\u0000-\u001f\u007f]/u.test(value)),
     expectedUpdatedAt: z.iso.datetime(),
+    expectedActorId: z.string().min(1).max(128),
   })
   .strict();
 export const editableDeveloperSchema = developerProfileUpdateSchema
-  .omit({ expectedUpdatedAt: true })
+  .omit({ expectedUpdatedAt: true, expectedActorId: true })
   .extend({
     id: z.string(),
     verifiedDeveloper: z.boolean(),

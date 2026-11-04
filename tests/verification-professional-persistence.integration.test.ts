@@ -43,6 +43,7 @@ async function save(
   const previous = await developerProfileRepository.own(actorId);
   return developerProfileRepository.update({
     actorId,
+    currentToken: `tok_${actorId}`,
     expectedUpdatedAt: previous.updatedAt,
     specialties: ["Lua"],
     githubUrl: "https://github.com/example",
@@ -108,6 +109,7 @@ it("serializes duplicate applications and concurrent shared-profile-version save
     ["contact-a", "contact-b"].map((discordTag) =>
       developerProfileRepository.update({
         actorId: id,
+        currentToken: `tok_${id}`,
         expectedUpdatedAt: initial.updatedAt,
         specialties: ["Lua"],
         githubUrl: initial.githubUrl,

@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, developerProfiles, userProfilePreferences, users } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 export const developerExperienceRevision = (
   profile: { specialties: string[]; githubUrl: string | null } | null,
 ) =>
@@ -53,6 +54,7 @@ class DeveloperProfileRepository {
   }
   async update(input: {
     actorId: string;
+    currentToken: string;
     expectedUpdatedAt: Date;
     specialties: string[];
     githubUrl: string;
@@ -77,6 +79,7 @@ class DeveloperProfileRepository {
         .where(eq(developerProfiles.userId, input.actorId))
         .for("update")
         .limit(1);
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       const fields = {
         specialties: input.specialties,
         githubUrl: input.githubUrl || null,
@@ -111,6 +114,7 @@ class DeveloperProfileRepository {
           experienceVerificationInvalidated: !!previous?.verifiedDeveloper && changed,
         },
       });
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       return {
         id: input.actorId,
         ...fields,

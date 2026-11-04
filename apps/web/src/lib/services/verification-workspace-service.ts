@@ -131,15 +131,29 @@ class VerificationWorkspaceService {
   async ownProfile(actor: User) {
     return editable(await developerProfileRepository.own(actor.id));
   }
-  async updateProfile(actor: User, input: z.infer<typeof developerProfileUpdateSchema>) {
-    const row = await developerProfileRepository.update({
-      ...input,
-      actorId: actor.id,
-      expectedUpdatedAt: new Date(input.expectedUpdatedAt),
-      profileId: generateId("dev"),
-      auditId: generateId("aud"),
-    });
-    return editable(row);
+  async updateProfile(
+    actor: User,
+    input: z.infer<typeof developerProfileUpdateSchema>,
+    currentToken: string,
+  ) {
+    if (input.expectedActorId !== actor.id)
+      throw new AppError("The signed-in account changed", 409, "ACCOUNT_CHANGED");
+    const { expectedActorId: _expectedActorId, ...fields } = input;
+    try {
+      const row = await developerProfileRepository.update({
+        ...fields,
+        actorId: actor.id,
+        currentToken,
+        expectedUpdatedAt: new Date(input.expectedUpdatedAt),
+        profileId: generateId("dev"),
+        auditId: generateId("aud"),
+      });
+      return editable(row);
+    } catch (error) {
+      if (isPostgresDeadlock(error))
+        throw new AppError("Please retry saving the profile", 409, "PROFILE_SAVE_RETRY");
+      throw error;
+    }
   }
   async publicProfile(id: string) {
     const profile = await developerProfileRepository.publicProfile(id);
