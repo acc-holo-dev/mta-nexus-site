@@ -157,15 +157,16 @@ it("rejects stale team rights and mismatched private DTOs without showing loaded
     "Private title",
   );
   state.discussionReports.mockResolvedValue({ ...reports, commentId: "foreign" });
-  expect(renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }))).not.toContain(
-    "Private title",
-  );
+  const mismatched = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
+  expect(mismatched).toContain('role="alert"');
+  expect(mismatched).toContain("overflow-x-clip");
+  expect(mismatched).not.toContain("Private title");
 });
 it("does not read private reports for ordinary users or history for anonymous sessions", async () => {
   state.session.mockResolvedValue({ id: "actor", role: "user" });
-  expect(renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }))).toContain(
-    'role="alert"',
-  );
+  const denied = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
+  expect(denied).toContain('role="alert"');
+  expect(denied).toContain("overflow-x-clip");
   expect(state.discussionReports).not.toHaveBeenCalled();
   state.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await History({ id: "org", contentId: "post" }))).toContain(
@@ -238,15 +239,15 @@ it("shows an honest recovery state when the session cannot be read", async () =>
   expect(html).not.toContain("/auth/login");
 });
 it("rejects duplicate filters before either private data source", async () => {
-  expect(
-    renderToStaticMarkup(
-      await Reports({
-        id: "post",
-        commentId: "comment",
-        searchParams: Promise.resolve({ q: ["a", "b"] }),
-      }),
-    ),
-  ).toContain('role="alert"');
+  const invalidReports = renderToStaticMarkup(
+    await Reports({
+      id: "post",
+      commentId: "comment",
+      searchParams: Promise.resolve({ q: ["a", "b"] }),
+    }),
+  );
+  expect(invalidReports).toContain('role="alert"');
+  expect(invalidReports).toContain("overflow-x-clip");
   expect(state.discussionReports).not.toHaveBeenCalled();
   expect(
     renderToStaticMarkup(

@@ -133,9 +133,10 @@ it("renders parent context and removal control only for an existing scoped comme
 });
 it("denies ordinary sessions before loading private discussion and shows login for anonymous visitors", async () => {
   state.session.mockResolvedValue({ id: "actor", role: "user" });
-  expect(renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }))).toContain(
-    "current administrator or moderator",
-  );
+  const denied = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
+  expect(denied).toContain("current administrator or moderator");
+  expect(denied).toContain('role="alert"');
+  expect(denied).toContain("overflow-x-clip");
   expect(state.discussion).not.toHaveBeenCalled();
   state.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }))).toContain(
@@ -144,12 +145,13 @@ it("denies ordinary sessions before loading private discussion and shows login f
 });
 it("shows localized service failures and rejects scope-mismatched DTOs", async () => {
   state.discussion.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
-  expect(renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }))).toContain(
-    'role="alert"',
-  );
+  const revoked = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
+  expect(revoked).toContain('role="alert"');
+  expect(revoked).toContain("overflow-x-clip");
   state.discussion.mockResolvedValue({ ...page, publication: { ...publication, id: "foreign" } });
   const html = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
   expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
   expect(html).not.toContain("Private publication");
 });
 it("shows an honest recovery state when discussion moderation fails to load", async () => {
