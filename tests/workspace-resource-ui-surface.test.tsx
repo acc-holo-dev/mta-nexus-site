@@ -144,6 +144,7 @@ describe("workspace and resource UI surface", () => {
           },
         }),
       );
+      expect(html).toContain(`<search aria-label="${copy.filters}"`);
       expect(html).toContain(copy.search);
       expect(html).toContain('data-ui="input"');
       expect(html).toContain('for="publisher-search"');

@@ -30,6 +30,7 @@ describe("staff support queue UI", () => {
         <SupportCenter staffMode />
       </LocaleProvider>,
     );
+    expect(staff).toContain(`<search aria-label="${copy.staffFilters}"`);
     expect(staff).toContain(copy.staffFilters);
     expect(staff).toContain(copy.filterStatus);
     expect(staff).toContain(copy.allStatuses);

@@ -277,44 +277,46 @@ export async function OrderCaseListPage({
       <p role="note" className="text-sm text-secondary">
         {copy.financeNote}
       </p>
-      <form action={base} className="flex flex-wrap items-end gap-3" aria-label={copy.filters}>
-        <label className="space-y-2">
-          <span className="block text-sm">{copy.status}</span>
-          <select
-            name="reviewStatus"
-            defaultValue={filters.reviewStatus ?? ""}
-            className="rounded-lg border border-base bg-surface p-2 text-sm"
-          >
-            <option value="">{copy.all}</option>
-            {ORDER_CASE_REVIEW_STATUSES.map((value) => (
-              <option key={value} value={value}>
-                {orderCaseStatusLabel(locale, value)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-2">
-          <span className="block text-sm">{copy.thread}</span>
-          <select
-            name="threadStatus"
-            defaultValue={filters.threadStatus ?? ""}
-            className="rounded-lg border border-base bg-surface p-2 text-sm"
-          >
-            <option value="">{copy.all}</option>
-            {(["open", "resolved", "closed"] as const).map((value) => (
-              <option key={value} value={value}>
-                {orderCaseThreadLabel(locale, value)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Button type="submit" variant="outline" size="sm">
-          {copy.apply}
-        </Button>
-        <Link href={base} className={navLinkClass}>
-          {copy.clear}
-        </Link>
-      </form>
+      <search aria-label={copy.filters}>
+        <form action={base} className="flex flex-wrap items-end gap-3">
+          <label className="space-y-2">
+            <span className="block text-sm">{copy.status}</span>
+            <select
+              name="reviewStatus"
+              defaultValue={filters.reviewStatus ?? ""}
+              className="min-h-11 rounded-lg border border-base bg-surface p-2 text-sm"
+            >
+              <option value="">{copy.all}</option>
+              {ORDER_CASE_REVIEW_STATUSES.map((value) => (
+                <option key={value} value={value}>
+                  {orderCaseStatusLabel(locale, value)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2">
+            <span className="block text-sm">{copy.thread}</span>
+            <select
+              name="threadStatus"
+              defaultValue={filters.threadStatus ?? ""}
+              className="min-h-11 rounded-lg border border-base bg-surface p-2 text-sm"
+            >
+              <option value="">{copy.all}</option>
+              {(["open", "resolved", "closed"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {orderCaseThreadLabel(locale, value)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button type="submit" variant="outline" size="touch">
+            {copy.apply}
+          </Button>
+          <Link href={base} className={navLinkClass}>
+            {copy.clear}
+          </Link>
+        </form>
+      </search>
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((item) => (
