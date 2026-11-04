@@ -1,15 +1,56 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatHistoryDate } from "../lib/commerce-history-format";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { getLicenseControlCopy, licenseActionLabel } from "../lib/license-control-i18n";
 import { licenseRuntimePage } from "../lib/license-runtime-query";
 import { authService } from "../lib/services/auth-service";
 import { licenseControlService } from "../lib/services/license-control-service";
 import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+function licenseHistoryAccessError(error: unknown): "missing" | "failed" {
+  if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
+  return "failed";
+}
+
+function LicenseHistoryLoadError({
+  locale,
+  backHref,
+  backLabel,
+  retryHref,
+}: {
+  locale: string;
+  backHref: string;
+  backLabel: string;
+  retryHref: string;
+}) {
+  const copy = getLicenseControlCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <div className={pageShellClass}>
+      <Link href={backHref} className={navLinkClass}>
+        {backLabel}
+      </Link>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </div>
+  );
+}
 
 export async function licenseHistoryMetadata(): Promise<Metadata> {
   return {
@@ -34,11 +75,10 @@ export async function LicenseHistoryPage({
     if (Array.isArray(value)) for (const item of value) params.append(key, item);
     else if (value !== undefined) params.append(key, value);
   }
+  const base = moderation ? "/admin/licenses" : "/workspace/licenses";
+  const historyBase = `${base}/${encodeURIComponent(licenseId)}/history`;
+  const returnPath = `${historyBase}${params.size ? `?${params}` : ""}`;
   if (!actor) {
-    const base = moderation
-      ? `/admin/licenses/${encodeURIComponent(licenseId)}/history`
-      : `/workspace/licenses/${encodeURIComponent(licenseId)}/history`;
-    const returnPath = `${base}${params.size ? `?${params}` : ""}`;
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let page = 1;
@@ -48,19 +88,23 @@ export async function LicenseHistoryPage({
     if (error instanceof AppError && error.statusCode === 400) notFound();
     throw error;
   }
-  const result = await licenseControlService
-    .history(actor, licenseId, page, moderation)
-    .catch((error: unknown) => {
-      if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-      throw error;
-    });
-  const base = moderation ? "/admin/licenses" : "/workspace/licenses";
+  let result: Awaited<ReturnType<typeof licenseControlService.history>> | null = null;
+  try {
+    result = await licenseControlService.history(actor, licenseId, page, moderation);
+  } catch (error) {
+    if (licenseHistoryAccessError(error) === "missing") notFound();
+    return (
+      <LicenseHistoryLoadError
+        locale={locale}
+        backHref={`${base}/${encodeURIComponent(licenseId)}`}
+        backLabel={copy.manage}
+        retryHref={returnPath}
+      />
+    );
+  }
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href={`${base}/${encodeURIComponent(licenseId)}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`${base}/${encodeURIComponent(licenseId)}`} className={navLinkClass}>
         {copy.manage}
       </Link>
       <h1 className="font-display text-primary">{copy.fullHistory}</h1>
@@ -97,10 +141,7 @@ export async function LicenseHistoryPage({
       {result.totalPages > 1 && (
         <nav aria-label={copy.fullHistory} className="flex gap-4 text-sm">
           {result.page > 1 && (
-            <Link
-              href={`?page=${result.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page - 1}`} className={navLinkClass}>
               {copy.previous}
             </Link>
           )}
@@ -108,10 +149,7 @@ export async function LicenseHistoryPage({
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link
-              href={`?page=${result.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page + 1}`} className={navLinkClass}>
               {copy.next}
             </Link>
           )}

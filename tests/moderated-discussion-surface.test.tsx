@@ -27,6 +27,9 @@ vi.mock("../apps/web/src/components/moderated-discussion-removal", () => ({
 }));
 
 import { ModeratedDiscussionScreen } from "../apps/web/src/components/moderated-discussion-screen";
+import { moderatedDiscussionCopy } from "../apps/web/src/lib/moderated-discussion-copy";
+import DiscussionLoading from "../apps/web/src/app/admin/community/[id]/discussion/loading";
+import DiscussionReportsLoading from "../apps/web/src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
 
 const time = "2026-10-11T00:00:00.000Z",
   publication = {
@@ -147,4 +150,32 @@ it("shows localized service failures and rejects scope-mismatched DTOs", async (
   const html = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
   expect(html).toContain('role="alert"');
   expect(html).not.toContain("Private publication");
+});
+it("shows an honest recovery state when discussion moderation fails to load", async () => {
+  state.discussion.mockRejectedValue(new Error("discussion unavailable"));
+  const copy = moderatedDiscussionCopy("en");
+  const html = renderToStaticMarkup(
+    await ModeratedDiscussionScreen({
+      id: "post",
+      searchParams: Promise.resolve({ q: "word", author: "writer" }),
+    }),
+  );
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/admin/community/post/discussion?q=word&amp;author=writer");
+  expect(html).not.toContain("Private publication");
+});
+it("shows an honest recovery state when the session cannot be read", async () => {
+  state.session.mockRejectedValue(new Error("session unavailable"));
+  const copy = moderatedDiscussionCopy("en");
+  const html = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).not.toContain("/auth/login");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  for (const Loading of [DiscussionLoading, DiscussionReportsLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0 max-w-4xl");
+    expect(html).toContain("overflow-x-clip");
+  }
 });

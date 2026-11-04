@@ -20,6 +20,8 @@ const en = {
   back: "Back to comment",
   link: "Open moderation context",
   unavailable: "Report context could not be loaded. Reload the comment or report.",
+  loadUnavailable:
+    "Comment reports are temporarily unavailable. This does not mean there are no reports.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Жалобы на этот комментарий",
@@ -41,5 +43,6 @@ const ru: Record<keyof typeof en, string> = {
   back: "К комментарию",
   link: "Открыть контекст модерации",
   unavailable: "Не удалось загрузить контекст жалобы. Загрузите комментарий или жалобу.",
+  loadUnavailable: "Жалобы на комментарий временно недоступны. Это не означает, что жалоб нет.",
 };
 export const discussionReportsCopy = (locale: Locale) => (locale === "ru" ? ru : en);

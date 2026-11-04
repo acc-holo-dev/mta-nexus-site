@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,14 +13,37 @@ import {
   parseDiscussionReportsQuery,
 } from "../lib/discussion-reports-contract";
 import { discussionReportsCopy } from "../lib/discussion-reports-copy";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { moderatedDiscussionHref } from "../lib/moderated-discussion-contract";
-import { moderatedDiscussionError } from "../lib/moderated-discussion-copy";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./platform-sign-in";
 import { DiscussionReportBatch } from "./discussion-report-batch";
+import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+function DiscussionReportsLoadError({ locale, retryHref }: { locale: string; retryHref: string }) {
+  const copy = discussionReportsCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
+      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </section>
+  );
+}
+
 export async function DiscussionReportsScreen({
   id,
   commentId,
@@ -33,30 +56,21 @@ export async function DiscussionReportsScreen({
   const locale = await getRequestLocale(),
     copy = discussionReportsCopy(locale),
     general = moderationCopy(locale),
-    labels = communityReportCopy(locale),
-    path = discussionReportsHref(id, commentId);
-  let failure = "";
+    labels = communityReportCopy(locale);
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries((await searchParams) ?? {}))
+    if (value !== undefined)
+      for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
+  const path = `/admin/community/${encodeURIComponent(id)}/discussion/${encodeURIComponent(commentId)}/reports${params.size ? `?${params}` : ""}`;
+  let sessionFailed = false;
   const actor = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
     .catch(() => {
-      failure = general.unavailable;
+      sessionFailed = true;
       return null;
     });
-  if (failure) {
-    return (
-      <section className="nexus-panel space-y-3 p-5">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-danger">
-          {failure}
-        </p>
-        <a
-          href={path}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {general.reload}
-        </a>
-      </section>
-    );
+  if (sessionFailed) {
+    return <DiscussionReportsLoadError locale={locale} retryHref={path} />;
   }
   if (!actor) {
     return <PlatformSignIn locale={locale} returnPath={path} />;
@@ -71,26 +85,31 @@ export async function DiscussionReportsScreen({
       </section>
     );
   }
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {}))
-    if (value !== undefined)
-      for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
   const filters = parseDiscussionReportsQuery(params);
+  let failure = "";
   if (!filters) failure = general.invalid;
+  let loadFailed = false;
   const raw = filters
     ? await communityModerationService
         .discussionReports(actor, id, commentId, filters)
         .catch((error: unknown) => {
           if (error instanceof AppError && error.statusCode === 404) notFound();
-          failure = moderatedDiscussionError(
-            locale,
-            error instanceof AppError ? error.code : "INTERNAL_ERROR",
-          );
+          if (
+            error instanceof AppError &&
+            (error.statusCode === 403 || error.code === "FORBIDDEN")
+          ) {
+            failure = general.denied;
+            return null;
+          }
+          loadFailed = true;
           return null;
         })
     : null;
   const parsed = discussionReportsPageSchema.safeParse(raw);
-  if (!parsed.success || parsed.data.publication.id !== id || parsed.data.commentId !== commentId)
+  if (!parsed.success || parsed.data.publication.id !== id || parsed.data.commentId !== commentId) {
+    if (loadFailed) {
+      return <DiscussionReportsLoadError locale={locale} retryHref={path} />;
+    }
     return (
       <section className="nexus-panel space-y-3 p-5">
         <p role="alert" className="text-danger">
@@ -104,9 +123,10 @@ export async function DiscussionReportsScreen({
         </a>
       </section>
     );
+  }
   const data = parsed.data;
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className={pageShellClass}>
       <header className="space-y-3">
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>

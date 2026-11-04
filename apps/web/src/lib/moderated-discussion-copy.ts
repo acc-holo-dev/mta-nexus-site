@@ -34,6 +34,8 @@ const en = {
   changed: "The comment changed. Reload and review the current text before removing it.",
   unavailable:
     "The comment or publication is unavailable. Return to the discussion or reload current data.",
+  loadUnavailable:
+    "Discussion moderation is temporarily unavailable. This does not mean there are no comments.",
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Модерация обсуждения",
@@ -68,6 +70,8 @@ const ru: Record<keyof typeof en, string> = {
   changed: "Комментарий изменился. Загрузите и проверьте актуальный текст перед удалением.",
   unavailable:
     "Комментарий или публикация недоступны. Вернитесь к обсуждению или загрузите актуальные данные.",
+  loadUnavailable:
+    "Модерация обсуждения временно недоступна. Это не означает, что комментариев нет.",
 };
 export const moderatedDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function moderatedDiscussionError(locale: Locale, code: unknown) {
