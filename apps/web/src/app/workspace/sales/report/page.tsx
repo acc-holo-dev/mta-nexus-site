@@ -1,20 +1,27 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { SellerSalesReportView } from "../../../../components/seller-sales-report";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
 import { sellerSalesPageQuery } from "../../../../lib/seller-sales-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sales report | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function SellerSalesPage({
   searchParams,
 }: {
@@ -22,44 +29,72 @@ export default async function SellerSalesPage({
 }) {
   const [store, locale, params] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
     c = sellerSalesCopy(locale);
+  const dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
+  const pageParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === "string") pageParams.set(key, value);
+  }
+  const returnPath = `/workspace/sales/report${pageParams.size ? `?${pageParams}` : ""}`;
   if (!actor) {
-    const pageParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) {
-      if (typeof value === "string") pageParams.set(key, value);
-    }
-    return (
-      <PlatformSignIn
-        locale={locale}
-        returnPath={`/workspace/sales/report${pageParams.size ? `?${pageParams}` : ""}`}
-      />
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   try {
-    // Empty form fields are omitted only on the SSR form surface; private APIs stay strict.
     const normalized = { ...params };
     if (normalized.currency === "all") delete normalized.currency;
     if (normalized.productId === "") delete normalized.productId;
     const { query, scopePage } = sellerSalesPageQuery(normalized);
     const [report, scopes] = await Promise.all([
-      sellerSalesService.report(actor, query),
-      sellerSalesService.scopes(actor, scopePage),
+      sellerSalesService.report(actor, query).catch((error) => {
+        if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
+        return null;
+      }),
+      sellerSalesService.scopes(actor, scopePage).catch(() => null),
     ]);
+    if (!report || !scopes) {
+      return (
+        <div className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8">
+          <Link href="/workspace/sales" className={linkClass}>
+            {c.back}
+          </Link>
+          <ErrorState
+            title={c.loadUnavailable}
+            action={
+              <Link href={returnPath} className={linkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
     return <SellerSalesReportView report={report} query={query} scopes={scopes} locale={locale} />;
   } catch (error) {
+    if (error instanceof Error && error.message === "NEXT_NOT_FOUND") throw error;
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className="space-y-4 py-8">
+        <section className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8">
           <p role="alert">{c.invalid}</p>
-          <Link
-            href="/workspace/sales/report"
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/sales/report" className={linkClass}>
             {c.reset}
           </Link>
         </section>
       );
-    throw error;
+    return (
+      <div className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8">
+        <Link href="/workspace/sales" className={linkClass}>
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link href={returnPath} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
   }
 }

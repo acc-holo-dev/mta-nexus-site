@@ -1,10 +1,11 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../lib/resource-cart-receipts-i18n";
 import {
@@ -14,6 +15,7 @@ import {
 } from "../../../../lib/resource-cart-receipts-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../lib/services/resource-cart-receipts-service";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -21,6 +23,11 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function ResourceCartReceiptsPage({
   searchParams,
 }: {
@@ -28,6 +35,7 @@ export default async function ResourceCartReceiptsPage({
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
     copy = resourceCartReceiptsCopy(locale);
+  const dictionary = getDictionary(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user) {
     const pageParams = new URLSearchParams();
@@ -48,39 +56,50 @@ export default async function ResourceCartReceiptsPage({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className="space-y-4 py-8">
+      <section className={`${pageShellClass} space-y-4`}>
         <p role="alert">{copy.invalid}</p>
-        <Link
-          href="/workspace/acquisitions/receipts"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/acquisitions/receipts" className={linkClass}>
           {copy.title}
         </Link>
       </section>
     );
   }
-  const result = await resourceCartReceiptsService.page(user, query);
+  const returnHref = resourceCartReceiptsUrl({ ...query, page: query.page ?? 1 });
+  const result = await resourceCartReceiptsService.page(user, query).catch(() => null);
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <nav className="flex flex-wrap gap-4 text-sm">
+          <Link href="/workspace/cart" className={linkClass}>
+            {copy.cart}
+          </Link>
+          <Link href="/workspace/acquisitions" className={linkClass}>
+            {copy.history}
+          </Link>
+        </nav>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnHref} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const current = { ...query, page: result.page };
   const receiptsFiltered = query.days !== "all" || query.evidence !== "all";
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className={pageShellClass}>
       <nav className="flex flex-wrap gap-4 text-sm">
-        <Link
-          href="/workspace/cart"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/cart" className={linkClass}>
           {copy.cart}
         </Link>
-        <Link
-          href="/workspace/acquisitions"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/acquisitions" className={linkClass}>
           {copy.history}
         </Link>
-        <Link
-          href="/workspace/library"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/library" className={linkClass}>
           {copy.library}
         </Link>
       </nav>
@@ -124,27 +143,22 @@ export default async function ResourceCartReceiptsPage({
         <Button type="submit" variant="outline" className="text-sm">
           {copy.apply}
         </Button>
-        <Link
-          href="/workspace/acquisitions/receipts"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/acquisitions/receipts" className={linkClass}>
           {copy.clear}
         </Link>
       </form>
       {!result.items.length ? (
-        <div className="nexus-panel space-y-3 p-6">
-          <p className="text-secondary">
-            {result.total === 0 && !receiptsFiltered ? copy.emptyNever : copy.emptyFiltered}
-          </p>
-          {!result.items.length && (receiptsFiltered || result.total > 0) ? (
-            <Link
-              href="/workspace/acquisitions/receipts"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.clear}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={result.total === 0 && !receiptsFiltered ? copy.emptyNever : copy.emptyFiltered}
+          description={copy.note}
+          action={
+            result.total === 0 && !receiptsFiltered ? undefined : (
+              <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+                {copy.clear}
+              </Link>
+            )
+          }
+        />
       ) : (
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.items.map((item) => (
@@ -152,7 +166,7 @@ export default async function ResourceCartReceiptsPage({
               <h2 className="font-semibold">
                 <Link
                   href={resourceCartReceiptUrl(item.requestId)}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkClass}
                   prefetch={false}
                 >
                   {copy.receipt}
@@ -176,7 +190,7 @@ export default async function ResourceCartReceiptsPage({
         {result.page > 1 ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page - 1 })}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkClass}
           >
             {copy.previous}
           </Link>
@@ -187,14 +201,14 @@ export default async function ResourceCartReceiptsPage({
         {result.page < result.totalPages ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page + 1 })}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkClass}
           >
             {copy.next}
           </Link>
         ) : null}
         <a
           href={resourceCartReceiptsUrl(current, true).replace("receipts?", "receipts/export?")}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkClass}
         >
           {copy.export}
         </a>

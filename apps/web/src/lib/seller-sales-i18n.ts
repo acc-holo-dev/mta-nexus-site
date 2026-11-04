@@ -1,3 +1,5 @@
+import type { Locale } from "./i18n";
+
 const copies = {
   en: {
     attribution: "Seller attribution",
@@ -7,6 +9,8 @@ const copies = {
       "This view uses the seller and resource title recorded when each order line was inserted. Current ownership does not move these lines between sellers. Earlier lines without snapshots are excluded. This is not provider settlement evidence.",
     title: "Sales report",
     loading: "Loading sales report…",
+    detailLoading: "Loading sale line…",
+    loadUnavailable: "Sales report is temporarily unavailable. Recorded sales were not loaded.",
     detail: "Sale line",
     back: "Back to sales",
     personal: "Personal portfolio",
@@ -72,6 +76,8 @@ const copies = {
       "Этот режим использует продавца и название при записи строки заказа. Изменение текущего владельца не переносит строки между продавцами. Старые строки без снимков исключены. Это не подтверждение расчётов внешнего провайдера.",
     title: "Отчёт о продажах",
     loading: "Загрузка отчёта о продажах…",
+    detailLoading: "Загрузка строки продажи…",
+    loadUnavailable: "Отчёт о продажах временно недоступен. Записи продаж не загружены.",
     detail: "Строка продажи",
     back: "К продажам",
     personal: "Личные ресурсы",
@@ -130,11 +136,11 @@ const copies = {
     },
   },
 };
-export function sellerSalesCopy(locale: string) {
-  return copies[locale === "ru" ? "ru" : "en"];
+export function sellerSalesCopy(locale: Locale) {
+  return copies[locale];
 }
 
-export function sellerSalesTime(value: Date, locale: "en" | "ru") {
+export function sellerSalesTime(value: Date, locale: Locale) {
   return new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-GB", {
     dateStyle: "medium",
     timeStyle: "medium",

@@ -1,20 +1,27 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { formatFinancialMinor } from "../../../../../lib/financial-i18n";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { sellerSalesCopy, sellerSalesTime } from "../../../../../lib/seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../../../../../lib/seller-sales-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../../lib/services/seller-sales-service";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sale line | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function SellerSalePage({
   params,
   searchParams,
@@ -29,18 +36,15 @@ export default async function SellerSalePage({
       searchParams,
     ]),
     c = sellerSalesCopy(locale);
+  const dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
+  const pageParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (typeof value === "string") pageParams.set(key, value);
+  }
+  const returnPath = `/workspace/sales/report/${encodeURIComponent(id)}${pageParams.size ? `?${pageParams}` : ""}`;
   if (!actor) {
-    const pageParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(query)) {
-      if (typeof value === "string") pageParams.set(key, value);
-    }
-    return (
-      <PlatformSignIn
-        locale={locale}
-        returnPath={`/workspace/sales/report/${encodeURIComponent(id)}${pageParams.size ? `?${pageParams}` : ""}`}
-      />
-    );
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   const values = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
@@ -59,11 +63,38 @@ export default async function SellerSalePage({
     : sellerSalesService.detail(actor, id, organizationId)
   ).catch((error) => {
     if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-    throw error;
+    return null;
   });
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8">
+        <Link
+          href={sellerSalesUrl({
+            page: 1,
+            days: "all",
+            status: "all",
+            evidence: "all",
+            organizationId,
+            attribution,
+          })}
+          className={linkClass}
+        >
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link href={returnPath} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const { sale, scope } = result;
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8">
       <Link
         href={sellerSalesUrl({
           page: 1,
@@ -73,7 +104,7 @@ export default async function SellerSalePage({
           organizationId,
           attribution,
         })}
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkClass}
       >
         {c.back}
       </Link>
@@ -105,7 +136,7 @@ export default async function SellerSalePage({
       {sale.inCurrentPortfolio !== false ? (
         <Link
           href={`/workspace/resources/${encodeURIComponent(sale.productId)}`}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkClass}
         >
           {c.manage}
         </Link>

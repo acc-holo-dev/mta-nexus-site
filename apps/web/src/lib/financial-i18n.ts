@@ -1,10 +1,13 @@
 import { getCommerceHistoryCopy } from "./commerce-history-i18n";
 import { getCommercialCopy } from "./commercial-i18n";
+import type { Locale } from "./i18n";
 
 const copy = {
   en: {
     title: "Financial statements",
     loading: "Loading financial statements…",
+    statementsLoadUnavailable:
+      "Financial statements are temporarily unavailable. Database records were not loaded.",
     personal: "Personal account",
     organization: "Organization account",
     organizations: "Organization statements",
@@ -52,6 +55,7 @@ const copy = {
   ru: {
     title: "Финансовые выписки",
     loading: "Загрузка финансовых выписок…",
+    statementsLoadUnavailable: "Финансовые выписки временно недоступны. Записи БД не загружены.",
     personal: "Личный счёт",
     organization: "Счёт организации",
     organizations: "Выписки организаций",
@@ -105,16 +109,16 @@ export const financialFlags = [
   "unbalancedLedger",
   "missingLedger",
 ] as const;
-export function getFinancialCopy(locale: string) {
+export function getFinancialCopy(locale: Locale) {
   return locale === "ru" ? copy.ru : copy.en;
 }
-export function financialOrderLabel(locale: string, status: string) {
+export function financialOrderLabel(locale: Locale, status: string) {
   const labels = getCommerceHistoryCopy(locale === "ru" ? "ru" : "en").orderStatuses;
   return Object.hasOwn(labels, status)
     ? labels[status as keyof typeof labels]
     : getCommercialCopy(locale).unknown;
 }
-export function financialPaymentLabel(locale: string, status: string) {
+export function financialPaymentLabel(locale: Locale, status: string) {
   const labels = getCommercialCopy(locale);
   if (status === "cancelled") return labels.cancelledPayment;
   const known = (
@@ -130,7 +134,7 @@ export function financialPaymentLabel(locale: string, status: string) {
   ).find((value) => value === status);
   return known ? labels[known] : labels.unknown;
 }
-export function financialReferenceLabel(locale: string, reference: string) {
+export function financialReferenceLabel(locale: Locale, reference: string) {
   const labels =
     locale === "ru"
       ? { order: "Заказ", fee: "Комиссия", payout: "Выплата", refund: "Возврат" }
@@ -139,7 +143,7 @@ export function financialReferenceLabel(locale: string, reference: string) {
     ? labels[reference as keyof typeof labels]
     : getCommercialCopy(locale).unknown;
 }
-export function formatFinancialMinor(value: string | number, currency: string, locale: string) {
+export function formatFinancialMinor(value: string | number, currency: string, locale: Locale) {
   if (!["USD", "EUR", "RUB"].includes(currency)) return "—";
   const amount = BigInt(value),
     absolute = amount < 0n ? -amount : amount;

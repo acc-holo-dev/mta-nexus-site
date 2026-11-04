@@ -1,8 +1,9 @@
 import type { SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
 import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { formatFinancialMinor } from "../lib/financial-i18n";
+import type { Locale } from "../lib/i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../lib/seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../lib/seller-sales-query";
 
@@ -16,9 +17,11 @@ export function SellerSalesReportView({
   report: SellerSalesReport;
   query: SellerSalesQuery;
   scopes: Scopes;
-  locale: "en" | "ru";
+  locale: Locale;
 }) {
   const c = sellerSalesCopy(locale);
+  const linkClass =
+    "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   const resetHref = sellerSalesUrl({
     page: 1,
     days: "all",
@@ -38,7 +41,7 @@ export function SellerSalesReportView({
     "/api/sales/export",
   );
   return (
-    <div className="mx-auto max-w-6xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8">
       <Link
         href="/workspace/sales"
         className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -233,17 +236,17 @@ export function SellerSalesReportView({
           ))}
         </ol>
       ) : (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-8">
-          <p className="text-secondary">{c.empty}</p>
-          {filtered ? (
-            <Link
-              href={resetHref}
-              className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {c.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={c.empty}
+          description={query.attribution === "recorded" ? c.recordedNotice : c.notice}
+          action={
+            filtered ? (
+              <Link href={resetHref} className={linkClass}>
+                {c.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {report.totalPages > 1 ? (
         <nav aria-label={c.page} className="flex gap-4 text-sm">

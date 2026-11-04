@@ -4,6 +4,8 @@ const copy = {
   en: {
     title: "Free acquisition receipts",
     loading: "Loading acquisition receipts…",
+    loadUnavailable:
+      "Acquisition receipts are temporarily unavailable. Saved receipts were not loaded.",
     receipts: "Receipts",
     apply: "Apply filters",
     clear: "Clear filters",
@@ -63,6 +65,7 @@ const copy = {
   ru: {
     title: "Квитанции бесплатного получения",
     loading: "Загрузка квитанций получения…",
+    loadUnavailable: "Квитанции получения временно недоступны. Сохранённые квитанции не загружены.",
     receipts: "Квитанции",
     apply: "Применить фильтры",
     clear: "Сбросить фильтры",

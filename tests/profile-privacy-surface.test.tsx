@@ -34,6 +34,7 @@ import UserActivity, {
   generateMetadata as activityMetadata,
 } from "../apps/web/src/app/users/[username]/activity/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
 
 const saved = {
   id: "actor",
@@ -114,4 +115,15 @@ it("returns not found for hidden personal activity without requesting publicatio
   );
   expect(state.page).not.toHaveBeenCalled();
   expect(await activityMetadata()).toMatchObject({ robots: { index: false, follow: false } });
+});
+it("shows honest recovery when public activity fails to resolve a profile", async () => {
+  state.resolve.mockRejectedValueOnce(new Error("profile unavailable"));
+  const html = renderToStaticMarkup(
+    await UserActivity({ params: Promise.resolve({ username: "member" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(publicationCopy("en").loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/users/member/activity"');
+  expect(state.page).not.toHaveBeenCalled();
 });

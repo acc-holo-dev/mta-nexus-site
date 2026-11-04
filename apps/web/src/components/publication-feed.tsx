@@ -34,7 +34,13 @@ export function PublicationFeed({
   const copy = publicationCopy(locale),
     types = getUserPlatformCopy(locale);
   const page = initial,
-    error = initial ? "" : errorCode ? publicationError(locale, errorCode) : copy.error;
+    error = initial
+      ? ""
+      : errorCode
+        ? errorCode === "INTERNAL_ERROR"
+          ? copy.loadUnavailable
+          : publicationError(locale, errorCode)
+        : copy.error;
   const filtered = Boolean(
     filters.query || filters.type || filters.source || filters.author || filters.tag,
   );
