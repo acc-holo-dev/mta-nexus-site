@@ -31,6 +31,7 @@ vi.mock("../apps/web/src/lib/services/public-verification-history-service", () =
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 
+import UserTrustHistoryLoading from "../apps/web/src/app/users/[username]/trust/history/loading";
 import HistoryPage, {
   generateMetadata as historyMetadata,
 } from "../apps/web/src/app/users/[username]/trust/history/page";
@@ -240,8 +241,12 @@ it("does not interpret empty history or failed reads as verification decisions",
     },
     empty = renderToStaticMarkup(await HistoryPage(profile));
   expect(empty).toContain(copy.empty);
+  expect(empty).toContain(copy.emptyHint);
   expect(empty).not.toContain(copy.emptyFiltered);
   expect(empty).toContain(copy.verified);
+  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toContain("min-w-0");
+  expect(empty).toContain("min-h-11");
   mocks.approvals.mockResolvedValueOnce({
     subject,
     items: [],
@@ -252,12 +257,18 @@ it("does not interpret empty history or failed reads as verification decisions",
     await HistoryPage({ ...profile, searchParams: Promise.resolve({ type: "developer" }) }),
   );
   expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.emptyFilteredHint);
   expect(filtered).toContain(copy.reset);
   expect(filtered).toContain("/users/writer/trust/history");
   mocks.approvals.mockRejectedValueOnce(new Error("secret proof"));
   const failed = renderToStaticMarkup(await HistoryPage(profile));
   expect(failed).toContain(approvalCopy("en").unavailable);
+  expect(failed).toContain('role="alert"');
+  expect(failed).toContain(getDictionary("en").errors.retry);
+  expect(failed).toContain("overflow-x-clip");
+  expect(failed).toContain("min-h-11");
   expect(failed).not.toContain(approvalCopy("en").empty);
+  expect(failed).not.toContain(approvalCopy("en").emptyHint);
   expect(failed).not.toContain("secret proof");
 });
 it("rejects public proof filters and returns missing profile 404", async () => {
@@ -265,7 +276,17 @@ it("rejects public proof filters and returns missing profile 404", async () => {
     await HistoryPage({ ...profile, searchParams: Promise.resolve({ includeProof: "true" }) }),
   );
   expect(html).toContain(approvalCopy("en").invalid);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/users/writer/trust/history"');
   expect(mocks.approvals).not.toHaveBeenCalled();
   mocks.approvals.mockRejectedValue(new AppError("missing", 404, "NOT_FOUND"));
   await expect(HistoryPage(profile)).rejects.toThrow("NOT_FOUND");
+});
+it("clips user trust history loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await UserTrustHistoryLoading());
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(approvalCopy("en").loading);
 });

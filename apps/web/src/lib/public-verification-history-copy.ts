@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { trustError } from "./public-user-trust-copy";
+
 const en = {
   title: "Recorded verification approvals",
   description: "Dated approval records retained by NEXUS. Current badges are shown separately.",
@@ -14,7 +15,10 @@ const en = {
   older: "Older records",
   loading: "Loading approval records…",
   empty: "No dated approval records are published for this profile yet.",
+  emptyHint:
+    "An empty approval history is a confirmed result for this profile, not a verification outage.",
   emptyFiltered: "No dated approvals are recorded for this page and filter.",
+  emptyFilteredHint: "Clear the filter to see every retained approval for this profile.",
   approved: "Approval recorded",
   scope:
     "These are retained approval records, not a full verification lifecycle. Pending and rejected applications, evidence and staff notes are private. An old approval does not establish current verification; a missing record does not imply rejection or misconduct.",
@@ -40,7 +44,10 @@ const ru: Record<keyof typeof en, string> = {
   older: "Старые записи",
   loading: "Загрузка записей одобрений…",
   empty: "Для этого профиля пока нет опубликованных записей одобрений.",
+  emptyHint:
+    "Пустая история одобрений — подтверждённый результат для этого профиля, а не сбой верификации.",
   emptyFiltered: "На этой странице нет записанных одобрений по выбранному фильтру.",
+  emptyFilteredHint: "Сбросьте фильтр, чтобы увидеть все сохранённые одобрения этого профиля.",
   approved: "Одобрение записано",
   scope:
     "Это сохранённые записи одобрений, а не полный жизненный цикл верификации. Ожидающие и отклонённые заявки, доказательства и внутренние заметки приватны. Прошлое одобрение не подтверждает текущий статус; отсутствие записи не означает отказ или нарушение.",
