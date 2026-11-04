@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { ResourceReviewReportScreen } from "../../../../../components/resource-review-report-screen";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceReviewCopy } from "../../../../../lib/resource-review-i18n";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -11,5 +14,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  return ResourceReviewReportScreen({ staff: true, id: (await params).id });
+  return (
+    <div className={pageShellClass}>
+      {await ResourceReviewReportScreen({ staff: true, id: (await params).id })}
+    </div>
+  );
 }

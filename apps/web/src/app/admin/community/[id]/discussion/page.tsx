@@ -1,6 +1,9 @@
 import { ModeratedDiscussionScreen } from "../../../../../components/moderated-discussion-screen";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { moderatedDiscussionCopy } from "../../../../../lib/moderated-discussion-copy";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -16,5 +19,9 @@ export default async function Page({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const scope = await params;
-  return <ModeratedDiscussionScreen id={scope.id} searchParams={searchParams} />;
+  return (
+    <div className={pageShellClass}>
+      <ModeratedDiscussionScreen id={scope.id} searchParams={searchParams} />
+    </div>
+  );
 }

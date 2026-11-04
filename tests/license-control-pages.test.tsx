@@ -45,6 +45,7 @@ vi.mock("../apps/web/src/components/license-control-panel", () => ({
 }));
 
 import AdminLicenseHistoryLoading from "../apps/web/src/app/admin/licenses/[id]/history/loading";
+import AdminLicenseDetailLoading from "../apps/web/src/app/admin/licenses/[id]/loading";
 import ModeratorPage from "../apps/web/src/app/admin/licenses/[id]/page";
 import LicensesLoading from "../apps/web/src/app/admin/licenses/loading";
 import MaintenanceLoading from "../apps/web/src/app/admin/licenses/maintenance/loading";
@@ -280,7 +281,7 @@ it("renders empty maintenance inventory without inventing due licenses", async (
   expect(html).toContain("overflow-x-clip");
 });
 it("clips honest loading shells on narrow layouts", async () => {
-  for (const Loading of [LicensesLoading, MaintenanceLoading]) {
+  for (const Loading of [LicensesLoading, MaintenanceLoading, AdminLicenseDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
     expect(html).toContain("overflow-x-clip");
@@ -307,6 +308,28 @@ it("shows an honest recovery state when owner license detail fails", async () =>
   expect(html).toContain('href="/workspace/licenses/lic_a"');
   expect(html).not.toContain(license.key);
   expect(state.servers).not.toHaveBeenCalled();
+});
+it("shows an honest recovery state when moderator license detail fails", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.moderationDetail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getLicenseControlCopy("en");
+  const html = renderToStaticMarkup(await ModeratorPage(params));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/admin/licenses/lic_a"');
+  expect(html).not.toContain(license.key);
+});
+it("clips the moderator license detail shell and raises history navigation to touch height", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  const html = renderToStaticMarkup(await ModeratorPage(params));
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/admin/licenses/lic_a/history"');
+  expect(html).not.toContain(license.key);
 });
 it("renders EmptyState when owner license detail has no recorded actions", async () => {
   state.detail.mockResolvedValue({ ...license, history: [] });
