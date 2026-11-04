@@ -179,6 +179,28 @@ it("does not read private reports for ordinary users or history for anonymous se
   expect(failed).not.toContain(organizationPublicationHistoryCopy("en").title);
   expect(state.history).not.toHaveBeenCalled();
 });
+it("shows an honest recovery state when comment reports fail to load", async () => {
+  state.discussionReports.mockRejectedValue(new Error("reports unavailable"));
+  const copy = discussionReportsCopy("en");
+  const html = renderToStaticMarkup(
+    await Reports({
+      id: "post",
+      commentId: "comment",
+      searchParams: Promise.resolve({ q: "word", view: "history" }),
+    }),
+  );
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("q=word&amp;view=history");
+  expect(html).not.toContain("Private title");
+});
+it("shows an honest recovery state when the session cannot be read", async () => {
+  state.session.mockRejectedValue(new Error("session unavailable"));
+  const copy = discussionReportsCopy("en");
+  const html = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).not.toContain("/auth/login");
+});
 it("rejects duplicate filters before either private data source", async () => {
   expect(
     renderToStaticMarkup(

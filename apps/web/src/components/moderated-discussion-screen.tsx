@@ -1,6 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +8,7 @@ import { parseModerationDetailQuery } from "../lib/community-moderation-contract
 import { moderationCopy } from "../lib/community-moderation-copy";
 import { discussionReportsHref } from "../lib/discussion-reports-contract";
 import { discussionReportsCopy } from "../lib/discussion-reports-copy";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
   moderatedDiscussionDetailSchema,
@@ -15,15 +16,41 @@ import {
   moderatedDiscussionPageSchema,
   parseModeratedDiscussionQuery,
 } from "../lib/moderated-discussion-contract";
-import {
-  moderatedDiscussionCopy,
-  moderatedDiscussionError,
-} from "../lib/moderated-discussion-copy";
+import { moderatedDiscussionCopy } from "../lib/moderated-discussion-copy";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { PlatformSignIn } from "./platform-sign-in";
 import { ModeratedDiscussionRemoval } from "./moderated-discussion-removal";
+import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+function ModeratedDiscussionLoadError({
+  locale,
+  retryHref,
+}: {
+  locale: string;
+  retryHref: string;
+}) {
+  const copy = moderatedDiscussionCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
+      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </section>
+  );
+}
+
 export async function ModeratedDiscussionScreen({
   id,
   commentId,
@@ -35,30 +62,21 @@ export async function ModeratedDiscussionScreen({
 }) {
   const locale = await getRequestLocale(),
     copy = moderatedDiscussionCopy(locale),
-    general = moderationCopy(locale),
-    href = moderatedDiscussionHref(id, undefined, undefined, commentId);
-  let unavailable = false;
+    general = moderationCopy(locale);
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries((await searchParams) ?? {}))
+    if (value !== undefined)
+      for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
+  const href = `/admin/community/${encodeURIComponent(id)}/discussion${commentId ? `/${encodeURIComponent(commentId)}` : ""}${params.size ? `?${params}` : ""}`;
+  let sessionFailed = false;
   const actor = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
     .catch(() => {
-      unavailable = true;
+      sessionFailed = true;
       return null;
     });
-  if (unavailable) {
-    return (
-      <section className="nexus-panel space-y-3 p-5">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-danger">
-          {general.unavailable}
-        </p>
-        <a
-          href={href}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {general.reload}
-        </a>
-      </section>
-    );
+  if (sessionFailed) {
+    return <ModeratedDiscussionLoadError locale={locale} retryHref={href} />;
   }
   if (!actor) {
     return <PlatformSignIn locale={locale} returnPath={href} />;
@@ -73,14 +91,11 @@ export async function ModeratedDiscussionScreen({
       </section>
     );
   }
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {}))
-    if (value !== undefined)
-      for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
   const filters = commentId
     ? parseModerationDetailQuery(params)
     : parseModeratedDiscussionQuery(params);
   let failure = filters ? "" : general.invalid;
+  let loadFailed = false;
   const raw = filters
     ? await (commentId
         ? communityModerationService.discussionDetail(actor, id, commentId, filters.cursor)
@@ -91,10 +106,11 @@ export async function ModeratedDiscussionScreen({
           )
       ).catch((error: unknown) => {
         if (error instanceof AppError && error.statusCode === 404) notFound();
-        failure = moderatedDiscussionError(
-          locale,
-          error instanceof AppError ? error.code : "INTERNAL_ERROR",
-        );
+        if (error instanceof AppError && (error.statusCode === 403 || error.code === "FORBIDDEN")) {
+          failure = general.denied;
+          return null;
+        }
+        loadFailed = true;
         return null;
       })
     : null;
@@ -105,7 +121,10 @@ export async function ModeratedDiscussionScreen({
     !parsed.success ||
     parsed.data.publication.id !== id ||
     ("comment" in parsed.data && parsed.data.comment && parsed.data.comment.id !== commentId)
-  )
+  ) {
+    if (loadFailed) {
+      return <ModeratedDiscussionLoadError locale={locale} retryHref={href} />;
+    }
     return (
       <section className="nexus-panel space-y-3 p-5">
         <p role="alert" className="text-danger">
@@ -117,14 +136,12 @@ export async function ModeratedDiscussionScreen({
         >
           {general.reload}
         </a>
-        <Link
-          href={moderatedDiscussionHref(id)}
-          className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={moderatedDiscussionHref(id)} className={navLinkClass}>
           {copy.back}
         </Link>
       </section>
     );
+  }
   const data = parsed.data,
     publication = data.publication;
   const date = (value: string) => (
@@ -147,7 +164,7 @@ export async function ModeratedDiscussionScreen({
       <span>{copy.unknown}</span>
     );
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className={pageShellClass}>
       <header className="space-y-3">
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>

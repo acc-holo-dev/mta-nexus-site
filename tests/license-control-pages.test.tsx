@@ -50,6 +50,8 @@ import MaintenanceLoading from "../apps/web/src/app/admin/licenses/maintenance/l
 import MaintenancePage from "../apps/web/src/app/admin/licenses/maintenance/page";
 import QueuePage from "../apps/web/src/app/admin/licenses/page";
 import OwnerPage, { metadata } from "../apps/web/src/app/workspace/licenses/[id]/page";
+import AdminLicenseHistoryLoading from "../apps/web/src/app/admin/licenses/[id]/history/loading";
+import WorkspaceLicenseHistoryLoading from "../apps/web/src/app/workspace/licenses/[id]/history/loading";
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
@@ -200,6 +202,18 @@ it("requires authentication before history and rejects ambiguous page filters", 
   ).rejects.toThrow("NOT_FOUND");
   expect(state.history).not.toHaveBeenCalled();
 });
+it("shows an honest recovery state when full license history fails", async () => {
+  state.history.mockRejectedValue(new Error("history unavailable"));
+  const copy = getLicenseControlCopy("en");
+  const html = renderToStaticMarkup(
+    await LicenseHistoryPage({ licenseId: "lic_a", query: { page: "2" } }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/workspace/licenses/lic_a/history?page=2");
+  expect(html).not.toContain("&lt;script&gt;product&lt;/script&gt;");
+});
 it("passes only observed recovery capability and endpoint revision to the client", async () => {
   state.detail.mockResolvedValue({
     ...license,
@@ -267,6 +281,11 @@ it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [LicensesLoading, MaintenanceLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
+  }
+  for (const Loading of [WorkspaceLicenseHistoryLoading, AdminLicenseHistoryLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0 max-w-4xl");
     expect(html).toContain("overflow-x-clip");
   }
 });
