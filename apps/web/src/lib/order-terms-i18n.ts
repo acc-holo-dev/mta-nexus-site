@@ -3,6 +3,9 @@ import { licenseModelLabel } from "./license-model-i18n";
 const copies = {
   en: {
     title: "Recorded order terms",
+    termsLoading: "Loading recorded order terms…",
+    loadUnavailable:
+      "Recorded order terms are temporarily unavailable. Database snapshots were not loaded.",
     back: "Back to order",
     lines: "Order lines",
     legacy: "No recorded snapshot",
@@ -44,6 +47,9 @@ const copies = {
   },
   ru: {
     title: "Зафиксированные условия заказа",
+    termsLoading: "Загрузка зафиксированных условий заказа…",
+    loadUnavailable:
+      "Зафиксированные условия заказа временно недоступны. Снимки из БД не загружены.",
     back: "К заказу",
     lines: "Строки заказа",
     legacy: "Снимок условий не записан",

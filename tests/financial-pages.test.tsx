@@ -33,9 +33,13 @@ vi.mock("@nexus/db", () => ({
   financialReviewRepository: { page: state.page, detail: state.detail },
 }));
 
+import { AppError } from "@nexus/domain";
+import DetailLoading from "../apps/web/src/app/admin/commerce/reconciliation/[id]/loading";
 import Detail from "../apps/web/src/app/admin/commerce/reconciliation/[id]/page";
+import ReviewLoading from "../apps/web/src/app/admin/commerce/reconciliation/loading";
 import Review from "../apps/web/src/app/admin/commerce/reconciliation/page";
 import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
+import { getFinancialCopy } from "../apps/web/src/lib/financial-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
   bounds = { page: 2, totalPages: 3, total: 41 };
@@ -148,4 +152,53 @@ it("shows recorded discrepancies and safe attempts without settlement actions or
   expect(html).not.toContain("SECRET-FAILURE");
   expect(html).not.toContain("<form");
   expect(html).toContain("page=3");
+  expect(html).toContain("overflow-x-clip");
+});
+it("shows an honest recovery state when the reconciliation queue fails", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.page.mockRejectedValue(new Error("reconciliation unavailable"));
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(
+    await Review({ searchParams: Promise.resolve({ page: "2", filter: "review" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/commerce/reconciliation?filter=review&amp;page=2"');
+  expect(html).not.toContain("&lt;ORDER&gt;");
+});
+it("renders an empty review queue with clear-filters recovery when the review filter is active", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.page.mockResolvedValue({ orders: [], page: 1, totalPages: 1, pageSize: 20, total: 0 });
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(
+    await Review({ searchParams: Promise.resolve({ filter: "review" }) }),
+  );
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.clearFilters);
+  expect(html).toContain('href="?filter=all"');
+  expect(html).toContain("overflow-x-clip");
+});
+it("rejects stale admin privilege before loading the reconciliation queue", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.page.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
+  await expect(Review({ searchParams: Promise.resolve({}) })).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("shows an honest recovery state when recorded order evidence fails", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.detail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(await Detail(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/commerce/reconciliation/ord_a?page=2"');
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  for (const Loading of [ReviewLoading, DetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(getFinancialCopy("en").reviewLoading);
+  }
 });

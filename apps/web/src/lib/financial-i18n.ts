@@ -21,6 +21,10 @@ const copy = {
     empty: "No recorded financial operations.",
     note: "Recorded balances are grouped by currency. They do not prove funds are held, available or withdrawable. The original hold is 7 days; payment confirmation, hold allocation and payouts require a payment provider. This page creates no purchase, payment or access right.",
     review: "Financial reconciliation",
+    reviewLoading: "Loading financial reconciliation…",
+    loadUnavailable:
+      "Financial reconciliation is temporarily unavailable. Database records were not loaded.",
+    clearFilters: "Show all recorded orders",
     reviewOnly: "Requires review",
     allOrders: "All recorded orders",
     reviewNote:
@@ -64,6 +68,9 @@ const copy = {
     empty: "Финансовых записей нет.",
     note: "Баланс показан отдельно по каждой валюте. Он не подтверждает удержание, доступность или возможность вывода средств. Исходное удержание — 7 дней; подтверждение платежа, распределение удержаний и выплаты требуют платёжного провайдера. Эта страница не создаёт покупки, платежи или права доступа.",
     review: "Сверка финансовых состояний",
+    reviewLoading: "Загрузка сверки финансовых состояний…",
+    loadUnavailable: "Сверка финансовых состояний временно недоступна. Записи БД не загружены.",
+    clearFilters: "Показать все записанные заказы",
     reviewOnly: "Требуют проверки",
     allOrders: "Все записанные заказы",
     reviewNote:
