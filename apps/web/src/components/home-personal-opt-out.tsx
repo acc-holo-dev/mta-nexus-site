@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import {
   HOME_PERSONAL_HIDE,
   HOME_PERSONAL_SHOW,
-  homePersonalPreferenceCookie,
   type HomePersonalPreference,
+  homePersonalPreferenceCookie,
 } from "../lib/home-personal-preference";
 
 export function HomePersonalOptOut({

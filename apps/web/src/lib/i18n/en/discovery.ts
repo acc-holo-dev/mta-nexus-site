@@ -33,10 +33,15 @@ export const discovery = {
     personalScopeNote:
       "Open free beta: up to 12 recent items from those sources on Home. Your notification inbox keeps the full history and read state.",
     personalEmpty: "Nothing new from your watches, follows, or replies right now.",
+    personalEmptyHint:
+      "An empty personal strip is not a load failure. Public Home sections below stay available, and your notification inbox keeps the full history.",
     personalError:
       "Your personal changes could not be loaded. Public Home sections below are still available.",
+    personalRetry: "Try again",
     personalPartial: "Some personal sources could not be loaded. Showing what is available.",
     personalHidden: "Personal changes are hidden on Home. Public sections below are unchanged.",
+    personalHiddenHint:
+      "Use Show personal changes on Home to bring this strip back. Public sections stay available either way.",
     personalHide: "Don't show personal changes on Home",
     personalShow: "Show personal changes on Home",
     personalReasonReleaseWatch: "New version on a watched resource",

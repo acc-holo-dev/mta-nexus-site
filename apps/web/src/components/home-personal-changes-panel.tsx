@@ -1,4 +1,4 @@
-import { SectionHeader } from "@nexus/ui";
+import { EmptyState, ErrorState, SectionHeader } from "@nexus/ui";
 import Link from "next/link";
 import type { PersonalChangesSummary } from "../lib/home-personal-changes-types";
 import type { HomePersonalPreference } from "../lib/home-personal-preference";
@@ -9,9 +9,12 @@ export type HomePersonalCopy = {
   description: string;
   scopeNote: string;
   empty: string;
+  emptyHint: string;
   error: string;
+  retry: string;
   partial: string;
   hidden: string;
+  hiddenHint: string;
   hidePreference: string;
   showPreference: string;
   reasonReleaseWatch: string;
@@ -26,6 +29,9 @@ const reasonKey = {
   replyToMe: "reasonReplyToMe",
 } as const;
 
+const actionLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const HOME_PERSONAL_CHANGES_HEADING_ID = "home-personal-changes-heading";
 export const HOME_PERSONAL_CHANGES_SCOPE_NOTE_ID = "home-personal-changes-scope-note";
 
@@ -39,7 +45,10 @@ export function HomePersonalChangesPanel({
   copy: HomePersonalCopy;
 }) {
   return (
-    <section aria-labelledby={HOME_PERSONAL_CHANGES_HEADING_ID}>
+    <section
+      aria-labelledby={HOME_PERSONAL_CHANGES_HEADING_ID}
+      className="min-w-0 space-y-3 overflow-x-clip"
+    >
       <SectionHeader
         title={copy.title}
         description={copy.description}
@@ -57,38 +66,54 @@ export function HomePersonalChangesPanel({
         {copy.scopeNote}
       </p>
 
-      {summary.status === "hidden" ? <p className="text-sm text-muted">{copy.hidden}</p> : null}
+      {summary.status === "hidden" ? (
+        <EmptyState title={copy.hidden} description={copy.hiddenHint} />
+      ) : null}
 
-      {summary.status === "empty" ? <p className="text-sm text-muted">{copy.empty}</p> : null}
+      {summary.status === "empty" ? (
+        <EmptyState
+          title={copy.empty}
+          description={copy.emptyHint}
+          action={
+            <Link href="/notifications?state=unread" className={actionLinkClass}>
+              {copy.openInbox}
+            </Link>
+          }
+        />
+      ) : null}
 
       {summary.status === "error" ? (
-        <div className="space-y-2 text-sm text-muted">
-          <p>{copy.error}</p>
-          <Link
-            href="/notifications?state=unread"
-            className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.openInbox}
-          </Link>
-        </div>
+        <ErrorState
+          title={copy.error}
+          action={
+            <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
+              <Link href="/" className={actionLinkClass}>
+                {copy.retry}
+              </Link>
+              <Link href="/notifications?state=unread" className={actionLinkClass}>
+                {copy.openInbox}
+              </Link>
+            </div>
+          }
+        />
       ) : null}
 
       {summary.status === "partial" || summary.status === "ok" ? (
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3 overflow-x-clip">
           {summary.status === "partial" ? (
             <p className="text-sm text-muted">{copy.partial}</p>
           ) : null}
-          <ul className="divide-y divide-base rounded-lg border border-base bg-elevated">
+          <ul className="min-w-0 divide-y divide-base overflow-x-clip rounded-lg border border-base bg-elevated">
             {summary.items.map((item) => (
-              <li key={item.id}>
+              <li key={item.id} className="min-w-0">
                 <Link
                   href={item.href}
-                  className="flex flex-col gap-1 px-4 py-3 text-sm transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)]"
+                  className="flex min-h-11 min-w-0 flex-col justify-center gap-1 overflow-x-clip px-4 py-3 text-sm transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)]"
                 >
                   <span className="font-label uppercase text-faint">
                     {copy[reasonKey[item.reason]]}
                   </span>
-                  <span className="font-semibold text-primary">{item.title}</span>
+                  <span className="break-words font-semibold text-primary">{item.title}</span>
                 </Link>
               </li>
             ))}
