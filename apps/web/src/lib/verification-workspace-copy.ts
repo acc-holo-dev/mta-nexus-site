@@ -40,6 +40,7 @@ const en = {
   choose: "Choose organization",
   manage: "Organizations you manage",
   noTeams: "No organizations you manage match this search.",
+  noTeamsHint: "Try another name or clear the search to see organizations you currently manage.",
   clearTeamSearch: "Clear organization search",
   requiresProfile:
     "Save at least one specialty in your professional profile before applying for experience verification.",
@@ -62,6 +63,9 @@ const en = {
   selfReview: "Another moderator must approve your application.",
   reviewNotes: "Moderator feedback",
   noApplications: "No applications in this view.",
+  noApplicationsHint: "Switch to the other decisions view or open your full application history.",
+  noApplicationsFilteredHint:
+    "Clear the verification type filter or open your full application history.",
   all: "All targets",
   type: "Verification type",
   search: "Search",
@@ -120,6 +124,8 @@ const ru: Record<keyof typeof en, string> = {
   choose: "Выбрать организацию",
   manage: "Организации под вашим управлением",
   noTeams: "Организаций под вашим управлением по этому запросу нет.",
+  noTeamsHint:
+    "Попробуйте другое название или сбросьте поиск, чтобы увидеть организации под вашим управлением.",
   clearTeamSearch: "Сбросить поиск организаций",
   requiresProfile:
     "Сохраните хотя бы одну специализацию в профессиональном профиле перед заявкой на подтверждение опыта.",
@@ -143,6 +149,9 @@ const ru: Record<keyof typeof en, string> = {
   selfReview: "Вашу заявку должен одобрить другой модератор.",
   reviewNotes: "Комментарий модератора",
   noApplications: "В этом разделе заявок нет.",
+  noApplicationsHint: "Переключитесь на другой раздел решений или откройте полную историю заявок.",
+  noApplicationsFilteredHint:
+    "Сбросьте фильтр типа верификации или откройте полную историю заявок.",
   all: "Все цели",
   type: "Тип верификации",
   search: "Найти",
