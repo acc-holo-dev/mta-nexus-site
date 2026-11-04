@@ -97,7 +97,15 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       preferences,
     });
   } catch (error: unknown) {
-    if (error instanceof AppError) {
+    if (
+      error instanceof AppError &&
+      [
+        "UNSUPPORTED_MEDIA_TYPE",
+        "INVALID_BODY_LENGTH",
+        "REQUEST_BODY_TOO_LARGE",
+        "REQUEST_BODY_TIMEOUT",
+      ].includes(error.code)
+    ) {
       return json(context, { error: error.message, code: error.code }, error.statusCode);
     }
     logRequestEvent({

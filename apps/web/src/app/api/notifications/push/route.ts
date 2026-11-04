@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
 import { readWebPushVapidConfig } from "@nexus/config";
 import { webPushSubscriptionRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
@@ -107,6 +109,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: "Web Push is not configured" }, 503);
     }
 
+    requireServerJsonContentType(request);
     const limit = await consumeRateLimit("notificationMutation", authenticated.user.id);
     if (!limit.success) {
       return json(
@@ -118,7 +121,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const parsed = parseWebPushSubscription(await request.json().catch(() => null));
+    const parsed = parseWebPushSubscription(await readBoundedJson(request, 16 * 1024));
     if (!parsed) {
       return json(
         context,
@@ -159,6 +162,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       subscribed: true,
     });
   } catch (error) {
+    if (
+      error instanceof AppError &&
+      [
+        "UNSUPPORTED_MEDIA_TYPE",
+        "INVALID_BODY_LENGTH",
+        "REQUEST_BODY_TOO_LARGE",
+        "REQUEST_BODY_TIMEOUT",
+      ].includes(error.code)
+    ) {
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
+    }
     logRequestEvent({
       level: "error",
       event: "notifications.push_subscribe_failed",
@@ -185,6 +199,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: "Authentication required" }, 401);
     }
 
+    requireServerJsonContentType(request);
     const limit = await consumeRateLimit("notificationMutation", authenticated.user.id);
     if (!limit.success) {
       return json(
@@ -196,7 +211,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    const body = await readBoundedJson(request, 16 * 1024);
     const endpoint =
       body &&
       typeof body === "object" &&
@@ -225,6 +240,17 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       subscribed: false,
     });
   } catch (error) {
+    if (
+      error instanceof AppError &&
+      [
+        "UNSUPPORTED_MEDIA_TYPE",
+        "INVALID_BODY_LENGTH",
+        "REQUEST_BODY_TOO_LARGE",
+        "REQUEST_BODY_TIMEOUT",
+      ].includes(error.code)
+    ) {
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
+    }
     logRequestEvent({
       level: "error",
       event: "notifications.push_unsubscribe_failed",

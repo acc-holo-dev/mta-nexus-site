@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   endpoints: [
@@ -52,8 +56,9 @@ vi.mock("../../../../lib/services/web-push-endpoint-policy", () => ({
   parseWebPushEndpoint: vi.fn((value: string) => new URL(value)),
 }));
 
+import { webPushSubscriptionRepository } from "@nexus/db";
 import { NextRequest } from "next/server";
-import { GET } from "./route";
+import { DELETE, GET, POST } from "./route";
 
 function fingerprint(endpoint: string) {
   return createHash("sha256").update(endpoint, "utf8").digest("hex");
@@ -103,4 +108,43 @@ describe("Web Push exact subscription status", () => {
       error: "Invalid Web Push endpoint fingerprint",
     });
   });
+});
+
+describe("Web Push mutation body boundaries", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    stubBrowserMutationOrigin();
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it.each([
+    ["POST", POST],
+    ["DELETE", DELETE],
+  ] as const)(
+    "rejects non-JSON and oversized %s bodies before storage",
+    async (method, handler) => {
+      const makeRequest = (contentType: string, body: string) =>
+        new NextRequest("https://nexus.test/api/notifications/push", {
+          method,
+          headers: {
+            ...browserMutationHeaders(),
+            "content-type": contentType,
+            cookie: "nexus_session=session-token",
+          },
+          body,
+        });
+      const wrongMedia = await handler(makeRequest("text/plain", "{}"));
+      expect(wrongMedia.status).toBe(415);
+      expect(await wrongMedia.json()).toMatchObject({ code: "UNSUPPORTED_MEDIA_TYPE" });
+
+      const oversized = await handler(
+        makeRequest("application/json", JSON.stringify({ value: "x".repeat(16384) })),
+      );
+      expect(oversized.status).toBe(413);
+      expect(await oversized.json()).toMatchObject({ code: "REQUEST_BODY_TOO_LARGE" });
+      expect(oversized.headers.get("cache-control")).toBe("private, no-store");
+      expect(webPushSubscriptionRepository.upsertWithResult).not.toHaveBeenCalled();
+      expect(webPushSubscriptionRepository.removeForSession).not.toHaveBeenCalled();
+    },
+  );
 });
