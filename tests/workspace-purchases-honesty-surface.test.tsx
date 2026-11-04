@@ -113,6 +113,15 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     expect(source).not.toContain('role="alert"');
   }
 
+  const terms = read("apps/web/src/app/workspace/purchases/[id]/terms/page.tsx");
+  expect(terms).toContain("ErrorState");
+  expect(terms).toContain("overflow-x-clip");
+  expect(terms).toContain("min-w-0");
+  expect(terms).toMatch(/min-h-11|size="touch"/u);
+  expect(terms).toContain("title={c.invalid}");
+  expect(terms).not.toContain('role="alert"');
+  expect(terms).not.toContain('<p role="alert"');
+
   const shellPages = [
     "apps/web/src/app/workspace/purchases/[id]/support/page.tsx",
     "apps/web/src/app/workspace/order-cases/page.tsx",

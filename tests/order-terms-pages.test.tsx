@@ -140,11 +140,27 @@ it("admin pages retain explicit financial scope and their own navigation", async
   expect(html).toContain("/api/admin/commerce/orders/ord_a/terms/export?page=2");
   expect(html).toContain("/admin/commerce/reconciliation/ord_a");
 });
-it("invalid query arrays and page sizes produce recovery without repository reads", async () => {
-  const html = renderToStaticMarkup(
+it("invalid query arrays recover through ErrorState without repository reads", async () => {
+  const copy = orderTermsCopy("en");
+  const buyer = renderToStaticMarkup(
     await Buyer({ ...input, searchParams: Promise.resolve({ page: ["1", "2"] }) }),
   );
-  expect(html).toContain('role="alert"');
+  expect(buyer).toContain('role="alert"');
+  expect(buyer).toContain("bg-danger-soft");
+  expect(buyer).toContain(copy.invalid);
+  expect(buyer).toContain("overflow-x-clip");
+  expect(buyer).toContain('href="/workspace/purchases"');
+  expect(state.report).not.toHaveBeenCalled();
+
+  state.actor = { id: "usr_a", role: "admin" };
+  const admin = renderToStaticMarkup(
+    await Admin({ ...input, searchParams: Promise.resolve({ page: ["1", "2"] }) }),
+  );
+  expect(admin).toContain('role="alert"');
+  expect(admin).toContain("bg-danger-soft");
+  expect(admin).toContain(copy.invalid);
+  expect(admin).toContain("overflow-x-clip");
+  expect(admin).toContain('href="/admin/commerce/reconciliation"');
   expect(state.report).not.toHaveBeenCalled();
 });
 it("unavailable order details are masked", async () => {
