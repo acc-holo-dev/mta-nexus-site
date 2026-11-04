@@ -65,13 +65,10 @@ export function SupportCaseActions({
             key={action.status}
             type="button"
             variant="outline"
+            size="touch"
             disabled={busy}
             onClick={() => void changeStatus(action.status, action.label)}
-            className={
-              action.status === "closed"
-                ? "min-h-10 border-danger/30 text-danger"
-                : "min-h-10 text-accent"
-            }
+            className={action.status === "closed" ? "border-danger/30 text-danger" : "text-accent"}
           >
             {action.label}
           </Button>

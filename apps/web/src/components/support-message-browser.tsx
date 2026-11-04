@@ -70,7 +70,7 @@ export function SupportMessageBrowser({
             <option value="staff">{copy.staff}</option>
           </select>
         </label>
-        <Button type="submit" className="min-h-10" variant="primary">
+        <Button type="submit" size="touch" variant="primary">
           {copy.apply}
         </Button>
         <Link
