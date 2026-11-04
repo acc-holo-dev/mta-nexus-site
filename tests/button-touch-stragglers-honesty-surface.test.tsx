@@ -25,10 +25,7 @@ it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-
 
 it("locks resource-review primary submit CTAs to size=touch", () => {
   const source = read("apps/web/src/components/resource-review-controls.tsx");
-  const touchSubmits =
-    source.match(/<Button type="submit" size="touch"/gu) ??
-    source.match(/type="submit" size="touch"/gu) ??
-    [];
+  const touchSubmits = source.match(/<Button\s+type="submit"\s+size="touch"/gu) ?? [];
   expect(touchSubmits.length).toBeGreaterThanOrEqual(3);
 });
 

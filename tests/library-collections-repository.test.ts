@@ -750,12 +750,12 @@ it("copies exact selected own references from an archived source without issuing
   expect(text).not.toMatch(
     /(?:from "products"|entitlements|licenses|resource_library_selections|resource_release_watches)/u,
   );
-  expect(state.queries.at(-1)?.params).toContain("library.collection_copy-items");
-  expect(
-    state.queries
-      .at(-1)
-      ?.params.some((p) => typeof p === "string" && p.includes('"sourceRevision":4')),
-  ).toBe(true);
+  const audit = state.queries.find((query) => query.sql.startsWith('insert into "audit_events"'));
+  expect(audit?.params).toContain("library.collection_copy-items");
+  expect(audit?.params.some((p) => typeof p === "string" && p.includes('"sourceRevision":4'))).toBe(
+    true,
+  );
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
 });
 it.each([
   { index: 7, rows: [] },
@@ -874,7 +874,10 @@ it("moves only selected owned references atomically and proves the source succes
   expect(removal?.params).toContain("lcol_source");
   expect(removal?.params).toContain("prd_a");
   expect(removal?.params).toContain("prd_b");
-  expect(state.queries.at(-1)?.params).toContain("library.collection_move-items");
+  expect(
+    state.queries.find((query) => query.sql.startsWith('insert into "audit_events"'))?.params,
+  ).toContain("library.collection_move-items");
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
   expect(sqlText()).not.toMatch(
     /from "products"|entitlements|resource_library_selections|resource_release_watches/u,
   );
@@ -1078,8 +1081,18 @@ it("reconciles a full collection atomically, requires exact prior membership and
   expect(remove).toBeGreaterThan(0);
   expect(add).toBeGreaterThan(remove);
   expect(audit).toBeGreaterThan(add);
-  expect(queries.at(-1)?.sql).toContain("clock_timestamp()");
-  expect(queries.at(-1)?.params).toContainEqual(new Date("2026-10-14T00:00:00.000Z"));
+  const expiryCheck = queries.findIndex(
+    (query) =>
+      query.sql.includes("clock_timestamp()") &&
+      query.params.some(
+        (param) =>
+          param instanceof Date &&
+          param.getTime() === new Date("2026-10-14T00:00:00.000Z").getTime(),
+      ),
+  );
+  expect(expiryCheck).toBeGreaterThan(audit);
+  expect(queries.at(-1)?.sql).toContain('from "sessions"');
+  expect(expiryCheck).toBeLessThan(queries.length - 1);
   expect(queries.find((q) => q.sql.includes('insert into "audit_events"'))?.params).toContain(
     JSON.stringify({
       requestId,
@@ -1148,7 +1161,12 @@ it("reconciles removal-only orphan references without product or grant reads", a
   await repo.command(input(command));
   expect(state.rows).toHaveLength(0);
   expect(sqlText()).not.toMatch(/from "products"|from "entitlements"|from "licenses"/iu);
-  expect(state.queries.at(-1)?.sql).toContain('insert into "audit_events"');
+  const auditIndex = state.queries.findIndex((query) =>
+    query.sql.startsWith('insert into "audit_events"'),
+  );
+  expect(auditIndex).toBeGreaterThan(-1);
+  expect(auditIndex).toBeLessThan(state.queries.length - 1);
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
 });
 it("replays original reconciliation evidence without current grant/member checks and rejects changed UUID reuse", async () => {
   const original = record(libraryCollectionCommandSchema.parse(reconcile), {

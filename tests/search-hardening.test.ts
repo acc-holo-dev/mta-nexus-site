@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 describe("public search hardening", () => {
   it("validates, rate-limits and bounds public search responses", () => {
@@ -19,7 +19,7 @@ describe("public search hardening", () => {
     expect(route).toMatch(
       /Math\.min\(\s*Math\.max\(\s*Math\.floor\(requestedLimit\),\s*1,?\s*\),\s*DEFAULT_LIMIT,?\s*\)/u,
     );
-    expect(route).toContain("stale-while-revalidate=60");
+    expect(route).toMatch(/const publicHeaders = \{\s*"Cache-Control": "no-store"/u);
   });
 
   it("bounds every discovery source and the final result set", () => {

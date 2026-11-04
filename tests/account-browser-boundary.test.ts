@@ -47,11 +47,13 @@ const profileBody = {
   expectedUpdatedAt: "2026-10-10T12:00:00.000Z",
 };
 const privacyBody = {
+  expectedActorId: "usr_owner",
   showActivity: false,
   showProfessionalContacts: false,
   expectedUpdatedAt: "2026-10-10T00:00:00.000Z",
 };
 const developerBody = {
+  expectedActorId: "usr_owner",
   specialties: ["Lua"],
   githubUrl: "https://github.com/example",
   discordTag: "dev",
