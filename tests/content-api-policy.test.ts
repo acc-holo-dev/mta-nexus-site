@@ -98,7 +98,11 @@ describe("community content API behavior", () => {
     const unsupported = await POST(
       new NextRequest("http://nexus.test/api/content", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": "text/plain",
+        },
         body: "{}",
       }),
     );
@@ -118,6 +122,7 @@ describe("community content API behavior", () => {
     expect(mocks.createWithAudit).toHaveBeenCalledWith(
       expect.objectContaining({ body: article }),
       expect.anything(),
+      "session",
     );
   });
 
@@ -164,6 +169,7 @@ describe("community content API behavior", () => {
         action: "content.created",
         details: expect.objectContaining({ status: "draft" }),
       }),
+      "session",
     );
   });
 
@@ -180,6 +186,7 @@ describe("community content API behavior", () => {
           publishedAt: expect.any(Date),
         }),
         expect.anything(),
+        "session",
       );
     },
   );
@@ -196,7 +203,16 @@ describe("community content API behavior", () => {
         publishedAt: expect.any(Date),
       }),
       expect.anything(),
+      "session",
     );
+  });
+
+  it("returns a private retryable conflict for a rolled-back database deadlock", async () => {
+    mocks.createWithAudit.mockRejectedValueOnce({ cause: { code: "40P01" } });
+    const response = await POST(request(body()));
+    expect(response.status).toBe(409);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(await response.json()).toMatchObject({ code: "CONTENT_CREATION_RETRY" });
   });
 
   it("rejects a linked organization the actor does not manage", async () => {

@@ -23,6 +23,9 @@ export const POST = withBrowserMutation((request: NextRequest) => {
       const content = await authorContentService.create(
         await readBoundedJson(request, 128 * 1024),
         user,
+        undefined,
+        undefined,
+        request.cookies.get("nexus_session")?.value,
       );
       return { success: true, content };
     },

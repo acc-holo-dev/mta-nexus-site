@@ -11,6 +11,7 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
+import { isPostgresDeadlock } from "../../../lib/postgres-error";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { serverService } from "../../../lib/services/server-service";
@@ -71,7 +72,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
-    if (!user) {
+    if (!token || !user) {
       return privateJson(context, { error: "Authentication required" }, 401);
     }
 
@@ -202,6 +203,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           type: parsed.data.type,
         },
       },
+      token,
     );
 
     return privateJson(
@@ -213,6 +215,13 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       201,
     );
   } catch (error: unknown) {
+    if (isPostgresDeadlock(error)) {
+      return privateJson(
+        context,
+        { error: "Please retry creating the publication", code: "CONTENT_CREATION_RETRY" },
+        409,
+      );
+    }
     if (
       error instanceof AppError &&
       [
@@ -220,6 +229,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "INVALID_BODY_LENGTH",
         "REQUEST_BODY_TOO_LARGE",
         "REQUEST_BODY_TIMEOUT",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "UNAUTHORIZED",
       ].includes(error.code)
     ) {
       return privateJson(context, { error: error.message, code: error.code }, error.statusCode);

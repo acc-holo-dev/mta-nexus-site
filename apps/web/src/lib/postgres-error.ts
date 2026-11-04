@@ -24,3 +24,14 @@ export function isUniqueConstraintViolation(
   }
   return false;
 }
+
+/** PostgreSQL guarantees that a deadlock victim's transaction is rolled back. */
+export function isPostgresDeadlock(error: unknown): boolean {
+  let current = error;
+  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth++) {
+    const candidate = current as { code?: unknown; cause?: unknown };
+    if (candidate.code === "40P01") return true;
+    current = candidate.cause;
+  }
+  return false;
+}

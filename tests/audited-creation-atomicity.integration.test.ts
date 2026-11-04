@@ -1,13 +1,14 @@
-import { describe, expect, it } from "vitest";
 import {
   auditEvents,
   contentRepository,
   db,
   productRepository,
   serverRepository,
+  sessionRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 
 describe("audited creation atomicity", () => {
   it("rolls back created rows when the paired audit insert fails", async () => {
@@ -20,6 +21,13 @@ describe("audited creation atomicity", () => {
       username: `create_atomic_${suffix}`,
       displayName: "Create Atomic User",
       role: "developer",
+    });
+    const token = `tok_create_atomic_${suffix}`;
+    await sessionRepository.create({
+      id: `ses_create_atomic_${suffix}`,
+      userId,
+      token,
+      expiresAt: new Date(Date.now() + 60_000),
     });
 
     async function occupyAudit(id: string, targetId: string) {
@@ -127,6 +135,7 @@ describe("audited creation atomicity", () => {
           targetId: contentId,
           targetType: "content",
         },
+        token,
       ),
     ).rejects.toBeTruthy();
     expect(await contentRepository.findById(contentId)).toBeNull();

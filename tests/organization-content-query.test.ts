@@ -1,5 +1,6 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -34,10 +35,12 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-import { organizationContentRepository as team } from "../packages/db/src/repositories/organization-content";
+
 import { authorContentRepository as author } from "../packages/db/src/repositories/author-content";
 import { contentRepository } from "../packages/db/src/repositories/content";
+import { organizationContentRepository as team } from "../packages/db/src/repositories/organization-content";
 import { content, organizations } from "../packages/db/src/schema";
+
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:00.001Z";
 const org = (ownerId = "actor") =>
@@ -220,7 +223,7 @@ it("does not confirm a team edit when audit fails", async () => {
   ).rejects.toMatchObject({ cause: expect.objectContaining({ message: "audit failure" }) });
 });
 it("rechecks organization publication rights inside legacy content creation instead of trusting a route precheck", async () => {
-  state.rows = [[org("actual-owner")], [["owner"]]];
+  state.rows = [[["org", "actual-owner"]], [["actor", "user"]], [["org", "owner", []]]];
   await expect(
     contentRepository.createWithAudit(
       {
@@ -236,6 +239,7 @@ it("rechecks organization publication rights inside legacy content creation inst
         commentCount: 0,
       },
       audit,
+      "token",
     ),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(writes()).toHaveLength(0);

@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -22,17 +22,18 @@ vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { remove: vi.fn() },
 }));
 
-import { POST as createContent } from "../apps/web/src/app/api/workspace/content/route";
+import { POST as restoreContent } from "../apps/web/src/app/api/workspace/content/[id]/restore/route";
 import {
   DELETE as archiveContent,
   PATCH as editContent,
 } from "../apps/web/src/app/api/workspace/content/[id]/route";
-import { POST as restoreContent } from "../apps/web/src/app/api/workspace/content/[id]/restore/route";
+import { POST as createContent } from "../apps/web/src/app/api/workspace/content/route";
 import {
   DELETE as deleteDiscussion,
   PATCH as editDiscussion,
 } from "../apps/web/src/app/api/workspace/discussions/[id]/route";
 import { DELETE as removeReaction } from "../apps/web/src/app/api/workspace/reactions/[id]/route";
+import { authorContentService } from "../apps/web/src/lib/services/author-content-service";
 
 const context = { params: Promise.resolve({ id: "cnt_a" }) };
 const mutations = [
@@ -71,6 +72,18 @@ afterEach(() => {
 });
 
 describe("author desk handlers enforce the browser boundary independently of Proxy", () => {
+  it("passes the initiating session to personal creation", async () => {
+    authService.getSession.mockResolvedValueOnce({ id: "writer" } as never);
+    const response = await createContent(request("POST", { origin: "https://nexus.test" }));
+    expect(response.status).toBe(201);
+    expect(authorContentService.create).toHaveBeenCalledWith(
+      { title: "Desk note" },
+      { id: "writer" },
+      undefined,
+      undefined,
+      "writer",
+    );
+  });
   it.each(mutations)(
     "rejects a missing Origin on %s before session or body reads",
     async (_name, method, handler) => {

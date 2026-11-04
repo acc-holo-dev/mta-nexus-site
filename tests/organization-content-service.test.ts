@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ create: vi.fn(), mutate: vi.fn(), personal: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   organizationContentRepository: { create: mocks.create },
@@ -7,7 +8,10 @@ vi.mock("@nexus/db", () => ({
   contentRepository: { createWithAudit: mocks.personal },
 }));
 vi.mock("@nexus/security", () => ({ generateId: (prefix: string) => `${prefix}_generated` }));
+
+import { authorContentService as author } from "../apps/web/src/lib/services/author-content-service";
 import { organizationContentService as service } from "../apps/web/src/lib/services/organization-content-service";
+
 const actor = { id: "editor" } as User;
 const input = {
   title: " Team publication ",
@@ -61,6 +65,23 @@ it("creates a normalized draft using trusted actor and organization scope and re
   });
   expect(saved).not.toHaveProperty("viewCount");
   expect(mocks.personal).not.toHaveBeenCalled();
+});
+
+it("passes the initiating session to personal creation and reports rolled-back deadlocks", async () => {
+  mocks.personal.mockResolvedValueOnce(row);
+  await author.create(input, actor, undefined, undefined, "session-token");
+  expect(mocks.personal).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.anything(),
+    "session-token",
+  );
+  mocks.personal.mockRejectedValueOnce({ cause: { code: "40P01" } });
+  await expect(
+    author.create(input, actor, undefined, undefined, "session-token"),
+  ).rejects.toMatchObject({
+    code: "CONTENT_CREATION_RETRY",
+    statusCode: 409,
+  });
 });
 it.each(["post", "question"])(
   "publishes community type %s immediately using existing policy",

@@ -22,14 +22,13 @@ import {
   publicationNotificationDeliveries,
   users,
 } from "../schema";
+import { lockContentCreationAuthority } from "./content-creation-authority";
 import { contentHelpfulCount } from "./content-reaction-count";
 import { lockInitiatingSession } from "./initiating-session";
-import { organizationWorkspaceAccess } from "./organization-workspace";
 import { publicContentAssociations } from "./public-content-associations";
 import { publicationNotice } from "./publication-notice";
 import { resourceReviewsRepository } from "./resource-reviews";
 import { containsPattern } from "./search-pattern";
-import { serverContentAccess } from "./server-content";
 
 export class ContentRepository {
   async countDrafts(): Promise<number> {
@@ -428,19 +427,20 @@ export class ContentRepository {
   async createWithAudit(
     data: Omit<Content, "createdAt" | "updatedAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Content> {
     return db.transaction(async (tx) => {
-      if (data.serverId) await serverContentAccess(tx, data.serverId, data.authorId);
-      if (data.organizationId) {
-        const access = await organizationWorkspaceAccess(
-          tx,
-          data.organizationId,
-          data.authorId,
-          "share",
-        );
-        if (!["owner", "admin", "developer"].includes(access.role))
-          throw new AppError("Organization publication rights revoked", 403, "FORBIDDEN");
-      }
+      if (audit.actorId !== data.authorId)
+        throw new AppError("Publication actor mismatch", 403, "FORBIDDEN");
+      await lockContentCreationAuthority(tx, {
+        actorId: data.authorId,
+        token: currentToken,
+        productId: data.productId,
+        serverId: data.serverId,
+        organizationId: data.organizationId,
+        type: data.type,
+        status: data.status,
+      });
       const now = new Date();
       const rows = await tx
         .insert(content)
@@ -457,6 +457,8 @@ export class ContentRepository {
         "created",
         audit.id,
       );
+      // Notification fanout can wait on locks; do not commit with an expired session.
+      await lockInitiatingSession(tx, data.authorId, currentToken);
       return created as unknown as Content;
     });
   }

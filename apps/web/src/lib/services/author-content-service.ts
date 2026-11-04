@@ -13,6 +13,7 @@ import {
   authorPublicationRestoreSchema,
   type parseAuthorPublicationHistoryQuery,
 } from "../author-publication-desk-contract";
+import { isPostgresDeadlock } from "../postgres-error";
 import {
   writerArchiveSchema,
   writerCreateSchema,
@@ -164,7 +165,13 @@ class AuthorContentService {
       coverImageUrl: safeExternalWebUrl(item.coverImageUrl) ? item.coverImageUrl : undefined,
     };
   }
-  async create(input: unknown, actor: User, organizationId?: string, serverId?: string) {
+  async create(
+    input: unknown,
+    actor: User,
+    organizationId?: string,
+    serverId?: string,
+    currentToken?: string,
+  ) {
     if (organizationId && serverId) throw new ValidationError("Ambiguous publication scope");
     const parsed = writerCreateSchema.safeParse(input);
     if (!parsed.success) throw new ValidationError("Invalid publication");
@@ -182,7 +189,10 @@ class AuthorContentService {
               data: Parameters<typeof contentRepository.createWithAudit>[0],
               audit: Parameters<typeof contentRepository.createWithAudit>[1],
             ) => organizationContentRepository.create(organizationId, actor.id, data, audit)
-          : contentRepository.createWithAudit.bind(contentRepository);
+          : (
+              data: Parameters<typeof contentRepository.createWithAudit>[0],
+              audit: Parameters<typeof contentRepository.createWithAudit>[1],
+            ) => contentRepository.createWithAudit(data, audit, currentToken ?? "");
       return await save(
         {
           ...parsed.data,
@@ -216,6 +226,8 @@ class AuthorContentService {
         },
       );
     } catch (error) {
+      if (isPostgresDeadlock(error))
+        throw new AppError("Please retry creating the publication", 409, "CONTENT_CREATION_RETRY");
       const pg = error as {
         code?: string;
         constraint?: string;
