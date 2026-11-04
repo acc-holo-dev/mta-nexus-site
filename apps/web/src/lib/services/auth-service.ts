@@ -1,14 +1,22 @@
-import { SESSION_LIFETIME_SECONDS } from "../session-policy";
 import {
-  userRepository,
-  sessionRepository,
-  authRepository,
   accountEmailEnrollmentRepository,
+  accountPasswordResetRepository,
   accountRecoveryAbuseLimitRepository,
+  authRepository,
   getPinnedAccountMailProducerCipher,
   getPinnedAccountRecoveryAbuseKey,
-  accountPasswordResetRepository,
+  sessionRepository,
+  userRepository,
 } from "@nexus/db";
+import type { User } from "@nexus/domain";
+import {
+  AppError,
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  RateLimitExceededError,
+  UnauthorizedError,
+} from "@nexus/domain";
 import {
   freshAuthProofAccepted,
   generateId,
@@ -17,15 +25,12 @@ import {
   normalizeEmailForAbuse,
   verifyPassword,
 } from "@nexus/security";
-import {
-  AppError,
-  NotFoundError,
-  UnauthorizedError,
-  ConflictError,
-  ForbiddenError,
-  RateLimitExceededError,
-} from "@nexus/domain";
-import type { User } from "@nexus/domain";
+import { SESSION_LIFETIME_SECONDS } from "../session-policy";
+
+// Public fixed fixture, using the same scrypt parameters as real password hashes.
+// It is not an account credential; its result is never accepted for authentication.
+const DUMMY_PASSWORD_HASH =
+  "00000000000000000000000000000000:600ca564e0a3f838baeb936b3360e51838e1ce06e8866220b6419223cf7c339c95f695da579a4afd572e4801cd84d38c57fa988788497743ad6dfe492bad1a0a";
 
 function toPublicUser(user: User & { passwordHash?: string | null }): User {
   const { passwordHash: _, ...publicUser } = user;
@@ -99,12 +104,11 @@ class AuthService {
 
   async login(input: { email: string; password: string }): Promise<{ user: User; token: string }> {
     const userWithHash = await userRepository.findByEmail(input.email);
-    if (!userWithHash?.passwordHash) {
-      throw new UnauthorizedError("Invalid email or password");
-    }
-
-    const isMatch = await verifyPassword(input.password, userWithHash.passwordHash);
-    if (!isMatch) {
+    const isMatch = await verifyPassword(
+      input.password,
+      userWithHash?.passwordHash ?? DUMMY_PASSWORD_HASH,
+    );
+    if (!userWithHash?.passwordHash || !isMatch) {
       throw new UnauthorizedError("Invalid email or password");
     }
 
