@@ -1,12 +1,16 @@
 "use client";
 
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "./auth-return-path";
 
 type AuthMode = "login" | "register";
+
+const pageShellClass = "mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip px-4 py-10 sm:px-0";
+const navLinkClass =
+  "inline-flex min-h-11 items-center font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function responseError(value: unknown, fallback: string): string {
   if (!value || typeof value !== "object") return fallback;
@@ -83,7 +87,7 @@ export function AuthForm({
   const alternateHref = authEntryHref(registering ? "login" : "register", returnPath);
 
   return (
-    <div className="mx-auto max-w-md space-y-6 px-4 py-10 sm:px-0">
+    <div className={pageShellClass}>
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-primary">
           {registering ? copy.registerTitle : copy.loginTitle}
@@ -96,17 +100,13 @@ export function AuthForm({
         onSubmit={submit}
         aria-busy={loading}
         aria-describedby={error ? "auth-error" : undefined}
-        className="nexus-panel space-y-4 p-5"
+        className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
       >
-        {error && (
-          <p
-            id="auth-error"
-            role="alert"
-            className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-3 text-sm text-danger"
-          >
-            {error}
-          </p>
-        )}
+        {error ? (
+          <div id="auth-error">
+            <ErrorState title={error} />
+          </div>
+        ) : null}
         <Input
           id="auth-email"
           name="email"
@@ -188,20 +188,14 @@ export function AuthForm({
       <div className="space-y-2 text-sm text-muted">
         {!registering && (
           <p>
-            <Link
-              href="/auth/forgot-password"
-              className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/auth/forgot-password" className={navLinkClass}>
               {copy.forgot}
             </Link>
           </p>
         )}
         <p>
           {registering ? `${copy.already} ` : `${copy.newUser} `}
-          <Link
-            href={alternateHref}
-            className="font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={alternateHref} className={navLinkClass}>
             {registering ? copy.signIn : copy.create}
           </Link>
         </p>

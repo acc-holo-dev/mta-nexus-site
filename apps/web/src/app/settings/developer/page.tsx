@@ -1,7 +1,8 @@
+import { EmptyState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { DeveloperProfileEditor } from "../../../components/developer-profile-editor";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
@@ -10,6 +11,11 @@ import { verificationWorkspaceService } from "../../../lib/services/verification
 import { editableDeveloperSchema } from "../../../lib/verification-workspace-contract";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata() {
   return {
     title: verificationCopy(await getRequestLocale()).profile,
@@ -22,23 +28,32 @@ export default async function DeveloperSettingsPage() {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/settings/developer" />;
   if (!["developer", "admin"].includes(actor.role))
-    return <div className="nexus-panel p-8 text-sm text-muted">{copy.roleRequired}</div>;
+    return (
+      <div className={pageShellClass}>
+        <EmptyState
+          title={copy.roleRequired}
+          description={copy.profileDescription}
+          action={
+            <Link href="/settings" className={navLinkClass}>
+              {profilePrivacyCopy(locale).back}
+            </Link>
+          }
+        />
+      </div>
+    );
   const initial = await verificationWorkspaceService
     .ownProfile(actor)
     .then((value) => editableDeveloperSchema.parse(value))
     .catch(() => null);
   return (
-    <div className="space-y-6">
+    <div className={pageShellClass}>
       <ProfileChangeHistoryLink locale={locale} />
       <header>
         <h1 className="text-2xl font-bold text-primary">{copy.profile}</h1>
         <p className="mt-2 text-sm text-muted">{copy.profileDescription}</p>
       </header>
       <DeveloperProfileEditor key={actor.id} initial={initial} locale={locale} />
-      <Link
-        href="/settings/privacy"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/settings/privacy" className={navLinkClass}>
         {profilePrivacyCopy(locale).title}
       </Link>
     </div>

@@ -1,5 +1,5 @@
 "use client";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
@@ -18,6 +18,11 @@ import {
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
+const retryButtonClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export function DeveloperProfileEditor({
   initial,
   locale,
@@ -121,7 +126,7 @@ export function DeveloperProfileEditor({
     }
   }
   return (
-    <div className="nexus-panel space-y-5 p-5 sm:p-6" aria-busy={pending}>
+    <div className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6" aria-busy={pending}>
       <p className="text-sm text-muted">{copy.invalidation}</p>
       <p className="text-xs text-muted">{copy.pendingChange}</p>
       {profile?.verifiedDeveloper && (
@@ -160,33 +165,47 @@ export function DeveloperProfileEditor({
           onChange={(event) => setDiscord(event.target.value)}
         />
         <div className="flex flex-wrap gap-3">
-          <Button type="submit" isLoading={pending} disabled={!profile || pending}>
+          <Button
+            type="submit"
+            isLoading={pending}
+            disabled={!profile || pending}
+            className="min-h-11"
+          >
             {copy.save}
           </Button>
           <Button
             type="button"
             variant="secondary"
             disabled={pending}
+            className="min-h-11"
             onClick={() => void reload()}
           >
             {copy.reload}
           </Button>
         </div>
       </form>
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              className={retryButtonClass}
+              onClick={() => void reload()}
+            >
+              {copy.reload}
+            </Button>
+          }
+        />
+      ) : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}
         </p>
       )}
-      <Link
-        href="/workspace/verification"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/verification" className={navLinkClass}>
         {copy.back}
       </Link>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -19,6 +19,12 @@ type State =
   | { kind: "submitting"; proof: Proof }
   | { kind: "success"; email: string }
   | { kind: "error"; proof?: Proof; message: string };
+
+const pageShellClass = "mx-auto min-w-0 max-w-lg overflow-x-clip py-16";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const retryButtonClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default function VerifyEmailPage() {
   const { dictionary } = useNexusLocale();
@@ -59,10 +65,10 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg py-16">
+    <div className={pageShellClass}>
       <section
         aria-labelledby="verify-email-heading"
-        className="nexus-panel space-y-5 p-6 shadow-nexus-sm"
+        className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-6 shadow-nexus-sm"
       >
         <div className="flex items-center gap-3">
           <MailCheck className="h-5 w-5 text-accent" aria-hidden="true" />
@@ -78,17 +84,14 @@ export default function VerifyEmailPage() {
         )}
 
         {state.kind === "invalid" && (
-          <>
-            <p role="alert" className="text-sm text-muted">
-              {copy.invalidVerification}
-            </p>
-            <Link
-              href="/settings"
-              className="inline-block text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.backToSettings}
-            </Link>
-          </>
+          <ErrorState
+            title={copy.invalidVerification}
+            action={
+              <Link href="/settings" className={navLinkClass}>
+                {copy.backToSettings}
+              </Link>
+            }
+          />
         )}
 
         {(state.kind === "ready" || state.kind === "submitting") && (
@@ -96,6 +99,7 @@ export default function VerifyEmailPage() {
             <p className="text-sm leading-relaxed text-muted">{copy.verifyDescription}</p>
             <Button
               type="button"
+              className="min-h-11"
               isLoading={state.kind === "submitting"}
               onClick={() => void confirm(state.proof)}
             >
@@ -106,27 +110,24 @@ export default function VerifyEmailPage() {
 
         {state.kind === "error" && (
           <>
-            <p
-              role="alert"
-              className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-3 text-sm text-danger"
-            >
-              {state.message}
-            </p>
-            {state.proof && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  if (state.kind === "error" && state.proof) void confirm(state.proof);
-                }}
-              >
-                {copy.retry}
-              </Button>
-            )}
-            <Link
-              href="/settings"
-              className="block text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <ErrorState
+              title={state.message}
+              action={
+                state.proof ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className={retryButtonClass}
+                    onClick={() => {
+                      if (state.kind === "error" && state.proof) void confirm(state.proof);
+                    }}
+                  >
+                    {copy.retry}
+                  </Button>
+                ) : undefined
+              }
+            />
+            <Link href="/settings" className={navLinkClass}>
               {copy.backToSettings}
             </Link>
           </>
@@ -138,10 +139,7 @@ export default function VerifyEmailPage() {
               {copy.verifiedPrefix} {state.email}
             </p>
             <p className="text-xs text-muted">{copy.confirmationConsumed}</p>
-            <Link
-              href="/settings"
-              className="inline-block text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/settings" className={navLinkClass}>
               {copy.backToSettings}
             </Link>
           </>

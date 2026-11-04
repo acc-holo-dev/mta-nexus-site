@@ -6,7 +6,7 @@ export default async function Loading() {
   const dictionary = getDictionary(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-md space-y-6 py-16"
+      className="mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip py-16"
       aria-busy="true"
       aria-labelledby="auth-login-loading-heading"
     >

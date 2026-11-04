@@ -99,11 +99,14 @@ it("lets ordinary users edit privacy without advertising role-restricted develop
   expect(html).toContain(profilePrivacyCopy("en").save);
   expect(html).not.toContain('href="/settings/developer"');
 });
-it("keeps save disabled and offers saved-state recovery after a private load failure", async () => {
+it("keeps save disabled and offers ErrorState recovery after a private load failure", async () => {
   state.own.mockRejectedValue(new Error("private SQL"));
   const html = renderToStaticMarkup(await PrivacyPage());
   expect(html).toContain('role="alert"');
   expect(html).toContain(profilePrivacyCopy("en").unavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("min-h-11");
   expect(html).toMatch(/<fieldset disabled=""/u);
   expect(html).toContain(profilePrivacyCopy("en").reload);
   expect(html).not.toContain("private SQL");

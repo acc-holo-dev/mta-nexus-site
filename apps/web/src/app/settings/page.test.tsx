@@ -30,6 +30,8 @@ describe("account settings loading accessibility", () => {
       expect(html).toContain('id="settings-loading-heading"');
       expect(html).toContain(copy.title);
       expect(html).toContain(copy.loading);
+      expect(html).toContain("min-w-0");
+      expect(html).toContain("overflow-x-clip");
     },
   );
 
@@ -49,6 +51,8 @@ describe("account settings loading accessibility", () => {
       expect(html).toContain('id="settings-loading-heading"');
       expect(html).toContain(copy.title);
       expect(html).toContain(copy.loading);
+      expect(html).toContain("min-w-0");
+      expect(html).toContain("overflow-x-clip");
     },
   );
 });
