@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const h = vi.hoisted(() => ({
@@ -34,23 +34,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) })
 
 import { LibraryCollectionItemCopyForm } from "../apps/web/src/components/library-collection-item-copy";
 import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
-type Element = ReactElement<Record<string, unknown>>;
+type Element = FlatTestElement;
 function nodes(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(nodes);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const e = node as Element;
-  const type = e.type as
-    | string
-    | { displayName?: string }
-    | (((props: unknown) => ReactNode) & { displayName?: string });
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
-  }
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return nodes(type(e.props));
-  }
-  return [e, ...nodes(e.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 let source = {
   id: "lcol_source",
@@ -218,7 +206,13 @@ it("counts only missing destination references against its capacity", async () =
   expect(h.fetch).toHaveBeenCalledOnce();
   expect(
     render().some(
-      (n) => n.props.role === "alert" && n.props.children === libraryCollectionsCopy("en").quota,
+      (n) =>
+        (typeof n.type !== "string" &&
+          (n.type as { name?: string }).name === "ErrorState" &&
+          n.props.title === libraryCollectionsCopy("en").quota) ||
+        (n.props.role === "alert" &&
+          Array.isArray(n.props.children) &&
+          JSON.stringify(n.props.children).includes(libraryCollectionsCopy("en").quota)),
     ),
   ).toBe(true);
 });

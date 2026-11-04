@@ -11,6 +11,8 @@ const en = {
   success: "All reviewed collection changes are recorded.",
   noChanges: "Choose a different membership in at least one collection.",
   quota: "At most 20 changed collections per operation and 5000 group receipts per account.",
+  actionErrorDescription:
+    "A failed membership batch is not a recorded group change. Retry the same reviewed set or reload the current state.",
 };
 const ru: typeof en = {
   title: "Изменить несколько коллекций",
@@ -25,6 +27,8 @@ const ru: typeof en = {
   success: "Все выбранные изменения коллекций записаны.",
   noChanges: "Измените состав хотя бы одной коллекции.",
   quota: "До 20 изменяемых коллекций за операцию и 5000 групповых квитанций на аккаунт.",
+  actionErrorDescription:
+    "Неудачная групповая смена состава — это не записанное изменение. Повторите тот же набор или обновите текущее состояние.",
 };
 export function libraryMembershipBatchesCopy(locale: "ru" | "en") {
   return locale === "ru" ? ru : en;

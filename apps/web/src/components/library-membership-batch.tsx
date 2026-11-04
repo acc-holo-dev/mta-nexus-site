@@ -5,11 +5,10 @@ import {
   type LibraryMembershipBatchCommand,
   type LibraryResourceCollections,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { libraryMembershipBatchCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { confirmedMembershipBatch } from "../lib/library-membership-batch-confirmation";
@@ -17,6 +16,7 @@ import { libraryMembershipBatchesCopy } from "../lib/library-membership-batches-
 import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 export function LibraryMembershipBatchForm({
   report,
   locale,
@@ -263,6 +263,7 @@ export function LibraryMembershipBatchForm({
             (!checked || !changed.length || changed.length > LIBRARY_COLLECTION_BATCH_LIMIT))
         }
         variant="outline"
+        className="min-h-11"
       >
         {busy ? c.busy : saved ? c.saved : blocked ? c.reload : frozen ? c.retryAction : h.apply}
       </Button>
@@ -271,19 +272,20 @@ export function LibraryMembershipBatchForm({
           {c.frozen}
         </p>
       )}
-      {error && (
-        <div className="space-y-2">
-          <p role="alert" className="text-warning">
-            {error}
-          </p>
-          <a
-            href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.reload}
-          </a>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={h.actionErrorDescription}
+          action={
+            <a
+              href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.reload}
+            </a>
+          }
+        />
+      ) : null}
       {saved && (
         <div className="space-y-2">
           <p role="status">{h.success}</p>

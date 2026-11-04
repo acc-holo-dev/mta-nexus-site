@@ -5,11 +5,10 @@ import {
   type LibraryCollectionCommand,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -18,6 +17,7 @@ import { confirmedCollectionCommand } from "../lib/library-collections-confirmat
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 
 export function LibraryCollectionBatchForm({
   locale,
@@ -267,6 +267,7 @@ export function LibraryCollectionBatchForm({
               collection.revision >= 2147483647))
         }
         variant="outline"
+        className="min-h-11"
       >
         {busy
           ? c.busy
@@ -283,24 +284,22 @@ export function LibraryCollectionBatchForm({
           {c.frozen}
         </p>
       )}
-      {error && (
-        <div className="space-y-2">
-          <p role="alert" className="text-sm text-warning">
-            {error}
-          </p>
-          {error.includes(c.fullCollection) && (
-            <p role="note" className="text-sm text-muted">
-              {c.itemLimitNext}
-            </p>
-          )}
-          <a
-            href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.reload}
-          </a>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={
+            error.includes(c.fullCollection) ? c.capacityErrorDescription : c.actionErrorDescription
+          }
+          action={
+            <a
+              href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.reload}
+            </a>
+          }
+        />
+      ) : null}
       {saved && pending.current && (
         <div className="space-y-2">
           <p role="status" aria-live="polite">

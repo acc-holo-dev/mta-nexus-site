@@ -5,7 +5,7 @@ import {
   type LibraryCollectionReconcilePreview,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import {
   libraryCollectionImportPreviewSchema,
   libraryCollectionManifestSchema,
@@ -171,10 +171,32 @@ export function LibraryCollectionImport({
             />
           </label>
         </fieldset>
-        <Button type="submit" disabled={busy || frozen || !source} variant="outline">
+        <Button
+          type="submit"
+          disabled={busy || frozen || !source}
+          variant="outline"
+          className="min-h-11"
+        >
           {busy ? m.busy : m.preview}
         </Button>
-        {error && <p role="alert">{error}</p>}
+        {error ? (
+          <ErrorState
+            title={error}
+            description={m.previewErrorDescription}
+            action={
+              error === c.retry ? (
+                <Button
+                  type="submit"
+                  disabled={busy || frozen || !source}
+                  variant="outline"
+                  className="min-h-11"
+                >
+                  {m.preview}
+                </Button>
+              ) : undefined
+            }
+          />
+        ) : null}
       </form>
       {frozen && <p role="note">{m.frozen}</p>}
       {preview && (

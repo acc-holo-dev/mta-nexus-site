@@ -55,6 +55,10 @@ export function flattenReactTestTree(node: ReactNode): FlatTestElement[] {
     const type = element.type as (props: Record<string, unknown>) => ReactNode;
     return flattenReactTestTree(type(element.props));
   }
+  if (name === "ErrorState") {
+    const type = element.type as (props: Record<string, unknown>) => ReactNode;
+    return [element, ...flattenReactTestTree(type(element.props))];
+  }
   return [element, ...flattenReactTestTree(element.props.children as ReactNode)];
 }
 
