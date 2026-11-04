@@ -50,6 +50,8 @@ const en = {
   disabled: "Disabled",
   back: "Back to organization",
   reload: "Reload saved state",
+  formErrorHint:
+    "Ownership was not transferred. Retry after reloading the saved organization state.",
   actions: {
     "organization.created": "Organization created",
     "organization.profile_updated": "Public profile updated",
@@ -110,6 +112,8 @@ const ru: typeof en = {
   disabled: "Отключено",
   back: "К организации",
   reload: "Загрузить сохранённое состояние",
+  formErrorHint:
+    "Владение не передано. Повторите после загрузки сохранённого состояния организации.",
   actions: {
     "organization.created": "Организация создана",
     "organization.profile_updated": "Публичный профиль изменён",

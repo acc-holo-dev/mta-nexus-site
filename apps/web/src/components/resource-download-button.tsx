@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -145,7 +145,7 @@ export function ResourceDownloadButton({
         isLoading={busy}
         data-download-intent={resolvedIntent}
         data-build-id={buildId ?? ""}
-        className="h-auto w-full gap-2 bg-success-solid py-3 text-sm font-bold shadow-nexus hover:opacity-90"
+        className="min-h-11 h-auto w-full gap-2 bg-success-solid py-3 text-sm font-bold shadow-nexus hover:opacity-90"
       >
         <Download className="h-4 w-4" aria-hidden="true" />
         {busy ? copy.downloadPreparing : label}
@@ -163,23 +163,26 @@ export function ResourceDownloadButton({
             type="button"
             variant="ghost"
             onClick={() => active.current?.abort()}
-            className="h-auto px-0 text-sm text-secondary underline"
+            className="h-auto min-h-11 px-0 text-sm text-secondary underline"
           >
             {copy.downloadCancel}
           </Button>
         </div>
       )}
-      {failure && (
-        <p role="alert" className="text-sm text-secondary">
-          {copy.downloadErrors[failure]}
-        </p>
-      )}
-      {failure === "signIn" ? (
-        <GuestAuthLinks
-          loginHref={loginHref}
-          registerHref={registerHref}
-          signInLabel={copy.downloadSignIn}
-          createAccountLabel={workspaceCopy.createAccount}
+      {failure ? (
+        <ErrorState
+          title={copy.downloadErrors[failure]}
+          description={copy.downloadErrorHint}
+          action={
+            failure === "signIn" ? (
+              <GuestAuthLinks
+                loginHref={loginHref}
+                registerHref={registerHref}
+                signInLabel={copy.downloadSignIn}
+                createAccountLabel={workspaceCopy.createAccount}
+              />
+            ) : undefined
+          }
         />
       ) : null}
       {notice && (
@@ -193,7 +196,7 @@ export function ResourceDownloadButton({
       receipt.version === version ? (
         <Link
           href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {resourceDeliveriesCopy(locale).details}
         </Link>

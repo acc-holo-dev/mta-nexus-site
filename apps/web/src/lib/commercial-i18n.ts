@@ -57,6 +57,8 @@ const copy = {
     hold: "Initial hold: 7 days",
     estimateNote:
       "This is an estimate of the selected published terms, not an active subscription benefit. Provider fees and taxes are excluded. The seller amount is not a balance available to withdraw.",
+    formErrorHint:
+      "No plan, payment or cancellation change was recorded. Retry the same request or reload the current commercial state.",
     paymentOperations: "Payment history and cancellation",
     attempts: "Recorded payment attempts",
     noAttempts: "No recorded payment attempts.",
@@ -162,6 +164,8 @@ const copy = {
     hold: "Начальное удержание: 7 дней",
     estimateNote:
       "Это оценка выбранных опубликованных условий, а не преимущество активной подписки. Сборы провайдера и налоги не включены. Сумма продавцу не является доступным для вывода балансом.",
+    formErrorHint:
+      "Тариф, платёж или отмена не изменялись. Повторите тот же запрос или обновите текущее коммерческое состояние.",
     paymentOperations: "История платежей и отмена",
     attempts: "Записанные платёжные попытки",
     noAttempts: "Платёжных попыток не зафиксировано.",

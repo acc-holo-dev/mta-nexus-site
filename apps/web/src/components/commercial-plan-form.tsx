@@ -5,7 +5,7 @@ import {
   type CommercialPlan,
   type CommercialPlanCommand,
 } from "@nexus/domain";
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { commercialPlanCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -96,7 +96,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
   const patch = (key: keyof typeof values, value: string) =>
     setValues((current) => ({ ...current, [key]: value }));
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-5 p-5">
+    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5">
       <p role="note" className="text-sm text-secondary">
         {copy.editNote}
       </p>
@@ -230,11 +230,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
           {copy.dirtyNote}
         </p>
       ) : null}
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {saved ? (
         <p role="status" className="text-sm text-success">
           {copy.saved}
@@ -245,6 +241,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
           type="submit"
           disabled={disabled || plan?.status === "archived" || (!!plan && !dirty)}
           isLoading={busy}
+          className="min-h-11"
         >
           {busy ? copy.saving : plan ? copy.save : copy.create}
         </Button>
@@ -261,6 +258,7 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
                 variant="outline"
                 onClick={() => void send(action)}
                 disabled={disabled || dirty}
+                className="min-h-11"
               >
                 {copy[action]}
               </Button>

@@ -70,6 +70,8 @@ const copy = {
         "Upload a version with a trusted clean scan before submitting the draft.",
       RESOURCE_LIFECYCLE_INVALID: "Enter a reason of 5–1000 characters and confirm the action.",
       fallback: "The operation was not confirmed. Retry or refresh to check the current state.",
+      formErrorHint:
+        "No cart or acquisition change was recorded. Retry the same request or refresh the cart state.",
     },
   },
   ru: {
@@ -141,6 +143,8 @@ const copy = {
       RESOURCE_LIFECYCLE_INVALID: "Укажите причину длиной 5–1000 символов и подтвердите действие.",
       fallback:
         "Операция не подтверждена. Повторите запрос или обновите страницу, чтобы проверить состояние.",
+      formErrorHint:
+        "Корзина или получение не изменялись. Повторите тот же запрос или обновите состояние корзины.",
     },
   },
 };

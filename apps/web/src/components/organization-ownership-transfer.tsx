@@ -1,5 +1,5 @@
 "use client";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../lib/i18n";
@@ -106,7 +106,7 @@ export function OrganizationOwnershipTransfer({
   return (
     <section
       id="organization-ownership-transfer"
-      className="nexus-panel scroll-mt-20 space-y-4 border border-danger/30 p-5"
+      className="nexus-panel min-w-0 scroll-mt-20 space-y-4 overflow-x-clip border border-danger/30 p-5"
       aria-busy={busy}
     >
       <h2 className="font-heading text-primary">{copy.transfer}</h2>
@@ -170,31 +170,39 @@ export function OrganizationOwnershipTransfer({
               variant="danger"
               disabled={busy || slug !== data.organization.slug || !currentPassword}
               isLoading={busy}
+              className="min-h-11"
             >
               {copy.submit}
             </Button>
-            <Button type="button" variant="secondary" disabled={busy} onClick={onCancel}>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={busy}
+              onClick={onCancel}
+              className="min-h-11"
+            >
               {copy.cancel}
             </Button>
           </div>
         </form>
       )}
-      {error && (
-        <div className="space-y-2">
-          <p role="alert" className="text-sm text-danger">
-            {error}
-          </p>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={busy}
-            onClick={onReload}
-            className="h-auto min-h-9 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reload}
-          </Button>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.formErrorHint}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={busy}
+              onClick={onReload}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reload}
+            </Button>
+          }
+        />
+      ) : null}
     </section>
   );
 }

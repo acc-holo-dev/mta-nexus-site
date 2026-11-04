@@ -1,7 +1,7 @@
 "use client";
 import type { LicenseReleaseCheck, LicenseReleaseConfirmation } from "@nexus/domain";
 import { LICENSE_RUNTIME_TOKEN_PATTERN } from "@nexus/domain";
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { getLicenseControlCopy } from "../lib/license-control-i18n";
 import {
@@ -157,7 +157,7 @@ export function LicenseRuntimeProbe({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             disabled={busy}
             onClick={() => void check()}
           >
@@ -169,7 +169,7 @@ export function LicenseRuntimeProbe({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-auto px-0 text-sm text-accent"
+                className="h-auto min-h-11 px-0 text-sm text-accent"
                 disabled={busy || context.page <= 1}
                 onClick={() => setPage(context.page - 1)}
               >
@@ -182,7 +182,7 @@ export function LicenseRuntimeProbe({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-auto px-0 text-sm text-accent"
+                className="h-auto min-h-11 px-0 text-sm text-accent"
                 disabled={busy || context.page >= context.totalPages}
                 onClick={() => setPage(context.page + 1)}
               >
@@ -218,11 +218,7 @@ export function LicenseRuntimeProbe({
           </time>
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
     </section>
   );
 }

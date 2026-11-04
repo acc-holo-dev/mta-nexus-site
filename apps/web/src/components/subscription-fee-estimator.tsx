@@ -1,6 +1,6 @@
 "use client";
 import type { commercialFeeEstimate } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { formatHistoryAmount } from "../lib/commerce-history-format";
 import { parseCommercialAmount } from "../lib/commercial-confirmation";
@@ -73,7 +73,7 @@ export function SubscriptionFeeEstimator({
           : c.estimateFailed;
   }
   return (
-    <form className="nexus-panel space-y-4 p-5" onSubmit={submit}>
+    <form className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5" onSubmit={submit}>
       <p className="text-sm text-secondary" role="note">
         {c.feeNote}
       </p>
@@ -109,10 +109,10 @@ export function SubscriptionFeeEstimator({
           </select>
         </label>
       </fieldset>
-      <Button type="submit" variant="outline" isLoading={busy}>
+      <Button type="submit" variant="outline" isLoading={busy} className="min-h-11">
         {busy ? c.busy : c.calculate}
       </Button>
-      {error && <p role="alert">{error}</p>}
+      {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
       {result && (
         <output className="block space-y-2">
           <p>

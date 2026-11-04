@@ -32,6 +32,8 @@ export function storageMaintenanceCopy(locale: string) {
         hash: "SHA-256",
         size: "Байт",
         error: "Операция не завершена. Обновите сведения; результат мог быть сохранён сервером.",
+        formErrorHint:
+          "Не считайте очистку завершённой без подтверждения. Обновите сведения и повторите при необходимости.",
         cleanup: "Удалить этот объект",
         confirm:
           "Подтверждаю удаление этого объекта без ссылок и постоянный запрет новых привязок его ключа.",
@@ -88,6 +90,8 @@ export function storageMaintenanceCopy(locale: string) {
         hash: "SHA-256",
         size: "Bytes",
         error: "The operation did not complete. Refresh; the server may have recorded its outcome.",
+        formErrorHint:
+          "Do not treat cleanup as finished without confirmation. Refresh details and retry if needed.",
         cleanup: "Delete this object",
         confirm:
           "I confirm deletion of this unreferenced object and the permanent ban on new references to its key.",

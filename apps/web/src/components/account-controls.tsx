@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, buttonClassName } from "@nexus/ui";
+import { Button, buttonClassName, ErrorState } from "@nexus/ui";
 import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -125,7 +125,7 @@ export function AccountControls() {
     variant: "outline",
     size: "sm",
     className:
-      "shrink-0 rounded-md border-base bg-elevated px-2 font-semibold text-primary sm:px-2.5",
+      "min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold text-primary sm:px-2.5",
   });
 
   return (
@@ -164,7 +164,7 @@ export function AccountControls() {
             isLoading={signingOut}
             aria-label={signingOut ? copy.signingOut : copy.signOut}
             title={signingOut ? copy.signingOut : copy.signOut}
-            className="shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+            className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
@@ -176,7 +176,7 @@ export function AccountControls() {
           variant="outline"
           size="sm"
           onClick={() => setAttempt((value) => value + 1)}
-          className="shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+          className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
         >
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>
@@ -190,14 +190,11 @@ export function AccountControls() {
         </Link>
       )}
 
-      {error && (
-        <p
-          role="alert"
-          className="absolute right-0 top-full z-50 mt-2 w-64 max-w-[85vw] rounded-md border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-3 text-xs text-danger shadow-nexus"
-        >
-          {error}
-        </p>
-      )}
+      {error ? (
+        <div className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[85vw] shadow-nexus">
+          <ErrorState title={error} description={copy.errorHint} className="items-stretch py-4" />
+        </div>
+      ) : null}
     </div>
   );
 }

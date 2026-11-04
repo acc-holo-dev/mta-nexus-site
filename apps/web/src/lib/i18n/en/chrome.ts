@@ -13,6 +13,7 @@ export const chrome = {
     signIn: "Sign in",
     checkError: "Could not check your account. Try again.",
     signOutError: "Could not confirm sign out. Your session may still be active. Try again.",
+    errorHint: "Retry keeps the same signed-in destination. This does not change your session.",
   },
   notificationBell: {
     close: "Close notifications",

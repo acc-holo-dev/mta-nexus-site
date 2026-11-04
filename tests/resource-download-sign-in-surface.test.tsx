@@ -66,6 +66,22 @@ vi.mock("@nexus/ui", async () => {
       children: ReactNode;
       [key: string]: unknown;
     }) => React.createElement("button", { type: "button", onClick, ...props }, children),
+    ErrorState: ({
+      title,
+      description,
+      action,
+    }: {
+      title: string;
+      description?: string;
+      action?: ReactNode;
+    }) =>
+      React.createElement(
+        "div",
+        { role: "alert" },
+        React.createElement("h2", null, title),
+        description ? React.createElement("p", null, description) : null,
+        action ? React.createElement("div", null, action) : null,
+      ),
   };
 });
 vi.mock("../apps/web/src/lib/resource-download-client", async (original) => {
