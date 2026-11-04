@@ -204,12 +204,24 @@ export class ProductService {
   }
 
   async getProductPreviewBySlug(slug: string, actor: User | null): Promise<Product | null> {
+    return (await this.getProductDetailAccessBySlug(slug, actor))?.product ?? null;
+  }
+
+  async getProductDetailAccessBySlug(
+    slug: string,
+    actor: User | null,
+  ): Promise<{ product: Product; isPublic: boolean } | null> {
     const product = await productRepository.findBySlug(slug);
     if (product?.price !== 0) return null;
-    if (product.status === "published") return product;
+    if (
+      product.status === "published" &&
+      (await buildRepository.findLatestPublishedByProduct(product.id))
+    ) {
+      return { product, isPublic: true };
+    }
     if (!actor) return null;
 
-    return (await this.canManageProduct(product, actor)) ? product : null;
+    return (await this.canManageProduct(product, actor)) ? { product, isPublic: false } : null;
   }
 
   async getProductById(id: string): Promise<Product | null> {

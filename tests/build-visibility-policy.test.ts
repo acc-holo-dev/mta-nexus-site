@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Product, User } from "@nexus/domain";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   findBySlug: vi.fn(),
+  findLatestPublishedByProduct: vi.fn(),
   listPublishedByProduct: vi.fn(),
   listByProduct: vi.fn(),
   can: vi.fn(),
@@ -19,6 +20,7 @@ vi.mock("@nexus/db", () => ({
     listPublishedFreeDependingOnSlug: vi.fn(async () => []),
   },
   buildRepository: {
+    findLatestPublishedByProduct: mocks.findLatestPublishedByProduct,
     listPublishedByProduct: mocks.listPublishedByProduct,
     listByProduct: mocks.listByProduct,
   },
@@ -73,6 +75,7 @@ describe("resource build visibility behavior", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.findLatestPublishedByProduct.mockResolvedValue({ id: "bld_public" });
     mocks.listPublishedByProduct.mockResolvedValue([{ id: "bld_public", status: "published" }]);
     mocks.listByProduct.mockResolvedValue([
       { id: "bld_public", status: "published" },
@@ -130,6 +133,42 @@ describe("resource build visibility behavior", () => {
 
     await expect(service.getProductPreviewBySlug(draft.slug, outsider)).resolves.toBe(draft);
     expect(mocks.hasManagementAccess).toHaveBeenCalledExactlyOnceWith(draft.id, outsider);
+  });
+
+  it("limits a published resource without a safe build to a labeled manager preview", async () => {
+    const published = product({ status: "published" });
+    mocks.findBySlug.mockResolvedValue(published);
+    mocks.findLatestPublishedByProduct.mockResolvedValue(null);
+
+    await expect(service.getProductDetailAccessBySlug(published.slug, null)).resolves.toBeNull();
+    await expect(
+      service.getProductDetailAccessBySlug(published.slug, outsider),
+    ).resolves.toBeNull();
+    mocks.hasManagementAccess.mockResolvedValue(true);
+    await expect(service.getProductDetailAccessBySlug(published.slug, outsider)).resolves.toEqual({
+      product: published,
+      isPublic: false,
+    });
+    expect(mocks.findLatestPublishedByProduct).toHaveBeenCalledWith(published.id);
+  });
+
+  it("allows public detail only when a published resource has a safe build", async () => {
+    const published = product({ status: "published" });
+    mocks.findBySlug.mockResolvedValue(published);
+    await expect(service.getProductDetailAccessBySlug(published.slug, null)).resolves.toEqual({
+      product: published,
+      isPublic: true,
+    });
+    expect(mocks.hasManagementAccess).not.toHaveBeenCalled();
+  });
+
+  it("does not expose published detail when the safe-build lookup fails", async () => {
+    const published = product({ status: "published" });
+    mocks.findBySlug.mockResolvedValue(published);
+    mocks.findLatestPublishedByProduct.mockRejectedValue(new Error("Database unavailable"));
+    await expect(service.getProductDetailAccessBySlug(published.slug, null)).rejects.toThrow(
+      "Database unavailable",
+    );
   });
 
   it("propagates a failed live access lookup without returning the draft", async () => {

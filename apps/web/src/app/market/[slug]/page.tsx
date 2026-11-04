@@ -138,9 +138,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const commerceCopy = getResourceCommerceCopy(locale);
   const watchCopy = resourceReleaseWatchesCopy(locale);
   const reviewCopy = resourceReviewCopy(locale);
-  let product: Awaited<ReturnType<typeof productService.getProductPreviewBySlug>>;
+  let detail: Awaited<ReturnType<typeof productService.getProductDetailAccessBySlug>>;
   try {
-    product = await productService.getProductPreviewBySlug(slug, user);
+    detail = await productService.getProductDetailAccessBySlug(slug, user);
   } catch {
     return (
       <div className={pageShellClass}>
@@ -157,14 +157,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     );
   }
 
-  if (!product) {
+  if (!detail) {
     notFound();
   }
 
+  const { product, isPublic } = detail;
   const managementAccess = user
     ? productService.canManageProduct(product, user)
     : Promise.resolve(false);
-  const isPublished = product.status === "published";
   const isAdmin = user?.role === "admin";
   const detailReturnPath = `/market/${encodeURIComponent(product.slug)}`;
 
@@ -195,12 +195,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       const canInspectBuilds = canManageProduct || isAdmin;
       return productService.getProductBuilds(product.id, canInspectBuilds);
     }),
-    isPublished ? resourceReviewService.publicPage(product.id).catch(() => null) : null,
-    isPublished ? resourceQaService.publicPage(product.id, 1, user).catch(() => null) : null,
+    isPublic ? resourceReviewService.publicPage(product.id).catch(() => null) : null,
+    isPublic ? resourceQaService.publicPage(product.id, 1, user).catch(() => null) : null,
     productService.getDependencyResolution(product).catch(() => null),
     productService.getReverseDependencySummary(product.slug).catch(() => null),
-    isPublished ? resourceManagementService.publicVariants(product.id) : null,
-    isPublished
+    isPublic ? resourceManagementService.publicVariants(product.id) : null,
+    isPublic
       ? resourceMediaRepository.publicItems(product.id)
       : managementAccess.then(async (allowed) =>
           allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : [],
@@ -212,7 +212,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       ? followWorkspaceRepository.states(user.id, "product", [product.id]).catch(() => null)
       : Promise.resolve([] as string[]),
   ]);
-  const hasAccess = isPublished && (canManageProduct || isLicensed || isAdmin);
+  const hasAccess = isPublic && (canManageProduct || isLicensed || isAdmin);
   const saveInitial = {
     authenticated: Boolean(user),
     following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
@@ -254,7 +254,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className={pageShellClass}>
-      {!isPublished && (
+      {!isPublic && (
         <div className="rounded-xl border border-[color:var(--nexus-warning)]/25 bg-warning-soft p-4 text-sm text-warning">
           <strong>{copy.privatePreview}</strong> · {copy.resourceStatus}:{" "}
           {formatProductStatus(product.status, copy)}. {copy.notPublic}
@@ -316,7 +316,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </div>
 
             <div className="space-y-3 border-t border-base pt-4">
-              {isPublished ? (
+              {isPublic ? (
                 <div className="space-y-1">
                   <FollowButton
                     targetType="product"
@@ -386,7 +386,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     />
                   </section>
                 </div>
-              ) : isPublished && product.price === 0 ? (
+              ) : isPublic && product.price === 0 ? (
                 <div className="space-y-3">
                   <div className="space-y-2" data-acquire-intent="single">
                     <p className="text-center text-[11px] text-muted">
@@ -400,7 +400,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     </Link>
                     <p className="text-center text-[11px] text-faint">{copy.claimRequired}</p>
                   </div>
-                  {isPublished && (
+                  {isPublic && (
                     <AddResourceToCart
                       key={product.id}
                       productId={product.id}
@@ -427,7 +427,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 </div>
               ) : (
                 <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
-                  {isPublished ? dictionary.checkout.paidDisabled : copy.notPublic}
+                  {isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}
                 </div>
               )}
             </div>
@@ -526,7 +526,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </div>
 
             <p className="text-xs leading-relaxed text-muted">{copy.latestBuildNotice}</p>
-            {isPublished && (
+            {isPublic && (
               <Link
                 href={releaseHistoryHref(product.slug)}
                 className="inline-flex text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -623,7 +623,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <span>{copy.reviews}</span>
             </h2>
 
-            {isPublished && !reviewPage ? (
+            {isPublic && !reviewPage ? (
               <ErrorState
                 title={reviewCopy.pageUnavailable}
                 description={reviewCopy.pageUnavailableDescription}
@@ -664,7 +664,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             )}
           </section>
 
-          {isPublished ? (
+          {isPublic ? (
             <div id="resource-qa">
               <ResourceQaPanel
                 productId={product.id}

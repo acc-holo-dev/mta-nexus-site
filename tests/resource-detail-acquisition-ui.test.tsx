@@ -15,12 +15,15 @@ const state = vi.hoisted(() => ({
   canManage: false,
   locale: "en" as "en" | "ru",
   product: null as null | Record<string, unknown>,
+  isPublic: true,
   builds: [] as Array<Record<string, unknown>>,
 }));
 
 const productService = vi.hoisted(() => ({
   getProductBySlug: vi.fn(async () => state.product),
-  getProductPreviewBySlug: vi.fn(async () => state.product),
+  getProductDetailAccessBySlug: vi.fn(async () =>
+    state.product ? { product: state.product, isPublic: state.isPublic } : null,
+  ),
   canManageProduct: vi.fn(async () => state.canManage),
   getProductBuilds: vi.fn(async () => state.builds),
   getDependencyResolution: vi.fn(async () => null),
@@ -299,7 +302,21 @@ describe("resource detail acquisition behavior", () => {
     state.canManage = false;
     state.locale = "en";
     state.product = product(0);
+    state.isPublic = true;
     state.builds = [build("bld_latest", "2.0.0"), build("bld_old", "1.0.0")];
+  });
+
+  it("labels a published resource without a safe build as a private manager preview", async () => {
+    state.user = { id: "usr_owner", username: "owner", role: "user" };
+    state.canManage = true;
+    state.isPublic = false;
+    const copy = getDictionary("en").product;
+    const html = renderPage(
+      await ProductDetailPage({ params: Promise.resolve({ slug: "detail-resource" }) }),
+    );
+    expect(html).toContain(copy.privatePreview);
+    expect(html).toContain(copy.notPublic);
+    expect(html).not.toContain('data-testid="resource-qa"');
   });
 
   it("starts public metadata lookup while locale resolution is pending", async () => {
