@@ -1,21 +1,21 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, readFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import {
-  REQUIRED_RELEASE_GATES,
-  writeReleaseEvidence,
-  executeReleaseCommand,
-  repositoryStayedStable,
   buildEvidenceChecksum,
-  listMigrationEvidence,
-  summarizeReleaseEvidence,
-  summarizeExternalEvidence,
   buildReleaseManifest,
   evaluateReleaseManifest,
+  executeReleaseCommand,
+  listMigrationEvidence,
   RELEASE_MANIFEST_SCHEMA_VERSION,
   RELEASE_RETENTION_CONTRACT,
+  REQUIRED_RELEASE_GATES,
+  repositoryStayedStable,
+  summarizeExternalEvidence,
+  summarizeReleaseEvidence,
+  writeReleaseEvidence,
 } from "../release-evidence-lib.mjs";
 
 const sampleSha = "a".repeat(40);
@@ -355,4 +355,64 @@ test("OPS-08 release manifest blocks missing or mismatched digest SHA schema and
     ).ok,
     true,
   );
+});
+
+test("strict app image validation requires a resolved digest for the exact SHA and platform", () => {
+  const good = {
+    digest: `sha256:${"1".repeat(64)}`,
+    platform: "linux/amd64",
+    sourceSha: sampleSha,
+    status: "resolved",
+  };
+  const check = (image) =>
+    evaluateReleaseManifest({ ...sampleManifest(), image }, { requireImageDigest: true });
+  assert.equal(check(good).ok, true);
+  for (const bad of [
+    { ...good, digest: null },
+    { ...good, digest: "sha256:bad" },
+    { ...good, platform: null },
+    { ...good, platform: "/" },
+    { ...good, platform: "linux/arm/v7/extra" },
+    { ...good, sourceSha: null },
+    { ...good, sourceSha: "" },
+    { ...good, sourceSha: "f".repeat(40) },
+    { ...good, status: null },
+    { ...good, status: "unresolved" },
+    { digest: good.digest, platform: good.platform },
+  ]) {
+    assert.equal(check(bad).ok, false, JSON.stringify(bad));
+  }
+  // The existing non-strict technical check still permits an unresolved image.
+  assert.equal(evaluateReleaseManifest(sampleManifest()).ok, true);
+});
+
+test("strict infra validation requires the complete resolved pin inventory", () => {
+  const pins = JSON.parse(readFileSync("deploy/infra-image-pins.json", "utf8"));
+  const good = pins.images;
+  const check = (infraImages) =>
+    evaluateReleaseManifest(sampleManifest({ infraImages }), { requireResolvedInfra: true });
+  assert.equal(check(good).ok, true);
+  for (const bad of [
+    null,
+    [],
+    [good[0]],
+    [...good, good[0]],
+    [{ role: "invented", digest: `sha256:${"1".repeat(64)}` }],
+    good.map((item, index) => (index === 0 ? { ...item, role: "invented" } : item)),
+    good.map((item, index) => (index === 0 ? { ...item, ref: "node:latest" } : item)),
+    good.map((item, index) => (index === 0 ? { ...item, digest: null } : item)),
+    good.map((item, index) => (index === 0 ? { ...item, status: "unresolved" } : item)),
+    good.map((item, index) => (index === 0 ? { ...item, platform: "linux/arm/v7/extra" } : item)),
+    ...["ref", "digest", "status", "platform"].map((field) =>
+      good.map((item, index) => {
+        if (index !== 0) return item;
+        const entry = { ...item };
+        delete entry[field];
+        return entry;
+      }),
+    ),
+  ]) {
+    assert.equal(check(bad).ok, false, JSON.stringify(bad));
+  }
+  assert.equal(evaluateReleaseManifest(sampleManifest()).ok, true);
 });

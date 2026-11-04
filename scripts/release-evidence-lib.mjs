@@ -1,8 +1,14 @@
 import { spawnSync } from "node:child_process";
-import { performance } from "node:perf_hooks";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, mkdtempSync, writeFileSync, renameSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
+import { performance } from "node:perf_hooks";
+import {
+  evaluateInfraImagePins,
+  INFRA_IMAGE_PIN_SCHEMA_VERSION,
+  isImagePlatform,
+  POSTGRES_VOLUME_PATH,
+} from "./infra-image-policy.mjs";
 
 export function sha256File(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -320,11 +326,18 @@ export function evaluateReleaseManifest(
         reason: "Release manifest app image digest is missing or invalid.",
       };
     }
-    if (typeof image.platform !== "string" || !image.platform.includes("/")) {
+    if (!isImagePlatform(image.platform)) {
       return {
         ok: false,
         status: "blocked",
-        reason: "Release manifest app image platform is missing.",
+        reason: "Release manifest app image platform is missing or invalid.",
+      };
+    }
+    if (image.status !== "resolved" || image.sourceSha !== sha) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: "Release manifest app image must be resolved for the exact repository SHA.",
       };
     }
   } else if (image.status === "resolved" && !DIGEST_RE.test(image.digest ?? "")) {
@@ -342,22 +355,22 @@ export function evaluateReleaseManifest(
     };
   }
   if (requireResolvedInfra) {
-    const infra = manifest.infraImages;
-    if (!Array.isArray(infra) || infra.length === 0) {
+    const result = evaluateInfraImagePins(
+      {
+        schemaVersion: INFRA_IMAGE_PIN_SCHEMA_VERSION,
+        productionAuthorized: false,
+        postgresMajor: manifest.postgresMajor,
+        postgresVolumePath: POSTGRES_VOLUME_PATH,
+        images: manifest.infraImages,
+      },
+      { requireResolved: true },
+    );
+    if (!result.ok) {
       return {
         ok: false,
         status: "blocked",
-        reason: "Release manifest infra image digests are missing.",
+        reason: `Release manifest infra images: ${result.reason}`,
       };
-    }
-    for (const entry of infra) {
-      if (!DIGEST_RE.test(entry?.digest ?? "")) {
-        return {
-          ok: false,
-          status: "blocked",
-          reason: `Release manifest infra digest missing for role ${entry?.role ?? "unknown"}.`,
-        };
-      }
     }
   }
   if (manifest.retention?.ciArtifactDays !== 14) {
