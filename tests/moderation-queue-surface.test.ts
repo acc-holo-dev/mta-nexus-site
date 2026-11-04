@@ -161,6 +161,29 @@ describe("moderation queue admin boundary", () => {
     expect(markup).toContain("min-w-0 space-y-8 overflow-x-clip");
     expect(markup).toContain('href="/admin/support"');
     expect(markup).toContain(copy.supportQueue);
+    expect(markup).toContain('href="/admin/reports"');
+    expect(markup).toContain(copy.reportsQueue);
+    expect(markup).toContain('href="/admin/resources"');
+  });
+
+  it("shows an honest hub recovery state when queue loads fail together", async () => {
+    state.user = {
+      id: "usr_admin",
+      username: "admin",
+      displayName: "Admin",
+      role: "admin",
+    };
+    mocks.listReports.mockRejectedValue(new Error("queue unavailable"));
+
+    const markup = renderToStaticMarkup(await AdminPage({ searchParams: Promise.resolve({}) }));
+    const copy = getDictionary("en").admin;
+
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain(copy.hubUnavailable);
+    expect(markup).toContain("overflow-x-clip");
+    expect(markup).toContain(getDictionary("en").errors.retry);
+    expect(markup).toContain('href="/admin?');
+    expect(markup).not.toContain(copy.resourceBuildQueue);
   });
 
   it("normalizes invalid build page input before repository access", async () => {

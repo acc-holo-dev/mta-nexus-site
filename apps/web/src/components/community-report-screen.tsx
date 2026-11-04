@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,6 +11,7 @@ import {
 } from "../lib/community-report-contract";
 import { communityReportCopy } from "../lib/community-report-copy";
 import { reportGroupsCopy } from "../lib/community-report-groups-copy";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
@@ -26,7 +28,8 @@ export async function CommunityReportScreen({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const locale = await getRequestLocale(),
-    copy = communityReportCopy(locale);
+    copy = communityReportCopy(locale),
+    dictionary = getDictionary(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const base = staff ? "/admin/reports" : "/workspace/reports";
   const listParams = new URLSearchParams();
@@ -46,16 +49,26 @@ export async function CommunityReportScreen({
   }
   if (staff && !can(actor, "admin.moderation")) {
     return (
-      <div className="nexus-panel space-y-3 p-8">
-        <h1 className="text-xl font-semibold text-primary">{copy.forbidden}</h1>
+      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+        <ErrorState
+          title={copy.forbidden}
+          action={
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.admin.title}
+            </Link>
+          }
+        />
       </div>
     );
   }
   const title = id ? copy.detail : staff ? copy.queue : copy.title;
   const header = (
-    <header>
+    <header className="min-w-0 space-y-2">
       <h1 className="text-2xl font-bold text-primary">{title}</h1>
-      <p className="mt-2 text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
+      <p className="text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
       {staff && !id && (
         <Link
           href="/admin/reports/targets"
@@ -76,7 +89,7 @@ export async function CommunityReportScreen({
       if (error instanceof AppError && error.statusCode === 404) notFound();
     }
     return (
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6 overflow-x-clip">
         {header}
         <CommunityReportDetailView
           key={`${actor.id}:${id}:${staff}`}
@@ -91,17 +104,19 @@ export async function CommunityReportScreen({
   const filters = communityReportPageQuery(await searchParams);
   if (!filters)
     return (
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4 overflow-x-clip">
         {header}
-        <p role="alert" className="nexus-panel p-5 text-danger">
-          {copy.queryInvalid}
-        </p>
-        <Link
-          href={staff ? "/admin/reports" : "/workspace/reports"}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
+        <ErrorState
+          title={copy.queryInvalid}
+          action={
+            <Link
+              href={base}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          }
+        />
       </div>
     );
   const initial = await communityReportService
@@ -109,7 +124,7 @@ export async function CommunityReportScreen({
     .then((value) => communityReportPageSchema.parse(value))
     .catch(() => null);
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       {header}
       <CommunityReportList
         key={`${actor.id}:${staff}:${JSON.stringify(filters)}`}

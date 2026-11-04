@@ -50,9 +50,9 @@
 4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
-7. Следующий разрешённый продуктовый результат — **Admin primary journey** (reports/resources/verification hubs beyond support queue). Support (list/create → open case; staff queue; messages; honest empty|error + overflow clip; form vs list errors separated) уходит отдельным PR. После merge: один сценарий Admin hub → open queue/detail или honest empty/error; mobile; RU/EN.
-8. Приёмка: focused admin suites + typecheck/lint/build; browser evidence только на exact SHA. Сначала CI tip после merge — красный tip важнее новой UI-работы.
-9. Дальше: Admin → operational gates **OPS-09…20**, ads **UX-24–26**, пилоты **GROW-02…09** без активации.
+7. Следующий разрешённый результат после merge Admin primary — **operational gates OPS-09…20** (F03 alert routing, F04 backup/recovery, github_settings). Admin hub (Promise.all.catch → hubUnavailable + retry; reports/resources chrome; resource moderation ErrorState/EmptyState/clearFilters; community report list/detail ErrorState + overflow clip; loadings clipped) уходит отдельным PR. После merge tip: сначала CI на exact SHA — красный tip важнее новой OPS-работы.
+8. Приёмка OPS: только по свидетельству с целевой среды / явному допуску владельца; локальная подготовка ≠ live gate. Ads **UX-24–26** и пилоты **GROW-02…09** без активации.
+9. Product UI journeys (Notifications → Library → Discover/Resources → Server/Profile/Community → Support → Admin) закрыты кодом в stack PR; не объявлять production readiness по числу PR.
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 

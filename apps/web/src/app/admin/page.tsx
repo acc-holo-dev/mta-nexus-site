@@ -103,6 +103,38 @@ export default async function AdminPage({
 
   const adminUser = currentUser;
   const canViewAudit = can(adminUser, "admin.audit");
+  const loaded = await Promise.all([
+    adminService.getSystemHealthMetrics(adminUser),
+    adminService.listReports(adminUser, reportView, reportPage),
+    verificationRepository.listPage(verificationView, verificationPage),
+    verificationRepository.countPending(),
+    buildRepository.listPendingReviewPage(buildPage),
+    buildRepository.countPendingReview(),
+    buildRepository.listRiskReviewPage(riskBuildPage),
+    buildRepository.countQuarantined(),
+    contentRepository.listDraftPage(contentPage),
+    contentRepository.countDrafts(),
+    canViewAudit ? adminService.listAuditLogs(adminUser) : Promise.resolve([]),
+  ]).catch(() => null);
+
+  if (!loaded) {
+    return (
+      <div className="min-w-0 space-y-6 overflow-x-clip">
+        <ErrorState
+          title={copy.hubUnavailable}
+          action={
+            <Link
+              href={adminHref({})}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
   const [
     health,
     reportPageResult,
@@ -115,25 +147,15 @@ export default async function AdminPage({
     contentPageResult,
     pendingContentCount,
     auditLogs,
-  ] = await Promise.all([
-    adminService.getSystemHealthMetrics(adminUser),
-    adminService.listReports(adminUser, reportView, reportPage),
-    verificationRepository.listPage(verificationView, verificationPage),
-    verificationRepository.countPending(),
-    buildRepository.listPendingReviewPage(buildPage),
-    buildRepository.countPendingReview(),
-    buildRepository.listRiskReviewPage(riskBuildPage),
-    buildRepository.countQuarantined(),
-    contentRepository.listDraftPage(contentPage),
-    contentRepository.countDrafts(),
-    canViewAudit ? adminService.listAuditLogs(adminUser) : Promise.resolve([]),
-  ]);
+  ] = loaded;
 
   const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
   const { reports, hasMore: moreReports } = reportPageResult;
   const { builds: pendingBuilds, hasMore: moreBuilds } = buildPageResult;
   const { builds: riskBuilds, hasMore: moreRiskBuilds } = riskBuildPageResult;
   const { items: pendingContent, hasMore: moreContent } = contentPageResult;
+  const chromeLinkClass =
+    "inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
   return (
     <div className="min-w-0 space-y-8 overflow-x-clip">
@@ -147,31 +169,22 @@ export default async function AdminPage({
         </div>
         <div className="flex min-w-0 flex-wrap items-center gap-2 self-start sm:self-auto">
           {currentUser.role === "admin" ? (
-            <Link
-              href="/admin/commerce/plans"
-              className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/admin/commerce/plans" className={chromeLinkClass}>
               {getCommercialCopy(locale).admin}
             </Link>
           ) : null}
-          <Link
-            href="/admin/resources"
-            className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/admin/resources" className={chromeLinkClass}>
             {getResourceReleaseControlCopy(locale).moderation}
           </Link>
+          <Link href="/admin/reports" className={chromeLinkClass}>
+            {copy.reportsQueue}
+          </Link>
           {currentUser.role === "admin" ? (
-            <Link
-              href="/admin/commerce/reconciliation"
-              className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/admin/commerce/reconciliation" className={chromeLinkClass}>
               {getFinancialCopy(locale).review}
             </Link>
           ) : null}
-          <Link
-            href="/admin/support"
-            className="inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/admin/support" className={chromeLinkClass}>
             {copy.supportQueue}
           </Link>
           <span className="rounded-full border border-base bg-inset px-3 py-1 font-label uppercase text-muted">

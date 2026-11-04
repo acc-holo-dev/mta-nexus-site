@@ -1,7 +1,8 @@
+import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { AppError } from "@nexus/domain";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -79,12 +80,14 @@ vi.mock("../apps/web/src/components/resource-moderation-controls", () => ({
     <span data-status={product.status}>Moderation</span>
   ),
 }));
-import Updates, { metadata } from "../apps/web/src/app/workspace/library/updates/page";
-import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
-import Versions from "../apps/web/src/app/workspace/library/[id]/versions/page";
-import Staff from "../apps/web/src/app/admin/resources/page";
+
 import StaffDetail from "../apps/web/src/app/admin/resources/[id]/page";
+import Staff from "../apps/web/src/app/admin/resources/page";
+import Versions from "../apps/web/src/app/workspace/library/[id]/versions/page";
+import Updates, { metadata } from "../apps/web/src/app/workspace/library/updates/page";
 import Publisher from "../apps/web/src/app/workspace/resources/[id]/moderation/page";
+import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+
 const input = {
   params: Promise.resolve({ id: "prd_a" }),
   searchParams: Promise.resolve({ page: "2" }),
@@ -323,6 +326,37 @@ it("rejects stale staff privilege before rendering the private queue", async () 
   state.user = { id: "usr_a", role: "moderator" };
   state.staff.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
   await expect(Staff(input)).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("shows an honest recovery state when staff moderation inventory fails", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.staff.mockRejectedValue(new Error("inventory unavailable"));
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await Staff(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/resources?page=2"');
+  expect(html).not.toContain("&lt;Resource&gt;");
+});
+it("renders empty staff inventory with clear-filters recovery when filters are active", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.staff.mockResolvedValue({
+    resources: [],
+    page: 1,
+    totalPages: 1,
+    pageSize: 20,
+    total: 0,
+  });
+  const copy = getResourceReleaseControlCopy("en");
+  const filtered = renderToStaticMarkup(
+    await Staff({
+      searchParams: Promise.resolve({ status: "suspended", query: "alpha", page: "1" }),
+    }),
+  );
+  expect(filtered).toContain(copy.empty);
+  expect(filtered).toContain(copy.clearFilters);
+  expect(filtered).toContain('href="/admin/resources"');
+  expect(filtered).toContain("overflow-x-clip");
 });
 it("renders staff decisions with resource revision controls and bounded history", async () => {
   state.user = { id: "usr_a", role: "moderator" };

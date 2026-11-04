@@ -87,6 +87,9 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
     <CommunityReportList initial={null} filters={filters} locale="en" />,
   );
   expect(failure).toContain('role="alert"');
+  expect(failure).toContain(communityReportCopy("en").unavailable);
+  expect(failure).toContain("overflow-x-clip");
+  expect(failure).toContain(communityReportCopy("en").reload);
   expect(failure).not.toContain(communityReportCopy("en").empty);
   expect(failure).not.toContain(communityReportCopy("en").emptyFiltered);
   const empty = renderToStaticMarkup(
@@ -97,6 +100,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
     />,
   );
   expect(empty).toContain(communityReportCopy("en").empty);
+  expect(empty).toContain("overflow-x-clip");
   expect(empty).not.toContain(communityReportCopy("en").emptyFiltered);
   const filteredEmpty = renderToStaticMarkup(
     <CommunityReportList
@@ -114,6 +118,25 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   );
   expect(detail).toContain(communityReportCopy("en").missing);
   expect(detail).not.toContain(communityReportCopy("en").remove_comment);
+  const detailFailure = renderToStaticMarkup(
+    <CommunityReportDetailView id="report" initial={null} locale="en" />,
+  );
+  expect(detailFailure).toContain('role="alert"');
+  expect(detailFailure).toContain(communityReportCopy("en").unavailable);
+  expect(detailFailure).toContain("overflow-x-clip");
+});
+it("keeps staff report screens clipped and recovers invalid filters through ErrorState", async () => {
+  mocks.session.mockResolvedValue({ id: "actor", role: "moderator" });
+  const invalid = renderToStaticMarkup(
+    await CommunityReportScreen({
+      staff: true,
+      searchParams: Promise.resolve({ q: ["x", "y"] }),
+    }),
+  );
+  expect(invalid).toContain(communityReportCopy("en").queryInvalid);
+  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toContain('href="/admin/reports"');
+  expect(mocks.page).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(
   "keeps staff notes/actions private and escapes target content in %s",

@@ -1,5 +1,6 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -33,6 +34,7 @@ export function CommunityReportList({
     [error, setError] = useState(initial ? "" : copy.unavailable);
   const guard = useRef(false);
   const controller = useRef<AbortController | null>(null);
+  const filtersActive = Boolean(filters.target || filters.type || filters.query);
   useEffect(() => () => controller.current?.abort(), []);
   function href(changes: Partial<CommunityReportQuery> = {}) {
     const values = { ...filters, ...changes },
@@ -70,20 +72,24 @@ export function CommunityReportList({
     }
   }
   return (
-    <div className="space-y-5" aria-busy={pending}>
-      <nav className="flex gap-3" aria-label={copy.status}>
+    <div className="min-w-0 space-y-5 overflow-x-clip" aria-busy={pending}>
+      <nav className="flex min-w-0 flex-wrap gap-3" aria-label={copy.status}>
         {(["pending", "history"] as const).map((view) => (
           <Link
             key={view}
             href={href({ view, page: 1 })}
             aria-current={filters.view === view ? "page" : undefined}
-            className={`min-h-9 rounded-md border border-base px-3 py-2 text-sm ${filterNavLinkClass} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm ${filterNavLinkClass} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {copy[view]}
           </Link>
         ))}
       </nav>
-      <form method="GET" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form
+        method="GET"
+        action={path}
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+      >
         <input type="hidden" name="view" value={filters.view} />
         <label className="min-w-0 basis-full space-y-1 text-sm text-secondary">
           <span>{copy.textSearch}</span>
@@ -118,83 +124,114 @@ export function CommunityReportList({
             ))}
           </select>
         </label>
-        <Button type="submit">{copy.search}</Button>
+        <Button type="submit" className="min-h-11">
+          {copy.search}
+        </Button>
         <Link
-          className={`min-h-9 py-2 text-sm text-accent underline ${filterNavLinkClass}`}
+          className={`inline-flex min-h-11 items-center text-sm text-accent underline ${filterNavLinkClass}`}
           href={path}
         >
           {copy.reset}
         </Link>
       </form>
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
-      <Button type="button" variant="secondary" disabled={pending} onClick={() => void reload()}>
-        {pending ? copy.loading : copy.reload}
-      </Button>
-      {page?.items.length === 0 && (
-        <div className="nexus-panel space-y-3 p-8 text-sm text-muted">
-          <p>{filters.target || filters.type || filters.query ? copy.emptyFiltered : copy.empty}</p>
-          {(filters.target || filters.type || filters.query) && (
-            <Link
-              href={path}
-              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              onClick={() => void reload()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
-              {copy.reset}
+              {pending ? copy.loading : copy.reload}
+            </Button>
+          }
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={pending}
+          onClick={() => void reload()}
+          className="min-h-11"
+        >
+          {pending ? copy.loading : copy.reload}
+        </Button>
+      )}
+      {!error && page?.items.length === 0 ? (
+        <EmptyState
+          title={filtersActive ? copy.emptyFiltered : copy.empty}
+          description={filtersActive ? copy.reset : copy.description}
+          icon={<Flag className="h-6 w-6" aria-hidden="true" />}
+          action={
+            filtersActive ? (
+              <Link
+                href={path}
+                className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : null}
+      <div className="min-w-0 space-y-3">
+        {!error
+          ? page?.items.map((report) => (
+              <article key={report.id} className="nexus-panel min-w-0 space-y-2 p-4">
+                <div className="flex min-w-0 flex-wrap justify-between gap-2">
+                  <Link
+                    className={`break-words text-sm font-semibold text-accent underline ${filterNavLinkClass}`}
+                    href={`${path}/${encodeURIComponent(report.id)}`}
+                  >
+                    {copy[report.targetType]} · {copy[report.type]}
+                  </Link>
+                  <span className="text-xs text-secondary">{copy[report.status]}</span>
+                </div>
+                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                  {report.reason}
+                </p>
+                <p className="text-xs text-muted">
+                  {copy.created}:{" "}
+                  <time dateTime={report.createdAt}>
+                    {new Date(report.createdAt).toLocaleString(
+                      locale === "ru" ? "ru-RU" : "en-US",
+                      {
+                        timeZone: "UTC",
+                      },
+                    )}{" "}
+                    UTC
+                  </time>
+                </p>
+              </article>
+            ))
+          : null}
+      </div>
+      {!error ? (
+        <nav className="flex flex-wrap items-center gap-4 text-sm" aria-label={copy.page}>
+          {filters.page > 1 && (
+            <Link
+              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              href={href({ page: filters.page - 1 })}
+            >
+              {copy.previous}
             </Link>
           )}
-        </div>
-      )}
-      <div className="space-y-3">
-        {page?.items.map((report) => (
-          <article key={report.id} className="nexus-panel space-y-2 p-4">
-            <div className="flex flex-wrap justify-between gap-2">
-              <Link
-                className={`text-sm font-semibold text-accent underline ${filterNavLinkClass}`}
-                href={`${path}/${encodeURIComponent(report.id)}`}
-              >
-                {copy[report.targetType]} · {copy[report.type]}
-              </Link>
-              <span className="text-xs text-secondary">{copy[report.status]}</span>
-            </div>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-              {report.reason}
-            </p>
-            <p className="text-xs text-muted">
-              {copy.created}:{" "}
-              <time dateTime={report.createdAt}>
-                {new Date(report.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
-                  timeZone: "UTC",
-                })}{" "}
-                UTC
-              </time>
-            </p>
-          </article>
-        ))}
-      </div>
-      <nav className="flex flex-wrap items-center gap-4 text-sm" aria-label={copy.page}>
-        {filters.page > 1 && (
-          <Link
-            className={`text-accent underline ${filterNavLinkClass}`}
-            href={href({ page: filters.page - 1 })}
-          >
-            {copy.previous}
-          </Link>
-        )}
-        <span className="text-muted">
-          {copy.page} {filters.page}
-        </span>
-        {page?.hasMore && filters.page < 9999 && (
-          <Link
-            className={`text-accent underline ${filterNavLinkClass}`}
-            href={href({ page: filters.page + 1 })}
-          >
-            {copy.next}
-          </Link>
-        )}
-      </nav>
+          <span className="inline-flex min-h-11 items-center text-muted">
+            {copy.page} {filters.page}
+          </span>
+          {page?.hasMore && filters.page < 9999 && (
+            <Link
+              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              href={href({ page: filters.page + 1 })}
+            >
+              {copy.next}
+            </Link>
+          )}
+        </nav>
+      ) : null}
     </div>
   );
 }
