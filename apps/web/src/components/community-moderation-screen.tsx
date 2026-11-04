@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -22,6 +23,10 @@ import { communityModerationService } from "../lib/services/community-moderation
 import { platformFieldClass } from "../lib/user-platform-client";
 import { ContentModerationControls } from "./content-moderation-controls";
 import { PlatformSignIn } from "./platform-sign-in";
+
+const focusLink =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function CommunityModerationScreen({
   id,
   searchParams,
@@ -42,17 +47,16 @@ export async function CommunityModerationScreen({
   const returnPath = id ? moderationDetailHref(id) : "/admin/community";
   if (authError) {
     return (
-      <div className="nexus-panel mx-auto max-w-md space-y-3 p-6">
+      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-sm text-danger">
-          {copy.unavailable}
-        </p>
-        <a
-          href={returnPath}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reload}
-        </a>
+        <ErrorState
+          title={copy.unavailable}
+          action={
+            <a href={returnPath} className={focusLink}>
+              {copy.reload}
+            </a>
+          }
+        />
       </div>
     );
   }
@@ -61,11 +65,12 @@ export async function CommunityModerationScreen({
   }
   if (!can(actor, "admin.moderation")) {
     return (
-      <div className="nexus-panel mx-auto max-w-md space-y-3 p-6">
+      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <p role="alert" className="text-sm text-danger">
-          {copy.denied}
-        </p>
+        <ErrorState
+          title={copy.denied}
+          icon={<ShieldAlert className="h-5 w-5" aria-hidden="true" />}
+        />
       </div>
     );
   }
@@ -82,17 +87,14 @@ export async function CommunityModerationScreen({
     </time>
   );
   const failure = (message: string, href: string) => (
-    <div className="nexus-panel space-y-3 p-5">
-      <p role="alert" className="text-sm text-danger">
-        {message}
-      </p>
-      <a
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        href={href}
-      >
-        {copy.reload}
-      </a>
-    </div>
+    <ErrorState
+      title={message}
+      action={
+        <a className={focusLink} href={href}>
+          {copy.reload}
+        </a>
+      }
+    />
   );
   if (id) {
     const filters = parseModerationDetailQuery(params);
@@ -113,11 +115,8 @@ export async function CommunityModerationScreen({
     if (raw && !parsed.success) error = copy.unavailable;
     if (!parsed.success)
       return (
-        <div className="space-y-5">
-          <Link
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href="/admin/community"
-          >
+        <div className="min-w-0 space-y-5 overflow-x-clip">
+          <Link className={focusLink} href="/admin/community">
             {copy.back}
           </Link>
           <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
@@ -126,14 +125,11 @@ export async function CommunityModerationScreen({
       );
     const { item, history, nextCursor } = parsed.data;
     return (
-      <div className="mx-auto max-w-4xl space-y-6">
-        <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href="/admin/community"
-        >
+      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+        <Link className={focusLink} href="/admin/community">
           {copy.back}
         </Link>
-        <header className="nexus-panel space-y-3 p-5">
+        <header className="nexus-panel min-w-0 space-y-3 p-5">
           <h1 className="break-words text-2xl font-bold text-primary">{item.title}</h1>
           <p className="text-sm text-muted">
             {types[item.type]} · {copy[item.status]}
@@ -148,10 +144,7 @@ export async function CommunityModerationScreen({
             {copy.updated}: {date(item.updatedAt)}
           </p>
           {item.status === "published" && (
-            <Link
-              href={`/articles/${encodeURIComponent(item.slug)}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`/articles/${encodeURIComponent(item.slug)}`} className={focusLink}>
               {copy.publicPage}
             </Link>
           )}
@@ -171,22 +164,22 @@ export async function CommunityModerationScreen({
             <p className="break-words text-xs text-muted">{item.tags.join(" · ")}</p>
           )}
         </header>
-        <section className="nexus-panel space-y-3 p-5">
+        <section className="nexus-panel min-w-0 space-y-3 p-5">
           <h2 className="font-heading text-primary">{copy.body}</h2>
           <div className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
             {item.body}
           </div>
-          {item.truncated && (
+          {item.truncated ? (
             <p role="alert" className="text-sm text-danger">
               {copy.large}
             </p>
-          )}
+          ) : null}
         </section>
-        <section className="nexus-panel space-y-4 p-5">
+        <section className="nexus-panel min-w-0 space-y-4 p-5">
           <p className="text-sm text-muted">{copy.description}</p>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}/discussion`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={focusLink}
           >
             {moderatedDiscussionCopy(locale).open}
           </Link>
@@ -199,21 +192,22 @@ export async function CommunityModerationScreen({
             workspace
           />
         </section>
-        <section className="space-y-4">
+        <section className="min-w-0 space-y-4">
           <h2 className="font-heading text-primary">{copy.history}</h2>
           <p className="text-sm text-muted">{copy.historyScope}</p>
-          <a
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href={moderationDetailHref(id)}
-          >
+          <a className={focusLink} href={moderationDetailHref(id)}>
             {copy.latest}
           </a>
-          {!history.length && (
-            <p className="nexus-panel p-5 text-sm text-muted">{copy.noHistory}</p>
-          )}
-          <ol className="space-y-3">
+          {!history.length ? (
+            <EmptyState
+              title={copy.noHistory}
+              description={copy.historyScope}
+              icon={<FileText className="h-6 w-6" aria-hidden="true" />}
+            />
+          ) : null}
+          <ol className="min-w-0 space-y-3">
             {history.map((event) => (
-              <li key={event.id} className="nexus-panel space-y-2 p-5">
+              <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-5">
                 <p className="text-sm text-primary">
                   {event.action === "content.published" ? copy.publish : copy.archive} ·{" "}
                   {date(event.createdAt)}
@@ -222,23 +216,23 @@ export async function CommunityModerationScreen({
                   {event.from ? copy[event.from] : copy.unknown} →{" "}
                   {event.to ? copy[event.to] : copy.unknown}
                 </p>
-                {event.notes && (
+                {event.notes ? (
                   <p className="whitespace-pre-wrap break-words text-sm text-secondary">
                     {copy.reason}: {event.notes}
                   </p>
-                )}
+                ) : null}
               </li>
             ))}
           </ol>
-          {nextCursor && (
+          {nextCursor ? (
             <Link
               prefetch={false}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={focusLink}
               href={moderationDetailHref(id, nextCursor)}
             >
               {copy.older}
             </Link>
-          )}
+          ) : null}
         </section>
       </div>
     );
@@ -256,24 +250,25 @@ export async function CommunityModerationScreen({
     : null;
   const parsed = moderationPageSchema.safeParse(raw);
   if (raw && !parsed.success) error = copy.unavailable;
+  const filtersActive = Boolean(
+    filters &&
+      (filters.query || filters.author || filters.status || filters.type || filters.cursor),
+  );
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
+      <header className="min-w-0 space-y-2">
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
-        <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href="/admin/reports"
-        >
+        <Link className={focusLink} href="/admin/reports">
           {copy.reports}
         </Link>
       </header>
-      {parsed.success && filters && (
+      {parsed.success && filters ? (
         <>
           <form
             method="get"
             action="/admin/community"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+            className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
           >
             <label className="min-w-44 flex-1 space-y-1 text-xs text-muted">
               {copy.search}
@@ -326,19 +321,27 @@ export async function CommunityModerationScreen({
             <Button className="min-h-11" type="submit" variant="primary">
               {copy.apply}
             </Button>
-            <Link
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href="/admin/community"
-            >
+            <Link className={focusLink} href="/admin/community">
               {copy.reset}
             </Link>
           </form>
           {!parsed.data.items.length ? (
-            <p className="nexus-panel p-5 text-sm text-muted">{copy.empty}</p>
+            <EmptyState
+              title={copy.empty}
+              description={filtersActive ? copy.reset : copy.description}
+              icon={<FileText className="h-6 w-6" aria-hidden="true" />}
+              action={
+                filtersActive ? (
+                  <Link className={focusLink} href="/admin/community">
+                    {copy.reset}
+                  </Link>
+                ) : undefined
+              }
+            />
           ) : (
-            <ul className="space-y-3">
+            <ul className="min-w-0 space-y-3">
               {parsed.data.items.map((item) => (
-                <li key={item.id} className="nexus-panel space-y-2 p-5">
+                <li key={item.id} className="nexus-panel min-w-0 space-y-2 p-5">
                   <Link
                     className="block break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     href={moderationDetailHref(item.id)}
@@ -355,25 +358,22 @@ export async function CommunityModerationScreen({
             </ul>
           )}
           <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-            <a
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={moderationHref(filters)}
-            >
+            <a className={focusLink} href={moderationHref(filters)}>
               {copy.latest}
             </a>
-            {parsed.data.nextCursor && (
+            {parsed.data.nextCursor ? (
               <Link
                 prefetch={false}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={focusLink}
                 href={moderationHref(filters, parsed.data.nextCursor)}
               >
                 {copy.older}
               </Link>
-            )}
+            ) : null}
           </nav>
         </>
-      )}
-      {error && failure(error, filters ? moderationHref(filters) : "/admin/community")}
+      ) : null}
+      {error ? failure(error, filters ? moderationHref(filters) : "/admin/community") : null}
     </div>
   );
 }
