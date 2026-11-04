@@ -21,8 +21,11 @@ export function PublicProfileForm() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<{ text: string; error: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [latest, setLatest] = useState<EditableProfile | null>(null);
+  const [recoveryRequired, setRecoveryRequired] = useState(false);
   const pending = useRef(false);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: revision explicitly reloads the saved profile after a conflict or read failure.
+  const loadedIdentity = useRef<{ id: string; username: string } | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: revision explicitly retries the initial read; later checks keep the draft.
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
@@ -31,7 +34,21 @@ export function PublicProfileForm() {
       .then((data) => {
         const loaded = parseEditableProfile(data.profile);
         if (!loaded) throw new Error(userPlatformError(locale, "UNCONFIRMED"));
-        if (!controller.signal.aborted) setProfile(loaded);
+        if (controller.signal.aborted) return;
+        if (
+          loadedIdentity.current &&
+          (loadedIdentity.current.id !== loaded.id ||
+            loadedIdentity.current.username !== loaded.username)
+        ) {
+          loadedIdentity.current = null;
+          setProfile(null);
+          setLatest(null);
+          setRecoveryRequired(false);
+          setNotice({ text: copy.profileAccountChanged, error: true });
+          return;
+        }
+        loadedIdentity.current = { id: loaded.id, username: loaded.username };
+        setProfile(loaded);
       })
       .catch((error) => {
         if (!controller.signal.aborted)
@@ -44,10 +61,10 @@ export function PublicProfileForm() {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [locale, revision, copy.unavailable]);
+  }, [revision]);
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!profile || pending.current || loading) return;
+    if (!profile || pending.current || loading || recoveryRequired || latest) return;
     const form = new FormData(event.currentTarget);
     const fields = {
       displayName: String(form.get("displayName") ?? "").trim(),
@@ -63,11 +80,17 @@ export function PublicProfileForm() {
         expectedUpdatedAt: profile.updatedAt,
       });
       const saved = parseEditableProfile(data.profile);
+      if (saved && (saved.id !== profile.id || saved.username !== profile.username)) {
+        loadedIdentity.current = null;
+        setProfile(null);
+        setLatest(null);
+        setRecoveryRequired(false);
+        setNotice({ text: copy.profileAccountChanged, error: true });
+        return;
+      }
       if (
         data.success !== true ||
         !saved ||
-        saved.id !== profile.id ||
-        saved.username !== profile.username ||
         saved.displayName !== fields.displayName ||
         saved.bio !== fields.bio ||
         saved.avatarUrl !== fields.avatarUrl ||
@@ -79,9 +102,37 @@ export function PublicProfileForm() {
       router.refresh();
     } catch (error) {
       setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setRecoveryRequired(true);
     } finally {
       pending.current = false;
       setBusy(false);
+    }
+  }
+  async function checkSavedProfile() {
+    if (!profile || pending.current || loading) return;
+    pending.current = true;
+    setLoading(true);
+    setLatest(null);
+    try {
+      const data = await platformRequest("/api/account/profile", locale, "GET");
+      const next = parseEditableProfile(data.profile);
+      if (!next) throw new Error(userPlatformError(locale, "UNCONFIRMED"));
+      if (next.id !== profile.id || next.username !== profile.username) {
+        loadedIdentity.current = null;
+        setProfile(null);
+        setRecoveryRequired(false);
+        setNotice({ text: copy.profileAccountChanged, error: true });
+        return;
+      }
+      if (Date.parse(next.updatedAt) < Date.parse(profile.updatedAt))
+        throw new Error(userPlatformError(locale, "UNCONFIRMED"));
+      setLatest(next);
+      setNotice(null);
+    } catch (error) {
+      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+    } finally {
+      pending.current = false;
+      setLoading(false);
     }
   }
   return (
@@ -107,7 +158,7 @@ export function PublicProfileForm() {
         </p>
       )}
       {profile && (
-        <form key={profile.updatedAt} onSubmit={save} aria-busy={busy} className="space-y-4">
+        <form key={profile.id} onSubmit={save} aria-busy={busy || loading} className="space-y-4">
           <div className="flex items-center gap-3">
             <Avatar
               src={profile.avatarUrl || undefined}
@@ -153,20 +204,59 @@ export function PublicProfileForm() {
               maxLength={2048}
               defaultValue={profile.avatarUrl}
             />
-            <Button type="submit" isLoading={busy} className="min-h-11">
+            <Button
+              type="submit"
+              isLoading={busy}
+              disabled={recoveryRequired || Boolean(latest)}
+              className="min-h-11"
+            >
               {copy.save}
             </Button>
           </fieldset>
         </form>
+      )}
+      {profile && recoveryRequired && (
+        <p className="text-sm text-muted">{copy.profileRecoveryHelp}</p>
+      )}
+      {profile && latest && (
+        <section
+          className="space-y-2 rounded-lg border border-base p-4"
+          aria-label={copy.profileLatest}
+        >
+          <h3 className="font-semibold">{copy.profileLatest}</h3>
+          <p className="text-sm text-muted">{copy.profileCompareHelp}</p>
+          <p className="break-words">
+            {copy.displayName}: {latest.displayName}
+          </p>
+          <p className="whitespace-pre-wrap break-words">
+            {copy.bio}: {latest.bio}
+          </p>
+          <p className="break-words">
+            {copy.avatar}: {latest.avatarUrl}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy || loading}
+            onClick={() => {
+              setProfile(latest);
+              setLatest(null);
+              setRecoveryRequired(false);
+              setNotice(null);
+            }}
+          >
+            {copy.profileUseLatest}
+          </Button>
+        </section>
       )}
       {(notice?.error || (!profile && !loading)) && (
         <Button
           type="button"
           variant="ghost"
           disabled={busy || loading}
-          onClick={() => setRevision((value) => value + 1)}
+          onClick={() => (profile ? void checkSavedProfile() : setRevision((value) => value + 1))}
         >
-          {copy.retry}
+          {profile ? copy.profileCompare : copy.retry}
         </Button>
       )}
     </section>

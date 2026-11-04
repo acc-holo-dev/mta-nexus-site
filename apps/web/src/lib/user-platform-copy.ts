@@ -56,6 +56,14 @@ const en = {
   bio: "About you",
   avatar: "Avatar URL",
   profileLink: "View my profile",
+  profileCompare: "Check saved profile",
+  profileLatest: "Latest saved profile",
+  profileCompareHelp:
+    "Compare these fields with your draft. Using this version as the basis keeps your draft; saving will replace the saved fields.",
+  profileUseLatest: "Use this profile as the basis",
+  profileRecoveryHelp:
+    "Your draft is still in the form. Copy it before navigating away or signing in again.",
+  profileAccountChanged: "The signed-in account changed. The previous account's draft was closed.",
   signIn: "Sign in",
   signInRequired: "Sign in to manage your account",
   retry: "Reload saved version",
@@ -138,6 +146,14 @@ const ru: typeof en = {
   bio: "О себе",
   avatar: "URL аватара",
   profileLink: "Посмотреть мой профиль",
+  profileCompare: "Проверить сохранённый профиль",
+  profileLatest: "Последняя сохранённая версия профиля",
+  profileCompareHelp:
+    "Сравните эти поля с черновиком. Выбор этой версии сохранит ваш черновик; при сохранении поля профиля будут заменены.",
+  profileUseLatest: "Использовать этот профиль как основу",
+  profileRecoveryHelp:
+    "Черновик остался в форме. Скопируйте его перед переходом со страницы или повторным входом.",
+  profileAccountChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
   signIn: "Войти",
   signInRequired: "Войдите для управления аккаунтом",
   retry: "Загрузить сохранённую версию",
