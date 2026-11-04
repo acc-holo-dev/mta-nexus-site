@@ -71,6 +71,9 @@ const en = {
   invalidQuery: "Invalid filters. Clear the filters to continue.",
   loadUnavailable:
     "Purchase cases are temporarily unavailable. This does not mean you have no cases.",
+  loadUnavailableHint:
+    "Retry keeps the same filters and page. A temporary load failure is not a closed or missing case.",
+  loading: "Loading purchase cases…",
 };
 const ru: typeof en = {
   title: "Поддержка покупки",
@@ -137,6 +140,9 @@ const ru: typeof en = {
   buyerCases: "Мои обращения по покупкам",
   invalidQuery: "Недопустимые фильтры. Сбросьте их, чтобы продолжить.",
   loadUnavailable: "Обращения по покупкам временно недоступны. Это не означает, что обращений нет.",
+  loadUnavailableHint:
+    "Повтор сохраняет те же фильтры и страницу. Временный сбой загрузки — это не закрытое и не отсутствующее обращение.",
+  loading: "Загрузка обращений по покупкам…",
 };
 export function orderCaseCopy(locale: string) {
   return locale === "ru" ? ru : en;

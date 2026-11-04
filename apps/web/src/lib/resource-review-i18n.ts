@@ -86,6 +86,8 @@ const en = {
   detail: "Open report",
   loadUnavailable:
     "Review reports are temporarily unavailable. This does not mean there are no reports.",
+  loadUnavailableHint:
+    "Retry keeps the same view and page. A temporary load failure is not a resolved or missing report.",
 };
 const ru: typeof en = {
   title: "Отзывы о ресурсах",
@@ -171,6 +173,8 @@ const ru: typeof en = {
   all: "Все отзывы",
   detail: "Открыть жалобу",
   loadUnavailable: "Жалобы на отзывы временно недоступны. Это не означает, что жалоб нет.",
+  loadUnavailableHint:
+    "Повтор сохраняет тот же раздел и страницу. Временный сбой загрузки — это не решённая и не отсутствующая жалоба.",
 };
 export const resourceReviewCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function resourceReviewError(locale: Locale, code: unknown) {

@@ -3,10 +3,12 @@ import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
 
 // Honest loading shell for /workspace/review-reports/[id].
 export default async function Loading() {
-  const copy = resourceReviewCopy(await getRequestLocale());
+  const locale = await getRequestLocale();
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const copy = resourceReviewCopy(typedLocale);
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="review-report-loading-heading"
     >

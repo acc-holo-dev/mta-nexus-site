@@ -1,18 +1,20 @@
-import { getCommerceHistoryCopy } from "../../../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { orderCaseCopy } from "../../../../../lib/order-case-i18n";
 
 // Honest loading shell for /workspace/purchases/[id]/support.
 export default async function Loading() {
-  const copy = getCommerceHistoryCopy(await getRequestLocale());
+  const locale = await getRequestLocale();
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const copy = orderCaseCopy(typedLocale);
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="purchase-support-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="purchase-support-loading-heading" className="font-display text-primary">
-          {copy.details}
+          {copy.create}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}

@@ -176,7 +176,9 @@ it("shows an honest recovery state when the case queue fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).toContain("reviewStatus=refund_recommended&amp;page=2");
   expect(html).not.toContain("&lt;Private order&gt;");
 });
@@ -199,6 +201,7 @@ it("shows an honest recovery state when intake evidence fails to load", async ()
   const copy = orderCaseCopy("en");
   const html = renderToStaticMarkup(await OrderCaseCreatePage({ orderId: "ord_a" }));
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("/workspace/purchases/ord_a/support");
 });

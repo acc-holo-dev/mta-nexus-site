@@ -309,7 +309,9 @@ it("shows an honest recovery state when the report queue fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).toContain("view=history&amp;page=2");
 });
 it("shows an honest recovery state when a report detail fails", async () => {
@@ -318,6 +320,7 @@ it("shows an honest recovery state when a report detail fails", async () => {
   const copy = resourceReviewCopy("en");
   const html = renderToStaticMarkup(await ResourceReviewReportScreen({ staff: true, id: "rpt_a" }));
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain('href="/admin/commerce/reviews/rpt_a"');
   expect(html).not.toContain("INTERNAL_STAFF_NOTE");
 });
