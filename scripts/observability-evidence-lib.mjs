@@ -35,6 +35,21 @@ export const OBSERVABILITY_RUNBOOK_MENTIONS = Object.freeze([
   "check-web-push-worker-queue",
 ]);
 
+/**
+ * Live-drill signalName whitelist: failure signals from the operator runbook.
+ * Excludes the probe script name (not an injectable failure signal).
+ */
+export const OBSERVABILITY_LIVE_DRILL_SIGNAL_NAMES = Object.freeze(
+  OBSERVABILITY_RUNBOOK_MENTIONS.filter((name) => name !== "check-web-push-worker-queue"),
+);
+
+/** Threshold keys a live drill may exercise (same set as readiness alert env). */
+export const OBSERVABILITY_LIVE_DRILL_THRESHOLD_KEYS = Object.freeze([
+  ...OBSERVABILITY_ALERT_ENV_KEYS,
+]);
+
+const REPLACE_WITH_PLACEHOLDER = /REPLACE_WITH_/u;
+
 function readJson(path) {
   try {
     return JSON.parse(readFileSync(path, "utf8"));
@@ -215,6 +230,23 @@ function nonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+/** True when a string still carries a REPLACE_WITH_* template token. */
+export function containsReplaceWithPlaceholder(value) {
+  return typeof value === "string" && REPLACE_WITH_PLACEHOLDER.test(value);
+}
+
+function rejectReplaceWithFields(fields) {
+  for (const [label, value] of fields) {
+    if (containsReplaceWithPlaceholder(value)) {
+      return {
+        ok: false,
+        reason: `${label} still contains a REPLACE_WITH_* placeholder; live drill is not complete`,
+      };
+    }
+  }
+  return null;
+}
+
 /** Operator readiness JSON must never close F03 / OPS-14 live routing proof. */
 export function isObservabilityReadinessEvidence(evidence) {
   return evidence && typeof evidence === "object" && evidence.kind === OBSERVABILITY_READINESS_KIND;
@@ -223,6 +255,7 @@ export function isObservabilityReadinessEvidence(evidence) {
 /**
  * Validates live alert routing drill evidence (F03 / OPS-14).
  * Rejects observability-readiness payloads mis-submitted as live proof.
+ * Rejects REPLACE_WITH_* leftovers even when verdict.passed is true.
  */
 export function validateObservabilityLiveDrillEvidence(evidence) {
   if (!evidence || typeof evidence !== "object") {
@@ -256,6 +289,14 @@ export function validateObservabilityLiveDrillEvidence(evidence) {
   if (!nonEmptyString(evidence?.channel?.type) || !nonEmptyString(evidence?.channel?.route)) {
     return { ok: false, reason: "alert channel type and route are required" };
   }
+  const placeholderReject = rejectReplaceWithFields([
+    ["owner.name", evidence.owner.name],
+    ["environment.name", evidence.environment.name],
+    ["channel.type", evidence.channel.type],
+    ["channel.route", evidence.channel.route],
+    ["drill.signalName", evidence?.drill?.signalName],
+  ]);
+  if (placeholderReject) return placeholderReject;
   const thresholds = evidence?.thresholds;
   if (!thresholds || typeof thresholds !== "object" || Array.isArray(thresholds)) {
     return { ok: false, reason: "applicable alert thresholds object is required" };
@@ -263,9 +304,22 @@ export function validateObservabilityLiveDrillEvidence(evidence) {
   if (Object.keys(thresholds).length === 0) {
     return { ok: false, reason: "thresholds must list the values exercised in the drill" };
   }
+  const allowedThresholdKeys = new Set(OBSERVABILITY_LIVE_DRILL_THRESHOLD_KEYS);
   for (const [key, value] of Object.entries(thresholds)) {
     if (!nonEmptyString(key)) {
       return { ok: false, reason: "threshold keys must be non-empty" };
+    }
+    if (containsReplaceWithPlaceholder(key)) {
+      return {
+        ok: false,
+        reason: `threshold key ${key} still contains a REPLACE_WITH_* placeholder`,
+      };
+    }
+    if (!allowedThresholdKeys.has(key)) {
+      return {
+        ok: false,
+        reason: `threshold key ${key} is not in the live-drill whitelist`,
+      };
     }
     if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
       return { ok: false, reason: `threshold ${key} must be a positive number` };
@@ -294,6 +348,12 @@ export function validateObservabilityLiveDrillEvidence(evidence) {
   if (!nonEmptyString(evidence?.drill?.signalName)) {
     return { ok: false, reason: "drill.signalName must identify the injected or observed failure" };
   }
+  if (!OBSERVABILITY_LIVE_DRILL_SIGNAL_NAMES.includes(evidence.drill.signalName)) {
+    return {
+      ok: false,
+      reason: `drill.signalName ${evidence.drill.signalName} is not in the live-drill whitelist`,
+    };
+  }
   return { ok: true, reason: null };
 }
 
@@ -306,13 +366,13 @@ export function buildObservabilityLiveDrillEvidenceTemplate({
     generatedAt,
     environment: { name: "REPLACE_WITH_TARGET_ENV" },
     owner: { name: "REPLACE_WITH_ONCALL_OWNER" },
-    channel: { type: "REPLACE_CHANNEL_TYPE", route: "REPLACE_REDACTED_ROUTE" },
+    channel: { type: "REPLACE_WITH_CHANNEL_TYPE", route: "REPLACE_WITH_REDACTED_ROUTE" },
     thresholds: {
       WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT: 80,
       WEB_PUSH_QUEUE_ALERT_DUE_JOBS: 100,
       WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS: 900,
     },
-    drill: { signalName: "REPLACE_SAFE_FAILURE_SIGNAL" },
+    drill: { signalName: "REPLACE_WITH_SAFE_FAILURE_SIGNAL" },
     timeline: {
       signalAt: generatedAt,
       alertAt: generatedAt,

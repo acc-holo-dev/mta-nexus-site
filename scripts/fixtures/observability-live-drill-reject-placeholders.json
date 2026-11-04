@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "observability_live_drill",
+  "generatedAt": "2026-11-04T12:00:00.000Z",
+  "environment": {
+    "name": "REPLACE_WITH_TARGET_ENV"
+  },
+  "owner": {
+    "name": "REPLACE_WITH_ONCALL_OWNER"
+  },
+  "channel": {
+    "type": "REPLACE_WITH_CHANNEL_TYPE",
+    "route": "REPLACE_WITH_REDACTED_ROUTE"
+  },
+  "thresholds": {
+    "WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT": 80,
+    "WEB_PUSH_QUEUE_ALERT_DUE_JOBS": 100,
+    "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS": 900
+  },
+  "drill": {
+    "signalName": "REPLACE_WITH_SAFE_FAILURE_SIGNAL"
+  },
+  "timeline": {
+    "signalAt": "2026-11-04T12:00:00.000Z",
+    "alertAt": "2026-11-04T12:00:45.000Z",
+    "humanReceivedAt": "2026-11-04T12:02:10.000Z",
+    "recoveryAt": "2026-11-04T12:18:00.000Z"
+  },
+  "verdict": {
+    "passed": true,
+    "failures": []
+  },
+  "evidenceSha256": "cf2ba1aab7359c55ad0dcd40e1dcf53ebc9db74e0b03d654476a1cd8af5e640e"
+}
