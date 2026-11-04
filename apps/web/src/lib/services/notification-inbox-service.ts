@@ -23,34 +23,41 @@ function safeLink(value: string | null) {
   return safeExternalWebUrl(value) ?? null;
 }
 const bounded = (value: string, maximum: number) => Array.from(value).slice(0, maximum).join("");
+/** Format a server-side inbox snapshot without exposing its raw notification data. */
+export function formatNotificationInboxPage(
+  page: Awaited<ReturnType<typeof notificationRepository.pageInbox>>,
+  locale: Locale,
+) {
+  return {
+    ...page,
+    items: page.items.map((item) => {
+      const text = formatNotification(
+        item as Pick<Notification, "title" | "message" | "data">,
+        getDictionary(locale).buildReviewNotifications,
+        locale,
+      );
+      return {
+        id: item.id,
+        title: bounded(text.title, 512),
+        message: bounded(text.message, 8192),
+        link: safeLink(item.link),
+        category: (INBOX_CATEGORIES as readonly string[]).includes(item.category)
+          ? (item.category as (typeof INBOX_CATEGORIES)[number])
+          : ("system" as const),
+        isRead: item.isRead,
+        createdAt: item.createdAt,
+        truncated:
+          item.truncated ||
+          Array.from(text.title).length > 512 ||
+          Array.from(text.message).length > 8192,
+      };
+    }),
+  };
+}
 class NotificationInboxService {
   async page(actorId: string, filters: NotificationInboxQuery, locale: Locale) {
     const page = await notificationRepository.pageInbox(actorId, filters);
-    return {
-      ...page,
-      items: page.items.map((item) => {
-        const text = formatNotification(
-          item as Pick<Notification, "title" | "message" | "data">,
-          getDictionary(locale).buildReviewNotifications,
-          locale,
-        );
-        return {
-          id: item.id,
-          title: bounded(text.title, 512),
-          message: bounded(text.message, 8192),
-          link: safeLink(item.link),
-          category: (INBOX_CATEGORIES as readonly string[]).includes(item.category)
-            ? (item.category as (typeof INBOX_CATEGORIES)[number])
-            : ("system" as const),
-          isRead: item.isRead,
-          createdAt: item.createdAt,
-          truncated:
-            item.truncated ||
-            Array.from(text.title).length > 512 ||
-            Array.from(text.message).length > 8192,
-        };
-      }),
-    };
+    return formatNotificationInboxPage(page, locale);
   }
   async exportPage(actorId: string, filters: NotificationInboxQuery, locale: Locale) {
     const page = notificationInboxPageSchema.parse(await this.page(actorId, filters, locale));

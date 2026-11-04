@@ -1,10 +1,10 @@
 import "server-only";
 
 import { notificationRepository, resourceReleaseWatchesRepository } from "@nexus/db";
-import type { Locale } from "./i18n";
 import type { PersonalChangeReason, PersonalChangesSummary } from "./home-personal-changes-types";
+import type { Locale } from "./i18n";
 import { followWorkspaceService } from "./services/follow-workspace-service";
-import { notificationInboxService } from "./services/notification-inbox-service";
+import { formatNotificationInboxPage } from "./services/notification-inbox-service";
 
 export type { PersonalChangesSummary } from "./home-personal-changes-types";
 
@@ -37,18 +37,12 @@ export async function loadPersonalChangesSummary(
 
   const [inboxResult, watchesResult, followsResult] = await Promise.allSettled([
     (async () => {
-      const [formatted, raw] = await Promise.all([
-        notificationInboxService.page(
-          actorId,
-          { query: "", state: "unread", category: "all" },
-          locale,
-        ),
-        notificationRepository.pageInbox(actorId, {
-          query: "",
-          state: "unread",
-          category: "all",
-        }),
-      ]);
+      const raw = await notificationRepository.pageInbox(actorId, {
+        query: "",
+        state: "unread",
+        category: "all",
+      });
+      const formatted = formatNotificationInboxPage(raw, locale);
       return { formatted, raw };
     })(),
     resourceReleaseWatchesRepository.page(actorId, 1, "enabled", ""),
