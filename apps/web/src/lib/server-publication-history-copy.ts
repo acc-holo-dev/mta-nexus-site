@@ -14,6 +14,8 @@ const en = {
   restoredNotice: "The publication was restored as a server draft.",
   identity: "Editor",
   unavailable: "Publication history could not be loaded. Reload the server workspace.",
+  unavailableHint:
+    "This does not change publication status. Reload history after the editorial service recovers.",
   historyEmptyHint:
     "Editorial status changes for this publication appear here after they are retained.",
 };
@@ -31,6 +33,8 @@ const ru: Record<keyof typeof en, string> = {
   restoredNotice: "Публикация возвращена в черновики сервера.",
   identity: "Редактор",
   unavailable: "Не удалось загрузить историю публикации. Загрузите кабинет сервера.",
+  unavailableHint:
+    "Это не меняет статус публикации. Перезагрузите историю после восстановления сервиса редакции.",
   historyEmptyHint: "Изменения статуса этой публикации появятся здесь после сохранения в журнале.",
 };
 export const serverPublicationHistoryCopy = (locale: Locale) => (locale === "ru" ? ru : en);

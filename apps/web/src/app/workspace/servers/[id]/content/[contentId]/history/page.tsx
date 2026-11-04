@@ -1,6 +1,9 @@
 import { ServerPublicationHistoryScreen } from "../../../../../../../components/server-publication-history-screen";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 import { serverPublicationHistoryCopy } from "../../../../../../../lib/server-publication-history-copy";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const copy = serverPublicationHistoryCopy(await getRequestLocale());
@@ -18,5 +21,9 @@ export default async function Page({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const scope = await params;
-  return ServerPublicationHistoryScreen({ ...scope, searchParams });
+  return (
+    <div className={pageShellClass}>
+      {await ServerPublicationHistoryScreen({ ...scope, searchParams })}
+    </div>
+  );
 }

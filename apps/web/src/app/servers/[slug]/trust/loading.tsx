@@ -1,1 +1,7 @@
-export { default } from "../../../organizations/[slug]/trust/loading";
+import OrganizationTrustLoading from "../../../organizations/[slug]/trust/loading";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
+export default async function Loading() {
+  return <div className={pageShellClass}>{await OrganizationTrustLoading()}</div>;
+}

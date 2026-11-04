@@ -14,6 +14,8 @@ export const serverContentCopy = (locale: Locale) =>
         emptyHint: "Создайте первую публикацию сервера или дождитесь материалов команды.",
         emptyFilteredHint:
           "Сбросьте фильтры или измените запрос, чтобы увидеть публикации сервера.",
+        loadUnavailableHint:
+          "Это не меняет публикации. Перезагрузите редактор после восстановления сервиса.",
         uncertain:
           "Не удалось подтвердить сохранение. Проверьте публикации сервера перед повторной отправкой.",
         notice:
@@ -30,6 +32,8 @@ export const serverContentCopy = (locale: Locale) =>
         loading: "Loading server publications…",
         emptyHint: "Create the first server publication or wait for team contributions.",
         emptyFilteredHint: "Reset filters or change the query to see server publications.",
+        loadUnavailableHint:
+          "This does not change publications. Reload the editor after the content service recovers.",
         uncertain: "Could not confirm the save. Check server publications before submitting again.",
         notice:
           "The author and owner receive creation, edit, archive and moderation notices when content notifications are enabled. Members without management rights have no access.",
