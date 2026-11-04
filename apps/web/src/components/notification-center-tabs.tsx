@@ -21,7 +21,7 @@ export function NotificationCenterTabs({
   children: ReactNode;
   state?: (typeof STATES)[number];
   filters?: NotificationInboxQuery | null;
-  labels: { title: string; all: string; unread: string; read: string };
+  labels: { title: string; readingState?: string; all: string; unread: string; read: string };
 }) {
   const base: NotificationInboxQuery = filters
     ? {
@@ -32,10 +32,11 @@ export function NotificationCenterTabs({
         at: filters.at,
       }
     : { query: "", state: "all", category: "all" };
+  const readingNavLabel = labels.readingState ?? labels.title;
 
   return (
     <div className="space-y-4">
-      <nav aria-label={labels.title} className="flex flex-wrap items-center gap-2">
+      <nav aria-label={readingNavLabel} className="flex flex-wrap items-center gap-2">
         {STATES.map((item) => {
           const active = state === item;
           const href = notificationInboxHref("/notifications", { ...base, state: item });

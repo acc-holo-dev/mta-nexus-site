@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { AppError } from "@nexus/domain";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PlatformSignIn } from "../../components/platform-sign-in";
 import { NotificationCenterTabs } from "../../components/notification-center-tabs";
 import { NotificationInbox } from "../../components/notification-inbox";
+import { PlatformSignIn } from "../../components/platform-sign-in";
+import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import {
   INBOX_CATEGORIES,
@@ -32,6 +33,7 @@ export default async function NotificationCenterPage({
 }) {
   const locale = await getRequestLocale(),
     copy = notificationInboxCopy(locale),
+    dictionary = getDictionary(locale),
     params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {})) {
     if (Array.isArray(value)) for (const part of value) params.append(key, part);
@@ -43,10 +45,18 @@ export default async function NotificationCenterPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="mx-auto max-w-4xl space-y-6">
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {copy.unavailable}
-        </p>
+      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+        <ErrorState
+          title={copy.unavailable}
+          action={
+            <Link
+              href={returnPath}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -74,7 +84,7 @@ export default async function NotificationCenterPage({
     }
   })();
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
       <header className="space-y-3 border-b border-base pb-6">
         <Link
           href="/workspace"
@@ -97,6 +107,7 @@ export default async function NotificationCenterPage({
         filters={filters}
         labels={{
           title: copy.title,
+          readingState: copy.readingState,
           all: copy.all,
           unread: copy.unread,
           read: copy.read,
@@ -107,7 +118,7 @@ export default async function NotificationCenterPage({
           method="get"
           className="nexus-panel flex flex-wrap items-end gap-3 p-4"
         >
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+          <label className="min-w-0 flex-1 space-y-1 text-xs text-muted sm:min-w-40">
             {copy.query}
             <input
               type="search"
@@ -170,11 +181,19 @@ export default async function NotificationCenterPage({
         >
           {copy.latest}
         </Link>
-        {error && (
-          <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-            {error}
-          </p>
-        )}
+        {error ? (
+          <ErrorState
+            title={error}
+            action={
+              <Link
+                href={returnPath}
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        ) : null}
         {page && filters && (
           <NotificationInbox key={randomUUID()} initialPage={page} filters={filters} />
         )}

@@ -43,9 +43,16 @@ it.each(["en", "ru"] as const)(
     const copy = notificationInboxCopy(locale);
     const html = await render({ q: "needle", state: "unread", category: "content" });
     expect(html).toContain(copy.openBetaNote);
+    expect(html).toContain("min-w-0 max-w-4xl");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(`<nav aria-label="${copy.readingState}"`);
+    expect(html).not.toContain(`<nav aria-label="${copy.title}"`);
+    expect(html).toContain(`aria-label="${copy.pageNavigation}"`);
+    expect(html).toContain(`<section class="space-y-4" aria-label="${copy.title}"`);
     expect(html).toContain('action="/notifications"');
     expect(html).toContain(`>${copy.reset}<`);
     expect(html).toContain('name="q"');
+    expect(html).toContain("min-w-0 flex-1");
     expect(html).toContain('name="category"');
     expect(html).toContain('type="hidden"');
     expect(html).toContain('name="state"');
@@ -59,6 +66,8 @@ it.each(["en", "ru"] as const)(
     expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
     const loadingHtml = renderToStaticMarkup(await Loading());
     expect(loadingHtml).toContain('aria-busy="true"');
+    expect(loadingHtml).toContain("min-w-0 max-w-4xl");
+    expect(loadingHtml).toContain("overflow-x-clip");
     expect(loadingHtml).toContain('id="notification-inbox-loading-heading"');
     expect(loadingHtml).toContain('aria-labelledby="notification-inbox-loading-heading"');
     expect(loadingHtml).toContain(`>${copy.title}<`);
@@ -125,9 +134,45 @@ it("preserves notification filters in the guest login return path", async () => 
 it("rejects duplicated filters before inbox queries and offers recovery", async () => {
   const html = await render({ state: ["read", "unread"] });
   expect(html).toContain("Invalid notification filters");
+  expect(html).toContain('role="alert"');
+  expect(html).toContain("Try again");
+  expect(html).toContain('href="/notifications?state=read&amp;state=unread"');
   expect(state.page).not.toHaveBeenCalled();
   expect(html).toContain("Latest matching notifications");
 });
+it.each(["en", "ru"] as const)(
+  "opens a notification destination from the filtered inbox in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = notificationInboxCopy(locale);
+    state.page.mockResolvedValue({
+      items: [
+        {
+          id: "n-open",
+          title: "Release ready",
+          message: "body",
+          link: "/market/resource-a",
+          category: "content",
+          isRead: false,
+          createdAt: "2026-10-13T00:00:00.000000Z",
+          truncated: false,
+        },
+      ],
+      unreadCount: 1,
+      olderCursor: null,
+      newerCursor: null,
+    });
+    const html = await render({ state: "unread" });
+    expect(html).toContain("Release ready");
+    expect(html).toContain('href="/market/resource-a"');
+    expect(html).toContain(`>${copy.view}<`);
+    expect(html).toContain(`aria-label="${copy.pageNavigation}"`);
+    expect(html).toContain(`aria-label="${copy.readingState}"`);
+    expect(copy.readingState).not.toBe(copy.title);
+    expect(copy.pageNavigation).not.toBe(copy.title);
+    expect(copy.pageNavigation).not.toBe(copy.readingState);
+  },
+);
 it("filters the inbox from URL state and highlights the matching All/Unread/Read link", async () => {
   state.page.mockResolvedValue({
     items: [
@@ -225,8 +270,12 @@ it.each(["session", "page"] as const)(
   "shows a recoverable failure for %s without an empty-success state",
   async (dependency) => {
     state[dependency].mockRejectedValue(new Error("PRIVATE_SQL"));
-    const html = await render();
+    const html = await render({ state: "unread" });
     expect(html).toContain("temporarily unavailable");
+    expect(html).toContain('role="alert"');
+    expect(html).toContain("Try again");
+    expect(html).toContain('href="/notifications?state=unread"');
+    expect(html).toContain("overflow-x-clip");
     expect(html).not.toContain("PRIVATE_SQL");
     expect(html).not.toContain("No notifications yet");
   },
