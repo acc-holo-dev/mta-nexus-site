@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const harness = vi.hoisted(() => ({
@@ -126,3 +127,36 @@ it("deletes a saved follow only after confirmAction approves removal", async () 
     body: JSON.stringify({ targetType: "organization", targetId: "org" }),
   });
 });
+it.each(["en", "ru"] as const)(
+  "renders EmptyState title and description for an empty saved list in %s",
+  (locale) => {
+    harness.cursor = 0;
+    harness.slots = [];
+    const copy = followCopy(locale);
+    const html = renderToStaticMarkup(
+      FollowWorkspace({
+        initial: { items: [], hasMore: false, nextCursor: null },
+        query: "",
+        locale,
+      }),
+    );
+    expect(html).toContain(copy.empty);
+    expect(html).toContain(copy.emptyHint);
+    expect(html).toContain(copy.discover);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+  },
+);
+it.each(["en", "ru"] as const)(
+  "renders ErrorState retry when the saved workspace has no initial page in %s",
+  (locale) => {
+    harness.cursor = 0;
+    harness.slots = [];
+    const copy = followCopy(locale);
+    const html = renderToStaticMarkup(FollowWorkspace({ initial: null, query: "", locale }));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.pageError);
+    expect(html).toContain(copy.retry);
+    expect(html).toContain("overflow-x-clip");
+  },
+);
