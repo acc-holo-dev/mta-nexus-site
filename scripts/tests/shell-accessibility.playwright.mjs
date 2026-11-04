@@ -629,62 +629,18 @@ for (const locale of ["en", "ru"]) {
         `${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`,
       );
     }
-    await loginFixture(page);
-    await page.goto("/notifications");
-    await waitForReadyCapture(page);
-    const inboxCopy = notificationInboxCopy(locale);
-    // Reading filters use a distinct landmark from the page title (notifications primary journey).
-    const notificationFilters = page.getByRole("navigation", {
-      name: inboxCopy.readingState,
-      exact: true,
-    });
-    const allNotificationsLink = notificationFilters.getByRole("link", {
-      name: inboxCopy.all,
-      exact: true,
-    });
-    const unreadNotificationsLink = notificationFilters.getByRole("link", {
-      name: inboxCopy.unread,
-      exact: true,
-    });
-    await expect(allNotificationsLink).toHaveAttribute("aria-current", "page");
-    await expect(unreadNotificationsLink).toHaveAttribute("href", "/notifications?state=unread");
-    await unreadNotificationsLink.focus();
-    await assertVisibleFocusIndicator(
-      unreadNotificationsLink,
-      `${locale} unread notification filter`,
-    );
-    await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/\/notifications\?state=unread$/u);
-    await waitForReadyCapture(page);
-    await expect(unreadNotificationsLink).toHaveAttribute("aria-current", "page");
-    await expect(allNotificationsLink).not.toHaveAttribute("aria-current", "page");
-    // List composition follows the same URL state as the select/service (no second local filter).
-    // Signed-in inbox filter links compose URL state without a second local filter.
-    const stateLinks = await notificationFilters.evaluate((nav) =>
-      [...nav.querySelectorAll("a")].map((link) => ({
-        href: link.getAttribute("href"),
-        current: link.getAttribute("aria-current"),
-        label: link.textContent?.trim() ?? "",
-      })),
-    );
-    assert.deepEqual(
-      stateLinks.map((link) => link.href),
-      ["/notifications", "/notifications?state=unread", "/notifications?state=read"],
-      `${locale}: notification All/Unread/Read links must encode the real inbox state query`,
-    );
-    assert.equal(
-      stateLinks.filter((link) => link.current === "page").length,
-      1,
-      `${locale}: exactly one reading-state filter may be current`,
-    );
-    assert.equal(stateLinks[1]?.current, "page");
-    evidence.push(
-      `${locale}: notification All/Unread/Read links sync URL state, restore aria-current, and compose the inbox filter without fake local tabs`,
-    );
 
+    // Guest More/Discover before loginFixture so Sign in stays visible (UX-23 A).
     await page.setViewportSize({ width: 390, height: 480 });
     await page.goto("/market");
     await waitForReadyCapture(page);
+    // Account chrome Sign in is outside More; More still keeps its own guest CTA.
+    await expect(
+      page.getByRole("banner").getByRole("link", {
+        name: dictionary.accountControls.signIn,
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/auth/login?next=%2Fmarket");
     const mobileNavigation = page.getByRole("navigation", {
       name: dictionary.nav.ecosystem,
       exact: true,
@@ -802,6 +758,59 @@ for (const locale of ["en", "ru"]) {
     assert.deepEqual(errors, []);
     evidence.push(
       `${locale}: ordinary Discover search remains keyboard reachable and fits a short mobile viewport; no uncaught browser errors`,
+    );
+
+    await loginFixture(page);
+    await page.goto("/notifications");
+    await waitForReadyCapture(page);
+    const inboxCopy = notificationInboxCopy(locale);
+    // Reading filters use a distinct landmark from the page title (notifications primary journey).
+    const notificationFilters = page.getByRole("navigation", {
+      name: inboxCopy.readingState,
+      exact: true,
+    });
+    const allNotificationsLink = notificationFilters.getByRole("link", {
+      name: inboxCopy.all,
+      exact: true,
+    });
+    const unreadNotificationsLink = notificationFilters.getByRole("link", {
+      name: inboxCopy.unread,
+      exact: true,
+    });
+    await expect(allNotificationsLink).toHaveAttribute("aria-current", "page");
+    await expect(unreadNotificationsLink).toHaveAttribute("href", "/notifications?state=unread");
+    await unreadNotificationsLink.focus();
+    await assertVisibleFocusIndicator(
+      unreadNotificationsLink,
+      `${locale} unread notification filter`,
+    );
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/notifications\?state=unread$/u);
+    await waitForReadyCapture(page);
+    await expect(unreadNotificationsLink).toHaveAttribute("aria-current", "page");
+    await expect(allNotificationsLink).not.toHaveAttribute("aria-current", "page");
+    // List composition follows the same URL state as the select/service (no second local filter).
+    // Signed-in inbox filter links compose URL state without a second local filter.
+    const stateLinks = await notificationFilters.evaluate((nav) =>
+      [...nav.querySelectorAll("a")].map((link) => ({
+        href: link.getAttribute("href"),
+        current: link.getAttribute("aria-current"),
+        label: link.textContent?.trim() ?? "",
+      })),
+    );
+    assert.deepEqual(
+      stateLinks.map((link) => link.href),
+      ["/notifications", "/notifications?state=unread", "/notifications?state=read"],
+      `${locale}: notification All/Unread/Read links must encode the real inbox state query`,
+    );
+    assert.equal(
+      stateLinks.filter((link) => link.current === "page").length,
+      1,
+      `${locale}: exactly one reading-state filter may be current`,
+    );
+    assert.equal(stateLinks[1]?.current, "page");
+    evidence.push(
+      `${locale}: notification All/Unread/Read links sync URL state, restore aria-current, and compose the inbox filter without fake local tabs`,
     );
   });
 }
