@@ -1,5 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import type { Locale } from "../apps/web/src/lib/i18n";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -7,7 +9,7 @@ const h = vi.hoisted(() => ({
   fetch: vi.fn(),
   refresh: vi.fn(),
   reload: vi.fn(),
-  locale: "en",
+  locale: "en" as Locale,
   productId: "prd_a",
   revision: 3,
   artifactValid: true,
@@ -43,8 +45,10 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) })
 vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: h.locale }),
 }));
+
 import { LibraryReleaseSelectionControls } from "../apps/web/src/components/library-release-selection-controls";
 import { getResourceReleaseControlCopy } from "../apps/web/src/lib/resource-release-control-i18n";
+
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(n: ReactNode): Element[] {
   if (Array.isArray(n)) return n.flatMap(nodes);
@@ -117,21 +121,24 @@ beforeEach(() => {
   vi.stubGlobal("window", { location: { reload: h.reload } });
 });
 afterEach(() => vi.unstubAllGlobals());
-it.each(["en", "ru"])("freezes a lost request and retries it exactly in %s", async (locale) => {
-  h.locale = locale;
-  const copy = getResourceReleaseControlCopy(locale);
-  h.fetch.mockRejectedValueOnce(new Error("lost"));
-  await click(`${copy.choose}: 2`);
-  const init = h.fetch.mock.calls[0][1] as RequestInit;
-  expect(button(`${copy.choose}: 3`).props.disabled).toBe(true);
-  await click(`${copy.choose}: 3`); // Even a stale handler cannot replace the frozen command.
-  expect(h.fetch).toHaveBeenCalledOnce();
-  h.fetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ack(init) });
-  await click(copy.retrySame);
-  expect(h.fetch.mock.calls[1][1].body).toBe(init.body);
-  expect(h.refresh).toHaveBeenCalledOnce();
-  expect(button(`${copy.choose}: 2`).props.disabled).toBe(true);
-});
+it.each(["en", "ru"] as const)(
+  "freezes a lost request and retries it exactly in %s",
+  async (locale) => {
+    h.locale = locale;
+    const copy = getResourceReleaseControlCopy(locale);
+    h.fetch.mockRejectedValueOnce(new Error("lost"));
+    await click(`${copy.choose}: 2`);
+    const init = h.fetch.mock.calls[0][1] as RequestInit;
+    expect(button(`${copy.choose}: 3`).props.disabled).toBe(true);
+    await click(`${copy.choose}: 3`); // Even a stale handler cannot replace the frozen command.
+    expect(h.fetch).toHaveBeenCalledOnce();
+    h.fetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ack(init) });
+    await click(copy.retrySame);
+    expect(h.fetch.mock.calls[1][1].body).toBe(init.body);
+    expect(h.refresh).toHaveBeenCalledOnce();
+    expect(button(`${copy.choose}: 2`).props.disabled).toBe(true);
+  },
+);
 it("keeps a malformed success response unresolved until the same request is confirmed", async () => {
   h.fetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ success: true }) });
   await click("Use latest approved version");

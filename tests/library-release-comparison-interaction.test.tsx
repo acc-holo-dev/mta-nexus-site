@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import type { Locale } from "../apps/web/src/lib/i18n";
 
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -8,7 +9,7 @@ const h = vi.hoisted(() => ({
   fetch: vi.fn(),
   refresh: vi.fn(),
   reload: vi.fn(),
-  locale: "en",
+  locale: "en" as Locale,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
@@ -95,7 +96,7 @@ beforeEach(() => {
   vi.stubGlobal("window", { location: { reload: h.reload } });
 });
 afterEach(() => vi.unstubAllGlobals());
-it.each(["en", "ru"])(
+it.each(["en", "ru"] as const)(
   "requires explicit confirmation and freezes the exact reviewed archive in %s",
   async (locale) => {
     h.locale = locale;
