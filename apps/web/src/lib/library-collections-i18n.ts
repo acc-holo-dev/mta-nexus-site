@@ -1,5 +1,7 @@
 const en = {
   loadUnavailable: "Your resource collections are temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty collection view. Retry to fetch the latest private collection state.",
   title: "My resource collections",
   library: "Resource library",
   resourceCollections: "Collections containing this resource",
@@ -56,6 +58,8 @@ const en = {
   browseLibrary: "Browse free resources",
   emptyFiltered: "No collections in this status filter.",
   emptyItems: "This collection has no resources yet.",
+  emptyItemsHint:
+    "An empty reference list is not a load failure. Add resources or clear filters after they are recorded.",
   emptyFilteredItems: "No resources match this search.",
   archivedNote:
     "This collection is archived. Restore it to change its name or contents. Your resource rights and version preferences are preserved.",
@@ -109,6 +113,8 @@ const en = {
 };
 const ru: typeof en = {
   loadUnavailable: "Коллекции ресурсов временно недоступны. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустой список коллекций. Повторите запрос, чтобы получить актуальное состояние.",
   title: "Мои коллекции ресурсов",
   library: "Библиотека ресурсов",
   resourceCollections: "Коллекции с этим ресурсом",
@@ -165,6 +171,8 @@ const ru: typeof en = {
   browseLibrary: "Смотреть бесплатные ресурсы",
   emptyFiltered: "В этом фильтре статуса коллекций нет.",
   emptyItems: "В этой коллекции пока нет ресурсов.",
+  emptyItemsHint:
+    "Пустой список ссылок — не ошибка загрузки. Добавьте ресурсы или сбросьте фильтры после записи.",
   emptyFilteredItems: "По этому поиску ресурсов нет.",
   archivedNote:
     "Коллекция в архиве. Восстановите её, чтобы изменить название или состав. Права на ресурсы и выбранные версии сохраняются.",

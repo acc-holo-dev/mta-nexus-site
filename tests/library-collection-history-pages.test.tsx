@@ -158,9 +158,14 @@ it.each([
 it("renders empty account history and maps an absent account to a missing page", async () => {
   const historyHref = 'href="/workspace/library/collections/history"';
   const clearLinks = (html: string) => (html.match(new RegExp(historyHref, "g")) ?? []).length;
+  const copy = libraryCollectionHistoryCopy("en");
   state.history.mockResolvedValue({ ...report(), items: [], total: 0, totalPages: 1, page: 1 });
   const filteredEmpty = await screen();
-  expect(filteredEmpty).toContain(libraryCollectionHistoryCopy("en").empty);
+  expect(filteredEmpty).toContain(copy.empty);
+  expect(filteredEmpty).toContain(copy.emptyHint);
+  expect(filteredEmpty).toContain("overflow-x-clip");
+  expect(filteredEmpty).toContain("min-h-11");
+  expect(filteredEmpty).not.toContain('role="alert"');
   expect(clearLinks(filteredEmpty)).toBe(2);
   state.history.mockResolvedValue({
     ...report(),
@@ -174,8 +179,29 @@ it("renders empty account history and maps an absent account to a missing page",
     productId: undefined,
   });
   const defaultEmpty = await screen({});
-  expect(defaultEmpty).toContain(libraryCollectionHistoryCopy("en").empty);
+  expect(defaultEmpty).toContain(copy.empty);
+  expect(defaultEmpty).toContain(copy.emptyHint);
+  expect(defaultEmpty).toContain("overflow-x-clip");
   expect(clearLinks(defaultEmpty)).toBe(1);
   state.history.mockRejectedValue(new AppError("private detail", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("shows ErrorState recovery when collection history fails to load", async () => {
+  const copy = libraryCollectionHistoryCopy("en");
+  state.history.mockRejectedValue(new Error("history unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).not.toContain(copy.emptyHint);
+});
+it("locks ErrorState for invalid history filters with retry shell", async () => {
+  const copy = libraryCollectionHistoryCopy("en");
+  const html = await screen({ userId: "other" });
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
 });

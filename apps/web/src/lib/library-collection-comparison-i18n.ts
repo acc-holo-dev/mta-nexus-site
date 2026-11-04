@@ -3,6 +3,15 @@ const en = {
   loading: "Loading collection comparison…",
   note: "Compare resource references in two of your collections. Counts cover the full pair; search matches currently accessible names. Collection membership never grants downloads.",
   choose: "Choose another collection to compare.",
+  chooseHint:
+    "Pick a destination collection to compare references. An empty comparison is not a load failure.",
+  noDestinationHint:
+    "Create or restore another collection before comparing. A missing destination is not a load failure.",
+  emptyHint:
+    "No references match this comparison filter. An empty table is not a load failure — clear filters or choose another pair.",
+  loadUnavailable: "Collection comparison is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty comparison. Retry to fetch the latest collection pair.",
   destination: "Comparison destination",
   compare: "Compare",
   all: "All references",
@@ -22,6 +31,15 @@ const ru: typeof en = {
   loading: "Загрузка сравнения коллекций…",
   note: "Сравните записи ресурсов двух своих коллекций. Счётчики относятся к полному составу; поиск учитывает названия доступных сейчас ресурсов. Коллекции не предоставляют права на скачивание.",
   choose: "Выберите другую коллекцию для сравнения.",
+  chooseHint:
+    "Выберите коллекцию назначения для сравнения ссылок. Пустое сравнение — не ошибка загрузки.",
+  noDestinationHint:
+    "Создайте или восстановите другую коллекцию перед сравнением. Отсутствие назначения — не ошибка загрузки.",
+  emptyHint:
+    "Нет ссылок по этому фильтру сравнения. Пустая таблица — не ошибка загрузки; сбросьте фильтры или выберите другую пару.",
+  loadUnavailable: "Сравнение коллекций временно недоступно. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустое сравнение. Повторите запрос за актуальной парой коллекций.",
   destination: "Коллекция для сравнения",
   compare: "Сравнить",
   all: "Все записи",

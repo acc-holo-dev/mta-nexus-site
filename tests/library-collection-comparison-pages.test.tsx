@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
@@ -55,12 +56,14 @@ vi.mock("../apps/web/src/components/library-collection-item-copy", () => ({
     </button>
   ),
 }));
+
 import Page, {
   dynamic,
   generateMetadata,
 } from "../apps/web/src/app/workspace/library/collections/[id]/compare/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 import { libraryCollectionComparisonCopy } from "../apps/web/src/lib/library-collection-comparison-i18n";
+
 const source = {
     id: "lcol_a",
     name: "Source & name",
@@ -192,11 +195,38 @@ it("keeps destination-only pages read-only", async () => {
   expect(html).toContain(libraryCollectionComparisonCopy("en").noSourceItems);
 });
 it("chooses an owned comparison target before reading resources", async () => {
+  const copy = libraryCollectionComparisonCopy("en");
   state.comparison.mockResolvedValue({ ...report(), comparison: null });
   const html = await screen({});
-  expect(html).toContain(libraryCollectionComparisonCopy("en").choose);
+  expect(html).toContain(copy.choose);
+  expect(html).toContain(copy.chooseHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-transfer");
   expect(html).not.toContain("Accessible");
+});
+it("shows EmptyState when comparison filters match no references", async () => {
+  const value = report();
+  value.comparison.items = [];
+  value.comparison.total = 0;
+  state.comparison.mockResolvedValue(value);
+  const html = await screen();
+  const copy = libraryCollectionComparisonCopy("en");
+  expect(html).toContain(copy.emptyHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).not.toContain('role="alert"');
+});
+it("shows ErrorState recovery when comparison fails to load", async () => {
+  const copy = libraryCollectionComparisonCopy("en");
+  state.comparison.mockRejectedValue(new Error("comparison unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
 });
 it("authenticates before inspecting query selectors", async () => {
   state.actor = null;
@@ -208,7 +238,10 @@ it("authenticates before inspecting query selectors", async () => {
 it.each([{ userId: "other" }, { to: ["a", "b"] }, { to: "../private" }, { filter: "common" }])(
   "rejects invalid comparison selectors before reading %o",
   async (query) => {
-    expect(await screen(query)).toContain('role="alert"');
+    const html = await screen(query);
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(libraryCollectionComparisonCopy("en").loadUnavailableDescription);
+    expect(html).toContain("overflow-x-clip");
     expect(state.comparison).not.toHaveBeenCalled();
   },
 );

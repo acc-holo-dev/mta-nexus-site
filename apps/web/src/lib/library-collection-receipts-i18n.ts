@@ -5,6 +5,11 @@ const en = {
   note: "The receipt records the committed result. Restoration offers an inverse of its recorded additions/removals under your current collection state and resource access. Choose changes explicitly; later edits to other references are retained.",
   unsupported: "This receipt does not prove a reversible composition change.",
   unknown: "The recorded receipt could not be verified.",
+  unknownHint:
+    "An unverified receipt is not a load failure. Open history for another receipt, or retry if loading failed.",
+  loadUnavailable: "This collection receipt is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not a missing receipt. Retry to fetch the latest recorded receipt detail.",
   recorded: "Recorded collection",
   current: "Current collection",
   time: "Time (UTC)",
@@ -24,6 +29,11 @@ const ru: typeof en = {
   note: "Квитанция хранит записанный результат. Восстановление предлагает обратные добавления и удаления с учётом текущего состава коллекции и доступа к ресурсам. Выберите изменения явно; последующие правки других ссылок сохранятся.",
   unsupported: "Эта квитанция не подтверждает обратимое изменение состава.",
   unknown: "Записанную квитанцию не удалось проверить.",
+  unknownHint:
+    "Непроверенная квитанция — не ошибка загрузки. Откройте историю для другой квитанции или повторите запрос.",
+  loadUnavailable: "Квитанция коллекции временно недоступна. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не отсутствующая квитанция. Повторите запрос за актуальной детализацией.",
   recorded: "Записанная коллекция",
   current: "Текущая коллекция",
   time: "Время (UTC)",
