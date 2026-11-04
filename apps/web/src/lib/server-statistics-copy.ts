@@ -1,4 +1,5 @@
 import type { Locale } from "./i18n";
+
 const en = {
   title: "Server statistics",
   open: "Detailed statistics",
@@ -24,8 +25,8 @@ const en = {
   unknown: "Unknown",
   yes: "Yes",
   no: "No",
-  empty:
-    "No stored observations in this period. Choose another period or check that the existing collector is running.",
+  empty: "No stored observations in this period.",
+  emptyHint: "Choose another period or check that the existing collector is running.",
   observations: "Recorded observations",
   observationsScope:
     "Newest first, 25 per page. Period totals and chart include all matching records.",
@@ -58,6 +59,7 @@ const en = {
   exportSamples: "Download this observation page as CSV",
   downloading: "Preparing download…",
   endOfPage: "No earlier recorded observations in this period.",
+  endOfPageHint: "Return to the newest observations or choose another period end.",
   exportScope:
     "Interval CSV includes the entire selected period, including empty intervals. Observation CSV contains only the displayed page. Exports retain the displayed period end.",
   snapshot: "Period end",
@@ -100,8 +102,8 @@ const ru: typeof en = {
   unknown: "Неизвестно",
   yes: "Да",
   no: "Нет",
-  empty:
-    "В этом периоде нет сохранённых наблюдений. Выберите другой период или проверьте работу существующего сборщика.",
+  empty: "В этом периоде нет сохранённых наблюдений.",
+  emptyHint: "Выберите другой период или проверьте работу существующего сборщика.",
   observations: "Сохранённые наблюдения",
   observationsScope:
     "Сначала новые, по 25 на странице. Итоги и график учитывают все записи периода.",
@@ -134,6 +136,7 @@ const ru: typeof en = {
   exportSamples: "Скачать эту страницу наблюдений в CSV",
   downloading: "Подготовка загрузки…",
   endOfPage: "В этом периоде больше нет более ранних наблюдений.",
+  endOfPageHint: "Вернитесь к новым наблюдениям или выберите другой конец периода.",
   exportScope:
     "CSV интервалов включает весь выбранный период, в том числе пустые интервалы. CSV наблюдений содержит только показанную страницу. Выгрузки сохраняют отображаемый конец периода.",
   snapshot: "Конец периода",

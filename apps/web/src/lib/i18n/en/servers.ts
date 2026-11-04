@@ -115,8 +115,9 @@ export const servers = {
     peakPlayers: "Peak players",
     averagePlayers: "Average players",
     latestStored: "Latest stored",
-    empty:
-      "No stored observations are available for the selected period. History appears after the NEXUS collector records confirmed master-list observations.",
+    empty: "No stored observations for the selected period.",
+    emptyHint:
+      "History appears after the NEXUS collector records confirmed master-list observations. Missing observations do not mean the server was offline.",
     window: "Recorded interval",
     chartLabel: "Recorded peak players by interval",
     playerCountUnknown: "player count unknown",
@@ -131,5 +132,7 @@ export const servers = {
     moderated: "Moderated content",
     unavailable: "Server updates are temporarily unavailable. Live server status is unaffected.",
     empty: "No published server updates yet.",
+    emptyHint:
+      "Published articles, news, and announcements linked to this server appear here after moderation.",
   },
 };
