@@ -4,6 +4,7 @@ import { Flag } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Locale } from "../lib/i18n";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { resourceReviewCopy, resourceReviewState } from "../lib/resource-review-i18n";
@@ -29,7 +30,7 @@ function ResourceReviewLoadError({
   backLabel,
   retryHref,
 }: {
-  locale: string;
+  locale: Locale;
   backHref: string;
   backLabel: string;
   retryHref: string;
@@ -180,6 +181,7 @@ export async function ResourceReviewReportScreen({
       ) : (
         <EmptyState
           title={copy.reportEmpty}
+          description={copy[alternateView]}
           icon={<Flag className="h-6 w-6" aria-hidden="true" />}
           action={
             <Link href={`${base}?view=${alternateView}`} className={navLinkClass}>

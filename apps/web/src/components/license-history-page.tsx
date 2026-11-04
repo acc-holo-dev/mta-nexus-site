@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatHistoryDate } from "../lib/commerce-history-format";
+import type { Locale } from "../lib/i18n";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { getLicenseControlCopy, licenseActionLabel } from "../lib/license-control-i18n";
@@ -28,7 +29,7 @@ function LicenseHistoryLoadError({
   backLabel,
   retryHref,
 }: {
-  locale: string;
+  locale: Locale;
   backHref: string;
   backLabel: string;
   retryHref: string;

@@ -8,6 +8,7 @@ import { parseModerationDetailQuery } from "../lib/community-moderation-contract
 import { moderationCopy } from "../lib/community-moderation-copy";
 import { discussionReportsHref } from "../lib/discussion-reports-contract";
 import { discussionReportsCopy } from "../lib/discussion-reports-copy";
+import type { Locale } from "../lib/i18n";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
@@ -31,7 +32,7 @@ function ModeratedDiscussionLoadError({
   locale,
   retryHref,
 }: {
-  locale: string;
+  locale: Locale;
   retryHref: string;
 }) {
   const copy = moderatedDiscussionCopy(locale),
