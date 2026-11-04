@@ -11,6 +11,8 @@ const copies = {
     loading: "Loading sales report…",
     detailLoading: "Loading sale line…",
     loadUnavailable: "Sales report is temporarily unavailable. Recorded sales were not loaded.",
+    loadUnavailableHint:
+      "Retry keeps the same filters. A temporary load failure is not a cancelled sale or payout authorization.",
     detail: "Sale line",
     back: "Back to sales",
     personal: "Personal portfolio",
@@ -48,6 +50,8 @@ const copies = {
     signIn: "Sign in",
     signInRequired: "Sign in to view sales",
     invalid: "Invalid report filters.",
+    invalidDescription:
+      "Invalid filters are not a load failure. Reset them and open the sales report again.",
     finance: "Financial statements",
     manage: "Manage resource",
     notice:
@@ -78,6 +82,8 @@ const copies = {
     loading: "Загрузка отчёта о продажах…",
     detailLoading: "Загрузка строки продажи…",
     loadUnavailable: "Отчёт о продажах временно недоступен. Записи продаж не загружены.",
+    loadUnavailableHint:
+      "Повтор сохраняет те же фильтры. Временный сбой загрузки — это не отмена продажи и не разрешение на выплату.",
     detail: "Строка продажи",
     back: "К продажам",
     personal: "Личные ресурсы",
@@ -115,6 +121,8 @@ const copies = {
     signIn: "Войти",
     signInRequired: "Войдите для просмотра продаж",
     invalid: "Некорректные фильтры отчёта.",
+    invalidDescription:
+      "Некорректные фильтры — не ошибка загрузки. Сбросьте их и снова откройте отчёт о продажах.",
     finance: "Финансовые выписки",
     manage: "Управление ресурсом",
     notice:

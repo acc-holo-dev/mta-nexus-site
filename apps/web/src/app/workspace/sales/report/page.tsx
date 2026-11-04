@@ -59,6 +59,7 @@ export default async function SellerSalesPage({
           </Link>
           <ErrorState
             title={c.loadUnavailable}
+            description={c.loadUnavailableHint}
             action={
               <Link href={returnPath} className={linkClass}>
                 {dictionary.errors.retry}
@@ -75,10 +76,15 @@ export default async function SellerSalesPage({
     if (error instanceof AppError && error.statusCode === 400)
       return (
         <section className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8">
-          <p role="alert">{c.invalid}</p>
-          <Link href="/workspace/sales/report" className={linkClass}>
-            {c.reset}
-          </Link>
+          <ErrorState
+            title={c.invalid}
+            description={c.invalidDescription}
+            action={
+              <Link href="/workspace/sales/report" className={linkClass}>
+                {c.reset}
+              </Link>
+            }
+          />
         </section>
       );
     return (
@@ -88,6 +94,7 @@ export default async function SellerSalesPage({
         </Link>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
           action={
             <Link href={returnPath} className={linkClass}>
               {dictionary.errors.retry}
