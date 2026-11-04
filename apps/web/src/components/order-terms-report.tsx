@@ -1,4 +1,6 @@
 import type { OrderTermsReport } from "@nexus/domain";
+import { EmptyState } from "@nexus/ui";
+import { ScrollText } from "lucide-react";
 import Link from "next/link";
 import { formatFinancialMinor } from "../lib/financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../lib/order-terms-i18n";
@@ -24,15 +26,14 @@ export function OrderTermsReportView({
   const flags = (
     ["amountMismatch", "currencyMismatch", "negativeValues", "unsupportedCurrency"] as const
   ).filter((key) => report.summary[key]);
+  const linkClass =
+    "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link
-        href={base}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <Link href={base} className={linkClass}>
         {c.back}
       </Link>
-      <header className="space-y-3">
+      <header className="min-w-0 space-y-3">
         <h1 className="font-display text-primary">{c.title}</h1>
         <h2 className="break-words text-xl">{report.order.orderNumber}</h2>
         <p className="text-sm text-muted">
@@ -45,7 +46,7 @@ export function OrderTermsReportView({
       <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
         {c.notice}
       </p>
-      <section className="nexus-panel space-y-4 p-5">
+      <section className="nexus-panel min-w-0 space-y-4 p-5">
         <h2 className="text-lg font-semibold">{c.check}</h2>
         <p className="text-sm text-secondary">{c.consistencyNotice}</p>
         <dl className="grid gap-3 text-sm sm:grid-cols-3">
@@ -86,16 +87,13 @@ export function OrderTermsReportView({
           ))}
         </ul>
       </section>
-      <a
-        href={`${api}/export?page=${report.page}`}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <a href={`${api}/export?page=${report.page}`} className={linkClass}>
         {c.export}
       </a>
       {report.lines.length ? (
         <ol className="space-y-4">
           {report.lines.map((line) => (
-            <li key={line.id} className="nexus-panel space-y-4 p-5">
+            <li key={line.id} className="nexus-panel min-w-0 space-y-4 p-5">
               <h2 className="break-words text-lg font-semibold">
                 {line.terms?.product.title ?? line.productId}
               </h2>
@@ -147,26 +145,24 @@ export function OrderTermsReportView({
           ))}
         </ol>
       ) : (
-        <p className="text-secondary">{c.empty}</p>
+        <EmptyState
+          title={c.empty}
+          description={c.notice}
+          icon={<ScrollText className="h-6 w-6" aria-hidden="true" />}
+        />
       )}
       {report.totalPages > 1 ? (
-        <nav aria-label={c.page} className="flex gap-4 text-sm">
+        <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
           {report.page > 1 ? (
-            <Link
-              href={`${base}/terms?page=${report.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`${base}/terms?page=${report.page - 1}`} className={linkClass}>
               {c.previous}
             </Link>
           ) : null}
-          <span>
+          <span className="inline-flex min-h-11 items-center">
             {c.page} {report.page} {c.of} {report.totalPages}
           </span>
           {report.page < report.totalPages ? (
-            <Link
-              href={`${base}/terms?page=${report.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`${base}/terms?page=${report.page + 1}`} className={linkClass}>
               {c.next}
             </Link>
           ) : null}

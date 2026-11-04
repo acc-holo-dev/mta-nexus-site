@@ -1,5 +1,6 @@
 import { financialReviewRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -13,6 +14,7 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../../../../../lib/financial-i18n";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -34,8 +36,9 @@ export default async function ReconciliationDetail({
     params,
     searchParams,
   ]);
-  const copy = getFinancialCopy(locale),
-    user = await authService.getSession(store.get("nexus_session")?.value);
+  const copy = getFinancialCopy(locale);
+  const dictionary = getDictionary(locale);
+  const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
       <PlatformSignIn
@@ -44,24 +47,50 @@ export default async function ReconciliationDetail({
       />
     );
   if (user.role !== "admin") notFound();
-  const result = await financialReviewRepository
-    .detail(user.id, id, Math.min(parseHistoryPage(query.page), 1000))
-    .catch((error) => {
-      if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-      throw error;
-    });
+  const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
+  const returnHref =
+    pageNumber > 1
+      ? `/admin/commerce/reconciliation/${encodeURIComponent(id)}?page=${pageNumber}`
+      : `/admin/commerce/reconciliation/${encodeURIComponent(id)}`;
+  let missing = false;
+  const result = await financialReviewRepository.detail(user.id, id, pageNumber).catch((error) => {
+    if (error instanceof AppError && [403, 404].includes(error.statusCode)) {
+      missing = true;
+      return null;
+    }
+    return null;
+  });
+  if (missing) notFound();
+  const linkClass =
+    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+        <Link href="/admin/commerce/reconciliation" className={linkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnHref} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href="/admin/commerce/reconciliation"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <Link href="/admin/commerce/reconciliation" className={linkClass}>
         {copy.back}
       </Link>
       <h1 className="break-words font-display text-primary">{result.order.orderNumber}</h1>
       <Link
         href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}/terms`}
-        className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkClass}
       >
         {orderTermsCopy(locale).title}
       </Link>
@@ -83,7 +112,7 @@ export default async function ReconciliationDetail({
       {result.attempts.length ? (
         <ol className="space-y-3">
           {result.attempts.map((attempt) => (
-            <li key={attempt.id} className="nexus-panel space-y-2 p-5">
+            <li key={attempt.id} className="nexus-panel min-w-0 space-y-2 p-5">
               <p className="text-sm">
                 {financialPaymentLabel(locale, attempt.status)} ·{" "}
                 {formatFinancialMinor(attempt.amount, attempt.currency, locale)}
@@ -98,23 +127,17 @@ export default async function ReconciliationDetail({
         <p className="text-secondary">{copy.empty}</p>
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex gap-4 text-sm">
+        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={`?page=${result.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page - 1}`} className={linkClass}>
               {copy.previous}
             </Link>
           ) : null}
-          <span>
+          <span className="inline-flex min-h-11 items-center">
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={`?page=${result.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page + 1}`} className={linkClass}>
               {copy.next}
             </Link>
           ) : null}
