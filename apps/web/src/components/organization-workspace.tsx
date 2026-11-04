@@ -188,9 +188,11 @@ export function OrganizationWorkspacePanel({
       </Link>
       {!manageable && <p className="nexus-panel p-4 text-sm text-muted">{copy.readOnly}</p>}
       <OrganizationProfileForm
-        key={data.organization.updatedAt}
+        key={`${actorId}:${data.organization.id}`}
         locale={locale}
+        actorId={actorId}
         initial={data.organization}
+        canEdit={manageable}
         disabled={!manageable || busy}
         onBusyChange={(value) => {
           guard.current = value;

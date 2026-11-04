@@ -62,6 +62,14 @@ const en = {
   readOnly: "You can view this team. Profile and team changes require an owner or administrator.",
   back: "All organizations",
   errorConflict: "The organization or team changed. Reload current data before saving again.",
+  profileChanged: "The saved organization changed. Compare it with your draft before continuing.",
+  profileLatest: "Latest saved organization profile",
+  profileCheck: "Check saved profile",
+  profileUseLatest: "Use this version as the basis for my draft",
+  profileDraftHelp:
+    "Your draft is kept. Using this version as the basis keeps it; saving will replace the profile fields.",
+  profileVerify: "Verify your account to view the draft",
+  profileActorChanged: "The signed-in account changed. The previous account's draft was closed.",
   errorExists: "This account already belongs to the organization.",
   errorMember: "The account or team member was not found.",
   errorProtected: "You cannot change this member or assign this role.",
@@ -135,6 +143,15 @@ const ru: Record<keyof typeof en, string> = {
   back: "Все организации",
   errorConflict:
     "Организация или команда изменились. Загрузите актуальные данные перед повторным сохранением.",
+  profileChanged:
+    "Сохранённый профиль организации изменился. Сравните его с черновиком перед продолжением.",
+  profileLatest: "Последний сохранённый профиль организации",
+  profileCheck: "Проверить сохранённый профиль",
+  profileUseLatest: "Использовать эту версию как основу черновика",
+  profileDraftHelp:
+    "Черновик сохранён. Выбор этой версии оставит его в форме; при сохранении поля профиля будут заменены.",
+  profileVerify: "Подтвердить аккаунт, чтобы увидеть черновик",
+  profileActorChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
   errorExists: "Этот аккаунт уже состоит в организации.",
   errorMember: "Аккаунт или участник команды не найден.",
   errorProtected: "Вы не можете изменить этого участника или назначить эту роль.",
