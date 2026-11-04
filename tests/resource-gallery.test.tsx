@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { ResourceMediaItem } from "@nexus/domain";
 import { createElement, createRef, type MouseEvent, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -28,17 +30,19 @@ vi.mock("@nexus/ui", async () => {
       type,
       disabled,
       onClick,
+      className,
       "aria-label": ariaLabel,
     }: {
       children: ReactNode;
       type?: "button";
       disabled?: boolean;
       onClick?: () => void;
+      className?: string;
       "aria-label"?: string;
     }) =>
       React.createElement(
         "button",
-        { type: type ?? "button", disabled, onClick, "aria-label": ariaLabel },
+        { type: type ?? "button", disabled, onClick, className, "aria-label": ariaLabel },
         children,
       ),
     buttonClassName: () => "mock-button-primary",
@@ -195,6 +199,18 @@ describe("ResourceGalleryLightbox", () => {
       expect(html).toContain('href="/api/resource-media/rmi_a"');
       expect(html).toContain(copy.lightboxOpenOriginal);
       expect(html).toContain("disabled");
+      expect(html).toContain("min-h-11 min-w-11");
+      expect(html).not.toContain("h-8 w-8");
     },
   );
+
+  it("keeps close and nav icon controls at touch target size in source", () => {
+    const source = readFileSync(
+      resolve(process.cwd(), "apps/web/src/components/resource-gallery-lightbox.tsx"),
+      "utf8",
+    );
+    const touchTargets = source.match(/min-h-11 min-w-11/gu) ?? [];
+    expect(touchTargets.length).toBeGreaterThanOrEqual(3);
+    expect(source).not.toMatch(/\bh-8 w-8\b/u);
+  });
 });

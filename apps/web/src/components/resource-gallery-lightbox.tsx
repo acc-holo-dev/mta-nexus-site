@@ -125,7 +125,7 @@ export function ResourceGalleryLightbox({
           size="icon"
           aria-label={copy.lightboxClose}
           onClick={onClose}
-          className="h-8 w-8 shrink-0 rounded-md"
+          className="min-h-11 min-w-11 shrink-0 rounded-md"
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </Button>
@@ -139,7 +139,7 @@ export function ResourceGalleryLightbox({
             disabled={!canPrevious}
             aria-label={copy.lightboxPrevious}
             onClick={goPrevious}
-            className="absolute left-0 top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full sm:left-2"
+            className="absolute left-0 top-1/2 z-10 min-h-11 min-w-11 -translate-y-1/2 rounded-full sm:left-2"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </Button>
@@ -151,7 +151,7 @@ export function ResourceGalleryLightbox({
             disabled={!canNext}
             aria-label={copy.lightboxNext}
             onClick={goNext}
-            className="absolute right-0 top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full sm:right-2"
+            className="absolute right-0 top-1/2 z-10 min-h-11 min-w-11 -translate-y-1/2 rounded-full sm:right-2"
           >
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </Button>
