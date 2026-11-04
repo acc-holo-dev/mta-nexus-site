@@ -2,6 +2,8 @@ import { AuthForm } from "../../../components/auth-form";
 import { parseAuthReturnPath } from "../../../components/auth-return-path";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export default async function RegisterPage({
   searchParams,
 }: {
@@ -15,5 +17,9 @@ export default async function RegisterPage({
         ? params.next[0]
         : undefined;
   const initialReturnPath = parseAuthReturnPath(nextRaw);
-  return <AuthForm mode="register" locale={locale} initialReturnPath={initialReturnPath} />;
+  return (
+    <div className={pageShellClass}>
+      <AuthForm mode="register" locale={locale} initialReturnPath={initialReturnPath} />
+    </div>
+  );
 }

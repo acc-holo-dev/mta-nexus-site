@@ -11,6 +11,9 @@ import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import { parseProfileChangeHistoryQuery } from "../../../lib/profile-change-history-contract";
 import { authService } from "../../../lib/services/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/profile-change-history-service";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -36,7 +39,13 @@ export default async function ProfileHistoryPage({
         ? `/settings/history?${params}`
         : "/settings/history";
   const actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  if (!actor) {
+    return (
+      <div className={pageShellClass}>
+        <PlatformSignIn locale={locale} returnPath={returnPath} />
+      </div>
+    );
+  }
   const parsed = parsedForReturn,
     filters = parsed ?? { period: "all" as const, group: "all" as const, query: "" };
   let error = parsed ? undefined : privateChangeHistoryCopy(locale).invalid;
@@ -49,5 +58,9 @@ export default async function ProfileHistoryPage({
         return null;
       })
     : null;
-  return <ProfileChangeHistoryView data={data} filters={filters} locale={locale} error={error} />;
+  return (
+    <div className={pageShellClass}>
+      <ProfileChangeHistoryView data={data} filters={filters} locale={locale} error={error} />
+    </div>
+  );
 }
