@@ -170,7 +170,7 @@ export async function CommunityModerationScreen({
             {item.body}
           </div>
           {item.truncated ? (
-            <p role="alert" className="text-sm text-danger">
+            <p role="note" className="text-sm text-muted">
               {copy.large}
             </p>
           ) : null}

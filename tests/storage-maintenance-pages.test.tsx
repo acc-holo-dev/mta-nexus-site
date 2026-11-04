@@ -114,6 +114,20 @@ it("preserves terminal changed states without offering automatic deletion", asyn
   expect(html).not.toContain('type="checkbox"');
   expect(html).toContain("overflow-x-clip");
 });
+it("surfaces a failed removal resultCode through ErrorState instead of bare danger text", async () => {
+  state.detail.mockResolvedValue({
+    ...item,
+    state: "failed",
+    eligible: false,
+    resultCode: "STORAGE_REMOVAL_FAILED",
+  });
+  const copy = storageMaintenanceCopy("en");
+  const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: item.id }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.error);
+  expect(html).toContain("STORAGE_REMOVAL_FAILED");
+  expect(html).not.toContain('<p class="text-danger">');
+});
 it("maps revoked admin privilege to not found before loading the journal", async () => {
   state.list.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
   await expect(Page({ searchParams: Promise.resolve({}) })).rejects.toThrow("NOT_FOUND");

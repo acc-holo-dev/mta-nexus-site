@@ -306,6 +306,7 @@ it("shows legacy truncation explicitly and retains a bounded review surface", as
   });
   const html = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
   expect(html).toContain(moderationCopy("en").large);
+  expect(html).toContain(`role="note" class="text-sm text-muted">${moderationCopy("en").large}`);
   expect(html).toContain(moderationCopy("en").noHistory);
   expect(html).toContain("overflow-x-clip");
 });
