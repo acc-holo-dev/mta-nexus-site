@@ -4,9 +4,12 @@
 
 ## Текущая интеграционная волна — verified green на tip
 
-Опубликовано на `main` и подтверждено CI на exact tip:
+Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
-- `06435b41` / #280 — split discussion-report-batch interaction suite (current tip);
+- `b7e8d9db` / #316 — search landmarks for support, publication desk and directory filters;
+- `484da60a` / #315 — server-review confirmation coverage and split collection copy suite;
+- `d3a5224a` / #317 — notification bell, push and license UI states;
+- `06435b41` / #280 — split discussion-report-batch interaction suite;
 - `49375934` / #279 — split managed-server-visibility interaction suite;
 - `8ea5d29b` / #281 — pnpm aliases for F03/F04 evidence verify;
 - `3227a8a3` / #282 — support workspace touch targets `min-h-11`;
@@ -29,8 +32,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `3883cb618f8bb73090d1a1d8c95486cd31db97b5` (`test: split discussion-report-batch interaction suite`).
-- **Verified CI green on that tip:** [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) on `3883cb61` after #310–#312 residual honesty wave.
+- **Проверенный tip `origin/main`:** `b7e8d9db40aba99e549db7b4f4a5154ddb29bd82` / #316.
+- **CI на этом SHA:** [CI 41903647006](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41903647006) — success. Выполнены lint/types/unit, database tests, сборка production image и production browser smoke; отдельные browser suites, backup restore и остальные skipped jobs в этот прогон не входили.
+- Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
+- **Предыдущий green:** `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
@@ -72,11 +77,11 @@
 
 На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13/ARC14 + FLOW/UX/OPS/GROW-01 и UX-19/20/22. **Не** закрыты **F03/F04** (нужен live evidence), GitHub settings, deploy, реклама и GROW-пилоты.
 
-**Последний GitHub-verified baseline:** tip `d281ac6755…` / [CI 41828791678](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41817787691) (full browsers). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска и соответствующих свидетельств.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep (#200–#247) + browser honesty restore (#252) + deps (#249/#250) в `main`; tip `d281ac6755…` full green. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #316 в проверенном `origin/main`. CI на этом SHA не означает production readiness.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
