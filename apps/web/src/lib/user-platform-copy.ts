@@ -76,6 +76,7 @@ const en = {
   editText: "Edit text",
   unavailable: "This section is temporarily unavailable. Please try again.",
   UNAUTHORIZED: "Sign in again to continue.",
+  ACCOUNT_CHANGED: "The signed-in account changed. Reload the profile before editing.",
   FORBIDDEN: "You no longer have permission to edit this publication.",
   NOT_FOUND: "The item was not found or is unavailable to your account.",
   VALIDATION_FAILED: "Check the fields and their length. Image links must use HTTP or HTTPS.",
@@ -166,6 +167,7 @@ const ru: typeof en = {
   editText: "Редактировать текст",
   unavailable: "Раздел временно недоступен. Попробуйте ещё раз.",
   UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
+  ACCOUNT_CHANGED: "Аккаунт изменился. Загрузите профиль заново перед редактированием.",
   FORBIDDEN: "У вас больше нет прав на редактирование этой публикации.",
   NOT_FOUND: "Запись не найдена или недоступна вашему аккаунту.",
   VALIDATION_FAILED:

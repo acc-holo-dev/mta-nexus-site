@@ -41,6 +41,7 @@ vi.mock("../apps/web/src/lib/user-platform-client", async (original) => ({
 }));
 
 import { PublicProfileForm } from "../apps/web/src/components/public-profile-form";
+import { PlatformRequestError } from "../apps/web/src/lib/user-platform-client";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
 
 type Element = ReactElement<Record<string, unknown>>;
@@ -134,6 +135,7 @@ it.each(["en", "ru"] as const)(
     expect(harness.request.mock.calls[3]?.[3]).toMatchObject({
       displayName: "My draft",
       bio: "My unsaved bio",
+      expectedActorId: original.id,
       expectedUpdatedAt: latest.updatedAt,
     });
     if (typeof cleanup === "function") cleanup();
@@ -157,6 +159,24 @@ it("keeps the current draft on read failure and closes it if the actor changes",
   expect(harness.slots[3]).toMatchObject({ text: copy.profileAccountChanged });
   if (typeof cleanup === "function") cleanup();
 });
+
+it.each(["en", "ru"] as const)(
+  "closes the old draft when the server detects a changed account in %s",
+  async (locale) => {
+    harness.locale = locale;
+    const cleanup = await load();
+    const message = locale === "en" ? "Account changed" : "Аккаунт изменился";
+    harness.request.mockRejectedValueOnce(new PlatformRequestError(message, "ACCOUNT_CHANGED"));
+    await save(render());
+    expect(harness.request.mock.calls[1]?.[3]).toMatchObject({
+      expectedActorId: original.id,
+      expectedUpdatedAt: original.updatedAt,
+    });
+    expect(render().some((node) => node.type === "form")).toBe(false);
+    expect(harness.slots[3]).toMatchObject({ text: message, error: true });
+    if (typeof cleanup === "function") cleanup();
+  },
+);
 
 it("closes the previous draft if a save response identifies a different actor", async () => {
   harness.locale = "en";

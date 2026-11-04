@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const now = new Date("2026-10-10T12:00:00Z");
 const state = vi.hoisted(() => ({ user: null as Record<string, unknown> | null }));
 const mocks = vi.hoisted(() => ({
@@ -27,17 +28,20 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: mocks.rate,
   generateId: (prefix: string) => `${prefix}_generated`,
 }));
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 import {
   GET as profileGet,
   PATCH as profilePatch,
 } from "../apps/web/src/app/api/account/profile/route";
-import { GET as list, POST as create } from "../apps/web/src/app/api/workspace/content/route";
 import {
+  DELETE as archive,
   GET as get,
   PATCH as update,
-  DELETE as archive,
 } from "../apps/web/src/app/api/workspace/content/[id]/route";
+import { POST as create, GET as list } from "../apps/web/src/app/api/workspace/content/route";
+import { userPlatformError } from "../apps/web/src/lib/user-platform-copy";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const context = { params: Promise.resolve({ id: "cnt_author" }) };
 const input = {
   title: "Author publication",
@@ -245,11 +249,21 @@ it("allows only the editable profile fields and the session account", async () =
     displayName: "New name",
     bio: "New bio",
     avatarUrl: "https://images.example.test/avatar.png",
+    expectedActorId: "usr_author",
     expectedUpdatedAt: now.toISOString(),
   };
   const response = await profilePatch(request("PATCH", fields));
   expect(response.status).toBe(200);
-  expect(mocks.profile).toHaveBeenCalledWith("usr_author", now, fields, "aud_generated");
+  expect(mocks.profile).toHaveBeenCalledWith(
+    "usr_author",
+    now,
+    {
+      displayName: fields.displayName,
+      bio: fields.bio,
+      avatarUrl: fields.avatarUrl,
+    },
+    "aud_generated",
+  );
   const data = await response.json();
   expect(data.profile).toMatchObject({ displayName: "New name", bio: "New bio" });
   expect(data.profile).not.toHaveProperty("email");
@@ -263,11 +277,50 @@ it("returns a conflict when profile version no longer matches", async () => {
       displayName: "Writer",
       bio: "",
       avatarUrl: "",
+      expectedActorId: "usr_author",
       expectedUpdatedAt: now.toISOString(),
     }),
   );
   expect(response.status).toBe(409);
   expect(await response.json()).toMatchObject({ code: "CONFLICT" });
+});
+it.each(["en", "ru"])(
+  "rejects a switched account even when profile versions match in %s",
+  async (locale) => {
+    const original = await profileGet(request("GET", undefined, locale));
+    const { profile } = await original.json();
+    state.user = { ...state.user, id: "usr_other", username: "other", updatedAt: now };
+    const response = await profilePatch(
+      request(
+        "PATCH",
+        {
+          displayName: "Draft from first account",
+          bio: "",
+          avatarUrl: "",
+          expectedActorId: profile.id,
+          expectedUpdatedAt: profile.updatedAt,
+        },
+        locale,
+      ),
+    );
+    expect(response.status).toBe(409);
+    const body = await response.json();
+    expect(body.code).toBe("ACCOUNT_CHANGED");
+    expect(body.error).toBe(userPlatformError(locale as "en" | "ru", "ACCOUNT_CHANGED"));
+    expect(mocks.profile).not.toHaveBeenCalled();
+  },
+);
+it("fails closed for old clients without the account precondition", async () => {
+  const response = await profilePatch(
+    request("PATCH", {
+      displayName: "Draft",
+      bio: "",
+      avatarUrl: "",
+      expectedUpdatedAt: now.toISOString(),
+    }),
+  );
+  expect(response.status).toBe(422);
+  expect(mocks.profile).not.toHaveBeenCalled();
 });
 it("enforces rates before reading or writing publication data", async () => {
   mocks.rate.mockResolvedValue({ success: false });

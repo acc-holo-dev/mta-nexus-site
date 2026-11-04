@@ -24,11 +24,13 @@ const editableContentSchema = contentFieldsSchema
     updatedAt: z.iso.datetime(),
   })
   .passthrough();
-const editableProfileSchema = profileUpdateSchema.omit({ expectedUpdatedAt: true }).extend({
-  id: z.string().min(1),
-  username: z.string().min(1),
-  updatedAt: z.iso.datetime(),
-});
+const editableProfileSchema = profileUpdateSchema
+  .omit({ expectedUpdatedAt: true, expectedActorId: true })
+  .extend({
+    id: z.string().min(1),
+    username: z.string().min(1),
+    updatedAt: z.iso.datetime(),
+  });
 export type EditableContent = z.infer<typeof editableContentSchema>;
 export function parseEditableContent(value: unknown) {
   const parsed = editableContentSchema.safeParse(value);
@@ -37,6 +39,15 @@ export function parseEditableContent(value: unknown) {
 export function parseEditableProfile(value: unknown) {
   const parsed = editableProfileSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
+}
+
+export class PlatformRequestError extends Error {
+  constructor(
+    message: string,
+    readonly code: unknown,
+  ) {
+    super(message);
+  }
 }
 
 export async function platformRequest(
@@ -56,7 +67,7 @@ export async function platformRequest(
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const code = data && typeof data === "object" && "code" in data ? data.code : null;
-    throw new Error(translateError(locale, code));
+    throw new PlatformRequestError(translateError(locale, code), code);
   }
   if (!data || typeof data !== "object") throw new Error(translateError(locale, "UNCONFIRMED"));
   return data as Record<string, unknown>;

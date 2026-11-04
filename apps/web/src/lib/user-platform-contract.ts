@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { createContentSchema, externalWebUrlSchema } from "@nexus/validation";
+import { z } from "zod";
 
 export const editorialTypes = ["article", "news", "devlog", "update", "announcement"] as const;
 export const communityTypes = ["post", "question"] as const;
@@ -37,6 +37,7 @@ export const profileUpdateSchema = z
     displayName: z.string().trim().min(2).max(80),
     bio: z.string().trim().max(2000),
     avatarUrl: externalWebUrlSchema.or(z.literal("")),
+    expectedActorId: z.string().min(1).max(128),
     expectedUpdatedAt: z.iso.datetime(),
   })
   .strict();

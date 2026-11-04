@@ -1,6 +1,6 @@
 import { userRepository } from "@nexus/db";
-import { AppError, ValidationError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+import { AppError, ValidationError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { profileUpdateSchema } from "../user-platform-contract";
@@ -18,10 +18,13 @@ class PublicProfileService {
   async update(input: unknown, actor: User) {
     const parsed = profileUpdateSchema.safeParse(input);
     if (!parsed.success) throw new ValidationError("Invalid public profile");
+    if (parsed.data.expectedActorId !== actor.id)
+      throw new AppError("The signed-in account changed", 409, "ACCOUNT_CHANGED");
+    const { expectedActorId: _expectedActorId, expectedUpdatedAt, ...fields } = parsed.data;
     const updated = await userRepository.updatePublicProfile(
       actor.id,
-      new Date(parsed.data.expectedUpdatedAt),
-      parsed.data,
+      new Date(expectedUpdatedAt),
+      fields,
       generateId("aud"),
     );
     if (!updated) throw new AppError("Profile changed", 409, "CONFLICT");

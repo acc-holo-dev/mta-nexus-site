@@ -3,7 +3,11 @@ import { Avatar, Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { parseEditableProfile, platformRequest } from "../lib/user-platform-client";
+import {
+  PlatformRequestError,
+  parseEditableProfile,
+  platformRequest,
+} from "../lib/user-platform-client";
 import type { EditableProfile } from "../lib/user-platform-contract";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
 import { useNexusLocale } from "./locale-context";
@@ -77,6 +81,7 @@ export function PublicProfileForm() {
     try {
       const data = await platformRequest("/api/account/profile", locale, "PATCH", {
         ...fields,
+        expectedActorId: profile.id,
         expectedUpdatedAt: profile.updatedAt,
       });
       const saved = parseEditableProfile(data.profile);
@@ -101,6 +106,14 @@ export function PublicProfileForm() {
       setNotice({ text: copy.saved, error: false });
       router.refresh();
     } catch (error) {
+      if (error instanceof PlatformRequestError && error.code === "ACCOUNT_CHANGED") {
+        loadedIdentity.current = null;
+        setProfile(null);
+        setLatest(null);
+        setRecoveryRequired(false);
+        setNotice({ text: error.message, error: true });
+        return;
+      }
       setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
       setRecoveryRequired(true);
     } finally {

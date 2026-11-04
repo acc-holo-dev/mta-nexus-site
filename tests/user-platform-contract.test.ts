@@ -1,17 +1,18 @@
 import { expect, it } from "vitest";
 import {
-  contentPageFiltered,
-  parseContentPage,
-  contentPageHref,
-  writerCreateSchema,
-  writerUpdateSchema,
-  profileUpdateSchema,
-} from "../apps/web/src/lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../apps/web/src/lib/user-platform-copy";
-import {
   parseEditableContent,
   parseEditableProfile,
 } from "../apps/web/src/lib/user-platform-client";
+import {
+  contentPageFiltered,
+  contentPageHref,
+  parseContentPage,
+  profileUpdateSchema,
+  writerCreateSchema,
+  writerUpdateSchema,
+} from "../apps/web/src/lib/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../apps/web/src/lib/user-platform-copy";
+
 const fields = {
   title: "Title",
   body: "A sufficiently long body.",
@@ -79,6 +80,7 @@ it.each([
       displayName: "User",
       bio: "",
       avatarUrl,
+      expectedActorId: "usr_1",
       expectedUpdatedAt: "2026-10-10T12:00:00Z",
     }).success,
   ).toBe(false);
