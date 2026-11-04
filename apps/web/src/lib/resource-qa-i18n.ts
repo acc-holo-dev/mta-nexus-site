@@ -16,7 +16,14 @@ const copy = {
     answer: "Post answer",
     answering: "Posting answer…",
     resolve: "Mark as useful answer",
+    resolveConfirmTitle: "Mark this answer as useful?",
+    resolveConfirm:
+      "This answer becomes the resolved reply for the question. You can reopen the thread later if needed.",
     reopen: "Reopen question",
+    reopenConfirmTitle: "Reopen this question?",
+    reopenConfirm:
+      "The resolved answer is cleared and the question returns to open. Existing answers stay visible.",
+    cancel: "Cancel",
     follow: "Follow thread",
     unfollow: "Stop following thread",
     followingHelp: "Get updates for this question only. This is not a new-release watch.",
@@ -64,7 +71,14 @@ const copy = {
     answer: "Ответить",
     answering: "Отправка ответа…",
     resolve: "Отметить полезный ответ",
+    resolveConfirmTitle: "Отметить этот ответ как полезный?",
+    resolveConfirm:
+      "Этот ответ станет решением вопроса. Позже ветку можно снова открыть при необходимости.",
     reopen: "Открыть вопрос снова",
+    reopenConfirmTitle: "Снова открыть этот вопрос?",
+    reopenConfirm:
+      "Отметка полезного ответа снимается, вопрос снова открыт. Существующие ответы остаются видимыми.",
+    cancel: "Отмена",
     follow: "Следить за веткой",
     unfollow: "Не следить за веткой",
     followingHelp: "Уведомления только по этому вопросу. Это не слежение за новыми релизами.",
