@@ -432,6 +432,15 @@ describe("resource detail acquisition behavior", () => {
       expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(2);
       expect(html).not.toContain('data-testid="resource-download"');
       expect(html).not.toContain(getDictionary(locale).checkout.paidDisabled);
+      // Narrow viewports follow DOM order; acquisition must precede deep content.
+      expect(html.indexOf('data-testid="resource-acquisition-panel"')).toBeGreaterThan(-1);
+      expect(html.indexOf('data-testid="resource-acquisition-panel"')).toBeLessThan(
+        html.indexOf('data-testid="resource-detail-content"'),
+      );
+      expect(html).toContain("lg:order-2");
+      expect(html).toContain("lg:order-1 lg:col-span-2");
+      expect((html.match(/data-acquire-intent="single"/gu) ?? []).length).toBe(1);
+      expect((html.match(/data-testid="resource-release-watch"/gu) ?? []).length).toBe(1);
     },
   );
 
@@ -479,6 +488,12 @@ describe("resource detail acquisition behavior", () => {
     // History list (2) + download aside for published current version (1).
     expect((html.match(/data-testid="build-provenance"/gu) ?? []).length).toBe(3);
     expect(html).toContain('data-build-id="bld_latest"');
+    expect(html.indexOf('data-testid="resource-acquisition-panel"')).toBeLessThan(
+      html.indexOf('data-testid="resource-detail-content"'),
+    );
+    expect(html.indexOf('data-testid="resource-download"')).toBeLessThan(
+      html.indexOf(getDictionary("en").product.releaseHistory),
+    );
   });
 
   it("lets a current manager inspect builds and download without entitlement", async () => {
