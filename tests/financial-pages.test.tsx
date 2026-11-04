@@ -39,6 +39,7 @@ import Detail from "../apps/web/src/app/admin/commerce/reconciliation/[id]/page"
 import ReviewLoading from "../apps/web/src/app/admin/commerce/reconciliation/loading";
 import Review from "../apps/web/src/app/admin/commerce/reconciliation/page";
 import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
+import FinanceLoading from "../apps/web/src/app/workspace/finance/loading";
 import { getFinancialCopy } from "../apps/web/src/lib/financial-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
@@ -201,4 +202,19 @@ it("clips honest loading shells on narrow layouts", async () => {
     expect(html).toContain("overflow-x-clip");
     expect(html).toContain(getFinancialCopy("en").reviewLoading);
   }
+  const financeLoading = renderToStaticMarkup(await FinanceLoading());
+  expect(financeLoading).toContain("min-w-0");
+  expect(financeLoading).toContain("overflow-x-clip");
+  expect(financeLoading).toContain(getFinancialCopy("en").loading);
+});
+it("shows an honest recovery state when workspace statements fail to load", async () => {
+  state.statement.mockRejectedValueOnce(new Error("statements unavailable"));
+  state.scopes.mockResolvedValueOnce({ scopes: [], page: 1, totalPages: 1, total: 0 });
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(await Statement({ searchParams: Promise.resolve({ page: "2" }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.statementsLoadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/finance?page=2&amp;scopePage=1"');
+  expect(html).not.toContain("statements unavailable");
 });

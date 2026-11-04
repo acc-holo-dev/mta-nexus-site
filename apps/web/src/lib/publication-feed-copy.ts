@@ -38,6 +38,8 @@ const en = {
   previous: "Previous page",
   next: "Older publications",
   loading: "Loading…",
+  loadUnavailable:
+    "Public activity is temporarily unavailable. This does not mean there are no publications.",
   error: "Unable to load publications. Try again.",
   empty: "No publications here yet.",
   emptyFollowing: "Follow people, teams, servers or resources to see their public updates here.",
@@ -85,6 +87,7 @@ const ru: Record<keyof typeof en, string> = {
   previous: "Предыдущая страница",
   next: "Старые публикации",
   loading: "Загрузка…",
+  loadUnavailable: "Публичная активность временно недоступна. Это не означает, что публикаций нет.",
   error: "Не удалось загрузить публикации. Попробуйте ещё раз.",
   empty: "Публикаций пока нет.",
   emptyFollowing:

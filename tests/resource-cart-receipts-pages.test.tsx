@@ -32,7 +32,9 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 }));
 
 import Detail from "../apps/web/src/app/workspace/acquisitions/receipts/[id]/page";
+import DetailLoading from "../apps/web/src/app/workspace/acquisitions/receipts/[id]/loading";
 import Page, { generateMetadata } from "../apps/web/src/app/workspace/acquisitions/receipts/page";
+import ListLoading from "../apps/web/src/app/workspace/acquisitions/receipts/loading";
 import { resourceCartReceiptsCopy } from "../apps/web/src/lib/resource-cart-receipts-i18n";
 
 const requestId = "11111111-1111-4111-8111-111111111111";
@@ -197,3 +199,31 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("/workspace/acquisitions/receipts");
   },
 );
+it("shows an honest recovery state when acquisition receipts fail to load", async () => {
+  state.page.mockRejectedValueOnce(new Error("receipts unavailable"));
+  const copy = resourceCartReceiptsCopy("en");
+  const html = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ page: "2", days: "30" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("days=30");
+  expect(html).not.toContain("receipts unavailable");
+});
+it("shows an honest recovery state when a receipt detail fails to load", async () => {
+  state.detail.mockRejectedValueOnce(new Error("receipt unavailable"));
+  const copy = resourceCartReceiptsCopy("en");
+  const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: requestId }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(`href="/workspace/acquisitions/receipts/${requestId}"`);
+});
+it("clips honest receipt loading shells on narrow layouts", async () => {
+  for (const Loading of [ListLoading, DetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
+  }
+});

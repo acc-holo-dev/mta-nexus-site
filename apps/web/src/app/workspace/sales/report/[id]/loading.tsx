@@ -1,21 +1,21 @@
-import { getCommerceHistoryCopy } from "../../../../../lib/commerce-history-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { sellerSalesCopy } from "../../../../../lib/seller-sales-i18n";
 
 // Honest loading shell for /workspace/sales/report/[id].
 export default async function Loading() {
-  const copy = getCommerceHistoryCopy(await getRequestLocale());
+  const copy = sellerSalesCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="sales-report-detail-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="sales-report-detail-loading-heading" className="font-display text-primary">
-          {copy.salesTitle}
+          {copy.detail}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
+          {copy.detailLoading}
         </p>
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">

@@ -11,7 +11,7 @@ export async function PublicationFeedLoading({
   const copy = publicationCopy(await getRequestLocale());
   return (
     <section
-      className="space-y-6"
+      className="min-w-0 space-y-6 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="publication-feed-loading-heading"
     >

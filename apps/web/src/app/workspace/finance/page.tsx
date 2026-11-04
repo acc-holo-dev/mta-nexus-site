@@ -1,5 +1,6 @@
 import { financialStatementsRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -11,13 +12,20 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../../../lib/financial-i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Financial statements | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+
+const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function FinancialStatements({
   searchParams,
 }: {
@@ -29,8 +37,9 @@ export default async function FinancialStatements({
   }>;
 }) {
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
-  const copy = getFinancialCopy(locale),
-    user = await authService.getSession(store.get("nexus_session")?.value);
+  const copy = getFinancialCopy(locale);
+  const dictionary = getDictionary(locale);
+  const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user) {
     const returnQuery = new URLSearchParams();
     for (const key of ["page", "currency", "organizationId", "scopePage"] as const) {
@@ -47,18 +56,43 @@ export default async function FinancialStatements({
         ? query.organizationId
         : undefined;
   if (query.organizationId && !organizationId) notFound();
+  const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
+  const scopePageNumber = Math.min(parseHistoryPage(query.scopePage), 1000);
+  const returnHref = (() => {
+    const params = new URLSearchParams({
+      page: String(pageNumber),
+      scopePage: String(scopePageNumber),
+      ...(currency ? { currency } : {}),
+      ...(organizationId ? { organizationId } : {}),
+    });
+    return `/workspace/finance?${params}`;
+  })();
   const [result, scopes] = await Promise.all([
     financialStatementsRepository
-      .statement(user.id, Math.min(parseHistoryPage(query.page), 1000), currency, organizationId)
+      .statement(user.id, pageNumber, currency, organizationId)
       .catch((error) => {
         if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-        throw error;
+        return null;
       }),
-    financialStatementsRepository.scopes(
-      user.id,
-      Math.min(parseHistoryPage(query.scopePage), 1000),
-    ),
+    financialStatementsRepository.scopes(user.id, scopePageNumber).catch(() => null),
   ]);
+  if (!result || !scopes) {
+    return (
+      <div className={pageShellClass}>
+        <Link href="/workspace/sales" className={linkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.statementsLoadUnavailable}
+          action={
+            <Link href={returnHref} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const href = (
     page: number,
     selectedCurrency: string | null = currency ?? null,
@@ -67,11 +101,8 @@ export default async function FinancialStatements({
   ) =>
     `/workspace/finance?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), ...(selectedCurrency ? { currency: selectedCurrency } : {}), ...(selectedScope ? { organizationId: selectedScope } : {}) })}`;
   return (
-    <div className="mx-auto max-w-6xl space-y-6 py-8">
-      <Link
-        href="/workspace/sales"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace/sales" className={linkClass}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
@@ -80,10 +111,7 @@ export default async function FinancialStatements({
         {copy.note}
       </p>
       <nav aria-label={copy.currency} className="flex flex-wrap gap-4 text-sm">
-        <Link
-          href={href(1, null)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(1, null)} className={linkClass}>
           {copy.all}
         </Link>
         {["USD", "EUR", "RUB"].map((value) => (
@@ -91,7 +119,7 @@ export default async function FinancialStatements({
             key={value}
             href={href(1, value)}
             aria-current={value === currency ? "page" : undefined}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkClass}
           >
             {value}
           </Link>
@@ -131,7 +159,7 @@ export default async function FinancialStatements({
           ))}
         </ul>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <EmptyState title={copy.empty} description={copy.note} />
       )}
       {result.entries.length ? (
         <div className="overflow-x-auto">
@@ -175,10 +203,7 @@ export default async function FinancialStatements({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={href(result.page - 1)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page - 1)} className={linkClass}>
               {copy.previous}
             </Link>
           ) : null}
@@ -186,10 +211,7 @@ export default async function FinancialStatements({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={href(result.page + 1)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page + 1)} className={linkClass}>
               {copy.next}
             </Link>
           ) : null}
@@ -197,19 +219,13 @@ export default async function FinancialStatements({
       ) : null}
       <section className="space-y-3 border-t border-base pt-5">
         <h2 className="text-lg font-semibold">{copy.organizations}</h2>
-        <Link
-          href="/workspace/finance"
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/finance" className={linkClass}>
           {copy.personal}
         </Link>
         <ul className="flex flex-wrap gap-4">
           {scopes.scopes.map((scope) => (
             <li key={scope.id}>
-              <Link
-                href={href(1, currency, scope.id)}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={href(1, currency, scope.id)} className={linkClass}>
                 {scope.name}
               </Link>
             </li>
@@ -220,7 +236,7 @@ export default async function FinancialStatements({
             {scopes.page > 1 ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkClass}
               >
                 {copy.previous}
               </Link>
@@ -231,7 +247,7 @@ export default async function FinancialStatements({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkClass}
               >
                 {copy.next}
               </Link>

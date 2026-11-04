@@ -1,11 +1,17 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { publicationFeedView } from "../lib/publication-feed-view";
 import { publicationFeedService } from "../lib/services/publication-feed-service";
 import { PublicationFeed } from "./publication-feed";
+
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function PublicProfileActivity({
   kind,
   handle,
@@ -17,22 +23,38 @@ export async function PublicProfileActivity({
 }) {
   const locale = await getRequestLocale(),
     copy = publicationCopy(locale);
+  const dictionary = getDictionary(locale);
   const profile = await publicationFeedService.resolve(kind, handle).catch((error: unknown) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
-    throw error;
+    return null;
   });
+  const profilePath = `/${kind === "user" ? "users" : kind === "server" ? "servers" : "organizations"}/${encodeURIComponent(handle)}`;
+  const activityPath = `${profilePath}/${kind === "server" ? "updates" : "activity"}`;
+  if (!profile) {
+    return (
+      <div className="min-w-0 space-y-6 overflow-x-clip">
+        <Link href={profilePath} className={linkClass}>
+          {kind === "server" ? copy.serverBack : copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={activityPath} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const { filters, initial, errorCode } = await publicationFeedView(
     { kind, id: profile.id },
     await searchParams,
   );
-  const profilePath = `/${kind === "user" ? "users" : kind === "server" ? "servers" : "organizations"}/${encodeURIComponent(handle)}`;
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       <header className="space-y-2">
-        <Link
-          href={profilePath}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={profilePath} className={linkClass}>
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
         <h1 className="text-2xl font-bold text-primary">
@@ -47,7 +69,7 @@ export async function PublicProfileActivity({
         initial={initial}
         filters={filters}
         locale={locale}
-        path={`${profilePath}/${kind === "server" ? "updates" : "activity"}`}
+        path={activityPath}
         server={kind === "server"}
         errorCode={errorCode}
       />

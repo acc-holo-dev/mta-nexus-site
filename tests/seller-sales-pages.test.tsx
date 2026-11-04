@@ -33,7 +33,9 @@ vi.mock("../apps/web/src/lib/services/seller-sales-service", () => ({
 }));
 
 import Detail from "../apps/web/src/app/workspace/sales/report/[id]/page";
+import DetailLoading from "../apps/web/src/app/workspace/sales/report/[id]/loading";
 import Page, { metadata } from "../apps/web/src/app/workspace/sales/report/page";
+import ReportLoading from "../apps/web/src/app/workspace/sales/report/loading";
 import { sellerSalesCopy } from "../apps/web/src/lib/seller-sales-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
@@ -227,4 +229,37 @@ it("recorded attribution stays in exports/details and hides management for forme
   expect(state.detail).toHaveBeenCalledWith(state.actor, "itm_a", "org_a", "recorded");
   expect(line).not.toContain("/workspace/resources/prd_a");
   expect(line).toContain("attribution=recorded");
+});
+it("shows an honest recovery state when the sales report fails to load", async () => {
+  state.report.mockRejectedValueOnce(new Error("report unavailable"));
+  state.scopes.mockResolvedValueOnce({ scopes: [], page: 1, totalPages: 1 });
+  const copy = sellerSalesCopy("en");
+  const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ page: "2" }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/sales/report?page=2"');
+  expect(html).not.toContain("report unavailable");
+});
+it("shows an honest recovery state when a sale line fails to load", async () => {
+  state.detail.mockRejectedValueOnce(new Error("detail unavailable"));
+  const copy = sellerSalesCopy("en");
+  const html = renderToStaticMarkup(
+    await Detail({
+      params: Promise.resolve({ id: "itm_a" }),
+      searchParams: Promise.resolve({ organizationId: "org_a" }),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/sales/report/itm_a?organizationId=org_a"');
+});
+it("clips honest sales loading shells on narrow layouts", async () => {
+  for (const Loading of [ReportLoading, DetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
+  }
+  expect(renderToStaticMarkup(await DetailLoading())).toContain(sellerSalesCopy("en").detailLoading);
 });

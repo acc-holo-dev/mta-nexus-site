@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -7,11 +8,13 @@ import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceCartReviewEvidence } from "../../../../../components/resource-cart-review-evidence";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCartReceiptsCopy } from "../../../../../lib/resource-cart-receipts-i18n";
 import { resourceCartReceiptId } from "../../../../../lib/resource-cart-receipts-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceCartReceiptsService } from "../../../../../lib/services/resource-cart-receipts-service";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -19,6 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
+
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export default async function ResourceCartReceiptPage({
   params,
 }: {
@@ -26,14 +33,12 @@ export default async function ResourceCartReceiptPage({
 }) {
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]),
     copy = resourceCartReceiptsCopy(locale);
+  const dictionary = getDictionary(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
-  if (!user)
-    return (
-      <PlatformSignIn
-        locale={locale}
-        returnPath={`/workspace/acquisitions/receipts/${encodeURIComponent(id)}`}
-      />
-    );
+  const returnPath = `/workspace/acquisitions/receipts/${encodeURIComponent(id)}`;
+  if (!user) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
   let requestId: string;
   try {
     requestId = resourceCartReceiptId(id);
@@ -42,14 +47,28 @@ export default async function ResourceCartReceiptPage({
   }
   const receipt = await resourceCartReceiptsService.detail(user, requestId).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
-    throw error;
+    return null;
   });
+  if (!receipt) {
+    return (
+      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+        <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+          {copy.title}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnPath} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href="/workspace/acquisitions/receipts"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <Link href="/workspace/acquisitions/receipts" className={linkClass}>
         {copy.title}
       </Link>
       <h1 className="font-display text-primary">{copy.receipt}</h1>
@@ -103,7 +122,7 @@ export default async function ResourceCartReceiptPage({
               {item.downloadable ? (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkClass}
                   prefetch={false}
                 >
                   {copy.versions}
@@ -113,10 +132,7 @@ export default async function ResourceCartReceiptPage({
           ))}
         </ol>
       )}
-      <Link
-        href="/workspace/library"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/library" className={linkClass}>
         {copy.library}
       </Link>
     </div>
