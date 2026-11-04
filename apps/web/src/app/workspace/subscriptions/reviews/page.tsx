@@ -4,6 +4,11 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  PlanReviewLoadError,
+  planReviewNavLinkClass,
+  planReviewPageShellClass,
+} from "../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { formatHistoryAmount, formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -37,7 +42,10 @@ export default async function PlanReviewsPage({
       />
     );
   }
+  let recoveryRetry = "/workspace/subscriptions/reviews";
   try {
+    const pageQuery = planReviewsPageParams(params);
+    recoveryRetry = `/workspace/subscriptions/reviews${pageQuery.size ? `?${pageQuery}` : ""}`;
     const normalized = { ...params };
     if (normalized.organizationId === "") delete normalized.organizationId;
     const query = planReviewsQuery(planReviewsPageParams(normalized));
@@ -48,11 +56,8 @@ export default async function PlanReviewsPage({
     const href = (page: number, scopePage = scopes.page) =>
       `/workspace/subscriptions/reviews?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
-        <Link
-          href="/subscriptions"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <div className={planReviewPageShellClass}>
+        <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
@@ -186,6 +191,13 @@ export default async function PlanReviewsPage({
           </Link>
         </section>
       );
-    throw error;
+    return (
+      <PlanReviewLoadError
+        locale={locale}
+        backHref="/subscriptions"
+        backLabel={c.back}
+        retryHref={recoveryRetry}
+      />
+    );
   }
 }

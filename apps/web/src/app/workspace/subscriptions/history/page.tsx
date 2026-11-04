@@ -5,6 +5,11 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import {
+  SubscriptionLoadError,
+  subscriptionNavLinkClass,
+  subscriptionPageShellClass,
+} from "../../../../components/subscription-workspace-recovery";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
@@ -38,16 +43,19 @@ export default async function SubscriptionHistoryPage({
       />
     );
   }
+  let recoveryRetry = "/workspace/subscriptions/history";
   try {
-    const query = subscriptionsQuery(subscriptionPageParams(raw), "history"),
+    const pageParams = subscriptionPageParams(raw);
+    recoveryRetry = `/workspace/subscriptions/history${pageParams.size ? `?${pageParams}` : ""}`;
+    const query = subscriptionsQuery(pageParams, "history"),
       result = await subscriptionsService.history(actor, query);
     const href = (page: number) =>
       `/workspace/subscriptions/history?${new URLSearchParams({ page: String(page), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
-      <section className="mx-auto max-w-4xl space-y-6 py-8">
+      <section className={subscriptionPageShellClass}>
         <Link
           href={subscriptionAccountHref(query.organizationId)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={subscriptionNavLinkClass}
         >
           {c.title}
         </Link>
@@ -122,6 +130,13 @@ export default async function SubscriptionHistoryPage({
           <Link href="/workspace/subscriptions">{c.title}</Link>
         </section>
       );
-    throw error;
+    return (
+      <SubscriptionLoadError
+        locale={locale}
+        backHref={subscriptionAccountHref(undefined)}
+        backLabel={c.title}
+        retryHref={recoveryRetry}
+      />
+    );
   }
 }

@@ -3,6 +3,8 @@ import type { Locale } from "./i18n";
 const en = {
   title: "My subscription",
   loading: "Loading subscription…",
+  loadUnavailable:
+    "Your subscription account is temporarily unavailable. This does not mean you have no subscription.",
   activate: "Activate free plan",
   cancel: "End subscription now",
   history: "Subscription history",
@@ -73,6 +75,7 @@ const en = {
 const ru: typeof en = {
   title: "Моя подписка",
   loading: "Загрузка подписки…",
+  loadUnavailable: "Аккаунт подписки временно недоступен. Это не означает, что подписки нет.",
   activate: "Подключить бесплатный тариф",
   cancel: "Прекратить подписку сейчас",
   history: "История подписки",

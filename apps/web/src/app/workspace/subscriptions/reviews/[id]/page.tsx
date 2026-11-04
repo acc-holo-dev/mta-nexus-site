@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { PlanReviewDetailView } from "../../../../../components/plan-review-detail";
+import { PlanReviewLoadError } from "../../../../../components/plan-review-workspace-recovery";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
 import {
@@ -43,8 +44,11 @@ export default async function PlanReviewPage({
       />
     );
   }
+  let recoveryRetry = planReviewHref(id);
   try {
-    const selection = planReviewsQuery(planReviewsPageParams(query), true),
+    const pageParams = planReviewsPageParams(query);
+    recoveryRetry = planReviewHref(id, pageParams.get("organizationId") ?? undefined);
+    const selection = planReviewsQuery(pageParams, true),
       detail = await planReviewsService.detail(actor, id, selection.organizationId);
     return (
       <PlanReviewDetailView
@@ -67,6 +71,13 @@ export default async function PlanReviewPage({
           </Link>
         </section>
       );
-    throw error;
+    return (
+      <PlanReviewLoadError
+        locale={locale}
+        backHref="/workspace/subscriptions/reviews"
+        backLabel={c.title}
+        retryHref={recoveryRetry}
+      />
+    );
   }
 }

@@ -12,7 +12,7 @@ export default async function Loading() {
     >
       <header className="space-y-2">
         <h1 id="subscription-receipt-loading-heading" className="font-display text-primary">
-          {copy.title}
+          {copy.recorded}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}

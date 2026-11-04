@@ -4,10 +4,15 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { PlanReviewTerms } from "../../../components/plan-review-terms";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { SubscriptionControls } from "../../../components/subscription-controls";
 import { SubscriptionFeeEstimator } from "../../../components/subscription-fee-estimator";
+import {
+  SubscriptionLoadError,
+  subscriptionNavLinkClass,
+  subscriptionPageShellClass,
+} from "../../../components/subscription-workspace-recovery";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../lib/services/subscriptions-service";
@@ -40,8 +45,11 @@ export default async function SubscriptionAccountPage({
       />
     );
   }
+  let recoveryRetry = "/workspace/subscriptions";
   try {
-    const query = subscriptionsQuery(subscriptionPageParams(raw)),
+    const pageParams = subscriptionPageParams(raw);
+    recoveryRetry = `/workspace/subscriptions${pageParams.size ? `?${pageParams}` : ""}`;
+    const query = subscriptionsQuery(pageParams),
       [result, scopes] = await Promise.all([
         subscriptionsService.dashboard(actor, query.organizationId),
         subscriptionsService.scopes(actor, query.scopePage),
@@ -52,13 +60,10 @@ export default async function SubscriptionAccountPage({
       "/workspace/subscriptions/history",
     );
     return (
-      <section className="mx-auto max-w-4xl space-y-6 py-8">
+      <section className={subscriptionPageShellClass}>
         <h1 className="font-display">{c.title}</h1>
         <nav className="flex flex-wrap gap-4">
-          <Link
-            href="/subscriptions"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/subscriptions" className={subscriptionNavLinkClass}>
             {c.catalog}
           </Link>
           <Link
@@ -168,6 +173,13 @@ export default async function SubscriptionAccountPage({
           <Link href="/workspace/subscriptions">{c.title}</Link>
         </section>
       );
-    throw error;
+    return (
+      <SubscriptionLoadError
+        locale={locale}
+        backHref="/subscriptions"
+        backLabel={c.catalog}
+        retryHref={recoveryRetry}
+      />
+    );
   }
 }

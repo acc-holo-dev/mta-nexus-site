@@ -1,18 +1,18 @@
-import { getCommerceHistoryCopy } from "../../../../../lib/commerce-history-i18n";
+import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 
 // Honest loading shell for /workspace/purchases/[id]/operations.
 export default async function Loading() {
-  const copy = getCommerceHistoryCopy(await getRequestLocale());
+  const copy = getCommercialCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="purchase-operations-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="purchase-operations-loading-heading" className="font-display text-primary">
-          {copy.details}
+          {copy.paymentOperations}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}
