@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { DirectoryFilters, DirectoryResults } from "../../../components/discovery-directory";
 import { discoverHref } from "../../../lib/discover-query";
@@ -11,6 +12,9 @@ import { discoveryStreamCopy, discoveryStreamError } from "../../../lib/discover
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 export const dynamic = "force-dynamic";
+const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata() {
   const copy = discoveryStreamCopy(await getRequestLocale());
   return {
@@ -26,7 +30,7 @@ export default async function StreamPage({
 }) {
   const locale = await getRequestLocale(),
     copy = discoveryStreamCopy(locale),
-    dictionary = getDictionary(locale).discover,
+    dictionary = getDictionary(locale),
     params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
@@ -46,42 +50,36 @@ export default async function StreamPage({
       )
     : null;
   return (
-    <div className="space-y-6">
+    <div className={pageShellClass}>
       <header className="space-y-2">
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
-        <Link
-          href={discoverHref(state ?? fallback)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={discoverHref(state ?? fallback)} className={actionLinkClass}>
           {copy.paged}
         </Link>
       </header>
-      <nav aria-label={dictionary.tabsLabel} className="flex flex-wrap gap-4">
+      <nav aria-label={dictionary.discover.tabsLabel} className="flex flex-wrap gap-4">
         {STREAM_TYPES.map((type) => (
           <Link
             key={type}
             aria-current={state?.type === type ? "page" : undefined}
             href={discoveryStreamHref({ ...fallback, type, query: state?.query ?? "" })}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={actionLinkClass}
           >
-            {dictionary[type]}
+            {dictionary.discover[type]}
           </Link>
         ))}
       </nav>
       {state && <DirectoryFilters state={state} locale={locale} path="/discover/stream" stream />}
       {error ? (
-        <div className="nexus-panel space-y-3 p-5">
-          <p role="alert" className="text-sm text-danger">
-            {error}
-          </p>
-          <a
-            href={discoveryStreamHref(state ?? fallback)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.latest}
-          </a>
-        </div>
+        <ErrorState
+          title={error}
+          action={
+            <Link href={discoveryStreamHref(state ?? fallback)} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       ) : (
         results
       )}
