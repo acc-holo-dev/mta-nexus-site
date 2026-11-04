@@ -140,9 +140,7 @@ function render() {
 function submit(nodes: Element[]) {
   const form = nodes.find((node) => node.type === "form");
   if (!form) throw new Error("Missing ownership transfer form");
-  return (
-    form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>
-  )({
+  return (form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>)({
     preventDefault() {},
   });
 }
