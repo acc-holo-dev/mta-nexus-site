@@ -477,12 +477,12 @@ export function SupportCenter({
             </select>
           </label>
           <div className="flex flex-wrap gap-4 sm:col-span-2">
-            <Button type="submit" className="min-h-10" variant="outline">
+            <Button type="submit" size="touch" variant="outline">
               {workspaceCopy.apply}
             </Button>
             <Link
               href={basePath}
-              className="min-h-10 py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {workspaceCopy.reset}
             </Link>

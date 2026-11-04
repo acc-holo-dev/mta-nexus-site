@@ -59,7 +59,8 @@ it.each(["ru", "en"] as const)(
     expect(renderToStaticMarkup(<SupportCaseActions {...props} busy />)).toContain('disabled=""');
     const staff = renderToStaticMarkup(<SupportCaseActions {...props} staff />);
     expect(staff).toContain("border border-base bg-surface");
-    expect(staff).toContain("min-h-10 text-accent");
+    expect(staff).toContain("min-h-11");
+    expect(staff).toContain("text-accent");
   },
 );
 it("renders URL-based escaped search inputs and role-specific create forms", () => {

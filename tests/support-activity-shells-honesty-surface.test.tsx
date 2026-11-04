@@ -135,3 +135,22 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
   );
   expect(read("apps/web/src/components/publication-feed.tsx")).toContain("EmptyState");
 });
+
+it("locks support case/filter/message controls to touch targets without min-h-10", () => {
+  const touchSurfaces = [
+    "apps/web/src/components/support-case-actions.tsx",
+    "apps/web/src/components/support-center.tsx",
+    "apps/web/src/components/support-message-browser.tsx",
+  ] as const;
+  for (const path of touchSurfaces) {
+    const source = read(path);
+    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).not.toContain("min-h-10");
+  }
+  expect(read("apps/web/src/components/support-case-actions.tsx")).toContain('size="touch"');
+  expect(read("apps/web/src/components/support-center.tsx")).toContain('size="touch"');
+  expect(read("apps/web/src/components/support-center.tsx")).toContain(
+    "inline-flex min-h-11 items-center",
+  );
+  expect(read("apps/web/src/components/support-message-browser.tsx")).toContain('size="touch"');
+});
