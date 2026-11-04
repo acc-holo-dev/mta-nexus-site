@@ -1,6 +1,10 @@
+import type { Locale } from "./i18n";
+
 const copy = {
   en: {
     title: "Saved plan reviews",
+    loading: "Loading saved plan reviews…",
+    loadUnavailable: "Saved plan reviews are temporarily unavailable. Please try again.",
     newReview: "Save selected terms",
     back: "Back to plan catalog",
     save: "Save review",
@@ -57,6 +61,8 @@ const copy = {
   },
   ru: {
     title: "Сохранённые обзоры тарифов",
+    loading: "Загрузка сохранённых обзоров тарифов…",
+    loadUnavailable: "Сохранённые обзоры тарифов временно недоступны. Попробуйте ещё раз.",
     newReview: "Сохранить выбранные условия",
     back: "К каталогу тарифов",
     save: "Сохранить обзор",
@@ -110,8 +116,8 @@ const copy = {
       "После неопределённого результата повторите неизменённый выбор. Обновление страницы начинает новый запрос.",
   },
 };
-export const planReviewsCopy = (locale: "en" | "ru") => copy[locale];
-export function planReviewError(locale: "en" | "ru", code: unknown) {
+export const planReviewsCopy = (locale: Locale) => copy[locale];
+export function planReviewError(locale: Locale, code: unknown) {
   const c = copy[locale];
   if (code === "UNAUTHORIZED") return c.signInRequired;
   if (code === "FORBIDDEN" || code === "NOT_FOUND") return c.access;

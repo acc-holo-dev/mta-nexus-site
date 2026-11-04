@@ -43,7 +43,9 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
 }));
 
 import { commercialFeeEstimate } from "@nexus/domain";
+import ReviewDetailLoading from "../apps/web/src/app/workspace/subscriptions/reviews/[id]/loading";
 import Detail from "../apps/web/src/app/workspace/subscriptions/reviews/[id]/page";
+import ReviewsLoading from "../apps/web/src/app/workspace/subscriptions/reviews/loading";
 import New from "../apps/web/src/app/workspace/subscriptions/reviews/new/page";
 import History from "../apps/web/src/app/workspace/subscriptions/reviews/page";
 import { planReviewsCopy } from "../apps/web/src/lib/plan-reviews-i18n";
@@ -224,4 +226,38 @@ it("masks absent or unauthorized details", async () => {
   await expect(
     Detail({ params: Promise.resolve({ id: review.id }), searchParams: Promise.resolve({}) }),
   ).rejects.toThrow("NOT_FOUND");
+});
+it("shows an honest recovery state when saved plan reviews fail to load", async () => {
+  state.page.mockRejectedValue(new Error("reviews unavailable"));
+  const copy = planReviewsCopy("en");
+  const html = renderToStaticMarkup(await History({ searchParams: Promise.resolve({}) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/subscriptions/reviews"');
+});
+it("shows honest recovery when review detail or new review loads fail", async () => {
+  const copy = planReviewsCopy("en");
+  state.detail.mockRejectedValue(new Error("detail unavailable"));
+  expect(
+    renderToStaticMarkup(
+      await Detail({
+        params: Promise.resolve({ id: review.id }),
+        searchParams: Promise.resolve({}),
+      }),
+    ),
+  ).toContain(copy.loadUnavailable);
+  state.plan.mockRejectedValue(new Error("plan unavailable"));
+  expect(
+    renderToStaticMarkup(
+      await New({ searchParams: Promise.resolve({ planId: "cplan_a", revision: "2" }) }),
+    ),
+  ).toContain(copy.loadUnavailable);
+});
+it("clips honest plan review loading shells on narrow layouts", async () => {
+  for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(planReviewsCopy("en").loading);
+  }
 });

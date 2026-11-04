@@ -1,12 +1,12 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { subscriptionsCopy } from "../../../../lib/subscriptions-i18n";
+import { planReviewsCopy } from "../../../../lib/plan-reviews-i18n";
 
 // Honest loading shell for /workspace/subscriptions/reviews.
 export default async function Loading() {
-  const copy = subscriptionsCopy(await getRequestLocale());
+  const copy = planReviewsCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="subscription-reviews-loading-heading"
     >

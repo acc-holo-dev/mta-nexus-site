@@ -44,8 +44,10 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: state.locale }),
 }));
 
+import ActivateLoading from "../apps/web/src/app/workspace/subscriptions/activate/loading";
 import Activate from "../apps/web/src/app/workspace/subscriptions/activate/page";
 import History from "../apps/web/src/app/workspace/subscriptions/history/page";
+import SubscriptionsLoading from "../apps/web/src/app/workspace/subscriptions/loading";
 import Account from "../apps/web/src/app/workspace/subscriptions/page";
 import Detail from "../apps/web/src/app/workspace/subscriptions/receipts/[id]/page";
 import { subscriptionsCopy } from "../apps/web/src/lib/subscriptions-i18n";
@@ -202,4 +204,34 @@ it("escapes plan descriptions and rejects ambiguous selectors before data access
   );
   expect(invalid).toContain('role="alert"');
   expect(state.plan).not.toHaveBeenCalled();
+});
+it("shows an honest recovery state when subscription data fails to load", async () => {
+  state.dashboard.mockRejectedValue(new Error("subscription unavailable"));
+  const copy = subscriptionsCopy("en");
+  const html = renderToStaticMarkup(await Account(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/subscriptions"');
+});
+it("shows honest recovery when history or receipt loads fail", async () => {
+  const copy = subscriptionsCopy("en");
+  state.history.mockRejectedValue(new Error("history unavailable"));
+  expect(renderToStaticMarkup(await History(context))).toContain(copy.loadUnavailable);
+  state.detail.mockRejectedValue(new Error("receipt unavailable"));
+  expect(renderToStaticMarkup(await Detail(context))).toContain(copy.loadUnavailable);
+});
+it("shows honest recovery when activation prerequisites fail unexpectedly", async () => {
+  state.plan.mockRejectedValue(new Error("plan unavailable"));
+  const copy = subscriptionsCopy("en");
+  const html = renderToStaticMarkup(await Activate(activateContext));
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain('href="/subscriptions"');
+});
+it("clips honest subscription loading shells on narrow layouts", async () => {
+  for (const Loading of [SubscriptionsLoading, ActivateLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(subscriptionsCopy("en").loading);
+  }
 });

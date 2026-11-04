@@ -1,10 +1,12 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { OrderTermsReportView } from "../../../../../components/order-terms-report";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { orderTermsCopy } from "../../../../../lib/order-terms-i18n";
 import { orderTermsPageQuery } from "../../../../../lib/order-terms-query";
@@ -15,6 +17,9 @@ export const metadata: Metadata = {
   title: "Order terms | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export default async function TermsPage({
   params,
   searchParams,
@@ -28,7 +33,8 @@ export default async function TermsPage({
       params,
       searchParams,
     ]),
-    c = orderTermsCopy(locale);
+    c = orderTermsCopy(locale),
+    dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
@@ -37,6 +43,11 @@ export default async function TermsPage({
         returnPath={`/workspace/purchases/${encodeURIComponent(id)}/terms`}
       />
     );
+  const returnHref = (() => {
+    const page = typeof query.page === "string" ? query.page : undefined;
+    const base = `/workspace/purchases/${encodeURIComponent(id)}/terms`;
+    return page ? `${base}?page=${encodeURIComponent(page)}` : base;
+  })();
   try {
     const values = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
@@ -49,16 +60,27 @@ export default async function TermsPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className="space-y-4 py-8">
+        <section className={`${pageShellClass} space-y-4`}>
           <p role="alert">{c.invalid}</p>
-          <Link
-            href="/workspace/purchases"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/purchases" className={linkClass}>
             {c.back}
           </Link>
         </section>
       );
-    throw error;
+    return (
+      <section className={pageShellClass}>
+        <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkClass}>
+          {c.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link href={returnHref} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
+    );
   }
 }

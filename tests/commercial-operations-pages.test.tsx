@@ -52,6 +52,7 @@ import PlansLoading from "../apps/web/src/app/admin/commerce/plans/loading";
 import PlanNewLoading from "../apps/web/src/app/admin/commerce/plans/new/loading";
 import Plans from "../apps/web/src/app/admin/commerce/plans/page";
 import Catalog from "../apps/web/src/app/subscriptions/page";
+import OperationsLoading from "../apps/web/src/app/workspace/purchases/[id]/operations/loading";
 import Operations, { metadata } from "../apps/web/src/app/workspace/purchases/[id]/operations/page";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { getCommercialCopy } from "../apps/web/src/lib/commercial-i18n";
@@ -263,4 +264,20 @@ it("clips honest loading shells on narrow layouts", async () => {
 it("hides another buyer's order", async () => {
   state.detail.mockRejectedValue(new AppError("Private order", 404, "NOT_FOUND"));
   await expect(Operations(input)).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("shows an honest recovery state when buyer payment operations fail", async () => {
+  state.detail.mockRejectedValue(new Error("operations unavailable"));
+  const copy = getCommercialCopy("en");
+  const html = markup(await Operations(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/purchases/ord_a/operations?page=2"');
+});
+it("clips honest buyer operations loading on narrow layouts", async () => {
+  const copy = getCommercialCopy("en");
+  const html = renderToStaticMarkup(await OperationsLoading());
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(copy.paymentOperations);
+  expect(html).toContain(copy.loading);
 });

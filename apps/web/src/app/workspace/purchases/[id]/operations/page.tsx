@@ -1,24 +1,30 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { OrderCancellationForm } from "../../../../../components/order-cancellation-form";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import {
   formatHistoryAmount,
   formatHistoryDate,
   parseHistoryPage,
 } from "../../../../../lib/commerce-history-format";
 import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { orderOperationsService } from "../../../../../lib/services/commercial-plan-service";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Order operations | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const linkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export default async function OrderOperationsPage({
   params,
   searchParams,
@@ -33,6 +39,7 @@ export default async function OrderOperationsPage({
     searchParams,
   ]);
   const copy = getCommercialCopy(locale),
+    dictionary = getDictionary(locale),
     user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
@@ -41,12 +48,29 @@ export default async function OrderOperationsPage({
         returnPath={`/workspace/purchases/${encodeURIComponent(id)}/operations`}
       />
     );
-  const result = await orderOperationsService
-    .detail(user, id, Math.min(parseHistoryPage(query.page), 1000))
-    .catch((error) => {
-      if (error instanceof AppError && error.statusCode === 404) notFound();
-      throw error;
-    });
+  const pageNumber = Math.min(parseHistoryPage(query.page), 1000),
+    returnHref = `/workspace/purchases/${encodeURIComponent(id)}/operations${pageNumber > 1 ? `?page=${pageNumber}` : ""}`;
+  const result = await orderOperationsService.detail(user, id, pageNumber).catch((error) => {
+    if (error instanceof AppError && error.statusCode === 404) notFound();
+    return null;
+  });
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnHref} className={linkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const states = {
     processing: copy.processing,
     pending: copy.pending,
@@ -61,11 +85,8 @@ export default async function OrderOperationsPage({
   const status = (value: string) =>
     Object.hasOwn(states, value) ? states[value as keyof typeof states] : copy.unknown;
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href={`/workspace/purchases/${encodeURIComponent(id)}`}
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkClass}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.paymentOperations}</h1>
@@ -125,10 +146,7 @@ export default async function OrderOperationsPage({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={`?page=${result.page - 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page - 1}`} className={linkClass}>
               {copy.previous}
             </Link>
           ) : null}
@@ -136,10 +154,7 @@ export default async function OrderOperationsPage({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={`?page=${result.page + 1}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`?page=${result.page + 1}`} className={linkClass}>
               {copy.next}
             </Link>
           ) : null}

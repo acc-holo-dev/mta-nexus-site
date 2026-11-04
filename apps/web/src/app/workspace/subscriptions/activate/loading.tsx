@@ -6,13 +6,13 @@ export default async function Loading() {
   const copy = subscriptionsCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="subscriptions-activate-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="subscriptions-activate-loading-heading" className="font-display text-primary">
-          {copy.title}
+          {copy.activate}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}

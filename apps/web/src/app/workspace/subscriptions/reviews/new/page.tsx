@@ -3,8 +3,13 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { PlanReviewForm } from "../../../../../components/plan-review-form";
+import {
+  PlanReviewLoadError,
+  planReviewNavLinkClass,
+  planReviewPageShellClass,
+} from "../../../../../components/plan-review-workspace-recovery";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
 import { planReviewNewQuery, planReviewsPageParams } from "../../../../../lib/plan-reviews-query";
@@ -32,8 +37,11 @@ export default async function NewPlanReview({
       />
     );
   }
+  let recoveryRetry = "/workspace/subscriptions/reviews/new";
   try {
-    const query = planReviewNewQuery(planReviewsPageParams(params)),
+    const pageQuery = planReviewsPageParams(params);
+    recoveryRetry = `/workspace/subscriptions/reviews/new${pageQuery.size ? `?${pageQuery}` : ""}`;
+    const query = planReviewNewQuery(pageQuery),
       plan = await planReviewsService.plan(query.planId);
     if (!plan) notFound();
     if (plan.revision !== query.revision)
@@ -54,11 +62,8 @@ export default async function NewPlanReview({
     const href = (page: number) =>
       `/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
-      <div className="mx-auto max-w-4xl space-y-6 py-8">
-        <Link
-          href="/subscriptions"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <div className={planReviewPageShellClass}>
+        <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>
         <h1 className="font-display">{c.newReview}</h1>
@@ -114,6 +119,13 @@ export default async function NewPlanReview({
           </Link>
         </section>
       );
-    throw error;
+    return (
+      <PlanReviewLoadError
+        locale={locale}
+        backHref="/subscriptions"
+        backLabel={c.back}
+        retryHref={recoveryRetry}
+      />
+    );
   }
 }

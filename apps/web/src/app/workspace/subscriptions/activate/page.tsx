@@ -3,9 +3,14 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { PlanReviewTerms } from "../../../../components/plan-review-terms";
+import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { SubscriptionControls } from "../../../../components/subscription-controls";
+import {
+  SubscriptionLoadError,
+  subscriptionNavLinkClass,
+  subscriptionPageShellClass,
+} from "../../../../components/subscription-workspace-recovery";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
@@ -36,8 +41,11 @@ export default async function SubscriptionActivationPage({
       />
     );
   }
+  let recoveryRetry = "/workspace/subscriptions/activate";
   try {
-    const query = subscriptionActivationQuery(subscriptionPageParams(raw)),
+    const pageParams = subscriptionPageParams(raw);
+    recoveryRetry = `/workspace/subscriptions/activate${pageParams.size ? `?${pageParams}` : ""}`;
+    const query = subscriptionActivationQuery(pageParams),
       plan = await subscriptionsService.plan(query.planId);
     if (!plan || plan.revision !== query.revision)
       throw new AppError("Plan changed", 409, "SUBSCRIPTION_PLAN_CHANGED");
@@ -50,11 +58,8 @@ export default async function SubscriptionActivationPage({
     const href = (page: number) =>
       `/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
     return (
-      <section className="mx-auto max-w-4xl space-y-6 py-8">
-        <Link
-          href="/subscriptions"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <section className={subscriptionPageShellClass}>
+        <Link href="/subscriptions" className={subscriptionNavLinkClass}>
           {c.catalog}
         </Link>
         <h1 className="font-display">{c.activate}</h1>
@@ -88,6 +93,13 @@ export default async function SubscriptionActivationPage({
           <Link href="/subscriptions">{c.catalog}</Link>
         </section>
       );
-    throw error;
+    return (
+      <SubscriptionLoadError
+        locale={locale}
+        backHref="/subscriptions"
+        backLabel={c.catalog}
+        retryHref={recoveryRetry}
+      />
+    );
   }
 }

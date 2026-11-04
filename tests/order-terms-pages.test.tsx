@@ -32,6 +32,7 @@ vi.mock("../apps/web/src/lib/services/order-terms-service", () => ({
 
 import TermsLoading from "../apps/web/src/app/admin/commerce/reconciliation/[id]/terms/loading";
 import Admin from "../apps/web/src/app/admin/commerce/reconciliation/[id]/terms/page";
+import BuyerTermsLoading from "../apps/web/src/app/workspace/purchases/[id]/terms/loading";
 import Buyer, { metadata } from "../apps/web/src/app/workspace/purchases/[id]/terms/page";
 import { orderTermsCopy } from "../apps/web/src/lib/order-terms-i18n";
 
@@ -150,6 +151,15 @@ it("unavailable order details are masked", async () => {
   state.report.mockRejectedValue(new AppError("Private order", 404, "NOT_FOUND"));
   await expect(Buyer(input)).rejects.toThrow("NOT_FOUND");
 });
+it("shows an honest recovery state when buyer order terms fail", async () => {
+  state.report.mockRejectedValue(new Error("terms unavailable"));
+  const copy = orderTermsCopy("en");
+  const html = renderToStaticMarkup(await Buyer(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/purchases/ord_a/terms?page=2"');
+});
 it("shows an honest recovery state when admin order terms fail", async () => {
   state.actor = { id: "usr_a", role: "admin" };
   state.report.mockRejectedValue(new Error("terms unavailable"));
@@ -165,4 +175,11 @@ it("clips honest admin terms loading on narrow layouts", async () => {
   expect(html).toContain("min-w-0 max-w-5xl");
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain(orderTermsCopy("en").termsLoading);
+});
+it("clips honest buyer terms loading on narrow layouts", async () => {
+  const copy = orderTermsCopy("en");
+  const html = renderToStaticMarkup(await BuyerTermsLoading());
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(copy.title);
+  expect(html).toContain(copy.termsLoading);
 });
