@@ -1,18 +1,18 @@
-import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { storageMaintenanceCopy } from "../../../../../lib/storage-maintenance-i18n";
 
 // Honest loading shell for /admin/storage/objects/[id].
 export default async function Loading() {
-  const copy = getDictionary(await getRequestLocale()).admin;
+  const copy = storageMaintenanceCopy(await getRequestLocale());
   return (
     <section
-      className="space-y-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="admin-storage-object-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="admin-storage-object-loading-heading" className="font-display text-primary">
-          {copy.title}
+          {copy.detail}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}

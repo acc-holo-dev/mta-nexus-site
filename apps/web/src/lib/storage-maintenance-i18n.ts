@@ -3,6 +3,8 @@ export function storageMaintenanceCopy(locale: string) {
     ? {
         title: "Обслуживание хранилища",
         loading: "Загрузка журнала хранилища…",
+        loadUnavailable: "Обслуживание хранилища временно недоступно. Попробуйте ещё раз.",
+        clearFilters: "Сбросить фильтры",
         back: "Администрирование",
         inventory: "Журнал объектов",
         discovery: "Обнаружить объекты",
@@ -56,6 +58,8 @@ export function storageMaintenanceCopy(locale: string) {
     : {
         title: "Storage maintenance",
         loading: "Loading storage journal…",
+        loadUnavailable: "Storage maintenance is temporarily unavailable. Please try again.",
+        clearFilters: "Clear filters",
         back: "Administration",
         inventory: "Object journal",
         discovery: "Discover objects",
