@@ -1,10 +1,10 @@
+import type { AuditEvent, User } from "@nexus/domain";
+import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import { and, eq, gt, ne } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, sessions, users } from "../schema";
-import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "@nexus/domain";
-import type { AuditEvent, User } from "@nexus/domain";
-import { digestSessionToken } from "./sessions";
 import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
+import { digestSessionToken } from "./sessions";
 
 interface SessionWrite {
   id: string;
@@ -128,6 +128,9 @@ export class AuthRepository {
         details: { revokedSessionCount, currentSessionRotated: true },
         createdAt: new Date(),
       });
+      // The token has been rotated; recheck the same session by its new token
+      // after any waits in session revocation and audit insertion.
+      await this.lockCurrentSession(tx, data.userId, data.nextToken);
       return { revokedSessionCount, expiresAt: current.expiresAt };
     });
   }
@@ -180,7 +183,12 @@ export class AuthRepository {
       }
 
       const previousContextId = user.activeContextId ?? "personal";
-      if (previousContextId === data.contextId) return toUserWithoutPassword(user);
+      if (previousContextId === data.contextId) {
+        await this.lockCurrentSession(tx, data.userId, data.currentToken);
+        return toUserWithoutPassword(user);
+      }
+
+      await this.lockCurrentSession(tx, data.userId, data.currentToken);
 
       const [updated] = await tx
         .update(users)
@@ -197,6 +205,7 @@ export class AuthRepository {
         details: { from: previousContextId, to: data.contextId },
         createdAt: new Date(),
       });
+      await this.lockCurrentSession(tx, data.userId, data.currentToken);
       return toUserWithoutPassword(updated);
     });
   }
@@ -216,7 +225,10 @@ export class AuthRepository {
         .delete(sessions)
         .where(and(eq(sessions.id, data.sessionId), eq(sessions.userId, data.userId)))
         .returning({ id: sessions.id });
-      if (revoked.length === 0) return false;
+      if (revoked.length === 0) {
+        await this.lockCurrentSession(tx, data.userId, data.currentToken);
+        return false;
+      }
       await tx.insert(auditEvents).values({
         id: data.auditId,
         actorId: data.userId,
@@ -227,6 +239,7 @@ export class AuthRepository {
         details: { sessionId: data.sessionId },
         createdAt: new Date(),
       });
+      await this.lockCurrentSession(tx, data.userId, data.currentToken);
       return true;
     });
   }
@@ -243,7 +256,10 @@ export class AuthRepository {
         .delete(sessions)
         .where(and(eq(sessions.userId, data.userId), ne(sessions.id, current.id)))
         .returning({ expiresAt: sessions.expiresAt });
-      if (revoked.length === 0) return 0;
+      if (revoked.length === 0) {
+        await this.lockCurrentSession(tx, data.userId, data.currentToken);
+        return 0;
+      }
       // Expired rows are removed too, but are not presented as active logins.
       const revokedCount = revoked.filter((row) => row.expiresAt.getTime() > cutoff).length;
       await tx.insert(auditEvents).values({
@@ -256,6 +272,7 @@ export class AuthRepository {
         details: { revokedCount, removedSessionCount: revoked.length },
         createdAt: new Date(),
       });
+      await this.lockCurrentSession(tx, data.userId, data.currentToken);
       return revokedCount;
     });
   }

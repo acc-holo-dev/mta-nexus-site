@@ -27,9 +27,10 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-import { UserRepository } from "../packages/db/src/repositories/users";
+
 import { AuthRepository } from "../packages/db/src/repositories/auth";
 import { toUserWithoutPassword } from "../packages/db/src/repositories/public-user-projection";
+import { UserRepository } from "../packages/db/src/repositories/users";
 
 const repository = new UserRepository();
 const auth = new AuthRepository();
@@ -200,9 +201,9 @@ it("registers a user, session and audit while returning no password hash", async
   expect(state.queries[2].sql).toMatch(/^insert into "audit_events" /);
 });
 it("keeps the locked no-op personal context credential-free", async () => {
-  state.results = [[row()], [liveSession()]];
+  state.results = [[row()], [liveSession()], [liveSession()]];
   expect(await contextSwitch("personal")).toMatchObject(expected);
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(3);
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries[0].sql).not.toContain('"password_hash"');
   expect(state.queries[1].sql).not.toContain('"password_hash"');
@@ -213,19 +214,21 @@ it("checks a current owner under locks, writes context and audit, and returns no
     [row()],
     [liveSession()],
     [["user-1"]],
+    [liveSession()],
     [row({ activeContextId: "organization" })],
     [],
+    [liveSession()],
   ];
   const result = await contextSwitch("organization");
   expect(result).toMatchObject({ id: "user-1", activeContextId: "organization" });
   expect(result).not.toHaveProperty("passwordHash");
-  expect(state.queries).toHaveLength(5);
+  expect(state.queries).toHaveLength(7);
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries[1].sql).toContain('"sessions"');
   expect(state.queries[1].sql).toContain("for update");
   expect(state.queries[2].sql).toContain("for share");
-  expect(state.queries[3].sql).toMatch(/^update "users" /);
-  expect(state.queries[4].sql).toMatch(/^insert into "audit_events" /);
+  expect(state.queries[4].sql).toMatch(/^update "users" /);
+  expect(state.queries[5].sql).toMatch(/^insert into "audit_events" /);
   for (const query of state.queries) expect(query.sql).not.toContain('"password_hash"');
 });
 it("requires current membership before a non-owned context mutation", async () => {
@@ -235,6 +238,15 @@ it("requires current membership before a non-owned context mutation", async () =
   expect(state.queries[1].sql).toContain('"sessions"');
   expect(state.queries[3].sql).toContain("for share");
   expect(state.queries.every((query) => !query.sql.startsWith("update "))).toBe(true);
+});
+it("rechecks session expiry after organization access and before changing context", async () => {
+  state.results = [[row()], [liveSession()], [["user-1"]], [liveSession(new Date(now.getTime()))]];
+  await expect(contextSwitch("organization")).rejects.toThrow("Authentication required");
+  expect(
+    state.queries.every(
+      (query) => !query.sql.startsWith("update ") && !query.sql.startsWith("insert "),
+    ),
+  ).toBe(true);
 });
 it("rechecks the initiating session before a context write and fails closed when it is gone", async () => {
   state.results = [[row()]];
@@ -258,9 +270,9 @@ it("rechecks the initiating session before a context write and fails closed when
   ).toBe(true);
 });
 it("locks a live session and still skips a no-op personal context write", async () => {
-  state.results = [[row()], [liveSession()]];
+  state.results = [[row()], [liveSession()], [liveSession()]];
   await expect(contextSwitch("personal")).resolves.toMatchObject(expected);
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(3);
   expect(state.queries[1].sql).toContain('"sessions"');
   expect(state.queries[1].params).toContain(tokenDigest);
   expect(
