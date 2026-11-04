@@ -81,6 +81,17 @@ it("locks settings password and recovery native controls to fieldControlClass wi
   }
 });
 
+it("locks active sessions empty list to EmptyState and revoke/reload ghosts to size=touch", () => {
+  const source = read("apps/web/src/components/settings-active-sessions.tsx");
+  expect(source).toContain("EmptyState");
+  expect(source).toContain("noSessions");
+  expect(source).toContain("sessionsDescription");
+  expect(source).toContain('size="touch"');
+  expect(source).not.toContain('size="sm"');
+  expect(source).not.toContain("min-h-10");
+  expect(source).not.toContain('role="alert"');
+});
+
 it("wraps settings history guest and authenticated returns in the clipped page shell", () => {
   const source = read("apps/web/src/app/settings/history/page.tsx");
   expect(source).toContain("PlatformSignIn");
