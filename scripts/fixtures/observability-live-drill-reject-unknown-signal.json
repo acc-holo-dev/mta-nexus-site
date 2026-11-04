@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "observability_live_drill",
+  "generatedAt": "2026-11-04T12:00:00.000Z",
+  "environment": {
+    "name": "staging-primary"
+  },
+  "owner": {
+    "name": "platform-oncall"
+  },
+  "channel": {
+    "type": "pager",
+    "route": "team-platform-escalation"
+  },
+  "thresholds": {
+    "WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT": 80,
+    "WEB_PUSH_QUEUE_ALERT_DUE_JOBS": 100,
+    "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS": 900
+  },
+  "drill": {
+    "signalName": "invented_failure_signal"
+  },
+  "timeline": {
+    "signalAt": "2026-11-04T12:00:00.000Z",
+    "alertAt": "2026-11-04T12:00:45.000Z",
+    "humanReceivedAt": "2026-11-04T12:02:10.000Z",
+    "recoveryAt": "2026-11-04T12:18:00.000Z"
+  },
+  "verdict": {
+    "passed": true,
+    "failures": []
+  },
+  "evidenceSha256": "91e2655ef6d49cda1303332167979c4a949bdb2c41c2f55565914da747934477"
+}

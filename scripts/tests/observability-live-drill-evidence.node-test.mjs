@@ -4,8 +4,12 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import {
+  buildObservabilityLiveDrillEvidenceTemplate,
   buildObservabilityReadinessEvidence,
+  containsReplaceWithPlaceholder,
   OBSERVABILITY_LIVE_DRILL_KIND,
+  OBSERVABILITY_LIVE_DRILL_SIGNAL_NAMES,
+  OBSERVABILITY_LIVE_DRILL_THRESHOLD_KEYS,
   validateObservabilityLiveDrillEvidence,
 } from "../observability-evidence-lib.mjs";
 
@@ -65,6 +69,31 @@ test("fixture reject: readiness evidence is not F03 live proof", () => {
   assert.match(result.reason ?? "", /observability-readiness/u);
 });
 
+test("fixture reject: REPLACE_WITH_* leftovers fail even when verdict.passed", () => {
+  const body = fixture("observability-live-drill-reject-placeholders.json");
+  assert.equal(body.verdict.passed, true);
+  assert.equal(containsReplaceWithPlaceholder(body.owner.name), true);
+  const result = validateObservabilityLiveDrillEvidence(body);
+  assert.equal(result.ok, false);
+  assert.match(result.reason ?? "", /REPLACE_WITH_\*/u);
+});
+
+test("fixture reject: unknown drill.signalName is not whitelisted", () => {
+  const body = fixture("observability-live-drill-reject-unknown-signal.json");
+  assert.equal(body.verdict.passed, true);
+  const result = validateObservabilityLiveDrillEvidence(body);
+  assert.equal(result.ok, false);
+  assert.match(result.reason ?? "", /not in the live-drill whitelist/u);
+});
+
+test("fixture reject: unknown threshold key is not whitelisted", () => {
+  const body = fixture("observability-live-drill-reject-unknown-threshold.json");
+  assert.equal(body.verdict.passed, true);
+  const result = validateObservabilityLiveDrillEvidence(body);
+  assert.equal(result.ok, false);
+  assert.match(result.reason ?? "", /threshold key MADE_UP_ALERT_THRESHOLD/u);
+});
+
 test("live drill validator rejects broken timeline and failed verdict", () => {
   assert.equal(validateObservabilityLiveDrillEvidence(liveDrill()).ok, true);
   assert.equal(
@@ -86,4 +115,59 @@ test("live drill validator rejects broken timeline and failed verdict", () => {
     ).ok,
     false,
   );
+});
+
+test("live drill validator rejects owner REPLACE_WITH_* with passed verdict", () => {
+  const result = validateObservabilityLiveDrillEvidence(
+    liveDrill({ owner: { name: "REPLACE_WITH_ONCALL_OWNER" } }),
+  );
+  assert.equal(result.ok, false);
+  assert.match(result.reason ?? "", /owner\.name.*REPLACE_WITH_\*/u);
+});
+
+test("live drill validator enforces signalName and threshold key whitelists", () => {
+  assert.ok(OBSERVABILITY_LIVE_DRILL_SIGNAL_NAMES.includes("publication_delivery_failed"));
+  assert.ok(OBSERVABILITY_LIVE_DRILL_THRESHOLD_KEYS.includes("WEB_PUSH_QUEUE_ALERT_DUE_JOBS"));
+  assert.equal(
+    validateObservabilityLiveDrillEvidence(
+      liveDrill({ drill: { signalName: "not_a_known_signal" } }),
+    ).ok,
+    false,
+  );
+  assert.equal(
+    validateObservabilityLiveDrillEvidence(
+      liveDrill({
+        thresholds: {
+          WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT: 80,
+          UNKNOWN_THRESHOLD_KEY: 1,
+        },
+      }),
+    ).ok,
+    false,
+  );
+});
+
+test("live drill template stays rejected (template_not_executed + placeholders)", () => {
+  const template = buildObservabilityLiveDrillEvidenceTemplate({
+    generatedAt: "2026-11-04T12:00:00.000Z",
+  });
+  assert.equal(template.verdict.passed, false);
+  assert.equal(validateObservabilityLiveDrillEvidence(template).ok, false);
+
+  const forged = withChecksum({
+    schemaVersion: template.schemaVersion,
+    kind: template.kind,
+    generatedAt: template.generatedAt,
+    environment: template.environment,
+    owner: template.owner,
+    channel: template.channel,
+    thresholds: template.thresholds,
+    drill: template.drill,
+    timeline: template.timeline,
+    limitations: template.limitations,
+    verdict: { passed: true, failures: [] },
+  });
+  const result = validateObservabilityLiveDrillEvidence(forged);
+  assert.equal(result.ok, false);
+  assert.match(result.reason ?? "", /REPLACE_WITH_\*/u);
 });
