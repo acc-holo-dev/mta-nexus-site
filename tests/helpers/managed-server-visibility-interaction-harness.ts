@@ -24,11 +24,11 @@ export type ManagedServerVisibilityBatchComponent = (props: {
 
 export type Element = FlatTestElement;
 
-export const time = "2026-10-12T00:00:00.123456Z",
-  next = "2026-10-12T00:00:00.124456Z",
-  token = "a".repeat(64);
+export const time = "2026-10-12T00:00:00.123456Z";
+const next = "2026-10-12T00:00:00.124456Z";
+export const token = "a".repeat(64);
 
-export const items = [
+const items = [
   { id: "a", name: "Personal", card: "Personal card" },
   { id: "b", name: "Team", card: "Team card" },
 ];
