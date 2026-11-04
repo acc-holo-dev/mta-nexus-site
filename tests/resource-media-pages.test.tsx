@@ -89,6 +89,19 @@ it("removes editing controls from a withdrawn resource", () => {
   expect(html).not.toContain('type="file"');
   expect(html).not.toContain("Make cover");
 });
+it.each(["en", "ru"] as const)(
+  "renders EmptyState title and description for an empty gallery in %s",
+  (locale) => {
+    const copy = resourceMediaCopy(locale);
+    const html = renderToStaticMarkup(
+      <ResourceMediaEditor initial={{ ...initial, items: [] }} locale={locale} />,
+    );
+    expect(html).toContain(copy.empty);
+    expect(html).toContain(copy.emptyDescription);
+    expect(html).toContain("border-dashed");
+    expect(html).not.toContain(`<p class="text-muted">${copy.empty}</p>`);
+  },
+);
 it("hides missing rights with the existing not-found boundary", async () => {
   state.managed.mockRejectedValue(new AppError("Denied", 404, "NOT_FOUND"));
   await expect(ResourceMediaScreen({ productId: "prd_a" })).rejects.toThrow("NOT_FOUND");

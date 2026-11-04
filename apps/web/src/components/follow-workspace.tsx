@@ -170,38 +170,40 @@ export function FollowWorkspace({
           </Link>
         ))}
       </nav>
-      <form action="/workspace/saved" method="get" className="flex flex-wrap items-end gap-3">
-        {type && <input name="type" type="hidden" value={type} />}
-        <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
-          {copy.search}
-          <input
-            name="q"
-            type="search"
-            maxLength={100}
-            defaultValue={query}
-            className="min-h-11 w-full rounded-lg border border-base bg-inset px-3 text-sm text-primary"
-          />
-        </label>
-        <Button
-          type="submit"
-          variant="outline"
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.submit}
-        </Button>
-        <Link href={href(type, "")} className={actionLinkClass}>
-          {copy.clear}
-        </Link>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!!pending}
-          onClick={() => void load("latest")}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {pending === "latest" ? copy.refreshing : copy.latest}
-        </Button>
-      </form>
+      <search aria-label={copy.search}>
+        <form action="/workspace/saved" method="get" className="flex flex-wrap items-end gap-3">
+          {type && <input name="type" type="hidden" value={type} />}
+          <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
+            {copy.search}
+            <input
+              name="q"
+              type="search"
+              maxLength={100}
+              defaultValue={query}
+              className="min-h-11 w-full rounded-lg border border-base bg-inset px-3 text-sm text-primary"
+            />
+          </label>
+          <Button
+            type="submit"
+            variant="outline"
+            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.submit}
+          </Button>
+          <Link href={href(type, "")} className={actionLinkClass}>
+            {copy.clear}
+          </Link>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!!pending}
+            onClick={() => void load("latest")}
+            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {pending === "latest" ? copy.refreshing : copy.latest}
+          </Button>
+        </form>
+      </search>
       {error && (
         <ErrorState
           title={error}

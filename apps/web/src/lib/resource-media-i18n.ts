@@ -26,6 +26,8 @@ const copies = {
     reload: "Reload gallery",
     saved: "Gallery saved. Publication requires review.",
     empty: "No uploaded gallery images yet.",
+    emptyDescription:
+      "Upload a static PNG, JPEG or WebP image to start the gallery. The first image becomes the cover.",
     busy: "Processing…",
     previewUnavailable: "Preview unavailable",
     lightboxTitle: "Gallery image",
@@ -81,6 +83,8 @@ const copies = {
     reload: "Обновить галерею",
     saved: "Галерея сохранена. Для публикации нужна проверка.",
     empty: "В галерее пока нет загруженных изображений.",
+    emptyDescription:
+      "Загрузите статичное PNG, JPEG или WebP, чтобы начать галерею. Первое изображение станет обложкой.",
     busy: "Обработка…",
     previewUnavailable: "Превью недоступно",
     lightboxTitle: "Изображение галереи",

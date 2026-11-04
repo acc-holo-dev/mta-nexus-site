@@ -158,6 +158,7 @@ it.each(["en", "ru"] as const)(
     );
     for (const key of ["user", "server", "organization", "product"] as const)
       expect(html).toContain(followCopy(locale)[key]);
+    expect(html).toContain(`<search aria-label="${followCopy(locale).search}"`);
     expect(html).toContain('href="/organizations/team"');
     expect(html).toContain(followCopy(locale).unavailableTarget);
     expect(html).toContain(`${followCopy(locale).remove}: Team`);
