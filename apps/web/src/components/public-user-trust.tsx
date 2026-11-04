@@ -4,6 +4,10 @@ import type { Locale } from "../lib/i18n";
 import type { PublicUserTrust } from "../lib/public-user-trust-contract";
 import { trustCopy } from "../lib/public-user-trust-copy";
 import { approvalCopy } from "../lib/public-verification-history-copy";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; locale: Locale }) {
   const copy = trustCopy(locale),
     profile = `/users/${encodeURIComponent(data.user.username)}`;
@@ -15,21 +19,15 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       timeZone: "UTC",
     });
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={profile}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={profile} className={actionLinkClass}>
         {copy.back}
       </Link>
-      <header className="nexus-panel space-y-3 p-6">
-        <Link
-          href={`${profile}/trust/history`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
+        <Link href={`${profile}/trust/history`} className={actionLinkClass}>
           {approvalCopy(locale).title}
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3 overflow-x-clip">
           <Avatar
             src={data.user.avatarUrl ?? undefined}
             alt={data.user.displayName}
@@ -44,9 +42,9 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.source}</p>
       </header>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
         {(["identity", "developer"] as const).map((kind) => (
-          <section key={kind} className="nexus-panel space-y-3 p-5">
+          <section key={kind} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
             <h2 className="font-heading text-primary">{copy[kind]}</h2>
             <p
               className={
@@ -75,17 +73,17 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
           </section>
         ))}
       </div>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <h2 className="font-heading text-primary">{copy.joined}</h2>
         <time className="text-sm text-secondary" dateTime={data.user.joinedAt}>
           {date(data.user.joinedAt)}
         </time>
         <p className="text-xs text-muted">{copy.joinedScope}</p>
       </section>
-      <section className="nexus-panel space-y-4 p-5">
+      <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           {(["servers", "organizations"] as const).map((kind) => (
-            <div key={kind}>
+            <div key={kind} className="min-w-0">
               <h2 className="font-heading text-primary">{copy[kind]}</h2>
               <p className="mt-2 font-numeric text-2xl font-bold text-primary">
                 {data[kind].total}
@@ -98,30 +96,24 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         </div>
         <p className="text-xs text-muted">{copy.ownershipScope}</p>
       </section>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <h2 className="font-heading text-primary">{copy.publications}</h2>
         {data.publications === null ? (
           <p className="text-sm text-muted">{copy.hiddenActivity}</p>
         ) : (
           <>
             <p className="font-numeric text-2xl font-bold text-primary">{data.publications}</p>
-            <Link
-              href={`${profile}/activity`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`${profile}/activity`} className={actionLinkClass}>
               {copy.activity}
             </Link>
           </>
         )}
         <p className="text-xs text-muted">{copy.publicationScope}</p>
       </section>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <h2 className="font-heading text-primary">{copy.limits}</h2>
         <p className="text-sm text-secondary">{copy.limitsDescription}</p>
-        <Link
-          href="/workspace/verification"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/verification" className={actionLinkClass}>
           {copy.settings}
         </Link>
       </section>

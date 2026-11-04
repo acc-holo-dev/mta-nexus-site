@@ -230,7 +230,26 @@ it("offers safe trust recovery on infrastructure failure and 404 on a missing pr
   mocks.trust.mockRejectedValueOnce(new Error("secret SQL"));
   const html = renderToStaticMarkup(await TrustPage(input));
   expect(html).toContain(trustCopy("en").unavailable);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain('href="/users/writer/trust"');
   expect(html).not.toContain("secret SQL");
   mocks.trust.mockRejectedValueOnce(new AppError("missing", 404, "NOT_FOUND"));
   await expect(TrustPage(input)).rejects.toThrow("NOT_FOUND");
+});
+it("clips public trust panels and loading shells on narrow layouts", async () => {
+  const panel = renderToStaticMarkup(<PublicUserTrustPanel data={trustData} locale="en" />);
+  expect(panel).toContain("overflow-x-clip");
+  expect(panel).toContain("min-w-0");
+  expect(panel).toContain("min-h-11");
+  const { default: TrustLoading } = await import(
+    "../apps/web/src/app/users/[username]/trust/loading"
+  );
+  const loading = renderToStaticMarkup(await TrustLoading());
+  expect(loading).toContain("overflow-x-clip");
+  expect(loading).toContain("min-w-0");
+  expect(loading).toContain(trustCopy("en").loading);
 });

@@ -6,11 +6,11 @@ export default async function Loading() {
   const copy = approvalCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-4xl space-y-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="user-trust-history-loading-heading"
     >
-      <header className="nexus-panel space-y-3 p-6">
+      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
         <h1 id="user-trust-history-loading-heading" className="text-xl font-bold text-primary">
           {copy.title}
         </h1>

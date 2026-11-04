@@ -1,7 +1,8 @@
 import { AppError } from "@nexus/domain";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
   approvalPageHref,
@@ -10,6 +11,9 @@ import {
 import { approvalCopy, approvalError } from "../../../../../lib/public-verification-history-copy";
 import { publicVerificationHistoryService } from "../../../../../lib/services/public-verification-history-service";
 export const dynamic = "force-dynamic";
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const copy = approvalCopy(await getRequestLocale()),
     { username } = await params;
@@ -29,6 +33,7 @@ export default async function ApprovalHistoryPage({
   const { username } = await params,
     locale = await getRequestLocale(),
     copy = approvalCopy(locale),
+    dictionary = getDictionary(locale),
     query = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {})) {
     if (Array.isArray(value)) for (const part of value) query.append(key, part);
@@ -49,14 +54,11 @@ export default async function ApprovalHistoryPage({
       })
     : null;
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={`/users/${encodeURIComponent(username)}/trust`}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/users/${encodeURIComponent(username)}/trust`} className={actionLinkClass}>
         {copy.back}
       </Link>
-      <header className="nexus-panel space-y-3 p-6">
+      <header className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-6">
         <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
         {page && (
           <p className="break-words font-semibold text-primary">
@@ -67,7 +69,7 @@ export default async function ApprovalHistoryPage({
         <p className="text-sm text-secondary">{copy.scope}</p>
       </header>
       {page && (
-        <section className="nexus-panel space-y-3 p-5">
+        <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
           <h2 className="font-heading text-primary">{copy.current}</h2>
           <dl className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -92,7 +94,7 @@ export default async function ApprovalHistoryPage({
       <form
         action={approvalPageHref(username)}
         method="get"
-        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 overflow-x-clip p-4"
       >
         <label className="space-y-1 text-xs text-muted">
           {copy.type}
@@ -109,41 +111,40 @@ export default async function ApprovalHistoryPage({
         <Button type="submit" className="min-h-11 font-semibold">
           {copy.filter}
         </Button>
-        <Link
-          href={approvalPageHref(username)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={approvalPageHref(username)} className={actionLinkClass}>
           {copy.reset}
         </Link>
       </form>
-      <a
-        href={latest}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <a href={latest} className={actionLinkClass}>
         {copy.latest}
       </a>
       {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
+        <ErrorState
+          title={error}
+          action={
+            <a href={latest} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </a>
+          }
+        />
       )}
       {page && !page.items.length && (
-        <div role="status" className="nexus-panel space-y-3 p-6 text-sm text-muted">
-          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
-          {filtered ? (
-            <Link
-              href={approvalPageHref(username)}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={filtered ? copy.emptyFiltered : copy.empty}
+          description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
+          action={
+            filtered ? (
+              <Link href={approvalPageHref(username)} className={actionLinkClass}>
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {page && (
-        <ol className="space-y-3">
+        <ol className="min-w-0 space-y-3 overflow-x-clip">
           {page.items.map((record) => (
-            <li key={record.key} className="nexus-panel space-y-2 p-5">
+            <li key={record.key} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
               <h2 className="font-semibold text-primary">{copy[record.type]}</h2>
               <p className="text-sm text-secondary">{copy.approved}</p>
               <time dateTime={record.approvedAt} className="text-sm text-muted">
