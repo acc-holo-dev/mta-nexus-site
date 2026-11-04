@@ -54,7 +54,7 @@ describe("public and disabled API correlation boundaries", () => {
     contentState.fail = false;
   });
 
-  it("keeps cacheable article success free of a replayable per-request id", async () => {
+  it("does not cache article success", async () => {
     const response = await contentGET(
       new NextRequest("https://nexus.test/api/content/article-one"),
       {
@@ -65,9 +65,7 @@ describe("public and disabled API correlation boundaries", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("cache-control")).toBe(
-      "public, max-age=30, stale-while-revalidate=120",
-    );
+    expect(response.headers.get("cache-control")).toBe("no-store");
     expect(response.headers.get("x-request-id")).toBeNull();
   });
 

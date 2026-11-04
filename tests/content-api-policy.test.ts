@@ -121,14 +121,12 @@ describe("community content API behavior", () => {
     );
   });
 
-  it("bounds public reads and returns explicitly public cache headers", async () => {
+  it("bounds public reads and avoids caching revocable associations", async () => {
     const response = await GET(new NextRequest("http://nexus.test/api/content?limit=999"));
 
     expect(response.status).toBe(200);
     expect(mocks.listPublished).toHaveBeenCalledWith(100);
-    expect(response.headers.get("Cache-Control")).toBe(
-      "public, max-age=30, stale-while-revalidate=120",
-    );
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("X-Request-Id")).toBeNull();
   });
 

@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       request.nextUrl.searchParams.get("channel") === "community"
         ? await contentService.pageCommunity(filters)
         : await contentService.pageArticles(filters);
-    return Response.json(result, { headers: { "Cache-Control": "public, max-age=30" } });
+    return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json(
       { error: userPlatformError(resolveLocale(request.cookies.get("nexus_locale")?.value), null) },

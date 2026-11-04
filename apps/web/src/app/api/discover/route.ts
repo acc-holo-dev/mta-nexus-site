@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         { status: 429, headers },
       );
     return jsonWithRequestId(context, await discoveryService.page(query), {
-      headers: { "Cache-Control": "public, max-age=15, stale-while-revalidate=60" },
+      headers,
     });
   } catch (error) {
     logRequestEvent({ level: "error", event: "discover.page_failed", context, status: 503, error });

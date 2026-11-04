@@ -18,7 +18,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-const errorHeaders = {
+const noStoreHeaders = {
   "Cache-Control": "no-store",
 };
 
@@ -49,22 +49,25 @@ export async function GET(
         { error: "Product not found" },
         {
           status: 404,
-          headers: errorHeaders,
+          headers: noStoreHeaders,
         },
       );
     }
 
-    return Response.json({
-      id: product.id,
-      title: product.title,
-      slug: product.slug,
-      type: product.type,
-      price: product.price,
-      currency: product.currency || "USD",
-      licenseModel: product.licenseModel,
-      currentVersion: product.currentVersion,
-      thumbnailUrl: product.thumbnailUrl,
-    });
+    return Response.json(
+      {
+        id: product.id,
+        title: product.title,
+        slug: product.slug,
+        type: product.type,
+        price: product.price,
+        currency: product.currency || "USD",
+        licenseModel: product.licenseModel,
+        currentVersion: product.currentVersion,
+        thumbnailUrl: product.thumbnailUrl,
+      },
+      { headers: noStoreHeaders },
+    );
   } catch (error) {
     logRequestEvent({
       level: "error",
@@ -80,7 +83,7 @@ export async function GET(
       },
       {
         status: 503,
-        headers: errorHeaders,
+        headers: noStoreHeaders,
       },
     );
   }

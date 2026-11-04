@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { consumeRateLimit } from "@nexus/security";
+import { NextRequest } from "next/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET } from "../apps/web/src/app/api/search/route";
 
 vi.mock("@nexus/security", async (importOriginal) => ({
@@ -29,7 +29,7 @@ describe("public search rate-limit identity", () => {
       }),
     );
     expect(untrusted.status).toBe(200);
-    expect(untrusted.headers.get("cache-control")).toContain("public");
+    expect(untrusted.headers.get("cache-control")).toBe("no-store");
     expect(untrusted.headers.get("x-request-id")).toBeNull();
     expect(consumeRateLimit).toHaveBeenCalledWith("search", "unknown");
 

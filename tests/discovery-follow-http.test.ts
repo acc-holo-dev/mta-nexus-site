@@ -92,7 +92,7 @@ it("serves anonymous paginated Discovery using category-specific normalized filt
     request("/api/discover?type=servers&page=2&q=RP&language=ru&verified=1&sort=name"),
   );
   expect(response.status).toBe(200);
-  expect(response.headers.get("cache-control")).toContain("public");
+  expect(response.headers.get("cache-control")).toBe("no-store");
   expect(mocks.discover).toHaveBeenCalledWith(
     expect.objectContaining({
       type: "servers",

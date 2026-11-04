@@ -20,7 +20,7 @@ const SEARCH_TYPES = new Set<SearchResultType>([
 ]);
 
 const publicHeaders = {
-  "Cache-Control": "public, max-age=15, stale-while-revalidate=60",
+  "Cache-Control": "no-store",
 };
 
 const errorHeaders = {

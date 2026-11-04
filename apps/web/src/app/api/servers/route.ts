@@ -4,7 +4,6 @@ import { createServerSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { mtaDirectoryHttpCacheControl } from "../../../lib/mta-directory-cache";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -85,8 +84,8 @@ export async function GET(request: NextRequest) {
         directoryFetchedAt: directory?.fetchedAt ?? null,
         limit,
       },
-      // Bound shared HTTP caching by the remaining master-list freshness.
-      { headers: { "Cache-Control": mtaDirectoryHttpCacheControl(directory) } },
+      // Owner-managed visibility can change independently of the master snapshot.
+      { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
     logRequestEvent({

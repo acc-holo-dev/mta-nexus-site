@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   article: vi.fn(),
@@ -43,7 +43,7 @@ describe("published content detail HTTP behavior", () => {
     expect(mocks.comments).not.toHaveBeenCalled();
   });
 
-  it("returns bounded comments and public cache headers for a published article", async () => {
+  it("returns bounded comments without caching a published article", async () => {
     mocks.article.mockResolvedValue({ id: "cnt_1", slug: "published" });
     mocks.comments.mockResolvedValue([{ id: "cmt_1" }]);
     const response = await GET(new NextRequest("http://nexus.test/api/content/published"), {
@@ -52,8 +52,6 @@ describe("published content detail HTTP behavior", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.comments).toHaveBeenCalledWith({ contentId: "cnt_1" }, 100);
-    expect(response.headers.get("Cache-Control")).toBe(
-      "public, max-age=30, stale-while-revalidate=120",
-    );
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
   });
 });

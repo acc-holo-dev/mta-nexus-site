@@ -79,12 +79,12 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { GET as getAuthContext } from "../apps/web/src/app/api/auth/context/route";
+import { GET as getContent } from "../apps/web/src/app/api/content/route";
 import { GET as getNotificationPreferences } from "../apps/web/src/app/api/notifications/preferences/route";
 import { GET as getNotifications } from "../apps/web/src/app/api/notifications/route";
-import { GET as getServers } from "../apps/web/src/app/api/servers/route";
-import { GET as getContent } from "../apps/web/src/app/api/content/route";
 import { GET as getSearch } from "../apps/web/src/app/api/search/route";
 import { GET as getDirectory } from "../apps/web/src/app/api/servers/directory/route";
+import { GET as getServers } from "../apps/web/src/app/api/servers/route";
 
 function request(path: string) {
   const value = new NextRequest(`https://nexus.test${path}`);
@@ -193,7 +193,7 @@ describe("HTTP cache visibility contract", () => {
     expect(mocks.notifications).toHaveBeenCalledWith("usr_notifications", 25, true);
   });
 
-  it("keeps anonymous server listings explicitly public-cacheable", async () => {
+  it("does not cache managed server listings whose visibility can change", async () => {
     mocks.servers.mockResolvedValue([
       {
         id: "srv_public",
@@ -205,30 +205,30 @@ describe("HTTP cache visibility contract", () => {
     const response = await getServers(request("/api/servers?limit=12"));
 
     expect(response.status).toBe(200);
-    expectPublic(response);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(mocks.servers).toHaveBeenCalledWith(12);
   });
 
-  it("keeps published content explicitly public-cacheable", async () => {
+  it("does not cache published content with revocable associations", async () => {
     mocks.publishedContent.mockResolvedValue([{ id: "cnt_public", status: "published" }]);
 
     const response = await getContent(request("/api/content?limit=20"));
 
     expect(response.status).toBe(200);
-    expectPublic(response);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(mocks.publishedContent).toHaveBeenCalledWith(20);
   });
 
-  it("keeps empty and non-empty discovery search responses public", async () => {
+  it("does not cache discovery search responses", async () => {
     const empty = await getSearch(request("/api/search?q="));
     expect(empty.status).toBe(200);
-    expectPublic(empty);
+    expect(empty.headers.get("Cache-Control")).toBe("no-store");
     expect(mocks.search).not.toHaveBeenCalled();
 
     mocks.search.mockResolvedValue([{ type: "server", id: "srv_result" }]);
     const result = await getSearch(request("/api/search?q=nexus&limit=10"));
     expect(result.status).toBe(200);
-    expectPublic(result);
+    expect(result.headers.get("Cache-Control")).toBe("no-store");
     expect(mocks.search).toHaveBeenCalledWith("nexus", 10, undefined);
   });
 

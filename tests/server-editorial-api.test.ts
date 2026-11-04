@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { getDirectory, listServers } = vi.hoisted(() => ({
   getDirectory: vi.fn(),
@@ -122,7 +122,7 @@ describe("editorial server API", () => {
     expect(reads).toBe(10_000);
   });
 
-  it("prevents shared caching when live provenance is stale or missing", async () => {
+  it("never caches managed listings, regardless of live provenance", async () => {
     listServers.mockResolvedValue([
       { id: "srv_1", name: "Nexus", ipAddress: "203.0.113.7", port: 22003 },
     ]);
@@ -136,7 +136,7 @@ describe("editorial server API", () => {
     const fresh = await GET(request());
     expect(stale.headers.get("Cache-Control")).toBe("no-store");
     expect(missing.headers.get("Cache-Control")).toBe("no-store");
-    expect(fresh.headers.get("Cache-Control")).toBe("public, max-age=30");
+    expect(fresh.headers.get("Cache-Control")).toBe("no-store");
     expect((await fresh.json()).directoryAvailable).toBe(true);
   });
 });

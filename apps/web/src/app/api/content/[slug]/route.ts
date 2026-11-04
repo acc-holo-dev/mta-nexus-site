@@ -7,7 +7,7 @@ import {
 import { contentService } from "../../../../lib/services/content-service";
 
 const publicHeaders = {
-  "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
+  "Cache-Control": "no-store",
 };
 
 const errorHeaders = {
@@ -39,8 +39,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const comments = await contentService.getComments({ contentId: article.id }, 100);
 
-    // A unique per-request correlation ID must not be embedded in a
-    // cacheable public representation: intermediaries may replay it.
+    // Avoid storing an association after its visibility changes.
     return Response.json({ content: article, comments }, { headers: publicHeaders });
   } catch (error) {
     logRequestEvent({

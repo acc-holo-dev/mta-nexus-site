@@ -21,7 +21,7 @@ const privateHeaders = {
 };
 
 const publicHeaders = {
-  "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
+  "Cache-Control": "no-store",
 };
 
 const errorHeaders = {
@@ -45,8 +45,7 @@ export async function GET(request: NextRequest) {
       : 50;
     const content = await contentRepository.listPublished(limit);
 
-    // Keep the cacheable public representation free of a unique
-    // correlation header; a CDN may replay cached response headers.
+    // Visibility of associated servers and resources can change at any time.
     return Response.json({ content, limit }, { headers: publicHeaders });
   } catch (error) {
     logRequestEvent({
