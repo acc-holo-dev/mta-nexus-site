@@ -36,8 +36,9 @@ const copy = {
     action: "Action",
     server: "Verified server",
     choose: "Choose a server",
-    noServers:
-      "No eligible servers. Complete the server-control proof and moderator approval first.",
+    noServers: "No eligible servers.",
+    noServersHint:
+      "Complete the server-control proof and moderator approval first. An empty list here is a confirmed result, not a load failure.",
     reason: "Reason (visible to the license owner)",
     confirm: "I confirm this action and its consequences",
     submit: "Apply",
@@ -148,8 +149,9 @@ const copy = {
     action: "Действие",
     server: "Подтверждённый сервер",
     choose: "Выберите сервер",
-    noServers:
-      "Подходящих серверов нет. Сначала пройдите проверку контроля сервера и одобрение модератора.",
+    noServers: "Подходящих серверов нет.",
+    noServersHint:
+      "Сначала пройдите проверку контроля сервера и одобрение модератора. Пустой список здесь — подтверждённый результат, а не сбой загрузки.",
     reason: "Причина (видна владельцу лицензии)",
     confirm: "Подтверждаю действие и его последствия",
     submit: "Применить",
