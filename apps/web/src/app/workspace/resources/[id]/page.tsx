@@ -81,10 +81,7 @@ export default async function ManageResourcePage({
         <p className="text-secondary">
           {copy.statusLabels[product.status]} · {product.currentVersion}
         </p>
-        <Link
-          href={`/market/${product.slug}`}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/market/${product.slug}`} className={navLinkClass}>
           {copy.preview}
         </Link>
       </header>
@@ -174,9 +171,13 @@ export default async function ManageResourcePage({
                   </p>
                 )}
                 {build.status === "quarantined" && build.quarantineReason && (
-                  <p className="whitespace-pre-wrap break-words text-sm text-danger">
-                    {copy.quarantine}: {build.quarantineReason}
-                  </p>
+                  <aside
+                    role="note"
+                    className="rounded-lg border border-[color:var(--nexus-danger)]/20 bg-danger-soft p-3 text-sm text-danger"
+                  >
+                    <p className="font-semibold">{copy.quarantine}</p>
+                    <p className="mt-1 whitespace-pre-wrap break-words">{build.quarantineReason}</p>
+                  </aside>
                 )}
                 {history.decisions
                   .filter((decision) => decision.buildId === build.id)
@@ -212,7 +213,7 @@ export default async function ManageResourcePage({
                   )}
                 <Link
                   href={`/workspace/resources/${id}/builds/${build.id}`}
-                  className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={navLinkClass}
                 >
                   {buildCopy.manage}
                 </Link>

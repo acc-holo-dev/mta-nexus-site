@@ -14,6 +14,10 @@ import { resourceRequirementsService } from "../lib/services/resource-requiremen
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceRequirementsReportBody } from "./resource-requirements-report-body";
 
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function CollectionRequirementsScreen({
   params,
   searchParams,
@@ -60,20 +64,17 @@ export async function CollectionRequirementsScreen({
     });
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellClass}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {c.back}
         </Link>
         <ErrorState
           title={c.loadUnavailable}
           action={
-            <Link
-              href={`${requirementsBase}${retrySuffix}`}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`${requirementsBase}${retrySuffix}`} className={navLinkClass}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -84,10 +85,10 @@ export async function CollectionRequirementsScreen({
   const copy = resourceRequirementsCopy(locale);
   const suffix = query.targetMta ? `?${new URLSearchParams({ targetMta: query.targetMta })}` : "";
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellClass}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {c.back}
       </Link>
@@ -111,7 +112,7 @@ export async function CollectionRequirementsScreen({
             required
           />
         </label>
-        <Button type="submit" variant="outline">
+        <Button type="submit" variant="outline" size="touch">
           {copy.check}
         </Button>
       </form>
@@ -131,9 +132,15 @@ export async function CollectionRequirementsScreen({
         <dd>{result.unavailableItemCount}</dd>
       </dl>
       {result.unavailableItemCount > 0 && (
-        <p role="note" className="text-danger">
-          {c.withheld}
-        </p>
+        <aside
+          role="note"
+          className="rounded-lg border border-[color:var(--nexus-danger)]/20 bg-danger-soft p-4 text-sm text-danger"
+        >
+          <p className="font-semibold">
+            {c.unavailable}: {result.unavailableItemCount}
+          </p>
+          <p className="mt-1">{c.withheld}</p>
+        </aside>
       )}
       <ResourceRequirementsReportBody
         report={result.report}
