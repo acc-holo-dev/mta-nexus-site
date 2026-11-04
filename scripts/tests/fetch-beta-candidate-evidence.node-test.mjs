@@ -1,5 +1,13 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -7,12 +15,62 @@ import { evaluateBetaCandidate, FULL_ACCEPTANCE_JOBS } from "../beta-candidate-l
 import {
   BETA_CANDIDATE_ARTIFACT_TARGETS,
   fetchBetaCandidateEvidence,
+  installStagedArtifacts,
   normalizeCandidateSha,
   pickArtifactName,
   selectSuccessfulRun,
 } from "../fetch-beta-candidate-evidence-lib.mjs";
 
 const sha = "d".repeat(40);
+
+test("failed downloads leave the complete previous evidence untouched", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-beta-fetch-download-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  mkdirSync(join(root, "artifacts"));
+  const names = [`ci-evidence-${sha}`, `release-upgrade-${sha}-1`, `backup-restore-${sha}-1`];
+  const paths = BETA_CANDIDATE_ARTIFACT_TARGETS.map((target) => join(root, target.localPath));
+  for (const [index, path] of paths.entries()) writeFileSync(path, `previous-${index}`);
+  for (const failAt of [1, 2]) {
+    let downloads = 0;
+    const gh = {
+      listRuns: () => [{ databaseId: 1, headSha: sha, conclusion: "success", status: "completed" }],
+      listArtifacts: () => names.map((name) => ({ name, expired: false })),
+      downloadArtifact(_runId, _name, directory) {
+        if (downloads++ === failAt) throw new Error("download failed");
+        writeFileSync(join(directory, "evidence.json"), "new");
+      },
+    };
+    assert.throws(() => fetchBetaCandidateEvidence({ sha, root, gh }), /download failed/u);
+    for (const [index, path] of paths.entries()) {
+      assert.equal(readFileSync(path, "utf8"), `previous-${index}`);
+    }
+  }
+});
+
+test("failed installation restores previous files and removes newly installed files", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-beta-fetch-install-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const items = Array.from({ length: 3 }, (_, index) => ({
+    payload: join(root, `new-${index}`),
+    destination: join(root, `target-${index}`),
+  }));
+  for (const item of items) writeFileSync(item.payload, "new");
+  writeFileSync(items[0].destination, "previous");
+  let calls = 0;
+  assert.throws(
+    () =>
+      installStagedArtifacts(items, root, {
+        renameFile(from, to) {
+          if (++calls === 3) throw new Error("install failed");
+          renameSync(from, to);
+        },
+      }),
+    /install failed/u,
+  );
+  assert.equal(readFileSync(items[0].destination, "utf8"), "previous");
+  assert.equal(existsSync(items[1].destination), false);
+  assert.equal(existsSync(items[2].destination), false);
+});
 
 test("artifact name picker prefers the newest attempt and never invents names", () => {
   assert.equal(

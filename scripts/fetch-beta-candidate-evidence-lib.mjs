@@ -1,6 +1,13 @@
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+} from "node:fs";
 import { join } from "node:path";
 
 export const BETA_CANDIDATE_ARTIFACT_TARGETS = Object.freeze([
@@ -136,6 +143,40 @@ export function selectSuccessfulRun(runs, sha) {
   return candidates[0] ?? null;
 }
 
+/** Restore prior files on a caught installation error; this is not crash-atomic. */
+export function installStagedArtifacts(items, stagingDir, { renameFile = renameSync } = {}) {
+  const backups = items.map((item, index) => {
+    const backup = join(stagingDir, `backup-${index}.json`);
+    const existed = existsSync(item.destination);
+    if (existed) copyFileSync(item.destination, backup);
+    return { ...item, existed, backup };
+  });
+  const installed = [];
+  try {
+    for (const item of backups) {
+      renameFile(item.payload, item.destination);
+      installed.push(item);
+    }
+  } catch (error) {
+    const rollbackErrors = [];
+    for (const item of installed.reverse()) {
+      try {
+        if (item.existed) renameSync(item.backup, item.destination);
+        else rmSync(item.destination, { force: true });
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError);
+      }
+    }
+    if (rollbackErrors.length) {
+      throw new AggregateError(
+        [error, ...rollbackErrors],
+        `Evidence installation failed and rollback was incomplete; backups remain in ${stagingDir}`,
+      );
+    }
+    throw error;
+  }
+}
+
 /**
  * Download retained CI evidence for an exact SHA into local artifact paths.
  * Never invents PASS JSON; fails when required artifacts are missing/expired.
@@ -177,33 +218,41 @@ export function fetchBetaCandidateEvidence({
     );
   }
 
-  const installed = [];
-  for (const item of resolved) {
-    const temp = mkdtempSync(join(tmpdir(), `nexus-beta-fetch-${item.id}-`));
-    try {
-      gh.downloadArtifact(run.databaseId, item.artifactName, temp);
-      const payload = findJsonPayload(temp);
+  const artifactsDir = join(root, "artifacts");
+  mkdirSync(artifactsDir, { recursive: true });
+  // Stage on the destination filesystem before touching any existing evidence.
+  const stagingDir = mkdtempSync(join(artifactsDir, ".beta-fetch-"));
+  let preserveStaging = false;
+  try {
+    const staged = resolved.map((item, index) => {
+      const directory = join(stagingDir, `download-${index}`);
+      mkdirSync(directory);
+      gh.downloadArtifact(run.databaseId, item.artifactName, directory);
+      const payload = findJsonPayload(directory);
       if (!payload) {
         throw new Error(`Downloaded artifact ${item.artifactName} did not contain JSON evidence.`);
       }
-      const destination = join(root, item.localPath);
-      mkdirSync(join(root, "artifacts"), { recursive: true });
-      copyFileSync(payload, destination);
-      installed.push({
-        id: item.id,
-        artifactName: item.artifactName,
-        localPath: item.localPath,
-        present: existsSync(destination),
-      });
-    } finally {
-      rmSync(temp, { recursive: true, force: true });
+      return { ...item, payload, destination: join(root, item.localPath) };
+    });
+    try {
+      installStagedArtifacts(staged, stagingDir);
+    } catch (error) {
+      preserveStaging = error instanceof AggregateError;
+      throw error;
     }
+    const installed = staged.map((item) => ({
+      id: item.id,
+      artifactName: item.artifactName,
+      localPath: item.localPath,
+      present: existsSync(item.destination),
+    }));
+    return Object.freeze({
+      sha: run.headSha,
+      runId: run.databaseId,
+      runUrl: run.url ?? null,
+      installed: Object.freeze(installed),
+    });
+  } finally {
+    if (!preserveStaging) rmSync(stagingDir, { recursive: true, force: true });
   }
-
-  return Object.freeze({
-    sha: run.headSha,
-    runId: run.databaseId,
-    runUrl: run.url ?? null,
-    installed: Object.freeze(installed),
-  });
 }
