@@ -1,11 +1,13 @@
+import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { AppError } from "@nexus/domain";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "admin" } as null | { id: string; role: "admin" | "moderator" },
   locale: "en" as "en" | "ru",
   catalog: vi.fn(),
+  adminPage: vi.fn(),
   adminDetail: vi.fn(),
   detail: vi.fn(),
 }));
@@ -36,13 +38,24 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/commercial-plan-service", () => ({
-  commercialPlanService: { catalog: state.catalog, adminDetail: state.adminDetail },
+  commercialPlanService: {
+    catalog: state.catalog,
+    adminPage: state.adminPage,
+    adminDetail: state.adminDetail,
+  },
   orderOperationsService: { detail: state.detail },
 }));
-import Catalog from "../apps/web/src/app/subscriptions/page";
+
+import PlanDetailLoading from "../apps/web/src/app/admin/commerce/plans/[id]/loading";
 import Admin from "../apps/web/src/app/admin/commerce/plans/[id]/page";
+import PlansLoading from "../apps/web/src/app/admin/commerce/plans/loading";
+import PlanNewLoading from "../apps/web/src/app/admin/commerce/plans/new/loading";
+import Plans from "../apps/web/src/app/admin/commerce/plans/page";
+import Catalog from "../apps/web/src/app/subscriptions/page";
 import Operations, { metadata } from "../apps/web/src/app/workspace/purchases/[id]/operations/page";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
+import { getCommercialCopy } from "../apps/web/src/lib/commercial-i18n";
+
 const now = new Date("2026-10-10T12:00:00Z"),
   input = {
     params: Promise.resolve({ id: "ord_a" }),
@@ -64,6 +77,21 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "admin" };
   state.locale = "en";
+  state.adminPage.mockReset().mockResolvedValue({
+    plans: [
+      {
+        ...terms,
+        id: "cplan_a",
+        slug: "seller-plan",
+        scope: "organization",
+        status: "published",
+        revision: 2,
+      },
+    ],
+    total: 21,
+    totalPages: 2,
+    page: 2,
+  });
   state.catalog.mockReset().mockResolvedValue({
     plans: [
       {
@@ -175,11 +203,62 @@ it("provides reason and confirmation controls only for a currently cancellable u
 it("does not load private order or admin history before login", async () => {
   state.user = null;
   expect(markup(await Operations(input))).toContain("/auth/login");
-  expect(markup(await Admin(input))).toContain(
-    'href="/auth/login?next=%2Fadmin%2Fcommerce%2Fplans%2Ford_a"',
+  expect(markup(await Admin({ ...input, params: Promise.resolve({ id: "cplan_a" }) }))).toContain(
+    'href="/auth/login?next=%2Fadmin%2Fcommerce%2Fplans%2Fcplan_a"',
   );
   expect(state.detail).not.toHaveBeenCalled();
   expect(state.adminDetail).not.toHaveBeenCalled();
+  expect(state.adminPage).not.toHaveBeenCalled();
+});
+it("shows an honest recovery state when the admin plans queue fails", async () => {
+  state.adminPage.mockRejectedValue(new Error("plans unavailable"));
+  const copy = getCommercialCopy("en");
+  const html = markup(
+    await Plans({
+      searchParams: Promise.resolve({ status: "published", page: "2" }),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/commerce/plans?status=published&amp;page=2"');
+});
+it("renders an empty admin plans page with clear-filters recovery when filters are active", async () => {
+  state.adminPage.mockResolvedValue({ plans: [], total: 0, totalPages: 1, page: 1 });
+  const copy = getCommercialCopy("en");
+  const html = markup(
+    await Plans({ searchParams: Promise.resolve({ status: "draft", page: "1" }) }),
+  );
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.clearFilters);
+  expect(html).toContain('href="/admin/commerce/plans"');
+  expect(html).toContain("overflow-x-clip");
+});
+it("rejects stale admin privilege before loading the plans queue", async () => {
+  state.adminPage.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
+  await expect(Plans({ searchParams: Promise.resolve({}) })).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("shows an honest recovery state when admin plan detail fails", async () => {
+  state.adminDetail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getCommercialCopy("en");
+  const html = markup(await Admin({ ...input, params: Promise.resolve({ id: "cplan_a" }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/commerce/plans/cplan_a?page=2"');
+});
+it("hides missing admin plans before inventing detail", async () => {
+  state.adminDetail.mockRejectedValue(new AppError("Missing", 404, "NOT_FOUND"));
+  await expect(Admin({ ...input, params: Promise.resolve({ id: "cplan_a" }) })).rejects.toThrow(
+    "NEXT_NOT_FOUND",
+  );
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  for (const Loading of [PlansLoading, PlanDetailLoading, PlanNewLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("Loading commercial plans");
+  }
 });
 it("hides another buyer's order", async () => {
   state.detail.mockRejectedValue(new AppError("Private order", 404, "NOT_FOUND"));

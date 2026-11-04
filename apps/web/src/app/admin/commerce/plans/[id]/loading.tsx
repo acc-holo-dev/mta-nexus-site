@@ -1,18 +1,18 @@
-import { getDictionary } from "../../../../../lib/i18n";
+import { getCommercialCopy } from "../../../../../lib/commercial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 
 // Honest loading shell for /admin/commerce/plans/[id].
 export default async function Loading() {
-  const copy = getDictionary(await getRequestLocale()).admin;
+  const copy = getCommercialCopy(await getRequestLocale());
   return (
     <section
-      className="space-y-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="admin-plan-detail-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="admin-plan-detail-loading-heading" className="font-display text-primary">
-          {copy.title}
+          {copy.admin}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.loading}
