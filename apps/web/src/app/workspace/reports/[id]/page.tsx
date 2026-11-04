@@ -1,6 +1,9 @@
 import { CommunityReportScreen } from "../../../../components/community-report-screen";
 import { communityReportCopy } from "../../../../lib/community-report-copy";
 import { getRequestLocale } from "../../../../lib/i18n-server";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -9,5 +12,9 @@ export async function generateMetadata() {
   };
 }
 export default async function ReportPage({ params }: { params: Promise<{ id: string }> }) {
-  return <CommunityReportScreen id={(await params).id} />;
+  return (
+    <div className={pageShellClass}>
+      <CommunityReportScreen id={(await params).id} />
+    </div>
+  );
 }

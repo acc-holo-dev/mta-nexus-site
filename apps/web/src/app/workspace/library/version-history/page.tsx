@@ -1,4 +1,7 @@
 import { LibraryReleaseHistoryScreen } from "../../../../components/library-release-history-screen";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Version selection history | MTA NEXUS",
@@ -7,5 +10,9 @@ export const metadata = {
 export default function Page(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <LibraryReleaseHistoryScreen {...props} />;
+  return (
+    <div className={pageShellClass}>
+      <LibraryReleaseHistoryScreen {...props} />
+    </div>
+  );
 }

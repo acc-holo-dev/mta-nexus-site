@@ -11,6 +11,8 @@ import { getRequestLocale } from "../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip py-8";
+
 export default async function DevelopmentStatusPage() {
   if (process.env.NODE_ENV === "production") {
     notFound();
@@ -43,7 +45,7 @@ export default async function DevelopmentStatusPage() {
   const emailStatus = config.EMAIL_PROVIDER === "disabled" ? copy.disabled : copy.configured;
 
   return (
-    <div className="space-y-8">
+    <div className={pageShellClass}>
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="flex items-center gap-2.5 font-display text-primary">
@@ -57,7 +59,7 @@ export default async function DevelopmentStatusPage() {
 
       <section aria-labelledby="dev-environment-heading">
         <SectionHeader title={copy.environment} titleId="dev-environment-heading" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid min-w-0 grid-cols-1 gap-4 overflow-x-clip sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
             label={copy.environment}
             value={config.NODE_ENV}
@@ -96,7 +98,10 @@ export default async function DevelopmentStatusPage() {
         </div>
       </section>
 
-      <section aria-labelledby="dev-app-url-heading" className="nexus-panel space-y-2 p-5">
+      <section
+        aria-labelledby="dev-app-url-heading"
+        className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5"
+      >
         <h2
           id="dev-app-url-heading"
           className="flex items-center gap-2 text-sm font-semibold text-primary"
