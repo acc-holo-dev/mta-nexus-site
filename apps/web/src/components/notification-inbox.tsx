@@ -463,7 +463,7 @@ export function NotificationInbox({
           </li>
         ))}
       </ul>
-      <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.pageNavigation} className="flex flex-wrap gap-4">
         {page.newerCursor && (
           <Link
             prefetch={false}

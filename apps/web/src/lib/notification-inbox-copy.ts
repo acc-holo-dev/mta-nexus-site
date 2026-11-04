@@ -43,6 +43,7 @@ const en = {
   latest: "Latest matching notifications",
   older: "Older",
   newer: "Newer",
+  pageNavigation: "Notification page",
   view: "View",
   empty: "No notifications yet.",
   emptyFiltered:
@@ -117,6 +118,7 @@ const ru: typeof en = {
   latest: "Последние подходящие уведомления",
   older: "Раньше",
   newer: "Позже",
+  pageNavigation: "Страница уведомлений",
   view: "Открыть",
   empty: "Уведомлений пока нет.",
   emptyFiltered:

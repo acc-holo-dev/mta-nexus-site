@@ -298,7 +298,175 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <ResourceVariantChoices group={variantGroup} productId={product.id} locale={locale} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+        <aside className="space-y-6 lg:order-2" data-testid="resource-acquisition-panel">
+          <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
+            <div>
+              <div className="text-3xl font-black text-primary">{formattedPrice}</div>
+              <div className="mt-1 text-xs text-muted">
+                {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3 border-t border-base pt-4">
+              {isPublished ? (
+                <div className="space-y-1">
+                  <FollowButton
+                    targetType="product"
+                    targetId={product.id}
+                    targetName={product.title}
+                    initial={saveInitial}
+                    locale={locale}
+                  />
+                </div>
+              ) : null}
+              {hasAccess ? (
+                <div className="space-y-3">
+                  <div className="space-y-1 rounded-lg border border-[color:var(--nexus-success)]/20 bg-success-soft p-3.5">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-success">
+                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                      <span>{canManageProduct ? copy.managementAccess : copy.inLibrary}</span>
+                    </div>
+                    <p className="text-[11px] text-muted">{copy.authorized}</p>
+                  </div>
+
+                  <ResourceDownloadButton
+                    productId={product.id}
+                    version={product.currentVersion}
+                    intent="latest"
+                  />
+
+                  {downloadBuild ? (
+                    <BuildProvenanceDetails
+                      build={{
+                        id: downloadBuild.id,
+                        version: downloadBuild.version,
+                        status: downloadBuild.status,
+                        sha256Hash: downloadBuild.sha256Hash,
+                        fileName: downloadBuild.fileName,
+                        fileSizeBytes: downloadBuild.fileSizeBytes,
+                        mimeType: downloadBuild.mimeType,
+                        scanStatus: downloadBuild.scanStatus,
+                        scanner: downloadBuild.scanner,
+                        scannedAt: downloadBuild.scannedAt,
+                        mtaVersionTarget: downloadBuild.mtaVersionTarget,
+                        isSigned: downloadBuild.isSigned,
+                      }}
+                      locale={locale}
+                    />
+                  ) : null}
+
+                  <Link
+                    href="/workspace/library"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-base bg-surface py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+                  >
+                    <Key className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{copy.openLibrary}</span>
+                  </Link>
+
+                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
+                    <h3 className="text-xs font-semibold uppercase text-primary">
+                      {watchCopy.title}
+                    </h3>
+                    <ResourceReleaseWatchControl
+                      key={`${product.id}:${watchState.revision}:${commerceEnabled}`}
+                      watch={watchState}
+                      available={Boolean(downloadBuild)}
+                      commerceEnabled={commerceEnabled}
+                      hasAccess
+                      surface="detail"
+                      returnPath={detailReturnPath}
+                    />
+                  </section>
+                </div>
+              ) : isPublished && product.price === 0 ? (
+                <div className="space-y-3">
+                  <div className="space-y-2" data-acquire-intent="single">
+                    <p className="text-center text-[11px] text-muted">
+                      {commerceCopy.singleIntent}
+                    </p>
+                    <Link
+                      href={`/acquire?productId=${product.id}`}
+                      className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    >
+                      {copy.addToLibrary}
+                    </Link>
+                    <p className="text-center text-[11px] text-faint">{copy.claimRequired}</p>
+                  </div>
+                  {isPublished && (
+                    <AddResourceToCart
+                      key={product.id}
+                      productId={product.id}
+                      signedIn={!!user}
+                      returnPath={detailReturnPath}
+                    />
+                  )}
+                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
+                    <h3 className="text-xs font-semibold uppercase text-primary">
+                      {watchCopy.title}
+                    </h3>
+                    <ResourceReleaseWatchControl
+                      key={`watch-guest-or-noaccess:${product.id}`}
+                      watch={watchState}
+                      available={false}
+                      commerceEnabled={commerceEnabled}
+                      hasAccess={false}
+                      acquireHref={`/acquire?productId=${product.id}`}
+                      guest={!user}
+                      surface="detail"
+                      returnPath={detailReturnPath}
+                    />
+                  </section>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
+                  {isPublished ? dictionary.checkout.paidDisabled : copy.notPublic}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-3 border-t border-base pt-4 text-xs">
+              <h4 className="font-label uppercase text-primary">{copy.compatibility}</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.mtaVersion}</span>
+                  <span className="font-mono text-secondary">
+                    {product.compatibility.mtaMinVersion
+                      ? `>= ${product.compatibility.mtaMinVersion}`
+                      : copy.notDeclared}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.dependencies}</span>
+                  <ProductDependencyList
+                    declared={product.compatibility.dependencies ?? []}
+                    resolution={dependencyResolution}
+                    locale={locale}
+                  />
+                </div>
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.libraryAdditions}</span>
+                  <span className="font-mono text-secondary">{product.salesCount}</span>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.rating}</span>
+                  {product.ratingCount > 0 ? (
+                    <span className="font-mono text-warning">
+                      {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
+                    </span>
+                  ) : (
+                    <span className="text-secondary">{copy.noReviewsYet}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5 rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3 text-xs">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <div className="text-[11px] leading-relaxed text-secondary">{copy.security}</div>
+            </div>
+          </div>
+        </aside>
+        <div className="space-y-6 lg:order-1 lg:col-span-2" data-testid="resource-detail-content">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-lg">
             <ResourcePreview
               src={product.thumbnailUrl}
@@ -490,175 +658,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </div>
           ) : null}
         </div>
-
-        <aside className="space-y-6">
-          <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
-            <div>
-              <div className="text-3xl font-black text-primary">{formattedPrice}</div>
-              <div className="mt-1 text-xs text-muted">
-                {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
-              </div>
-            </div>
-
-            <div className="space-y-3 border-t border-base pt-4">
-              {isPublished ? (
-                <div className="space-y-1">
-                  <FollowButton
-                    targetType="product"
-                    targetId={product.id}
-                    targetName={product.title}
-                    initial={saveInitial}
-                    locale={locale}
-                  />
-                </div>
-              ) : null}
-              {hasAccess ? (
-                <div className="space-y-3">
-                  <div className="space-y-1 rounded-lg border border-[color:var(--nexus-success)]/20 bg-success-soft p-3.5">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-success">
-                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                      <span>{canManageProduct ? copy.managementAccess : copy.inLibrary}</span>
-                    </div>
-                    <p className="text-[11px] text-muted">{copy.authorized}</p>
-                  </div>
-
-                  <ResourceDownloadButton
-                    productId={product.id}
-                    version={product.currentVersion}
-                    intent="latest"
-                  />
-
-                  {downloadBuild ? (
-                    <BuildProvenanceDetails
-                      build={{
-                        id: downloadBuild.id,
-                        version: downloadBuild.version,
-                        status: downloadBuild.status,
-                        sha256Hash: downloadBuild.sha256Hash,
-                        fileName: downloadBuild.fileName,
-                        fileSizeBytes: downloadBuild.fileSizeBytes,
-                        mimeType: downloadBuild.mimeType,
-                        scanStatus: downloadBuild.scanStatus,
-                        scanner: downloadBuild.scanner,
-                        scannedAt: downloadBuild.scannedAt,
-                        mtaVersionTarget: downloadBuild.mtaVersionTarget,
-                        isSigned: downloadBuild.isSigned,
-                      }}
-                      locale={locale}
-                    />
-                  ) : null}
-
-                  <Link
-                    href="/workspace/library"
-                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-base bg-surface py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
-                  >
-                    <Key className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>{copy.openLibrary}</span>
-                  </Link>
-
-                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
-                    <h3 className="text-xs font-semibold uppercase text-primary">
-                      {watchCopy.title}
-                    </h3>
-                    <ResourceReleaseWatchControl
-                      key={`${product.id}:${watchState.revision}:${commerceEnabled}`}
-                      watch={watchState}
-                      available={Boolean(downloadBuild)}
-                      commerceEnabled={commerceEnabled}
-                      hasAccess
-                      surface="detail"
-                      returnPath={detailReturnPath}
-                    />
-                  </section>
-                </div>
-              ) : isPublished && product.price === 0 ? (
-                <div className="space-y-3">
-                  <div className="space-y-2" data-acquire-intent="single">
-                    <p className="text-center text-[11px] text-muted">
-                      {commerceCopy.singleIntent}
-                    </p>
-                    <Link
-                      href={`/acquire?productId=${product.id}`}
-                      className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                    >
-                      {copy.addToLibrary}
-                    </Link>
-                    <p className="text-center text-[11px] text-faint">{copy.claimRequired}</p>
-                  </div>
-                  {isPublished && (
-                    <AddResourceToCart
-                      key={product.id}
-                      productId={product.id}
-                      signedIn={!!user}
-                      returnPath={detailReturnPath}
-                    />
-                  )}
-                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
-                    <h3 className="text-xs font-semibold uppercase text-primary">
-                      {watchCopy.title}
-                    </h3>
-                    <ResourceReleaseWatchControl
-                      key={`watch-guest-or-noaccess:${product.id}`}
-                      watch={watchState}
-                      available={false}
-                      commerceEnabled={commerceEnabled}
-                      hasAccess={false}
-                      acquireHref={`/acquire?productId=${product.id}`}
-                      guest={!user}
-                      surface="detail"
-                      returnPath={detailReturnPath}
-                    />
-                  </section>
-                </div>
-              ) : (
-                <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
-                  {isPublished ? dictionary.checkout.paidDisabled : copy.notPublic}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3 border-t border-base pt-4 text-xs">
-              <h4 className="font-label uppercase text-primary">{copy.compatibility}</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between gap-4 border-b border-base py-1">
-                  <span className="text-muted">{copy.mtaVersion}</span>
-                  <span className="font-mono text-secondary">
-                    {product.compatibility.mtaMinVersion
-                      ? `>= ${product.compatibility.mtaMinVersion}`
-                      : copy.notDeclared}
-                  </span>
-                </div>
-                <div className="flex justify-between gap-4 border-b border-base py-1">
-                  <span className="text-muted">{copy.dependencies}</span>
-                  <ProductDependencyList
-                    declared={product.compatibility.dependencies ?? []}
-                    resolution={dependencyResolution}
-                    locale={locale}
-                  />
-                </div>
-                <div className="flex justify-between gap-4 border-b border-base py-1">
-                  <span className="text-muted">{copy.libraryAdditions}</span>
-                  <span className="font-mono text-secondary">{product.salesCount}</span>
-                </div>
-                <div className="flex justify-between gap-4 border-b border-base py-1">
-                  <span className="text-muted">{copy.rating}</span>
-                  {product.ratingCount > 0 ? (
-                    <span className="font-mono text-warning">
-                      {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
-                    </span>
-                  ) : (
-                    <span className="text-secondary">{copy.noReviewsYet}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2.5 rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3 text-xs">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-              <div className="text-[11px] leading-relaxed text-secondary">{copy.security}</div>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
