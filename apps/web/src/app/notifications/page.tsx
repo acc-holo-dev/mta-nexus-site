@@ -113,63 +113,65 @@ export default async function NotificationCenterPage({
           read: copy.read,
         }}
       >
-        <form
-          action="/notifications"
-          method="get"
-          className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-        >
-          <label className="min-w-0 flex-1 space-y-1 text-xs text-muted sm:min-w-40">
-            {copy.query}
-            <input
-              type="search"
-              name="q"
-              maxLength={100}
-              defaultValue={filters?.query ?? ""}
-              className={`${fieldClass} block min-h-11 w-full`}
-            />
-          </label>
-          <input type="hidden" name="state" value={filters?.state ?? "all"} />
-          <label className="space-y-1 text-xs text-muted">
-            {copy.category}
-            <select
-              name="category"
-              defaultValue={filters?.category ?? "all"}
-              className={`${fieldClass} block min-h-11`}
-            >
-              <option value="all">{copy.all}</option>
-              {INBOX_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {copy[category]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="space-y-1 text-xs text-muted">
-            {copy.period}
-            <select
-              name="period"
-              defaultValue={filters?.period ?? "all"}
-              className={`${fieldClass} block min-h-11`}
-            >
-              {INBOX_PERIODS.map((period) => (
-                <option key={period} value={period}>
-                  {period === "all" ? copy.all : copy[`period${period}`]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <Button type="submit" className="min-h-11 font-semibold">
-            {copy.search}
-          </Button>
-          {filtersActive ? (
-            <Link
-              href="/notifications"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </form>
+        <search aria-label={copy.filters}>
+          <form
+            action="/notifications"
+            method="get"
+            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+          >
+            <label className="min-w-0 flex-1 space-y-1 text-xs text-muted sm:min-w-40">
+              {copy.query}
+              <input
+                type="search"
+                name="q"
+                maxLength={100}
+                defaultValue={filters?.query ?? ""}
+                className={`${fieldClass} block min-h-11 w-full`}
+              />
+            </label>
+            <input type="hidden" name="state" value={filters?.state ?? "all"} />
+            <label className="space-y-1 text-xs text-muted">
+              {copy.category}
+              <select
+                name="category"
+                defaultValue={filters?.category ?? "all"}
+                className={`${fieldClass} block min-h-11`}
+              >
+                <option value="all">{copy.all}</option>
+                {INBOX_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {copy[category]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1 text-xs text-muted">
+              {copy.period}
+              <select
+                name="period"
+                defaultValue={filters?.period ?? "all"}
+                className={`${fieldClass} block min-h-11`}
+              >
+                {INBOX_PERIODS.map((period) => (
+                  <option key={period} value={period}>
+                    {period === "all" ? copy.all : copy[`period${period}`]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button type="submit" className="min-h-11 font-semibold">
+              {copy.search}
+            </Button>
+            {filtersActive ? (
+              <Link
+                href="/notifications"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            ) : null}
+          </form>
+        </search>
         <Link
           prefetch={false}
           href={

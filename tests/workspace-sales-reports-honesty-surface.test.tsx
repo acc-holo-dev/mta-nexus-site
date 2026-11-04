@@ -101,16 +101,34 @@ it("locks seller sales report apply CTA to size=touch", () => {
   expect(source).not.toContain("min-h-10");
 });
 
+it("locks seller sales report filter panel as a localized search landmark with touch select chrome", () => {
+  const source = read("apps/web/src/components/seller-sales-report.tsx");
+  expect(source).toContain("<search aria-label={c.filters}>");
+  expect(source).toMatch(
+    /<select[\s\S]*?className="block min-h-11 w-full rounded border border-base bg-surface p-2"/u,
+  );
+  expect(source).not.toMatch(
+    /<select[\s\S]*?className="block w-full rounded border border-base bg-surface p-2"/u,
+  );
+  const en = sellerSalesCopy("en");
+  const ru = sellerSalesCopy("ru");
+  expect(en.filters).toBe("Sales filters");
+  expect(ru.filters).toBe("Фильтры продаж");
+});
+
 it("locks additive seller sales honesty copy for report recovery", () => {
   const i18n = read("apps/web/src/lib/seller-sales-i18n.ts");
   expect(i18n).toContain("loadUnavailableHint");
   expect(i18n).toContain("invalidDescription");
+  expect(i18n).toContain("filters:");
   const en = sellerSalesCopy("en");
   const ru = sellerSalesCopy("ru");
   expect(en.loadUnavailableHint).not.toBe("");
   expect(en.invalidDescription).not.toBe("");
+  expect(en.filters).not.toBe("");
   expect(ru.loadUnavailableHint).not.toBe("");
   expect(ru.invalidDescription).not.toBe("");
+  expect(ru.filters).not.toBe("");
 });
 
 it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", () => {
