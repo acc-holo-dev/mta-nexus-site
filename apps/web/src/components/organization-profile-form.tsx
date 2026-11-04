@@ -304,6 +304,15 @@ export function OrganizationProfileForm({
               variant="outline"
               disabled={busy}
               onClick={() => {
+                if (!dirty) {
+                  setFields({
+                    name: newest.name,
+                    description: newest.description,
+                    logoUrl: newest.logoUrl,
+                    websiteUrl: newest.websiteUrl,
+                    slug: newest.slug,
+                  });
+                }
                 setBase(newest);
                 setChecked(null);
                 setNeedsCheck(false);

@@ -145,6 +145,16 @@ it("checks the current actor and saved version after an unconfirmed update", asy
   expect(harness.request.mock.calls[2]?.[0]).toBe("/api/workspace/organizations/org_1");
 });
 
+it("loads the new fields when there is no local draft to preserve", () => {
+  const copy = getOrganizationCopy("en");
+  render();
+  const changed = { ...latest, name: "Remote organization" };
+  (findTestButton(render(changed), copy.profileUseLatest).props.onClick as () => void)();
+  expect(render(changed).find((node) => node.props.id === "organization-name")?.props.value).toBe(
+    "Remote organization",
+  );
+});
+
 it("hides a draft after rights are revoked until the original actor is verified", async () => {
   const copy = getOrganizationCopy("en");
   editDraft();
