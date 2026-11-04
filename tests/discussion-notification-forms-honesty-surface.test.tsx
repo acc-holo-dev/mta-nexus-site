@@ -32,6 +32,14 @@ it("locks discussion and notification form failures to ErrorState with touch CTA
   }
 });
 
+it("locks context switcher native select to fieldControlClass without h-10 chrome", () => {
+  const source = read("apps/web/src/components/context-switcher.tsx");
+  expect(source).toContain("fieldControlClass");
+  expect(source).toContain("min-h-11");
+  expect(source).not.toContain("h-10");
+  expect(source).not.toContain("fieldClassBlock");
+});
+
 it("keeps additive formErrorHint / errorHint copy for discussion and notification honesty", () => {
   expect(read("apps/web/src/lib/i18n/en/chrome.ts")).toContain(
     "Retry refreshes this preview only. It does not mark notifications as read.",

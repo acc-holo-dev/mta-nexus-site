@@ -1,7 +1,7 @@
 "use client";
 
 import { normalizeMtaAddress } from "@nexus/domain";
-import { Button, ErrorState, Input } from "@nexus/ui";
+import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedCreatedServer } from "../lib/server-mutation-confirmation";
@@ -12,10 +12,6 @@ import {
 } from "../lib/server-organization-options";
 import { useNexusLocale } from "./locale-context";
 
-const controlClass =
-  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const textareaClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const nativeLabelClass = "block font-label uppercase text-secondary";
 
 export function RegisterServerForm() {
@@ -151,7 +147,10 @@ export function RegisterServerForm() {
             name="organizationId"
             defaultValue=""
             disabled={loading || organizationsLoading || organizationsFailed}
-            className={controlClass}
+            className={fieldControlClass({
+              disabled: loading || organizationsLoading || organizationsFailed,
+              className: "min-h-11",
+            })}
           >
             <option value="">{copy.personalScope}</option>
             {organizations.map((organization) => (
@@ -203,7 +202,10 @@ export function RegisterServerForm() {
             rows={4}
             maxLength={5000}
             disabled={loading}
-            className={textareaClass}
+            className={fieldControlClass({
+              disabled: loading,
+              className: "h-auto min-h-28",
+            })}
           />
         </div>
 
@@ -274,7 +276,10 @@ export function RegisterServerForm() {
             maxLength={3000}
             placeholder="https://..."
             disabled={loading}
-            className={textareaClass}
+            className={fieldControlClass({
+              disabled: loading,
+              className: "h-auto min-h-24",
+            })}
           />
         </div>
 
@@ -347,7 +352,10 @@ export function RegisterServerForm() {
             name="visibility"
             defaultValue="public"
             disabled={loading}
-            className={controlClass}
+            className={fieldControlClass({
+              disabled: loading,
+              className: "min-h-11",
+            })}
           >
             <option value="public">{copy.public}</option>
             <option value="unlisted">{copy.unlisted}</option>
