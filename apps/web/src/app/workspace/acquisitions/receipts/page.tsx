@@ -56,11 +56,15 @@ export default async function ResourceCartReceiptsPage({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className={`${pageShellClass} space-y-4`}>
-        <p role="alert">{copy.invalid}</p>
-        <Link href="/workspace/acquisitions/receipts" className={linkClass}>
-          {copy.title}
-        </Link>
+      <section className={pageShellClass}>
+        <ErrorState
+          title={copy.invalid}
+          action={
+            <Link href="/workspace/acquisitions/receipts" className={linkClass}>
+              {copy.title}
+            </Link>
+          }
+        />
       </section>
     );
   }

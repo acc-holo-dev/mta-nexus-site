@@ -131,9 +131,15 @@ it("authenticates and rejects repeated filters before querying receipts", async 
   expect(html).toContain("/auth/login");
   expect(state.page).not.toHaveBeenCalled();
   state.user = { id: "usr_a" };
-  expect(
-    renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ days: ["7", "30"] }) })),
-  ).toContain("Invalid receipt filters");
+  const copy = resourceCartReceiptsCopy("en");
+  const invalid = renderToStaticMarkup(
+    await Page({ searchParams: Promise.resolve({ days: ["7", "30"] }) }),
+  );
+  expect(invalid).toContain(copy.invalid);
+  expect(invalid).toContain('role="alert"');
+  expect(invalid).toContain("bg-danger-soft");
+  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toContain('href="/workspace/acquisitions/receipts"');
   expect(state.page).not.toHaveBeenCalled();
 });
 it("shows frozen evidence with an exact-build retry, without rendering private fields", async () => {

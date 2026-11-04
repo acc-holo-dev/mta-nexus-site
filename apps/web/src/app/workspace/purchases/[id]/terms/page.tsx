@@ -60,11 +60,15 @@ export default async function TermsPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={`${pageShellClass} space-y-4`}>
-          <p role="alert">{c.invalid}</p>
-          <Link href="/workspace/purchases" className={linkClass}>
-            {c.back}
-          </Link>
+        <section className={pageShellClass}>
+          <ErrorState
+            title={c.invalid}
+            action={
+              <Link href="/workspace/purchases" className={linkClass}>
+                {c.back}
+              </Link>
+            }
+          />
         </section>
       );
     return (
