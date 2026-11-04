@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
@@ -139,23 +139,24 @@ export function ContextSwitcher() {
         </label>
       )}
 
-      {error && (
-        <div className="flex flex-wrap items-center gap-3">
-          <p role="alert" className="text-xs text-danger">
-            {error}
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setReload((value) => value + 1)}
-            disabled={loading || saving}
-            className="rounded-md"
-          >
-            {copy.retry}
-          </Button>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.errorHint}
+          className="items-stretch py-4"
+          action={
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setReload((value) => value + 1)}
+              disabled={loading || saving}
+              className="min-h-11 rounded-md"
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
+      ) : null}
 
       <p className="text-[11px] text-faint">{copy.note}</p>
     </section>

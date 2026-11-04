@@ -66,6 +66,7 @@ const en = {
   signIn: "Sign in to join the discussion",
   latest: "Show latest comments",
   searchKeepsDraft: "Search does not clear your draft comment.",
+  formErrorHint: "The comment action was not saved. Reload the saved comment before trying again.",
 };
 const ru: Record<keyof typeof en, string> = {
   reloadSaved: "Загрузить сохранённый комментарий",
@@ -133,6 +134,8 @@ const ru: Record<keyof typeof en, string> = {
   signIn: "Войдите, чтобы участвовать в обсуждении",
   latest: "Показать новые комментарии",
   searchKeepsDraft: "Поиск не очищает черновик комментария.",
+  formErrorHint:
+    "Действие с комментарием не сохранено. Загрузите сохранённый комментарий перед повторной попыткой.",
 };
 export const getDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function discussionError(locale: Locale, code: unknown) {

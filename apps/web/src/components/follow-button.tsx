@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -203,17 +203,24 @@ function FollowControl({
       ) : state === "self" ? (
         <p className="text-sm text-muted">{copy.self}</p>
       ) : state === "error" ? (
-        <Button
-          type="button"
-          variant="outline"
-          className="min-h-11"
-          onClick={() => {
-            setMessage("");
-            setAttempt((value) => value + 1);
-          }}
-        >
-          {shared.retry}
-        </Button>
+        <ErrorState
+          title={message || shared.error}
+          description={shared.errorHint}
+          className="items-stretch py-4"
+          action={
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              onClick={() => {
+                setMessage("");
+                setAttempt((value) => value + 1);
+              }}
+            >
+              {shared.retry}
+            </Button>
+          }
+        />
       ) : (
         <Button
           type="button"
@@ -241,19 +248,11 @@ function FollowControl({
         </Button>
       )}
       {showHint && <p className="max-w-sm text-xs text-muted">{copy.hint}</p>}
-      {message && (
-        <p
-          role={state === "error" ? "alert" : "status"}
-          className={`max-w-sm text-xs ${state === "error" ? "text-danger" : "text-success"}`}
-        >
+      {message && state !== "error" ? (
+        <p role="status" className="max-w-sm text-xs text-success">
           {message}
         </p>
-      )}
-      {state === "error" && !message && (
-        <p role="alert" className="text-xs text-danger">
-          {shared.error}
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }

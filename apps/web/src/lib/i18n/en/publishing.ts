@@ -135,6 +135,8 @@ export const publishing = {
     publishingComment: "Publishing…",
     publishComment: "Publish comment",
     commentError: "Could not publish the comment",
+    commentErrorHint:
+      "The comment was not published. Fix the text above and submit the same form again.",
   },
   developers: {
     title: "MTA Developer & Studio Network",

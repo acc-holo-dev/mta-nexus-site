@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { moderationCopy } from "../lib/community-moderation-copy";
@@ -119,24 +119,35 @@ export function ModeratedDiscussionRemoval({
       >
         {pending ? copy.saving : copy.remove}
       </Button>
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.formErrorHint}
+          action={
+            blocked ? (
+              <a
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
+              >
+                {general.reload}
+              </a>
+            ) : undefined
+          }
+        />
+      ) : null}
       {message && (
         <p role="status" className="text-sm text-success">
           {message}
         </p>
       )}
-      {blocked && (
+      {blocked && !error ? (
         <a
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
         >
           {general.reload}
         </a>
-      )}
+      ) : null}
     </section>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { Button, EmptyState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -307,11 +307,23 @@ export function NotificationInbox({
           {announcement}
         </p>
       )}
-      {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.formErrorHint}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={busy}
+              onClick={() => void refresh()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.retry}
+            </Button>
+          }
+        />
+      ) : null}
       <div className="nexus-panel flex flex-wrap items-center gap-3 p-4">
         {page.unreadCount > 0 && (
           <Button

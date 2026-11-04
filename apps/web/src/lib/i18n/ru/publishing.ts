@@ -135,6 +135,8 @@ export const publishing = {
     publishingComment: "Публикация…",
     publishComment: "Опубликовать комментарий",
     commentError: "Не удалось опубликовать комментарий",
+    commentErrorHint:
+      "Комментарий не опубликован. Исправьте текст выше и отправьте ту же форму снова.",
   },
   developers: {
     title: "Разработчики и студии MTA",

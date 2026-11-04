@@ -1,8 +1,8 @@
 "use client";
 
 import type { Notification } from "@nexus/domain";
-import { Button } from "@nexus/ui";
-import { AlertTriangle, Bell, CheckCheck, ExternalLink, X } from "lucide-react";
+import { Button, ErrorState } from "@nexus/ui";
+import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatNotification } from "../lib/notification-copy";
@@ -203,7 +203,7 @@ export function NotificationBell() {
                 size="sm"
                 disabled={marking}
                 onClick={() => void markAllRead()}
-                className="h-auto min-h-6 gap-1 px-1 text-[11px] font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="h-auto min-h-11 gap-1 px-1 text-[11px] font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 <CheckCheck className="h-3 w-3" aria-hidden="true" />
                 <span>{inboxCopy.markAllRead}</span>
@@ -211,26 +211,23 @@ export function NotificationBell() {
             )}
           </div>
 
-          {error && (
-            <div
-              role="alert"
-              className="flex items-center justify-between gap-2 border-b border-base bg-warning-soft px-3 py-2 text-[11px] text-warning"
-            >
-              <span className="flex items-center gap-1.5">
-                <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
-                {error}
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setAttempt((value) => value + 1)}
-                className="h-auto min-h-6 px-1 font-semibold underline"
-              >
-                {copy.retry}
-              </Button>
-            </div>
-          )}
+          {error ? (
+            <ErrorState
+              title={error}
+              description={copy.errorHint}
+              className="rounded-none border-x-0 border-t-0 py-4"
+              action={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setAttempt((value) => value + 1)}
+                  className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {copy.retry}
+                </Button>
+              }
+            />
+          ) : null}
 
           <section
             aria-label={copy.previewList}
@@ -277,7 +274,7 @@ export function NotificationBell() {
                     <Link
                       href={notification.link}
                       onClick={() => setIsOpen(false)}
-                      className="inline-flex items-center gap-1 text-[11px] text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className="inline-flex min-h-11 items-center gap-1 text-[11px] text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       <span>{copy.view}</span>
                       <ExternalLink className="h-2.5 w-2.5" aria-hidden="true" />
@@ -295,7 +292,7 @@ export function NotificationBell() {
             <Link
               href="/notifications"
               onClick={() => setIsOpen(false)}
-              className="font-caption text-muted transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center font-caption text-muted transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.openCenter} →
             </Link>

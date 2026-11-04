@@ -184,6 +184,8 @@ export const workspace = {
     loadError: "Could not load account contexts.",
     retry: "Try again",
     switchError: "Could not switch context.",
+    errorHint:
+      "Retry reloads the saved context list. A failed switch does not change your active workspace.",
     note: "Context switching changes the active workspace only; permissions still depend on ownership or membership.",
   },
 };

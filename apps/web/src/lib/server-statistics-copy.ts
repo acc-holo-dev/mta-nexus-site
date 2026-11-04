@@ -77,6 +77,7 @@ const en = {
   notFound: "Server not found",
   limit: "Too many statistics requests. Try again shortly.",
   forbidden: "You no longer have access to this server.",
+  exportErrorHint: "No file was downloaded. Retry keeps the same period and page selection.",
 };
 const ru: typeof en = {
   title: "Статистика сервера",
@@ -156,6 +157,7 @@ const ru: typeof en = {
   notFound: "Сервер не найден",
   limit: "Слишком много запросов статистики. Повторите позже.",
   forbidden: "У вас больше нет доступа к этому серверу.",
+  exportErrorHint: "Файл не скачан. Повтор сохраняет тот же период и выбранную страницу.",
 };
 export const serverStatisticsCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function serverStatisticsError(locale: Locale, code: unknown) {

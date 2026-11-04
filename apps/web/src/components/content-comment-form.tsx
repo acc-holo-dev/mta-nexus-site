@@ -1,8 +1,8 @@
 "use client";
 
-import { type FormEvent, useRef, useState } from "react";
+import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
-import { Button } from "@nexus/ui";
+import { type FormEvent, useRef, useState } from "react";
 import { createCommentIntentKey, submitContentCommentRequest } from "../lib/content-comment-client";
 import { useNexusLocale } from "./locale-context";
 
@@ -61,16 +61,18 @@ export function ContentCommentForm({ slug }: { slug: string }) {
         />
       </label>
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" isLoading={submitting} disabled={text.trim().length < 2}>
+        <Button
+          type="submit"
+          size="sm"
+          isLoading={submitting}
+          disabled={text.trim().length < 2}
+          className="min-h-11"
+        >
           {submitting ? copy.publishingComment : copy.publishComment}
         </Button>
         <span className="font-numeric text-[11px] text-faint">{text.length}/5000</span>
       </div>
-      {error && (
-        <p role="alert" className="text-xs text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.commentErrorHint} /> : null}
     </form>
   );
 }

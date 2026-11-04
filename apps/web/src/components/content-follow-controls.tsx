@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { Bell, BellOff, Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -223,22 +223,24 @@ function ContentFollowControl({
 
   if (failed) {
     return (
-      <div className="space-y-2">
-        <Button
-          type="button"
-          variant="outline"
-          className="min-h-11"
-          onClick={() => {
-            setMessage("");
-            setAttempt((value) => value + 1);
-          }}
-        >
-          {copy.retry}
-        </Button>
-        <p role="alert" className="text-xs text-danger">
-          {message || copy.error}
-        </p>
-      </div>
+      <ErrorState
+        title={message || copy.error}
+        description={copy.errorHint}
+        className="items-stretch py-4"
+        action={
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            onClick={() => {
+              setMessage("");
+              setAttempt((value) => value + 1);
+            }}
+          >
+            {copy.retry}
+          </Button>
+        }
+      />
     );
   }
 
@@ -333,14 +335,11 @@ function ContentFollowControl({
           )}
         </div>
       </div>
-      {message && (
-        <p
-          role={failed ? "alert" : "status"}
-          className={`max-w-sm text-xs ${failed ? "text-danger" : "text-success"}`}
-        >
+      {message ? (
+        <p role="status" className="max-w-sm text-xs text-success">
           {message}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

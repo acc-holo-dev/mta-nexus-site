@@ -77,6 +77,8 @@ const en = {
   forbidden: "This notification update is not allowed.",
   missing: "A selected notification is no longer available.",
   limited: "Too many requests. Try again shortly.",
+  formErrorHint:
+    "The inbox was not updated. Reload the saved page before changing reading status again.",
 };
 const ru: typeof en = {
   markAllRead: "Отметить весь список прочитанным",
@@ -156,6 +158,8 @@ const ru: typeof en = {
   forbidden: "Это изменение уведомлений запрещено.",
   missing: "Одно из выбранных уведомлений больше недоступно.",
   limited: "Слишком много запросов. Попробуйте немного позже.",
+  formErrorHint:
+    "Список не обновлён. Загрузите сохранённую страницу перед следующим изменением прочитанного состояния.",
 };
 export const notificationInboxCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function notificationInboxError(locale: Locale, code: unknown) {
