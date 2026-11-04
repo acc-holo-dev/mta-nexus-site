@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { platformSignInFocusClass } from "../../../components/guest-auth-links";
@@ -12,14 +13,21 @@ import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
 } from "../../../lib/author-publication-desk-copy";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { authorContentService } from "../../../lib/services/author-content-service";
 import { platformFieldClass } from "../../../lib/user-platform-client";
 import { writerTypes } from "../../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function generateMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -27,6 +35,7 @@ export async function generateMetadata() {
     robots: { index: false, follow: false },
   };
 }
+
 export default async function AuthorContentPage({
   searchParams,
 }: {
@@ -34,6 +43,7 @@ export default async function AuthorContentPage({
 }) {
   const locale = await getRequestLocale(),
     copy = authorPublicationDeskCopy(locale),
+    dictionary = getDictionary(locale),
     labels = getUserPlatformCopy(locale),
     rawSearchParams = (await searchParams) ?? {},
     params = new URLSearchParams();
@@ -61,10 +71,19 @@ export default async function AuthorContentPage({
       return null;
     }
   })();
+  const filteredEmpty = Boolean(
+    filters?.cursor ||
+      filters?.query ||
+      filters?.tag ||
+      filters?.status !== "all" ||
+      filters?.type !== "all" ||
+      filters?.source !== "all",
+  );
+  const retryHref = filters ? returnPath : "/workspace/content";
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className={pageShellClass}>
       <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
           <p className="mt-2 text-sm text-muted">{copy.description}</p>
         </div>
@@ -78,7 +97,7 @@ export default async function AuthorContentPage({
       <form
         action="/workspace/content"
         method="get"
-        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
       >
         <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
           {copy.query}
@@ -145,10 +164,7 @@ export default async function AuthorContentPage({
         <Button type="submit" className="min-h-11 font-semibold">
           {copy.search}
         </Button>
-        <Link
-          href="/workspace/content"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/content" className={navLinkClass}>
           {copy.reset}
         </Link>
       </form>
@@ -156,47 +172,45 @@ export default async function AuthorContentPage({
       <Link
         prefetch={false}
         href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {copy.latest}
       </Link>
       {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
+        <ErrorState
+          title={error}
+          action={
+            <Link href={retryHref} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       )}
       {report && !report.items.length && (
-        <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
-          <p>
-            {filters?.cursor ||
-            filters?.query ||
-            filters?.tag ||
-            filters?.status !== "all" ||
-            filters?.type !== "all" ||
-            filters?.source !== "all"
-              ? copy.emptyFiltered
-              : copy.empty}
-          </p>
-          {(filters?.cursor ||
-            filters?.query ||
-            filters?.tag ||
-            filters?.status !== "all" ||
-            filters?.type !== "all" ||
-            filters?.source !== "all") && (
-            <Link
-              href="/workspace/content"
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          title={filteredEmpty ? copy.emptyFiltered : copy.empty}
+          description={filteredEmpty ? copy.emptyFilteredHint : copy.emptyHint}
+          action={
+            filteredEmpty ? (
+              <Link href="/workspace/content" className={navLinkClass}>
+                {copy.reset}
+              </Link>
+            ) : (
+              <Link
+                href="/workspace/content/new"
+                className={`inline-flex min-h-11 items-center rounded-lg bg-accent px-4 text-sm font-semibold text-white ${platformSignInFocusClass}`}
+              >
+                {labels.create}
+              </Link>
+            )
+          }
+        />
       )}
-      <ul className="space-y-3">
+      <ul className="min-w-0 space-y-3">
         {filters &&
           report?.items.map((item) => (
             <li key={item.id}>
-              <article className="nexus-panel space-y-3 p-5">
+              <article className="nexus-panel min-w-0 space-y-3 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <h2 className="min-w-0 break-words font-semibold text-primary">
                     <Link
@@ -252,14 +266,14 @@ export default async function AuthorContentPage({
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}`}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={navLinkClass}
                   >
                     {labels.edit}
                   </Link>
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}/history`}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={navLinkClass}
                   >
                     {copy.history}
                   </Link>
@@ -267,7 +281,7 @@ export default async function AuthorContentPage({
                     <Link
                       prefetch={false}
                       href={`/articles/${encodeURIComponent(item.slug)}`}
-                      className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={navLinkClass}
                     >
                       {labels.publicView}
                     </Link>
@@ -283,7 +297,7 @@ export default async function AuthorContentPage({
             <Link
               prefetch={false}
               href={authorPublicationDeskHref(filters, report.newerCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.newer}
             </Link>
@@ -292,7 +306,7 @@ export default async function AuthorContentPage({
             <Link
               prefetch={false}
               href={authorPublicationDeskHref(filters, report.olderCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.older}
             </Link>

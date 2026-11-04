@@ -19,11 +19,15 @@ const en = {
   older: "Older changes",
   newer: "Newer changes",
   empty: "You have no publications yet.",
+  emptyHint: "Create a publication to manage drafts, reviews and public pages from this desk.",
   emptyFiltered: "No publications match these filters.",
+  emptyFilteredHint: "Clear the filters or open the latest changes to see your full library.",
   history: "Status history",
   historyDescription:
     "Retained creation, editing and status events for your publication. Private moderation notes and account details are not included.",
   historyEmpty: "No retained events yet.",
+  historyEmptyHint:
+    "Creation, editing and status events appear here after they are retained for this publication.",
   historyOlder: "Earlier events",
   historyLatest: "Latest events",
   actorAuthor: "Author",
@@ -68,11 +72,17 @@ const ru: typeof en = {
   older: "Более ранние изменения",
   newer: "Более поздние изменения",
   empty: "У вас пока нет публикаций.",
+  emptyHint:
+    "Создайте публикацию, чтобы вести черновики, проверки и публичные страницы в этом кабинете.",
   emptyFiltered: "По этим фильтрам публикаций нет.",
+  emptyFilteredHint:
+    "Сбросьте фильтры или откройте последние изменения, чтобы увидеть всю библиотеку.",
   history: "История статусов",
   historyDescription:
     "Сохранённые события создания, редактирования и изменения статуса вашей публикации. Внутренние заметки модерации и данные аккаунтов скрыты.",
   historyEmpty: "Сохранённых событий пока нет.",
+  historyEmptyHint:
+    "События создания, редактирования и смены статуса появятся здесь после сохранения для этой публикации.",
   historyOlder: "Ранние события",
   historyLatest: "Последние события",
   actorAuthor: "Автор",
