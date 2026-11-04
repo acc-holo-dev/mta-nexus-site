@@ -14,7 +14,7 @@ import {
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../lib/profile-privacy-copy";
-import { platformRequest } from "../lib/user-platform-client";
+import { PlatformRequestError, platformRequest } from "../lib/user-platform-client";
 import { actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 
 const retryButtonClass =
@@ -105,6 +105,7 @@ export function ProfilePrivacyEditor({
         "PATCH",
         {
           ...fields,
+          expectedActorId: profile.id,
           expectedUpdatedAt: profile.updatedAt,
         },
         requestController.signal,
@@ -119,6 +120,13 @@ export function ProfilePrivacyEditor({
       }
     } catch (error) {
       if (requestController.signal.aborted) return;
+      if (error instanceof PlatformRequestError && error.code === "ACCOUNT_CHANGED") {
+        setProfile(null);
+        setActivity(true);
+        setContacts(true);
+        setNotice({ text: error.message, error: true });
+        return;
+      }
       const text = error instanceof Error ? error.message : copy.uncertain;
       setNotice({ text, error: true });
       if (text === copy.conflict) {
@@ -195,7 +203,7 @@ export function ProfilePrivacyEditor({
           <Button
             type="button"
             variant="secondary"
-            disabled={pending}
+            disabled={pending || !profile}
             className="min-h-11"
             onClick={() => void loadPreferences("revision")}
             aria-describedby="privacy-refresh-description"

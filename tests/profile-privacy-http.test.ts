@@ -1,7 +1,8 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
 import { profilePrivacyCopy } from "../apps/web/src/lib/profile-privacy-copy";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   rate: vi.fn(),
@@ -15,12 +16,15 @@ vi.mock("../apps/web/src/lib/services/profile-privacy-service", () => ({
   profilePrivacyService: { own: mocks.own, update: mocks.update },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 import { GET, PATCH } from "../apps/web/src/app/api/account/privacy/route";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const actor = { id: "actor", role: "user" };
 const input = {
   showActivity: false,
   showProfessionalContacts: false,
+  expectedActorId: "actor",
   expectedUpdatedAt: "2026-10-10T00:00:00.000Z",
 };
 const preferences = {
@@ -66,6 +70,34 @@ it("reads and saves only the live session actor and returns private confirmation
     expect(response.headers.get("vary")).toBe("Cookie");
     expect(response.headers.get("x-request-id")).toBeTruthy();
   }
+});
+it.each(["en", "ru"] as const)(
+  "rejects a changed account even if revisions coincide in %s",
+  async (locale) => {
+    mocks.own.mockResolvedValueOnce({ ...preferences, updatedAt: input.expectedUpdatedAt });
+    const before = await GET(request("GET"));
+    const prior = (await before.json()).preferences;
+    mocks.session.mockResolvedValue({ id: "other", role: "user" });
+    const response = await PATCH(
+      request(
+        "PATCH",
+        { ...input, expectedActorId: prior.id, expectedUpdatedAt: prior.updatedAt },
+        "",
+        { cookie: `nexus_session=other;nexus_locale=${locale}` },
+      ),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      code: "ACCOUNT_CHANGED",
+      error: profilePrivacyCopy(locale).accountChanged,
+    });
+    expect(mocks.update).not.toHaveBeenCalled();
+  },
+);
+it("rejects old clients without an account precondition", async () => {
+  const { expectedActorId: _expectedActorId, ...oldInput } = input;
+  expect((await PATCH(request("PATCH", oldInput))).status).toBe(400);
+  expect(mocks.update).not.toHaveBeenCalled();
 });
 it("denies anonymous reads and writes before accessing preferences", async () => {
   mocks.session.mockResolvedValue(null);

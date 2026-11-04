@@ -4,12 +4,13 @@ export const profilePrivacyUpdateSchema = z
   .object({
     showActivity: z.boolean(),
     showProfessionalContacts: z.boolean(),
+    expectedActorId: z.string().min(1).max(128),
     expectedUpdatedAt: z.iso.datetime(),
   })
   .strict();
 
 export const editablePrivacySchema = profilePrivacyUpdateSchema
-  .omit({ expectedUpdatedAt: true })
+  .omit({ expectedUpdatedAt: true, expectedActorId: true })
   .extend({
     id: z.string().min(1).max(128),
     username: z.string().min(1).max(128),

@@ -1,9 +1,12 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ own: vi.fn(), visibility: vi.fn(), update: vi.fn() }));
 vi.mock("@nexus/db", () => ({ profilePrivacyRepository: mocks }));
 vi.mock("@nexus/security", () => ({ generateId: () => "audit" }));
+
 import { profilePrivacyService as service } from "../apps/web/src/lib/services/profile-privacy-service";
+
 const actor = { id: "actor" } as User;
 const row = {
   id: actor.id,
@@ -26,11 +29,23 @@ it("projects private editable preferences without unrelated account fields", asy
   });
   expect(mocks.own).toHaveBeenCalledWith(actor.id);
 });
+it("rejects a mismatched account before calling the repository", async () => {
+  await expect(
+    service.update(actor, {
+      expectedActorId: "other",
+      showActivity: true,
+      showProfessionalContacts: false,
+      expectedUpdatedAt: row.updatedAt.toISOString(),
+    }),
+  ).rejects.toMatchObject({ code: "ACCOUNT_CHANGED", statusCode: 409 });
+  expect(mocks.update).not.toHaveBeenCalled();
+});
 it("binds the write to session identity and converts the shared revision without spreading supplied fields", async () => {
   mocks.update.mockResolvedValue(row);
   const fields = {
     showActivity: false,
     showProfessionalContacts: true,
+    expectedActorId: actor.id,
     expectedUpdatedAt: row.updatedAt.toISOString(),
     actorId: "victim",
   };

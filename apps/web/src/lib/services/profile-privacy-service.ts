@@ -1,6 +1,6 @@
 import { profilePrivacyRepository } from "@nexus/db";
-import { NotFoundError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+import { AppError, NotFoundError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import type { z } from "zod";
 import type { profilePrivacyUpdateSchema } from "../profile-privacy-contract";
@@ -26,6 +26,8 @@ class ProfilePrivacyService {
     };
   }
   async update(actor: User, fields: z.infer<typeof profilePrivacyUpdateSchema>) {
+    if (fields.expectedActorId !== actor.id)
+      throw new AppError("Account changed", 409, "ACCOUNT_CHANGED");
     return editable(
       await profilePrivacyRepository.update({
         actorId: actor.id,

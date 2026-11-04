@@ -36,6 +36,8 @@ export const PATCH = withBrowserMutation((request: NextRequest) => {
       requireServerJsonContentType(request);
       const parsed = profilePrivacyUpdateSchema.safeParse(await readBoundedJson(request, 4096));
       if (!parsed.success) throw new AppError("Invalid visibility", 400, "VALIDATION_ERROR");
+      if (parsed.data.expectedActorId !== actor.id)
+        throw new AppError("Account changed", 409, "ACCOUNT_CHANGED");
       if (!(await consumeRateLimit("profileEditing", actor.id)).success)
         throw new RateLimitExceededError();
       return { success: true, preferences: await profilePrivacyService.update(actor, parsed.data) };

@@ -1,14 +1,15 @@
 import { expect, it } from "vitest";
 import {
-  profilePrivacyUpdateSchema,
-  parseEditablePrivacy,
   confirmedPrivacyUpdate,
+  parseEditablePrivacy,
+  profilePrivacyUpdateSchema,
 } from "../apps/web/src/lib/profile-privacy-contract";
 import {
   profilePrivacyCopy,
   profilePrivacyError,
   profilePrivacyMutationError,
 } from "../apps/web/src/lib/profile-privacy-copy";
+
 const previous = {
   id: "user",
   username: "member",
@@ -19,7 +20,7 @@ const previous = {
 const fields = { showActivity: false, showProfessionalContacts: false };
 const saved = { ...previous, ...fields, updatedAt: "2026-10-10T00:00:00.001Z" };
 it("requires explicit boolean visibility and the shared revision, with no actor or trust fields", () => {
-  const valid = { ...fields, expectedUpdatedAt: previous.updatedAt };
+  const valid = { ...fields, expectedActorId: previous.id, expectedUpdatedAt: previous.updatedAt };
   expect(profilePrivacyUpdateSchema.parse(valid)).toEqual(valid);
   for (const value of [
     { ...valid, userId: "victim" },
@@ -59,6 +60,7 @@ it.each(["en", "ru"] as const)(
     expect(Object.keys(copy)).toEqual(Object.keys(profilePrivacyCopy("en")));
     expect(Object.values(copy).every((value) => value.length > 0)).toBe(true);
     expect(profilePrivacyError(locale, "CONFLICT")).toBe(copy.conflict);
+    expect(profilePrivacyError(locale, "ACCOUNT_CHANGED")).toBe(copy.accountChanged);
     expect(profilePrivacyError(locale, "UNAUTHORIZED")).toBe(copy.signIn);
     expect(profilePrivacyError(locale, "unknown internal SQL")).toBe(copy.unavailable);
     expect(profilePrivacyMutationError(locale, "unknown internal SQL")).toBe(copy.uncertain);
