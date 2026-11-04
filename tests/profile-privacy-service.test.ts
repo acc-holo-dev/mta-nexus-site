@@ -31,12 +31,16 @@ it("projects private editable preferences without unrelated account fields", asy
 });
 it("rejects a mismatched account before calling the repository", async () => {
   await expect(
-    service.update(actor, {
-      expectedActorId: "other",
-      showActivity: true,
-      showProfessionalContacts: false,
-      expectedUpdatedAt: row.updatedAt.toISOString(),
-    }),
+    service.update(
+      actor,
+      {
+        expectedActorId: "other",
+        showActivity: true,
+        showProfessionalContacts: false,
+        expectedUpdatedAt: row.updatedAt.toISOString(),
+      },
+      "test",
+    ),
   ).rejects.toMatchObject({ code: "ACCOUNT_CHANGED", statusCode: 409 });
   expect(mocks.update).not.toHaveBeenCalled();
 });
@@ -49,15 +53,32 @@ it("binds the write to session identity and converts the shared revision without
     expectedUpdatedAt: row.updatedAt.toISOString(),
     actorId: "victim",
   };
-  const result = await service.update(actor, fields);
+  const result = await service.update(actor, fields, "test");
   expect(mocks.update).toHaveBeenCalledWith({
     actorId: actor.id,
+    currentToken: "test",
     showActivity: false,
     showProfessionalContacts: true,
     expectedUpdatedAt: row.updatedAt,
     auditId: "audit",
   });
   expect(result).not.toHaveProperty("email");
+});
+
+it("reports a rolled-back deadlock as a retryable conflict", async () => {
+  mocks.update.mockRejectedValueOnce({ cause: { code: "40P01" } });
+  await expect(
+    service.update(
+      actor,
+      {
+        expectedActorId: actor.id,
+        expectedUpdatedAt: row.updatedAt.toISOString(),
+        showActivity: false,
+        showProfessionalContacts: false,
+      },
+      "test",
+    ),
+  ).rejects.toMatchObject({ code: "PRIVACY_SAVE_RETRY", statusCode: 409 });
 });
 it("returns only visibility to public pages and fails closed for a missing account or database failure", async () => {
   mocks.visibility.mockResolvedValue(row);

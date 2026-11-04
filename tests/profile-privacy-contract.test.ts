@@ -61,6 +61,7 @@ it.each(["en", "ru"] as const)(
     expect(Object.values(copy).every((value) => value.length > 0)).toBe(true);
     expect(profilePrivacyError(locale, "CONFLICT")).toBe(copy.conflict);
     expect(profilePrivacyError(locale, "ACCOUNT_CHANGED")).toBe(copy.accountChanged);
+    expect(profilePrivacyMutationError(locale, "PRIVACY_SAVE_RETRY")).toBe(copy.retry);
     expect(profilePrivacyError(locale, "UNAUTHORIZED")).toBe(copy.signIn);
     expect(profilePrivacyError(locale, "unknown internal SQL")).toBe(copy.unavailable);
     expect(profilePrivacyMutationError(locale, "unknown internal SQL")).toBe(copy.uncertain);

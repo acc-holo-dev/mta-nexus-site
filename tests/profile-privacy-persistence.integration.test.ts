@@ -40,6 +40,12 @@ async function fixture(role = "developer") {
     displayName: "Privacy fixture",
     role,
   });
+  await sessionRepository.create({
+    id: `ses_${actor.id}`,
+    userId: actor.id,
+    token: `tok_${actor.id}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   userIds.push(actor.id);
   return actor;
 }
@@ -49,6 +55,7 @@ async function save(actorId: string, showActivity = false, showProfessionalConta
     actorId,
     showActivity,
     showProfessionalContacts,
+    currentToken: `tok_${actorId}`,
     expectedUpdatedAt: previous.updatedAt,
     auditId: `aud_${randomUUID()}`,
   });
@@ -196,15 +203,10 @@ it("closes direct and followed-user activity while retaining published content a
 it("serializes privacy, ordinary and professional profile writers against the same revision without losing another writer's changes", async () => {
   const actor = await fixture(),
     previous = await privacy.own(actor.id);
-  await sessionRepository.create({
-    id: `ses_${actor.id}`,
-    userId: actor.id,
-    token: `tok_${actor.id}`,
-    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
-  });
   const results = await Promise.allSettled([
     privacy.update({
       actorId: actor.id,
+      currentToken: `tok_${actor.id}`,
       expectedUpdatedAt: previous.updatedAt,
       showActivity: false,
       showProfessionalContacts: false,
@@ -215,6 +217,7 @@ it("serializes privacy, ordinary and professional profile writers against the sa
       previous.updatedAt,
       { displayName: "Concurrent name", bio: "Concurrent biography", avatarUrl: "" },
       `aud_${randomUUID()}`,
+      `tok_${actor.id}`,
     ),
     developerProfileRepository.update({
       actorId: actor.id,
@@ -241,6 +244,7 @@ it("serializes privacy, ordinary and professional profile writers against the sa
   await expect(
     privacy.update({
       actorId: actor.id,
+      currentToken: `tok_${actor.id}`,
       expectedUpdatedAt: previous.updatedAt,
       showActivity: true,
       showProfessionalContacts: true,
@@ -263,6 +267,7 @@ it("rolls back preferences and shared revision when the mandatory audit cannot b
   await expect(
     privacy.update({
       actorId: actor.id,
+      currentToken: `tok_${actor.id}`,
       expectedUpdatedAt: previous.updatedAt,
       showActivity: false,
       showProfessionalContacts: false,

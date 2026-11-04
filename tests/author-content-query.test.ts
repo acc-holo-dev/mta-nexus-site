@@ -241,12 +241,15 @@ it("profile updates compare milliseconds and write only editable public fields w
     updatedAt: new Date(version.getTime() + 1).toISOString(),
   };
   state.rows = [
+    [["usr_1"]],
+    [["ses_1", "2099-01-01T00:00:00.000Z"]],
     [
       Object.keys(getTableColumns(users))
         .filter((key) => key !== "passwordHash")
         .map((key) => fixture[key as keyof typeof fixture] ?? null),
     ],
     [],
+    [["ses_1", "2099-01-01T00:00:00.000Z"]],
   ];
   expect(
     await new UserRepository().updatePublicProfile(
@@ -254,25 +257,29 @@ it("profile updates compare milliseconds and write only editable public fields w
       version,
       { displayName: "Writer", bio: "", avatarUrl: "" },
       "aud_1",
+      "session-token",
     ),
   ).toMatchObject({ displayName: "Writer" });
-  const update = state.queries[0];
+  const update = state.queries[2];
   expect(update.sql).toContain("date_trunc('milliseconds'");
   expect(update.sql.split(" returning ")[1]).not.toContain('"password_hash"');
   const set = update.sql.split(" set ")[1].split(" where ")[0];
   expect(set).not.toContain('"role"');
   expect(set).not.toContain('"email"');
   expect(set).not.toContain('"is_verified"');
-  expect(state.queries[1].params).toContain("user.profile_updated");
+  expect(state.queries[3].params).toContain("user.profile_updated");
+  expect(state.queries[4].sql).toContain('from "sessions"');
 });
 it("does not audit an unconfirmed profile update", async () => {
+  state.rows = [[["usr_1"]], [["ses_1", "2099-01-01T00:00:00.000Z"]], []];
   expect(
     await new UserRepository().updatePublicProfile(
       "usr_1",
       version,
       { displayName: "Writer", bio: "", avatarUrl: "" },
       "aud_1",
+      "session-token",
     ),
   ).toBeNull();
-  expect(state.queries).toHaveLength(1);
+  expect(state.queries).toHaveLength(3);
 });

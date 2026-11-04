@@ -37,6 +37,7 @@ function request(body: unknown, cookie = "nexus_session=ses_current") {
 const validBody = {
   currentPassword: "Current-password-123!",
   newPassword: "Replacement-password-456!",
+  expectedActorId: "usr_owner",
 };
 
 describe("password change HTTP contract", () => {
@@ -93,6 +94,27 @@ describe("password change HTTP contract", () => {
         )
       ).status,
     ).toBe(400);
+    expect(changePassword).not.toHaveBeenCalled();
+  });
+
+  it("rejects a changed account even if the current password would match", async () => {
+    state.user = { id: "usr_other" };
+    const response = await POST(request(validBody));
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "ACCOUNT_CHANGED" });
+    expect(changePassword).not.toHaveBeenCalled();
+    const russian = await POST(request(validBody, "nexus_session=ses_other; nexus_locale=ru"));
+    expect(russian.status).toBe(409);
+    expect(await russian.json()).toMatchObject({
+      error: "Аккаунт изменился. Обновите настройки и попробуйте снова.",
+    });
+  });
+
+  it("fails closed when an old client omits the actor precondition", async () => {
+    const response = await POST(
+      request({ currentPassword: validBody.currentPassword, newPassword: validBody.newPassword }),
+    );
+    expect(response.status).toBe(400);
     expect(changePassword).not.toHaveBeenCalled();
   });
 

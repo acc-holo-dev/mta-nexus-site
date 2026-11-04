@@ -287,6 +287,7 @@ it("confirms a password change before posting the update", async () => {
       body: JSON.stringify({
         currentPassword: "current-pass",
         newPassword: "replacement-pass",
+        expectedActorId: "usr_owner",
       }),
     }),
   );

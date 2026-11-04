@@ -336,6 +336,8 @@ export function SettingsPageClient() {
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!sessionSnapshot) return;
+    const expectedActorId = sessionSnapshot.actorId;
     if (
       !(await confirmAction({
         title: copy.changePasswordConfirmTitle,
@@ -352,7 +354,7 @@ export function SettingsPageClient() {
       const data = await requestSettings<{
         success: boolean;
         revokedSessionCount: number;
-      }>("/api/auth/password", "POST", password);
+      }>("/api/auth/password", "POST", { ...password, expectedActorId });
 
       if (data.success !== true) {
         throw new SettingsRequestError(copy.unconfirmedPasswordChange, 502);

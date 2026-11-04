@@ -1,15 +1,22 @@
 import { randomUUID } from "node:crypto";
-import { afterEach, expect, it } from "vitest";
+import {
+  authorContentRepository,
+  contentRepository,
+  db,
+  sessionRepository,
+  userRepository,
+} from "@nexus/db";
+import type { Content, User } from "@nexus/domain";
 import { eq, inArray } from "drizzle-orm";
-import { db, authorContentRepository, contentRepository, userRepository } from "@nexus/db";
+import { afterEach, expect, it } from "vitest";
 import {
   auditEvents,
   comments,
-  organizations,
   organizationMembers,
+  organizations,
   users,
 } from "../packages/db/src/schema";
-import type { Content, User } from "@nexus/domain";
+
 const createdUsers: string[] = [],
   createdOrganizations: string[] = [];
 afterEach(async () => {
@@ -201,6 +208,13 @@ it("rejects revoked organization permissions before altering content or insertin
 });
 it("permits one concurrent profile version and persists its public fields and audit", async () => {
   const actor = await user();
+  const currentToken = `tok_${actor.id}`;
+  await sessionRepository.create({
+    id: `ses_${actor.id}`,
+    userId: actor.id,
+    token: currentToken,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   const results = await Promise.all(
     ["First name", "Second name"].map((displayName) =>
       userRepository.updatePublicProfile(
@@ -208,6 +222,7 @@ it("permits one concurrent profile version and persists its public fields and au
         actor.updatedAt,
         { displayName, bio: "Updated biography", avatarUrl: "" },
         `aud_platform_${randomUUID()}`,
+        currentToken,
       ),
     ),
   );

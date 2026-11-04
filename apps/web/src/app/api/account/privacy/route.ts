@@ -1,4 +1,4 @@
-import { AppError, RateLimitExceededError } from "@nexus/domain";
+import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
@@ -40,7 +40,12 @@ export const PATCH = withBrowserMutation((request: NextRequest) => {
         throw new AppError("Account changed", 409, "ACCOUNT_CHANGED");
       if (!(await consumeRateLimit("profileEditing", actor.id)).success)
         throw new RateLimitExceededError();
-      return { success: true, preferences: await profilePrivacyService.update(actor, parsed.data) };
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      if (!currentToken) throw new UnauthorizedError();
+      return {
+        success: true,
+        preferences: await profilePrivacyService.update(actor, parsed.data, currentToken),
+      };
     },
     200,
     profilePrivacyMutationError,

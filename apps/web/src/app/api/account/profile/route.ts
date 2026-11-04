@@ -1,4 +1,4 @@
-import { RateLimitExceededError } from "@nexus/domain";
+import { RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
@@ -16,9 +16,15 @@ export const PATCH = withBrowserMutation((request: NextRequest) => {
     if (!(await consumeRateLimit("profileEditing", user.id)).success)
       throw new RateLimitExceededError();
     requireServerJsonContentType(request);
+    const token = request.cookies.get("nexus_session")?.value;
+    if (!token) throw new UnauthorizedError();
     return {
       success: true,
-      profile: await publicProfileService.update(await readBoundedJson(request, 16 * 1024), user),
+      profile: await publicProfileService.update(
+        await readBoundedJson(request, 16 * 1024),
+        user,
+        token,
+      ),
     };
   });
 });

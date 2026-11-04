@@ -78,7 +78,13 @@ export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Current password is required").max(128),
     newPassword: z.string().min(8, "Password must be at least 8 characters").max(128),
+    expectedActorId: z
+      .string()
+      .min(1)
+      .max(128)
+      .refine((value) => value.trim() === value),
   })
+  .strict()
   .superRefine((value, context) => {
     if (value.currentPassword === value.newPassword) {
       context.addIssue({

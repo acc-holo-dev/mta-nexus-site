@@ -15,7 +15,7 @@ export function editableProfile(user: User) {
   };
 }
 class PublicProfileService {
-  async update(input: unknown, actor: User) {
+  async update(input: unknown, actor: User, currentToken: string) {
     const parsed = profileUpdateSchema.safeParse(input);
     if (!parsed.success) throw new ValidationError("Invalid public profile");
     if (parsed.data.expectedActorId !== actor.id)
@@ -26,6 +26,7 @@ class PublicProfileService {
       new Date(expectedUpdatedAt),
       fields,
       generateId("aud"),
+      currentToken,
     );
     if (!updated) throw new AppError("Profile changed", 409, "CONFLICT");
     return editableProfile(updated);

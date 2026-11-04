@@ -33,6 +33,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         400,
       );
     }
+    if (parsed.data.expectedActorId !== user.id)
+      return json(
+        {
+          error:
+            request.cookies.get("nexus_locale")?.value === "ru"
+              ? "Аккаунт изменился. Обновите настройки и попробуйте снова."
+              : "Account changed. Reload settings and try again.",
+          code: "ACCOUNT_CHANGED",
+        },
+        409,
+      );
     const changed = await authService.changePassword({
       userId: user.id,
       currentPassword: parsed.data.currentPassword,

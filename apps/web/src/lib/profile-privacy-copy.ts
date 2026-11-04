@@ -44,6 +44,7 @@ const en = {
     "The server did not confirm the saved settings. Refresh the version or load saved settings to check the result.",
   forbidden: "Your current session cannot change these settings.",
   accountChanged: "The signed-in account changed. Load its privacy settings before editing.",
+  retry: "The settings were not saved. Please try again.",
   notFound: "This account is no longer available.",
   rate: "Too many requests. Wait a moment and try again.",
 };
@@ -92,6 +93,7 @@ const ru: typeof en = {
     "Сервер не подтвердил сохранённые настройки. Обновите версию или загрузите их и проверьте результат.",
   forbidden: "Текущая сессия не позволяет изменить эти настройки.",
   accountChanged: "Аккаунт изменился. Загрузите его настройки приватности перед редактированием.",
+  retry: "Настройки не сохранены. Попробуйте ещё раз.",
   notFound: "Этот аккаунт больше недоступен.",
   rate: "Слишком много запросов. Подождите немного и повторите попытку.",
 };
@@ -109,6 +111,8 @@ export function profilePrivacyError(locale: Locale, code: unknown, mutation = fa
       return copy.conflict;
     case "ACCOUNT_CHANGED":
       return copy.accountChanged;
+    case "PRIVACY_SAVE_RETRY":
+      return copy.retry;
     case "RATE_LIMIT_EXCEEDED":
       return copy.rate;
     case "VALIDATION_ERROR":

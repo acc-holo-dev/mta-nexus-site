@@ -63,7 +63,7 @@ it("reads and saves only the live session actor and returns private confirmation
   expect(mocks.own).toHaveBeenCalledWith(actor);
   const save = await PATCH(request("PATCH", input));
   expect(await save.json()).toEqual({ success: true, preferences });
-  expect(mocks.update).toHaveBeenCalledWith(actor, input);
+  expect(mocks.update).toHaveBeenCalledWith(actor, input, "test");
   for (const response of [read, save]) {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("private, no-store");

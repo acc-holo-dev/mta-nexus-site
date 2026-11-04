@@ -1,7 +1,8 @@
-import { eq, sql } from "drizzle-orm";
 import { AppError, NotFoundError } from "@nexus/domain";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, userProfilePreferences, users } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 
 const preferences = {
   showActivity: sql<boolean>`coalesce(${userProfilePreferences.showActivity}, true)`,
@@ -38,6 +39,7 @@ class ProfilePrivacyRepository {
 
   async update(input: {
     actorId: string;
+    currentToken: string;
     expectedUpdatedAt: Date;
     showActivity: boolean;
     showProfessionalContacts: boolean;
@@ -54,6 +56,7 @@ class ProfilePrivacyRepository {
       if (!actor) throw new NotFoundError("User");
       if (actor.updatedAt.getTime() !== input.expectedUpdatedAt.getTime())
         throw new AppError("Profile changed", 409, "CONFLICT");
+      await lockInitiatingSession(tx, actor.id, input.currentToken);
       const fields = {
         showActivity: input.showActivity,
         showProfessionalContacts: input.showProfessionalContacts,
@@ -78,6 +81,7 @@ class ProfilePrivacyRepository {
         action: "user.privacy_updated",
         details: { fields: ["showActivity", "showProfessionalContacts"] },
       });
+      await lockInitiatingSession(tx, actor.id, input.currentToken);
       return { id: actor.id, username: actor.username, ...fields, updatedAt: updated.updatedAt };
     });
   }

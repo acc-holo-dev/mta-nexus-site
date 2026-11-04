@@ -1,17 +1,17 @@
-import { describe, it, expect } from "vitest";
 import { compareResourceVersions, resourceVersionsConflict } from "@nexus/domain";
 import {
-  createServerSchema,
-  createOrganizationSchema,
-  updateServerSchema,
-  safeExternalWebUrl,
-  createProductSchema,
-  createBuildSchema,
-  resourceVersionSchema,
-  checkoutSchema,
   changePasswordSchema,
+  checkoutSchema,
+  createBuildSchema,
+  createOrganizationSchema,
+  createProductSchema,
+  createServerSchema,
   notificationPreferencesSchema,
+  resourceVersionSchema,
+  safeExternalWebUrl,
+  updateServerSchema,
 } from "@nexus/validation";
+import { describe, expect, it } from "vitest";
 
 describe("Validation Schemas", () => {
   it("should validate server creation data", () => {
@@ -165,6 +165,7 @@ describe("Validation Schemas", () => {
       changePasswordSchema.safeParse({
         currentPassword: "old-password",
         newPassword: "new-password",
+        expectedActorId: "usr_1",
       }).success,
     ).toBe(true);
 
@@ -172,6 +173,7 @@ describe("Validation Schemas", () => {
       changePasswordSchema.safeParse({
         currentPassword: "same-password",
         newPassword: "same-password",
+        expectedActorId: "usr_1",
       }).success,
     ).toBe(false);
   });

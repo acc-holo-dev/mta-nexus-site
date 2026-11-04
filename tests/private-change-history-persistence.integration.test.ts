@@ -8,6 +8,7 @@ import {
   type ProfileChangeHistoryRepository,
   profilePrivacyRepository,
   profileChangeHistoryRepository as profiles,
+  sessionRepository,
   userRepository,
   users,
 } from "@nexus/db";
@@ -36,6 +37,12 @@ async function actor(displayName = "Writer") {
     email: `${key}@nexus.test`,
     displayName,
     role: "user",
+  });
+  await sessionRepository.create({
+    id: `ses_${value.id}`,
+    userId: value.id,
+    token: `tok_${value.id}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
   });
   actorIds.push(value.id);
   return value;
@@ -89,10 +96,12 @@ it("reads actual profile/privacy edit audits and never exports their private val
       avatarUrl: "https://safe.test/avatar.png",
     },
     `aud_${randomUUID()}`,
+    `tok_${owner.id}`,
   );
   if (!changed) throw Error("Profile write not confirmed");
   await profilePrivacyRepository.update({
     actorId: owner.id,
+    currentToken: `tok_${owner.id}`,
     expectedUpdatedAt: changed.updatedAt,
     showActivity: false,
     showProfessionalContacts: false,

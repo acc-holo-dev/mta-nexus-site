@@ -1,9 +1,11 @@
-import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
-import { containsPattern } from "./search-pattern";
-import { db } from "../client";
-import { users, auditEvents } from "../schema";
 import type { User } from "@nexus/domain";
+import { UnauthorizedError } from "@nexus/domain";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { db } from "../client";
+import { auditEvents, users } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
+import { containsPattern } from "./search-pattern";
 
 export class UserRepository {
   async updatePublicProfile(
@@ -11,8 +13,16 @@ export class UserRepository {
     expectedUpdatedAt: Date,
     fields: { displayName: string; bio: string; avatarUrl: string },
     auditId: string,
+    currentToken: string,
   ): Promise<User | null> {
     return db.transaction(async (tx) => {
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, id))
+        .for("update");
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, id, currentToken);
       const [row] = await tx
         .update(users)
         .set({
@@ -39,6 +49,7 @@ export class UserRepository {
         details: { fields: ["displayName", "bio", "avatarUrl"] },
         createdAt: new Date(),
       });
+      await lockInitiatingSession(tx, id, currentToken);
       return toUserWithoutPassword(row);
     });
   }

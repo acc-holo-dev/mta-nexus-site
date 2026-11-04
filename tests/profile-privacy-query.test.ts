@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -26,13 +27,16 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
+import { developerProfileRepository as professional } from "../packages/db/src/repositories/developer-profile";
 import { profilePrivacyRepository as privacy } from "../packages/db/src/repositories/profile-privacy";
 import { publicationFeedRepository as feed } from "../packages/db/src/repositories/publication-feed";
-import { developerProfileRepository as professional } from "../packages/db/src/repositories/developer-profile";
+
 const time = "2026-10-10T00:00:00.000Z",
   later = "2026-10-10T00:00:00.001Z";
 const input = {
   actorId: "actor",
+  currentToken: "test",
   showActivity: false,
   showProfessionalContacts: false,
   expectedUpdatedAt: new Date(time),
@@ -72,7 +76,12 @@ it("keeps public visibility free of private account identity and revision", asyn
   await expect(privacy.own("missing")).rejects.toMatchObject({ code: "NOT_FOUND" });
 });
 it("locks the shared user revision before upserting visibility and atomically writes a monotonic revision and narrow audit", async () => {
-  state.rows = [[["actor", "member", time]], [[later]]];
+  state.rows = [
+    [["actor", "member", time]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
+    [[later]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
+  ];
   expect(await privacy.update(input)).toEqual({
     id: "actor",
     username: "member",
@@ -106,7 +115,12 @@ it.each([
   },
 );
 it("propagates an audit failure without confirming a save", async () => {
-  state.rows = [[["actor", "member", time]], [[later]]];
+  state.rows = [
+    [["actor", "member", time]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
+    [[later]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
+  ];
   state.failAudit = true;
   await expect(privacy.update(input)).rejects.toMatchObject({
     cause: expect.objectContaining({ message: "audit failure" }),

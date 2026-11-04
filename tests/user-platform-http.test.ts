@@ -263,6 +263,7 @@ it("allows only the editable profile fields and the session account", async () =
       avatarUrl: fields.avatarUrl,
     },
     "aud_generated",
+    "test",
   );
   const data = await response.json();
   expect(data.profile).toMatchObject({ displayName: "New name", bio: "New bio" });
