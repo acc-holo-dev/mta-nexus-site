@@ -2,24 +2,23 @@
 
 **Дата:** 4 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
-## Текущая интеграционная волна — ожидает CI на опубликованном exact SHA
+## Текущая интеграционная волна — verified green на tip
 
-Локально проверенная цепочка поверх `41330d89a607ea501d2868f73355136c01d742ae` (включая docs handoff `4e3b1214`):
+Опубликовано на `main` и подтверждено CI на exact tip:
 
-- `70e372f2` — development seed и historical seed отказываются работать без явного acknowledgement и против production-конфигурации;
-- `739723af` — восстановлены historical-seed проверки и зелёный локальный code gate;
-- `3f32b3d6` — общий `PageHeader` применён к публичным каталогам серверов, статей и Discover;
-- `6cbe787e` — общий `SearchField` применён к публичному поиску, публикациям и каталогу MTA-серверов;
-- `54c6b674` — общий `ErrorState` отделяет сбой загрузки от подтверждённого empty state и держит retry рядом;
-- `d235ba9b` — общий GET-only `FilterBar` сохраняет URL-backed фильтры и search-landmark семантику;
-- resource mobile primary + shell a11y restore (эта ветка): footer legal links wrap at 320px RU; inbox pagination landmark ≠ center title; `/market/[slug]` acquisition aside precedes deep content in DOM (`lg:order` keeps desktop sticky two-column).
-
-Локально на этой ветке: focused acquisition/footer/notification suites, `pnpm lint` / `format:check` / `typecheck`, production `next build` (123 страницы), browser measure 320 RU без overflow и mobile/desktop order на live bind-mounted app. Tip `4e3b1214` resource-browser красный из‑за footer overflow + duplicate Notification center nav; auth-browser timeouts на том SHA считать отдельно. Не переносить verified green со старого commit.
+- `4c09a3fa` / #182 — resource mobile primary + shell 320px overflow;
+- `3eb8dad6` — integrate Discover → Library → Notifications → Server/Profile/Community → Support → Admin journeys;
+- `95e3c124` / #192 — Admin storage honesty;
+- `2d0bae1a` / #189 — Admin licenses honesty;
+- `657f1f03` / #190 — Admin hub EmptyState polish;
+- `320db223` / #191 — F03/F04 evidence schemas (local prep only; gates remain open);
+- `931e4963` / #181 — Cloud Agent toolchain note in AGENTS.md.
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `98d245f0279669d8fe549af082514e4dd82c033e` (`fix(web): focus review fields and record the green tip`).
-- **Verified CI green on that tip:** [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990) (lint/unit/db/image + production browser smoke selected).
+- **Tip SHA:** `931e4963663a94d6fb69a791f5eb0c74d7b5206c` (`docs(agents): record Cloud Agent toolchain and Compose startup`).
+- **Verified CI green on that tip:** [CI 41772235893](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41772235893) (15 checks, selected scope).
+- **Prior selected green:** `98d245f0…` / [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990).
 - **Prior selected green:** `8163c0c5…` / [CI 41507032591](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41507032591).
 - **Prior selected green:** `748df327…` / [CI 41503267385](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41503267385).
 - **Prior selected green:** `359faea8…` / [CI 41485628226](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41485628226).
@@ -50,17 +49,17 @@
 4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
-7. Следующий разрешённый результат после merge Admin primary — **operational gates OPS-09…20** (F03 alert routing, F04 backup/recovery, github_settings). Admin hub (Promise.all.catch → hubUnavailable + retry; reports/resources chrome; resource moderation ErrorState/EmptyState/clearFilters; community report list/detail ErrorState + overflow clip; loadings clipped) уходит отдельным PR. После merge tip: сначала CI на exact SHA — красный tip важнее новой OPS-работы.
-8. Приёмка OPS: только по свидетельству с целевой среды / явному допуску владельца; локальная подготовка ≠ live gate. Ads **UX-24–26** и пилоты **GROW-02…09** без активации.
-9. Product UI journeys (Notifications → Library → Discover/Resources → Server/Profile/Community → Support → Admin) закрыты кодом в stack PR; не объявлять production readiness по числу PR.
+7. Следующий разрешённый результат — **live operational drills** для **F03** (alert routing) и **F04** (backup/recovery) с заполнением evidence schemas из #191; плюс **OPS-09/11 github_settings** только по явному допуску. Локальные validators уже в tip; `external_live` / settings ≠ закрыты.
+8. Приёмка OPS: только свидетельство с целевой среды + допуск владельца. Ads **UX-24–26** и пилоты **GROW-02…09** без активации.
+9. Product UI journeys и Admin honesty locks на tip; не объявлять production readiness по числу PR/зелёному CI.
 
-На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
+На tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13/ARC14 + FLOW/UX/OPS/GROW-01 и UX-19/20/22. **Не** закрыты **F03/F04** (нужен live evidence), GitHub settings, deploy, реклама и GROW-пилоты.
 
-**Последний GitHub-verified baseline:** `98d245f0…` / [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990). Текущая опубликованная интеграционная волна перечислена выше и не становится verified tip до зелёного CI на её exact SHA. Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+**Последний GitHub-verified baseline:** `931e496366…` / [CI 41772235893](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41772235893). Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 в `main`; verified tip `98d245f0…` selected green; last full selected `0a034c84…`. Не значит tip = production.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep волна в `main`; verified tip `931e496366…` selected green. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
