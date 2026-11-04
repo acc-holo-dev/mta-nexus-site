@@ -1,7 +1,7 @@
 "use client";
 
 import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../lib/i18n";
@@ -21,9 +21,9 @@ import { useNexusLocale } from "./locale-context";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =
-  "rounded-lg border border-base px-4 py-2 text-sm font-semibold text-primary hover:bg-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]";
+  "inline-flex min-h-11 items-center justify-center rounded-lg border border-base px-4 py-2 text-sm font-semibold text-primary hover:bg-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]";
 const outlineButtonClass =
-  "rounded-lg border-base font-semibold text-primary hover:bg-hover disabled:opacity-50";
+  "min-h-11 rounded-lg border-base font-semibold text-primary hover:bg-hover disabled:opacity-50";
 
 export function AddResourceToCart({
   productId,
@@ -89,13 +89,14 @@ export function AddResourceToCart({
     <div className="space-y-2" data-acquire-intent="batch">
       <p className="text-xs text-muted">{copy.batchIntent}</p>
       {added ? (
-        <Link href="/workspace/cart" className={`${buttonClass} block text-center`}>
+        <Link href="/workspace/cart" className={`${buttonClass} w-full`}>
           {copy.added} · {copy.openCart}
         </Link>
       ) : (
         <Button
           type="button"
           variant="outline"
+          size="touch"
           onClick={() => void add()}
           disabled={busy}
           className={`${outlineButtonClass} w-full`}
@@ -298,19 +299,27 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         </p>
       ) : null}
       {!cart.items.length ? (
-        <p className="text-secondary">{copy.empty}</p>
+        <EmptyState
+          title={copy.empty}
+          description={copy.subtitle}
+          action={
+            <Link href="/market" className={buttonClass}>
+              {copy.browse}
+            </Link>
+          }
+        />
       ) : (
         <ul className="space-y-3">
           {cart.items.map((item) => {
             const evidence = review?.items.find((row) => row.productId === item.productId);
             return (
-              <li key={item.productId} className="nexus-panel space-y-4 p-5">
-                <div className="flex flex-wrap items-center justify-between gap-4">
+              <li key={item.productId} className="nexus-panel min-w-0 space-y-4 p-5">
+                <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
                   <div className="min-w-0 space-y-2">
                     {item.available && item.slug ? (
                       <Link
                         href={`/market/${item.slug}`}
-                        className="break-words font-semibold text-primary hover:text-accent"
+                        className="inline-flex min-h-11 items-center break-words font-semibold text-primary hover:text-accent"
                       >
                         {item.title}
                       </Link>
@@ -329,6 +338,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                   <Button
                     type="button"
                     variant="outline"
+                    size="touch"
                     disabled={busy || uncertain}
                     aria-label={`${copy.remove}: ${item.title ?? copy.unavailable}`}
                     onClick={() => void confirmRemove(item)}
@@ -350,11 +360,12 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
           {copy.unavailableNote}
         </p>
       ) : null}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex min-w-0 flex-wrap gap-3">
         {uncertain ? (
           <Button
             type="button"
             variant="outline"
+            size="touch"
             disabled={busy}
             onClick={() => void run(acquire)}
             className={outlineButtonClass}
@@ -362,13 +373,14 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
             {receiptCopy.retry}
           </Button>
         ) : review?.reviewDigest ? (
-          <Button type="button" disabled={busy} onClick={() => void run(acquire)}>
+          <Button type="button" size="touch" disabled={busy} onClick={() => void run(acquire)}>
             {busy ? copy.working : receiptCopy.confirm}
           </Button>
         ) : cart.items.length > 0 ? (
           <Button
             type="button"
             variant="outline"
+            size="touch"
             disabled={busy || unavailable}
             onClick={() => void run(inspect)}
             className={outlineButtonClass}
@@ -379,6 +391,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         <Button
           type="button"
           variant="outline"
+          size="touch"
           disabled={busy}
           onClick={() => void run(refresh)}
           className={outlineButtonClass}
