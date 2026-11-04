@@ -4,6 +4,8 @@ import { BACKUP_RESTORE_EVIDENCE_FLAGS, BACKUP_RESTORE_LABEL } from "./backup-re
 
 export const PRODUCTION_RECOVERY_ACCEPTANCE_KIND = "production_recovery_acceptance";
 
+const REPLACE_WITH_PLACEHOLDER = /REPLACE_WITH_/u;
+
 function readJson(path) {
   try {
     return JSON.parse(readFileSync(path, "utf8"));
@@ -60,9 +62,27 @@ function positiveNumber(value) {
   return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
+/** True when a string still carries a REPLACE_WITH_* template token. */
+export function containsReplaceWithPlaceholder(value) {
+  return typeof value === "string" && REPLACE_WITH_PLACEHOLDER.test(value);
+}
+
+function rejectReplaceWithFields(fields) {
+  for (const [label, value] of fields) {
+    if (containsReplaceWithPlaceholder(value)) {
+      return {
+        ok: false,
+        reason: `${label} still contains a REPLACE_WITH_* placeholder; recovery acceptance is not complete`,
+      };
+    }
+  }
+  return null;
+}
+
 /**
  * Validates owner-filled production recovery acceptance (F04 / OPS-13).
  * Never treats CI disposable backup-restore PASS as operational acceptance.
+ * Rejects REPLACE_WITH_* leftovers even when verdict.passed is true.
  */
 export function validateProductionRecoveryAcceptanceEvidence(evidence) {
   if (!evidence || typeof evidence !== "object") {
@@ -111,6 +131,15 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence) {
   if (!nonEmptyString(access?.restoreRoles) || !nonEmptyString(access?.breakGlassProcedure)) {
     return { ok: false, reason: "restore access roles and break-glass procedure are required" };
   }
+  const placeholderReject = rejectReplaceWithFields([
+    ["owner.name", evidence.owner.name],
+    ["environment.name", evidence.environment.name],
+    ["retention.policy", retention.policy],
+    ["retention.offHostLocation", retention.offHostLocation],
+    ["access.restoreRoles", access.restoreRoles],
+    ["access.breakGlassProcedure", access.breakGlassProcedure],
+  ]);
+  if (placeholderReject) return placeholderReject;
   const measured = evidence?.measuredRestore;
   const startedMs = parseInstant(measured?.startedAt);
   const completedMs = parseInstant(measured?.completedAt);
@@ -142,6 +171,45 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence) {
     return { ok: false, reason: "measured restore duration exceeds declared RTO target" };
   }
   return { ok: true, reason: null };
+}
+
+/**
+ * Starter template for owner-filled F04 / OPS-13 acceptance.
+ * Always ships with verdict.passed false and REPLACE_WITH_* tokens so it cannot close the live gate.
+ */
+export function buildProductionRecoveryAcceptanceEvidenceTemplate({
+  generatedAt = new Date().toISOString(),
+} = {}) {
+  return withProductionRecoveryAcceptanceChecksum({
+    schemaVersion: 1,
+    kind: PRODUCTION_RECOVERY_ACCEPTANCE_KIND,
+    generatedAt,
+    environment: { name: "REPLACE_WITH_TARGET_ENV" },
+    owner: { name: "REPLACE_WITH_ACCEPTANCE_OWNER" },
+    targets: { rpoMinutes: 60, rtoMinutes: 240 },
+    retention: {
+      policy: "REPLACE_WITH_RETENTION_POLICY",
+      offHostLocation: "REPLACE_WITH_OFF_HOST_LOCATION",
+      offHostVerified: false,
+    },
+    access: {
+      restoreRoles: "REPLACE_WITH_RESTORE_ROLES",
+      breakGlassProcedure: "REPLACE_WITH_BREAK_GLASS_PROCEDURE",
+    },
+    measuredRestore: {
+      startedAt: generatedAt,
+      completedAt: generatedAt,
+      dataLossMinutes: 0,
+      withinRpo: false,
+      withinRto: false,
+    },
+    limitations: Object.freeze([
+      "Template only; replace placeholders after a real off-host recovery drill on the target environment.",
+      "Does not authorize production deployment.",
+      "CI disposable backup-restore PASS is not production recovery acceptance.",
+    ]),
+    verdict: Object.freeze({ passed: false, failures: Object.freeze(["template_not_executed"]) }),
+  });
 }
 
 export function readProductionRecoveryAcceptanceFile(path) {
