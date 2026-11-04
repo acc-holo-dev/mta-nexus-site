@@ -129,7 +129,7 @@ export function AuthorPublicationRestore({
     }
   }
   return (
-    <div className="nexus-panel space-y-3 p-4" aria-busy={busy}>
+    <div className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4" aria-busy={busy}>
       <p className="text-sm text-muted">{copy.restoreHelp}</p>
       <Button
         type="button"

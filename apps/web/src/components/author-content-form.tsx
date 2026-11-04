@@ -199,7 +199,7 @@ export function AuthorContentForm({
     }
   }
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4 overflow-x-clip">
       {server && (
         <p className="text-sm text-secondary">
           {serverContentCopy(locale).context}: <strong>{server.name}</strong>
@@ -230,7 +230,7 @@ export function AuthorContentForm({
           {saved.status === "published" && (
             <Link
               href={`/articles/${saved.slug}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.publicView}
             </Link>
@@ -238,7 +238,7 @@ export function AuthorContentForm({
           {archived && (
             <Link
               href={publicationSupportHref(saved.title)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.archivedNote}
             </Link>
@@ -259,7 +259,7 @@ export function AuthorContentForm({
               variant="ghost"
               disabled={busy}
               onClick={() => router.refresh()}
-              className="h-auto rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.retry}
             </Button>
@@ -279,7 +279,7 @@ export function AuthorContentForm({
         ref={formRef}
         onSubmit={submit}
         aria-busy={busy}
-        className="nexus-panel space-y-4 p-5 sm:p-6"
+        className="nexus-panel min-w-0 space-y-4 p-5 sm:p-6"
       >
         <fieldset disabled={busy || archived} className="space-y-4">
           {!saved && (
@@ -362,13 +362,13 @@ export function AuthorContentForm({
             </label>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button type="submit" isLoading={busy}>
+            <Button type="submit" isLoading={busy} className="min-h-11">
               {saved ? copy.save : copy.submit}
             </Button>
             <Button
               type="button"
               variant="ghost"
-              className="h-auto rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() =>
                 setPreview(
                   preview === null
@@ -387,7 +387,7 @@ export function AuthorContentForm({
       {preview !== null && (
         <section
           aria-label={copy.preview}
-          className="nexus-panel whitespace-pre-wrap break-words p-5 text-sm text-primary"
+          className="nexus-panel min-w-0 whitespace-pre-wrap break-words p-5 text-sm text-primary"
         >
           {preview}
         </section>
@@ -398,7 +398,7 @@ export function AuthorContentForm({
           variant="ghost"
           disabled={busy}
           onClick={() => void archive()}
-          className="h-auto px-0 text-sm font-semibold text-danger"
+          className="h-auto min-h-11 px-0 text-sm font-semibold text-danger"
         >
           {copy.archive}
         </Button>

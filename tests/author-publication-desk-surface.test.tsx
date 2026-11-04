@@ -150,6 +150,8 @@ it.each(["en", "ru"] as const)(
     expect(loadingHtml).toContain('aria-labelledby="publication-desk-loading-heading"');
     expect(loadingHtml).toContain(`>${loadingCopy.title}<`);
     expect(loadingHtml).toContain(loadingCopy.loading);
+    expect(loadingHtml).toContain("overflow-x-clip");
+    expect(loadingHtml).toContain("min-w-0");
   },
 );
 it.each(["en", "ru"] as const)(
@@ -226,14 +228,19 @@ it.each(["en", "ru"] as const)(
     state.locale = locale;
     const copy = authorPublicationDeskCopy(locale);
     expect(copy.emptyFiltered).not.toBe(copy.empty);
+    expect(copy.emptyFilteredHint).not.toBe(copy.emptyHint);
     state.desk.mockResolvedValue({ items: [], olderCursor: null, newerCursor: null });
     const empty = renderToStaticMarkup(await Desk({ searchParams: Promise.resolve({}) }));
     expect(empty).toContain(copy.empty);
+    expect(empty).toContain(copy.emptyHint);
     expect(empty).not.toContain(copy.emptyFiltered);
+    expect(empty).toContain("overflow-x-clip");
+    expect(empty).toContain('href="/workspace/content/new"');
     const filtered = renderToStaticMarkup(
       await Desk({ searchParams: Promise.resolve({ status: "draft" }) }),
     );
     expect(filtered).toContain(copy.emptyFiltered);
+    expect(filtered).toContain(copy.emptyFilteredHint);
     expect(filtered).not.toContain(copy.empty);
     expect(filtered).toContain(copy.reset);
     expect(filtered).toContain('href="/workspace/content"');
@@ -251,9 +258,36 @@ it("distinguishes auth, unavailable and forbidden-target errors from empty histo
     await History({ params: Promise.resolve({ id: "article" }) }),
   );
   expect(history).toContain('role="alert"');
+  expect(history).toContain('href="/workspace/content/article/history"');
+  expect(history).toContain("overflow-x-clip");
   expect(history).not.toContain("PRIVATE_TITLE");
   expect(history).not.toContain(authorPublicationDeskCopy("en").historyEmpty);
 });
+it.each(["en", "ru"] as const)(
+  "offers ErrorState retry on desk load failure and EmptyState on empty history in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = authorPublicationDeskCopy(locale);
+    state.desk.mockRejectedValueOnce(new AppError("PRIVATE_DESK", 500, "INTERNAL_ERROR"));
+    const desk = renderToStaticMarkup(await Desk({ searchParams: Promise.resolve({}) }));
+    expect(desk).toContain('role="alert"');
+    expect(desk).toContain(copy.unavailable);
+    expect(desk).toContain('href="/workspace/content"');
+    expect(desk).not.toContain("PRIVATE_DESK");
+    expect(desk).not.toContain(copy.empty);
+    state.history.mockResolvedValueOnce({
+      item: { id: "article", title: "Title", status: "draft", revision, recoverable: false },
+      events: [],
+      olderCursor: null,
+    });
+    const history = renderToStaticMarkup(
+      await History({ params: Promise.resolve({ id: "article" }) }),
+    );
+    expect(history).toContain(copy.historyEmpty);
+    expect(history).toContain(copy.historyEmptyHint);
+    expect(history).toContain("overflow-x-clip");
+  },
+);
 it.each(["en", "ru"] as const)(
   "retains one selected follow through forms and pagination and offers explicit broader navigation in %s",
   (locale) => {

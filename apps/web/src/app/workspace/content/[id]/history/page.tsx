@@ -1,4 +1,6 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AuthorPublicationRestore } from "../../../../../components/author-publication-restore";
@@ -8,13 +10,20 @@ import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
 } from "../../../../../lib/author-publication-desk-copy";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { authorContentService } from "../../../../../lib/services/author-content-service";
 import { publicationSupportHref } from "../../../../../lib/support-workspace-contract";
 import { getUserPlatformCopy } from "../../../../../lib/user-platform-copy";
+
 export const dynamic = "force-dynamic";
-export async function generateMetadata() {
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function generateMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
     title: copy.history,
@@ -22,6 +31,7 @@ export async function generateMetadata() {
     robots: { index: false, follow: false },
   };
 }
+
 export default async function PublicationHistoryPage({
   params,
   searchParams,
@@ -31,6 +41,7 @@ export default async function PublicationHistoryPage({
 }) {
   const locale = await getRequestLocale(),
     copy = authorPublicationDeskCopy(locale),
+    dictionary = getDictionary(locale),
     labels = getUserPlatformCopy(locale),
     { id } = await params,
     path = `/workspace/content/${encodeURIComponent(id)}/history`,
@@ -77,15 +88,13 @@ export default async function PublicationHistoryPage({
         : value === "archived"
           ? labels.archived
           : null;
+  const retryHref = filters ? returnPath : path;
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href="/workspace/content"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace/content" className={navLinkClass}>
         {labels.back}
       </Link>
-      <header className="space-y-2">
+      <header className="min-w-0 space-y-2">
         <h1 className="text-2xl font-extrabold text-primary">{copy.history}</h1>
         <p className="text-sm text-muted">{copy.historyDescription}</p>
         {report && (
@@ -93,9 +102,14 @@ export default async function PublicationHistoryPage({
         )}
       </header>
       {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
+        <ErrorState
+          title={error}
+          action={
+            <Link href={retryHref} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       )}
       {report && (
         <>
@@ -105,7 +119,7 @@ export default async function PublicationHistoryPage({
           <Link
             prefetch={false}
             href={`/workspace/content/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {labels.edit}
           </Link>
@@ -118,29 +132,22 @@ export default async function PublicationHistoryPage({
             />
           )}
           {report.item.status === "archived" && !report.item.recoverable && (
-            <div className="nexus-panel space-y-2 p-4">
+            <div className="nexus-panel min-w-0 space-y-2 p-4">
               <p className="text-sm text-muted">{copy.restoreHelp}</p>
-              <Link
-                href={publicationSupportHref(report.item.title)}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={publicationSupportHref(report.item.title)} className={navLinkClass}>
                 {copy.support}
               </Link>
             </div>
           )}
-          <Link
-            prefetch={false}
-            href={path}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link prefetch={false} href={path} className={navLinkClass}>
             {copy.historyLatest}
           </Link>
           {!report.events.length && (
-            <p className="nexus-panel p-6 text-sm text-muted">{copy.historyEmpty}</p>
+            <EmptyState title={copy.historyEmpty} description={copy.historyEmptyHint} />
           )}
-          <ol className="space-y-3">
+          <ol className="min-w-0 space-y-3">
             {report.events.map((event) => (
-              <li key={event.id} className="nexus-panel space-y-2 p-4">
+              <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-4">
                 <div className="flex flex-wrap justify-between gap-3">
                   <span className="text-sm font-semibold text-primary">{action(event.kind)}</span>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
@@ -171,7 +178,7 @@ export default async function PublicationHistoryPage({
             <Link
               prefetch={false}
               href={`${path}?${new URLSearchParams({ cursor: report.olderCursor })}`}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.historyOlder}
             </Link>
