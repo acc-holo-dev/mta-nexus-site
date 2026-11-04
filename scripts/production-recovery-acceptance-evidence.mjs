@@ -71,8 +71,7 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence) {
   if (isDisposableBackupRestoreRehearsalEvidence(evidence)) {
     return {
       ok: false,
-      reason:
-        "CI disposable backup-restore rehearsal is not production recovery acceptance (F04)",
+      reason: "CI disposable backup-restore rehearsal is not production recovery acceptance (F04)",
     };
   }
   if (evidence.schemaVersion !== 1 || evidence.kind !== PRODUCTION_RECOVERY_ACCEPTANCE_KIND) {
@@ -109,17 +108,17 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence) {
     };
   }
   const access = evidence?.access;
-  if (
-    !nonEmptyString(access?.restoreRoles) ||
-    !nonEmptyString(access?.breakGlassProcedure)
-  ) {
+  if (!nonEmptyString(access?.restoreRoles) || !nonEmptyString(access?.breakGlassProcedure)) {
     return { ok: false, reason: "restore access roles and break-glass procedure are required" };
   }
   const measured = evidence?.measuredRestore;
   const startedMs = parseInstant(measured?.startedAt);
   const completedMs = parseInstant(measured?.completedAt);
   if (startedMs === null || completedMs === null || completedMs < startedMs) {
-    return { ok: false, reason: "measured restore requires ordered startedAt/completedAt timestamps" };
+    return {
+      ok: false,
+      reason: "measured restore requires ordered startedAt/completedAt timestamps",
+    };
   }
   if (
     typeof measured?.dataLossMinutes !== "number" ||
@@ -131,7 +130,8 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence) {
   if (measured.withinRpo !== true || measured.withinRto !== true) {
     return {
       ok: false,
-      reason: "measured restore must explicitly confirm withinRpo and withinRto against owner targets",
+      reason:
+        "measured restore must explicitly confirm withinRpo and withinRto against owner targets",
     };
   }
   if (measured.dataLossMinutes > targets.rpoMinutes) {

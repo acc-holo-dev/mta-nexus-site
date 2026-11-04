@@ -1,6 +1,5 @@
 const en = {
-  loadUnavailable:
-    "Collection release overview is temporarily unavailable. Please try again.",
+  loadUnavailable: "Collection release overview is temporarily unavailable. Please try again.",
   title: "Collection release overview",
   note: "Compare your selected releases with the latest safe published builds. Counts follow the name search; fixed selections also appear in the pinned filter. This snapshot does not change versions or grant access. Downloads recheck current rights.",
   archived:

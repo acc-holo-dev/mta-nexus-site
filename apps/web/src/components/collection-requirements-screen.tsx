@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
-import { collectionHref, collectionPageParams } from "../lib/library-collections-query";
+import { collectionPageParams } from "../lib/library-collections-query";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
 import { authService } from "../lib/services/auth-service";

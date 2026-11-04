@@ -10,8 +10,8 @@ import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-
 import { libraryReleaseComparisonQuery } from "../lib/library-release-comparison-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryReleaseService } from "../lib/services/resource-release-control-service";
-import { PlatformSignIn } from "./platform-sign-in";
 import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function LibraryReleaseComparisonScreen({
   params,
   searchParams,
@@ -54,10 +54,12 @@ export async function LibraryReleaseComparisonScreen({
     to: query.to,
     returnPage: String(query.returnPage),
   })}`;
-  const result = await libraryReleaseService.compare(actor, path.id, query).catch((error: unknown) => {
-    if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-    return null;
-  });
+  const result = await libraryReleaseService
+    .compare(actor, path.id, query)
+    .catch((error: unknown) => {
+      if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
+      return null;
+    });
   if (!result) {
     return (
       <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">

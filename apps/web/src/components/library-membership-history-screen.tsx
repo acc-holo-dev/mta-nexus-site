@@ -20,8 +20,8 @@ import {
 } from "../lib/library-membership-history-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
-import { PlatformSignIn } from "./platform-sign-in";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function LibraryMembershipHistoryScreen({
   params,
   searchParams,
@@ -113,10 +113,12 @@ export async function LibraryMembershipHistoryScreen({
     }
     const query = libraryMembershipHistoryQuery(filters);
     const retryHref = `${membershipHistoryHref()}?${libraryMembershipHistorySuffix(query)}`;
-    const result = await libraryCollectionsService.membershipHistory(actor, query).catch((error: unknown) => {
-      if (error instanceof AppError) throw error;
-      return null;
-    });
+    const result = await libraryCollectionsService
+      .membershipHistory(actor, query)
+      .catch((error: unknown) => {
+        if (error instanceof AppError) throw error;
+        return null;
+      });
     if (!result) {
       return (
         <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">

@@ -1,6 +1,5 @@
 const en = {
-  loadUnavailable:
-    "Version selection history is temporarily unavailable. Please try again.",
+  loadUnavailable: "Version selection history is temporarily unavailable. Please try again.",
   title: "My version selection history",
   loading: "Loading version selection history…",
   note: "Recorded choices from individual and group operations. Resource names are current labels; release labels require current access and safe publication. Lost access preserves your own recorded IDs. History does not restore versions or grant files.",

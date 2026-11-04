@@ -15,8 +15,8 @@ import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i1
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { librarySelectionBatchesService } from "../lib/services/library-selection-batches-service";
-import { PlatformSignIn } from "./platform-sign-in";
 import { LibrarySelectionBatchControls } from "./library-selection-batch-controls";
+import { PlatformSignIn } from "./platform-sign-in";
 export async function LibrarySelectionBatchScreen({
   params,
   searchParams,
@@ -149,10 +149,12 @@ export async function LibrarySelectionBatchScreen({
         </div>
       );
     }
-    const result = await libraryCollectionsService.detail(actor, id, query).catch((error: unknown) => {
-      if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-      return null;
-    });
+    const result = await libraryCollectionsService
+      .detail(actor, id, query)
+      .catch((error: unknown) => {
+        if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
+        return null;
+      });
     if (!result) return loadFailure(retryHref);
     const pageHref = (page: number) =>
       `${base}?${new URLSearchParams({ page: String(page), ...(result.q ? { q: result.q } : {}) })}`;

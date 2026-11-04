@@ -15,8 +15,8 @@ import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import {
-  LibraryCollectionsPagination,
   type LibraryCollectionsActor,
+  LibraryCollectionsPagination,
   type LibraryCollectionsQuery,
   libraryCollectionsLinkClass,
 } from "./library-collections-screen-shared";
@@ -33,7 +33,10 @@ export async function LibraryCollectionsListView({
   const c = libraryCollectionsCopy(locale);
   const dictionary = getDictionary(locale);
   const query = collectionsQuery(collectionPageParams(queryValues), "list");
-  const retryHref = collectionHref(undefined, "", { status: query.status, page: String(query.page) });
+  const retryHref = collectionHref(undefined, "", {
+    status: query.status,
+    page: String(query.page),
+  });
   const result = await service.page(actor, query).catch(() => null);
   if (!result) {
     return (

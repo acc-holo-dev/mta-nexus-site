@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en",
@@ -19,8 +20,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
-import { getDictionary } from "../apps/web/src/lib/i18n";
+
 import { LibraryReleaseHistoryScreen } from "../apps/web/src/components/library-release-history-screen";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",
   days: 90,
@@ -104,8 +107,9 @@ it("rejects ambiguous scope and requires authentication before history calls", a
 });
 it("shows an honest recovery state when version history fails to load", async () => {
   h.history.mockRejectedValueOnce(new Error("history unavailable"));
-  const copy = (await import("../apps/web/src/lib/library-release-history-i18n"))
-    .libraryReleaseHistoryCopy("en");
+  const copy = (
+    await import("../apps/web/src/lib/library-release-history-i18n")
+  ).libraryReleaseHistoryCopy("en");
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);

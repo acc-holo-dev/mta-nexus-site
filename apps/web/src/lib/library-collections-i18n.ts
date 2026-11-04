@@ -1,6 +1,5 @@
 const en = {
-  loadUnavailable:
-    "Your resource collections are temporarily unavailable. Please try again.",
+  loadUnavailable: "Your resource collections are temporarily unavailable. Please try again.",
   title: "My resource collections",
   library: "Resource library",
   resourceCollections: "Collections containing this resource",

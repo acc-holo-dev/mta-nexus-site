@@ -217,11 +217,7 @@ function nonEmptyString(value) {
 
 /** Operator readiness JSON must never close F03 / OPS-14 live routing proof. */
 export function isObservabilityReadinessEvidence(evidence) {
-  return (
-    evidence &&
-    typeof evidence === "object" &&
-    evidence.kind === OBSERVABILITY_READINESS_KIND
-  );
+  return evidence && typeof evidence === "object" && evidence.kind === OBSERVABILITY_READINESS_KIND;
 }
 
 /**
@@ -257,10 +253,7 @@ export function validateObservabilityLiveDrillEvidence(evidence) {
   if (!nonEmptyString(evidence?.environment?.name)) {
     return { ok: false, reason: "target environment name is required" };
   }
-  if (
-    !nonEmptyString(evidence?.channel?.type) ||
-    !nonEmptyString(evidence?.channel?.route)
-  ) {
+  if (!nonEmptyString(evidence?.channel?.type) || !nonEmptyString(evidence?.channel?.route)) {
     return { ok: false, reason: "alert channel type and route are required" };
   }
   const thresholds = evidence?.thresholds;

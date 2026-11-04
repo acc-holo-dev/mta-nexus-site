@@ -1,6 +1,5 @@
 const en = {
-  loadUnavailable:
-    "Collection membership history is temporarily unavailable. Please try again.",
+  loadUnavailable: "Collection membership history is temporarily unavailable. Please try again.",
   title: "Collection membership history",
   loading: "Loading membership history…",
   note: "Inspect whole resource membership operations. Recorded names, revisions and changes remain unchanged; current collection membership and resource access are shown separately. Filters select whole groups, including every recorded collection.",
