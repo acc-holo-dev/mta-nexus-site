@@ -901,6 +901,7 @@ Do not place secrets or working backups in release assets.
 OPS-10 prepares a `ghcr-publish` job in `.github/workflows/ci.yml` that:
 
 - never runs on `pull_request`;
+- accepts only `push` or `workflow_dispatch` on `refs/heads/main` or a `refs/tags/v*` release ref;
 - requires `plan.outputs.full == true` and a successful summary for the exact SHA;
 - restores the already-built `production.tar` (`fail-on-cache-miss: true`) and
   validates `org.opencontainers.image.revision` — no rebuild under the same identity;

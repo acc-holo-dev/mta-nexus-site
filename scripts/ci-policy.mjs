@@ -110,7 +110,6 @@ export function summarizeJobs(policy, needs) {
 export function isTrustedGhcrPublishEvent({
   eventName,
   ref = "",
-  refType = "",
   fullAcceptance = false,
   publishEnabled = false,
 } = {}) {
@@ -118,9 +117,7 @@ export function isTrustedGhcrPublishEvent({
   if (!fullAcceptance) return false;
   if (!publishEnabled) return false;
   const trustedRef =
-    ref === "refs/heads/main" ||
-    refType === "tag" ||
-    (typeof ref === "string" && ref.startsWith("refs/tags/v"));
+    ref === "refs/heads/main" || (typeof ref === "string" && ref.startsWith("refs/tags/v"));
   return Boolean(trustedRef && (eventName === "push" || eventName === "workflow_dispatch"));
 }
 

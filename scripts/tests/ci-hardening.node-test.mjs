@@ -81,7 +81,22 @@ test("OPS-10 workflow keeps packages:write only on gated ghcr-publish job", () =
   const job = next >= 0 ? rest.slice(0, next) : rest;
   assert.match(job, /permissions:\n {6}contents: read\n {6}packages: write/u);
   assert.match(job, /github\.event_name != 'pull_request'/u);
+  assert.match(
+    job,
+    /\(github\.event_name == 'push' \|\| github\.event_name == 'workflow_dispatch'\)/u,
+  );
+  assert.match(
+    job,
+    /\(github\.ref == 'refs\/heads\/main' \|\| startsWith\(github\.ref, 'refs\/tags\/v'\)\)/u,
+  );
+  assert.doesNotMatch(
+    job,
+    /startsWith\(github\.ref, 'refs\/tags\/v'\)\s*\|\|\s*github\.event_name/u,
+  );
   assert.match(job, /needs\.plan\.outputs\.full == 'true'/u);
+  assert.match(job, /needs\.plan\.result == 'success'/u);
+  assert.match(job, /needs\.image\.result == 'success'/u);
+  assert.match(job, /needs\.summary\.result == 'success'/u);
   assert.match(job, /vars\.NEXUS_GHCR_PUBLISH_ENABLED == 'true'/u);
   assert.match(job, /fail-on-cache-miss: true/u);
   assert.match(job, /validate-ci-image\.sh/u);

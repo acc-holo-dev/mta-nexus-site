@@ -4,10 +4,10 @@ import { resolve } from "node:path";
 import test from "node:test";
 import {
   classifyChanges,
+  ghcrPublishJobPermissions,
+  isTrustedGhcrPublishEvent,
   requiredJobs,
   summarizeJobs,
-  isTrustedGhcrPublishEvent,
-  ghcrPublishJobPermissions,
 } from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
@@ -224,4 +224,28 @@ test("OPS-10 trusted GHCR publish requires full_acceptance and never trusts pull
     contents: "read",
     packages: "write",
   });
+});
+
+test("GHCR publish only trusts main or version tags for push and manual runs", () => {
+  const gates = { fullAcceptance: true, publishEnabled: true };
+  for (const eventName of ["push", "workflow_dispatch"]) {
+    for (const ref of ["refs/heads/main", "refs/tags/v1.2.3"]) {
+      assert.equal(
+        isTrustedGhcrPublishEvent({ eventName, ref, ...gates }),
+        true,
+        `${eventName} ${ref}`,
+      );
+    }
+    for (const ref of ["refs/heads/feature", "refs/tags/dev", "refs/pull/1/merge", ""]) {
+      assert.equal(
+        isTrustedGhcrPublishEvent({ eventName, ref, refType: "tag", ...gates }),
+        false,
+        `${eventName} ${ref}`,
+      );
+    }
+  }
+  assert.equal(
+    isTrustedGhcrPublishEvent({ eventName: "schedule", ref: "refs/heads/main", ...gates }),
+    false,
+  );
 });
