@@ -1,10 +1,11 @@
 import { AppError, RESOURCE_RELEASE_WATCH_LIMIT } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
+import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { collectionPageParams } from "../../../../../../lib/library-collections-query";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
@@ -12,6 +13,11 @@ import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-relea
 import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { resourceReleaseWatchesService } from "../../../../../../lib/services/resource-release-watches-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function Page({
@@ -29,6 +35,7 @@ export default async function Page({
   ]);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const copy = resourceReleaseWatchesCopy(locale);
+  const dictionary = getDictionary(locale);
   const base = `/workspace/library/collections/${encodeURIComponent(path.id)}/watches`;
   if (!actor) {
     let returnPath = base;
@@ -50,19 +57,39 @@ export default async function Page({
   } catch {
     notFound();
   }
+  const href = (page: number, filter = query.filter) =>
+    `${base}?${new URLSearchParams({ page: String(page), filter, query: query.query })}`;
   const result = await resourceReleaseWatchesService
     .collectionPage(actor, path.id, query.page, query.filter, query.query)
     .catch((error: unknown) => {
       if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-      throw error;
+      return null;
     });
-  const href = (page: number, filter = query.filter) =>
-    `${base}?${new URLSearchParams({ page: String(page), filter, query: query.query })}`;
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <Link
+          href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
+          className={navLinkClass}
+        >
+          {copy.library}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={href(query.page)} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className={pageShellClass}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {copy.library}
       </Link>
@@ -74,16 +101,10 @@ export default async function Page({
       <p>
         {copy.activeCount}: {result.activeWatchCount}/{RESOURCE_RELEASE_WATCH_LIMIT}
       </p>
-      <Link
-        href="/workspace/library/watches"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/library/watches" className={navLinkClass}>
         {copy.watchCenter}
       </Link>
-      <Link
-        href="/workspace/library/watches/history?source=collection"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/library/watches/history?source=collection" className={navLinkClass}>
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
       {result.collection.status === "archived" && <p role="note">{copy.archivedCollection}</p>}
@@ -98,7 +119,7 @@ export default async function Page({
             className="border border-base bg-inset px-3 py-2"
           />
         </label>
-        <Button type="submit" variant="outline">
+        <Button type="submit" variant="outline" className="min-h-11">
           {copy.search}
         </Button>
       </form>
@@ -108,7 +129,7 @@ export default async function Page({
             key={filter}
             href={href(1, filter)}
             aria-current={filter === query.filter ? "page" : undefined}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {copy[filter]} ({result.counts[filter]})
           </Link>
@@ -131,45 +152,56 @@ export default async function Page({
           title: available ? title : null,
         }))}
       />
-      {!result.items.length && (
-        <div className="nexus-panel space-y-3 p-6 text-sm text-muted" role="status">
-          <p>{result.counts.all === 0 ? copy.empty : copy.emptyFiltered}</p>
-          {result.counts.all !== 0 ? (
-            <Link
-              href={href(1, "all")}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
-      )}
-      <ul className="grid gap-4 sm:grid-cols-2">
-        {result.items.map((item) => (
-          <li key={item.productId} className="nexus-panel space-y-3 p-5">
-            <h3>{item.available ? (item.title ?? copy.privateResource) : copy.privateResource}</h3>
-            <p>
-              {item.enabled ? copy.enabled : copy.disabled}
-              {!item.available ? ` · ${copy.unavailable}` : ""}
-            </p>
-            {item.available && (
-              <Link
-                href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {copy.versions}
+      {!result.items.length ? (
+        <EmptyState
+          title={result.counts.all === 0 ? copy.empty : copy.emptyFiltered}
+          description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilteredHint}
+          action={
+            result.counts.all !== 0 ? (
+              <Link href={href(1, "all")} className={navLinkClass}>
+                {copy.reset}
               </Link>
-            )}
-          </li>
-        ))}
-      </ul>
+            ) : undefined
+          }
+        />
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {result.items.map((item) => (
+            <li key={item.productId} className="nexus-panel space-y-3 p-5">
+              <h3>
+                {item.available ? (item.title ?? copy.privateResource) : copy.privateResource}
+              </h3>
+              <p>
+                {item.enabled ? copy.enabled : copy.disabled}
+                {!item.available ? ` · ${copy.unavailable}` : ""}
+              </p>
+              {item.available && (
+                <Link
+                  href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
+                  className={navLinkClass}
+                >
+                  {copy.versions}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
       {result.totalPages > 1 && (
         <nav className="flex gap-4" aria-label={copy.page}>
-          {result.page > 1 && <Link href={href(result.page - 1)}>{copy.previous}</Link>}
-          <span>
+          {result.page > 1 && (
+            <Link href={href(result.page - 1)} className={navLinkClass}>
+              {copy.previous}
+            </Link>
+          )}
+          <span className="inline-flex min-h-11 items-center">
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
-          {result.page < result.totalPages && <Link href={href(result.page + 1)}>{copy.next}</Link>}
+          {result.page < result.totalPages && (
+            <Link href={href(result.page + 1)} className={navLinkClass}>
+              {copy.next}
+            </Link>
+          )}
         </nav>
       )}
     </div>

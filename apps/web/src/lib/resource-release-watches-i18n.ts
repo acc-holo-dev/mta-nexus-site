@@ -51,7 +51,10 @@ const en = {
   acquireRequired: "Add this free resource to your library before enabling release notifications.",
   noSafeBuild: "A published safe build is required before release notifications can be enabled.",
   empty: "You have no release watches yet.",
+  emptyHint: "Enable notifications for resources you keep to learn about future approved releases.",
   emptyFiltered: "No resource watches match this filter.",
+  emptyFilteredHint: "Try another filter or clear search to see all watches in this collection.",
+  loadUnavailable: "Release watches are temporarily unavailable. Please try again.",
   reset: "Clear filters",
   loading: "Loading release watches…",
   busy: "Saving…",
@@ -125,7 +128,12 @@ const ru: typeof en = {
     "Сначала добавьте этот бесплатный ресурс в библиотеку, чтобы включить уведомления о версиях.",
   noSafeBuild: "Для включения уведомлений о версиях нужна опубликованная безопасная сборка.",
   empty: "У вас пока нет подписок на выпуски.",
+  emptyHint:
+    "Включите уведомления для ресурсов, которые вы храните, чтобы узнавать о будущих одобренных выпусках.",
   emptyFiltered: "Нет подписок по выбранному фильтру.",
+  emptyFilteredHint:
+    "Выберите другой фильтр или сбросьте поиск, чтобы увидеть все подписки этой коллекции.",
+  loadUnavailable: "Подписки на выпуски временно недоступны. Попробуйте ещё раз.",
   reset: "Сбросить фильтры",
   loading: "Загружаем подписки на выпуски…",
   busy: "Сохранение…",

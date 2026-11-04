@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -16,6 +17,11 @@ import {
 } from "../../../../../lib/resource-deliveries-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -25,7 +31,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export default async function DownloadReceiptPage({ params }: { params: Promise<{ id: string }> }) {
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]),
-    copy = resourceDeliveriesCopy(locale);
+    copy = resourceDeliveriesCopy(locale),
+    dictionary = getDictionary(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user)
     return (
@@ -42,14 +49,31 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
   }
   const receipt = await resourceDeliveriesService.detail(user, receiptId).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
-    throw error;
+    return null;
   });
+  if (!receipt) {
+    return (
+      <div className={pageShellClass}>
+        <Link href="/workspace/library/downloads" className={navLinkClass}>
+          {copy.title}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link
+              href={`/workspace/library/downloads/${encodeURIComponent(id)}`}
+              className={navLinkClass}
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-8">
-      <Link
-        href="/workspace/library/downloads"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace/library/downloads" className={navLinkClass}>
         {copy.title}
       </Link>
       <h1 className="font-display text-primary">{copy.receipt}</h1>
@@ -85,7 +109,7 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
           status: "all",
           resourceId: receipt.resourceId,
         })}
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {copy.history}
       </Link>

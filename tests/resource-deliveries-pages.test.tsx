@@ -133,6 +133,7 @@ it("publisher summary contains aggregate states and preserves the chosen period"
   expect(html).toContain('scope="col"');
 });
 it("distinguishes empty inventory from filtered download history", async () => {
+  const copy = resourceDeliveriesCopy("en");
   state.page.mockResolvedValueOnce({
     items: [],
     counts: { all: 0, started: 0, served: 0, cancelled: 0, failed: 0 },
@@ -140,8 +141,10 @@ it("distinguishes empty inventory from filtered download history", async () => {
     totalPages: 1,
   });
   const never = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
-  expect(never).toContain(resourceDeliveriesCopy("en").emptyNever);
-  expect(never).not.toContain(resourceDeliveriesCopy("en").clearFilters);
+  expect(never).toContain(copy.emptyNever);
+  expect(never).toContain(copy.emptyNeverHint);
+  expect(never).toContain("overflow-x-clip");
+  expect(never).not.toContain(copy.clearFilters);
 
   state.page.mockResolvedValueOnce({
     items: [],
@@ -152,9 +155,10 @@ it("distinguishes empty inventory from filtered download history", async () => {
   const filtered = renderToStaticMarkup(
     await Page({ searchParams: Promise.resolve({ status: "failed" }) }),
   );
-  expect(filtered).toContain(resourceDeliveriesCopy("en").emptyFiltered);
-  expect(filtered).toContain(resourceDeliveriesCopy("en").clearFilters);
-  expect(filtered).not.toContain(resourceDeliveriesCopy("en").emptyNever);
+  expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.emptyFilteredHint);
+  expect(filtered).toContain(copy.clearFilters);
+  expect(filtered).not.toContain(copy.emptyNever);
 
   state.page.mockResolvedValueOnce({
     items: [],
@@ -165,9 +169,37 @@ it("distinguishes empty inventory from filtered download history", async () => {
   const emptyPage = renderToStaticMarkup(
     await Page({ searchParams: Promise.resolve({ page: "3" }) }),
   );
-  expect(emptyPage).toContain(resourceDeliveriesCopy("en").emptyFiltered);
-  expect(emptyPage).toContain(resourceDeliveriesCopy("en").clearFilters);
-  expect(emptyPage).not.toContain(resourceDeliveriesCopy("en").emptyNever);
+  expect(emptyPage).toContain(copy.emptyFiltered);
+  expect(emptyPage).toContain(copy.clearFilters);
+  expect(emptyPage).not.toContain(copy.emptyNever);
+});
+it("shows an honest recovery state when download history fails", async () => {
+  state.page.mockRejectedValue(new Error("downloads unavailable"));
+  const copy = resourceDeliveriesCopy("en");
+  const html = renderToStaticMarkup(
+    await Page({
+      searchParams: Promise.resolve({
+        days: "30",
+        status: "cancelled",
+        resourceId: "prd_a",
+        page: "2",
+      }),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("days=30");
+  expect(html).toContain("status=cancelled");
+});
+it("shows an honest recovery state when a download receipt fails", async () => {
+  state.detail.mockRejectedValue(new Error("receipt unavailable"));
+  const copy = resourceDeliveriesCopy("en");
+  const html = renderToStaticMarkup(await Detail(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/workspace/library/downloads/dlv_a");
 });
 it("distinguishes empty publisher inventory from filtered version summary", async () => {
   state.publisher.mockResolvedValueOnce({
