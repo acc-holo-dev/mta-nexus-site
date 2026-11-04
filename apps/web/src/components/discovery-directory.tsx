@@ -49,7 +49,7 @@ export function DirectoryFilters({
     <FilterBar key={discoverHref(state, path)} action={path} label={copy.filter} layout="stacked">
       {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
       <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-48 flex-1">
+        <div className="min-w-0 flex-1 sm:min-w-48">
           <SearchField
             className={field}
             label={dictionary.searchLabel}
@@ -103,12 +103,14 @@ export function DirectoryFilters({
             {copy.clearQuery}
           </Link>
         ) : null}
-        <Link
-          href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
-          className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
+        {hasActiveDiscoverFilters(state) ? (
+          <Link
+            href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
+            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.reset}
+          </Link>
+        ) : null}
       </div>
       {state.type === "servers" && (
         <div className="grid gap-3 sm:grid-cols-3">

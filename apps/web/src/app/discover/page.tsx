@@ -52,7 +52,7 @@ export default async function DiscoverPage({
   const results = await DirectoryResults({ state, locale });
 
   return (
-    <div className="space-y-7">
+    <div className="min-w-0 space-y-7 overflow-x-clip">
       <PageHeader
         title={copy.title}
         description={copy.description}
@@ -61,7 +61,7 @@ export default async function DiscoverPage({
 
       <nav
         aria-label={copy.tabsLabel}
-        className="flex items-center gap-1 overflow-x-auto border-b border-base"
+        className="flex max-w-full items-center gap-1 overflow-x-auto border-b border-base"
       >
         {DISCOVER_TYPES.map((item) => {
           const Icon = ICONS[item];
