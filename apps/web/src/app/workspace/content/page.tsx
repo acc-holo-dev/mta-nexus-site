@@ -94,80 +94,82 @@ export default async function AuthorContentPage({
           {labels.create}
         </Link>
       </header>
-      <form
-        action="/workspace/content"
-        method="get"
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-      >
-        <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-          {copy.query}
-          <input
-            type="search"
-            name="q"
-            maxLength={100}
-            defaultValue={filters?.query ?? ""}
-            className={`${platformFieldClass} block min-h-11`}
-          />
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {labels.status}
-          <select
-            name="status"
-            defaultValue={filters?.status ?? "all"}
-            className={`${platformFieldClass} block min-h-11`}
-          >
-            {(["all", "draft", "published", "archived"] as const).map((value) => (
-              <option key={value} value={value}>
-                {labels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {labels.type}
-          <select
-            name="type"
-            defaultValue={filters?.type ?? "all"}
-            className={`${platformFieldClass} block min-h-11`}
-          >
-            <option value="all">{copy.all}</option>
-            {writerTypes.map((value) => (
-              <option key={value} value={value}>
-                {labels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {copy.source}
-          <select
-            name="source"
-            defaultValue={filters?.source ?? "all"}
-            className={`${platformFieldClass} block min-h-11`}
-          >
-            {(["all", "personal", "organization", "server"] as const).map((value) => (
-              <option key={value} value={value}>
-                {copy[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {copy.tag}
-          <input
-            name="tag"
-            maxLength={30}
-            defaultValue={filters?.tag ?? ""}
-            className={`${platformFieldClass} block min-h-11`}
-          />
-        </label>
-        <Button type="submit" className="min-h-11 font-semibold">
-          {copy.search}
-        </Button>
-        <Link href="/workspace/content" className={navLinkClass}>
-          {copy.reset}
-        </Link>
-      </form>
+      <search aria-label={copy.filters}>
+        <form
+          action="/workspace/content"
+          method="get"
+          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+        >
+          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+            {copy.query}
+            <input
+              type="search"
+              name="q"
+              maxLength={100}
+              defaultValue={filters?.query ?? ""}
+              className={`${platformFieldClass} block min-h-11`}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {labels.status}
+            <select
+              name="status"
+              defaultValue={filters?.status ?? "all"}
+              className={`${platformFieldClass} block min-h-11`}
+            >
+              {(["all", "draft", "published", "archived"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {labels[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {labels.type}
+            <select
+              name="type"
+              defaultValue={filters?.type ?? "all"}
+              className={`${platformFieldClass} block min-h-11`}
+            >
+              <option value="all">{copy.all}</option>
+              {writerTypes.map((value) => (
+                <option key={value} value={value}>
+                  {labels[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.source}
+            <select
+              name="source"
+              defaultValue={filters?.source ?? "all"}
+              className={`${platformFieldClass} block min-h-11`}
+            >
+              {(["all", "personal", "organization", "server"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {copy[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.tag}
+            <input
+              name="tag"
+              maxLength={30}
+              defaultValue={filters?.tag ?? ""}
+              className={`${platformFieldClass} block min-h-11`}
+            />
+          </label>
+          <Button type="submit" className="min-h-11 font-semibold">
+            {copy.search}
+          </Button>
+          <Link href="/workspace/content" className={navLinkClass}>
+            {copy.reset}
+          </Link>
+        </form>
+      </search>
       <p className="text-xs text-muted">{copy.live}</p>
       <Link
         prefetch={false}

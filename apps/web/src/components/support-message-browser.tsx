@@ -38,48 +38,50 @@ export function SupportMessageBrowser({
         <p className="text-secondary break-words">{page.supportCase.subject}</p>
         <p className="text-sm text-muted">{copy.description}</p>
       </header>
-      <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
-        <label
-          className="flex min-w-0 flex-1 flex-col gap-1 text-sm text-secondary"
-          htmlFor="support-message-query"
-        >
-          {copy.search}
-          <input
-            id="support-message-query"
-            name="q"
-            type="search"
-            maxLength={80}
-            defaultValue={filters.query}
-            placeholder={copy.placeholder}
-            className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          />
-        </label>
-        <label
-          className="flex flex-col gap-1 text-sm text-secondary"
-          htmlFor="support-message-group"
-        >
-          {copy.group}
-          <select
-            id="support-message-group"
-            name="group"
-            defaultValue={filters.group}
-            className="rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      <search aria-label={copy.filters}>
+        <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+          <label
+            className="flex min-w-0 flex-1 flex-col gap-1 text-sm text-secondary"
+            htmlFor="support-message-query"
           >
-            <option value="all">{copy.all}</option>
-            <option value="requester">{copy.requester}</option>
-            <option value="staff">{copy.staff}</option>
-          </select>
-        </label>
-        <Button type="submit" size="touch" variant="primary">
-          {copy.apply}
-        </Button>
-        <Link
-          href={path}
-          className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
-      </form>
+            {copy.search}
+            <input
+              id="support-message-query"
+              name="q"
+              type="search"
+              maxLength={80}
+              defaultValue={filters.query}
+              placeholder={copy.placeholder}
+              className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            />
+          </label>
+          <label
+            className="flex flex-col gap-1 text-sm text-secondary"
+            htmlFor="support-message-group"
+          >
+            {copy.group}
+            <select
+              id="support-message-group"
+              name="group"
+              defaultValue={filters.group}
+              className="rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              <option value="all">{copy.all}</option>
+              <option value="requester">{copy.requester}</option>
+              <option value="staff">{copy.staff}</option>
+            </select>
+          </label>
+          <Button type="submit" size="touch" variant="primary">
+            {copy.apply}
+          </Button>
+          <Link
+            href={path}
+            className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.reset}
+          </Link>
+        </form>
+      </search>
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <Link
           href={supportMessageHref(path, filters, { fresh: true })}
