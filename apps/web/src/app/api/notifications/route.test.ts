@@ -176,6 +176,27 @@ describe("notification API request correlation", () => {
     expectPrivateCorrelation(updated);
   });
 
+  it("rejects non-JSON and oversized preference updates without saving", async () => {
+    const wrongMedia = await preferencesPATCH(
+      new NextRequest("https://nexus.test/api/notifications/preferences", {
+        method: "PATCH",
+        headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+        body: JSON.stringify({ followsEnabled: true }),
+      }),
+    );
+    expect(wrongMedia.status).toBe(415);
+    expectPrivateCorrelation(wrongMedia);
+    expect(await wrongMedia.json()).toMatchObject({ code: "UNSUPPORTED_MEDIA_TYPE" });
+
+    const oversized = await preferencesPATCH(
+      request("/api/notifications/preferences", "PATCH", { extra: "x".repeat(4096) }),
+    );
+    expect(oversized.status).toBe(413);
+    expectPrivateCorrelation(oversized);
+    expect(await oversized.json()).toMatchObject({ code: "REQUEST_BODY_TOO_LARGE" });
+    expect(notificationRepository.updatePreferences).not.toHaveBeenCalled();
+  });
+
   it("correlates Web Push state, registration and removal", async () => {
     const read = await pushGET(request("/api/notifications/push"));
     expect(read.status).toBe(200);

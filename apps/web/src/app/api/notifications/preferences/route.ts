@@ -1,7 +1,9 @@
 import { notificationRepository } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { notificationPreferencesSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
@@ -64,6 +66,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: "Authentication required" }, 401);
     }
 
+    requireServerJsonContentType(request);
     const rateLimit = await consumeRateLimit("notificationMutation", user.id);
     if (!rateLimit.success) {
       return json(
@@ -75,7 +78,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readBoundedJson(request, 4 * 1024);
     const parsed = notificationPreferencesSchema.safeParse(body);
     if (!parsed.success) {
       return json(
@@ -94,6 +97,9 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       preferences,
     });
   } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
+    }
     logRequestEvent({
       level: "error",
       event: "notifications.preferences_update_failed",
