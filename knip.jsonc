@@ -24,12 +24,6 @@
       "entry": ["scripts/**/*.{ts,mjs}", "src/repositories/account-mail-worker.fixture.ts"],
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],
       "drizzle": true
-    },
-    "packages/validation": {
-      "project": ["src/**/*.{ts,tsx}"],
-      "ignoreIssues": {
-        "src/resource-release-watches.ts": ["duplicates"]
-      }
     }
   }
 }

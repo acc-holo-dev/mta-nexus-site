@@ -7,23 +7,26 @@ export const resourceReleaseWatchCommandSchema = z
   })
   .strict();
 
+const resourceReleaseWatchDisableOrResumeItemsSchema = z
+  .array(
+    z
+      .object({
+        productId: z.string().regex(/^[A-Za-z0-9_-]{1,160}$/u),
+        expectedRevision: z.number().int().min(1).max(2_147_483_646),
+      })
+      .strict(),
+  )
+  .min(1)
+  .max(RESOURCE_RELEASE_WATCH_BATCH_LIMIT)
+  .refine((items) => new Set(items.map((item) => item.productId)).size === items.length)
+  .transform((items) =>
+    items.sort((a, b) => (a.productId < b.productId ? -1 : a.productId > b.productId ? 1 : 0)),
+  );
+
+/** Disable batch: same payload shape as resume; distinct Zod instance for knip/exports. */
 export const resourceReleaseWatchDisableCommandSchema = z
   .object({
-    items: z
-      .array(
-        z
-          .object({
-            productId: z.string().regex(/^[A-Za-z0-9_-]{1,160}$/u),
-            expectedRevision: z.number().int().min(1).max(2_147_483_646),
-          })
-          .strict(),
-      )
-      .min(1)
-      .max(RESOURCE_RELEASE_WATCH_BATCH_LIMIT)
-      .refine((items) => new Set(items.map((item) => item.productId)).size === items.length)
-      .transform((items) =>
-        items.sort((a, b) => (a.productId < b.productId ? -1 : a.productId > b.productId ? 1 : 0)),
-      ),
+    items: resourceReleaseWatchDisableOrResumeItemsSchema,
   })
   .strict();
 
@@ -48,4 +51,9 @@ export const resourceReleaseWatchEnableCommandSchema = z
   })
   .strict();
 
-export const resourceReleaseWatchResumeCommandSchema = resourceReleaseWatchDisableCommandSchema;
+/** Resume batch: same validation rules as disable; own schema object (not an alias). */
+export const resourceReleaseWatchResumeCommandSchema = z
+  .object({
+    items: resourceReleaseWatchDisableOrResumeItemsSchema,
+  })
+  .strict();
