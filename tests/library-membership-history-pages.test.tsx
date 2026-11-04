@@ -203,11 +203,15 @@ it.each([
   { operation: "delete" },
   { productId: "../private" },
 ])("rejects ambiguous or injected list selectors %o", async (query) => {
-  expect(await screen(query)).toContain('role="alert"');
+  const html = await screen(query);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
   expect(state.history).not.toHaveBeenCalled();
 });
 it("rejects all detail selectors and maps missing/foreign detail to a missing page", async () => {
-  expect(await screen({ page: "1" }, "lmb_a")).toContain('role="alert"');
+  const invalidDetail = await screen({ page: "1" }, "lmb_a");
+  expect(invalidDetail).toContain('role="alert"');
+  expect(invalidDetail).toContain("overflow-x-clip");
   expect(state.detail).not.toHaveBeenCalled();
   state.detail.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen({}, "lmb_foreign")).rejects.toThrow("NEXT_NOT_FOUND");

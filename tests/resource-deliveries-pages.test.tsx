@@ -252,6 +252,16 @@ it("invalid filters cause no repository query and foreign receipt IDs are not fo
     renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ days: ["7", "30"] }) })),
   ).toContain("Invalid filters");
   expect(state.page).not.toHaveBeenCalled();
+  const publisherInvalid = renderToStaticMarkup(
+    await Publisher({
+      params: Promise.resolve({ id: "prd_a" }),
+      searchParams: Promise.resolve({ days: ["7", "30"] }),
+    }),
+  );
+  expect(publisherInvalid).toContain(resourceDeliveriesCopy("en").invalid);
+  expect(publisherInvalid).toContain('role="alert"');
+  expect(publisherInvalid).toContain("overflow-x-clip");
+  expect(state.publisher).not.toHaveBeenCalled();
   state.detail.mockRejectedValue(new AppError("private", 404, "NOT_FOUND"));
   await expect(Detail(context)).rejects.toThrow("NEXT_NOT_FOUND");
   await expect(Detail({ params: Promise.resolve({ id: "bad" }) })).rejects.toThrow(

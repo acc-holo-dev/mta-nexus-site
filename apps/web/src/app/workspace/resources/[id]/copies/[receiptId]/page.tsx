@@ -121,11 +121,16 @@ export default async function ResourceCopyDetailPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className={`${pageShellClass} space-y-4`}>
-          <p role="alert">{resourceCopyError(locale, error.code)}</p>
-          <Link href="/workspace/resources" className={navLinkClass}>
-            {c.back}
-          </Link>
+        <section className={pageShellClass}>
+          <ErrorState
+            title={resourceCopyError(locale, error.code)}
+            description={c.errorDescription}
+            action={
+              <Link href="/workspace/resources" className={navLinkClass}>
+                {c.back}
+              </Link>
+            }
+          />
         </section>
       );
     throw error;
