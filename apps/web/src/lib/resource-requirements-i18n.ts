@@ -2,6 +2,7 @@ export function resourceRequirementsCopy(locale: string) {
   return locale === "ru"
     ? {
         title: "Подготовка ресурсов",
+        loading: "Загрузка подготовки ресурсов…",
         loadUnavailable: "Подготовка ресурсов временно недоступна. Попробуйте ещё раз.",
         note: "Отчёт проверяет текущие декларации каталога и записанные сведения выбранных сборок. Он не подтверждает установку, запуск MTA или наличие файлов на сервере. Скачивание отдельно проверяет актуальные права и безопасность файла.",
         preview:
@@ -56,6 +57,7 @@ export function resourceRequirementsCopy(locale: string) {
       }
     : {
         title: "Resource preparation",
+        loading: "Loading resource preparation…",
         loadUnavailable: "Resource preparation is temporarily unavailable. Please try again.",
         note: "This report checks current catalog declarations and recorded evidence of selected builds. It does not confirm installation, MTA execution or files on your server. Each download independently rechecks current access and artifact safety.",
         preview:

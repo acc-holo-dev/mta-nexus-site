@@ -21,6 +21,11 @@ const en = {
   collectionId: "Recorded collection ID/revision",
   time: "Recorded at (UTC)",
   empty: "No changes match these filters",
+  emptyHint:
+    "An empty history is not a load failure. Recorded notification commands appear here after they commit.",
+  loadUnavailable: "Release watch history is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty history. Retry to fetch the latest recorded notification commands.",
   export: "Export this history page as JSON",
   manage: "Manage current version and notification preferences",
   page: "Page",
@@ -52,6 +57,11 @@ const ru: typeof en = {
   collectionId: "Записанные ID и версия коллекции",
   time: "Дата записи (UTC)",
   empty: "Нет изменений по выбранным фильтрам",
+  emptyHint:
+    "Пустая история — не ошибка загрузки. Записанные команды уведомлений появятся здесь после сохранения.",
+  loadUnavailable: "История подписок на выпуски временно недоступна. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустая история. Повторите запрос, чтобы получить актуальные команды уведомлений.",
   export: "Экспортировать эту страницу истории в JSON",
   manage: "Текущие версии и настройки уведомлений",
   page: "Страница",

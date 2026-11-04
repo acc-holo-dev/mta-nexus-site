@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   locale: "en",
@@ -19,8 +20,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { history: h.history },
 }));
+
 import Page, { metadata } from "../apps/web/src/app/workspace/library/watches/history/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+
 const screen = async () =>
   renderToStaticMarkup(
     await Page({
@@ -102,6 +105,10 @@ it("requires sign-in and rejects duplicate filters before reading audit records"
   expect(h.history).not.toHaveBeenCalled();
 });
 it("offers to clear filters when a filtered watch history view is empty", async () => {
+  const { resourceReleaseWatchHistoryCopy } = await import(
+    "../apps/web/src/lib/resource-release-watch-history-i18n"
+  );
+  const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockResolvedValue({
     days: 30,
     source: "batch",
@@ -116,5 +123,23 @@ it("offers to clear filters when a filtered watch history view is empty", async 
     }),
   );
   expect(html).toContain("Clear filters");
+  expect(html).toContain(copy.emptyHint);
+  expect(html).toContain("overflow-x-clip");
   expect(html).toContain('href="/workspace/library/watches/history"');
+});
+
+it("shows an honest recovery state when release watch history fails to load", async () => {
+  const { resourceReleaseWatchHistoryCopy } = await import(
+    "../apps/web/src/lib/resource-release-watch-history-i18n"
+  );
+  const copy = resourceReleaseWatchHistoryCopy("en");
+  h.history.mockRejectedValue(new Error("history unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("source=batch");
+  expect(html).toContain("page=2");
+  expect(html).not.toContain("history unavailable");
 });

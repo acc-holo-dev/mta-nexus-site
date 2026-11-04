@@ -53,8 +53,10 @@ const en = {
   empty: "You have no release watches yet.",
   emptyHint: "Enable notifications for resources you keep to learn about future approved releases.",
   emptyFiltered: "No resource watches match this filter.",
-  emptyFilteredHint: "Try another filter or clear search to see all watches in this collection.",
+  emptyFilteredHint: "Try another filter or clear search to see all of your watches.",
   loadUnavailable: "Release watches are temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty watch list. Retry to fetch your current release notification preferences.",
   reset: "Clear filters",
   loading: "Loading release watches…",
   busy: "Saving…",
@@ -74,6 +76,8 @@ const en = {
   of: "of",
   updated: "Updated",
   invalid: "Invalid watch filters",
+  invalidDescription:
+    "Invalid filters are not a load failure. Clear them and open the release watches list again.",
   published: "Resource version published",
 };
 const ru: typeof en = {
@@ -131,9 +135,10 @@ const ru: typeof en = {
   emptyHint:
     "Включите уведомления для ресурсов, которые вы храните, чтобы узнавать о будущих одобренных выпусках.",
   emptyFiltered: "Нет подписок по выбранному фильтру.",
-  emptyFilteredHint:
-    "Выберите другой фильтр или сбросьте поиск, чтобы увидеть все подписки этой коллекции.",
+  emptyFilteredHint: "Выберите другой фильтр или сбросьте поиск, чтобы увидеть все ваши подписки.",
   loadUnavailable: "Подписки на выпуски временно недоступны. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустой список подписок. Повторите запрос, чтобы получить актуальные настройки уведомлений.",
   reset: "Сбросить фильтры",
   loading: "Загружаем подписки на выпуски…",
   busy: "Сохранение…",
@@ -153,6 +158,8 @@ const ru: typeof en = {
   of: "из",
   updated: "Обновлено",
   invalid: "Некорректные фильтры подписок",
+  invalidDescription:
+    "Некорректные фильтры — не ошибка загрузки. Сбросьте их и снова откройте список подписок.",
   published: "Опубликована версия ресурса",
 };
 export function resourceReleaseWatchesCopy(locale: Locale) {

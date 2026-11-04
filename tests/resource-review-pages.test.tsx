@@ -110,10 +110,56 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(locale === "ru" ? "Ресурс недоступен" : "Resource unavailable");
     expect(html).toContain("/workspace/library/review/prd_a");
     expect(html).toContain("page=3");
+    expect(html).toContain("overflow-x-clip");
     expect(html).not.toContain("<script>");
     expect(state.ownPage).toHaveBeenCalledWith("usr_a", 2);
   },
 );
+it("shows EmptyState honesty when own reviews are empty", async () => {
+  state.ownPage.mockResolvedValueOnce({ items: [], page: 1, totalPages: 1, total: 0 });
+  const copy = resourceReviewCopy("en");
+  const html = renderToStaticMarkup(await Own({ searchParams: Promise.resolve({}) }));
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.ownEmptyHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+});
+it("shows an honest recovery state when own reviews fail to load", async () => {
+  state.ownPage.mockRejectedValueOnce(new Error("reviews unavailable"));
+  const copy = resourceReviewCopy("en");
+  const html = renderToStaticMarkup(await Own({ searchParams: Promise.resolve({ page: "2" }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.pageUnavailable);
+  expect(html).toContain(copy.pageUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("page=2");
+  expect(html).not.toContain("reviews unavailable");
+});
+it("shows an honest recovery state when own review detail fails to load", async () => {
+  state.ownDetail.mockRejectedValueOnce(new Error("detail unavailable"));
+  const copy = resourceReviewCopy("en");
+  const html = renderToStaticMarkup(await Editor({ params: Promise.resolve({ id: "prd_a" }) }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.pageUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/library/review/prd_a"');
+  expect(html).not.toContain("detail unavailable");
+});
+it("clips honest own-review loading shells on narrow layouts", async () => {
+  const { default: OwnReviewsLoading } = await import(
+    "../apps/web/src/app/workspace/library/reviews/loading"
+  );
+  const { default: OwnReviewDetailLoading } = await import(
+    "../apps/web/src/app/workspace/library/review/[id]/loading"
+  );
+  const copy = resourceReviewCopy("en");
+  for (const Loading of [OwnReviewsLoading, OwnReviewDetailLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(copy.pageLoading);
+  }
+});
 it("does not fetch private reviews while signed out", async () => {
   state.actor = null;
   expect(renderToStaticMarkup(await Own({ searchParams: Promise.resolve({}) }))).toContain(

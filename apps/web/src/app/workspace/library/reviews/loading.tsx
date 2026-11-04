@@ -1,21 +1,21 @@
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { getLibraryCopy } from "../../../../lib/library-view";
+import { resourceReviewCopy } from "../../../../lib/resource-review-i18n";
 
 // Honest loading shell for /workspace/library/reviews.
 export default async function Loading() {
-  const copy = getLibraryCopy(await getRequestLocale());
+  const copy = resourceReviewCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="library-reviews-loading-heading"
     >
       <header className="space-y-2">
         <h1 id="library-reviews-loading-heading" className="font-display text-primary">
-          {copy.title}
+          {copy.own}
         </h1>
         <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
+          {copy.pageLoading}
         </p>
       </header>
       <div className="animate-pulse space-y-4" aria-hidden="true">
