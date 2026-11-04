@@ -1,6 +1,19 @@
 # Проверенный срез проекта
 
-**Дата:** 2 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 4 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+
+## Текущая интеграционная волна — ожидает CI на опубликованном exact SHA
+
+Локально проверенная цепочка поверх `41330d89a607ea501d2868f73355136c01d742ae`:
+
+- `70e372f2` — development seed и historical seed отказываются работать без явного acknowledgement и против production-конфигурации;
+- `739723af` — восстановлены historical-seed проверки и зелёный локальный code gate;
+- `3f32b3d6` — общий `PageHeader` применён к публичным каталогам серверов, статей и Discover;
+- `6cbe787e` — общий `SearchField` применён к публичному поиску, публикациям и каталогу MTA-серверов;
+- `54c6b674` — общий `ErrorState` отделяет сбой загрузки от подтверждённого empty state и держит retry рядом;
+- `d235ba9b` — общий GET-only `FilterBar` сохраняет URL-backed фильтры и search-landmark семантику.
+
+На `d235ba9b` локально прошли `pnpm check:code`, production `next build` (123 страницы) и focused UI suites. PostgreSQL 18 migrations + seed integration прошли на `739723af`; это не DB-доказательство для более нового SHA. GitHub CI нового опубликованного tip ещё нужно проверить; не переносить статус verified green со старого commit.
 
 ## Verified green baseline (bullets)
 
@@ -30,17 +43,19 @@
 
 ## Старт для следующего агента
 
-1. Только **`main`**: `git checkout main && git pull` → чистый `git status` (локальные WIP не путать с tip). Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started` по `python3 scripts/_agent_list_open_tasks.py`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
+1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Зафиксируйте exact SHA и сначала проверьте GitHub CI именно для него. Если новый tip красный, восстановление обязательного gate имеет приоритет над новой UI-работой. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started` по `python3 scripts/_agent_list_open_tasks.py`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
 2. Локальный scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore` и не должен появляться в коммитах. Не ведите параллельные handoff-журналы.
 3. Defaults владельца A/B — [DECISIONS.md](DECISIONS.md) (FLOW-05/06/12, UX-06/14/17/23, OPS-19, GROW-01). Ads/commerce/GROW пилоты не активированы.
 4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
-7. Очередь: **OPS-09…20** (external/github_settings и live gates), **UX-24–26** (ads proposals), **GROW-02…09** (пилоты). **UX-06/19/20/22** в tracker `done` — не открывать ads/commerce без нового поручения.
+7. Следующий разрешённый продуктовый результат — **mobile primary action публичного Resource**. На текущем коде `/market/[slug]` рендерит основной content-column раньше acquisition-aside, поэтому на узком экране получение/скачивание оказывается после gallery, overview, истории версий, reviews и Q&A. Исправьте порядок без второго экземпляра интерактивных controls: guest/free acquire, доступный download, переход в Library и release-watch должны появляться до глубокого контента на mobile; desktop sticky two-column layout должен сохраниться.
+8. Приёмка следующего результата: RU/EN; guest, free signed-in/no-access и entitled/owner состояния; ширины 320/390 и desktop; keyboard/focus; одно состояние каждого client control; никакого скрытого изменения selected/latest version; focused component/page tests, typecheck, lint и production build. Визуальный browser evidence заявлять только если он реально снят на exact SHA.
+9. После этого проходить key journeys последовательно: Resource → Discover → Workspace/Library → Notifications → Server → Profile → Community → Support → Admin. Для каждого брать один завершённый человеческий сценарий (primary action, сохранение контекста, mobile, loading/error/empty), а не выполнять массовую механическую замену разметки. Очередь внешних gates остаётся **OPS-09…20**, ads proposals — **UX-24–26**, пилоты — **GROW-02…09**; не активировать ads/commerce без нового поручения.
 
 На baseline tip закрыты кодовые разрывы аудита (см. [PROBLEMS.md](PROBLEMS.md)): F01/F02/F05/F06/F08/F09/F10(усиление)/UI01/INT13(idempotency)/ARC14(authoring) + связанные FLOW/UX/OPS/GROW-01 и **UX-19** (gallery lightbox), **UX-20** (version help), **UX-22** (publication readiness). TypeScript-блокеры интеграции на `main` сняты. **Не** закрыты **F03/F04** (operational gates) и human/deploy gates beta-кандидата.
 
-**Последняя локальная волна:** verified green — `98d245f0…` / [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990) (статус обращения, библиотека и поддержка в оболочке, честный Q&A, фокус полей отзыва). Коммиты после этого SHA (подтверждение снятия реакции и остановки уведомлений о версиях, подвал по сессии, ошибки темы и черновик обращения из публикации) ещё не являются verified tip. Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
+**Последний GitHub-verified baseline:** `98d245f0…` / [CI 41508863990](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41508863990). Текущая опубликованная интеграционная волна перечислена выше и не становится verified tip до зелёного CI на её exact SHA. Не закрывать F03/F04, GitHub settings, deploy, рекламу и GROW-пилоты без отдельного допуска.
 
 ## Свидетельства и ограничения
 
