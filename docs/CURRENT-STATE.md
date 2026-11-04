@@ -6,6 +6,11 @@
 
 Опубликовано на `main` и подтверждено CI на exact tip:
 
+- `06435b41` / #280 — split discussion-report-batch interaction suite (current tip);
+- `49375934` / #279 — split managed-server-visibility interaction suite;
+- `8ea5d29b` / #281 — pnpm aliases for F03/F04 evidence verify;
+- `3227a8a3` / #282 — support workspace touch targets `min-h-11`;
+- `3a4280ee` / #278 — CURRENT-STATE tip baseline `90ba9a23` after honesty wave2 #270–#277;
 - `1bb5ab2d` / #252 — browser contracts after honesty confirms (ConfirmDialog, ErrorState `id`, guest More order, login rate-limit);
 - `f3525fa5` / #249 — Dependabot biome/knip/swc/`@types/node` (full tip CI red on browsers until #252);
 - `d281ac67` / #261 — lucide-react 1.67.0;
@@ -24,8 +29,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Tip SHA:** `90ba9a23b6eb20c6d8bf582c4895611f2de9a0fa` (`chore(deps): bump next from 16.4.3 to 16.4.4`).
-- **Verified CI green on that tip:** pending tip CI on `90ba9a23` after #270–#277 / #273–#274; prior verified tip green [CI 41834525134](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41834525134) on `774191c4`.
+- **Tip SHA:** `06435b41c9a0d99b94f564a005f2cafdef4b20ba` (`test: split discussion-report-batch interaction suite`).
+- **Verified CI green on that tip:** pending tip CI on `06435b41` after #278–#282 / #279–#281 landings (run [41844140559](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41844140559) in progress); prior verified tip green [CI 41834525134](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41834525134) on `774191c4`.
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
