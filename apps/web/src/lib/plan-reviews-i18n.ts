@@ -5,6 +5,10 @@ const copy = {
     title: "Saved plan reviews",
     loading: "Loading saved plan reviews…",
     loadUnavailable: "Saved plan reviews are temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry keeps the same filters and selection. A temporary load failure does not erase saved reviews.",
+    selectionRecoverHint:
+      "Reload with a corrected selection, or return and open the page again from a valid link.",
     newReview: "Save selected terms",
     back: "Back to plan catalog",
     save: "Save review",
@@ -21,6 +25,8 @@ const copy = {
     period: "Period",
     apply: "Apply",
     empty: "No saved reviews in this period.",
+    emptyHint:
+      "Saved reviews appear here after you record selected plan terms for this account and period.",
     revision: "Version",
     price: "Plan price",
     term: "Plan term",
@@ -45,6 +51,8 @@ const copy = {
     scopeNext: "More organizations",
     history: "View saved reviews",
     noOrganizations: "You do not manage an organization on this page.",
+    noOrganizationsHint:
+      "Organization-scoped plans need an organization you manage. Switch page or choose a personal plan.",
     invalid: "The request is invalid. Reload and check your selection.",
     retry:
       "The result could not be confirmed. Retry the same selection; it will not create a duplicate.",
@@ -63,6 +71,10 @@ const copy = {
     title: "Сохранённые обзоры тарифов",
     loading: "Загрузка сохранённых обзоров тарифов…",
     loadUnavailable: "Сохранённые обзоры тарифов временно недоступны. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор сохраняет те же фильтры и выбор. Временный сбой загрузки не удаляет сохранённые обзоры.",
+    selectionRecoverHint:
+      "Обновите страницу с исправленным выбором или откройте её снова по корректной ссылке.",
     newReview: "Сохранить выбранные условия",
     back: "К каталогу тарифов",
     save: "Сохранить обзор",
@@ -79,6 +91,8 @@ const copy = {
     period: "Период",
     apply: "Применить",
     empty: "За этот период обзоров нет.",
+    emptyHint:
+      "Сохранённые обзоры появятся здесь после записи выбранных условий тарифа для этого аккаунта и периода.",
     revision: "Версия",
     price: "Цена тарифа",
     term: "Срок тарифа",
@@ -103,6 +117,8 @@ const copy = {
     scopeNext: "Другие организации",
     history: "История обзоров",
     noOrganizations: "На этой странице нет организаций под вашим управлением.",
+    noOrganizationsHint:
+      "Для тарифов организации нужна организация под вашим управлением. Смените страницу или выберите личный тариф.",
     invalid: "Некорректный запрос. Обновите страницу и проверьте выбор.",
     retry: "Результат не подтверждён. Повторите тот же выбор — дубликат не появится.",
     conflict: "Ключ запроса уже связан с другим выбором. Обновите страницу перед новым выбором.",

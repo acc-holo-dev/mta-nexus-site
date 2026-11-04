@@ -179,12 +179,30 @@ it("history preserves organization, periods and scope pagination", async () => {
   );
 });
 it("refuses stale catalog revision before constructing a save form", async () => {
+  const copy = planReviewsCopy("en");
   const html = renderToStaticMarkup(
     await New({ searchParams: Promise.resolve({ planId: "cplan_a", revision: "1" }) }),
   );
-  expect(html).toContain(planReviewsCopy("en").planChanged);
+  expect(html).toContain(copy.planChanged);
+  expect(html).toContain(copy.selectionRecoverHint);
+  expect(html).toContain('role="alert"');
   expect(html).not.toContain("/api/subscriptions");
   expect(state.scopes).not.toHaveBeenCalled();
+});
+it("shows EmptyState when saved plan reviews are absent", async () => {
+  state.page.mockResolvedValue({
+    scope: { id: "user:usr_a", name: null },
+    observedAt: date,
+    reviews: [],
+    page: 1,
+    pageSize: 20,
+    totalPages: 1,
+    total: 0,
+  });
+  const copy = planReviewsCopy("en");
+  const html = renderToStaticMarkup(await History({ searchParams: Promise.resolve({}) }));
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.emptyHint);
 });
 it.each(["user", "organization"])(
   "builds the %s selection with live authorized organization choices",
@@ -212,13 +230,16 @@ it.each(["user", "organization"])(
   },
 );
 it("malformed query arrays show recovery without requesting private details", async () => {
+  const copy = planReviewsCopy("en");
   const html = renderToStaticMarkup(
     await Detail({
       params: Promise.resolve({ id: review.id }),
       searchParams: Promise.resolve({ organizationId: ["org_a", "org_b"] }),
     }),
   );
-  expect(html).toContain(planReviewsCopy("en").invalid);
+  expect(html).toContain(copy.invalid);
+  expect(html).toContain(copy.selectionRecoverHint);
+  expect(html).toContain('role="alert"');
   expect(state.detail).not.toHaveBeenCalled();
 });
 it("masks absent or unauthorized details", async () => {
@@ -233,26 +254,28 @@ it("shows an honest recovery state when saved plan reviews fail to load", async 
   const html = renderToStaticMarkup(await History({ searchParams: Promise.resolve({}) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/subscriptions/reviews"');
 });
 it("shows honest recovery when review detail or new review loads fail", async () => {
   const copy = planReviewsCopy("en");
   state.detail.mockRejectedValue(new Error("detail unavailable"));
-  expect(
-    renderToStaticMarkup(
-      await Detail({
-        params: Promise.resolve({ id: review.id }),
-        searchParams: Promise.resolve({}),
-      }),
-    ),
-  ).toContain(copy.loadUnavailable);
+  const detail = renderToStaticMarkup(
+    await Detail({
+      params: Promise.resolve({ id: review.id }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(detail).toContain(copy.loadUnavailable);
+  expect(detail).toContain(copy.loadUnavailableHint);
   state.plan.mockRejectedValue(new Error("plan unavailable"));
-  expect(
-    renderToStaticMarkup(
-      await New({ searchParams: Promise.resolve({ planId: "cplan_a", revision: "2" }) }),
-    ),
-  ).toContain(copy.loadUnavailable);
+  const created = renderToStaticMarkup(
+    await New({ searchParams: Promise.resolve({ planId: "cplan_a", revision: "2" }) }),
+  );
+  expect(created).toContain(copy.loadUnavailable);
+  expect(created).toContain(copy.loadUnavailableHint);
 });
 it("clips honest plan review loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {

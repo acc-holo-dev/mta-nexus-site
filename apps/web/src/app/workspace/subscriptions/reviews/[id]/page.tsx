@@ -1,11 +1,16 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewDetailView } from "../../../../../components/plan-review-detail";
-import { PlanReviewLoadError } from "../../../../../components/plan-review-workspace-recovery";
+import {
+  planReviewNavLinkClass,
+  planReviewPageShellClass,
+} from "../../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { planReviewsCopy } from "../../../../../lib/plan-reviews-i18n";
 import {
@@ -34,6 +39,7 @@ export default async function PlanReviewPage({
       searchParams,
     ]),
     c = planReviewsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const pageParams = planReviewsPageParams(query);
@@ -61,23 +67,33 @@ export default async function PlanReviewPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{c.invalid}</p>
-          <Link
-            href="/workspace/subscriptions/reviews"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.title}
-          </Link>
+        <section className={planReviewPageShellClass}>
+          <ErrorState
+            title={c.invalid}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/workspace/subscriptions/reviews" className={planReviewNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     return (
-      <PlanReviewLoadError
-        locale={locale}
-        backHref="/workspace/subscriptions/reviews"
-        backLabel={c.title}
-        retryHref={recoveryRetry}
-      />
+      <section className={planReviewPageShellClass}>
+        <Link href="/workspace/subscriptions/reviews" className={planReviewNavLinkClass}>
+          {c.title}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={planReviewNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
     );
   }
 }

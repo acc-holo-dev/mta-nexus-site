@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -6,10 +7,10 @@ import { notFound } from "next/navigation";
 import { PlanReviewTerms } from "../../../../../components/plan-review-terms";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import {
-  SubscriptionLoadError,
   subscriptionNavLinkClass,
   subscriptionPageShellClass,
 } from "../../../../../components/subscription-workspace-recovery";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { subscriptionsService } from "../../../../../lib/services/subscriptions-service";
@@ -40,6 +41,7 @@ export default async function SubscriptionReceiptPage({
       searchParams,
     ]),
     c = subscriptionsCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     const pageParams = subscriptionPageParams(raw);
@@ -92,7 +94,7 @@ export default async function SubscriptionReceiptPage({
         </p>
         <a
           href={`/api/subscriptions/account/receipts/${encodeURIComponent(r.id)}/export${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={subscriptionNavLinkClass}
         >
           {c.export}
         </a>
@@ -102,18 +104,33 @@ export default async function SubscriptionReceiptPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className="space-y-4 py-8">
-          <p role="alert">{subscriptionError(locale, error.code)}</p>
-          <Link href="/workspace/subscriptions">{c.title}</Link>
+        <section className={subscriptionPageShellClass}>
+          <ErrorState
+            title={subscriptionError(locale, error.code)}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/workspace/subscriptions" className={subscriptionNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         </section>
       );
     return (
-      <SubscriptionLoadError
-        locale={locale}
-        backHref={subscriptionAccountHref(undefined)}
-        backLabel={c.title}
-        retryHref={recoveryRetry}
-      />
+      <section className={subscriptionPageShellClass}>
+        <Link href={subscriptionAccountHref(undefined)} className={subscriptionNavLinkClass}>
+          {c.title}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={subscriptionNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
     );
   }
 }

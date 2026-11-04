@@ -5,6 +5,10 @@ const en = {
   loading: "Loading subscription…",
   loadUnavailable:
     "Your subscription account is temporarily unavailable. This does not mean you have no subscription.",
+  loadUnavailableHint:
+    "Retry keeps the same account selection. A temporary load failure is not a cancelled subscription.",
+  selectionRecoverHint:
+    "Reload with a corrected selection, or return and open the page again from a valid link.",
   activate: "Activate free plan",
   cancel: "End subscription now",
   history: "Subscription history",
@@ -16,6 +20,8 @@ const en = {
   open: "Open",
   scopeMore: "More organizations",
   empty: "No subscription for this account.",
+  emptyHint:
+    "Activate a currently published free plan from the catalog when you want benefits for this account.",
   notice:
     "Published free plans can be activated without payment. Paid activation awaits a payment provider. One plan may be active per personal or organization account. The recorded terms last for the fixed period; renewal is manual after expiry. Resource licenses, payments, holds and balances are separate.",
   feeNote:
@@ -63,6 +69,8 @@ const en = {
   next: "Next",
   total: "Operations",
   historyEmpty: "No operations in this period.",
+  historyEmptyHint:
+    "Operations appear here after you activate or end a subscription for this account and period.",
   amount: "Transaction amount",
   currency: "Currency",
   calculate: "Estimate using my rate",
@@ -76,6 +84,10 @@ const ru: typeof en = {
   title: "Моя подписка",
   loading: "Загрузка подписки…",
   loadUnavailable: "Аккаунт подписки временно недоступен. Это не означает, что подписки нет.",
+  loadUnavailableHint:
+    "Повтор сохраняет тот же выбор аккаунта. Временный сбой загрузки — это не отмена подписки.",
+  selectionRecoverHint:
+    "Обновите страницу с исправленным выбором или откройте её снова по корректной ссылке.",
   activate: "Подключить бесплатный тариф",
   cancel: "Прекратить подписку сейчас",
   history: "История подписки",
@@ -87,6 +99,8 @@ const ru: typeof en = {
   open: "Открыть",
   scopeMore: "Другие организации",
   empty: "У этого аккаунта нет подписки.",
+  emptyHint:
+    "Подключите актуальный опубликованный бесплатный тариф из каталога, когда нужны преимущества для этого аккаунта.",
   notice:
     "Опубликованные бесплатные тарифы можно подключить без оплаты. Платное подключение ожидает интеграции провайдера. У личного аккаунта или организации может действовать один тариф. Зафиксированные условия действуют до окончания срока; новый период подключается вручную после истечения. Лицензии ресурсов, платежи, удержания и баланс учитываются отдельно.",
   feeNote:
@@ -134,6 +148,8 @@ const ru: typeof en = {
   next: "Далее",
   total: "Операций",
   historyEmpty: "За этот период нет операций.",
+  historyEmptyHint:
+    "Операции появятся здесь после подключения или прекращения подписки для этого аккаунта и периода.",
   amount: "Сумма сделки",
   currency: "Валюта",
   calculate: "Рассчитать по моей ставке",
