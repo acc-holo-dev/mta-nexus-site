@@ -4,7 +4,8 @@ import {
   notificationRepository,
   resourceMediaRepository,
 } from "@nexus/db";
-import { AppError, buildResourceVersionHelp } from "@nexus/domain";
+import { buildResourceVersionHelp } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -41,6 +42,10 @@ import { resourceReleaseWatchesService } from "../../../lib/services/resource-re
 import { resourceReviewService } from "../../../lib/services/resource-review-service";
 
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
+const actionLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
@@ -132,7 +137,25 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const copy = dictionary.product;
   const commerceCopy = getResourceCommerceCopy(locale);
   const watchCopy = resourceReleaseWatchesCopy(locale);
-  const product = await productService.getProductPreviewBySlug(slug, user);
+  const reviewCopy = resourceReviewCopy(locale);
+  let product: Awaited<ReturnType<typeof productService.getProductPreviewBySlug>>;
+  try {
+    product = await productService.getProductPreviewBySlug(slug, user);
+  } catch {
+    return (
+      <div className={pageShellClass}>
+        <ErrorState
+          title={copy.detailUnavailable}
+          description={copy.detailUnavailableDescription}
+          action={
+            <Link href={`/market/${encodeURIComponent(slug)}`} className={actionLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
 
   if (!product) {
     notFound();
@@ -172,18 +195,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       const canInspectBuilds = canManageProduct || isAdmin;
       return productService.getProductBuilds(product.id, canInspectBuilds);
     }),
-    isPublished
-      ? resourceReviewService.publicPage(product.id).catch((error) => {
-          if (error instanceof AppError && error.statusCode === 404) return null;
-          throw error;
-        })
-      : null,
-    isPublished
-      ? resourceQaService.publicPage(product.id, 1, user).catch((error) => {
-          if (error instanceof AppError && error.statusCode === 404) return null;
-          throw error;
-        })
-      : null,
+    isPublished ? resourceReviewService.publicPage(product.id).catch(() => null) : null,
+    isPublished ? resourceQaService.publicPage(product.id, 1, user).catch(() => null) : null,
     productService.getDependencyResolution(product).catch(() => null),
     productService.getReverseDependencySummary(product.slug).catch(() => null),
     isPublished ? resourceManagementService.publicVariants(product.id) : null,
@@ -193,12 +206,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : [],
         ),
     productService.getPublicAttribution(product.id),
-    user
-      ? resourceReleaseWatchesService.detail(user, product.id).catch((error) => {
-          if (error instanceof AppError && error.statusCode === 404) return null;
-          throw error;
-        })
-      : null,
+    user ? resourceReleaseWatchesService.detail(user, product.id).catch(() => null) : null,
     user ? notificationRepository.getPreferences(user.id).catch(() => null) : null,
     user
       ? followWorkspaceRepository.states(user.id, "product", [product.id]).catch(() => null)
@@ -245,7 +253,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
   return (
-    <div className="space-y-10">
+    <div className={pageShellClass}>
       {!isPublished && (
         <div className="rounded-xl border border-[color:var(--nexus-warning)]/25 bg-warning-soft p-4 text-sm text-warning">
           <strong>{copy.privatePreview}</strong> · {copy.resourceStatus}:{" "}
@@ -528,11 +536,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             )}
 
             {builds.length > 0 ? (
-              <div className="space-y-4">
+              <div className="min-w-0 space-y-4 overflow-x-clip">
                 {builds.map((build) => (
                   <article
                     key={build.id}
-                    className="space-y-3 rounded-lg border border-base bg-inset p-4"
+                    className="min-w-0 space-y-3 overflow-x-clip rounded-lg border border-base bg-inset p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
                       <div className="flex flex-wrap items-center gap-2">
@@ -598,7 +606,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-faint">{copy.noBuilds}</p>
+              <EmptyState title={copy.noBuilds} description={copy.noBuildsHint} />
             )}
           </section>
 
@@ -615,7 +623,20 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <span>{copy.reviews}</span>
             </h2>
 
-            {reviewPage ? (
+            {isPublished && !reviewPage ? (
+              <ErrorState
+                title={reviewCopy.pageUnavailable}
+                description={reviewCopy.pageUnavailableDescription}
+                action={
+                  <Link
+                    href={`/market/${encodeURIComponent(product.slug)}`}
+                    className={actionLinkClass}
+                  >
+                    {dictionary.errors.retry}
+                  </Link>
+                }
+              />
+            ) : reviewPage ? (
               <ResourceReviewList
                 reviews={reviewPage.reviews}
                 productId={product.id}
@@ -623,22 +644,22 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 locale={locale}
               />
             ) : (
-              <p className="text-xs text-faint">{resourceReviewCopy(locale).unavailable}</p>
+              <EmptyState title={copy.noReviews} description={copy.noReviewsHint} />
             )}
             {reviewPage && (
               <Link
                 href={`/market/${encodeURIComponent(product.slug)}/reviews`}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={actionLinkClass}
               >
-                {resourceReviewCopy(locale).all} ({reviewPage.total})
+                {reviewCopy.all} ({reviewPage.total})
               </Link>
             )}
             {reviewPage && user && (
               <Link
                 href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-                className="ml-4 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={`${actionLinkClass} ml-4`}
               >
-                {resourceReviewCopy(locale).write}
+                {reviewCopy.write}
               </Link>
             )}
           </section>
