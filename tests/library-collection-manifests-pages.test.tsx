@@ -96,10 +96,24 @@ it("authenticates before receipt or selector inspection", async () => {
 it.each([{ userId: "other" }, { page: "1" }, { q: ["a", "b"] }])(
   "rejects all import selectors %o before own reads",
   async (query) => {
-    expect(await screen(query)).toContain('role="alert"');
+    const html = await screen(query);
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(libraryCollectionManifestsCopy("en").loadUnavailableDescription);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
     expect(state.history).not.toHaveBeenCalled();
   },
 );
+it("shows ErrorState recovery when import export fails to load", async () => {
+  const copy = libraryCollectionManifestsCopy("en");
+  state.history.mockRejectedValue(new Error("import unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+});
 it("maps missing or foreign collection to the same unavailable page", async () => {
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen({}, "lcol_foreign")).rejects.toThrow("NEXT_NOT_FOUND");
@@ -116,9 +130,36 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain(libraryCollectionManifestsCopy(locale).reconcileTitle);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
     expect(await reconcileMetadata()).toMatchObject({
       title: `${libraryCollectionManifestsCopy(locale).reconcileTitle} | MTA NEXUS`,
       robots: { index: false, follow: false },
     });
+  },
+);
+it("shows ErrorState recovery when reconcile export fails to load", async () => {
+  const copy = libraryCollectionManifestsCopy("en");
+  state.history.mockRejectedValue(new Error("reconcile unavailable"));
+  const html = renderToStaticMarkup(
+    await ReconcilePage({
+      params: Promise.resolve({ id: "lcol_a" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.reconcileLoadUnavailable);
+  expect(html).toContain(copy.reconcileLoadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+});
+it.each(["en", "ru"] as const)(
+  "keeps the %s import success shell clipped with touch CTAs",
+  async (locale) => {
+    state.locale = locale;
+    const html = await screen();
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("min-w-0");
   },
 );

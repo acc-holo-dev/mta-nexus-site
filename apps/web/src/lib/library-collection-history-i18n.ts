@@ -9,6 +9,11 @@ const en = {
   clear: "Clear filters",
   export: "Download this JSON page",
   empty: "No matching collection operations.",
+  emptyHint:
+    "An empty history is not a load failure. Recorded collection commands appear here after they commit.",
+  loadUnavailable: "Collection command history is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty history. Retry to fetch the latest recorded collection operations.",
   unknown: "The recorded operation could not be verified.",
   current: "Current collection",
   recorded: "Recorded collection",
@@ -31,6 +36,11 @@ const ru: typeof en = {
   clear: "Сбросить фильтры",
   export: "Скачать эту страницу JSON",
   empty: "Подходящих операций с коллекциями нет.",
+  emptyHint:
+    "Пустая история — не ошибка загрузки. Записанные команды коллекций появятся здесь после сохранения.",
+  loadUnavailable: "История команд коллекций временно недоступна. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустая история. Повторите запрос, чтобы получить актуальные операции.",
   unknown: "Записанную операцию не удалось проверить.",
   current: "Текущая коллекция",
   recorded: "Записанная коллекция",

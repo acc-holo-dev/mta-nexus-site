@@ -1,10 +1,12 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { LibraryCollectionImport } from "../../../../../../components/library-collection-import";
+import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
 import { libraryCollectionManifestsCopy } from "../../../../../../lib/library-collection-manifests-i18n";
 import {
@@ -17,6 +19,11 @@ import {
 } from "../../../../../../lib/library-collections-query";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../../lib/services/library-collections-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -37,33 +44,53 @@ export default async function Page({
     params,
     searchParams,
   ]);
-  const c = libraryCollectionsCopy(locale),
-    m = libraryCollectionManifestsCopy(locale),
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const c = libraryCollectionsCopy(typedLocale),
+    m = libraryCollectionManifestsCopy(typedLocale),
+    dictionary = getDictionary(typedLocale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
-    return <PlatformSignIn locale={locale} returnPath={collectionHref(id, "reconcile")} />;
+    return <PlatformSignIn locale={typedLocale} returnPath={collectionHref(id, "reconcile")} />;
   try {
     if (collectionPageParams(raw).size)
       throw new AppError("Unexpected import query", 400, "COLLECTION_INVALID");
-    const manifest = await libraryCollectionsService.exportManifest(actor, (await params).id),
-      collection = manifest.collection;
+    const collectionId = (await params).id;
+    const manifest = await libraryCollectionsService
+      .exportManifest(actor, collectionId)
+      .catch((error: unknown) => {
+        if (error instanceof AppError) throw error;
+        return null;
+      });
+    if (!manifest) {
+      return (
+        <div className={pageShellClass}>
+          <ErrorState
+            title={m.reconcileLoadUnavailable}
+            description={m.reconcileLoadUnavailableDescription}
+            action={
+              <Link href={collectionHref(id, "reconcile")} className={navLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
+    const collection = manifest.collection;
     return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
-        <nav className="flex flex-wrap gap-4">
-          <Link
-            href={collectionHref(collection.id)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+      <div className={pageShellClass}>
+        <nav className="flex min-w-0 flex-wrap gap-4">
+          <Link href={collectionHref(collection.id)} className={navLinkClass}>
             {c.back}
           </Link>
           <a
             href={`/api/library/collections/${encodeURIComponent(collection.id)}/export`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={navLinkClass}
           >
             {m.export}
           </a>
         </nav>
-        <h1>
+        <h1 className="min-w-0 break-words">
           {m.reconcileTitle}: {collection.name}
         </h1>
         <p>
@@ -75,7 +102,7 @@ export default async function Page({
         <LibraryCollectionImport
           key={`reconcile:${collection.id}`}
           collection={collection}
-          locale={locale}
+          locale={typedLocale}
           reconcile
         />
       </div>
@@ -84,14 +111,16 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className="space-y-4 py-16">
-        <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link
-          href={collectionHref()}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.reload}
-        </Link>
+      <section className={pageShellClass}>
+        <ErrorState
+          title={libraryCollectionError(typedLocale, error.code)}
+          description={m.reconcileLoadUnavailableDescription}
+          action={
+            <Link href={collectionHref()} className={navLinkClass}>
+              {c.reload}
+            </Link>
+          }
+        />
       </section>
     );
   }

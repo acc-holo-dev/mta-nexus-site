@@ -142,6 +142,7 @@ it.each([{ userId: "other" }, { page: "1" }, { q: ["a", "b"] }])(
   },
 );
 it("renders neutral malformed proof and missing current state without restoration controls", async () => {
+  const copy = libraryCollectionReceiptsCopy("en");
   state.history.mockResolvedValue({
     ...report(),
     receipt: null,
@@ -150,8 +151,30 @@ it("renders neutral malformed proof and missing current state without restoratio
     resources: [],
   });
   const html = await screen();
-  expect(html).toContain(libraryCollectionReceiptsCopy("en").unknown);
+  expect(html).toContain(copy.unknown);
+  expect(html).toContain(copy.unknownHint);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-restore");
+});
+it("shows ErrorState recovery when receipt detail fails to load", async () => {
+  const copy = libraryCollectionReceiptsCopy("en");
+  state.history.mockRejectedValue(new Error("receipt unavailable"));
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).not.toContain(copy.unknownHint);
+});
+it("locks ErrorState for unexpected receipt selectors with retry shell", async () => {
+  const copy = libraryCollectionReceiptsCopy("en");
+  const html = await screen({ userId: "other" });
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailableDescription);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
 });
 it("does not promise inverse state for unsupported commands and handles foreign/missing receipts neutrally", async () => {
   const value = report();

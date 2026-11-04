@@ -1,6 +1,13 @@
 const en = {
   title: "Import resource references",
   reconcileTitle: "Reconcile collection with JSON",
+  loadUnavailable: "Collection import is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty import form. Retry to fetch the latest collection snapshot.",
+  reconcileLoadUnavailable:
+    "Collection reconciliation is temporarily unavailable. Please try again.",
+  reconcileLoadUnavailableDescription:
+    "A load failure is not an empty reconcile form. Retry to fetch the latest collection snapshot.",
   reconcileNote:
     "Compare the file with this collection. Choose missing references to add and references absent from the file to remove. Up to 20 selected changes commit together; unselected references keep their dates. The file never grants resource access.",
   removeCandidate: "In collection, absent from file",
@@ -29,6 +36,12 @@ const en = {
 const ru: typeof en = {
   title: "Импорт ссылок на ресурсы",
   reconcileTitle: "Сверить коллекцию с JSON",
+  loadUnavailable: "Импорт коллекции временно недоступен. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустая форма импорта. Повторите запрос за актуальным снимком коллекции.",
+  reconcileLoadUnavailable: "Сверка коллекции временно недоступна. Попробуйте ещё раз.",
+  reconcileLoadUnavailableDescription:
+    "Ошибка загрузки — это не пустая форма сверки. Повторите запрос за актуальным снимком коллекции.",
   reconcileNote:
     "Сравните файл с этой коллекцией. Выберите недостающие ссылки для добавления и ссылки вне файла для удаления. До 20 выбранных изменений сохраняются вместе; даты остальных записей сохраняются. Файл не даёт прав на ресурсы.",
   removeCandidate: "В коллекции, отсутствует в файле",

@@ -3,12 +3,13 @@ import {
   LIBRARY_COLLECTION_HISTORY_ACTIONS,
   LIBRARY_COLLECTION_HISTORY_DAYS,
 } from "@nexus/domain";
-import { Button, EmptyState, Input } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import {
@@ -29,8 +30,11 @@ import { membershipHistoryHref } from "../../../../../lib/library-membership-his
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
 
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const selectClass =
-  "h-10 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+  "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const labelClass = "block font-label uppercase text-secondary";
 
 export const dynamic = "force-dynamic";
@@ -46,8 +50,10 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
-  const c = libraryCollectionsCopy(locale),
-    h = libraryCollectionHistoryCopy(locale),
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const c = libraryCollectionsCopy(typedLocale),
+    h = libraryCollectionHistoryCopy(typedLocale),
+    dictionary = getDictionary(typedLocale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     let returnPath = "/workspace/library/collections/history";
@@ -57,11 +63,32 @@ export default async function Page({
     } catch {
       // Keep the list route when filters are invalid for unsigned visitors.
     }
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
   }
   try {
     const query = libraryCollectionHistoryQuery(collectionPageParams(raw));
-    const result = await libraryCollectionsService.accountHistory(actor, query);
+    const retryHref = `/workspace/library/collections/history?${libraryCollectionHistorySuffix(query)}`;
+    const result = await libraryCollectionsService
+      .accountHistory(actor, query)
+      .catch((error: unknown) => {
+        if (error instanceof AppError) throw error;
+        return null;
+      });
+    if (!result) {
+      return (
+        <div className={pageShellClass}>
+          <ErrorState
+            title={h.loadUnavailable}
+            description={h.loadUnavailableDescription}
+            action={
+              <Link href={retryHref} className={navLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
     const suffix = (page: number) => libraryCollectionHistorySuffix({ ...query, page });
     const filtered =
       result.action !== "all" ||
@@ -69,33 +96,24 @@ export default async function Page({
       Boolean(result.productId) ||
       result.days !== 30;
     return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
-          <Link
-            href={membershipHistoryHref()}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {libraryMembershipHistoryCopy(locale).history}
+      <div className={pageShellClass}>
+        <nav className="flex min-w-0 flex-wrap gap-4 text-sm" aria-label={h.title}>
+          <Link href={membershipHistoryHref()} className={navLinkClass}>
+            {libraryMembershipHistoryCopy(typedLocale).history}
           </Link>
-          <Link
-            href={collectionHref()}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={collectionHref()} className={navLinkClass}>
             {c.title}
           </Link>
-          <Link
-            href="/workspace/library"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/library" className={navLinkClass}>
             {c.library}
           </Link>
         </nav>
-        <h1 className="font-display">{h.title}</h1>
+        <h1 className="min-w-0 break-words font-display">{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
         <form
           method="get"
           action="/workspace/library/collections/history"
-          className="nexus-panel flex flex-wrap items-end gap-4 p-4"
+          className="nexus-panel flex min-w-0 flex-wrap items-end gap-4 overflow-x-clip p-4"
         >
           <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
             <span className={labelClass}>{h.days}</span>
@@ -135,13 +153,10 @@ export default async function Page({
               label={h.productId}
             />
           </div>
-          <Button type="submit" variant="secondary">
+          <Button type="submit" variant="secondary" size="touch">
             {h.filter}
           </Button>
-          <Link
-            href="/workspace/library/collections/history"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/library/collections/history" className={navLinkClass}>
             {h.clear}
           </Link>
         </form>
@@ -151,37 +166,31 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/history/export?${suffix(result.page)}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {h.export}
         </a>
-        {!result.items.length && (
+        {!result.items.length ? (
           <EmptyState
             title={h.empty}
-            description={h.note}
+            description={h.emptyHint}
             action={
               filtered ? (
-                <Link
-                  href="/workspace/library/collections/history"
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href="/workspace/library/collections/history" className={navLinkClass}>
                   {h.clear}
                 </Link>
               ) : undefined
             }
           />
-        )}
-        <ol className="space-y-4">
+        ) : null}
+        <ol className="min-w-0 space-y-4 overflow-x-clip">
           {result.items.map((item) => {
             const receipt = item.receipt,
               command = receipt?.command;
             return (
-              <li key={item.id} className="nexus-panel space-y-3 p-5">
-                <Link
-                  href={collectionReceiptHref(item.id)}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {libraryCollectionReceiptsCopy(locale).open}
+              <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+                <Link href={collectionReceiptHref(item.id)} className={navLinkClass}>
+                  {libraryCollectionReceiptsCopy(typedLocale).open}
                 </Link>
                 <h2 className="font-semibold">{command ? c[command.action] : h.unknown}</h2>
                 <p className="text-sm">
@@ -203,7 +212,7 @@ export default async function Page({
                         {h.current}:{" "}
                         <Link
                           href={collectionHref(item.currentCollection.id)}
-                          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                          className={navLinkClass}
                         >
                           {item.currentCollection.name}
                         </Link>{" "}
@@ -224,10 +233,7 @@ export default async function Page({
                     {item.currentSource && (
                       <p className="break-words text-sm">
                         {h.sourceCurrent}:{" "}
-                        <Link
-                          href={collectionHref(item.currentSource.id)}
-                          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
+                        <Link href={collectionHref(item.currentSource.id)} className={navLinkClass}>
                           {item.currentSource.name}
                         </Link>{" "}
                         · {c[item.currentSource.status]} · {c.revision}{" "}
@@ -261,7 +267,7 @@ export default async function Page({
                   </>
                 )}
                 {item.resources.length > 0 && (
-                  <ul className="space-y-2">
+                  <ul className="min-w-0 space-y-2 overflow-x-clip">
                     {item.resources.map((resource) => (
                       <li key={resource.productId} className="space-y-1 border-t border-base pt-2">
                         <p className="break-words">
@@ -273,7 +279,7 @@ export default async function Page({
                         {resource.currentAvailable && (
                           <Link
                             href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
-                            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                            className={navLinkClass}
                           >
                             {c.resourceCollections}
                           </Link>
@@ -287,22 +293,22 @@ export default async function Page({
           })}
         </ol>
         {result.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
+          <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
             {result.page > 1 && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page - 1)}`}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {c.previous}
               </Link>
             )}
-            <span>
+            <span className="inline-flex min-h-11 items-center">
               {c.page} {result.page} {c.of} {result.totalPages}
             </span>
             {result.page < result.totalPages && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page + 1)}`}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {c.next}
               </Link>
@@ -315,14 +321,16 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className="mx-auto max-w-xl space-y-4 py-16">
-        <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link
-          href="/workspace/library/collections/history"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.reload}
-        </Link>
+      <section className={pageShellClass}>
+        <ErrorState
+          title={libraryCollectionError(typedLocale, error.code)}
+          description={h.loadUnavailableDescription}
+          action={
+            <Link href="/workspace/library/collections/history" className={navLinkClass}>
+              {c.reload}
+            </Link>
+          }
+        />
       </section>
     );
   }
