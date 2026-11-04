@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
@@ -285,7 +285,7 @@ export function SupportCaseThread({
   if (loading) {
     return (
       <section
-        className="mx-auto max-w-4xl space-y-6"
+        className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
         aria-busy="true"
         aria-labelledby="support-case-thread-loading-heading"
       >
@@ -309,38 +309,40 @@ export function SupportCaseThread({
 
   if (!supportCase) {
     return (
-      <div className="mx-auto max-w-4xl space-y-4">
+      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
         <Link
           href={backHref}
-          className="text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>
-        <div role="alert" className="nexus-panel p-5 text-sm text-danger">
-          {error ?? copy.caseLoadError}
-        </div>
-        {success && (
+        <ErrorState
+          title={error ?? copy.caseLoadError}
+          action={
+            <Button
+              type="button"
+              onClick={() => void load()}
+              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              variant="ghost"
+            >
+              {workspaceCopy.reload}
+            </Button>
+          }
+        />
+        {success ? (
           <p role="status" aria-live="polite" className="text-sm text-success">
             {success}
           </p>
-        )}
-        <Button
-          type="button"
-          onClick={() => void load()}
-          className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          variant="ghost"
-        >
-          {workspaceCopy.reload}
-        </Button>
+        ) : null}
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
       <Link
         href={backHref}
-        className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
         {copy.back}
@@ -393,23 +395,22 @@ export function SupportCaseThread({
           {success}
         </p>
       )}
-      {error && (
-        <div
-          role="alert"
-          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
-        >
-          {error}
-          <Button
-            type="button"
-            disabled={sending || updatingStatus}
-            onClick={() => void load()}
-            className="h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            variant="ghost"
-          >
-            {workspaceCopy.reload}
-          </Button>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <Button
+              type="button"
+              disabled={sending || updatingStatus}
+              onClick={() => void load()}
+              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              variant="ghost"
+            >
+              {workspaceCopy.reload}
+            </Button>
+          }
+        />
+      ) : null}
 
       <section className="space-y-3" aria-label={copy.messages}>
         {messages.map((message) => (

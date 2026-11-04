@@ -6,7 +6,7 @@ export default async function Loading() {
   const copy = reportGroupsCopy(locale);
   return (
     <section
-      className="mx-auto max-w-4xl space-y-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="admin-publication-reports-loading-heading"
     >

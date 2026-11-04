@@ -71,6 +71,8 @@ it.each(["en", "ru"] as const)(
         />,
       );
     expect(html).toContain(copy.title);
+    expect(html).toContain("min-w-0 max-w-4xl");
+    expect(html).toContain("overflow-x-clip");
     expect(html).toContain(copy.focused);
     expect(html).toContain(copy.truncated);
     expect(html).toContain('method="get"');
@@ -124,11 +126,13 @@ it("gates anonymous reads and validates duplicate filters before loading data", 
   ).toContain("/auth/login");
   expect(mock.page).not.toHaveBeenCalled();
   mock.session.mockResolvedValue({ id: "owner" });
-  expect(
-    renderToStaticMarkup(
-      await SupportMessagePage({ id, searchParams: Promise.resolve({ q: ["x", "y"] }) }),
-    ),
-  ).toContain(supportMessageCopy("en").invalid);
+  const invalid = renderToStaticMarkup(
+    await SupportMessagePage({ id, searchParams: Promise.resolve({ q: ["x", "y"] }) }),
+  );
+  expect(invalid).toContain('role="alert"');
+  expect(invalid).toContain(supportMessageCopy("en").invalid);
+  expect(invalid).toContain(supportMessageCopy("en").reset);
+  expect(invalid).toContain("overflow-x-clip");
   expect(mock.page).not.toHaveBeenCalled();
 });
 it("delegates the staff-only requirement to a fresh server-side grant check", async () => {
@@ -144,6 +148,7 @@ it("delegates the staff-only requirement to a fresh server-side grant check", as
     true,
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain(`/admin/support/${id}/messages`);
   expect(html).not.toContain("Private subject");
 });
 it("returns private RU/EN metadata and handles search limits", async () => {
@@ -157,5 +162,6 @@ it("returns private RU/EN metadata and handles search limits", async () => {
     await SupportMessagePage({ id, searchParams: Promise.resolve({}) }),
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain(supportMessageCopy("ru").reset);
   expect(mock.page).not.toHaveBeenCalled();
 });

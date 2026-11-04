@@ -7,6 +7,7 @@ const en = {
   markOneRead: "Mark as read",
   markOneUnread: "Mark as unread",
   title: "Notification center",
+  readingState: "Reading filters",
   description: "Search your notification history and manage what you have read.",
   openBetaNote:
     "Open free beta: this inbox is the source of truth. Optional browser push may be delayed or unavailable.",
@@ -82,6 +83,7 @@ const ru: typeof en = {
   markOneRead: "Отметить прочитанным",
   markOneUnread: "Отметить непрочитанным",
   title: "Центр уведомлений",
+  readingState: "Фильтры прочтения",
   description: "Ищите сообщения в истории и управляйте прочитанным состоянием.",
   openBetaNote:
     "Открытая бесплатная бета: этот список — основной источник. Необязательный push в браузере может запаздывать или быть недоступен.",

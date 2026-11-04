@@ -154,6 +154,7 @@ export const workspace = {
     directoryTimeout: "The MTA directory took too long to respond. Please try again.",
     directoryFetchError: "The MTA directory is temporarily unavailable. Please try again.",
     publicServersLabel: "public servers",
+    openListing: "Open listing",
   },
   workspaceContext: {
     title: "Active workspace context",

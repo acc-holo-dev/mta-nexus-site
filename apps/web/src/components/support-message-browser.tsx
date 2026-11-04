@@ -26,7 +26,7 @@ export function SupportMessageBrowser({
   const date = (value: string) =>
     new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" });
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip">
       <Link
         href={base}
         className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

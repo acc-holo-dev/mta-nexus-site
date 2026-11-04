@@ -5,7 +5,7 @@ export default async function Loading() {
   const copy = reportHistoryCopy(await getRequestLocale());
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-6"
       aria-busy="true"
       aria-labelledby="report-history-loading-heading"
     >

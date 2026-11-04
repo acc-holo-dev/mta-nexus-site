@@ -153,7 +153,7 @@ it("keeps unavailable targets actionable only through an individual report and d
   expect(empty).toContain(copy.emptyFiltered);
   expect(empty).toContain(copy.reset);
   expect(empty).toContain("/admin/reports/targets");
-  expect(empty).toContain('role="status"');
+  expect(empty).toContain("overflow-x-clip");
   const lifetime = renderToStaticMarkup(
     <CommunityReportGroups
       page={{ ...page, items: [] }}
@@ -162,6 +162,7 @@ it("keeps unavailable targets actionable only through an individual report and d
     />,
   );
   expect(lifetime).toContain(copy.empty);
+  expect(lifetime).toContain("overflow-x-clip");
   expect(lifetime).not.toContain(copy.emptyFiltered);
 });
 it.each(["en", "ru"] as const)(
@@ -202,9 +203,12 @@ it("gates anonymous and revoked staff and rejects malformed scopes before privat
     ),
   ).toContain(reportGroupsCopy("en").invalid);
   mock.groups.mockRejectedValue(new AppError("revoked", 403, "FORBIDDEN"));
-  expect(
-    renderToStaticMarkup(await CommunityReportGroupsPage({ searchParams: Promise.resolve({}) })),
-  ).toContain('role="alert"');
+  const revoked = renderToStaticMarkup(
+    await CommunityReportGroupsPage({ searchParams: Promise.resolve({}) }),
+  );
+  expect(revoked).toContain('role="alert"');
+  expect(revoked).toContain("overflow-x-clip");
+  expect(revoked).toContain("/admin/reports/targets");
   const invalid = renderToStaticMarkup(
     await PublicationReportsPage({
       id: "post",

@@ -180,12 +180,14 @@ it.each(["ru", "en"] as const)(
     expect(queue).toContain("bg-accent text-white");
     expect(queue).toContain('href="/admin/community/item"');
     expect(queue).toContain("type=post&amp;author=writer&amp;cursor=older");
+    expect(queue).toContain("overflow-x-clip");
     const detail = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
     expect(detail).toContain("Full draft &lt;script&gt;");
     expect(detail).toContain("Private staff reason");
     expect(detail).not.toContain('href="/articles/post"');
     expect(detail).toContain('href="/users/writer"');
     expect(detail).toContain('href="/admin/community/item?cursor=older"');
+    expect(detail).toContain("overflow-x-clip");
     expect(await moderationMetadata()).toMatchObject({ robots: { index: false, follow: false } });
   },
 );
@@ -209,10 +211,14 @@ it("separates session failure from login and masks revoked-authority errors", as
   mocks.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
   const auth = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
   expect(auth).toContain(moderationCopy("en").unavailable);
+  expect(auth).toContain('role="alert"');
+  expect(auth).toContain("overflow-x-clip");
   expect(auth).not.toContain('href="/auth/login"');
   mocks.detail.mockRejectedValueOnce(new AppError("PRIVATE", 403, "FORBIDDEN"));
   const denied = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
   expect(denied).toContain(moderationCopy("en").denied);
+  expect(denied).toContain('role="alert"');
+  expect(denied).toContain("overflow-x-clip");
   expect(denied).not.toContain("Private draft");
 });
 it("rejects duplicate detail filters and preserves missing-target 404", async () => {
@@ -223,9 +229,23 @@ it("rejects duplicate detail filters and preserves missing-target 404", async ()
     }),
   );
   expect(html).toContain(moderationCopy("en").invalid);
+  expect(html).toContain('role="alert"');
+  expect(html).toContain("overflow-x-clip");
   expect(mocks.detail).not.toHaveBeenCalled();
   mocks.detail.mockRejectedValueOnce(new AppError("Missing", 404, "NOT_FOUND"));
   await expect(CommunityModerationScreen({ id: "item" })).rejects.toThrow("TEST_NOT_FOUND");
+});
+it("renders an empty moderation queue with clear-filters recovery", async () => {
+  mocks.page.mockResolvedValueOnce({ items: [], hasMore: false, nextCursor: null });
+  const html = renderToStaticMarkup(
+    await CommunityModerationScreen({
+      searchParams: Promise.resolve({ status: "draft", type: "post", q: "alpha" }),
+    }),
+  );
+  expect(html).toContain(moderationCopy("en").empty);
+  expect(html).toContain(moderationCopy("en").reset);
+  expect(html).toContain('href="/admin/community"');
+  expect(html).toContain("overflow-x-clip");
 });
 it("enables both existing moderation actions when a valid review note is entered", () => {
   mocks.ready = true;
@@ -263,4 +283,5 @@ it("shows legacy truncation explicitly and retains a bounded review surface", as
   const html = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));
   expect(html).toContain(moderationCopy("en").large);
   expect(html).toContain(moderationCopy("en").noHistory);
+  expect(html).toContain("overflow-x-clip");
 });

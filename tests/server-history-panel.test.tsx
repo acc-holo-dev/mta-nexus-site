@@ -1,6 +1,7 @@
-import { expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { expect, it } from "vitest";
 import { ServerHistoryPanel } from "../apps/web/src/components/server-history-panel";
+
 const history = {
   server: { id: "server", name: "Server", slug: "server" },
   source: "mta_master" as const,
@@ -70,7 +71,11 @@ it("renders an empty period without fabricated chart observations", () => {
   expect(html).not.toContain("<ol");
 });
 it("keeps an unavailable history separate from live status", () => {
-  expect(renderToStaticMarkup(<ServerHistoryPanel history={null} />)).toContain(
-    "temporarily unavailable",
+  const html = renderToStaticMarkup(
+    <ServerHistoryPanel history={null} retryHref="/servers/server" />,
   );
+  expect(html).toContain("temporarily unavailable");
+  expect(html).toContain('role="alert"');
+  expect(html).toContain('href="/servers/server"');
+  expect(html).toContain("Try again");
 });

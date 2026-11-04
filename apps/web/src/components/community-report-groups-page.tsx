@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { reportRateLimit } from "../lib/community-report-api";
@@ -42,16 +43,21 @@ export async function CommunityReportGroupsPage({
     );
   } catch (error) {
     return (
-      <div className="space-y-4">
-        <p role="alert" className="nexus-panel p-5 text-danger">
-          {reportGroupsError(locale, error instanceof AppError ? error.code : "INTERNAL_ERROR")}
-        </p>
-        <Link
-          href="/admin/reports/targets"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.reset}
-        </Link>
+      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
+        <ErrorState
+          title={reportGroupsError(
+            locale,
+            error instanceof AppError ? error.code : "INTERNAL_ERROR",
+          )}
+          action={
+            <Link
+              href="/admin/reports/targets"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          }
+        />
       </div>
     );
   }

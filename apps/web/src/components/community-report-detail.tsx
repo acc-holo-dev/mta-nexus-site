@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
@@ -148,32 +148,49 @@ export function CommunityReportDetailView({
     }
   }
   return (
-    <div className="space-y-5" aria-busy={pending}>
-      <div className="flex flex-wrap items-center gap-4">
+    <div className="min-w-0 space-y-5 overflow-x-clip" aria-busy={pending}>
+      <div className="flex min-w-0 flex-wrap items-center gap-4">
         <Link
           href={staff ? "/admin/reports" : "/workspace/reports"}
-          className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
         </Link>
-        <Button type="button" variant="secondary" disabled={pending} onClick={() => void reload()}>
+        <Button
+          type="button"
+          variant="secondary"
+          className="min-h-11"
+          disabled={pending}
+          onClick={() => void reload()}
+        >
           {pending ? copy.loading : copy.reload}
         </Button>
       </div>
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
-      {success && (
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              onClick={() => void reload()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {pending ? copy.loading : copy.reload}
+            </Button>
+          }
+        />
+      ) : null}
+      {success ? (
         <p
           role="status"
           className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {success}
         </p>
-      )}
-      {report && (
+      ) : null}
+      {report ? (
         <>
           <Link
             href={`${path}/history`}
@@ -181,7 +198,7 @@ export function CommunityReportDetailView({
           >
             {reportHistoryCopy(locale).title}
           </Link>
-          <section className="nexus-panel space-y-4 p-5">
+          <section className="nexus-panel min-w-0 space-y-4 p-5">
             <h2 className="break-words text-lg font-semibold text-primary">
               {copy[report.targetType]} · {copy[report.type]}
             </h2>
@@ -358,7 +375,7 @@ export function CommunityReportDetailView({
             </section>
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 }

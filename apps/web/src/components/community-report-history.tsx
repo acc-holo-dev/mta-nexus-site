@@ -4,7 +4,8 @@ import {
   REPORT_HISTORY_GROUPS,
   type ReportHistoryGroup,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
+import { Clock3 } from "lucide-react";
 import Link from "next/link";
 import { communityReportCopy } from "../lib/community-report-copy";
 import type { ReportHistoryPage } from "../lib/community-report-history-contract";
@@ -34,14 +35,14 @@ export function CommunityReportHistory({
       !!filters.cursor ||
       !!filters.until;
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip">
       <Link
         href={base}
         className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
-      <header className="space-y-2">
+      <header className="min-w-0 space-y-2">
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="text-sm text-secondary">
           {reportCopy[page.report.targetType]} · {reportCopy[page.report.type]} ·{" "}
@@ -52,7 +53,11 @@ export function CommunityReportHistory({
           {page.audience === "staff" ? copy.staffHint : copy.ownHint}
         </p>
       </header>
-      <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form
+        method="get"
+        action={path}
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+      >
         <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
           <span>{copy.period}</span>
           <select name="period" defaultValue={filters.period} className={platformFieldClass}>
@@ -83,16 +88,16 @@ export function CommunityReportHistory({
           {copy.reset}
         </Link>
       </form>
-      <div className="flex flex-wrap justify-between gap-3 text-sm">
+      <div className="flex min-w-0 flex-wrap justify-between gap-3 text-sm">
         <Link
           href={changeHistoryHref(path, filters, { fresh: true })}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.latest}
         </Link>
         <a
           href={changeHistoryHref(`/api${base}/history/export`, filters, { until: page.until })}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.download}
         </a>
@@ -100,21 +105,25 @@ export function CommunityReportHistory({
       <p className="text-xs text-muted">{copy.exportHint}</p>
       <PrivateChangeHistoryCutoff until={page.until} locale={locale} />
       {page.items.length === 0 ? (
-        <div role="status" className="nexus-panel space-y-3 p-5 text-muted">
-          <p>{filtered ? copy.emptyFiltered : copy.empty}</p>
-          {filtered ? (
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={filtered ? copy.emptyFiltered : copy.empty}
+          description={filtered ? copy.reset : copy.description}
+          icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
+          action={
+            filtered ? (
+              <Link
+                href={path}
+                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
-        <ol className="space-y-3" aria-label={copy.title}>
+        <ol className="min-w-0 space-y-3" aria-label={copy.title}>
           {page.items.map((event) => (
-            <li key={event.id} className="nexus-panel space-y-2 p-4">
+            <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-4">
               <div className="flex flex-wrap justify-between gap-2">
                 <h2 className="text-sm font-semibold text-primary">{copy.actions[event.action]}</h2>
                 <time dateTime={event.createdAt} className="text-xs text-muted">

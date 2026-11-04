@@ -6,7 +6,7 @@ export default async function Loading() {
   const dictionary = getDictionary(await getRequestLocale());
   return (
     <section
-      className="min-w-0 space-y-8"
+      className="min-w-0 space-y-8 overflow-x-clip"
       aria-busy="true"
       aria-labelledby="servers-loading-heading"
     >

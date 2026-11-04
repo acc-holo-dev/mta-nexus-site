@@ -4,13 +4,17 @@ import Link from "next/link";
 import { MtaMasterServerDirectory } from "../../components/mta-master-server-directory";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { mtaListingProfileRecord } from "../../lib/mta-listing-profile-map";
+import { serverService } from "../../lib/services/server-service";
 
 export default async function ServersPage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
+  const listings = await serverService.listServers(200).catch(() => []);
+  const profileByEndpoint = mtaListingProfileRecord(listings);
 
   return (
-    <div className="min-w-0 space-y-8">
+    <div className="min-w-0 space-y-8 overflow-x-clip">
       <PageHeader
         title={dictionary.servers.title}
         description={dictionary.servers.description}
@@ -25,7 +29,7 @@ export default async function ServersPage() {
           </Link>
         }
       />
-      <MtaMasterServerDirectory locale={locale} />
+      <MtaMasterServerDirectory locale={locale} profileByEndpoint={profileByEndpoint} />
     </div>
   );
 }
