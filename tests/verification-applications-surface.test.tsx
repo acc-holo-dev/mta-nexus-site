@@ -29,6 +29,7 @@ import History, {
   generateMetadata as historyMetadata,
 } from "../apps/web/src/app/workspace/verification/history/page";
 import { verificationApplicationsCopy } from "../apps/web/src/lib/verification-applications-copy";
+import { verificationCopy } from "../apps/web/src/lib/verification-workspace-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   params = { params: Promise.resolve({ id: "request" }) },
@@ -175,14 +176,19 @@ it("distinguishes never-empty history from filtered-empty results", async () => 
   const never = renderToStaticMarkup(await History({}));
   const copy = verificationApplicationsCopy("en");
   expect(never).toContain(copy.emptyNever);
+  expect(never).toContain(copy.emptyNeverHint);
   expect(never).not.toContain(copy.emptyFiltered);
-  expect(never).not.toContain(copy.clear);
+  expect(never).toContain('href="/workspace/verification"');
+  expect(never).toContain("overflow-x-clip");
+  expect(never).toContain("min-w-0");
   const filtered = renderToStaticMarkup(
     await History({ searchParams: Promise.resolve({ status: "pending" }) }),
   );
   expect(filtered).toContain(copy.emptyFiltered);
+  expect(filtered).toContain(copy.emptyFilteredHint);
   expect(filtered).not.toContain(copy.emptyNever);
   expect(filtered).toContain(copy.clear);
+  expect(filtered).toContain('href="/workspace/verification/history"');
 });
 it("distinguishes safe auth and target errors from an empty history", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
@@ -196,5 +202,46 @@ it("distinguishes safe auth and target errors from an empty history", async () =
   state.application.mockRejectedValueOnce(new AppError("PRIVATE_TARGET", 404, "NOT_FOUND"));
   const detail = renderToStaticMarkup(await Detail(params));
   expect(detail).toContain('role="alert"');
+  expect(detail).toContain('href="/workspace/verification/request"');
+  expect(detail).toContain("overflow-x-clip");
   expect(detail).not.toContain("PRIVATE_TARGET");
+});
+it.each(["en", "ru"] as const)(
+  "offers ErrorState retry on application load failure and EmptyState on empty events in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = verificationApplicationsCopy(locale);
+    const labels = verificationCopy(locale);
+    state.applications.mockRejectedValueOnce(new AppError("PRIVATE_LIST", 500, "INTERNAL_ERROR"));
+    const history = renderToStaticMarkup(await History({ searchParams: Promise.resolve({}) }));
+    expect(history).toContain('role="alert"');
+    expect(history).toContain(labels.unavailable);
+    expect(history).toContain('href="/workspace/verification/history"');
+    expect(history).toContain("overflow-x-clip");
+    expect(history).not.toContain("PRIVATE_LIST");
+    expect(history).not.toContain(copy.emptyNever);
+    state.application.mockResolvedValueOnce({
+      ...application,
+      events: [],
+      hasEarlierEvents: false,
+    });
+    const detail = renderToStaticMarkup(await Detail(params));
+    expect(detail).toContain(copy.noEvents);
+    expect(detail).toContain(copy.noEventsHint);
+    expect(detail).toContain("overflow-x-clip");
+    expect(detail).toContain("min-h-11");
+  },
+);
+it("clips honest verification application loading shells on narrow layouts", async () => {
+  const { default: HistoryLoading } = await import(
+    "../apps/web/src/app/workspace/verification/history/loading"
+  );
+  const { default: DetailLoading } = await import(
+    "../apps/web/src/app/workspace/verification/[id]/loading"
+  );
+  for (const LoadingShell of [HistoryLoading, DetailLoading]) {
+    const html = renderToStaticMarkup(await LoadingShell());
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-w-0");
+  }
 });

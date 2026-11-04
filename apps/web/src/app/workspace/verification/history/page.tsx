@@ -1,8 +1,9 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
@@ -17,7 +18,13 @@ import {
 } from "../../../../lib/verification-applications-copy";
 import { VERIFICATION_TYPES } from "../../../../lib/verification-workspace-contract";
 import { verificationCopy } from "../../../../lib/verification-workspace-copy";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata() {
   const copy = verificationApplicationsCopy(await getRequestLocale());
   return {
@@ -26,6 +33,7 @@ export async function generateMetadata() {
     robots: { index: false, follow: false },
   };
 }
+
 export default async function VerificationHistoryPage({
   searchParams,
 }: {
@@ -34,6 +42,7 @@ export default async function VerificationHistoryPage({
   const locale = await getRequestLocale(),
     copy = verificationApplicationsCopy(locale),
     labels = verificationCopy(locale),
+    dictionary = getDictionary(locale),
     params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
@@ -45,6 +54,7 @@ export default async function VerificationHistoryPage({
   const returnPath = params.size
     ? `/workspace/verification/history?${params}`
     : "/workspace/verification/history";
+  const retryHref = filters ? returnPath : "/workspace/verification/history";
   const sessionActor = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
     .catch(() => null);
@@ -66,21 +76,18 @@ export default async function VerificationHistoryPage({
     }
   })();
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className={pageShellClass}>
       <header>
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
-      <Link
-        href="/workspace/verification"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/verification" className={navLinkClass}>
         {labels.back}
       </Link>
       <form
         method="get"
         action="/workspace/verification/history"
-        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
       >
         <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
           {copy.query}
@@ -121,13 +128,11 @@ export default async function VerificationHistoryPage({
             ))}
           </select>
         </label>
-        <Button type="submit">{copy.search}</Button>
+        <Button type="submit" className="min-h-11">
+          {copy.search}
+        </Button>
         {historyFiltered ? (
-          <Link
-            prefetch={false}
-            href="/workspace/verification/history"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link prefetch={false} href="/workspace/verification/history" className={navLinkClass}>
             {copy.clear}
           </Link>
         ) : null}
@@ -136,37 +141,47 @@ export default async function VerificationHistoryPage({
       <Link
         prefetch={false}
         href={filters ? verificationApplicationsHref(filters) : "/workspace/verification/history"}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {copy.latest}
       </Link>
-      {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
-      )}
-      {report && !report.items.length && (
-        <div className="nexus-panel space-y-3 p-6">
-          <p className="text-sm text-muted">
-            {historyFiltered ? copy.emptyFiltered : copy.emptyNever}
-          </p>
-          {historyFiltered ? (
-            <Link
-              prefetch={false}
-              href="/workspace/verification/history"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.clear}
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <Link href={retryHref} className={navLinkClass}>
+              {dictionary.errors.retry}
             </Link>
-          ) : null}
-        </div>
-      )}
-      <ul className="space-y-3">
+          }
+        />
+      ) : null}
+      {report && !report.items.length ? (
+        <EmptyState
+          title={historyFiltered ? copy.emptyFiltered : copy.emptyNever}
+          description={historyFiltered ? copy.emptyFilteredHint : copy.emptyNeverHint}
+          action={
+            historyFiltered ? (
+              <Link
+                prefetch={false}
+                href="/workspace/verification/history"
+                className={navLinkClass}
+              >
+                {copy.clear}
+              </Link>
+            ) : (
+              <Link href="/workspace/verification" className={navLinkClass}>
+                {labels.back}
+              </Link>
+            )
+          }
+        />
+      ) : null}
+      <ul className="min-w-0 space-y-3">
         {report?.items.map((item) => (
           <li key={item.id}>
-            <article className="nexus-panel space-y-3 p-5">
+            <article className="nexus-panel min-w-0 space-y-3 p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <h2 className="font-semibold text-primary">
+                <h2 className="min-w-0 break-words font-semibold text-primary">
                   <Link
                     prefetch={false}
                     href={`/workspace/verification/${encodeURIComponent(item.id)}`}
@@ -190,7 +205,7 @@ export default async function VerificationHistoryPage({
               <Link
                 prefetch={false}
                 href={`/workspace/verification/${encodeURIComponent(item.id)}`}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {copy.open}
               </Link>
@@ -198,28 +213,28 @@ export default async function VerificationHistoryPage({
           </li>
         ))}
       </ul>
-      {filters && report && (
+      {filters && report ? (
         <nav aria-label={copy.title} className="flex flex-wrap justify-between gap-4 text-sm">
-          {report.newerCursor && (
+          {report.newerCursor ? (
             <Link
               prefetch={false}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={verificationApplicationsHref(filters, report.newerCursor)}
             >
               {copy.newer}
             </Link>
-          )}
-          {report.olderCursor && (
+          ) : null}
+          {report.olderCursor ? (
             <Link
               prefetch={false}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={verificationApplicationsHref(filters, report.olderCursor)}
             >
               {copy.older}
             </Link>
-          )}
+          ) : null}
         </nav>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -112,7 +112,7 @@ export function VerificationApplicationAmend({
     <form
       onSubmit={(event) => void amend(event)}
       aria-busy={busy}
-      className="nexus-panel space-y-4 p-5"
+      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
     >
       <h2 className="font-semibold text-primary">{copy.amend}</h2>
       <p className="text-xs text-muted">{labels.proofPrivacy}</p>
@@ -140,19 +140,19 @@ export function VerificationApplicationAmend({
             className={`${platformFieldClass} min-h-11`}
           />
         </label>
-        <Button type="submit" isLoading={busy} disabled={busy}>
+        <Button type="submit" className="min-h-11" isLoading={busy} disabled={busy}>
           {busy ? labels.loading : copy.amend}
         </Button>
       </fieldset>
-      {notice && (
+      {notice ? (
         <p
           role={saved ? "status" : "alert"}
           className={saved ? "text-sm text-success" : "text-sm text-danger"}
         >
           {notice}
         </p>
-      )}
-      {blocked && !busy && (
+      ) : null}
+      {blocked && !busy ? (
         <Button
           type="button"
           onClick={() => router.refresh()}
@@ -161,7 +161,7 @@ export function VerificationApplicationAmend({
         >
           {labels.reload}
         </Button>
-      )}
+      ) : null}
     </form>
   );
 }

@@ -1,10 +1,11 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import type { Locale } from "../lib/i18n";
+import { getDictionary } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 import { verificationApplicationsCopy } from "../lib/verification-applications-copy";
 import {
@@ -26,7 +27,8 @@ type Target = { type: "user" | "developer" | "organization"; id: string; name: s
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const accentLinkClass = `rounded text-sm text-accent underline ${filterNavLinkClass}`;
+const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${filterNavLinkClass}`;
+const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
 
 export function VerificationWorkspace({
   initial,
@@ -41,7 +43,8 @@ export function VerificationWorkspace({
   teamFilters: VerificationQuery;
   locale: Locale;
 }) {
-  const copy = verificationCopy(locale);
+  const copy = verificationCopy(locale),
+    dictionary = getDictionary(locale);
   const [overview, setOverview] = useState(initial),
     [teams, setTeams] = useState(initialTeams);
   const [target, setTarget] = useState<Target | null>(null),
@@ -199,30 +202,44 @@ export function VerificationWorkspace({
   const profile = overview?.profile,
     developer = !!profile && ["developer", "admin"].includes(profile.role);
   return (
-    <div className="space-y-6" aria-busy={pending}>
+    <div className={pageShellClass} aria-busy={pending}>
       <div className="flex flex-wrap gap-4">
-        <Button type="button" variant="secondary" disabled={pending} onClick={() => void reload()}>
+        <Button
+          type="button"
+          variant="secondary"
+          className="min-h-11"
+          disabled={pending}
+          onClick={() => void reload()}
+        >
           {pending ? copy.loading : copy.reload}
         </Button>
-        {developer && (
-          <Link href="/settings/developer" className={`min-h-10 py-2 ${accentLinkClass}`}>
+        {developer ? (
+          <Link href="/settings/developer" className={accentLinkClass}>
             {copy.editProfile}
           </Link>
-        )}
-        {profile && (
-          <Link
-            href={`/users/${encodeURIComponent(profile.username)}`}
-            className={`min-h-10 py-2 ${accentLinkClass}`}
-          >
+        ) : null}
+        {profile ? (
+          <Link href={`/users/${encodeURIComponent(profile.username)}`} className={accentLinkClass}>
             {copy.publicProfile}
           </Link>
-        )}
+        ) : null}
       </div>
-      {readError && (
-        <p role="alert" className="text-sm text-danger">
-          {readError}
-        </p>
-      )}
+      {readError ? (
+        <ErrorState
+          title={readError}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              onClick={() => void reload()}
+            >
+              {dictionary.errors.retry}
+            </Button>
+          }
+        />
+      ) : null}
       {profile && (
         <section className="nexus-panel space-y-3 p-5">
           <h2 className="font-heading text-primary">{copy.current}</h2>
@@ -238,12 +255,13 @@ export function VerificationWorkspace({
           <Button
             type="button"
             variant="secondary"
+            className="min-h-11"
             disabled={pending || profile.identityVerified || profile.identityPending}
             onClick={() => choose({ type: "user", id: profile.id, name: profile.name })}
           >
             {copy.apply} · {copy.user}
           </Button>
-          {developer && (
+          {developer ? (
             <>
               <p className="text-sm text-secondary">
                 {copy.developer}:{" "}
@@ -253,12 +271,13 @@ export function VerificationWorkspace({
                     ? copy.pending
                     : copy.unverified}
               </p>
-              {!profile.hasSpecialties && (
+              {!profile.hasSpecialties ? (
                 <p className="text-xs text-muted">{copy.requiresProfile}</p>
-              )}
+              ) : null}
               <Button
                 type="button"
                 variant="secondary"
+                className="min-h-11"
                 disabled={
                   pending ||
                   profile.experienceVerified ||
@@ -270,7 +289,7 @@ export function VerificationWorkspace({
                 {copy.apply} · {copy.developer}
               </Button>
             </>
-          )}
+          ) : null}
         </section>
       )}
       <section className="nexus-panel space-y-4 p-5">
@@ -278,41 +297,44 @@ export function VerificationWorkspace({
         <form
           method="GET"
           action="/workspace/verification"
-          className="flex flex-wrap items-end gap-3"
+          className="flex min-w-0 flex-wrap items-end gap-3"
         >
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="page" value={filters.page} />
-          {filters.type && <input type="hidden" name="type" value={filters.type} />}
+          {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
           <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
             <span>{copy.query}</span>
             <input
-              className={platformFieldClass}
+              className={`${platformFieldClass} min-h-11`}
               name="teamsQ"
               defaultValue={teamFilters.query}
               maxLength={100}
             />
           </label>
-          <Button type="submit" disabled={pending}>
+          <Button type="submit" className="min-h-11" disabled={pending}>
             {copy.search}
           </Button>
         </form>
-        {teams?.items.length === 0 && (
-          <>
-            <p className="text-sm text-muted">{copy.noTeams}</p>
-            {teamFilters.query.trim() ? (
-              <Link href={href({ teamsPage: 1, teamsQ: "" })} className={accentLinkClass}>
-                {copy.clearTeamSearch}
-              </Link>
-            ) : null}
-          </>
-        )}
-        <div className="space-y-3">
+        {teams?.items.length === 0 ? (
+          <EmptyState
+            title={copy.noTeams}
+            description={copy.noTeamsHint}
+            action={
+              teamFilters.query.trim() ? (
+                <Link href={href({ teamsPage: 1, teamsQ: "" })} className={accentLinkClass}>
+                  {copy.clearTeamSearch}
+                </Link>
+              ) : undefined
+            }
+          />
+        ) : null}
+        <div className="min-w-0 space-y-3">
           {teams?.items.map((team) => (
             <div
               key={team.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-base p-3"
+              className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-lg border border-base p-3"
             >
-              <div className="space-y-1">
+              <div className="min-w-0 space-y-1">
                 <Link
                   className={accentLinkClass}
                   href={`/organizations/${encodeURIComponent(team.slug)}`}
@@ -330,6 +352,7 @@ export function VerificationWorkspace({
               <Button
                 type="button"
                 variant="secondary"
+                className="min-h-11"
                 disabled={pending || team.pending || team.verified}
                 onClick={() => choose({ type: "organization", id: team.id, name: team.name })}
               >
@@ -339,25 +362,19 @@ export function VerificationWorkspace({
           ))}
         </div>
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.manage}>
-          {teamFilters.page > 1 && (
-            <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={href({ teamsPage: teamFilters.page - 1 })}
-            >
+          {teamFilters.page > 1 ? (
+            <Link className={accentLinkClass} href={href({ teamsPage: teamFilters.page - 1 })}>
               {copy.previous}
             </Link>
-          )}
-          <span className="text-muted">
+          ) : null}
+          <span className="inline-flex min-h-11 items-center text-muted">
             {copy.page} {teamFilters.page}
           </span>
-          {teams?.hasMore && teamFilters.page < 9999 && (
-            <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={href({ teamsPage: teamFilters.page + 1 })}
-            >
+          {teams?.hasMore && teamFilters.page < 9999 ? (
+            <Link className={accentLinkClass} href={href({ teamsPage: teamFilters.page + 1 })}>
               {copy.next}
             </Link>
-          )}
+          ) : null}
         </nav>
       </section>
       {target && (
@@ -384,7 +401,7 @@ export function VerificationWorkspace({
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.proof}</span>
                 <input
-                  className={platformFieldClass}
+                  className={`${platformFieldClass} min-h-11`}
                   type="url"
                   value={proof}
                   required
@@ -396,7 +413,7 @@ export function VerificationWorkspace({
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.notes}</span>
                 <textarea
-                  className={platformFieldClass}
+                  className={`${platformFieldClass} min-h-11`}
                   rows={4}
                   value={notes}
                   required
@@ -408,21 +425,18 @@ export function VerificationWorkspace({
               </label>
               <Button
                 type="submit"
+                className="min-h-11"
                 isLoading={pending}
                 disabled={pending || notes.trim().length < 10 || !proof.trim()}
               >
                 {copy.submit}
               </Button>
-              {writeError && (
-                <p role="alert" className="text-sm text-danger">
-                  {writeError}
-                </p>
-              )}
+              {writeError ? <ErrorState title={writeError} /> : null}
             </form>
           )}
           <Button
             type="button"
-            className="h-auto min-h-9 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
             disabled={pending}
             onClick={() => setTarget(null)}
@@ -431,17 +445,17 @@ export function VerificationWorkspace({
           </Button>
         </section>
       )}
-      <section className="nexus-panel space-y-3 p-5">
+      <section className="nexus-panel min-w-0 space-y-3 p-5">
         <p className="text-sm text-muted">{copy.serverHint}</p>
         <Link href="/workspace/servers" className={accentLinkClass}>
           {copy.servers}
         </Link>
       </section>
-      <section className="space-y-4">
+      <section className="min-w-0 space-y-4">
         <nav className="flex flex-wrap gap-3" aria-label={copy.title}>
           <Link
             href="/workspace/verification/history"
-            className={`min-h-11 rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
+            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
           >
             {verificationApplicationsCopy(locale).title}
           </Link>
@@ -450,7 +464,7 @@ export function VerificationWorkspace({
               key={view}
               href={href({ view, page: 1 })}
               aria-current={filters.view === view ? "page" : undefined}
-              className={`min-h-9 rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
             >
               {copy[view]}
             </Link>
@@ -459,13 +473,17 @@ export function VerificationWorkspace({
         <form
           method="GET"
           action="/workspace/verification"
-          className="flex flex-wrap items-end gap-3"
+          className="flex min-w-0 flex-wrap items-end gap-3"
         >
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="teamsQ" value={teamFilters.query} />
           <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
             <span>{copy.type}</span>
-            <select className={platformFieldClass} name="type" defaultValue={filters.type ?? ""}>
+            <select
+              className={`${platformFieldClass} min-h-11`}
+              name="type"
+              defaultValue={filters.type ?? ""}
+            >
               <option value="">{copy.all}</option>
               {VERIFICATION_TYPES.map((type) => (
                 <option value={type} key={type}>
@@ -474,60 +492,65 @@ export function VerificationWorkspace({
               ))}
             </select>
           </label>
-          <Button type="submit" disabled={pending}>
+          <Button type="submit" className="min-h-11" disabled={pending}>
             {copy.search}
           </Button>
         </form>
-        {overview?.history.items.length === 0 && (
-          <div className="nexus-panel space-y-3 p-8">
-            <p className="text-sm text-muted">{copy.noApplications}</p>
-            {filters.type ? (
-              <Link
-                href={`/workspace/verification?${new URLSearchParams({
-                  page: "1",
-                  view: filters.view,
-                  teamsPage: String(teamFilters.page),
-                  teamsQ: teamFilters.query,
-                })}`}
-                className={`inline-flex min-h-11 items-center ${accentLinkClass}`}
-              >
-                {copy.all}
-              </Link>
-            ) : (
-              <Link
-                href={href({
-                  view: filters.view === "history" ? "pending" : "history",
-                  page: 1,
-                })}
-                className={`inline-flex min-h-11 items-center ${accentLinkClass}`}
-              >
-                {copy[filters.view === "history" ? "pending" : "history"]}
-              </Link>
-            )}
-          </div>
-        )}
+        {overview?.history.items.length === 0 ? (
+          <EmptyState
+            title={copy.noApplications}
+            description={filters.type ? copy.noApplicationsFilteredHint : copy.noApplicationsHint}
+            action={
+              filters.type ? (
+                <Link
+                  href={`/workspace/verification?${new URLSearchParams({
+                    page: "1",
+                    view: filters.view,
+                    teamsPage: String(teamFilters.page),
+                    teamsQ: teamFilters.query,
+                  })}`}
+                  className={accentLinkClass}
+                >
+                  {copy.all}
+                </Link>
+              ) : (
+                <Link
+                  href={href({
+                    view: filters.view === "history" ? "pending" : "history",
+                    page: 1,
+                  })}
+                  className={accentLinkClass}
+                >
+                  {copy[filters.view === "history" ? "pending" : "history"]}
+                </Link>
+              )
+            }
+          />
+        ) : null}
         {overview?.history.items.map((application) => (
           <article
             key={application.id}
             id={`verification-${application.id}`}
-            className="nexus-panel scroll-mt-20 space-y-3 p-5"
+            className="nexus-panel min-w-0 scroll-mt-20 space-y-3 p-5"
           >
             <div className="flex flex-wrap justify-between gap-3">
-              <h3 className="text-sm font-semibold text-primary">{copy[application.targetType]}</h3>
+              <h3 className="min-w-0 break-words text-sm font-semibold text-primary">
+                {copy[application.targetType]}
+              </h3>
               <span className="text-xs text-secondary">{copy[application.status]}</span>
             </div>
             <p className="break-all text-xs text-muted">{application.targetId}</p>
             <Link
               prefetch={false}
               href={`/workspace/verification/${encodeURIComponent(application.id)}`}
-              className={`inline-flex min-h-11 items-center ${accentLinkClass}`}
+              className={accentLinkClass}
             >
               {verificationApplicationsCopy(locale).open}
             </Link>
             <p className="whitespace-pre-wrap break-words text-sm text-secondary">
               {application.notes}
             </p>
-            {safeExternalWebUrl(application.proofUrl) && (
+            {safeExternalWebUrl(application.proofUrl) ? (
               <a
                 className={accentLinkClass}
                 href={safeExternalWebUrl(application.proofUrl)}
@@ -536,15 +559,15 @@ export function VerificationWorkspace({
               >
                 {copy.proof}
               </a>
-            )}
-            {application.reviewNotes && (
+            ) : null}
+            {application.reviewNotes ? (
               <div className="space-y-1">
                 <h4 className="text-sm font-semibold text-primary">{copy.reviewNotes}</h4>
                 <p className="whitespace-pre-wrap break-words text-sm text-secondary">
                   {application.reviewNotes}
                 </p>
               </div>
-            )}
+            ) : null}
             <p className="text-xs text-muted">
               {copy.submittedAt}:{" "}
               <time dateTime={application.createdAt}>
@@ -555,7 +578,7 @@ export function VerificationWorkspace({
                 UTC
               </time>
             </p>
-            {application.resolvedAt && (
+            {application.resolvedAt ? (
               <p className="text-xs text-muted">
                 {copy.decidedAt}:{" "}
                 <time dateTime={application.resolvedAt}>
@@ -566,29 +589,23 @@ export function VerificationWorkspace({
                   UTC
                 </time>
               </p>
-            )}
+            ) : null}
           </article>
         ))}
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.title}>
-          {filters.page > 1 && (
-            <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={href({ page: filters.page - 1 })}
-            >
+          {filters.page > 1 ? (
+            <Link className={accentLinkClass} href={href({ page: filters.page - 1 })}>
               {copy.previous}
             </Link>
-          )}
-          <span className="text-muted">
+          ) : null}
+          <span className="inline-flex min-h-11 items-center text-muted">
             {copy.page} {filters.page}
           </span>
-          {overview?.history.hasMore && filters.page < 9999 && (
-            <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={href({ page: filters.page + 1 })}
-            >
+          {overview?.history.hasMore && filters.page < 9999 ? (
+            <Link className={accentLinkClass} href={href({ page: filters.page + 1 })}>
               {copy.next}
             </Link>
-          )}
+          ) : null}
         </nav>
       </section>
     </div>

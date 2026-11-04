@@ -11,7 +11,12 @@ const en = {
   status: "Application status",
   all: "All",
   emptyNever: "You have not submitted any verification applications yet.",
+  emptyNeverHint:
+    "Submit an application from the verification centre, then return here to track evidence and moderator feedback.",
   emptyFiltered: "No matching applications on this page.",
+  emptyFilteredHint: "Clear the filters or open the latest applications to see your full history.",
+  noEventsHint:
+    "Submission, evidence updates and review decisions appear here after they are retained for this application.",
   clear: "Clear filters",
   open: "Open application",
   latest: "Latest applications",
@@ -53,7 +58,12 @@ const ru: Record<keyof typeof en, string> = {
   status: "Статус заявки",
   all: "Все",
   emptyNever: "Вы ещё не подавали заявки на верификацию.",
+  emptyNeverHint:
+    "Подайте заявку в центре верификации, затем вернитесь сюда, чтобы отслеживать доказательства и ответы модераторов.",
   emptyFiltered: "На этой странице нет подходящих заявок.",
+  emptyFilteredHint: "Сбросьте фильтры или откройте последние заявки, чтобы увидеть всю историю.",
+  noEventsHint:
+    "Подача, обновления доказательств и решения по рассмотрению появятся здесь после сохранения для этой заявки.",
   clear: "Сбросить фильтры",
   open: "Открыть заявку",
   latest: "Последние заявки",

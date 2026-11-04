@@ -98,6 +98,7 @@ it.each(["ru", "en"] as const)(
   },
 );
 it("offers clear organization search when managed teams are empty", () => {
+  const copy = verificationCopy("en");
   const html = renderToStaticMarkup(
     <VerificationWorkspace
       initial={overview}
@@ -107,12 +108,16 @@ it("offers clear organization search when managed teams are empty", () => {
       locale="en"
     />,
   );
-  expect(html).toContain(verificationCopy("en").noTeams);
-  expect(html).toContain(verificationCopy("en").clearTeamSearch);
+  expect(html).toContain(copy.noTeams);
+  expect(html).toContain(copy.noTeamsHint);
+  expect(html).toContain(copy.clearTeamSearch);
   expect(html).toContain("teamsQ=");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-w-0");
 });
 
 it("offers a clear filter or alternate view when history is empty", () => {
+  const copy = verificationCopy("en");
   const emptyOverview: VerificationOverview = {
     ...overview,
     history: { ...overview.history, items: [], hasMore: false },
@@ -126,8 +131,9 @@ it("offers a clear filter or alternate view when history is empty", () => {
       locale="en"
     />,
   );
-  expect(filtered).toContain(verificationCopy("en").noApplications);
-  expect(filtered).toContain(verificationCopy("en").all);
+  expect(filtered).toContain(copy.noApplications);
+  expect(filtered).toContain(copy.noApplicationsFilteredHint);
+  expect(filtered).toContain(copy.all);
   expect(filtered).toContain(
     'href="/workspace/verification?page=1&amp;view=history&amp;teamsPage=1&amp;teamsQ="',
   );
@@ -140,11 +146,13 @@ it("offers a clear filter or alternate view when history is empty", () => {
       locale="en"
     />,
   );
-  expect(alternate).toContain(verificationCopy("en").history);
+  expect(alternate).toContain(copy.noApplicationsHint);
+  expect(alternate).toContain(copy.history);
   expect(alternate).toContain("view=history");
 });
 
 it("shows errors without presenting a failed read as empty history or editable default data", () => {
+  const copy = verificationCopy("en");
   const html = renderToStaticMarkup(
     <VerificationWorkspace
       initial={null}
@@ -155,10 +163,31 @@ it("shows errors without presenting a failed read as empty history or editable d
     />,
   );
   expect(html).toContain('role="alert"');
-  expect(html).not.toContain(verificationCopy("en").noApplications);
+  expect(html).toContain(copy.unavailable);
+  expect(html).toContain("min-h-11");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).not.toContain(copy.noApplications);
   const editor = renderToStaticMarkup(<DeveloperProfileEditor initial={null} locale="en" />);
   expect(editor).toContain('role="alert"');
   expect(editor).toContain("disabled");
+});
+it("clips the verification centre loading shell on narrow layouts", async () => {
+  const { default: VerificationLoading } = await import(
+    "../apps/web/src/app/workspace/verification/loading"
+  );
+  const html = renderToStaticMarkup(await VerificationLoading());
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-w-0");
+  expect(html).toContain(verificationCopy("en").loading);
+});
+it("recovers with ErrorState when verification session probing fails", async () => {
+  mocks.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
+  const html = renderToStaticMarkup(await VerificationPage({}));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(verificationCopy("en").unavailable);
+  expect(html).toContain('href="/workspace/verification"');
+  expect(html).toContain("overflow-x-clip");
+  expect(html).not.toContain("PRIVATE_AUTH");
 });
 it("publishes a genuine experience badge only when that flag is verified; suppresses unsafe legacy contact links", () => {
   const profile = {

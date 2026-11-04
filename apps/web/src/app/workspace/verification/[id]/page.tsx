@@ -1,8 +1,10 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { VerificationApplicationAmend } from "../../../../components/verification-application-amend";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { authService } from "../../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
@@ -11,13 +13,20 @@ import {
   verificationApplicationsError,
 } from "../../../../lib/verification-applications-copy";
 import { verificationCopy } from "../../../../lib/verification-workspace-copy";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata() {
   return {
     title: verificationApplicationsCopy(await getRequestLocale()).detail,
     robots: { index: false, follow: false },
   };
 }
+
 export default async function VerificationApplicationPage({
   params,
 }: {
@@ -26,6 +35,7 @@ export default async function VerificationApplicationPage({
   const locale = await getRequestLocale(),
     copy = verificationApplicationsCopy(locale),
     labels = verificationCopy(locale),
+    dictionary = getDictionary(locale),
     { id } = await params;
   const returnPath = `/workspace/verification/${encodeURIComponent(id)}`;
   let actor: Awaited<ReturnType<typeof authService.getSession>> | null = null;
@@ -37,20 +47,22 @@ export default async function VerificationApplicationPage({
   }
   if (authFailed) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className={pageShellClass}>
         <header>
           <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
           <p className="mt-2 text-sm text-muted">{copy.privacy}</p>
         </header>
-        <Link
-          href="/workspace/verification/history"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/verification/history" className={navLinkClass}>
           {copy.title}
         </Link>
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {labels.unavailable}
-        </p>
+        <ErrorState
+          title={labels.unavailable}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -77,63 +89,67 @@ export default async function VerificationApplicationPage({
     </time>
   );
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className={pageShellClass}>
       <header>
         <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
         <p className="mt-2 text-sm text-muted">{copy.privacy}</p>
       </header>
-      <Link
-        href="/workspace/verification/history"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href="/workspace/verification/history" className={navLinkClass}>
         {copy.title}
       </Link>
-      {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
-      )}
-      {application && (
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : null}
+      {application ? (
         <>
-          <article className="nexus-panel space-y-4 p-5">
+          <article className="nexus-panel min-w-0 space-y-4 p-5">
             <div className="flex flex-wrap justify-between gap-3">
-              <h2 className="font-semibold text-primary">{labels[application.targetType]}</h2>
+              <h2 className="min-w-0 break-words font-semibold text-primary">
+                {labels[application.targetType]}
+              </h2>
               <span className="text-sm text-secondary">{labels[application.status]}</span>
             </div>
             <p className="break-all text-xs text-muted">{application.id}</p>
             <p className="text-xs text-muted">
               {labels.submittedAt}: {time(application.createdAt)}
             </p>
-            {application.resolvedAt && (
+            {application.resolvedAt ? (
               <p className="text-xs text-muted">
                 {labels.decidedAt}: {time(application.resolvedAt)}
               </p>
-            )}
+            ) : null}
             <p className="whitespace-pre-wrap break-words text-sm text-secondary">
               {application.notes}
             </p>
-            {application.proofUrl && (
+            {application.proofUrl ? (
               <a
                 href={application.proofUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={navLinkClass}
               >
                 {labels.proof}
               </a>
-            )}
-            {application.reviewNotes && (
+            ) : null}
+            {application.reviewNotes ? (
               <section className="space-y-2">
                 <h3 className="font-semibold text-primary">{labels.reviewNotes}</h3>
                 <p className="whitespace-pre-wrap break-words text-sm text-secondary">
                   {application.reviewNotes}
                 </p>
               </section>
-            )}
-            {application.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
+            ) : null}
+            {application.truncated ? <p className="text-xs text-muted">{copy.truncated}</p> : null}
           </article>
-          {application.profileState && (
-            <section className="nexus-panel space-y-2 p-5">
+          {application.profileState ? (
+            <section className="nexus-panel min-w-0 space-y-2 p-5">
               <p className="text-sm text-secondary">
                 {
                   copy[
@@ -143,14 +159,11 @@ export default async function VerificationApplicationPage({
                   ]
                 }
               </p>
-              <Link
-                href="/settings/developer"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/settings/developer" className={navLinkClass}>
                 {labels.editProfile}
               </Link>
             </section>
-          )}
+          ) : null}
           {application.editable ? (
             <VerificationApplicationAmend
               key={application.revision}
@@ -163,11 +176,15 @@ export default async function VerificationApplicationPage({
           ) : (
             <p className="text-sm text-muted">{copy.readOnly}</p>
           )}
-          <section className="nexus-panel space-y-4 p-5">
+          <section className="nexus-panel min-w-0 space-y-4 p-5">
             <h2 className="font-semibold text-primary">{copy.events}</h2>
-            {application.hasEarlierEvents && <p className="text-xs text-muted">{copy.earlier}</p>}
-            {!application.events.length && <p className="text-sm text-muted">{copy.noEvents}</p>}
-            <ol className="space-y-3">
+            {application.hasEarlierEvents ? (
+              <p className="text-xs text-muted">{copy.earlier}</p>
+            ) : null}
+            {!application.events.length ? (
+              <EmptyState title={copy.noEvents} description={copy.noEventsHint} />
+            ) : null}
+            <ol className="min-w-0 space-y-3">
               {application.events.map((event) => (
                 <li key={event.id} className="flex flex-wrap justify-between gap-3 text-sm">
                   <span className="text-secondary">{eventLabels[event.action]}</span>
@@ -177,7 +194,7 @@ export default async function VerificationApplicationPage({
             </ol>
           </section>
         </>
-      )}
+      ) : null}
     </div>
   );
 }

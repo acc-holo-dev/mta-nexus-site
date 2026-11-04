@@ -5,7 +5,7 @@ export default async function Loading() {
   const copy = verificationApplicationsCopy(await getRequestLocale());
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="verification-detail-loading-heading"
     >
