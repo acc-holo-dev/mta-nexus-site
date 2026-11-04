@@ -112,7 +112,12 @@ it("uses one owner-locked transaction for remove-only orphan changes and records
   expect(sqlText()).toContain("pg_advisory_xact_lock");
   expect(sqlText()).not.toContain('from "products"');
   expect(sqlText()).not.toContain('from "entitlements"');
-  expect(state.queries.at(-1)?.params).toContain("library.memberships_changed");
+  const auditIndex = state.queries.findIndex((query) =>
+    query.params.includes("library.memberships_changed"),
+  );
+  expect(auditIndex).toBeGreaterThan(-1);
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
+  expect(auditIndex).toBeLessThan(state.queries.length - 1);
 });
 it("prechecks all reviewed revisions and memberships before applying any child", async () => {
   const second = { ...change, collectionId: "lcol_b" };

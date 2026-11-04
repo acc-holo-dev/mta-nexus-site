@@ -215,6 +215,8 @@ export async function applyLibraryMembershipBatch(input: {
         changes: command.changes,
       },
     });
+    // A child write or audit insert may have waited beyond the session expiry.
+    await lockInitiatingSession(tx, input.userId, input.currentToken);
     return {
       replayed: false,
       receipt: {

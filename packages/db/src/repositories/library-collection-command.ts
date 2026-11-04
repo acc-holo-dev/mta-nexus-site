@@ -473,5 +473,8 @@ export async function applyLibraryCollectionCommand(
 ) {
   const prepared = await prepareLibraryCollectionCommand(tx, input);
   await lockInitiatingSession(tx, input.userId, input.currentToken);
-  return prepared.write();
+  const result = await prepared.write();
+  // Writes and audit insertion can wait after the session was locked.
+  if (!prepared.replayed) await lockInitiatingSession(tx, input.userId, input.currentToken);
+  return result;
 }
