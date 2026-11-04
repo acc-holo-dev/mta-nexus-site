@@ -6,10 +6,11 @@ import {
   DataTableCell,
   DataTableEmpty,
   DataTableHeader,
+  EmptyState,
   ErrorState,
   SectionHeader,
 } from "@nexus/ui";
-import { ShieldAlert } from "lucide-react";
+import { FileText, ShieldAlert } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AdminBuildsQuarantineSection } from "../../components/admin/admin-builds-quarantine-section";
@@ -271,9 +272,11 @@ export default async function AdminPage({
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noDrafts}</p>
-            </div>
+            <EmptyState
+              title={copy.noDrafts}
+              description={`${copy.draftsAwaitingModeration}.`}
+              icon={<FileText className="h-6 w-6" aria-hidden="true" />}
+            />
           )}
         </div>
         {(contentPage > 1 || moreContent) && (

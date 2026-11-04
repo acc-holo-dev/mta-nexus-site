@@ -1,4 +1,4 @@
-import { SectionHeader, StatusBadge } from "@nexus/ui";
+import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels";
@@ -150,9 +150,11 @@ export function AdminBuildsQuarantineSection({
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noBuilds}</p>
-            </div>
+            <EmptyState
+              title={copy.noBuilds}
+              description={`${copy.buildsAwaitingReview}.`}
+              icon={<PackageCheck className="h-6 w-6" aria-hidden="true" />}
+            />
           )}
         </div>
         {(buildPage > 1 || moreBuilds) && (
@@ -262,9 +264,11 @@ export function AdminBuildsQuarantineSection({
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noRiskBuilds}</p>
-            </div>
+            <EmptyState
+              title={copy.noRiskBuilds}
+              description={copy.quarantineQueueDescription}
+              icon={<ShieldAlert className="h-6 w-6" aria-hidden="true" />}
+            />
           )}
         </div>
         {(riskBuildPage > 1 || moreRiskBuilds) && (

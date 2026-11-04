@@ -1,4 +1,4 @@
-import { SectionHeader, StatusBadge } from "@nexus/ui";
+import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
@@ -61,14 +61,14 @@ export function AdminVerificationQueueSection({
         <Link
           href={verificationHref("pending", 1)}
           aria-current={verificationView === "pending" ? "page" : undefined}
-          className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
         >
           {copy.verificationPending} ({pendingVerificationCount})
         </Link>
         <Link
           href={verificationHref("history", 1)}
           aria-current={verificationView === "history" ? "page" : undefined}
-          className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
         >
           {copy.verificationHistory}
         </Link>
@@ -169,13 +169,15 @@ export function AdminVerificationQueueSection({
             </div>
           ))
         ) : (
-          <div className="nexus-panel py-6 text-center">
-            <p className="font-caption text-muted">
-              {verificationView === "pending"
+          <EmptyState
+            title={
+              verificationView === "pending"
                 ? copy.noVerificationRequests
-                : copy.noVerificationHistory}
-            </p>
-          </div>
+                : copy.noVerificationHistory
+            }
+            description={copy.description}
+            icon={<BadgeCheck className="h-6 w-6" aria-hidden="true" />}
+          />
         )}
       </div>
       {(verificationPage > 1 || moreVerifications) && (

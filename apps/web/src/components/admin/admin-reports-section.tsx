@@ -1,4 +1,5 @@
-import { SectionHeader, StatusBadge } from "@nexus/ui";
+import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
+import { Flag } from "lucide-react";
 import Link from "next/link";
 import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels";
 import { communityReportCopy } from "../../lib/community-report-copy";
@@ -77,14 +78,14 @@ export function AdminReportsSection({
         <Link
           href={reportHref("pending", 1)}
           aria-current={reportView === "pending" ? "page" : undefined}
-          className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
         >
           {copy.reportQueue} ({reportsOpenCount})
         </Link>
         <Link
           href={reportHref("history", 1)}
           aria-current={reportView === "history" ? "page" : undefined}
-          className={`rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
         >
           {copy.reportHistory}
         </Link>
@@ -142,11 +143,11 @@ export function AdminReportsSection({
             </div>
           ))
         ) : (
-          <div className="nexus-panel py-6 text-center">
-            <p className="font-caption text-muted">
-              {reportView === "pending" ? copy.noReports : copy.noReportHistory}
-            </p>
-          </div>
+          <EmptyState
+            title={reportView === "pending" ? copy.noReports : copy.noReportHistory}
+            description={copy.caseHistory}
+            icon={<Flag className="h-6 w-6" aria-hidden="true" />}
+          />
         )}
       </div>
       {(reportPage > 1 || moreReports) && (
