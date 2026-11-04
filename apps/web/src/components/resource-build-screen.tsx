@@ -1,8 +1,10 @@
 import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPackageCopy } from "../lib/build-package-i18n";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
@@ -15,6 +17,46 @@ import { BuildPackageEvidencePanel } from "./build-package-evidence";
 import { BuildProvenanceDetails } from "./build-provenance-details";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceBuildControls } from "./resource-build-controls";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+function buildAccessError(error: unknown): "missing" | "failed" {
+  if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
+  return "failed";
+}
+
+function ResourceBuildLoadError({
+  locale,
+  backHref,
+  backLabel,
+  retryHref,
+}: {
+  locale: "en" | "ru";
+  backHref: string;
+  backLabel: string;
+  retryHref: string;
+}) {
+  const copy = getResourceBuildWorkspaceCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <section className={pageShellClass}>
+      <Link href={backHref} className={navLinkClass}>
+        {backLabel}
+      </Link>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </section>
+  );
+}
+
 export async function ResourceBuildScreen({
   productId,
   buildId,
@@ -29,24 +71,27 @@ export async function ResourceBuildScreen({
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   const returnPath = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}`;
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-  let detail: Awaited<ReturnType<typeof resourceBuildWorkspaceService.detail>>;
+  let detail: Awaited<ReturnType<typeof resourceBuildWorkspaceService.detail>> | null = null;
   try {
     detail = await resourceBuildWorkspaceService.detail(productId, buildId, actor, staff);
   } catch (error) {
-    if (error instanceof AppError && (error.statusCode === 404 || error.statusCode === 403))
-      notFound();
-    throw error;
+    if (buildAccessError(error) === "missing") notFound();
+    return (
+      <ResourceBuildLoadError
+        locale={locale}
+        backHref={staff ? "/admin" : `/workspace/resources/${encodeURIComponent(productId)}`}
+        backLabel={staff ? copy.reviewBack : copy.back}
+        retryHref={returnPath}
+      />
+    );
   }
   const { product, build, history } = detail;
   const publisherCopy = getResourcePublisherCopy(locale);
   const trustedScan =
     build.scanStatus === "clean" && Boolean(build.scanner?.trim() && build.scannedAt);
   return (
-    <div className="space-y-6">
-      <Link
-        href={staff ? "/admin" : `/workspace/resources/${productId}`}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={staff ? "/admin" : `/workspace/resources/${productId}`} className={navLinkClass}>
         {staff ? copy.reviewBack : copy.back}
       </Link>
       <header className="space-y-2">
@@ -59,7 +104,7 @@ export async function ResourceBuildScreen({
       </header>
       <Link
         href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
@@ -69,7 +114,7 @@ export async function ResourceBuildScreen({
       {staff && (
         <Link
           href={`/admin/resources/${encodeURIComponent(productId)}/media`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {resourceMediaCopy(locale).title}
         </Link>
@@ -124,7 +169,7 @@ export async function ResourceBuildScreen({
       )}
       <Link
         href={`/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={navLinkClass}
       >
         {buildPackageCopy(locale).inventory}
       </Link>
