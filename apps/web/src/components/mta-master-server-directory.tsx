@@ -2,8 +2,10 @@
 
 import { Button, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { mtaEndpointKey } from "../lib/mta-listing-profile-map";
 import type { MtaMasterServer } from "../lib/services/mta-master-directory-service";
 
 const PAGE_SIZE = 50;
@@ -23,7 +25,15 @@ type DirectoryResponse = {
   isStale: boolean;
 };
 
-function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Locale }) {
+function ServerCard({
+  server,
+  locale,
+  profileSlug,
+}: {
+  server: MtaMasterServer;
+  locale: Locale;
+  profileSlug?: string;
+}) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
   const address = `${server.address}:${server.port}`;
@@ -95,6 +105,14 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
           >
             {copy.connect}
           </a>
+          {profileSlug ? (
+            <Link
+              href={`/servers/${encodeURIComponent(profileSlug)}`}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base px-4 py-3 text-sm font-semibold text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.openListing}
+            </Link>
+          ) : null}
           <Button
             type="button"
             variant="secondary"
@@ -116,7 +134,13 @@ function ServerCard({ server, locale }: { server: MtaMasterServer; locale: Local
   );
 }
 
-export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale }) {
+export function MtaMasterServerDirectory({
+  locale = "en",
+  profileByEndpoint = {},
+}: {
+  locale?: Locale;
+  profileByEndpoint?: Record<string, string>;
+}) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
   const [query, setQuery] = useState("");
@@ -290,7 +314,12 @@ export function MtaMasterServerDirectory({ locale = "en" }: { locale?: Locale })
       {!error && !loading && directory && (
         <div className="space-y-2">
           {directory.servers.map((server) => (
-            <ServerCard key={`${server.address}:${server.port}`} server={server} locale={locale} />
+            <ServerCard
+              key={`${server.address}:${server.port}`}
+              server={server}
+              locale={locale}
+              profileSlug={profileByEndpoint[mtaEndpointKey(server.address, server.port)]}
+            />
           ))}
           {directory.servers.length === 0 && (
             <div className="nexus-panel space-y-3 p-6 text-center text-sm text-secondary">

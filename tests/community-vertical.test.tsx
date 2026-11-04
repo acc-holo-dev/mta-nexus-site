@@ -1,12 +1,12 @@
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import {
   buildCommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
 } from "../apps/web/src/lib/community-topic-submission";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   pathname: "/community",
@@ -169,6 +169,7 @@ describe("community topic submission behavior", () => {
     expect(html).toContain('href="/articles/vehicle-help"');
     expect(html).toContain("Vehicle Help");
     expect(html).toContain(">4 ");
+    expect(html).toContain("min-w-0 space-y-6 overflow-x-clip");
   });
 
   it("renders community navigation and a creation form without publication controls", async () => {

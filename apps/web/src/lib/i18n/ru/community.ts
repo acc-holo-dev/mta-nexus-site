@@ -61,6 +61,7 @@ export const community = {
     userNotFound: "Пользователь не найден",
     profileDescription: "Профиль MTA Nexus:",
     loading: "Загрузка профиля…",
+    loadUnavailable: "Профиль временно недоступен. Попробуйте ещё раз.",
     verifiedMember: "Проверенный участник",
     memberFallback: "Участник сообщества MTA и пользователь платформы.",
     joined: "На платформе с",

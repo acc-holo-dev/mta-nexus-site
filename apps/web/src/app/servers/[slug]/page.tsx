@@ -121,13 +121,13 @@ export default async function ServerDetailPage({
     : "bg-[var(--nexus-text-faint)]";
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-2 text-xs text-muted">
+    <div className="min-w-0 space-y-8 overflow-x-clip">
+      <div className="flex min-w-0 items-center gap-2 text-xs text-muted">
         <Link href="/servers" className="transition-colors hover:text-primary">
           {copy.breadcrumb}
         </Link>
         <span aria-hidden="true">/</span>
-        <span className="text-secondary">{server.name}</span>
+        <span className="min-w-0 truncate text-secondary">{server.name}</span>
       </div>
 
       <div className="relative overflow-hidden rounded-2xl border border-base bg-surface shadow-nexus-lg">
@@ -288,7 +288,11 @@ export default async function ServerDetailPage({
         </section>
       )}
 
-      <ServerHistoryPanel history={history} locale={locale} />
+      <ServerHistoryPanel
+        history={history}
+        locale={locale}
+        retryHref={`/servers/${encodeURIComponent(server.slug)}`}
+      />
 
       <ServerUpdatesPanel updates={serverUpdates} locale={locale} serverSlug={server.slug} />
 

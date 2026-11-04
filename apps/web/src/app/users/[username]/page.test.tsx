@@ -2,6 +2,7 @@ vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
 
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -43,13 +44,27 @@ vi.mock("../../../lib/services/mta-master-directory-service", () => ({
   indexMtaObservations: () => () => undefined,
 }));
 vi.mock("../../../components/product-card", () => ({
-  ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
+  ProductCard: ({ product }: { product: { title: string; slug?: string } }) => (
+    <article>
+      <a href={`/market/${product.slug ?? "resource"}`}>{product.title}</a>
+    </article>
+  ),
 }));
 vi.mock("../../../components/server-card", () => ({
-  ServerCard: ({ server }: { server: { name: string } }) => <article>{server.name}</article>,
+  ServerCard: ({ server }: { server: { name: string; slug?: string } }) => (
+    <article>
+      <a href={`/servers/${server.slug ?? "server"}`}>{server.name}</a>
+    </article>
+  ),
 }));
 vi.mock("@nexus/ui", () => ({
   Avatar: () => null,
+  ErrorState: ({ title, action }: { title: string; action?: ReactNode }) => (
+    <div role="alert">
+      <h2>{title}</h2>
+      {action}
+    </div>
+  ),
   StatCard: ({ label, value }: { label: string; value: number }) => (
     <p>
       {label}: {value}
@@ -87,7 +102,7 @@ beforeEach(() => {
   state.servers.mockReset();
   state.directory.mockReset();
   state.products.mockResolvedValue({
-    products: [{ id: "resource", title: "Second-page resource" }],
+    products: [{ id: "resource", slug: "second-page-resource", title: "Second-page resource" }],
     total: 49,
     page: 2,
     pageSize: 24,
@@ -104,10 +119,29 @@ it.each(["en", "ru"] as const)(
     expect(state.products).toHaveBeenCalledWith("user", 2, 24);
     expect(html).toContain("49");
     expect(html).toContain("Second-page resource");
+    expect(html).toContain('href="/market/second-page-resource"');
+    expect(html).toContain("min-w-0 space-y-10 overflow-x-clip");
     expect(html).toContain('href="/users/member?page=1#resources"');
     expect(html).toContain('href="/users/member?page=3#resources"');
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(state.directory).not.toHaveBeenCalled();
+  },
+);
+
+it.each(["en", "ru"] as const)(
+  "shows profile load failures as alerts instead of an empty portfolio in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = getDictionary(locale).profiles;
+    state.products.mockRejectedValueOnce(new Error("private-database-detail"));
+    const html = renderToStaticMarkup(await Page(input("2")));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain('href="/users/member"');
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).not.toContain("private-database-detail");
+    expect(html).not.toContain("Second-page resource");
+    expect(html).not.toContain('id="resources"');
   },
 );
 
@@ -118,7 +152,7 @@ it.each(["0", "-1", "abc", ["1", "2"], undefined])("normalizes malformed page %j
 
 it("keeps public servers visible when the external directory fails", async () => {
   state.servers.mockResolvedValue({
-    servers: [{ id: "server", name: "Public server" }],
+    servers: [{ id: "server", slug: "public-server", name: "Public server" }],
     total: 1,
     page: 1,
     pageSize: 12,
@@ -127,6 +161,7 @@ it("keeps public servers visible when the external directory fails", async () =>
   state.directory.mockRejectedValue(new Error("directory unavailable"));
   const html = renderToStaticMarkup(await Page(input("2")));
   expect(html).toContain("Public server");
+  expect(html).toContain('href="/servers/public-server"');
   expect(html).toContain("Second-page resource");
 });
 
@@ -152,7 +187,7 @@ it("omits the resource section for an empty portfolio", async () => {
 
 it("preserves resource and server pages independently", async () => {
   state.servers.mockResolvedValue({
-    servers: [{ id: "server", name: "Second-page server" }],
+    servers: [{ id: "server", slug: "second-page-server", name: "Second-page server" }],
     total: 25,
     page: 2,
     pageSize: 12,

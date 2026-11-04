@@ -1,13 +1,14 @@
-import Link from "next/link";
+import { ErrorState } from "@nexus/ui";
 import { Activity, BarChart3, Clock3 } from "lucide-react";
+import Link from "next/link";
+import { getDictionary, type Locale } from "../lib/i18n";
 import {
   formatHistoryIntervalUtc,
-  serverHistoryChartSlots,
   serverHistoryBarPercent,
+  serverHistoryChartSlots,
 } from "../lib/server-history-presentation";
-import type { ServerHistoryResult } from "../lib/services/server-history-service";
-import { getDictionary, type Locale } from "../lib/i18n";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";
+import type { ServerHistoryResult } from "../lib/services/server-history-service";
 
 function metric(value: number | null) {
   return value == null ? "—" : String(value);
@@ -16,27 +17,37 @@ function metric(value: number | null) {
 export function ServerHistoryPanel({
   history,
   locale = "en",
+  retryHref,
 }: {
   history: ServerHistoryResult | null;
   locale?: Locale;
+  retryHref?: string;
 }) {
-  const copy = getDictionary(locale).serverHistory;
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.serverHistory;
 
   if (!history) {
     return (
-      <section className="nexus-panel p-5 md:p-6" aria-labelledby="server-history-title">
-        <div className="flex items-start gap-3">
-          <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-faint" aria-hidden="true" />
-          <div className="space-y-1">
-            <h2
-              id="server-history-title"
-              className="text-sm font-bold uppercase tracking-wider text-primary"
-            >
-              {copy.title}
-            </h2>
-            <p className="text-xs text-muted">{copy.unavailable}</p>
-          </div>
-        </div>
+      <section aria-labelledby="server-history-title" className="space-y-3">
+        <h2
+          id="server-history-title"
+          className="text-sm font-bold uppercase tracking-wider text-primary"
+        >
+          {copy.title}
+        </h2>
+        <ErrorState
+          title={copy.unavailable}
+          action={
+            retryHref ? (
+              <Link
+                href={retryHref}
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.errors.retry}
+              </Link>
+            ) : undefined
+          }
+        />
       </section>
     );
   }

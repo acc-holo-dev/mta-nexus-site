@@ -154,6 +154,7 @@ export const workspace = {
     directoryTimeout: "Каталог MTA слишком долго не отвечал. Попробуйте ещё раз.",
     directoryFetchError: "Каталог MTA временно недоступен. Попробуйте ещё раз.",
     publicServersLabel: "публичных серверов",
+    openListing: "Открыть карточку",
   },
   workspaceContext: {
     title: "Активный контекст рабочей зоны",

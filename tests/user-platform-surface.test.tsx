@@ -92,6 +92,16 @@ it("renders service failure separately from an empty feed and hides internal tex
   expect(html).toContain('role="alert"');
   expect(html).toContain(getUserPlatformCopy("en").unavailable);
   expect(html).not.toContain("DB private details");
+  const community = renderToStaticMarkup(
+    await CommunityPage({ searchParams: Promise.resolve({ q: "help" }) }),
+  );
+  expect(community).toContain('role="alert"');
+  expect(community).toContain(getUserPlatformCopy("en").unavailable);
+  expect(community).toContain("Try again");
+  expect(community).toContain('href="/community?q=help"');
+  expect(community).toContain("overflow-x-clip");
+  expect(community).not.toContain("DB private details");
+  expect(community).not.toContain(getDictionary("en").community.noTopics);
 });
 it("adds login next from pathname when PlatformSignIn has no returnPath", () => {
   const html = renderToStaticMarkup(<PlatformSignIn locale="en" />);

@@ -1,4 +1,5 @@
 import type { Content } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
@@ -14,10 +15,12 @@ export function ServerUpdatesPanel({
   locale?: Locale;
   serverSlug?: string;
 }) {
-  const copy = getDictionary(locale).serverUpdates;
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.serverUpdates;
+  const retryHref = serverSlug ? `/servers/${encodeURIComponent(serverSlug)}` : undefined;
 
   return (
-    <section className="space-y-4" aria-labelledby="server-updates-heading">
+    <section className="min-w-0 space-y-4" aria-labelledby="server-updates-heading">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2
@@ -41,7 +44,19 @@ export function ServerUpdatesPanel({
       )}
 
       {updates === null ? (
-        <div className="nexus-panel p-5 text-xs text-warning">{copy.unavailable}</div>
+        <ErrorState
+          title={copy.unavailable}
+          action={
+            retryHref ? (
+              <Link
+                href={retryHref}
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.errors.retry}
+              </Link>
+            ) : undefined
+          }
+        />
       ) : updates.length === 0 ? (
         <div className="nexus-panel p-5 text-xs text-faint">{copy.empty}</div>
       ) : (

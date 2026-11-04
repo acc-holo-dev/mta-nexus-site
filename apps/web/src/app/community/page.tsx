@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { MessageSquare, Plus } from "lucide-react";
 import Link from "next/link";
 import {
@@ -9,7 +9,11 @@ import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { publicationCopy } from "../../lib/publication-feed-copy";
 import { contentService } from "../../lib/services/content-service";
-import { communityTypes, parseContentPage } from "../../lib/user-platform-contract";
+import {
+  communityTypes,
+  contentPageHref,
+  parseContentPage,
+} from "../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
 export const dynamic = "force-dynamic";
@@ -34,18 +38,18 @@ export default async function CommunityPage({
   const filtersActive = Boolean(filters.query || filters.type || filters.page > 1);
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       <header className="flex flex-col justify-between gap-4 border-b border-base pb-5 sm:flex-row sm:items-center">
-        <div>
+        <div className="min-w-0">
           <h1 className="flex items-center gap-2 font-display text-primary">
-            <MessageSquare className="h-6 w-6 text-accent" aria-hidden="true" />
+            <MessageSquare className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
             <span>{copy.title}</span>
           </h1>
           <p className="mt-1 text-sm text-muted">{copy.description}</p>
         </div>
         <Link
           href="/community/new"
-          className="inline-flex self-start items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] sm:self-auto"
+          className="inline-flex min-h-11 self-start items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] sm:self-auto"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           {copy.newTopic}
@@ -55,13 +59,13 @@ export default async function CommunityPage({
       <div className="flex flex-wrap gap-4">
         <Link
           href="/workspace/content"
-          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {platformCopy.studio}
         </Link>
         <Link
           href="/workspace/feed"
-          className="inline-block text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {publicationCopy(locale).title}
         </Link>
@@ -74,9 +78,17 @@ export default async function CommunityPage({
       />
 
       {!result ? (
-        <p role="alert" className="text-sm text-danger">
-          {platformCopy.unavailable}
-        </p>
+        <ErrorState
+          title={platformCopy.unavailable}
+          action={
+            <Link
+              href={contentPageHref("/community", filters, filters.page)}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
       ) : topics.length > 0 ? (
         <section className="space-y-2">
           {topics.map((topic) => (

@@ -1,5 +1,5 @@
 import { productRepository, serverRepository, userRepository } from "@nexus/db";
-import { Avatar, StatCard } from "@nexus/ui";
+import { Avatar, ErrorState, StatCard } from "@nexus/ui";
 import { Calendar, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -77,18 +77,47 @@ export default async function UserProfilePage({
   const sessionToken = wantsGuestPreview
     ? (await cookies()).get("nexus_session")?.value
     : undefined;
-  const [resourcePage, serverPage, professional, visibility, actor] = await Promise.all([
-    productRepository.pagePublishedFreeByAuthor(user.id, parseProfilePage(query?.page), 24),
-    serverRepository.pageActivePublicByOwner(user.id, parseProfilePage(query?.serverPage), 12),
+  const resourcePageNumber = parseProfilePage(query?.page);
+  const serverPageNumber = parseProfilePage(query?.serverPage);
+  const profileHref = `/users/${encodeURIComponent(user.username)}`;
+  let loadError = false;
+  const loaded = await Promise.all([
+    productRepository.pagePublishedFreeByAuthor(user.id, resourcePageNumber, 24),
+    serverRepository.pageActivePublicByOwner(user.id, serverPageNumber, 12),
     user.role === "developer" || user.role === "admin"
       ? verificationWorkspaceService.publicProfile(user.id).catch(() => null)
-      : null,
+      : Promise.resolve(null),
     profilePrivacyService.visibility(user.id),
     wantsGuestPreview ? authService.getSession(sessionToken) : Promise.resolve(null),
-  ]);
+  ]).catch(() => {
+    loadError = true;
+    return null;
+  });
+
+  if (loadError || !loaded) {
+    return (
+      <div className="min-w-0 space-y-6 overflow-x-clip">
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link
+              href={profileHref}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
+  const [resourcePage, serverPage, professional, visibility, actor] = loaded;
   const guestPreview = wantsGuestPreview && actor?.id === user.id;
   const userProducts = resourcePage.products;
-  const attributions = await productService.getPublicAttributions(userProducts);
+  const attributions = await productService
+    .getPublicAttributions(userProducts)
+    .catch(() => new Map());
   const userServers = serverPage.servers;
   const directory =
     userServers.length > 0
@@ -104,7 +133,7 @@ export default async function UserProfilePage({
   );
 
   return (
-    <div className="space-y-10">
+    <div className="min-w-0 space-y-10 overflow-x-clip">
       {guestPreview && (
         <p role="status" className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
           {privacyCopy.guestPreviewNote} {privacyCopy.scope}

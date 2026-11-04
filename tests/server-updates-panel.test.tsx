@@ -29,11 +29,15 @@ describe("server updates panel behavior", () => {
   it.each(["en", "ru"] as const)("distinguishes unavailable and empty feeds in %s", (locale) => {
     const copy = getDictionary(locale).serverUpdates;
 
-    const unavailable = renderToStaticMarkup(<ServerUpdatesPanel updates={null} locale={locale} />);
+    const unavailable = renderToStaticMarkup(
+      <ServerUpdatesPanel updates={null} locale={locale} serverSlug="my-server" />,
+    );
     expect(unavailable).toContain(copy.title);
     expect(unavailable).toContain(copy.description);
     expect(unavailable).toContain(copy.moderated);
     expect(unavailable).toContain(copy.unavailable);
+    expect(unavailable).toContain('role="alert"');
+    expect(unavailable).toContain('href="/servers/my-server"');
     expect(unavailable).not.toContain(copy.empty);
 
     const empty = renderToStaticMarkup(<ServerUpdatesPanel updates={[]} locale={locale} />);

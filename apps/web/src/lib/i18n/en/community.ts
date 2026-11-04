@@ -61,6 +61,7 @@ export const community = {
     userNotFound: "User not found",
     profileDescription: "MTA Nexus profile of",
     loading: "Loading profile…",
+    loadUnavailable: "This profile is temporarily unavailable. Please try again.",
     verifiedMember: "Verified member",
     memberFallback: "MTA community member and platform explorer.",
     joined: "Joined",
