@@ -1,7 +1,11 @@
 import { OrganizationPublicationHistoryScreen } from "../../../../../../../components/organization-publication-history-screen";
 import { getRequestLocale } from "../../../../../../../lib/i18n-server";
 import { organizationPublicationHistoryCopy } from "../../../../../../../lib/organization-publication-history-copy";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export async function generateMetadata() {
   const copy = organizationPublicationHistoryCopy(await getRequestLocale());
   return {
@@ -18,5 +22,9 @@ export default async function Page({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const scope = await params;
-  return OrganizationPublicationHistoryScreen({ ...scope, searchParams });
+  return (
+    <div className={pageShellClass}>
+      {await OrganizationPublicationHistoryScreen({ ...scope, searchParams })}
+    </div>
+  );
 }

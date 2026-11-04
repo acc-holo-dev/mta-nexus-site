@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
-import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { OrganizationHistoryView } from "../../../../../components/organization-history";
+import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
   organizationChangeHistorySchema,
@@ -13,7 +13,11 @@ import {
 } from "../../../../../lib/organization-governance-copy";
 import { authService } from "../../../../../lib/services/auth-service";
 import { organizationGovernanceService } from "../../../../../lib/services/organization-governance-service";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export async function generateMetadata() {
   return {
     title: organizationGovernanceCopy(await getRequestLocale()).history,
@@ -36,10 +40,12 @@ export default async function OrganizationHistoryPage({
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor)
     return (
-      <PlatformSignIn
-        locale={locale}
-        returnPath={`/workspace/organizations/${encodeURIComponent(id)}/activity`}
-      />
+      <div className={pageShellClass}>
+        <PlatformSignIn
+          locale={locale}
+          returnPath={`/workspace/organizations/${encodeURIComponent(id)}/activity`}
+        />
+      </div>
     );
   const values = new URLSearchParams();
   for (const [key, value] of Object.entries(query ?? {})) {
@@ -63,13 +69,15 @@ export default async function OrganizationHistoryPage({
       : null;
   if (!filters) error = organizationGovernanceCopy(locale).invalid;
   return (
-    <OrganizationHistoryView
-      id={id}
-      data={data}
-      before={filters?.before}
-      filters={filters ?? { period: "all", group: "all", query: "" }}
-      locale={locale}
-      error={error}
-    />
+    <div className={pageShellClass}>
+      <OrganizationHistoryView
+        id={id}
+        data={data}
+        before={filters?.before}
+        filters={filters ?? { period: "all", group: "all", query: "" }}
+        locale={locale}
+        error={error}
+      />
+    </div>
   );
 }

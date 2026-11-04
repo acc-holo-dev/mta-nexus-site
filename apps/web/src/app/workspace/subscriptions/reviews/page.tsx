@@ -4,10 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  planReviewNavLinkClass,
-  planReviewPageShellClass,
-} from "../../../../components/plan-review-workspace-recovery";
+import { planReviewNavLinkClass } from "../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { formatHistoryAmount, formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
@@ -20,6 +17,8 @@ import {
 } from "../../../../lib/plan-reviews-query";
 import { authService } from "../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../lib/services/plan-reviews-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Saved plan reviews | MTA NEXUS",
@@ -57,7 +56,7 @@ export default async function PlanReviewsPage({
     const href = (page: number, scopePage = scopes.page) =>
       `/workspace/subscriptions/reviews?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
-      <div className={planReviewPageShellClass}>
+      <div className={pageShellClass}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>
@@ -172,7 +171,7 @@ export default async function PlanReviewsPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={planReviewPageShellClass}>
+        <section className={pageShellClass}>
           <ErrorState
             title={c.invalid}
             description={c.selectionRecoverHint}
@@ -185,7 +184,7 @@ export default async function PlanReviewsPage({
         </section>
       );
     return (
-      <section className={planReviewPageShellClass}>
+      <section className={pageShellClass}>
         <Link href="/subscriptions" className={planReviewNavLinkClass}>
           {c.back}
         </Link>

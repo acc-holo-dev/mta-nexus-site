@@ -5,10 +5,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlanReviewDetailView } from "../../../../../components/plan-review-detail";
-import {
-  planReviewNavLinkClass,
-  planReviewPageShellClass,
-} from "../../../../../components/plan-review-workspace-recovery";
+import { planReviewNavLinkClass } from "../../../../../components/plan-review-workspace-recovery";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -20,6 +17,8 @@ import {
 } from "../../../../../lib/plan-reviews-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Recorded plan terms | MTA NEXUS",
@@ -57,17 +56,19 @@ export default async function PlanReviewPage({
     const selection = planReviewsQuery(pageParams, true),
       detail = await planReviewsService.detail(actor, id, selection.organizationId);
     return (
-      <PlanReviewDetailView
-        detail={detail}
-        locale={locale}
-        organizationId={selection.organizationId}
-      />
+      <div className={pageShellClass}>
+        <PlanReviewDetailView
+          detail={detail}
+          locale={locale}
+          organizationId={selection.organizationId}
+        />
+      </div>
     );
   } catch (error) {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className={planReviewPageShellClass}>
+        <section className={pageShellClass}>
           <ErrorState
             title={c.invalid}
             description={c.selectionRecoverHint}
@@ -80,7 +81,7 @@ export default async function PlanReviewPage({
         </section>
       );
     return (
-      <section className={planReviewPageShellClass}>
+      <section className={pageShellClass}>
         <Link href="/workspace/subscriptions/reviews" className={planReviewNavLinkClass}>
           {c.title}
         </Link>
