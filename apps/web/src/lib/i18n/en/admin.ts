@@ -274,7 +274,7 @@ export const admin = {
       "Web Push is not configured on this deployment yet. Inbox preferences above still work; ask an operator to configure VAPID before enabling browser push.",
     webPushDenied:
       "Browser notification permission is blocked for this site. Open your browser site settings, allow notifications, then return here and enable push. Inbox and watches are unaffected.",
-    webPushError: "Web Push state could not be confirmed. Reload settings before retrying.",
+    webPushError: "Web Push state could not be confirmed. Try checking again.",
     webPushLoading: "Checking browser push...",
     recoveryEmail: "Recovery email",
     recoveryNotVerified: "Not verified for recovery yet.",

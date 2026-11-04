@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { BellRing } from "lucide-react";
 import { Button } from "@nexus/ui";
+import { BellRing } from "lucide-react";
+import { useEffect, useId, useState } from "react";
 import { notificationInboxCopy } from "../lib/notification-inbox-copy";
 import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
@@ -110,6 +110,13 @@ async function deleteStoredEndpoint(endpoint: string): Promise<boolean> {
   return response.ok && data?.success === true;
 }
 
+async function ensureUnsubscribed(subscription: PushSubscription, manager: PushManager) {
+  if (await subscription.unsubscribe()) return;
+  // A browser may return false when the subscription was already removed.
+  const remaining = await manager.getSubscription();
+  if (remaining?.endpoint === subscription.endpoint) throw new Error("push-unsubscribe");
+}
+
 async function readPushState(endpoint?: string) {
   const endpointHash = endpoint ? await endpointFingerprint(endpoint) : null;
   const url = endpointHash
@@ -143,22 +150,6 @@ async function readEffectivePushStatus(publicKeyHint?: string | null): Promise<{
       : localSubscription
         ? false
         : null;
-  if (localSubscription && keyMatches === false) {
-    await deleteStoredEndpoint(localSubscription.endpoint).catch(() => false);
-    await localSubscription.unsubscribe().catch(() => false);
-    return {
-      status: derivePushStatus(
-        {
-          supported: true,
-          permission: capability.permission,
-          hasLocalSubscription: false,
-          keyMatches: null,
-        },
-        { ...state, subscribed: false },
-      ),
-      publicKey: state.publicKey,
-    };
-  }
   return {
     status: derivePushStatus(
       {
@@ -184,7 +175,9 @@ export function WebPushSettings() {
   const [status, setStatus] = useState<PushStatus>("loading");
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Retry restarts the state check.
   useEffect(() => {
     let active = true;
     async function load() {
@@ -201,7 +194,7 @@ export function WebPushSettings() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [attempt]);
 
   async function enable() {
     if (!publicKey || pending) return;
@@ -218,8 +211,8 @@ export function WebPushSettings() {
         subscription &&
         !matchesApplicationServerKey(subscription.options.applicationServerKey, publicKey)
       ) {
-        await deleteStoredEndpoint(subscription.endpoint).catch(() => false);
-        await subscription.unsubscribe().catch(() => false);
+        if (!(await deleteStoredEndpoint(subscription.endpoint))) throw new Error("push-cleanup");
+        await ensureUnsubscribed(subscription, registration.pushManager);
         subscription = null;
       }
       if (!subscription) {
@@ -248,7 +241,7 @@ export function WebPushSettings() {
         persisted.response.status === 409 &&
         persisted.data?.code === "WEB_PUSH_ENDPOINT_CONFLICT"
       ) {
-        await subscription.unsubscribe();
+        await ensureUnsubscribed(subscription, registration.pushManager);
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: applicationServerKey(publicKey),
@@ -299,7 +292,8 @@ export function WebPushSettings() {
         if (!(await deleteStoredEndpoint(subscription.endpoint))) {
           throw new Error("push-disable");
         }
-        await subscription.unsubscribe();
+        if (!registration) throw new Error("push-disable");
+        await ensureUnsubscribed(subscription, registration.pushManager);
       }
       const confirmed = await readEffectivePushStatus(publicKey);
       setPublicKey(confirmed.publicKey);
@@ -370,6 +364,19 @@ export function WebPushSettings() {
           onClick={() => void enable()}
         >
           {copy.webPushEnable}
+        </Button>
+      ) : status === "error" ? (
+        <Button
+          type="button"
+          size="touch"
+          variant="outline"
+          aria-describedby={describedBy}
+          onClick={() => {
+            setStatus("loading");
+            setAttempt((value) => value + 1);
+          }}
+        >
+          {copy.retry}
         </Button>
       ) : status === "loading" ? (
         <span aria-hidden="true" className="text-xs text-muted">

@@ -9,6 +9,7 @@ const harness = vi.hoisted(() => ({
   unsubscribe: vi.fn(async () => true),
   getSubscription: vi.fn(),
   getRegistration: vi.fn(),
+  effect: null as null | (() => undefined | (() => void)),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
@@ -28,8 +29,8 @@ vi.mock("react", async (original) => ({
       },
     ];
   },
-  useEffect: () => {
-    // Enabled status is seeded; skip browser capability bootstrap for confirm coverage.
+  useEffect: (effect: () => undefined | (() => void)) => {
+    harness.effect = effect;
   },
 }));
 vi.mock("../apps/web/src/components/locale-context", async () => {
@@ -60,7 +61,12 @@ function descendants(node: ReactNode): Element[] {
 
 function renderEnabled() {
   harness.slots = ["enabled", "vapid-public-key", false];
+  return render();
+}
+
+function render() {
   harness.cursor = 0;
+  harness.effect = null;
   harness.ids = 0;
   return descendants(WebPushSettings());
 }
@@ -148,4 +154,109 @@ it("does not disable or unsubscribe when confirmation is cancelled", async () =>
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(harness.unsubscribe).not.toHaveBeenCalled();
   expect(harness.getRegistration).not.toHaveBeenCalled();
+});
+
+it("reports an error if the browser refuses to unsubscribe", async () => {
+  harness.getSubscription.mockResolvedValue({
+    endpoint: "https://push.example/endpoint-a",
+    unsubscribe: harness.unsubscribe,
+    options: { applicationServerKey: null },
+  });
+  harness.fetch.mockResolvedValueOnce(response({ success: true }));
+  harness.unsubscribe.mockResolvedValueOnce(false);
+
+  (disableButton(renderEnabled()).props.onClick as () => void)();
+  await vi.waitFor(() => expect(harness.unsubscribe).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+});
+
+it("accepts a false unsubscribe result when the subscription is already gone", async () => {
+  harness.getSubscription
+    .mockResolvedValueOnce({
+      endpoint: "https://push.example/endpoint-a",
+      unsubscribe: harness.unsubscribe,
+      options: { applicationServerKey: null },
+    })
+    .mockResolvedValue(null);
+  harness.unsubscribe.mockResolvedValueOnce(false);
+  harness.fetch
+    .mockResolvedValueOnce(response({ success: true }))
+    .mockResolvedValueOnce(response({ configured: true, publicKey: "AQ", subscribed: false }));
+  (disableButton(renderEnabled()).props.onClick as () => void)();
+  await vi.waitFor(() => expect(disableButtonOrEnable(render())).toBe(true));
+  expect(render().some((node) => node.props.role === "alert")).toBe(false);
+});
+
+it("rechecks status after an error without changing the subscription", async () => {
+  harness.slots = ["error", null, false, 0];
+  const nodes = render();
+  const retry = nodes.find(
+    (node) => node.type === "button" && node.props.children === getDictionary("en").settings.retry,
+  );
+  if (!retry) throw new Error("Missing push retry control");
+  harness.getSubscription.mockResolvedValue(null);
+  harness.fetch.mockResolvedValue(
+    response({ configured: true, publicKey: "vapid-public-key", subscribed: false }),
+  );
+  (retry.props.onClick as () => void)();
+  expect(
+    render().some((node) => node.props.children === getDictionary("en").settings.webPushLoading),
+  ).toBe(true);
+  harness.effect?.();
+  await vi.waitFor(() => expect(disableButtonOrEnable(render())).toBe(true));
+  expect(harness.fetch.mock.calls[0]?.[1]?.method).toBeUndefined();
+  expect(harness.unsubscribe).not.toHaveBeenCalled();
+});
+
+function disableButtonOrEnable(nodes: Element[]) {
+  return nodes.some(
+    (node) =>
+      node.type === "button" && node.props.children === getDictionary("en").settings.webPushEnable,
+  );
+}
+
+it("checks a rotated key without deleting either subscription", async () => {
+  harness.slots = ["loading", null, false, 0];
+  harness.getSubscription.mockResolvedValue({
+    endpoint: "https://push.example/endpoint-a",
+    unsubscribe: harness.unsubscribe,
+    options: { applicationServerKey: new Uint8Array([2]).buffer },
+  });
+  harness.fetch.mockResolvedValue(
+    response({ configured: true, publicKey: "AQ", subscribed: true }),
+  );
+  render();
+  harness.effect?.();
+  await vi.waitFor(() => expect(disableButtonOrEnable(render())).toBe(true));
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  expect(harness.fetch.mock.calls[0]?.[1]?.method).toBeUndefined();
+  expect(harness.unsubscribe).not.toHaveBeenCalled();
+});
+
+it("does not remove the browser subscription when rotation cleanup fails on the server", async () => {
+  const subscribe = vi.fn();
+  const manager = {
+    getSubscription: vi.fn().mockResolvedValue({
+      endpoint: "https://push.example/endpoint-a",
+      unsubscribe: harness.unsubscribe,
+      options: { applicationServerKey: new Uint8Array([2]).buffer },
+    }),
+    subscribe,
+  };
+  vi.stubGlobal("Notification", { requestPermission: vi.fn().mockResolvedValue("granted") });
+  vi.stubGlobal("navigator", {
+    serviceWorker: { register: vi.fn().mockResolvedValue({ pushManager: manager }) },
+  });
+  harness.fetch.mockResolvedValue(response({ error: "unavailable" }, 503));
+  harness.slots = ["disabled", "AQ", false, 0];
+  const enable = render().find(
+    (node) =>
+      node.type === "button" && node.props.children === getDictionary("en").settings.webPushEnable,
+  );
+  if (!enable) throw new Error("Missing enable control");
+  (enable.props.onClick as () => void)();
+  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  expect(harness.unsubscribe).not.toHaveBeenCalled();
+  expect(subscribe).not.toHaveBeenCalled();
 });
