@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "production_recovery_acceptance",
+  "generatedAt": "2026-11-04T12:00:00.000Z",
+  "environment": {
+    "name": "REPLACE_WITH_TARGET_ENV"
+  },
+  "owner": {
+    "name": "REPLACE_WITH_ACCEPTANCE_OWNER"
+  },
+  "targets": {
+    "rpoMinutes": 60,
+    "rtoMinutes": 240
+  },
+  "retention": {
+    "policy": "REPLACE_WITH_RETENTION_POLICY",
+    "offHostLocation": "REPLACE_WITH_OFF_HOST_LOCATION",
+    "offHostVerified": true
+  },
+  "access": {
+    "restoreRoles": "REPLACE_WITH_RESTORE_ROLES",
+    "breakGlassProcedure": "REPLACE_WITH_BREAK_GLASS_PROCEDURE"
+  },
+  "measuredRestore": {
+    "startedAt": "2026-11-04T08:00:00.000Z",
+    "completedAt": "2026-11-04T09:45:00.000Z",
+    "dataLossMinutes": 15,
+    "withinRpo": true,
+    "withinRto": true
+  },
+  "verdict": {
+    "passed": true,
+    "failures": []
+  },
+  "evidenceSha256": "e3c8a9174d8be5b4f46649bd5484d71cb45a9591c82c35da893a0496fb7fcb3b"
+}
