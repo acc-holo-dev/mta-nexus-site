@@ -127,4 +127,16 @@ describe("current auth session HTTP contract", () => {
     expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
     expect(logout).toHaveBeenCalledWith("session-token");
   });
+
+  it("keeps logout without a cookie idempotent", async () => {
+    const response = await DELETE(
+      new NextRequest("https://nexus.test/api/auth/session", {
+        method: "DELETE",
+        headers: { origin: "https://nexus.test" },
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
+    expect(logout).not.toHaveBeenCalled();
+  });
 });
