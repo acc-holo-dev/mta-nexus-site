@@ -194,6 +194,36 @@ describe("private legacy commerce pages", () => {
     expect(html).not.toContain("private@example.test");
     expect(html).toContain("gross");
     expect(html).not.toContain('name="withdraw"');
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+  });
+
+  it("recovers with ErrorState when sales history fails to load", async () => {
+    state.seller.mockRejectedValue(new Error("db unavailable"));
+    const copy = getCommerceHistoryCopy("en");
+    const html = renderToStaticMarkup(await Sales(input()));
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.salesLoadUnavailable);
+    expect(html).toContain(copy.salesLoadUnavailableHint);
+    expect(html).toContain(getDictionary("en").errors.retry);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain('href="/workspace/sales?page=2"');
+  });
+
+  it("renders EmptyState when sales history has no completed sales", async () => {
+    state.seller.mockResolvedValue({
+      sales: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      pageSize: 20,
+    });
+    const copy = getCommerceHistoryCopy("en");
+    const html = renderToStaticMarkup(await Sales({ searchParams: Promise.resolve({}) }));
+    expect(html).toContain(copy.emptySales);
+    expect(html).toContain(copy.emptySalesHint);
+    expect(html).toContain("overflow-x-clip");
   });
   it("renders archive filters in both languages and preserves them in export and page links", async () => {
     for (const locale of ["en", "ru"] as const) {

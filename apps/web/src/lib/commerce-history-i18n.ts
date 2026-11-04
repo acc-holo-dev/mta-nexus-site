@@ -62,6 +62,12 @@ export const commerceHistoryCopy = {
     salesTitle: "Sales history",
     salesDescription: "Completed historical line items for resources authored by this account.",
     emptySales: "No completed historical sales for your resources.",
+    emptySalesHint:
+      "Completed historical sales appear here after a buyer order stores a line for your resource. An empty list is not a load failure or payout status.",
+    salesLoadUnavailable:
+      "Sales history is temporarily unavailable. This does not mean you have no sales.",
+    salesLoadUnavailableHint:
+      "Retry keeps the same page. A temporary load failure is not a cancelled sale or payout authorization.",
     loading: "Loading history…",
     grossNotice:
       "Amounts below are historical gross line prices, not your withdrawable balance, fees, earnings or payout authorization.",
@@ -141,6 +147,11 @@ export const commerceHistoryCopy = {
     salesDescription:
       "Ранее завершённые операции по ресурсам, автором которых является ваш аккаунт.",
     emptySales: "Завершённые продажи ваших ресурсов не найдены.",
+    emptySalesHint:
+      "Завершённые продажи появляются здесь после сохранения позиции заказа покупателя по вашему ресурсу. Пустой список — это не сбой загрузки и не статус выплаты.",
+    salesLoadUnavailable: "История продаж временно недоступна. Это не означает, что продаж нет.",
+    salesLoadUnavailableHint:
+      "Повтор сохраняет ту же страницу. Временный сбой загрузки — это не отмена продажи и не разрешение на выплату.",
     loading: "Загрузка истории…",
     grossNotice:
       "Показана полная цена позиции заказа, а не доступный к выводу баланс, прибыль, комиссия или разрешение на выплату.",
