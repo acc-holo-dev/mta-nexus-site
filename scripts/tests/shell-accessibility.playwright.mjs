@@ -11,6 +11,7 @@ assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
 const { getDictionary } = await import("../../apps/web/src/lib/i18n.ts");
 const { discoveryCopy } = await import("../../apps/web/src/lib/discovery-copy.ts");
+const { notificationInboxCopy } = await import("../../apps/web/src/lib/notification-inbox-copy.ts");
 assert(process.env.NEXUS_BROWSER_TOOLS);
 assert(process.env.NEXUS_BROWSER_REPORT_DIR);
 assert(process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
@@ -631,16 +632,18 @@ for (const locale of ["en", "ru"]) {
     await loginFixture(page);
     await page.goto("/notifications");
     await waitForReadyCapture(page);
+    const inboxCopy = notificationInboxCopy(locale);
+    // Reading filters use a distinct landmark from the page title (notifications primary journey).
     const notificationFilters = page.getByRole("navigation", {
-      name: dictionary.notifications.title,
+      name: inboxCopy.readingState,
       exact: true,
     });
     const allNotificationsLink = notificationFilters.getByRole("link", {
-      name: dictionary.notifications.all,
+      name: inboxCopy.all,
       exact: true,
     });
     const unreadNotificationsLink = notificationFilters.getByRole("link", {
-      name: dictionary.notifications.unread,
+      name: inboxCopy.unread,
       exact: true,
     });
     await expect(allNotificationsLink).toHaveAttribute("aria-current", "page");

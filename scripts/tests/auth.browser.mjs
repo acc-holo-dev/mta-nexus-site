@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { before, after, test } from "node:test";
-import { createRequire } from "node:module";
-import { mkdir, writeFile } from "node:fs/promises";
-import { randomBytes } from "node:crypto";
-import { join, resolve } from "node:path";
 import { execFile } from "node:child_process";
+import { randomBytes } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { join, resolve } from "node:path";
+import { after, before, test } from "node:test";
 import { promisify } from "node:util";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
@@ -493,6 +493,11 @@ check("J2-06 logout clears cookie, revokes replay and leaves the other account v
     const replay = { page };
     assert((await request(replay, "/api/auth/session")).data.authenticated === true);
     await alice.page.getByRole("button", { name: "Sign out", exact: true }).click();
+    // Account chrome confirms sign-out before DELETE (same pattern as fast-smoke).
+    await alice.page
+      .getByRole("dialog", { name: "Sign out" })
+      .getByRole("button", { name: "Sign out", exact: true })
+      .click();
     await alice.page.waitForURL(/\/auth\/login(?:\?|$)/);
     assert(
       !(await alice.context.cookies()).some((item) => item.name === "nexus_session"),
@@ -550,6 +555,10 @@ check(
       "Login must not reactivate the revoked token",
     );
     await alice.page.getByRole("button", { name: "Sign out", exact: true }).click();
+    await alice.page
+      .getByRole("dialog", { name: "Sign out" })
+      .getByRole("button", { name: "Sign out", exact: true })
+      .click();
     await alice.page.waitForURL(/\/auth\/login(?:\?|$)/);
     await alice.page.getByLabel("Email address", { exact: true }).fill(people[1].email);
     await alice.page.getByLabel("Password", { exact: true }).fill(password);

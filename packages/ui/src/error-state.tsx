@@ -3,6 +3,7 @@ import type * as React from "react";
 import { cn } from "./utils";
 
 export interface ErrorStateProps {
+  id?: string;
   title: string;
   description?: string;
   icon?: React.ReactNode;
@@ -11,9 +12,10 @@ export interface ErrorStateProps {
 }
 
 /** Honest failure state with an adjacent recovery action when one is available. */
-export function ErrorState({ title, description, icon, action, className }: ErrorStateProps) {
+export function ErrorState({ id, title, description, icon, action, className }: ErrorStateProps) {
   return (
     <div
+      id={id}
       role="alert"
       className={cn(
         "flex flex-col items-center justify-center rounded-xl border border-[color:var(--nexus-danger)]/30 bg-danger-soft px-4 py-8 text-center",

@@ -102,11 +102,7 @@ export function AuthForm({
         aria-describedby={error ? "auth-error" : undefined}
         className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
       >
-        {error ? (
-          <div id="auth-error">
-            <ErrorState title={error} />
-          </div>
-        ) : null}
+        {error ? <ErrorState id="auth-error" title={error} /> : null}
         <Input
           id="auth-email"
           name="email"
