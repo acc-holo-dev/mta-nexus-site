@@ -1,4 +1,7 @@
 import { ResourceRequirementsScreen } from "../../../../../components/resource-requirements-screen";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function Page({
@@ -9,5 +12,9 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ id }, raw] = await Promise.all([params, searchParams]);
-  return ResourceRequirementsScreen({ productId: id, scope: "library", raw });
+  return (
+    <div className={pageShellClass}>
+      {await ResourceRequirementsScreen({ productId: id, scope: "library", raw })}
+    </div>
+  );
 }

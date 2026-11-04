@@ -1,4 +1,7 @@
 import { LibrarySelectionBatchScreen } from "../../../../../../components/library-selection-batch-screen";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Resource version batch | MTA NEXUS",
@@ -8,5 +11,9 @@ export default function Page(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <LibrarySelectionBatchScreen {...props} />;
+  return (
+    <div className={pageShellClass}>
+      <LibrarySelectionBatchScreen {...props} />
+    </div>
+  );
 }

@@ -1,4 +1,7 @@
 import { CollectionRequirementsScreen } from "../../../../../../components/collection-requirements-screen";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Collection readiness | MTA NEXUS",
@@ -8,5 +11,9 @@ export default function Page(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <CollectionRequirementsScreen {...props} />;
+  return (
+    <div className={pageShellClass}>
+      <CollectionRequirementsScreen {...props} />
+    </div>
+  );
 }
