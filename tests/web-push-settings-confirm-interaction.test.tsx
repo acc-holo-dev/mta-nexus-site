@@ -77,6 +77,9 @@ function disableButton(nodes: Element[]) {
 const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
+/** Browser PushManager presence stub — module-scoped to avoid Biome component-in-hook lint. */
+function mockPushManager() {}
+
 beforeEach(() => {
   vi.clearAllMocks();
   harness.slots = [];
@@ -95,7 +98,7 @@ beforeEach(() => {
     serviceWorker: { getRegistration: harness.getRegistration },
   });
   vi.stubGlobal("window", {
-    PushManager: function PushManager() {},
+    PushManager: mockPushManager,
     Notification: notification,
   });
 });

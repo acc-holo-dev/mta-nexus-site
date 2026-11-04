@@ -146,9 +146,9 @@ it("confirms a password change before posting the update", async () => {
     .mockResolvedValueOnce(response({ sessions: [otherSession] }));
 
   const form = findNamed(render(), "SettingsPasswordForm");
-  await (
-    form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>
-  )({ preventDefault() {} });
+  await (form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>)({
+    preventDefault() {},
+  });
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalled());
 
   expect(confirmAction).toHaveBeenCalledWith({
@@ -175,24 +175,23 @@ it("confirms a password change before posting the update", async () => {
 it("does not change the password when confirmation is cancelled", async () => {
   confirmAction.mockResolvedValueOnce(false);
   const form = findNamed(render(), "SettingsPasswordForm");
-  await (
-    form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>
-  )({ preventDefault() {} });
+  await (form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>)({
+    preventDefault() {},
+  });
   expect(harness.fetch).not.toHaveBeenCalled();
 });
 
 it("confirms ending another session before DELETE", async () => {
   const copy = getDictionary("en").settings;
   harness.fetch
-    .mockResolvedValueOnce(
-      response({ success: true, scope: "single", sessionId: otherSession.id }),
-    )
+    .mockResolvedValueOnce(response({ success: true, scope: "single", sessionId: otherSession.id }))
     .mockResolvedValueOnce(response({ sessions: [] }));
 
   const sessions = findNamed(render(), "SettingsActiveSessions");
-  await (
-    sessions.props.onRevokeSession as (sessionId: string, label: string) => Promise<void>
-  )(otherSession.id, otherSession.userAgent);
+  await (sessions.props.onRevokeSession as (sessionId: string, label: string) => Promise<void>)(
+    otherSession.id,
+    otherSession.userAgent,
+  );
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalled());
 
   expect(confirmAction).toHaveBeenCalledWith({
@@ -216,9 +215,10 @@ it("confirms ending another session before DELETE", async () => {
 it("skips session revocation when confirmation is cancelled", async () => {
   confirmAction.mockResolvedValueOnce(false);
   const sessions = findNamed(render(), "SettingsActiveSessions");
-  await (
-    sessions.props.onRevokeSession as (sessionId: string, label: string) => Promise<void>
-  )(otherSession.id, otherSession.userAgent);
+  await (sessions.props.onRevokeSession as (sessionId: string, label: string) => Promise<void>)(
+    otherSession.id,
+    otherSession.userAgent,
+  );
   expect(harness.fetch).not.toHaveBeenCalled();
 });
 

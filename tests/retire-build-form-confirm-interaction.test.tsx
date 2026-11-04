@@ -80,7 +80,12 @@ function submit(nodes: Element[], reason = "No longer maintained") {
       }
     },
   );
-  return (form.props.onSubmit as (event: { preventDefault: () => void; currentTarget: object }) => Promise<void>)({
+  return (
+    form.props.onSubmit as (event: {
+      preventDefault: () => void;
+      currentTarget: object;
+    }) => Promise<void>
+  )({
     preventDefault() {},
     currentTarget: {},
   });
