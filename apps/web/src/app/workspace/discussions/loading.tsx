@@ -6,11 +6,11 @@ export default async function Loading() {
   const copy = ownDiscussionCopy(await getRequestLocale());
   return (
     <section
-      className="mx-auto max-w-4xl space-y-6"
+      className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="discussions-loading-heading"
     >
-      <header className="border-b border-base pb-6">
+      <header className="min-w-0 border-b border-base pb-6">
         <h1 id="discussions-loading-heading" className="text-2xl font-extrabold text-primary">
           {copy.title}
         </h1>

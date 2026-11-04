@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
+
 const en = {
   title: "Publication reactions",
   helpful: "Helpful",
@@ -32,7 +33,9 @@ const en = {
   latest: "Latest reactions",
   next: "Older reactions",
   empty: "You have not reacted to any publications yet.",
+  emptyDescription: "Reactions you leave on publications appear here so you can remove them later.",
   emptyFiltered: "No reactions match these filters.",
+  emptyFilteredDescription: "Clear the filters or open the latest reactions page to continue.",
   hidden: "Publication unavailable",
   hiddenDescription: "The publication was removed or is no longer public.",
   scope:
@@ -71,7 +74,11 @@ const ru: Record<keyof typeof en, string> = {
   latest: "Новые реакции",
   next: "Старые реакции",
   empty: "Вы пока не оставили реакций на публикации.",
+  emptyDescription:
+    "Реакции, которые вы оставляете на публикации, появляются здесь, чтобы их можно было удалить позже.",
   emptyFiltered: "По этим фильтрам реакций нет.",
+  emptyFilteredDescription:
+    "Сбросьте фильтры или откройте страницу новых реакций, чтобы продолжить.",
   hidden: "Публикация недоступна",
   hiddenDescription: "Публикация удалена или больше не является публичной.",
   scope:

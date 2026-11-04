@@ -1,26 +1,35 @@
 import { AppError, CONTENT_REACTION_EMOJI, CONTENT_REACTIONS } from "@nexus/domain";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { ReactionRemoval } from "../../../components/reaction-removal";
 import { parseReactionPage, reactionPageHref } from "../../../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { contentReactionService } from "../../../lib/services/content-reaction-service";
+
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const linkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export async function generateMetadata() {
   const copy = reactionCopy(await getRequestLocale());
   return { title: copy.my, description: copy.description, robots: { index: false, follow: false } };
 }
+
 export default async function ReactionsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const locale = await getRequestLocale(),
-    copy = reactionCopy(locale);
+    copy = reactionCopy(locale),
+    dictionary = getDictionary(locale);
   const rawSearchParams = (await searchParams) ?? {};
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
@@ -49,22 +58,20 @@ export default async function ReactionsPage({
         return null;
       })
     : null;
+  const filtered = Boolean(filters?.cursor || filters?.query || filters?.reaction);
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href="/workspace"
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace" className={linkClass}>
         {copy.back}
       </Link>
-      <header className="border-b border-base pb-6">
+      <header className="min-w-0 border-b border-base pb-6">
         <h1 className="text-2xl font-extrabold text-primary">{copy.my}</h1>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </header>
       <form
         action="/workspace/reactions"
         method="get"
-        className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
       >
         <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
           {copy.query}
@@ -94,47 +101,42 @@ export default async function ReactionsPage({
         <Button type="submit" className="min-h-11 font-semibold">
           {copy.search}
         </Button>
-        <Link
-          href="/workspace/reactions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/reactions" className={linkClass}>
           {copy.reset}
         </Link>
       </form>
-      <a
-        href={latest}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <a href={latest} className={linkClass}>
         {copy.latest}
       </a>
-      {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
-      )}
-      {page && !page.items.length && (
-        <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
-          <p>
-            {filters?.cursor || filters?.query || filters?.reaction
-              ? copy.emptyFiltered
-              : copy.empty}
-          </p>
-          {(filters?.cursor || filters?.query || filters?.reaction) && (
-            <Link
-              href="/workspace/reactions"
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          )}
-        </div>
-      )}
-      {page && (
-        <ul className="space-y-3">
+      {error ? (
+        <ErrorState
+          title={error}
+          action={
+            <a href={latest} className={linkClass}>
+              {dictionary.errors.retry}
+            </a>
+          }
+        />
+      ) : null}
+      {page && !page.items.length ? (
+        <EmptyState
+          title={filtered ? copy.emptyFiltered : copy.empty}
+          description={filtered ? copy.emptyFilteredDescription : copy.emptyDescription}
+          action={
+            filtered ? (
+              <Link href="/workspace/reactions" className={linkClass}>
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : null}
+      {page?.items.length ? (
+        <ul className="min-w-0 space-y-3">
           {page.items.map((item) => (
-            <li key={item.contentId} className="nexus-panel space-y-3 p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
+            <li key={item.contentId} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+              <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 overflow-x-clip">
                   {item.slug && item.title ? (
                     <Link
                       prefetch={false}
@@ -165,8 +167,8 @@ export default async function ReactionsPage({
             </li>
           ))}
         </ul>
-      )}
-      {page?.nextCursor && filters && (
+      ) : null}
+      {page?.nextCursor && filters ? (
         <Link
           prefetch={false}
           href={reactionPageHref(filters, page.nextCursor)}
@@ -174,7 +176,7 @@ export default async function ReactionsPage({
         >
           {copy.next}
         </Link>
-      )}
+      ) : null}
     </div>
   );
 }

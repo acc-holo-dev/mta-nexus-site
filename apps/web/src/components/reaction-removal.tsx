@@ -6,6 +6,7 @@ import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmAction } from "./confirm-action";
+
 export function ReactionRemoval({
   contentId,
   reloadHref,
@@ -77,7 +78,7 @@ export function ReactionRemoval({
     }
   }
   return (
-    <div className="space-y-2" aria-busy={phase === "saving"}>
+    <div className="min-w-0 space-y-2" aria-busy={phase === "saving"}>
       {phase !== "removed" && (
         <Button
           type="button"
