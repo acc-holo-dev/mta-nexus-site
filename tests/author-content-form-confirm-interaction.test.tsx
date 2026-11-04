@@ -30,6 +30,7 @@ vi.mock("react", async (original) => ({
     if (!(index in harness.slots)) harness.slots[index] = { current: initial };
     return harness.slots[index];
   },
+  useEffect: () => {},
 }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh, replace: harness.replace }),

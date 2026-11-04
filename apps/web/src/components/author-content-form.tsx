@@ -2,7 +2,7 @@
 import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { authorPublicationDeskCopy } from "../lib/author-publication-desk-copy";
 import type { Locale } from "../lib/i18n";
 import {
@@ -52,6 +52,22 @@ export function AuthorContentForm({
     : organization
       ? `/api/workspace/organizations/${encodeURIComponent(organization.id)}/content`
       : "/api/workspace/content";
+
+  useEffect(() => {
+    if (
+      !saved ||
+      !initial ||
+      initial.id !== saved.id ||
+      initial.slug !== saved.slug ||
+      initial.type !== saved.type ||
+      (organization && initial.organizationId !== organization.id) ||
+      (server && initial.serverId !== server.id) ||
+      Date.parse(initial.updatedAt) <= Date.parse(saved.updatedAt) ||
+      (latest && Date.parse(initial.updatedAt) <= Date.parse(latest.updatedAt))
+    )
+      return;
+    setLatest(initial);
+  }, [initial, saved, latest, organization, server]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
