@@ -18,6 +18,7 @@ import {
   contentSummaryColumns,
 } from "./content-summary";
 import { organizationWorkspaceAccess } from "./organization-workspace";
+import { publicContentAssociations } from "./public-content-associations";
 import { publicationNotice } from "./publication-notice";
 import { containsPattern } from "./search-pattern";
 import { serverContentAccess, serverContentContext } from "./server-content";
@@ -575,6 +576,7 @@ class AuthorContentRepository {
     const rows = await db
       .select({
         ...getTableColumns(content),
+        ...publicContentAssociations(),
         body: sql<string>`left(${content.body}, 350)`,
         likeCount: contentHelpfulCount(),
       })

@@ -1,34 +1,35 @@
+import type { AuditEvent, Comment, Content } from "@nexus/domain";
+import { AppError, NotFoundError } from "@nexus/domain";
 import {
-  eq,
-  asc,
-  desc,
   and,
+  asc,
   count,
-  sql,
-  inArray,
-  ilike,
-  or,
-  isNull,
+  desc,
+  eq,
   getTableColumns,
+  ilike,
+  inArray,
+  isNull,
+  or,
+  sql,
 } from "drizzle-orm";
-import { contentHelpfulCount } from "./content-reaction-count";
-import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { organizationWorkspaceAccess } from "./organization-workspace";
-import { serverContentAccess } from "./server-content";
-import { publicationNotice } from "./publication-notice";
-import { lockInitiatingSession } from "./initiating-session";
-import { resourceReviewsRepository } from "./resource-reviews";
 import {
   auditEvents,
-  content,
   comments,
+  content,
   discussionNotificationDeliveries,
   publicationNotificationDeliveries,
   users,
 } from "../schema";
-import { AppError, NotFoundError } from "@nexus/domain";
-import type { AuditEvent, Content, Comment } from "@nexus/domain";
+import { contentHelpfulCount } from "./content-reaction-count";
+import { lockInitiatingSession } from "./initiating-session";
+import { organizationWorkspaceAccess } from "./organization-workspace";
+import { publicContentAssociations } from "./public-content-associations";
+import { publicationNotice } from "./publication-notice";
+import { resourceReviewsRepository } from "./resource-reviews";
+import { containsPattern } from "./search-pattern";
+import { serverContentAccess } from "./server-content";
 
 export class ContentRepository {
   async countDrafts(): Promise<number> {
@@ -78,7 +79,11 @@ export class ContentRepository {
     const pattern = containsPattern(term);
     const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(
         and(
@@ -104,7 +109,11 @@ export class ContentRepository {
     const pattern = containsPattern(term);
     const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(
         and(
@@ -124,7 +133,11 @@ export class ContentRepository {
 
   async listPublished(limit = 50): Promise<Content[]> {
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(eq(content.status, "published"))
       .orderBy(desc(content.createdAt))
@@ -160,7 +173,11 @@ export class ContentRepository {
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
     const page = Math.min(requested, totalPages);
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(condition)
       .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`), desc(content.id))
@@ -175,7 +192,11 @@ export class ContentRepository {
       : 100;
 
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(and(eq(content.organizationId, organizationId), eq(content.status, "published")))
       .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`), desc(content.id))
@@ -186,7 +207,11 @@ export class ContentRepository {
   async listPublishedByTypes(types: Content["type"][], limit = 50): Promise<Content[]> {
     if (types.length === 0) return [];
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(and(eq(content.status, "published"), inArray(content.type, types)))
       .orderBy(desc(content.updatedAt))
@@ -205,7 +230,11 @@ export class ContentRepository {
     const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 12) : 6;
 
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(
         and(
@@ -233,7 +262,11 @@ export class ContentRepository {
     options: { incrementView?: boolean } = {},
   ): Promise<Content | null> {
     const rows = await db
-      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .select({
+        ...getTableColumns(content),
+        ...publicContentAssociations(),
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(and(eq(content.slug, slug), eq(content.status, "published")))
       .limit(1);

@@ -1,6 +1,7 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
 import { content, users } from "../packages/db/src/schema";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -26,8 +27,10 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { authorContentRepository } from "../packages/db/src/repositories/author-content";
 import { UserRepository } from "../packages/db/src/repositories/users";
+
 const version = new Date("2026-10-10T12:00:00.000Z");
 const fixture = {
   id: "cnt_1",
@@ -91,9 +94,15 @@ it("restricts public catalogs to published content and abbreviates body projecti
     query: "Lua",
   });
   expect(state.queries[0].sql).toContain('left("body", 350)');
+  expect(state.queries[0].sql).toContain("content.server_id");
+  expect(state.queries[0].sql).toContain("content.product_id");
+  expect(state.queries[0].sql).toContain("\"visibility\" = 'public'");
+  expect(state.queries[0].sql).toContain('"builds"."scan_status"');
   expect(state.queries[0].params).toContain("published");
   expect(state.queries[0].params).not.toContain("draft");
   expect(state.queries[0].params).toEqual([
+    "published",
+    "clean",
     "published",
     "post",
     "question",
