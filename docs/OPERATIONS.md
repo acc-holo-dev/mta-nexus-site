@@ -1142,8 +1142,9 @@ Offline queue-probe drill (disposable fixture; exit code 2 means alert, same pat
 DRILL_DIR="$(mktemp -d)"
 trap 'rm -rf "$DRILL_DIR"' EXIT
 HEALTH_FILE="$DRILL_DIR/web-push-health.json"
-cat >"$HEALTH_FILE" <<'EOF'
-{"status":"ready","configured":true,"pid":1,"batch":8,"heartbeatAt":"2099-01-01T00:00:00.000Z","staleAfterMs":60000,"progressAt":"2099-01-01T00:00:00.000Z","progressStaleAfterMs":180000,"queuePending":0,"queueDue":0,"queueLeased":0,"queueCapacity":10000,"queueOldestAgeSeconds":0,"reportPending":0,"reportFailed":0,"reportOldestAgeSeconds":0,"supportPending":0,"supportFailed":0,"supportOldestAgeSeconds":0,"verificationPending":0,"verificationFailed":0,"verificationOldestAgeSeconds":0,"discussionPending":0,"discussionFailed":0,"discussionOldestAgeSeconds":0,"publicationPending":1,"publicationFailed":1,"publicationOldestAgeSeconds":0,"buildIncidentPending":0,"buildIncidentFailed":0,"buildIncidentOldestAgeSeconds":0,"admissionPending":0,"admissionFailed":0,"admissionOldestAgeSeconds":0,"queueAlert":"alert","queueAlertReasons":["publication_delivery_failed"],"queueAlertThresholds":{"pendingPercent":80,"dueJobs":100,"oldestAgeSeconds":900}}
+DRILL_NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+cat >"$HEALTH_FILE" <<EOF
+{"status":"ready","configured":true,"pid":1,"batch":8,"heartbeatAt":"${DRILL_NOW}","staleAfterMs":60000,"progressAt":"${DRILL_NOW}","progressStaleAfterMs":180000,"queuePending":0,"queueDue":0,"queueLeased":0,"queueCapacity":10000,"queueOldestAgeSeconds":0,"reportPending":0,"reportFailed":0,"reportOldestAgeSeconds":0,"supportPending":0,"supportFailed":0,"supportOldestAgeSeconds":0,"verificationPending":0,"verificationFailed":0,"verificationOldestAgeSeconds":0,"discussionPending":0,"discussionFailed":0,"discussionOldestAgeSeconds":0,"publicationPending":1,"publicationFailed":1,"publicationOldestAgeSeconds":0,"buildIncidentPending":0,"buildIncidentFailed":0,"buildIncidentOldestAgeSeconds":0,"admissionPending":0,"admissionFailed":0,"admissionOldestAgeSeconds":0,"queueAlert":"alert","queueAlertReasons":["publication_delivery_failed"],"queueAlertThresholds":{"pendingPercent":80,"dueJobs":100,"oldestAgeSeconds":900}}
 EOF
 NEXUS_WEB_PUSH_HEALTH_FILE="$HEALTH_FILE" node scripts/check-web-push-worker-queue.mjs
 echo "expect exit code 2 (alert); got $?"

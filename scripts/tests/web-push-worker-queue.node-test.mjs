@@ -251,6 +251,30 @@ test("fails closed for stale or inconsistent snapshot", () => {
   assert.equal(run(snapshot({ queuePending: 8_000 })).status, 1);
 });
 
+test("rejects future timestamps and invalid counter types", () => {
+  const future = new Date(Date.now() + 60_000).toISOString();
+  assert.equal(run(snapshot({ heartbeatAt: future, progressAt: future })).status, 1);
+  assert.equal(run(snapshot({ reportFailed: null })).status, 1);
+  assert.equal(run(snapshot({ reportPending: "0" })).status, 1);
+});
+
+test("reports build-incident delivery counters with their alerts", () => {
+  const result = run(
+    snapshot({
+      buildIncidentPending: 3,
+      buildIncidentFailed: 1,
+      buildIncidentOldestAgeSeconds: 900,
+      queueAlert: "alert",
+      queueAlertReasons: ["build_incident_delivery_failed", "build_incident_delivery_backlog"],
+    }),
+  );
+  assert.equal(result.status, 2);
+  const value = JSON.parse(result.stdout);
+  assert.equal(value.buildIncidentPending, 3);
+  assert.equal(value.buildIncidentFailed, 1);
+  assert.equal(value.buildIncidentOldestAgeSeconds, 900);
+});
+
 test("alerts on admission recovery failure and age backlog without VAPID", () => {
   const result = run(
     snapshot({

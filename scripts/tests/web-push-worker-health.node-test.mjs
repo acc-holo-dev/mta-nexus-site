@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { readWebPushWorkerHealthSnapshot } from "../web-push-worker-health-state.mjs";
 
 const checker = new URL("../check-web-push-worker-health.mjs", import.meta.url);
 
@@ -113,6 +114,50 @@ test("fails closed for missing, malformed and stale heartbeat state", () => {
     run(
       healthy({
         heartbeatAt: new Date(Date.now() - 120_000).toISOString(),
+      }),
+    ),
+    0,
+  );
+});
+
+test("rejects future heartbeat and progress even when their timestamps agree", () => {
+  const future = new Date(Date.now() + 60_000).toISOString();
+  assert.notEqual(run(healthy({ heartbeatAt: future, progressAt: future })), 0);
+});
+
+test("permits five seconds of clock skew but rejects the next millisecond", async (t) => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-web-push-clock-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const healthFile = join(root, "health.json");
+  const now = Date.parse("2030-01-01T00:00:00.000Z");
+  const writeAt = (offset) => {
+    const timestamp = new Date(now + offset).toISOString();
+    writeFileSync(
+      healthFile,
+      JSON.stringify(healthy({ heartbeatAt: timestamp, progressAt: timestamp })),
+    );
+  };
+  writeAt(5_000);
+  await assert.doesNotReject(readWebPushWorkerHealthSnapshot({ healthFile, now }));
+  writeAt(5_001);
+  await assert.rejects(readWebPushWorkerHealthSnapshot({ healthFile, now }));
+});
+
+test("rejects null and string counters and thresholds", () => {
+  for (const field of [
+    "queueOldestAgeSeconds",
+    "reportPending",
+    "reportFailed",
+    "reportOldestAgeSeconds",
+  ]) {
+    assert.notEqual(run(healthy({ [field]: null })), 0, field);
+    assert.notEqual(run(healthy({ [field]: "0" })), 0, field);
+  }
+  assert.notEqual(run(healthy({ pid: "123" })), 0);
+  assert.notEqual(
+    run(
+      healthy({
+        queueAlertThresholds: { pendingPercent: "80", dueJobs: 100, oldestAgeSeconds: 900 },
       }),
     ),
     0,

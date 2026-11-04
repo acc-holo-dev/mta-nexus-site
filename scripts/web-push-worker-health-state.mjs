@@ -98,20 +98,20 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const data = JSON.parse(await readFile(healthFile, "utf8"));
 
   const heartbeatAt = Date.parse(data?.heartbeatAt);
-  const staleAfterMs = Number(data?.staleAfterMs);
+  const staleAfterMs = data?.staleAfterMs;
   const progressAt = Date.parse(data?.progressAt);
-  const progressStaleAfterMs = Number(data?.progressStaleAfterMs);
-  const pid = Number(data?.pid);
-  const batch = Number(data?.batch);
+  const progressStaleAfterMs = data?.progressStaleAfterMs;
+  const pid = data?.pid;
+  const batch = data?.batch;
   const configured = data?.configured;
-  const queuePending = Number(data?.queuePending);
-  const queueDue = Number(data?.queueDue);
-  const queueLeased = Number(data?.queueLeased);
-  const queueCapacity = Number(data?.queueCapacity);
-  const queueOldestAgeSeconds = Number(data?.queueOldestAgeSeconds);
-  const reportPending = Number(data?.reportPending);
-  const reportFailed = Number(data?.reportFailed);
-  const reportOldestAgeSeconds = Number(data?.reportOldestAgeSeconds);
+  const queuePending = data?.queuePending;
+  const queueDue = data?.queueDue;
+  const queueLeased = data?.queueLeased;
+  const queueCapacity = data?.queueCapacity;
+  const queueOldestAgeSeconds = data?.queueOldestAgeSeconds;
+  const reportPending = data?.reportPending;
+  const reportFailed = data?.reportFailed;
+  const reportOldestAgeSeconds = data?.reportOldestAgeSeconds;
   const supportPending = data?.supportPending;
   const supportFailed = data?.supportFailed;
   const supportOldestAgeSeconds = data?.supportOldestAgeSeconds;
@@ -131,14 +131,14 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const admissionFailed = data?.admissionFailed;
   const admissionOldestAgeSeconds = data?.admissionOldestAgeSeconds;
   const queueAlertThresholds = Object.freeze({
-    pendingPercent: Number(data?.queueAlertThresholds?.pendingPercent),
-    dueJobs: Number(data?.queueAlertThresholds?.dueJobs),
-    oldestAgeSeconds: Number(data?.queueAlertThresholds?.oldestAgeSeconds),
+    pendingPercent: data?.queueAlertThresholds?.pendingPercent,
+    dueJobs: data?.queueAlertThresholds?.dueJobs,
+    oldestAgeSeconds: data?.queueAlertThresholds?.oldestAgeSeconds,
   });
 
   const queueStateValid =
     [queuePending, queueDue, queueLeased, queueCapacity, queueOldestAgeSeconds].every(
-      (value) => Number.isInteger(value) && value >= 0,
+      (value) => Number.isSafeInteger(value) && value >= 0,
     ) &&
     queueCapacity >= 1 &&
     queueCapacity <= 50_000 &&
@@ -182,10 +182,13 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
 
   if (
     data?.status !== "ready" ||
+    !Number.isFinite(now) ||
     typeof configured !== "boolean" ||
     !Number.isFinite(heartbeatAt) ||
+    heartbeatAt > now + 5_000 ||
     !inRange(staleAfterMs, 30_000, 120_000) ||
     !Number.isFinite(progressAt) ||
+    progressAt > now + 5_000 ||
     !inRange(progressStaleAfterMs, 120_000, 600_000) ||
     progressAt > heartbeatAt + 5_000 ||
     !Number.isSafeInteger(pid) ||
