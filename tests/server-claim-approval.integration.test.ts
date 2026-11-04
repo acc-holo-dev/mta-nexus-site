@@ -1,5 +1,3 @@
-import { sql, eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   db,
   serverClaimChallengeRepository,
@@ -9,6 +7,8 @@ import {
   verificationRepository,
   verificationRequests,
 } from "@nexus/db";
+import { eq, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 async function staffSession(reviewerId: string) {
   const token = `tok_${reviewerId}`;
@@ -65,9 +65,11 @@ describe("server claim moderation ownership CAS", () => {
       isVerified: false,
     });
 
+    await staffSession(requesterId);
     const challenge = await serverClaimChallengeRepository.issue({
       serverId,
       requesterId,
+      currentToken: `tok_${requesterId}`,
       auditId: `aud_claim_issue_${suffix}`,
     });
     const sourceFetchedAt = await dbFutureTimestamp();
@@ -75,6 +77,7 @@ describe("server claim moderation ownership CAS", () => {
       id: challenge.id,
       serverId,
       requesterId,
+      currentToken: `tok_${requesterId}`,
       token: challenge.token,
       sourceFetchedAt,
       expectedEndpoint: { ipAddress: "198.51.100.70", port: serverPort },
@@ -208,15 +211,18 @@ describe("server claim moderation ownership CAS", () => {
       isVerified: false,
     });
 
+    await staffSession(requesterId);
     const challenge = await serverClaimChallengeRepository.issue({
       serverId,
       requesterId,
+      currentToken: `tok_${requesterId}`,
       auditId: `aud_claim_race_issue_${suffix}`,
     });
     await serverClaimChallengeRepository.consumeVerifiedProof({
       id: challenge.id,
       serverId,
       requesterId,
+      currentToken: `tok_${requesterId}`,
       token: challenge.token,
       sourceFetchedAt: await dbFutureTimestamp(),
       expectedEndpoint: { ipAddress: "198.51.100.72", port: serverPort },

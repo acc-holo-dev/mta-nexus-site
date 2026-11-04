@@ -10,6 +10,7 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../../../lib/observability";
+import { isPostgresDeadlock } from "../../../../../../lib/postgres-error";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { serverClaimService } from "../../../../../../lib/services/server-claim-service";
 
@@ -41,7 +42,7 @@ export const POST = withBrowserMutation(
     try {
       const sessionToken = request.cookies.get("nexus_session")?.value;
       const user = await authService.getSession(sessionToken);
-      if (!user) {
+      if (!sessionToken || !user) {
         return json(context, { error: "Authentication required" }, 401);
       }
 
@@ -81,10 +82,17 @@ export const POST = withBrowserMutation(
           token: parsed.data.token,
         },
         user,
+        sessionToken,
       );
 
       return json(context, result, 201);
     } catch (error: unknown) {
+      if (isPostgresDeadlock(error))
+        return json(
+          context,
+          { code: "SERVER_CLAIM_RETRY", error: "Please retry the server claim" },
+          409,
+        );
       if (error instanceof AppError) {
         return json(
           context,

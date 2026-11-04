@@ -110,7 +110,9 @@ describe("server claim service behavior", () => {
   });
 
   it("issues a bounded challenge only after current ownership checks", async () => {
-    await expect(serverClaimService.issueChallenge("srv_1", requester)).resolves.toMatchObject({
+    await expect(
+      serverClaimService.issueChallenge("srv_1", requester, "test-session"),
+    ).resolves.toMatchObject({
       challengeId: "scc_1",
       token,
       server: {
@@ -123,6 +125,7 @@ describe("server claim service behavior", () => {
     expect(mocks.issue).toHaveBeenCalledWith({
       serverId: "srv_1",
       requesterId: "usr_claimant",
+      currentToken: "test-session",
       auditId: "aud_test",
     });
   });
@@ -139,7 +142,7 @@ describe("server claim service behavior", () => {
         port: 22100,
       },
     });
-    const challenge = await serverClaimService.issueChallenge("srv_1", requester);
+    const challenge = await serverClaimService.issueChallenge("srv_1", requester, "test-session");
     expect(challenge.server).toEqual({
       id: "srv_1",
       name: "Updated Network Endpoint",
@@ -150,18 +153,24 @@ describe("server claim service behavior", () => {
 
   it("rejects verified, foreign-owned and unauthorized organization servers", async () => {
     state.server = server({ isVerified: true });
-    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+    await expect(
+      serverClaimService.issueChallenge("srv_1", requester, "test-session"),
+    ).rejects.toMatchObject({
       statusCode: 409,
     });
 
     state.server = server({ ownerId: "usr_other" });
-    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+    await expect(
+      serverClaimService.issueChallenge("srv_1", requester, "test-session"),
+    ).rejects.toMatchObject({
       statusCode: 409,
     });
 
     state.server = server({ organizationId: "org_1" });
     state.canManage = false;
-    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+    await expect(
+      serverClaimService.issueChallenge("srv_1", requester, "test-session"),
+    ).rejects.toMatchObject({
       statusCode: 403,
     });
 
@@ -178,6 +187,7 @@ describe("server claim service behavior", () => {
       serverClaimService.verifyChallenge(
         { serverId: "srv_1", challengeId: "scc_1", token },
         requester,
+        "test-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 503,
@@ -202,6 +212,7 @@ describe("server claim service behavior", () => {
       serverClaimService.verifyChallenge(
         { serverId: "srv_1", challengeId: "scc_1", token },
         requester,
+        "test-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 409,
@@ -222,6 +233,7 @@ describe("server claim service behavior", () => {
       serverClaimService.verifyChallenge(
         { serverId: "srv_1", challengeId: "scc_1", token },
         requester,
+        "test-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 422,
@@ -246,6 +258,7 @@ describe("server claim service behavior", () => {
       serverClaimService.verifyChallenge(
         { serverId: "srv_1", challengeId: "scc_1", token },
         requester,
+        "test-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 503,
@@ -270,6 +283,7 @@ describe("server claim service behavior", () => {
       serverClaimService.verifyChallenge(
         { serverId: "srv_1", challengeId: "scc_1", token },
         requester,
+        "test-session",
       ),
     ).resolves.toMatchObject({
       success: true,
@@ -288,6 +302,7 @@ describe("server claim service behavior", () => {
       id: "scc_1",
       serverId: "srv_1",
       requesterId: "usr_claimant",
+      currentToken: "test-session",
       token,
       sourceFetchedAt: new Date("2026-10-08T00:00:00.000Z"),
       expectedEndpoint: { ipAddress: "203.0.113.20", port: 22003 },
@@ -299,11 +314,13 @@ describe("server claim service behavior", () => {
   it("uses organization management authority even when a legacy personal owner is still recorded", async () => {
     state.server = server({ organizationId: "org_1", ownerId: "usr_legacy" });
     state.canManage = true;
-    await expect(serverClaimService.issueChallenge("srv_1", requester)).resolves.toHaveProperty(
-      "challengeId",
-    );
+    await expect(
+      serverClaimService.issueChallenge("srv_1", requester, "test-session"),
+    ).resolves.toHaveProperty("challengeId");
     state.canManage = false;
-    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+    await expect(
+      serverClaimService.issueChallenge("srv_1", requester, "test-session"),
+    ).rejects.toMatchObject({
       statusCode: 403,
     });
   });

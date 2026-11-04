@@ -93,7 +93,24 @@ describe("server claim challenge issue HTTP contract", () => {
     expect(issueChallenge).toHaveBeenCalledWith(
       "srv_1",
       expect.objectContaining({ id: "usr_claimant" }),
+      "test-session",
     );
+  });
+
+  it("reports a rolled-back deadlock as a private retryable conflict", async () => {
+    state.issueError = { cause: { code: "40P01" } };
+    const response = await POST(request(), { params: Promise.resolve({ id: "srv_1" }) });
+    expect(response.status).toBe(409);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(await response.json()).toMatchObject({ code: "SERVER_CLAIM_RETRY" });
+  });
+
+  it("rejects a missing session token even if session resolution is mocked as authenticated", async () => {
+    const input = request();
+    input.cookies.delete("nexus_session");
+    const response = await POST(input, { params: Promise.resolve({ id: "srv_1" }) });
+    expect(response.status).toBe(401);
+    expect(issueChallenge).not.toHaveBeenCalled();
   });
 
   it.each(["auth", "rate"] as const)("enforces %s before issuing a challenge", async (boundary) => {

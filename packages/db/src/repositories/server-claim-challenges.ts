@@ -1,20 +1,22 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import {
   AppError,
   ConflictError,
   NotFoundError,
   serverClaimMatchesOwnershipScope,
+  UnauthorizedError,
 } from "@nexus/domain";
+import { and, asc, eq, gt, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   serverClaimChallenges,
   servers,
+  users,
   verificationNotificationDeliveries,
   verificationRequests,
 } from "../schema";
-
+import { lockInitiatingSession } from "./initiating-session";
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 
 const CHALLENGE_LIFETIME_MS = 10 * 60_000;
@@ -39,7 +41,12 @@ function generateServerClaimToken(): string {
 }
 
 export class ServerClaimChallengeRepository {
-  async issue(input: { serverId: string; requesterId: string; auditId: string }): Promise<{
+  async issue(input: {
+    serverId: string;
+    requesterId: string;
+    auditId: string;
+    currentToken: string;
+  }): Promise<{
     id: string;
     token: string;
     expiresAt: Date;
@@ -82,6 +89,29 @@ export class ServerClaimChallengeRepository {
       if (pendingVerification) {
         throw new ConflictError("A server ownership request is already pending");
       }
+
+      // Keep issue and consume on the same server -> challenge -> session order.
+      await tx
+        .select({ id: serverClaimChallenges.id })
+        .from(serverClaimChallenges)
+        .where(
+          and(
+            eq(serverClaimChallenges.serverId, input.serverId),
+            eq(serverClaimChallenges.requesterId, input.requesterId),
+            isNull(serverClaimChallenges.consumedAt),
+            isNull(serverClaimChallenges.revokedAt),
+          ),
+        )
+        .orderBy(asc(serverClaimChallenges.id))
+        .for("update");
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.requesterId))
+        .limit(1)
+        .for("share");
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, input.requesterId, input.currentToken);
 
       const [clock] = await tx.execute(sql`select clock_timestamp()::text as now`);
       const createdAt = new Date(String(clock.now));
@@ -127,6 +157,8 @@ export class ServerClaimChallengeRepository {
         },
         createdAt,
       });
+
+      await lockInitiatingSession(tx, input.requesterId, input.currentToken);
 
       return Object.freeze({
         id,
@@ -174,6 +206,7 @@ export class ServerClaimChallengeRepository {
     id: string;
     serverId: string;
     requesterId: string;
+    currentToken: string;
     token: string;
     sourceFetchedAt: Date;
     expectedEndpoint: { ipAddress: string; port: number };
@@ -278,6 +311,15 @@ export class ServerClaimChallengeRepository {
         throw new ConflictError("A server ownership request is already pending");
       }
 
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.requesterId))
+        .limit(1)
+        .for("share");
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, input.requesterId, input.currentToken);
+
       const consumed = await tx
         .update(serverClaimChallenges)
         .set({
@@ -347,6 +389,8 @@ export class ServerClaimChallengeRepository {
         event: "server_claim",
         createdAt,
       });
+
+      await lockInitiatingSession(tx, input.requesterId, input.currentToken);
 
       return Object.freeze({
         verificationRequest,

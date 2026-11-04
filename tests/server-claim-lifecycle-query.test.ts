@@ -15,6 +15,10 @@ vi.mock("../packages/db/src/client", async () => {
     // after the existing control-proof checks; keep target fixtures separate.
     if (sql.startsWith('select "role" from "users"') && params[0] === "moderator")
       return { rows: [["moderator"]] };
+    if (sql.startsWith('select "id" from "users"') && params[0] === "manager")
+      return { rows: [["manager"]] };
+    if (sql.startsWith('select "id" from "server_claim_challenges"') && sql.includes("for update"))
+      return { rows: [] };
     // The initiating-session lock is not part of the claim-target fixtures.
     if (sql.includes('from "sessions"') && sql.includes("for update"))
       return { rows: [["ses_moderator", "2099-01-01T00:00:00.000Z"]] };
@@ -103,12 +107,18 @@ const request = (extra: Record<string, unknown> = {}) =>
 const challengeRepository = new ServerClaimChallengeRepository();
 const verificationRepository = new VerificationRepository();
 const issue = () =>
-  challengeRepository.issue({ serverId: "srv_a", requesterId: "manager", auditId: "aud_issue" });
+  challengeRepository.issue({
+    serverId: "srv_a",
+    requesterId: "manager",
+    auditId: "aud_issue",
+    currentToken: "tok_manager",
+  });
 const consume = () =>
   challengeRepository.consumeVerifiedProof({
     id: "scc_11111111-1111-4111-8111-111111111111",
     serverId: "srv_a",
     requesterId: "manager",
+    currentToken: "tok_manager",
     token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
     sourceFetchedAt: new Date(state.now),
     expectedEndpoint: { ipAddress: "198.51.100.8", port: 22003 },

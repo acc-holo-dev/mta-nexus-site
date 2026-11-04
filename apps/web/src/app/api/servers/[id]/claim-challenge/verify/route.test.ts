@@ -105,6 +105,27 @@ describe("server claim verification HTTP", () => {
     });
     expect(data).not.toHaveProperty("moderatorNotification");
     expect(verifyChallenge).toHaveBeenCalledOnce();
+    expect(verifyChallenge).toHaveBeenCalledWith(
+      expect.objectContaining({ serverId: "srv_1" }),
+      expect.objectContaining({ id: "usr_claimant" }),
+      "test-session",
+    );
+  });
+
+  it("reports a rolled-back deadlock as a private retryable conflict", async () => {
+    state.verificationError = { cause: { code: "40P01" } };
+    const response = await POST(request(), { params: Promise.resolve({ id: "srv_1" }) });
+    expect(response.status).toBe(409);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(await response.json()).toMatchObject({ code: "SERVER_CLAIM_RETRY" });
+  });
+
+  it("rejects a missing session token even if session resolution is mocked as authenticated", async () => {
+    const input = request();
+    input.cookies.delete("nexus_session");
+    const response = await POST(input, { params: Promise.resolve({ id: "srv_1" }) });
+    expect(response.status).toBe(401);
+    expect(verifyChallenge).not.toHaveBeenCalled();
   });
 
   it("does not call verification service if proof verification fails", async () => {

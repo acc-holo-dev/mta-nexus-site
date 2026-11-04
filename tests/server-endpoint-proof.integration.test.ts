@@ -1,16 +1,16 @@
-import { describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
 import {
   db,
-  serverClaimChallenges,
   serverClaimChallengeRepository,
+  serverClaimChallenges,
   serverRepository,
+  servers,
   sessionRepository,
   userRepository,
   verificationRepository,
   verificationRequests,
-  servers,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 async function fixture() {
   const suffix = `${Date.now().toString(36)}_${process.pid}_${Math.random().toString(36).slice(2, 8)}`;
@@ -31,6 +31,12 @@ async function fixture() {
     username: `reviewer_${suffix}`,
     displayName: "Endpoint Proof Reviewer",
     role: "moderator",
+  });
+  await sessionRepository.create({
+    id: `ses_${requesterId}`,
+    userId: requesterId,
+    token: `tok_${requesterId}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
   });
   const reviewerToken = `tok_${reviewerId}`;
   await sessionRepository.create({
@@ -59,6 +65,7 @@ async function issue(target: Awaited<ReturnType<typeof fixture>>) {
   const challenge = await serverClaimChallengeRepository.issue({
     serverId: target.serverId,
     requesterId: target.requesterId,
+    currentToken: `tok_${target.requesterId}`,
     auditId: `aud_issue_${target.suffix}`,
   });
   const [saved] = await db
@@ -78,6 +85,7 @@ async function consume(
     id: challenge.id,
     serverId: target.serverId,
     requesterId: target.requesterId,
+    currentToken: `tok_${target.requesterId}`,
     token: challenge.token,
     expectedEndpoint: target.endpoint,
     // Simulate a fresh master-list snapshot observed after issuance.
@@ -106,6 +114,7 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
         id: challenge.id,
         serverId: target.serverId,
         requesterId: target.requesterId,
+        currentToken: `tok_${target.requesterId}`,
         token: challenge.token,
         expectedEndpoint: target.endpoint,
         sourceFetchedAt: new Date(Date.now() + 5 * 60_000),

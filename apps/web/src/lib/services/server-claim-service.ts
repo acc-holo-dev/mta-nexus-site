@@ -26,7 +26,7 @@ async function assertRequesterCanChallenge(server: Server, requester: User): Pro
 }
 
 export const serverClaimService = {
-  async issueChallenge(serverId: string, requester: User) {
+  async issueChallenge(serverId: string, requester: User, currentToken: string) {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
     await assertRequesterCanChallenge(server, requester);
@@ -34,6 +34,7 @@ export const serverClaimService = {
     const challenge = await serverClaimChallengeRepository.issue({
       serverId,
       requesterId: requester.id,
+      currentToken,
       auditId: generateId("aud"),
     });
 
@@ -53,6 +54,7 @@ export const serverClaimService = {
       token: string;
     },
     requester: User,
+    currentToken: string,
   ) {
     const server = await serverRepository.findById(input.serverId);
     if (!server) throw new NotFoundError("Server", input.serverId);
@@ -104,6 +106,7 @@ export const serverClaimService = {
       id: input.challengeId,
       serverId: server.id,
       requesterId: requester.id,
+      currentToken,
       token: input.token,
       sourceFetchedAt,
       expectedEndpoint: { ipAddress: server.ipAddress, port: server.port },

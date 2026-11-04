@@ -1,6 +1,4 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
   db,
   licenseControlsRepository as repo,
@@ -11,10 +9,12 @@ import {
   verificationRepository,
 } from "@nexus/db";
 import { createLicenseRuntimeToken } from "@nexus/security";
+import { eq } from "drizzle-orm";
+import { expect, it } from "vitest";
 import {
   auditEvents,
-  builds,
   licenseRuntimeBindings as bindings,
+  builds,
   licenses,
   products,
   serverClaimChallenges,
@@ -28,6 +28,7 @@ async function prove(serverId: string, actorId: string, reviewerId: string) {
   const challenge = await serverClaimChallengeRepository.issue({
     serverId,
     requesterId: actorId,
+    currentToken: `tok_${actorId}`,
     auditId: id("aud"),
   });
   const [saved] = await db
@@ -38,6 +39,7 @@ async function prove(serverId: string, actorId: string, reviewerId: string) {
     id: challenge.id,
     serverId,
     requesterId: actorId,
+    currentToken: `tok_${actorId}`,
     token: challenge.token,
     expectedEndpoint: { ipAddress: challenge.server.ipAddress, port: challenge.server.port },
     sourceFetchedAt: new Date(Math.max(Date.now(), saved.createdAt.getTime())),

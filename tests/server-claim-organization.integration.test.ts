@@ -1,6 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, sql } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
   auditEvents,
   auditRepository,
@@ -9,14 +7,16 @@ import {
   organizationMembers,
   organizations,
   readManagedServerClaimStatus,
-  serverClaimChallenges,
   serverClaimChallengeRepository,
+  serverClaimChallenges,
   servers,
   sessionRepository,
   users,
   verificationRepository,
   verificationRequests,
 } from "@nexus/db";
+import { and, eq, sql } from "drizzle-orm";
+import { expect, it } from "vitest";
 
 let nextPort = 20_000 + (Date.now() % 30_000);
 async function fixture() {
@@ -37,12 +37,13 @@ async function fixture() {
     await db
       .insert(users)
       .values({ id, email: `${id}@example.invalid`, username: id, displayName: role, role });
-  await sessionRepository.create({
-    id: `ses_${reviewer}`,
-    userId: reviewer,
-    token: `tok_${reviewer}`,
-    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
-  });
+  for (const id of [manager, owner, reviewer])
+    await sessionRepository.create({
+      id: `ses_${id}`,
+      userId: id,
+      token: `tok_${id}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
   for (const id of [organization, otherOrganization])
     await db
       .insert(organizations)
@@ -70,6 +71,7 @@ async function fixture() {
     serverClaimChallengeRepository.issue({
       serverId,
       requesterId: manager,
+      currentToken: `tok_${manager}`,
       auditId: `aud_ci_${suffix}`,
     });
   const consume = async (challenge: Awaited<ReturnType<typeof issue>>) => {
@@ -80,6 +82,7 @@ async function fixture() {
       id: challenge.id,
       serverId,
       requesterId: manager,
+      currentToken: `tok_${manager}`,
       token: challenge.token,
       sourceFetchedAt: new Date(String(clock.now)),
       expectedEndpoint: { ipAddress: "198.51.100.205", port },
@@ -236,6 +239,7 @@ it("rolls back approval after revocation, but permits rejection and a new owner 
     serverClaimChallengeRepository.issue({
       serverId: f.serverId,
       requesterId: f.owner,
+      currentToken: `tok_${f.owner}`,
       auditId: `aud_retry_${f.requestId}`,
     }),
   ).resolves.toHaveProperty("token");
