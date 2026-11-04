@@ -87,6 +87,18 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
   );
 });
 
+it("locks collection requirements back/check touch targets and structured withheld messaging", () => {
+  const source = read("apps/web/src/components/collection-requirements-screen.tsx");
+  expect(source).toContain('size="touch"');
+  expect(source).toContain("inline-flex min-h-11 items-center");
+  expect(source).toContain("bg-danger-soft");
+  expect(source).toContain("border-[color:var(--nexus-danger)]/20");
+  expect(source).toContain("unavailableItemCount");
+  expect(source).toContain("c.withheld");
+  expect(source).toContain("c.unavailable");
+  expect(source).not.toMatch(/role="note"\s+className="text-danger"/u);
+});
+
 it.each([
   ["collection detail", CollectionDetailLoading, "library-collection-detail-loading-heading"],
   ["collection add", CollectionAddLoading, "collection-add-loading-heading"],
