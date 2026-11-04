@@ -18,6 +18,8 @@ const en = {
   busy: "Creating…",
   retry:
     "Result could not be confirmed. Retry the same request to avoid duplicates, or check draft copy history.",
+  errorDescription:
+    "A failed copy is not a new draft. Retry the same request or check copy history before starting another.",
   frozen:
     "This request is fixed for safe retries. Reload after checking history to start a different copy.",
   invalid: "Check the title and lowercase address (letters, numbers and single hyphens).",
@@ -93,6 +95,8 @@ const ru: typeof en = {
   busy: "Создание…",
   retry:
     "Результат не удалось подтвердить. Повторите тот же запрос без создания дублей или проверьте историю копий.",
+  errorDescription:
+    "Неуспешное копирование не создаёт новый черновик. Повторите тот же запрос или проверьте историю перед новой попыткой.",
   frozen:
     "Данные запроса зафиксированы для безопасного повтора. Проверьте историю и обновите страницу, чтобы создать другую копию.",
   invalid: "Проверьте название и адрес: строчные латинские буквы, цифры и одиночные дефисы.",

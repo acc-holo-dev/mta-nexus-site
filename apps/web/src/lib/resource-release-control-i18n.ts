@@ -77,6 +77,8 @@ const copy = {
     confirmSuspend: "I confirm that this resource must be removed from public availability.",
     confirmRelease: "I confirm return to draft for a new review.",
     saved: "Moderation decision confirmed.",
+    actionFailedDescription:
+      "A failed moderation action is not a changed resource state. Reload before retrying.",
     open: "Open resource",
     manage: "Manage versions",
     revision: "Preference revision",
@@ -178,6 +180,8 @@ const copy = {
     confirmSuspend: "Подтверждаю, что ресурс нужно снять с публичного доступа.",
     confirmRelease: "Подтверждаю возврат в черновик для повторной проверки.",
     saved: "Решение модерации подтверждено.",
+    actionFailedDescription:
+      "Неуспешное действие модерации не меняет состояние ресурса. Обновите страницу перед повтором.",
     open: "Открыть ресурс",
     manage: "Управлять версиями",
     revision: "Версия настройки",

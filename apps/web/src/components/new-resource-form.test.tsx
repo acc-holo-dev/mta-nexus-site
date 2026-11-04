@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { PRODUCT_TYPES } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
@@ -10,6 +13,11 @@ vi.mock("../components/locale-context", () => ({
 }));
 
 import { NewResourceForm } from "./new-resource-form";
+
+const source = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "new-resource-form.tsx"),
+  "utf8",
+);
 
 it.each(["en", "ru"] as const)("offers every supported resource type in %s", (locale) => {
   state.locale = locale;
@@ -32,4 +40,13 @@ it.each(["en", "ru"] as const)("renders localized build constraints in %s", (loc
   expect(html).toContain('pattern="1\\.[0-9]+(\\.[0-9]+)?"');
   expect(html).toContain('accept=".zip,.rar,.7z,.lua"');
   expect(html).toContain(copy.buildFileRequirements.replace("{maxFileSize}", "64"));
+  expect(html).toContain("min-h-11");
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+});
+
+it("locks new resource form honesty to ErrorState without ad-hoc alerts", () => {
+  expect(source).toContain("ErrorState");
+  expect(source).toContain("createErrorDescription");
+  expect(source).not.toContain('role="alert"');
 });

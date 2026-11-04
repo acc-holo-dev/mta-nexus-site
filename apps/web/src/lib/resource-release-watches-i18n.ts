@@ -62,6 +62,8 @@ const en = {
   busy: "Saving…",
   saved: "Release preference saved",
   failed: "Could not save the release preference",
+  failedDescription:
+    "A failed save is not an updated watch preference. Retry the same request or reload before changing it.",
   conflict: "The preference changed. Refresh and try again.",
   access: "Current library access is required to enable notifications.",
   maximum: "The limit of 100 active watches has been reached.",
@@ -144,6 +146,8 @@ const ru: typeof en = {
   busy: "Сохранение…",
   saved: "Настройка сохранена",
   failed: "Не удалось сохранить настройку",
+  failedDescription:
+    "Неуспешное сохранение не обновляет подписку. Повторите тот же запрос или обновите состояние перед изменением.",
   conflict: "Настройка изменилась. Обновите страницу и повторите.",
   access: "Для включения уведомлений нужны действующие права библиотеки.",
   maximum: "Достигнут предел в 100 активных подписок.",

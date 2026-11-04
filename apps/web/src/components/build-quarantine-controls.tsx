@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -115,8 +115,8 @@ export function BuildQuarantineControls({
         onClick={() => void act(action)}
         className={
           action === "quarantine"
-            ? "min-h-9 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
-            : "min-h-9 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
+            ? "min-h-11 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
+            : "min-h-11 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
         }
       >
         {pending ? (
@@ -128,11 +128,9 @@ export function BuildQuarantineControls({
         )}
         {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
       </Button>
-      {error && (
-        <p role="alert" className="text-[11px] text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState title={error} description={copy.quarantineBuildFailedDescription} />
+      ) : null}
     </div>
   );
 }

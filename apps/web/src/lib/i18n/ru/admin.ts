@@ -55,6 +55,8 @@ export const admin = {
     restoreBuildConfirm:
       "Вернуть эту сборку в публикацию, если trusted clean scan всё ещё действителен?",
     quarantineBuildFailed: "Не удалось изменить карантин сборки.",
+    quarantineBuildFailedDescription:
+      "Неуспешное действие карантина не меняет состояние сборки. Обновите страницу перед повтором.",
     quarantineBuildUnavailable: "Управление карантином временно недоступно.",
     quarantinedAt: "Помещена в карантин",
     noRiskBuilds: "На этой странице нет опубликованных или карантинных сборок.",
@@ -82,6 +84,8 @@ export const admin = {
     resolveReportConfirm: "Закрыть жалобу с указанным объяснением?",
     dismissReportConfirm: "Отклонить жалобу с указанным объяснением?",
     reportDecisionFailed: "Не удалось обновить жалобу.",
+    reportDecisionFailedDescription:
+      "Неуспешное решение не закрывает жалобу. Обновите очередь перед повтором.",
     reportDecisionUnavailable: "Модерация жалоб временно недоступна.",
     notes: "Заметки",
     noReports: "Жалоб в очереди модерации нет.",

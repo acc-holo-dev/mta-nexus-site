@@ -53,6 +53,8 @@ export const admin = {
     restoreBuildConfirm:
       "Restore this quarantined build to publication if its trusted clean scan is still valid?",
     quarantineBuildFailed: "Build quarantine action failed.",
+    quarantineBuildFailedDescription:
+      "A failed quarantine action is not a changed build state. Reload before retrying.",
     quarantineBuildUnavailable: "Build quarantine is temporarily unavailable.",
     quarantinedAt: "Quarantined",
     noRiskBuilds: "No published or quarantined builds are available in this review page.",
@@ -80,6 +82,8 @@ export const admin = {
     resolveReportConfirm: "Resolve this report with the recorded reason?",
     dismissReportConfirm: "Dismiss this report with the recorded reason?",
     reportDecisionFailed: "The report could not be updated.",
+    reportDecisionFailedDescription:
+      "A failed decision is not a closed report. Reload the queue before retrying.",
     reportDecisionUnavailable: "Report moderation is temporarily unavailable.",
     notes: "Notes",
     noReports: "No reports in the moderation queue.",

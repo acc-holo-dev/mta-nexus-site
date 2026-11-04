@@ -33,6 +33,8 @@ const copy = {
     page: "Page",
     working: "Saving…",
     saved: "Changes saved.",
+    actionFailedDescription:
+      "A failed save is not an updated compatibility or variant group. Reload before retrying.",
     mta: "Minimum MTA version",
     dependencies: "Dependency resource slugs",
     dependencyHint:
@@ -88,6 +90,8 @@ const copy = {
     page: "Страница",
     working: "Сохранение…",
     saved: "Изменения сохранены.",
+    actionFailedDescription:
+      "Неуспешное сохранение не обновляет совместимость или группу вариантов. Обновите страницу перед повтором.",
     mta: "Минимальная версия MTA",
     dependencies: "Slug зависимых ресурсов",
     dependencyHint:

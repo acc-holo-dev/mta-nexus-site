@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -82,7 +82,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           type="button"
           disabled={!ready || pending !== null}
           onClick={() => void decide("resolve")}
-          className="min-h-9 gap-1.5 bg-success-soft text-success text-xs"
+          className="min-h-11 gap-1.5 bg-success-soft text-success text-xs"
           variant="outline"
         >
           {pending === "resolve" ? (
@@ -96,7 +96,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           type="button"
           disabled={!ready || pending !== null}
           onClick={() => void decide("dismiss")}
-          className="min-h-9 gap-1.5 bg-danger-soft text-danger text-xs"
+          className="min-h-11 gap-1.5 bg-danger-soft text-danger text-xs"
           variant="outline"
         >
           {pending === "dismiss" ? (
@@ -108,11 +108,9 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
         </Button>
       </div>
       {!ready && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
-      {error && (
-        <p role="alert" className="text-xs text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState title={error} description={copy.reportDecisionFailedDescription} />
+      ) : null}
     </div>
   );
 }

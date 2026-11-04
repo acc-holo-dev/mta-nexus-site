@@ -23,7 +23,11 @@ export const publishing = {
     submitting: "Submitting...",
     submit: "Submit free resource for review",
     createError: "Could not create resource",
+    createErrorDescription:
+      "A failed submit is not a created resource. Fix the form if needed, then retry.",
     buildError: "Resource was created, but the build could not be submitted",
+    buildErrorDescription:
+      "The draft may already exist. Retry the build only; this will not create another resource.",
     buildRetryReady:
       "The resource draft is saved. Replace the archive or wait for the scanner, then retry; this will not create another resource.",
     pendingDraftLabel: "Draft slug:",

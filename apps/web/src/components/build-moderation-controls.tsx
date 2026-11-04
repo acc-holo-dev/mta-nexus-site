@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 
 import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -122,13 +122,13 @@ export function BuildModerationControls({
         {hasTrustedCleanScan ? (
           <a
             href={`/api/admin/builds/${encodeURIComponent(buildId)}/download`}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-base bg-surface px-3 py-2 text-[11px] font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-base bg-surface px-3 py-2 text-[11px] font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
           >
             <Download className="h-3.5 w-3.5" aria-hidden="true" />
             {copy.reviewArtifact}
           </a>
         ) : (
-          <span className="inline-flex min-h-9 items-center rounded-md border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-3 py-2 text-[11px] text-warning">
+          <span className="inline-flex min-h-11 items-center rounded-md border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-3 py-2 text-[11px] text-warning">
             {copy.artifactRequiresCleanScan}
           </span>
         )}
@@ -137,7 +137,7 @@ export function BuildModerationControls({
           type="button"
           disabled={uncertain || !expectedRevision || confirmedWrite || !canApprove}
           onClick={() => void moderate("approve")}
-          className="min-h-9 gap-1.5 bg-success-soft text-success text-[11px]"
+          className="min-h-11 gap-1.5 bg-success-soft text-success text-[11px]"
           variant="outline"
         >
           {pending === "approve" ? (
@@ -152,7 +152,7 @@ export function BuildModerationControls({
           type="button"
           disabled={uncertain || !expectedRevision || confirmedWrite || !canReject}
           onClick={() => void moderate("reject")}
-          className="min-h-9 gap-1.5 bg-danger-soft text-danger text-[11px]"
+          className="min-h-11 gap-1.5 bg-danger-soft text-danger text-[11px]"
           variant="outline"
         >
           {pending === "reject" ? (
@@ -164,21 +164,24 @@ export function BuildModerationControls({
         </Button>
       </div>
 
-      {error && (
-        <p role="alert" className="text-[11px] text-danger">
-          {error}
-        </p>
-      )}
-      {uncertain && (
-        <Button
-          type="button"
-          onClick={() => router.refresh()}
-          className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          variant="ghost"
-        >
-          {versionCopy.reload}
-        </Button>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={versionCopy.failedDescription}
+          action={
+            uncertain ? (
+              <Button
+                type="button"
+                onClick={() => router.refresh()}
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                variant="ghost"
+              >
+                {versionCopy.reload}
+              </Button>
+            ) : null
+          }
+        />
+      ) : null}
       {!hasNotes && (
         <p className="text-[10px] text-faint" aria-live="polite">
           {copy.reviewNoteHint}

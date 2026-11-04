@@ -1,7 +1,7 @@
 "use client";
 
 import { PRODUCT_TYPES } from "@nexus/domain";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useState } from "react";
 import { confirmedAuthorBuild } from "../lib/author-resource-response";
 import {
@@ -259,21 +259,21 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             size="sm"
             onClick={startNewSubmission}
             disabled={loading}
-            className="shrink-0"
+            className="min-h-11 shrink-0"
           >
             {copy.startNewResource}
           </Button>
         </div>
       )}
 
-      {error && (
-        <div
-          role="alert"
-          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
-        >
-          {error}
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={
+            error === copy.buildError ? copy.buildErrorDescription : copy.createErrorDescription
+          }
+        />
+      ) : null}
 
       <MtaMetaInspectorPanel
         onApplyMinimumVersion={setMtaVersionTarget}
@@ -284,7 +284,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         key={formEpoch}
         onSubmit={submit}
         aria-busy={loading}
-        className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+        className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
       >
         <fieldset disabled={loading} className="contents">
           <Input

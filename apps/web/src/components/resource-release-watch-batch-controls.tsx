@@ -5,7 +5,7 @@ import {
   type ResourceReleaseWatchDisableCommand,
   type ResourceReleaseWatchEnableCommand,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
@@ -226,6 +226,7 @@ export function ResourceReleaseWatchBatchControls({
         <Button
           type="button"
           variant="outline"
+          className="min-h-11"
           disabled={busy || saved || !confirmed || !selected.length || selected.length > capacity}
           onClick={() => void send()}
         >
@@ -236,20 +237,28 @@ export function ResourceReleaseWatchBatchControls({
         <div className="space-y-3">
           <p className="text-sm text-muted">{copy.pendingNote}</p>
           {!blocked && (
-            <Button type="button" variant="outline" disabled={busy} onClick={() => void send()}>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled={busy}
+              onClick={() => void send()}
+            >
               {copy.retrySame}
             </Button>
           )}
-          <Button type="button" variant="outline" disabled={busy} onClick={() => router.refresh()}>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            disabled={busy}
+            onClick={() => router.refresh()}
+          >
             {copy.reloadState}
           </Button>
         </div>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}

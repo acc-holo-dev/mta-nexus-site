@@ -23,17 +23,25 @@ export const workspace = {
       "The resource changed before your save completed. Your text is still here; review the latest details before saving again.",
     draftConflict:
       "The resource changed after this draft was saved. Restore your draft to review it before saving, or discard it to use the current details.",
+    draftConflictDescription:
+      "A conflict is not a saved update. Restore or discard the draft before editing again.",
     restoreDraft: "Restore draft",
     discardDraft: "Discard draft",
     draftUnavailable:
       "Draft recovery is unavailable in this browser. Keep this page open until you submit your changes.",
+    draftUnavailableDescription:
+      "Missing draft recovery is not a save failure. Keep this tab open and submit when ready.",
     fileReselect:
       "Only text is restored. After reopening this page, select the archive again. Text remains in this tab for up to 24 hours.",
     failed: "Could not save changes. Try again.",
+    failedDescription:
+      "A failed save is not an updated resource. Review the form and retry when ready.",
     invalid: "Check the title, description and tags (up to 20).",
     newVersion: "Submit a new version",
     versionSubmitted: "Version submitted for scanning and moderator review.",
     uploadFailed: "Could not submit this version. Try again.",
+    uploadFailedDescription:
+      "A failed upload is not a new version. Choose the archive again if needed, then retry.",
     history: "Version history",
     noBuilds: "No versions submitted yet.",
     notes: "Moderation notes",
@@ -54,6 +62,8 @@ export const workspace = {
     cancel: "Cancel",
     retired: "Version retired.",
     retireFailed: "Could not retire this version. Refresh and try again.",
+    retireFailedDescription:
+      "A failed retirement is not a removed version. Reload and retry if the version is still public.",
     retiring: "Retiring…",
     statusLabels: {
       draft: "Draft",
