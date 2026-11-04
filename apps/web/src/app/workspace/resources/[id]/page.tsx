@@ -1,3 +1,4 @@
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -14,6 +15,10 @@ import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { resourcePublicationReadinessService } from "../../../../lib/services/resource-publication-readiness-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -40,20 +45,35 @@ export default async function ManageResourcePage({
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
-  const [history, lifecycleHistory, publicationReadiness] = await Promise.all([
+  const publisherCopy = getResourcePublisherCopy(locale);
+  const loaded = await Promise.all([
     productService.getManagedHistory(id, actor, Number(query.page ?? 1)),
     productService.getResourceLifecycleHistory(id, actor),
     resourcePublicationReadinessService.summary(id, actor),
-  ]);
+  ]).catch(() => null);
+  if (!loaded) {
+    return (
+      <div className={pageShellClass}>
+        <Link href="/workspace/resources" className={navLinkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={publisherCopy.loadUnavailable}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  const [history, lifecycleHistory, publicationReadiness] = loaded;
   const commerceCopy = getResourceCommerceCopy(locale);
   const buildCopy = getResourceBuildWorkspaceCopy(locale);
-  const publisherCopy = getResourcePublisherCopy(locale);
   return (
-    <div className="space-y-8">
-      <Link
-        href="/workspace/resources"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href="/workspace/resources" className={navLinkClass}>
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -126,84 +146,84 @@ export default async function ManageResourcePage({
       />
       <section className="space-y-4">
         <h2 className="text-xl font-semibold text-primary">{copy.history}</h2>
-        {history.builds.length === 0 && <p className="text-secondary">{copy.noBuilds}</p>}
-        <ul className="space-y-4">
-          {history.builds.map((build) => (
-            <li key={build.id} className="space-y-3 rounded-lg border border-base bg-surface p-5">
-              <div className="flex flex-wrap justify-between gap-2">
-                <h3 className="font-semibold text-primary">{build.version}</h3>
-                <time
-                  dateTime={new Date(build.createdAt).toISOString()}
-                  className="text-sm text-muted"
-                >
-                  {new Date(build.createdAt).toLocaleDateString(
-                    locale === "ru" ? "ru-RU" : "en-GB",
-                  )}
-                </time>
-              </div>
-              <p className="text-sm text-secondary">
-                {copy.buildLabels[build.status]} · {copy.scan}:{" "}
-                {copy.scanLabels[build.scanStatus as keyof typeof copy.scanLabels] ??
-                  copy.scanLabels.unknown}
-              </p>
-              {build.releaseNotes && (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {build.releaseNotes}
-                </p>
-              )}
-              {build.status === "quarantined" && build.quarantineReason && (
-                <p className="whitespace-pre-wrap break-words text-sm text-danger">
-                  {copy.quarantine}: {build.quarantineReason}
-                </p>
-              )}
-              {history.decisions
-                .filter((decision) => decision.buildId === build.id)
-                .map((decision) => (
-                  <div
-                    key={decision.id}
-                    className="border-l-2 border-base pl-3 text-sm text-secondary"
+        {history.builds.length === 0 ? (
+          <EmptyState title={copy.noBuilds} description={publisherCopy.readiness.no_build} />
+        ) : (
+          <ul className="space-y-4">
+            {history.builds.map((build) => (
+              <li key={build.id} className="space-y-3 rounded-lg border border-base bg-surface p-5">
+                <div className="flex flex-wrap justify-between gap-2">
+                  <h3 className="font-semibold text-primary">{build.version}</h3>
+                  <time
+                    dateTime={new Date(build.createdAt).toISOString()}
+                    className="text-sm text-muted"
                   >
-                    <p>
-                      {copy.notes} ·{" "}
-                      {buildCopy.actions[decision.action as keyof typeof buildCopy.actions] ??
-                        decision.action}
-                    </p>
-                    <p className="whitespace-pre-wrap break-words">
-                      {typeof decision.details?.notes === "string"
-                        ? decision.details.notes
-                        : typeof decision.details?.reason === "string"
-                          ? decision.details.reason
-                          : ""}
-                    </p>
-                  </div>
-                ))}
-              {build.status !== "retired" &&
-                build.status !== "quarantined" &&
-                Number.isInteger(build.revision) &&
-                (build.revision ?? 0) >= 1 && (
-                  <RetireBuildForm
-                    productId={id}
-                    buildId={build.id}
-                    version={build.version}
-                    revision={build.revision as number}
-                  />
+                    {new Date(build.createdAt).toLocaleDateString(
+                      locale === "ru" ? "ru-RU" : "en-GB",
+                    )}
+                  </time>
+                </div>
+                <p className="text-sm text-secondary">
+                  {copy.buildLabels[build.status]} · {copy.scan}:{" "}
+                  {copy.scanLabels[build.scanStatus as keyof typeof copy.scanLabels] ??
+                    copy.scanLabels.unknown}
+                </p>
+                {build.releaseNotes && (
+                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                    {build.releaseNotes}
+                  </p>
                 )}
-              <Link
-                href={`/workspace/resources/${id}/builds/${build.id}`}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {buildCopy.manage}
-              </Link>
-            </li>
-          ))}
-        </ul>
+                {build.status === "quarantined" && build.quarantineReason && (
+                  <p className="whitespace-pre-wrap break-words text-sm text-danger">
+                    {copy.quarantine}: {build.quarantineReason}
+                  </p>
+                )}
+                {history.decisions
+                  .filter((decision) => decision.buildId === build.id)
+                  .map((decision) => (
+                    <div
+                      key={decision.id}
+                      className="border-l-2 border-base pl-3 text-sm text-secondary"
+                    >
+                      <p>
+                        {copy.notes} ·{" "}
+                        {buildCopy.actions[decision.action as keyof typeof buildCopy.actions] ??
+                          decision.action}
+                      </p>
+                      <p className="whitespace-pre-wrap break-words">
+                        {typeof decision.details?.notes === "string"
+                          ? decision.details.notes
+                          : typeof decision.details?.reason === "string"
+                            ? decision.details.reason
+                            : ""}
+                      </p>
+                    </div>
+                  ))}
+                {build.status !== "retired" &&
+                  build.status !== "quarantined" &&
+                  Number.isInteger(build.revision) &&
+                  (build.revision ?? 0) >= 1 && (
+                    <RetireBuildForm
+                      productId={id}
+                      buildId={build.id}
+                      version={build.version}
+                      revision={build.revision as number}
+                    />
+                  )}
+                <Link
+                  href={`/workspace/resources/${id}/builds/${build.id}`}
+                  className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {buildCopy.manage}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
         {history.totalPages > 1 && (
           <nav aria-label={copy.page} className="flex gap-4 text-sm">
             {history.page > 1 && (
-              <Link
-                href={`?page=${history.page - 1}`}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={`?page=${history.page - 1}`} className={navLinkClass}>
                 {copy.previous}
               </Link>
             )}
@@ -211,10 +231,7 @@ export default async function ManageResourcePage({
               {copy.page} {history.page} {copy.of} {history.totalPages}
             </span>
             {history.page < history.totalPages && (
-              <Link
-                href={`?page=${history.page + 1}`}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={`?page=${history.page + 1}`} className={navLinkClass}>
                 {copy.next}
               </Link>
             )}

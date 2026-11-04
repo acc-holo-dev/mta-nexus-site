@@ -155,3 +155,27 @@ it("explains an empty period filter and offers to show all time", async () => {
   expect(html).toContain(copy.clearPeriod);
   expect(html).not.toContain(copy.empty);
 });
+it("shows an honest recovery state when draft copy services fail", async () => {
+  state.preview.mockRejectedValue(new Error("preview unavailable"));
+  const copy = resourceCopyCopy("en");
+  const html = renderToStaticMarkup(await New(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+});
+it("shows an honest recovery state when copy history fails", async () => {
+  state.page.mockRejectedValue(new Error("history unavailable"));
+  const copy = resourceCopyCopy("en");
+  const html = renderToStaticMarkup(await History(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+});
+it("shows an honest recovery state when a recorded copy detail fails", async () => {
+  state.detail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = resourceCopyCopy("en");
+  const html = renderToStaticMarkup(await Detail(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+});

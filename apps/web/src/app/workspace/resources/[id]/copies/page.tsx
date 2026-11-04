@@ -1,11 +1,12 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceCopyCopy, resourceCopyError } from "../../../../../lib/resource-copy-i18n";
 import {
@@ -15,6 +16,11 @@ import {
 } from "../../../../../lib/resource-copy-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceCopyService } from "../../../../../lib/services/resource-copy-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Draft copies | MTA NEXUS",
@@ -33,7 +39,8 @@ export default async function ResourceCopiesPage({
       params,
       searchParams,
     ]),
-    c = resourceCopyCopy(locale);
+    c = resourceCopyCopy(locale),
+    dictionary = getDictionary(locale);
   const id = resourceCopyId(path.id);
   const returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {
@@ -46,17 +53,34 @@ export default async function ResourceCopiesPage({
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
-    const query = resourceCopiesQuery(resourceCopiesPageParams(raw), true),
+    const query = resourceCopiesQuery(resourceCopiesPageParams(raw), true);
+    let result: Awaited<ReturnType<typeof resourceCopyService.page>>;
+    try {
       result = await resourceCopyService.page(actor, id, query);
+    } catch (error) {
+      if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
+      return (
+        <section className={pageShellClass}>
+          <Link className={navLinkClass} href={`/workspace/resources/${encodeURIComponent(id)}`}>
+            {c.back}
+          </Link>
+          <ErrorState
+            title={c.loadUnavailable}
+            action={
+              <Link href={returnPath} className={navLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </section>
+      );
+    }
     const base = `/workspace/resources/${encodeURIComponent(id)}/copies`,
       href = (page: number) =>
         `${base}?${new URLSearchParams({ page: String(page), days: String(query.days) })}`;
     return (
-      <section className="mx-auto max-w-4xl space-y-6 py-8">
-        <Link
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={`/workspace/resources/${encodeURIComponent(id)}`}
-        >
+      <section className={pageShellClass}>
+        <Link className={navLinkClass} href={`/workspace/resources/${encodeURIComponent(id)}`}>
           {c.back}
         </Link>
         <h1 className="font-display">
@@ -91,17 +115,17 @@ export default async function ResourceCopiesPage({
           {c.total}: {result.total}
         </p>
         {result.copies.length === 0 ? (
-          <div className="nexus-panel space-y-3 p-6 text-sm text-muted">
-            <p>{query.days === "all" ? c.empty : c.emptyFiltered}</p>
-            {query.days !== "all" && (
-              <Link
-                href={base}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {c.clearPeriod}
-              </Link>
-            )}
-          </div>
+          <EmptyState
+            title={query.days === "all" ? c.empty : c.emptyFiltered}
+            description={query.days === "all" ? c.emptyHint : c.emptyFilteredHint}
+            action={
+              query.days !== "all" ? (
+                <Link href={base} className={navLinkClass}>
+                  {c.clearPeriod}
+                </Link>
+              ) : undefined
+            }
+          />
         ) : (
           <ul className="space-y-4">
             {result.copies.map((row) => (
@@ -130,12 +154,20 @@ export default async function ResourceCopiesPage({
             ))}
           </ul>
         )}
-        <nav className="flex gap-4" aria-label={c.history}>
-          {result.page > 1 && <Link href={href(result.page - 1)}>{c.previous}</Link>}
-          <span>
+        <nav className="flex flex-wrap gap-4" aria-label={c.history}>
+          {result.page > 1 && (
+            <Link href={href(result.page - 1)} className={navLinkClass}>
+              {c.previous}
+            </Link>
+          )}
+          <span className="inline-flex min-h-11 items-center">
             {result.page} / {result.totalPages}
           </span>
-          {result.page < result.totalPages && <Link href={href(result.page + 1)}>{c.next}</Link>}
+          {result.page < result.totalPages && (
+            <Link href={href(result.page + 1)} className={navLinkClass}>
+              {c.next}
+            </Link>
+          )}
         </nav>
       </section>
     );
@@ -143,12 +175,9 @@ export default async function ResourceCopiesPage({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && [400, 409].includes(error.statusCode))
       return (
-        <section className="space-y-4 py-8">
+        <section className={`${pageShellClass} space-y-4`}>
           <p role="alert">{resourceCopyError(locale, error.code)}</p>
-          <Link
-            href="/workspace/resources"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/resources" className={navLinkClass}>
             {c.back}
           </Link>
         </section>

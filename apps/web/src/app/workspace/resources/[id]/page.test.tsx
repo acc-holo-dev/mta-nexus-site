@@ -51,6 +51,7 @@ vi.mock("../../../../components/resource-lifecycle-controls", () => ({
   ResourceLifecycleControls: () => null,
 }));
 
+import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
 import Page, { metadata } from "./page";
 
 const input = {
@@ -118,3 +119,13 @@ it.each(["en", "ru"] as const)(
     expect(metadata.robots).toMatchObject({ index: false });
   },
 );
+it("shows an honest recovery state when managed resource data fails", async () => {
+  mocks.history.mockRejectedValue(new Error("history unavailable"));
+  const copy = getResourcePublisherCopy("en");
+  const html = renderToStaticMarkup(await Page(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("page=2");
+  expect(html).not.toContain("privateField");
+});

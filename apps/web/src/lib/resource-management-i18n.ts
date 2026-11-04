@@ -1,5 +1,8 @@
+import type { Locale } from "./i18n";
+
 const copy = {
   en: {
+    loadUnavailable: "Resource variant management is temporarily unavailable. Please try again.",
     variants: "Resource variants",
     compatibility: "Compatibility and dependencies",
     back: "Back to resource",
@@ -53,6 +56,7 @@ const copy = {
     },
   },
   ru: {
+    loadUnavailable: "Управление вариантами ресурса временно недоступно. Попробуйте ещё раз.",
     variants: "Варианты ресурса",
     compatibility: "Совместимость и зависимости",
     back: "Назад к ресурсу",
@@ -107,8 +111,8 @@ const copy = {
     },
   },
 } as const;
-export const getResourceManagementCopy = (locale: "ru" | "en") => copy[locale];
-export function resourceManagementError(locale: "ru" | "en", code: unknown) {
+export const getResourceManagementCopy = (locale: Locale) => copy[locale];
+export function resourceManagementError(locale: Locale, code: unknown) {
   const errors = copy[locale].errors;
   return typeof code === "string" && Object.hasOwn(errors, code)
     ? errors[code as keyof typeof errors]

@@ -1,10 +1,11 @@
 import { NotFoundError, RESOURCE_ACTIVITY_DAYS } from "@nexus/domain";
-import type { Metadata } from "next";
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { getResourceActivityCopy } from "../../../../../lib/resource-activity-i18n";
 import { resourceActivityDays } from "../../../../../lib/resource-activity-view";
@@ -16,6 +17,10 @@ export const metadata: Metadata = {
   title: "Resource activity | MTA NEXUS",
   robots: { index: false, follow: false },
 };
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export default async function ResourceActivityPage({
   params,
@@ -31,6 +36,7 @@ export default async function ResourceActivityPage({
     searchParams,
   ]);
   const copy = getResourceActivityCopy(locale);
+  const dictionary = getDictionary(locale);
   const returnParams = new URLSearchParams();
   if (query.days !== undefined) {
     for (const part of Array.isArray(query.days) ? query.days : [query.days])
@@ -45,18 +51,32 @@ export default async function ResourceActivityPage({
     .publisherReport(actor, id, resourceActivityDays(query.days))
     .catch((error) => {
       if (error instanceof NotFoundError) notFound();
-      throw error;
+      return null;
     });
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const href = (days: number) =>
     `/workspace/resources/${encodeURIComponent(id)}/activity?days=${days}`;
   const cards = ["acquisitions", "retainedGrants", "downloadStarts", "direct", "cart"] as const;
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className={pageShellClass}>
       <header className="space-y-3">
-        <Link
-          href={`/workspace/resources/${encodeURIComponent(id)}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
           {copy.back}
         </Link>
         <h1 className="font-display text-primary">{copy.analytics}</h1>
@@ -71,7 +91,7 @@ export default async function ResourceActivityPage({
             key={days}
             href={href(days)}
             aria-current={days === result.days ? "page" : undefined}
-            className="rounded-md border border-base px-4 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="inline-flex min-h-11 items-center rounded-md border border-base px-4 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {days} {copy.days}
           </Link>
@@ -126,7 +146,7 @@ export default async function ResourceActivityPage({
       <div className="space-y-2">
         <a
           href={`/api/products/${encodeURIComponent(id)}/activity/export?days=${result.days}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={navLinkClass}
         >
           {copy.export}
         </a>

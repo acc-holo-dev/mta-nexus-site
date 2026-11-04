@@ -130,6 +130,17 @@ it.each(["en", "ru"] as const)(
     expect(metadata.robots).toMatchObject({ index: false, follow: false });
   },
 );
+it("shows an honest recovery state when variant management fails", async () => {
+  state.managed.mockRejectedValue(new Error("variants unavailable"));
+  const { getResourceManagementCopy } = await import(
+    "../apps/web/src/lib/resource-management-i18n"
+  );
+  const copy = getResourceManagementCopy("en");
+  const html = renderToStaticMarkup(await VariantsPage(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+});
 it("routes member management to the authorized anchor and skips candidates", async () => {
   state.managed.mockResolvedValue({
     anchorProductId: "prd_anchor",

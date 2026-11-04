@@ -216,3 +216,13 @@ it("rejects ambiguous selectors and hides lost authority", async () => {
   state.history.mockRejectedValue(new AppError("private", 404, "NOT_FOUND"));
   await expect(HistoryPage(context)).rejects.toThrow("NEXT_NOT_FOUND");
 });
+it("shows an honest recovery state when editorial history fails", async () => {
+  state.history.mockRejectedValue(new Error("history unavailable"));
+  const copy = getResourcePublisherCopy("en");
+  const html = renderToStaticMarkup(await HistoryPage(context));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("kind=changes");
+  expect(html).not.toContain("DO_NOT_RENDER");
+});

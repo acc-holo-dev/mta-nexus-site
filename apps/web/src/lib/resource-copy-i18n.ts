@@ -1,6 +1,7 @@
 import type { Locale } from "./i18n";
 
 const en = {
+  loadUnavailable: "Draft copy management is temporarily unavailable. Please try again.",
   title: "Copy into a new draft",
   history: "Draft copies",
   recorded: "Recorded copy",
@@ -33,6 +34,8 @@ const en = {
   signIn: "Sign in",
   empty: "No accessible draft copies yet.",
   emptyFiltered: "No accessible draft copies in this period.",
+  emptyHint: "Copies you create from this resource appear here after they are recorded.",
+  emptyFilteredHint: "Try another period or show all recorded copies.",
   clearPeriod: "Show all time",
   period: "Period",
   all: "All time",
@@ -73,6 +76,7 @@ const en = {
   },
 };
 const ru: typeof en = {
+  loadUnavailable: "Управление копиями черновиков временно недоступно. Попробуйте ещё раз.",
   title: "Копировать в новый черновик",
   history: "Копии черновиков",
   recorded: "Сохранённая копия",
@@ -107,6 +111,8 @@ const ru: typeof en = {
   signIn: "Войти",
   empty: "Доступных копий черновиков пока нет.",
   emptyFiltered: "За этот период нет доступных копий черновиков.",
+  emptyHint: "Созданные из этого ресурса копии появятся здесь после записи.",
+  emptyFilteredHint: "Выберите другой период или покажите все записи.",
   clearPeriod: "Показать за всё время",
   period: "Период",
   all: "Всё время",

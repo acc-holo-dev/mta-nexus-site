@@ -1,5 +1,8 @@
+import type { Locale } from "./i18n";
+
 const copy = {
   en: {
+    loadUnavailable: "Resource activity is temporarily unavailable. Please try again.",
     history: "Acquisition history",
     analytics: "Resource activity",
     loading: "Loading acquisition history…",
@@ -44,6 +47,7 @@ const copy = {
     perpetual: "This historical license has no expiry.",
   },
   ru: {
+    loadUnavailable: "Активность ресурса временно недоступна. Попробуйте ещё раз.",
     history: "История приобретений",
     analytics: "Активность ресурса",
     loading: "Загрузка истории приобретений…",
@@ -88,6 +92,6 @@ const copy = {
   },
 } as const;
 
-export function getResourceActivityCopy(locale: string) {
+export function getResourceActivityCopy(locale: Locale) {
   return locale === "ru" ? copy.ru : copy.en;
 }
