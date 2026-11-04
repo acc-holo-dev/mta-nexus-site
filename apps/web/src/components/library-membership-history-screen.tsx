@@ -304,15 +304,19 @@ export async function LibraryMembershipHistoryScreen({
     }
     if (error.statusCode === 404) notFound();
     return (
-      <section className="mx-auto max-w-xl space-y-4 py-16">
-        <p role="alert">{libraryCollectionError(locale, error.code)}</p>
-        <Link
-          href={membershipHistoryHref()}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {c.reload}
-        </Link>
-      </section>
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <ErrorState
+          title={libraryCollectionError(locale, error.code)}
+          action={
+            <Link
+              href={membershipHistoryHref()}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
     );
   }
 }

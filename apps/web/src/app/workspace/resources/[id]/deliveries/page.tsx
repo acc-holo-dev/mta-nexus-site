@@ -58,14 +58,18 @@ export default async function PublisherDeliveriesPage({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
-      <section className="space-y-4 py-8">
-        <p role="alert">{copy.invalid}</p>
-        <Link
-          href={`/workspace/resources/${encodeURIComponent(id)}/deliveries`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.publisherTitle}
-        </Link>
+      <section className={pageShellClass}>
+        <ErrorState
+          title={copy.invalid}
+          action={
+            <Link
+              href={`/workspace/resources/${encodeURIComponent(id)}/deliveries`}
+              className={navLinkClass}
+            >
+              {copy.publisherTitle}
+            </Link>
+          }
+        />
       </section>
     );
   }

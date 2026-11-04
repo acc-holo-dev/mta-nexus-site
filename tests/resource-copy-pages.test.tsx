@@ -117,10 +117,13 @@ it("escapes source descriptions and copied titles", async () => {
 it("masks revoked access and rejects invalid query recovery without service reads", async () => {
   state.detail.mockRejectedValue(new AppError("private", 404, "NOT_FOUND"));
   await expect(Detail(context)).rejects.toThrow("NOT_FOUND");
+  const copy = resourceCopyCopy("en");
   const html = renderToStaticMarkup(
     await New({ ...context, searchParams: Promise.resolve({ actorId: "other" }) }),
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.errorDescription);
+  expect(html).toContain("overflow-x-clip");
   expect(state.preview).not.toHaveBeenCalled();
 });
 it("renders empty history with valid filters", async () => {
