@@ -75,6 +75,8 @@ const copy = {
     releaseSaved: "The server confirmed this exact release. Runtime authorization expires at",
     releaseFailed:
       "The release check could not be confirmed. Treat it as denied; reload current context before retrying.",
+    formErrorHint:
+      "No license, binding or runtime authorization change was recorded. Reload current context before retrying.",
     requestBody: "Request JSON (contains no token)",
     leaseExpired: "The short runtime authorization has expired. Check again.",
     all: "All statuses",
@@ -185,6 +187,8 @@ const copy = {
     releaseSaved: "Сервер подтвердил эту версию. Разрешение запуска истекает",
     releaseFailed:
       "Не удалось подтвердить проверку версии. Считайте её отклонённой; загрузите актуальные данные перед повтором.",
+    formErrorHint:
+      "Лицензия, привязка или разрешение запуска не изменялись. Загрузите актуальные данные перед повтором.",
     requestBody: "JSON запроса (без токена)",
     leaseExpired: "Короткое разрешение запуска истекло. Выполните проверку снова.",
     all: "Все состояния",

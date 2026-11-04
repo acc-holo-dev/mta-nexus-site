@@ -5,7 +5,7 @@ import {
   type LicenseModerationAction,
   type LicenseOwnerAction,
 } from "@nexus/domain";
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { licenseModerationCommandSchema, licenseOwnerCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -328,11 +328,7 @@ export function LicenseControlPanel({
           </fieldset>
         </form>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-red-400">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {completedRevision && !error && (
         <p
           role="status"

@@ -76,6 +76,8 @@ export const product = {
       timeout: "The download stopped responding. Check your connection and try again.",
       failed: "The download could not be completed. Check your connection and try again.",
     },
+    downloadErrorHint:
+      "Nothing was saved locally by NEXUS. Fix the condition above, then retry the same download.",
 
     openLibrary: "Open resource library",
     addToLibrary: "Add to library",

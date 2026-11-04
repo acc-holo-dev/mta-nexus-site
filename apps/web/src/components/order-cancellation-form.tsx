@@ -1,6 +1,6 @@
 "use client";
 import type { OrderCancellationCommand } from "@nexus/domain";
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { orderCancellationCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -81,7 +81,7 @@ export function OrderCancellationForm({
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <h2 className="text-xl font-semibold text-primary">{copy.cancel}</h2>
       <fieldset disabled={busy || retry || saved} className="space-y-4">
         <label htmlFor={`${field}-reason`} className="block space-y-2">
@@ -106,17 +106,18 @@ export function OrderCancellationForm({
           {copy.confirmCancel}
         </ActionConfirmCheckbox>
       </fieldset>
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {saved ? (
         <p role="status" className="text-sm text-success">
           {copy.cancelled}
         </p>
       ) : null}
-      <Button type="submit" disabled={busy || saved || !confirmed} isLoading={busy}>
+      <Button
+        type="submit"
+        disabled={busy || saved || !confirmed}
+        isLoading={busy}
+        className="min-h-11"
+      >
         {busy ? copy.cancelling : retry ? copy.retry : copy.cancel}
       </Button>
     </form>

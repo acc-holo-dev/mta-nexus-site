@@ -105,6 +105,8 @@ export const publishing = {
     create: "Create listing",
     createError: "Could not register server",
     unexpectedError: "Unexpected registration error",
+    formErrorHint:
+      "No server listing was created. Fix the fields above and submit the same form again.",
   },
   articles: {
     title: "MTA Engineering Hub & Articles",

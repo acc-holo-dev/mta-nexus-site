@@ -1,6 +1,6 @@
 "use client";
 import { type CommercialPlan, commercialFeeEstimate, type PlanReviewCommand } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { planReviewCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -83,7 +83,7 @@ export function PlanReviewForm({
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-5 p-5">
+    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5">
       <PlanReviewTerms terms={plan} locale={locale} />
       <p className="text-sm">
         {c.revision} {plan.revision} · {plan.scope === "user" ? c.personal : c.organization}
@@ -157,15 +157,12 @@ export function PlanReviewForm({
           {c.frozen}
         </p>
       ) : null}
-      {error ? (
-        <p role="alert" className="text-sm text-warning">
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
       <Button
         type="submit"
         disabled={busy || (plan.scope === "organization" && !organizationId)}
         isLoading={busy}
+        className="min-h-11"
       >
         {busy ? c.saving : c.save}
       </Button>

@@ -1,6 +1,6 @@
 "use client";
 import type { CommercialPlanTerms, SubscriptionCommand } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { subscriptionCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -106,7 +106,7 @@ export function SubscriptionControls(props: Props) {
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <p role="note" className="text-sm text-secondary">
         {props.action === "activate" ? c.notice : c.cancelNote}
       </p>
@@ -149,17 +149,13 @@ export function SubscriptionControls(props: Props) {
           {c.frozen}
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-warning">
-          {error}
-        </p>
-      )}
-      <Button type="submit" disabled={busy} isLoading={busy}>
+      {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
+      <Button type="submit" disabled={busy} isLoading={busy} className="min-h-11">
         {busy ? c.busy : props.action === "activate" ? c.activate : c.cancel}
       </Button>
       <Link
         href={`${subscriptionAccountHref(props.action === "cancel" ? props.organizationId : props.scope === "organization" ? organizationId || undefined : undefined).replace("/workspace/subscriptions", "/workspace/subscriptions/history")}`}
-        className="ml-4 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className="ml-4 inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {c.history}
       </Link>

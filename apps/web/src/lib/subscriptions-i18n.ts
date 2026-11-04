@@ -77,6 +77,8 @@ const en = {
   estimate: "Estimated fee",
   proceeds: "Estimated seller proceeds",
   estimateFailed: "The fee estimate could not be confirmed. Try again.",
+  formErrorHint:
+    "No subscription, payment or commission change was recorded. Retry the same request or reload the current account state.",
   actions: { activate: "Free plan activated", cancel: "Subscription ended" },
   statuses: { active: "Active", expired: "Expired", cancelled: "Ended" },
 };
@@ -156,6 +158,8 @@ const ru: typeof en = {
   estimate: "Расчётная комиссия",
   proceeds: "Расчётная сумма продавцу",
   estimateFailed: "Расчёт комиссии не удалось подтвердить. Попробуйте снова.",
+  formErrorHint:
+    "Подписка, платёж или комиссия не изменялись. Повторите тот же запрос или обновите текущее состояние аккаунта.",
   actions: { activate: "Бесплатный тариф подключён", cancel: "Подписка прекращена" },
   statuses: { active: "Действует", expired: "Истекла", cancelled: "Прекращена" },
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { normalizeMtaAddress } from "@nexus/domain";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedCreatedServer } from "../lib/server-mutation-confirmation";
@@ -129,25 +129,18 @@ export function RegisterServerForm() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:px-0">
+    <div className="mx-auto min-w-0 max-w-2xl space-y-6 overflow-x-clip px-4 py-8 sm:px-0">
       <div className="space-y-1.5">
         <h1 className="font-display text-primary">{copy.title}</h1>
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </div>
 
-      {error && (
-        <div
-          role="alert"
-          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
-        >
-          {error}
-        </div>
-      )}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
 
       <form
         onSubmit={submit}
         aria-busy={loading}
-        className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+        className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
       >
         <div className="space-y-1.5 sm:col-span-2">
           <label htmlFor="server-organization" className={nativeLabelClass}>

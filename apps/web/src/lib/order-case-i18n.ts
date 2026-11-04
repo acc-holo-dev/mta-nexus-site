@@ -31,6 +31,8 @@ const en = {
     "This order already has a case. Your new message was not added; open the existing conversation to continue.",
   invalid: "Check the subject, message and requested amount.",
   failed: "The request could not be completed. Check your permissions and reload.",
+  formErrorHint:
+    "No case, review or financial action was recorded. Retry the same request or reload the saved case state.",
   reload: "Reload saved state",
   open: "Open case",
   review: "Review",
@@ -102,6 +104,8 @@ const ru: typeof en = {
     "У заказа уже есть обращение. Новое сообщение не добавлено; откройте существующую переписку и продолжите её.",
   invalid: "Проверьте тему, сообщение и запрошенную сумму.",
   failed: "Не удалось выполнить запрос. Проверьте полномочия и загрузите состояние заново.",
+  formErrorHint:
+    "Обращение, разбор или финансовое действие не записывались. Повторите тот же запрос или загрузите сохранённое состояние обращения.",
   reload: "Загрузить сохранённое состояние",
   open: "Открыть обращение",
   review: "Разбор",

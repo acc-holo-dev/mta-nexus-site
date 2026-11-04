@@ -6,7 +6,7 @@ import {
   type OrderCaseReviewStatus,
   type SupportCaseStatus,
 } from "@nexus/domain";
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -116,7 +116,11 @@ export function OrderCaseCreateForm({
     }
   }
   return (
-    <form onSubmit={submit} aria-busy={busy} className="nexus-panel space-y-4 p-5">
+    <form
+      onSubmit={submit}
+      aria-busy={busy}
+      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
+    >
       <fieldset disabled={busy || savedId !== null} className="space-y-4">
         <label className="block space-y-2">
           <span>{copy.kind}</span>
@@ -176,21 +180,17 @@ export function OrderCaseCreateForm({
             <span className="block text-sm text-secondary">{copy.amountHelp}</span>
           </label>
         )}
-        <Button type="submit" variant="outline" isLoading={busy}>
+        <Button type="submit" variant="outline" isLoading={busy} className="min-h-11">
           {busy ? copy.busy : copy.send}
         </Button>
       </fieldset>
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {savedId && (
         <p role="status">
           {copy.saved}{" "}
           <Link
             href={`/workspace/order-cases/${encodeURIComponent(savedId)}`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.open}
           </Link>
@@ -301,7 +301,7 @@ export function OrderCaseReviewForm({
     }
   }
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-busy={busy}>
+    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5" aria-busy={busy}>
       <h2 className="text-lg font-semibold">{copy.review}</h2>
       <label className="block space-y-2">
         <span>{copy.notes}</span>
@@ -322,6 +322,7 @@ export function OrderCaseReviewForm({
             type="button"
             key={action}
             variant="outline"
+            className="min-h-11"
             disabled={
               busy ||
               sealed ||
@@ -337,14 +338,15 @@ export function OrderCaseReviewForm({
       {canRecommendRefund && monetary && !recommendationEligible && (
         <p className="text-sm text-secondary">{copy.recommendationBlocked}</p>
       )}
-      {message && (
-        <p
-          role={saved ? "status" : "alert"}
-          className={`text-sm ${saved ? "text-success" : "text-danger"}`}
-        >
-          {message}
-        </p>
-      )}
+      {message ? (
+        saved ? (
+          <p role="status" className="text-sm text-success">
+            {message}
+          </p>
+        ) : (
+          <ErrorState title={message} description={copy.formErrorHint} />
+        )
+      ) : null}
       <Button
         type="button"
         variant="ghost"

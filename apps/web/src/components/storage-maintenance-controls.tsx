@@ -1,5 +1,5 @@
 "use client";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { storageMaintenanceCopy } from "../lib/storage-maintenance-i18n";
@@ -57,12 +57,13 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
     }
   }
   return (
-    <section className="nexus-panel space-y-4 p-4">
+    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-4">
       <h2>{copy.discovery}</h2>
       <div className="flex flex-wrap gap-3">
         <Button
           type="button"
           variant="outline"
+          className="min-h-11"
           disabled={pending}
           onClick={() => void run("namespaces")}
         >
@@ -72,6 +73,7 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
           <Button
             type="button"
             variant="outline"
+            className="min-h-11"
             disabled={pending}
             onClick={() => void run("namespaces", nextNamespaces)}
           >
@@ -86,7 +88,7 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
               <Button
                 type="button"
                 variant="ghost"
-                className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 disabled={pending}
                 onClick={() => {
                   setOwner(owner);
@@ -138,13 +140,14 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
             }}
           />
         </div>
-        <Button type="submit" disabled={pending} isLoading={pending}>
+        <Button type="submit" disabled={pending} isLoading={pending} className="min-h-11">
           {pending ? copy.busy : copy.discover}
         </Button>
         {nextObjects !== null && (
           <Button
             type="button"
             variant="outline"
+            className="min-h-11"
             disabled={pending}
             onClick={() => void run("discover", nextObjects)}
           >
@@ -153,11 +156,7 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
         )}
       </form>
       <p role="status">{message}</p>
-      {error && (
-        <p role="alert" className="text-danger">
-          {copy.error}
-        </p>
-      )}
+      {error ? <ErrorState title={copy.error} description={copy.formErrorHint} /> : null}
     </section>
   );
 }
@@ -193,14 +192,14 @@ export function StorageCleanupControls({
     }
   }
   return (
-    <section className="nexus-panel space-y-4 p-4">
+    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-4">
       <p>{copy.cleanupNote}</p>
       <ActionConfirmCheckbox
         id="storage-maintenance-cleanup-confirm"
         checked={confirmed}
         onCheckedChange={setConfirmed}
         disabled={pending}
-        labelClassName="flex gap-2"
+        labelClassName="flex min-h-11 gap-2"
         checkboxClassName={actionConfirmCheckboxFocusClass}
       >
         {copy.confirm}
@@ -209,6 +208,7 @@ export function StorageCleanupControls({
         <Button
           type="button"
           variant="danger"
+          className="min-h-11"
           disabled={!confirmed || pending}
           isLoading={pending}
           onClick={() => void cleanup()}
@@ -218,6 +218,7 @@ export function StorageCleanupControls({
         <Button
           type="button"
           variant="outline"
+          className="min-h-11"
           disabled={pending}
           onClick={() => {
             setConfirmed(false);
@@ -227,11 +228,7 @@ export function StorageCleanupControls({
           {copy.refresh}
         </Button>
       </div>
-      {error && (
-        <p role="alert" className="text-danger">
-          {copy.error}
-        </p>
-      )}
+      {error ? <ErrorState title={copy.error} description={copy.formErrorHint} /> : null}
     </section>
   );
 }

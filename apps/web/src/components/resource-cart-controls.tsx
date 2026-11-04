@@ -1,7 +1,7 @@
 "use client";
 
 import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
-import { Button, EmptyState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../lib/i18n";
@@ -104,11 +104,7 @@ export function AddResourceToCart({
           {busy ? copy.working : copy.add}
         </Button>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.errors.formErrorHint} /> : null}
     </div>
   );
 }
@@ -273,13 +269,9 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         {receiptCopy.reviewNote}
       </p>
       {error ? (
-        <p
-          role="alert"
-          className="rounded-lg bg-danger-soft p-4 text-sm text-danger"
-          data-cart-state="error"
-        >
-          {error}
-        </p>
+        <div data-cart-state="error">
+          <ErrorState title={error} description={copy.errors.formErrorHint} />
+        </div>
       ) : null}
       {receiptId ? (
         <div

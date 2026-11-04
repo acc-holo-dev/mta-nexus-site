@@ -1,6 +1,6 @@
 "use client";
 import { COMMERCIAL_CURRENCIES, type CommercialCurrency } from "@nexus/domain";
-import { Button, fieldClassBlock } from "@nexus/ui";
+import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { formatHistoryAmount } from "../lib/commerce-history-format";
@@ -74,7 +74,10 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
     }
   }
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-labelledby={`${field}-heading`}>
+    <section
+      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
+      aria-labelledby={`${field}-heading`}
+    >
       <h2 id={`${field}-heading`} className="text-xl font-semibold text-primary">
         {copy.calculator}
       </h2>
@@ -123,15 +126,11 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
             </select>
           </label>
         </fieldset>
-        <Button type="submit" isLoading={busy}>
+        <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? copy.calculating : copy.calculate}
         </Button>
       </form>
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {result ? (
         <div role="status">
           <dl className="grid gap-3 text-sm sm:grid-cols-2">

@@ -66,6 +66,8 @@ const copy = {
       "The initial hold baseline is 7 days. Estimated proceeds are not a balance or an available payout.",
     frozen:
       "After an uncertain result, keep this selection unchanged and retry. Reloading starts a new request.",
+    formErrorHint:
+      "No plan review was recorded. Retry the same selection or reload before changing details.",
   },
   ru: {
     title: "Сохранённые обзоры тарифов",
@@ -130,6 +132,8 @@ const copy = {
       "Исходное удержание — 7 дней. Расчётная сумма продавца не является балансом или доступной выплатой.",
     frozen:
       "После неопределённого результата повторите неизменённый выбор. Обновление страницы начинает новый запрос.",
+    formErrorHint:
+      "Обзор тарифа не сохранён. Повторите тот же выбор или обновите страницу перед изменением деталей.",
   },
 };
 export const planReviewsCopy = (locale: Locale) => copy[locale];
