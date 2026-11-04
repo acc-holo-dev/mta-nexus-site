@@ -185,20 +185,20 @@ const copy = {
 export function getResourceReleaseControlCopy(locale: Locale) {
   return locale === "ru" ? copy.ru : copy.en;
 }
-export function resourceStatusLabel(locale: string, status: string) {
+export function resourceStatusLabel(locale: Locale, status: string) {
   const localized = getResourceReleaseControlCopy(locale);
   const known = (["draft", "pending_review", "published", "suspended", "archived"] as const).find(
     (value) => value === status,
   );
   return known ? localized[known] : localized.unknown;
 }
-export function resourceReleaseControlError(locale: string, code: unknown) {
+export function resourceReleaseControlError(locale: Locale, code: unknown) {
   const errors = getResourceReleaseControlCopy(locale).errors;
   return typeof code === "string" && Object.hasOwn(errors, code)
     ? errors[code as keyof typeof errors]
     : errors.fallback;
 }
-export function resourceModerationLabel(locale: string, action: string) {
+export function resourceModerationLabel(locale: Locale, action: string) {
   const copy = getResourceReleaseControlCopy(locale);
   return action === "product.moderation_suspended"
     ? copy.suspend

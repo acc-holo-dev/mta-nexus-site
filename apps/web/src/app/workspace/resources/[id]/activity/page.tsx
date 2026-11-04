@@ -1,5 +1,6 @@
 import { NotFoundError, RESOURCE_ACTIVITY_DAYS } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";

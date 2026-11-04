@@ -11,11 +11,12 @@ import {
 } from "../lib/library-release-request";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedLibraryRelease } from "../lib/resource-release-control-confirmation";
+import type { Locale } from "../lib/i18n";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
 } from "../lib/resource-release-control-i18n";
-export function useLibraryReleaseCommand(productId: string, locale: string) {
+export function useLibraryReleaseCommand(productId: string, locale: Locale) {
   const copy = getResourceReleaseControlCopy(locale),
     router = useRouter(),
     lock = useRef(false),
@@ -106,7 +107,7 @@ export function LibraryReleaseCommandStatus({
   locale,
 }: {
   state: ReturnType<typeof useLibraryReleaseCommand>;
-  locale: string;
+  locale: Locale;
 }) {
   const { pending, pendingProductId, pendingHref, blocked, busy, saved, error, send } = state;
   const copy = getResourceReleaseControlCopy(locale),
