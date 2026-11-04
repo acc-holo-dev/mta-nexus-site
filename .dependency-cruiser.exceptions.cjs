@@ -33,7 +33,7 @@ const HTTP_DB_SERVICE_REQUIRED = Object.freeze([
   "^apps/web/src/app/api/products/[^/]+/download/",
   "^apps/web/src/app/api/reports/",
   "^apps/web/src/app/api/support/route\\.ts$",
-  "^apps/web/src/app/api/support/\\[id\\]/",
+  "^apps/web/src/app/api/support/\\[id\\]/route\\.ts$",
   "^apps/web/src/app/api/verification/",
   "^apps/web/src/app/api/workspace/content/route\\.ts$",
 ]);

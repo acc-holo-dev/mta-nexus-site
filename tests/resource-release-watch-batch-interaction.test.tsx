@@ -1,5 +1,9 @@
-import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import {
+  type FlatTestElement,
+  flatTreeHasErrorText,
+  flattenReactTestTree,
+} from "./helpers/flatten-react-test-tree";
 
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
@@ -36,30 +40,16 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) })
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
 
-type Element = ReactElement<Record<string, unknown>>;
-function nodes(n: ReactNode): Element[] {
-  if (Array.isArray(n)) return n.flatMap(nodes);
-  if (!n || typeof n !== "object" || !("props" in n)) return [];
-  const e = n as Element;
-  const type = e.type as
-    | string
-    | { displayName?: string }
-    | (((props: unknown) => ReactNode) & { displayName?: string });
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
-  }
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return nodes(type(e.props));
-  }
-  return [e, ...nodes(e.props.children as ReactNode)];
-}
+type Element = FlatTestElement;
 const items = [
   { productId: "prd_b", enabled: true, revision: 3, title: null },
   { productId: "prd_a", enabled: true, revision: 1, title: "Core" },
 ];
 function render() {
   h.cursor = 0;
-  return nodes(ResourceReleaseWatchBatchControls({ items, locale: h.locale as "en" | "ru" }));
+  return flattenReactTestTree(
+    ResourceReleaseWatchBatchControls({ items, locale: h.locale as "en" | "ru" }),
+  );
 }
 function checks() {
   return render().filter((n) => n.type === "input" && n.props.type === "checkbox");
@@ -134,14 +124,7 @@ it("does not confirm partial or foreign acknowledgements", async () => {
   });
   await click("Stop selected watches");
   expect(h.refresh).not.toHaveBeenCalled();
-  expect(
-    render().some((n) => {
-      const type = n.type;
-      if (typeof type !== "function") return false;
-      const fn = type as { displayName?: string; name?: string };
-      return fn.displayName === "ErrorState" || fn.name === "ErrorState";
-    }),
-  ).toBe(true);
+  expect(flatTreeHasErrorText(render(), resourceReleaseWatchesCopy("en").failed)).toBe(true);
 });
 it("requires reload after a revision conflict and clears acknowledgement when selection changes", async () => {
   reviewed();

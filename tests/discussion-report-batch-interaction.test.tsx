@@ -250,7 +250,9 @@ it.each([
   harness.fetch.mockResolvedValue(response(reply));
   select();
   click(render(), reportBatchCopy("en").preview);
-  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  await vi.waitFor(() =>
+    expect(flatTreeHasErrorText(render(), reportBatchCopy("en").unavailable)).toBe(true),
+  );
   expect(render().some((node) => node.props.children === reportBatchCopy("en").confirm)).toBe(
     false,
   );
@@ -274,7 +276,9 @@ it.each([
   harness.fetch.mockResolvedValue(response(reply));
   const before = render();
   await commitBatch(() => render(), reportBatchCopy("en").confirm);
-  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  await vi.waitFor(() =>
+    expect(flatTreeHasErrorText(render(), reportBatchCopy("en").uncertain)).toBe(true),
+  );
   expect(harness.refresh).not.toHaveBeenCalled();
   click(before, reportBatchCopy("en").confirm);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
@@ -289,9 +293,8 @@ it("shows a localized stale-review failure without exposing server detail", asyn
   );
   await commitBatch(() => render("ru"), reportBatchCopy("ru").confirm);
   await vi.waitFor(() =>
-    expect(render("ru").some((node) => node.props.role === "alert")).toBe(true),
+    expect(flatTreeHasErrorText(render("ru"), reportBatchCopy("ru").changed)).toBe(true),
   );
-  expect(flatTreeHasErrorText(render("ru"), reportBatchCopy("ru").changed)).toBe(true);
   expect(harness.refresh).not.toHaveBeenCalled();
 });
 it.each(["preview", "command"])(
@@ -323,13 +326,14 @@ it("retains confirmed saved decisions if refreshing the page fails", async () =>
     throw Error("PRIVATE_REFRESH");
   });
   await commitBatch(() => render(), reportBatchCopy("en").confirm);
-  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  await vi.waitFor(() =>
+    expect(flatTreeHasErrorText(render(), reportBatchCopy("en").unavailable)).toBe(true),
+  );
   expect(
     render().some(
       (node) => node.props.role === "status" && node.props.children === reportBatchCopy("en").saved,
     ),
   ).toBe(true);
-  expect(flatTreeHasErrorText(render(), reportBatchCopy("en").unavailable)).toBe(true);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
 });
 it("keeps completed-history cards navigable without selection or write controls", () => {
@@ -394,7 +398,9 @@ it("does not accept a comment preview or a foreign acknowledgement as a publicat
   select("en", true);
   click(render("en", true, true), reportBatchCopy("en").preview);
   await vi.waitFor(() =>
-    expect(render("en", true, true).some((node) => node.props.role === "alert")).toBe(true),
+    expect(flatTreeHasErrorText(render("en", true, true), reportBatchCopy("en").unavailable)).toBe(
+      true,
+    ),
   );
   expect(
     render("en", true, true).some((node) => node.props.children === reportBatchCopy("en").confirm),
