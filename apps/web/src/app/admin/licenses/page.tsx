@@ -1,5 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
+import { KeyRound } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -12,6 +14,7 @@ import {
   parseHistoryPage,
 } from "../../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
@@ -34,24 +37,69 @@ export default async function LicensesModerationPage({
   if (!can(user, "admin.moderation")) notFound();
   const copy = getLicenseControlCopy(locale);
   const history = getCommerceHistoryCopy(locale);
+  const dictionary = getDictionary(locale);
   const status =
     typeof query.status === "string" && Object.hasOwn(history.licenseStatuses, query.status)
       ? query.status
       : "";
   const text = typeof query.q === "string" ? query.q.trim().slice(0, 120) : "";
-  const result = await licenseControlService.moderationPage(
-    user,
-    parseHistoryPage(query.page),
-    status,
-    text,
-  );
+  const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
+  const filtersActive = Boolean(status || text);
+  const returnHref = (() => {
+    const params = new URLSearchParams({
+      ...(status ? { status } : {}),
+      ...(text ? { q: text } : {}),
+      ...(pageNumber > 1 ? { page: String(pageNumber) } : {}),
+    });
+    return params.size ? `/admin/licenses?${params}` : "/admin/licenses";
+  })();
+  let forbidden = false;
+  const result = await licenseControlService
+    .moderationPage(user, pageNumber, status, text)
+    .catch((error) => {
+      if (error instanceof AppError && error.statusCode === 403) {
+        forbidden = true;
+        return null;
+      }
+      return null;
+    });
+  if (forbidden) notFound();
   const href = (page: number) =>
-    `/admin/licenses?${new URLSearchParams({ page: String(page), status, q: text })}`;
+    `/admin/licenses?${new URLSearchParams({
+      ...(status ? { status } : {}),
+      ...(text ? { q: text } : {}),
+      page: String(page),
+    })}`;
+
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <Link
+          href="/admin"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.adminBack}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link
+              href={returnHref}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
       <Link
         href="/admin"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.adminBack}
       </Link>
@@ -60,12 +108,12 @@ export default async function LicensesModerationPage({
       {user.role === "admin" && (
         <Link
           href="/admin/licenses/maintenance"
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {getLicenseMaintenanceCopy(locale).maintenance}
         </Link>
       )}
-      <form className="flex flex-wrap gap-3">
+      <form className="flex min-w-0 flex-wrap items-end gap-3" method="get">
         <input
           name="q"
           defaultValue={text}
@@ -87,14 +135,22 @@ export default async function LicensesModerationPage({
             </option>
           ))}
         </select>
-        <Button type="submit">{copy.searchButton}</Button>
+        <Button type="submit" className="min-h-11">
+          {copy.searchButton}
+        </Button>
+        {filtersActive ? (
+          <Link
+            href="/admin/licenses"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {copy.clearFilters}
+          </Link>
+        ) : null}
       </form>
-      {result.licenses.length === 0 ? (
-        <p className="text-sm text-muted">{copy.empty}</p>
-      ) : (
+      {result.licenses.length ? (
         <ol className="space-y-3">
           {result.licenses.map((license) => (
-            <li key={license.id} className="nexus-panel space-y-2 p-5">
+            <li key={license.id} className="nexus-panel min-w-0 space-y-2 p-5">
               <h2 className="font-semibold text-primary">{license.productTitle}</h2>
               <p className="text-sm text-secondary">
                 {licenseStatusLabel(
@@ -105,25 +161,57 @@ export default async function LicensesModerationPage({
               </p>
               <Link
                 href={`/admin/licenses/${license.id}`}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.manage} · {license.id}
               </Link>
             </li>
           ))}
         </ol>
+      ) : (
+        <EmptyState
+          title={copy.empty}
+          description={filtersActive ? copy.clearFilters : copy.policy}
+          icon={<KeyRound className="h-6 w-6" aria-hidden="true" />}
+          action={
+            filtersActive ? (
+              <Link
+                href="/admin/licenses"
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.clearFilters}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
-      <nav aria-label={history.page} className="flex justify-between text-sm">
-        {result.page > 1 ? <Link href={href(result.page - 1)}>{history.previous}</Link> : <span />}
-        <span>
-          {result.page} / {result.totalPages}
-        </span>
-        {result.page < result.totalPages ? (
-          <Link href={href(result.page + 1)}>{history.next}</Link>
-        ) : (
-          <span />
-        )}
-      </nav>
+      {result.totalPages > 1 ? (
+        <nav aria-label={history.page} className="flex flex-wrap justify-between gap-4 text-sm">
+          {result.page > 1 ? (
+            <Link
+              href={href(result.page - 1)}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {history.previous}
+            </Link>
+          ) : (
+            <span />
+          )}
+          <span className="inline-flex min-h-11 items-center">
+            {result.page} / {result.totalPages}
+          </span>
+          {result.page < result.totalPages ? (
+            <Link
+              href={href(result.page + 1)}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {history.next}
+            </Link>
+          ) : (
+            <span />
+          )}
+        </nav>
+      ) : null}
     </div>
   );
 }
