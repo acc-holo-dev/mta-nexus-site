@@ -62,7 +62,7 @@
 
 - **Исходники:** DOC + P1/P2 в `main`; verified tip `98d245f0…` selected green; last full selected `0a034c84…`. Не значит tip = production.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
-- **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice.
+- **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
 - **Tracker:** 64 done / 19 open (OPS external/github_settings, GROW pilots, ads UX-24–26). `done` ≠ production enablement.
 - **Архитектура:** `pnpm analyze:architecture` PASS на baseline-волне. Не заменяет unit/database/full_acceptance.

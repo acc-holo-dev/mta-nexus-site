@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "production_recovery_acceptance",
+  "generatedAt": "2026-11-04T12:00:00.000Z",
+  "environment": {
+    "name": "production-primary"
+  },
+  "owner": {
+    "name": "infra-lead"
+  },
+  "targets": {
+    "rpoMinutes": 60,
+    "rtoMinutes": 240
+  },
+  "retention": {
+    "policy": "Daily DB + uploads; 30-day rolling off-host",
+    "offHostLocation": "Provider bucket in separate region/account",
+    "offHostVerified": true
+  },
+  "access": {
+    "restoreRoles": "infra-lead + break-glass backup operator",
+    "breakGlassProcedure": "Documented in private runbook section R-04"
+  },
+  "measuredRestore": {
+    "startedAt": "2026-11-04T08:00:00.000Z",
+    "completedAt": "2026-11-04T09:45:00.000Z",
+    "dataLossMinutes": 15,
+    "withinRpo": true,
+    "withinRto": true
+  },
+  "verdict": {
+    "passed": true,
+    "failures": []
+  },
+  "evidenceSha256": "23d7cd0cbe25503f405f9ed9e92ade6915fdd8d1ff0c96d9da848239c9f6c81f"
+}
