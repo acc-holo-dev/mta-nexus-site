@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -7,6 +10,9 @@ import { resourceCopyCopy } from "../apps/web/src/lib/resource-copy-i18n";
 import { getResourceManagementCopy } from "../apps/web/src/lib/resource-management-i18n";
 import { getResourcePublisherCopy } from "../apps/web/src/lib/resource-publisher-i18n";
 import { getUserPlatformCopy } from "../apps/web/src/lib/user-platform-copy";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: () => undefined, refresh: () => undefined }),
@@ -144,8 +150,16 @@ describe("workspace and resource UI surface", () => {
       expect(html).toContain('for="publisher-type"');
       expect(html).toContain('data-ui="button"');
       expect(html).toContain(copy.apply);
+      expect(html).toContain("min-h-11");
+      expect(html).not.toContain("h-10");
     },
   );
+
+  it("locks publisher filter native selects to min-h-11 without h-10 chrome", () => {
+    const source = read("apps/web/src/components/resource-publisher-filters.tsx");
+    expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
+    expect(source).not.toContain("h-10");
+  });
 
   it("copies a resource through labeled Input fields", () => {
     localeState.locale = "en";

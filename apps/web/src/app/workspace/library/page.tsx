@@ -146,7 +146,7 @@ export default async function ResourceLibraryPage({
                 key={value}
                 href={libraryHref(value, 1)}
                 aria-current={filter === value ? "page" : undefined}
-                className="inline-flex h-10 items-center rounded-lg border border-base bg-surface px-4 text-sm text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] aria-[current=page]:border-transparent aria-[current=page]:bg-accent aria-[current=page]:text-white"
+                className="inline-flex min-h-11 items-center rounded-lg border border-base bg-surface px-4 text-sm text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] aria-[current=page]:border-transparent aria-[current=page]:bg-accent aria-[current=page]:text-white"
               >
                 {copy[value]} ({result.counts[value]})
               </Link>

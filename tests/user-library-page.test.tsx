@@ -244,6 +244,14 @@ describe("private resource library", () => {
     },
   );
 
+  it("locks library filter nav chips to min-h-11 without h-10 chrome", async () => {
+    const html = renderToStaticMarkup(await LibraryPage(pageProps()));
+    expect(html).toContain(
+      "inline-flex min-h-11 items-center rounded-lg border border-base bg-surface px-4",
+    );
+    expect(html).not.toContain("inline-flex h-10 items-center");
+  });
+
   it.each(["en", "ru"] as const)(
     "shows library load failures as alerts instead of an empty catalog in %s",
     async (locale) => {
