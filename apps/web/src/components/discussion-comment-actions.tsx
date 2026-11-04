@@ -100,7 +100,7 @@ export function DiscussionCommentActions({
     }
   }
   async function submit() {
-    if (!mode || stale || (mode === "edit" && !editable)) return;
+    if (!mode || stale || !revision || (mode === "edit" && !editable)) return;
     if (mode === "remove") {
       if (
         !(await confirmAction({
