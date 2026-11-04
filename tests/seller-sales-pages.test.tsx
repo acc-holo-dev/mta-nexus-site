@@ -141,11 +141,16 @@ it("normalizes empty GET form controls and masks unauthorized products", async (
   state.report.mockRejectedValue(new AppError("Private organization", 404, "NOT_FOUND"));
   await expect(Page(input)).rejects.toThrow("NEXT_NOT_FOUND");
 });
-it("invalid filters render a localized recovery link before data reads", async () => {
+it("invalid filters render a localized ErrorState recovery before data reads", async () => {
+  const copy = sellerSalesCopy("en");
   const html = renderToStaticMarkup(
     await Page({ searchParams: Promise.resolve({ userId: "other" }) }),
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.invalid);
+  expect(html).toContain(copy.invalidDescription);
+  expect(html).toContain(copy.reset);
+  expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/sales/report"');
   expect(state.report).not.toHaveBeenCalled();
   expect(state.scopes).not.toHaveBeenCalled();
@@ -237,7 +242,9 @@ it("shows an honest recovery state when the sales report fails to load", async (
   const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ page: "2" }) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(copy.loadUnavailableHint);
   expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/sales/report?page=2"');
   expect(html).not.toContain("report unavailable");
 });

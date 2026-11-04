@@ -18,6 +18,7 @@ import ReportsLoading from "../apps/web/src/app/workspace/reports/loading";
 import SalesLoading from "../apps/web/src/app/workspace/sales/loading";
 import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
 import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
+import { sellerSalesCopy } from "../apps/web/src/lib/seller-sales-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -77,6 +78,31 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
   expect(source).toContain("emptySalesHint");
   expect(source).toContain(".catch(() => null)");
   expect(source).not.toContain('role="alert"');
+});
+
+it("locks sales report honesty chrome with ErrorState recovery and no plain alert", () => {
+  const source = read("apps/web/src/app/workspace/sales/report/page.tsx");
+  expect(source).toContain("ErrorState");
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+  expect(source).toContain("min-h-11");
+  expect(source).toContain("loadUnavailableHint");
+  expect(source).toContain("invalidDescription");
+  expect(source).toContain("c.reset");
+  expect(source).not.toContain('role="alert"');
+  expect(source).toContain(".catch(() => null)");
+});
+
+it("locks additive seller sales honesty copy for report recovery", () => {
+  const i18n = read("apps/web/src/lib/seller-sales-i18n.ts");
+  expect(i18n).toContain("loadUnavailableHint");
+  expect(i18n).toContain("invalidDescription");
+  const en = sellerSalesCopy("en");
+  const ru = sellerSalesCopy("ru");
+  expect(en.loadUnavailableHint).not.toBe("");
+  expect(en.invalidDescription).not.toBe("");
+  expect(ru.loadUnavailableHint).not.toBe("");
+  expect(ru.invalidDescription).not.toBe("");
 });
 
 it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", () => {
