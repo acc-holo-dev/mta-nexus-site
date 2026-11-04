@@ -250,3 +250,13 @@ it("shows empty history and available resource links without granting download r
   expect(html).toContain("/workspace/library/prd_a/collections");
   expect(html).not.toContain("/download");
 });
+it("shows an honest recovery state when membership history fails to load", async () => {
+  state.history.mockRejectedValueOnce(new Error("membership history unavailable"));
+  const copy = libraryMembershipHistoryCopy("en");
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/library/collections/membership-history');
+  expect(html).not.toContain("membership history unavailable");
+});

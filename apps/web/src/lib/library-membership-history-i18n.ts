@@ -1,4 +1,6 @@
 const en = {
+  loadUnavailable:
+    "Collection membership history is temporarily unavailable. Please try again.",
   title: "Collection membership history",
   loading: "Loading membership history…",
   note: "Inspect whole resource membership operations. Recorded names, revisions and changes remain unchanged; current collection membership and resource access are shown separately. Filters select whole groups, including every recorded collection.",
@@ -18,6 +20,7 @@ const en = {
   history: "Membership history",
 };
 const ru: typeof en = {
+  loadUnavailable: "История состава коллекций временно недоступна. Попробуйте ещё раз.",
   title: "История состава коллекций",
   loading: "Загрузка истории состава…",
   note: "Операции с одним ресурсом показаны целиком. Записанные названия, ревизии и изменения сохраняются; текущий состав коллекций и доступ к ресурсу показаны отдельно. Фильтры выбирают группы со всеми записанными коллекциями.",

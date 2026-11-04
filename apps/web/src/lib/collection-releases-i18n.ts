@@ -1,4 +1,6 @@
 const en = {
+  loadUnavailable:
+    "Collection release overview is temporarily unavailable. Please try again.",
   title: "Collection release overview",
   note: "Compare your selected releases with the latest safe published builds. Counts follow the name search; fixed selections also appear in the pinned filter. This snapshot does not change versions or grant access. Downloads recheck current rights.",
   archived:
@@ -7,6 +9,7 @@ const en = {
   generated: "Snapshot time (UTC)",
 };
 const ru: typeof en = {
+  loadUnavailable: "Обзор выпусков коллекции временно недоступен. Попробуйте ещё раз.",
   title: "Обзор выпусков коллекции",
   note: "Сравните выбранные версии с последними безопасными опубликованными сборками. Счётчики учитывают поиск по названию; закреплённые версии также входят в фильтр закреплений. Обзор не меняет версии и права. При скачивании доступ проверяется заново.",
   archived:

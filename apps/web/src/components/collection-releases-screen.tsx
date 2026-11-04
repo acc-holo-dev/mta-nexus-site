@@ -1,10 +1,11 @@
 import { AppError, LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionReleasesQuery } from "../lib/collection-releases-query";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
@@ -30,6 +31,7 @@ export async function CollectionReleasesScreen({
     params,
     searchParams,
   ]);
+  const dictionary = getDictionary(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const cc = libraryCollectionsCopy(locale);
   const releasesBase = `/workspace/library/collections/${encodeURIComponent(path.id)}/releases`;
@@ -57,10 +59,38 @@ export async function CollectionReleasesScreen({
     .releases(actor, path.id, query)
     .catch((error: unknown) => {
       if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-      throw error;
+      return null;
     });
   const c = collectionReleasesCopy(locale),
     copy = getResourceReleaseControlCopy(locale);
+  const retryHref = `${collectionHref(path.id, "releases")}?${new URLSearchParams({
+    page: String(query.page),
+    filter: query.filter,
+    ...(query.q ? { q: query.q } : {}),
+  })}`;
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <Link
+          href={collectionHref(path.id)}
+          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {cc.back}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          action={
+            <Link
+              href={retryHref}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const suffix = (page = result.page, filter = result.filter) =>
     new URLSearchParams({
       page: String(page),
@@ -70,7 +100,7 @@ export async function CollectionReleasesScreen({
   const href = (page: number, filter = result.filter) =>
     `${collectionHref(path.id, "releases")}?${suffix(page, filter)}`;
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
       <Link
         href={collectionHref(path.id)}
         className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -145,23 +175,26 @@ export async function CollectionReleasesScreen({
         ))}
       </nav>
       {!result.items.length && (
-        <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
-          <p>
-            {result.q
+        <EmptyState
+          title={
+            result.q
               ? cc.emptyFilteredItems
               : result.filter !== "all"
                 ? cc.emptyFiltered
-                : cc.emptyItems}
-          </p>
-          {(result.filter !== "all" || result.q) && (
-            <Link
-              href={collectionHref(path.id, "releases")}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {cc.clear}
-            </Link>
-          )}
-        </div>
+                : cc.emptyItems
+          }
+          description={c.note}
+          action={
+            result.filter !== "all" || result.q ? (
+              <Link
+                href={collectionHref(path.id, "releases")}
+                className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {cc.clear}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       <ol className="grid gap-4 sm:grid-cols-2">
         {result.items.map((item) => {

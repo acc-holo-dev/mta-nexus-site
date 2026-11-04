@@ -31,6 +31,7 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
 }));
 
 import { CollectionReleasesScreen } from "../apps/web/src/components/collection-releases-screen";
+import { collectionReleasesCopy } from "../apps/web/src/lib/collection-releases-i18n";
 import { libraryCollectionsCopy } from "../apps/web/src/lib/library-collections-i18n";
 
 const item = {
@@ -154,4 +155,14 @@ it("requires authentication, strict query controls and current ownership", async
   expect(h.releases).not.toHaveBeenCalled();
   h.releases.mockRejectedValueOnce(new AppError("Absent", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NOT_FOUND");
+});
+it("shows an honest recovery state when collection releases fail to load", async () => {
+  h.releases.mockRejectedValueOnce(new Error("releases unavailable"));
+  const copy = collectionReleasesCopy("en");
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/lcol_a/releases");
+  expect(html).not.toContain("releases unavailable");
 });

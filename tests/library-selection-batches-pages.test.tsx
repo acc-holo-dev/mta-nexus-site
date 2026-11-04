@@ -119,3 +119,16 @@ it("rejects duplicate pagination before fetching private metadata", async () => 
   expect(state.detail).not.toHaveBeenCalled();
   expect(state.history).not.toHaveBeenCalled();
 });
+it("shows an honest recovery state when batch metadata fails to load", async () => {
+  state.detail.mockRejectedValueOnce(new Error("batch detail unavailable"));
+  const { librarySelectionBatchesCopy } = await import(
+    "../apps/web/src/lib/library-selection-batches-i18n"
+  );
+  const copy = librarySelectionBatchesCopy("en");
+  const html = renderToStaticMarkup(await screen(props));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/lcol_a/versions");
+  expect(html).not.toContain("batch detail unavailable");
+});

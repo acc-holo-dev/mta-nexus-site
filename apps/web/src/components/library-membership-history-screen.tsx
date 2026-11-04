@@ -3,10 +3,11 @@ import {
   LIBRARY_COLLECTION_HISTORY_DAYS,
   LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
@@ -37,6 +38,7 @@ export async function LibraryMembershipHistoryScreen({
   const c = libraryCollectionsCopy(locale),
     h = libraryCollectionHistoryCopy(locale),
     m = libraryMembershipHistoryCopy(locale),
+    dictionary = getDictionary(locale),
     actor = await authService.getSession(store.get("nexus_session")?.value);
   if (!actor) {
     let returnPath = membershipHistoryHref();
@@ -56,9 +58,44 @@ export async function LibraryMembershipHistoryScreen({
     const filters = collectionPageParams(raw);
     if (params) {
       if (filters.size) throw new AppError("Unexpected receipt query", 400, "COLLECTION_INVALID");
-      const result = await libraryCollectionsService.membershipReceipt(actor, (await params).id);
+      let missingReceipt = false;
+      const receiptId = (await params).id;
+      const receipt = await libraryCollectionsService
+        .membershipReceipt(actor, receiptId)
+        .catch((error: unknown) => {
+          if (error instanceof AppError && error.statusCode === 404) {
+            missingReceipt = true;
+            return null;
+          }
+          if (error instanceof AppError) throw error;
+          return null;
+        });
+      if (missingReceipt) notFound();
+      if (!receipt) {
+        return (
+          <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+            <Link
+              href={membershipHistoryHref()}
+              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {m.history}
+            </Link>
+            <ErrorState
+              title={m.loadUnavailable}
+              action={
+                <Link
+                  href={membershipHistoryHref(receiptId)}
+                  className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {dictionary.errors.retry}
+                </Link>
+              }
+            />
+          </div>
+        );
+      }
       return (
-        <div className="mx-auto max-w-5xl space-y-6 py-8">
+        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
           <Link
             href={membershipHistoryHref()}
             className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -67,15 +104,36 @@ export async function LibraryMembershipHistoryScreen({
           </Link>
           <h1>{m.detail}</h1>
           <p>{m.note}</p>
-          <LibraryMembershipHistoryEntry item={result.item} locale={locale} />
+          <LibraryMembershipHistoryEntry item={receipt.item} locale={locale} />
           <p>
-            <time dateTime={result.generatedAt}>{result.generatedAt}</time>
+            <time dateTime={receipt.generatedAt}>{receipt.generatedAt}</time>
           </p>
         </div>
       );
     }
-    const query = libraryMembershipHistoryQuery(filters),
-      result = await libraryCollectionsService.membershipHistory(actor, query);
+    const query = libraryMembershipHistoryQuery(filters);
+    const retryHref = `${membershipHistoryHref()}?${libraryMembershipHistorySuffix(query)}`;
+    const result = await libraryCollectionsService.membershipHistory(actor, query).catch((error: unknown) => {
+      if (error instanceof AppError) throw error;
+      return null;
+    });
+    if (!result) {
+      return (
+        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+          <ErrorState
+            title={m.loadUnavailable}
+            action={
+              <Link
+                href={retryHref}
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
     const suffix = (page: number) => libraryMembershipHistorySuffix({ ...query, page });
     const filtered =
       result.operation !== "all" ||
@@ -83,7 +141,7 @@ export async function LibraryMembershipHistoryScreen({
       Boolean(result.productId) ||
       result.days !== 30;
     return (
-      <div className="mx-auto max-w-5xl space-y-6 py-8">
+      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={m.title}>
           <Link
             href={collectionHref()}
@@ -176,17 +234,20 @@ export async function LibraryMembershipHistoryScreen({
           {h.export}
         </a>
         {!result.items.length && (
-          <div className="space-y-3 text-sm text-muted">
-            <p>{filtered ? m.emptyFiltered : m.emptyNever}</p>
-            {filtered ? (
-              <Link
-                href={membershipHistoryHref()}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
-                {m.clear}
-              </Link>
-            ) : null}
-          </div>
+          <EmptyState
+            title={filtered ? m.emptyFiltered : m.emptyNever}
+            description={m.note}
+            action={
+              filtered ? (
+                <Link
+                  href={membershipHistoryHref()}
+                  className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                >
+                  {m.clear}
+                </Link>
+              ) : undefined
+            }
+          />
         )}
         <ol className="space-y-4">
           {result.items.map((item) => (
@@ -221,7 +282,24 @@ export async function LibraryMembershipHistoryScreen({
       </div>
     );
   } catch (error) {
-    if (!(error instanceof AppError)) throw error;
+    if (error instanceof Error && error.message === "NEXT_NOT_FOUND") throw error;
+    if (!(error instanceof AppError)) {
+      return (
+        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+          <ErrorState
+            title={m.loadUnavailable}
+            action={
+              <Link
+                href={membershipHistoryHref()}
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </div>
+      );
+    }
     if (error.statusCode === 404) notFound();
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16">

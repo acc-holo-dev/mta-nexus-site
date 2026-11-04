@@ -37,6 +37,7 @@ vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
 }));
 
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { collectionRequirementsCopy } from "../apps/web/src/lib/collection-requirements-i18n";
 import { CollectionRequirementsScreen as screen } from "../apps/web/src/components/collection-requirements-screen";
 
 const root: ResourceRequirementNode = {
@@ -146,4 +147,14 @@ it("requires an authenticated user before querying the collection", async () => 
   expect(guest).toContain("/auth/login?next=");
   expect(guest).toContain("%2Fworkspace%2Flibrary%2Fcollections%2Flcol_a%2Frequirements");
   expect(state.report).not.toHaveBeenCalled();
+});
+it("shows an honest recovery state when collection readiness fails to load", async () => {
+  state.report.mockRejectedValueOnce(new Error("requirements unavailable"));
+  const copy = collectionRequirementsCopy("en");
+  const html = renderToStaticMarkup(await screen(props));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/lcol_a/requirements?targetMta=1.6.0");
+  expect(html).not.toContain("requirements unavailable");
 });

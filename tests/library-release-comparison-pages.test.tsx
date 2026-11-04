@@ -24,6 +24,7 @@ vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => (
 }));
 
 import { LibraryReleaseComparisonScreen } from "../apps/web/src/components/library-release-comparison-screen";
+import { libraryReleaseComparisonCopy } from "../apps/web/src/lib/library-release-comparison-i18n";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({
   id,
@@ -124,4 +125,14 @@ it("links each exact release to preparation and preserves the compared pair and 
   expect(html).toContain(
     "/requirements?previewBuildId=bld_b&amp;returnFrom=bld_a&amp;returnPage=2",
   );
+});
+it("shows an honest recovery state when comparison data fails to load", async () => {
+  h.compare.mockRejectedValueOnce(new Error("comparison-store-down"));
+  const copy = libraryReleaseComparisonCopy("en");
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("from=bld_a&amp;to=bld_b&amp;returnPage=2");
+  expect(html).not.toContain("comparison-store-down");
 });

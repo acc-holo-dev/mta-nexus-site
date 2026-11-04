@@ -102,3 +102,14 @@ it("rejects ambiguous scope and requires authentication before history calls", a
   expect(html).toContain("%2Fworkspace%2Flibrary%2Fversion-history");
   expect(h.history).not.toHaveBeenCalled();
 });
+it("shows an honest recovery state when version history fails to load", async () => {
+  h.history.mockRejectedValueOnce(new Error("history unavailable"));
+  const copy = (await import("../apps/web/src/lib/library-release-history-i18n"))
+    .libraryReleaseHistoryCopy("en");
+  const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("page=1&amp;days=30");
+  expect(html).not.toContain("history unavailable");
+});
