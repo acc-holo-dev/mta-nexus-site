@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
@@ -5,6 +7,8 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/market/example" }));
 
 import { ResourceQaPanel } from "../apps/web/src/components/resource-qa-panel";
 import { resourceQaCopy } from "../apps/web/src/lib/resource-qa-i18n";
+
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 const thread = {
   id: "rqa_thread",
@@ -100,4 +104,34 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
   expect(empty).toContain(copy.emptyHint);
   expect(empty).toContain("overflow-x-clip");
   expect(empty).not.toContain('role="alert"');
+});
+
+it("gates resolve and reopen writes behind confirmAction with localized copy", () => {
+  const source = read("apps/web/src/components/resource-qa-panel.tsx");
+  const i18n = read("apps/web/src/lib/resource-qa-i18n.ts");
+
+  expect(source).toContain('import { confirmAction } from "./confirm-action"');
+  expect(source).toContain("copy.resolveConfirmTitle");
+  expect(source).toContain("copy.reopenConfirmTitle");
+  expect(source).toContain("danger: false");
+  expect(source).toContain("danger: true");
+
+  const resolveConfirmAt = source.indexOf("copy.resolveConfirmTitle");
+  const resolveMutateAt = source.indexOf('action: "resolve"');
+  const reopenConfirmAt = source.indexOf("copy.reopenConfirmTitle");
+  const reopenMutateAt = source.indexOf('action: "reopen"');
+  expect(resolveConfirmAt).toBeGreaterThan(-1);
+  expect(resolveMutateAt).toBeGreaterThan(resolveConfirmAt);
+  expect(reopenConfirmAt).toBeGreaterThan(-1);
+  expect(reopenMutateAt).toBeGreaterThan(reopenConfirmAt);
+
+  const en = resourceQaCopy("en");
+  const ru = resourceQaCopy("ru");
+  expect(en.resolveConfirmTitle).not.toBe(ru.resolveConfirmTitle);
+  expect(en.resolveConfirm).not.toBe(ru.resolveConfirm);
+  expect(en.reopenConfirmTitle).not.toBe(ru.reopenConfirmTitle);
+  expect(en.reopenConfirm).not.toBe(ru.reopenConfirm);
+  expect(en.cancel).not.toBe(ru.cancel);
+  expect(i18n).toContain("resolveConfirmTitle");
+  expect(i18n).toContain("reopenConfirmTitle");
 });

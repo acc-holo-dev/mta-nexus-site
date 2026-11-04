@@ -14,6 +14,7 @@ import { getDictionary } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
 
 type BuildOption = { id: string; version: string };
@@ -235,6 +236,18 @@ export function ResourceQaPanel({
 
   async function onResolve(answerId: string) {
     if (!detail) return;
+    if (
+      !(await confirmAction({
+        title: copy.resolveConfirmTitle,
+        object: detail.thread.body,
+        consequences: copy.resolveConfirm,
+        confirmLabel: copy.resolve,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: false,
+      }))
+    )
+      return;
     const ok = await mutate(
       `${base}/${encodeURIComponent(detail.thread.id)}/resolve`,
       {
@@ -255,6 +268,18 @@ export function ResourceQaPanel({
 
   async function onReopen() {
     if (!detail) return;
+    if (
+      !(await confirmAction({
+        title: copy.reopenConfirmTitle,
+        object: detail.thread.body,
+        consequences: copy.reopenConfirm,
+        confirmLabel: copy.reopen,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
     const ok = await mutate(
       `${base}/${encodeURIComponent(detail.thread.id)}/resolve`,
       { action: "reopen", expectedRevision: detail.thread.revision },
