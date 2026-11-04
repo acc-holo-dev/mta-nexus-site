@@ -72,28 +72,44 @@ export function ServerReviewPanel({
   const [confirmed, setConfirmed] = useState(false);
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
+  const draftDirty = useRef(false);
+  const draftRevision = useRef(0);
+  const mineRequest = useRef(0);
+  const reviewServer = useRef(serverId);
+  const scopeGeneration = useRef(0);
+  const [conflict, setConflict] = useState(false);
+  const [latest, setLatest] = useState<{ review: Review | null; canReview: boolean } | null>(null);
+  const [checkingLatest, setCheckingLatest] = useState(false);
 
   const refreshMine = useCallback(async () => {
-    const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
-      credentials: "same-origin",
-      cache: "no-store",
-    });
-    if (response.status === 401) {
-      setSignedIn(false);
-      setMine(null);
-      return;
-    }
-    if (!response.ok) return;
-    const data = (await response.json()) as {
-      review: (Review & { moderationReason?: string | null }) | null;
-      canReview: boolean;
-      eligibility: string;
-    };
-    setSignedIn(true);
-    setMine(data);
-    if (!confirmed) {
-      setText(data.review?.text ?? "");
-      setRating(data.review?.rating ?? 5);
+    const generation = ++mineRequest.current;
+    try {
+      const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      if (generation !== mineRequest.current) return;
+      if (response.status === 401) {
+        setSignedIn(false);
+        setMine(null);
+        return;
+      }
+      if (!response.ok) return;
+      const data = (await response.json()) as {
+        review: (Review & { moderationReason?: string | null }) | null;
+        canReview: boolean;
+        eligibility: string;
+      };
+      if (generation !== mineRequest.current) return;
+      setSignedIn(true);
+      setMine(data);
+      if (!confirmed && !draftDirty.current) {
+        draftRevision.current = data.review?.revision ?? 0;
+        setText(data.review?.text ?? "");
+        setRating(data.review?.rating ?? 5);
+      }
+    } catch {
+      // Keep the last confirmed data and the draft when a background refresh fails.
     }
   }, [serverId, confirmed]);
 
@@ -105,10 +121,23 @@ export function ServerReviewPanel({
   }, [pathname]);
 
   useEffect(() => {
-    let cancelled = false;
-    void refreshMine().then(() => {
-      if (cancelled) return;
-    });
+    if (reviewServer.current !== serverId) {
+      reviewServer.current = serverId;
+      draftDirty.current = false;
+      draftRevision.current = 0;
+      setMine(null);
+      setSignedIn(false);
+      setPage(initialPage ?? null);
+      setUnavailable(loadState === "unavailable" || initialPage == null);
+      setConfirmed(false);
+      setMessage("");
+      setBusy(false);
+      setRetrying(false);
+      setConflict(false);
+      setLatest(null);
+      setCheckingLatest(false);
+    }
+    void refreshMine();
     const onVisible = () => {
       if (document.visibilityState === "visible") void refreshMine();
     };
@@ -118,11 +147,18 @@ export function ServerReviewPanel({
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("focus", onFocus);
     return () => {
-      cancelled = true;
+      mineRequest.current += 1;
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", onFocus);
     };
-  }, [refreshMine]);
+  }, [refreshMine, serverId, initialPage, loadState]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies(serverId): Invalidate old mutations when the server changes.
+  useEffect(() => {
+    return () => {
+      scopeGeneration.current += 1;
+    };
+  }, [serverId]);
 
   useEffect(() => {
     if (!message && !unavailable) return;
@@ -133,6 +169,7 @@ export function ServerReviewPanel({
     if (retrying) return;
     setRetrying(true);
     setMessage("");
+    const scope = scopeGeneration.current;
     try {
       const response = await fetch(
         `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page?.page ?? 1}`,
@@ -140,23 +177,29 @@ export function ServerReviewPanel({
       );
       if (!response.ok) throw new Error("Reviews unavailable");
       const next = (await response.json()) as PublicPage;
+      if (scope !== scopeGeneration.current) return;
       if (!Array.isArray(next.reviews) || !Number.isFinite(next.total)) {
         throw new Error("Invalid review page");
       }
       setPage(next);
       setUnavailable(false);
     } catch {
+      if (scope !== scopeGeneration.current) return;
       setUnavailable(true);
       setMessage(loadCopy.unavailable);
     } finally {
-      setRetrying(false);
+      if (scope === scopeGeneration.current) setRetrying(false);
     }
   }
 
   async function submit(action: "save" | "withdraw") {
-    if (busy || confirmed) return;
+    if (busy || confirmed || (action === "save" && conflict)) return;
+    const scope = scopeGeneration.current;
     setBusy(true);
     setMessage("");
+    mineRequest.current += 1;
+    const expectedRevision =
+      action === "save" ? draftRevision.current : (mine?.review?.revision ?? 0);
     try {
       const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews`, {
         method: "POST",
@@ -165,16 +208,21 @@ export function ServerReviewPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action,
-          expectedRevision: mine?.review?.revision ?? 0,
+          expectedRevision,
           ...(action === "save" ? { text, rating } : {}),
         }),
       });
       const value = await response.json().catch(() => null);
+      if (scope !== scopeGeneration.current) return;
       if (!response.ok) {
+        if (action === "save" && value?.code === "REVIEW_CHANGED") {
+          setConflict(true);
+          setLatest(null);
+        }
         setMessage(serverReviewError(locale, value?.code));
         return;
       }
-      if (!confirmedServerReview(value, mine?.review?.revision ?? 0, action)) {
+      if (!confirmedServerReview(value, expectedRevision, action)) {
         throw new Error("Unconfirmed review");
       }
       setConfirmed(true);
@@ -193,18 +241,55 @@ export function ServerReviewPanel({
         },
       }));
       setMessage(`${copy.saved}. ${loadCopy.reloadReason}`);
-      const refreshed = await fetch(
-        `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page?.page ?? 1}`,
-        { credentials: "same-origin", cache: "no-store" },
-      );
-      if (refreshed.ok) {
-        setPage((await refreshed.json()) as PublicPage);
+      try {
+        const refreshed = await fetch(
+          `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page?.page ?? 1}`,
+          { credentials: "same-origin", cache: "no-store" },
+        );
+        if (!refreshed.ok) throw new Error("Reviews unavailable");
+        const next = (await refreshed.json()) as PublicPage;
+        if (scope !== scopeGeneration.current) return;
+        setPage(next);
         setUnavailable(false);
+      } catch {
+        if (scope === scopeGeneration.current) setUnavailable(true);
       }
     } catch {
-      setMessage(copy.unknown);
+      if (scope === scopeGeneration.current) setMessage(copy.unknown);
     } finally {
-      setBusy(false);
+      if (scope === scopeGeneration.current) setBusy(false);
+    }
+  }
+
+  async function checkLatest() {
+    if (checkingLatest) return;
+    const scope = scopeGeneration.current;
+    setCheckingLatest(true);
+    setLatest(null);
+    try {
+      const response = await fetch(`/api/servers/${encodeURIComponent(serverId)}/reviews/mine`, {
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      const value = await response.json().catch(() => null);
+      if (scope !== scopeGeneration.current) return;
+      if (
+        !response.ok ||
+        typeof value?.canReview !== "boolean" ||
+        !(
+          value.review === null ||
+          (Number.isSafeInteger(value.review?.revision) &&
+            typeof value.review?.text === "string" &&
+            Number.isFinite(value.review?.rating))
+        )
+      )
+        throw new Error("Invalid review state");
+      setLatest({ review: value.review, canReview: value.canReview });
+      setMessage(copy.changed);
+    } catch {
+      if (scope === scopeGeneration.current) setMessage(copy.latestUnavailable);
+    } finally {
+      if (scope === scopeGeneration.current) setCheckingLatest(false);
     }
   }
 
@@ -215,6 +300,7 @@ export function ServerReviewPanel({
 
   async function withdrawReview() {
     if (busy || confirmed) return;
+    const scope = scopeGeneration.current;
     const source = (mine?.review?.text ?? text).trim();
     const object =
       source.length > 80 ? `${source.slice(0, 80)}…` : source.length > 0 ? source : copy.text;
@@ -230,6 +316,7 @@ export function ServerReviewPanel({
       }))
     )
       return;
+    if (scope !== scopeGeneration.current) return;
     void submit("withdraw");
   }
 
@@ -320,7 +407,10 @@ export function ServerReviewPanel({
                   {copy.rating}
                   <select
                     value={rating}
-                    onChange={(event) => setRating(Number(event.target.value))}
+                    onChange={(event) => {
+                      draftDirty.current = true;
+                      setRating(Number(event.target.value));
+                    }}
                     disabled={busy || confirmed}
                     className={`${fieldClassBlock} mt-2`}
                   >
@@ -335,7 +425,10 @@ export function ServerReviewPanel({
                   {copy.text}
                   <textarea
                     value={text}
-                    onChange={(event) => setText(event.target.value)}
+                    onChange={(event) => {
+                      draftDirty.current = true;
+                      setText(event.target.value);
+                    }}
                     minLength={3}
                     maxLength={4000}
                     required
@@ -343,7 +436,12 @@ export function ServerReviewPanel({
                     className={`${fieldClassBlock} mt-2 min-h-28`}
                   />
                 </label>
-                <Button type="submit" size="touch" disabled={busy || confirmed} isLoading={busy}>
+                <Button
+                  type="submit"
+                  size="touch"
+                  disabled={busy || confirmed || conflict}
+                  isLoading={busy}
+                >
                   {busy ? copy.busy : copy.save}
                 </Button>
               </form>
@@ -376,6 +474,47 @@ export function ServerReviewPanel({
         >
           {message}
         </p>
+        {conflict && (
+          <div className="space-y-2 text-sm">
+            <Button
+              type="button"
+              variant="outline"
+              size="touch"
+              disabled={checkingLatest}
+              onClick={() => void checkLatest()}
+            >
+              {copy.checkLatest}
+            </Button>
+            {latest && (
+              <div className="space-y-2">
+                <p className="font-semibold">{copy.latestReview}</p>
+                {latest.review ? (
+                  <p className="whitespace-pre-wrap break-words">
+                    {copy.rating}: {latest.review.rating}/5 · {latest.review.text}
+                  </p>
+                ) : (
+                  <p>{copy.noLatestReview}</p>
+                )}
+                {latest.canReview && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="touch"
+                    onClick={() => {
+                      draftRevision.current = latest.review?.revision ?? 0;
+                      setConflict(false);
+                      setLatest(null);
+                      setMessage("");
+                    }}
+                  >
+                    {copy.useLatest}
+                  </Button>
+                )}
+                {!latest.canReview && <p>{copy.latestNotEditable}</p>}
+              </div>
+            )}
+          </div>
+        )}
         {confirmed && (
           <Button
             type="button"
