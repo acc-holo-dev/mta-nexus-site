@@ -54,6 +54,7 @@ vi.mock("./locale-context", () => ({
         view: "View",
         loading: "Loading notifications...",
         empty: "No notifications yet",
+        emptyHint: "New notifications appear in this preview when activity reaches your account.",
         openCenter: "Open notification center",
         previewFootnote:
           "Preview shows up to 6 recent items. The unread count covers your entire inbox.",
@@ -93,7 +94,7 @@ function descendants(node: ReactNode): Element[] {
     | string;
   if (typeof type === "function") {
     const name = type.displayName || type.name;
-    if (name === "ErrorState") {
+    if (name === "ErrorState" || name === "EmptyState") {
       return descendants(type(element.props));
     }
     if (name === "Button") {

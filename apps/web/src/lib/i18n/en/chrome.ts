@@ -24,6 +24,7 @@ export const chrome = {
     view: "View",
     loading: "Loading notifications...",
     empty: "No notifications yet",
+    emptyHint: "New notifications appear in this preview when activity reaches your account.",
     openCenter: "Open notification center",
     previewList: "Recent notifications",
     previewFootnote:

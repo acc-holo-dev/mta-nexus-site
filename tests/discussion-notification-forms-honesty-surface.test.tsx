@@ -32,6 +32,18 @@ it("locks discussion and notification form failures to ErrorState with touch CTA
   }
 });
 
+it("locks notification bell empty preview to EmptyState with emptyHint copy", () => {
+  const source = read("apps/web/src/components/notification-bell.tsx");
+  expect(source).toContain("EmptyState");
+  expect(source).toContain("copy.empty");
+  expect(source).toContain("copy.emptyHint");
+  expect(source).not.toMatch(
+    /<div className="py-6 text-center font-caption text-muted">\{copy\.empty\}<\/div>/u,
+  );
+  expect(read("apps/web/src/lib/i18n/en/chrome.ts")).toContain("emptyHint:");
+  expect(read("apps/web/src/lib/i18n/ru/chrome.ts")).toContain("emptyHint:");
+});
+
 it("locks MTA meta inspector apply CTA to size=touch without min-h-8", () => {
   const source = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
   expect(source).toMatch(

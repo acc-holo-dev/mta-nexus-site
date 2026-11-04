@@ -353,7 +353,7 @@ export function WebPushSettings() {
       {status === "enabled" ? (
         <Button
           type="button"
-          size="sm"
+          size="touch"
           variant="outline"
           isLoading={pending}
           aria-describedby={describedBy}
@@ -364,7 +364,7 @@ export function WebPushSettings() {
       ) : status === "disabled" ? (
         <Button
           type="button"
-          size="sm"
+          size="touch"
           isLoading={pending}
           aria-describedby={describedBy}
           onClick={() => void enable()}

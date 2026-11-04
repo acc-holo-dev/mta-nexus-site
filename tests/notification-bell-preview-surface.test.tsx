@@ -41,3 +41,19 @@ it("marks the notification preview busy before the first poll completes", () => 
   );
   expect(html).toContain('aria-busy="true"');
 });
+
+it("renders empty preview through EmptyState with honesty hint copy", () => {
+  harness.slots = [[], 0, true, true, null, null, false, 0];
+  harness.cursor = 0;
+  const html = renderToStaticMarkup(
+    <LocaleProvider locale="en">
+      <NotificationBell />
+    </LocaleProvider>,
+  );
+  expect(html).toContain("No notifications yet");
+  expect(html).toContain(
+    "New notifications appear in this preview when activity reaches your account.",
+  );
+  expect(html).toContain("border-dashed");
+  expect(html).not.toContain('class="py-6 text-center font-caption text-muted"');
+});

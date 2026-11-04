@@ -71,3 +71,14 @@ it("locks license bind noServers empty to EmptyState with honesty hint copy", ()
   expect(i18n).toContain("noServersHint:");
   expect(i18n.match(/noServersHint:/gu)?.length).toBe(2);
 });
+
+it("locks license control ghost pagination and token CTAs to size=touch", () => {
+  const panel = read("apps/web/src/components/license-control-panel.tsx");
+  expect(panel).toContain('size="touch"');
+  expect(panel).not.toContain('size="sm"');
+  expect(panel.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(6);
+  expect(panel).toContain("void loadServers(servers.page - 1)");
+  expect(panel).toContain("void loadServers(servers.page + 1)");
+  expect(panel).toContain("setSecret(null)");
+  expect(panel).toMatch(/variant="ghost"\s+size="touch"/u);
+});
