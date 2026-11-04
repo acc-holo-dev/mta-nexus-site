@@ -1,6 +1,6 @@
 "use client";
 import { type ManagedResourceVariants, RESOURCE_VARIANT_LIMIT } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -195,7 +195,7 @@ export function ResourceVariantsForm({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
+                  size="touch"
                   disabled={disabled || index === 0}
                   aria-label={`${copy.up}: ${row.title}`}
                   onClick={() => move(index, -1)}
@@ -206,7 +206,7 @@ export function ResourceVariantsForm({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
+                  size="touch"
                   disabled={disabled || index === selected.length - 1}
                   aria-label={`${copy.down}: ${row.title}`}
                   onClick={() => move(index, 1)}
@@ -217,7 +217,7 @@ export function ResourceVariantsForm({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
+                  size="touch"
                   disabled={disabled || row.productId === product.id}
                   aria-label={`${copy.remove}: ${row.title}`}
                   onClick={() =>
@@ -285,9 +285,9 @@ export function ResourceVariantsForm({
             </li>
           ))}
         </ul>
-        {candidates.candidates.length === 0 && (
-          <p className="text-sm text-muted">{copy.noCandidates}</p>
-        )}
+        {candidates.candidates.length === 0 ? (
+          <EmptyState title={copy.noCandidates} description={copy.noCandidatesHint} />
+        ) : null}
         <nav aria-label={copy.candidates} className="flex items-center gap-4 text-sm text-accent">
           <Button
             type="button"

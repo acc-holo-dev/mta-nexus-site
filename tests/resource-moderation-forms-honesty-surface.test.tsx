@@ -59,6 +59,32 @@ it("locks resource media editor reorder/remove CTAs to size=touch", () => {
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(4);
 });
 
+it("locks resource variants reorder/remove to size=touch and noCandidates to EmptyState", () => {
+  const source = read("apps/web/src/components/resource-variants-form.tsx");
+  expect(source).toContain("EmptyState");
+  expect(source).toContain("copy.noCandidates");
+  expect(source).toContain("copy.noCandidatesHint");
+  expect(source).not.toMatch(/<p className="text-sm text-muted">\{copy\.noCandidates\}<\/p>/u);
+  expect(source).toContain('size="touch"');
+  expect(source).not.toContain('size="sm"');
+  expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(3);
+
+  const i18n = read("apps/web/src/lib/resource-management-i18n.ts");
+  expect(i18n).toContain("noCandidates:");
+  expect(i18n).toContain("noCandidatesHint:");
+  expect(i18n.match(/noCandidatesHint:/gu)?.length).toBe(2);
+});
+
+it("locks new resource post-create CTA to size=touch", () => {
+  const source = read("apps/web/src/components/new-resource-form.tsx");
+  expect(source).toMatch(
+    /onClick=\{startNewSubmission\}[\s\S]{0,80}?size="touch"|size="touch"[\s\S]{0,80}?onClick=\{startNewSubmission\}/u,
+  );
+  expect(source).not.toMatch(
+    /onClick=\{startNewSubmission\}[\s\S]{0,80}?size="sm"|size="sm"[\s\S]{0,80}?onClick=\{startNewSubmission\}/u,
+  );
+});
+
 it("locks new resource native controls to fieldControlClass without h-10 chrome", () => {
   const source = read("apps/web/src/components/new-resource-form.tsx");
   expect(source).toContain("fieldControlClass");
