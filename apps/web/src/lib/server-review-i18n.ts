@@ -5,6 +5,8 @@ const en = {
   description:
     "Reviews require an active follow of this public server. Follow is not proof of gameplay. Star ratings are one signal among others — not the server’s sole trust score.",
   empty: "No follow-based reviews yet.",
+  emptyHint:
+    "Published follow-based reviews for this server will appear here. An empty list is not a load failure.",
   write: "Write or manage my review",
   access:
     "Follow this public server to leave a review. Follow confirms a saved interest, not that you joined or played. Operators cannot review their own server.",
@@ -49,6 +51,8 @@ const ru: typeof en = {
   description:
     "Отзывы требуют активной подписки (follow) на этот публичный сервер. Follow не доказывает игру. Оценка — один из сигналов, а не единственный рейтинг доверия.",
   empty: "Пока нет отзывов на основании follow.",
+  emptyHint:
+    "Здесь появятся опубликованные отзывы на основании follow. Пустой список — не ошибка загрузки.",
   write: "Написать или изменить мой отзыв",
   access:
     "Подпишитесь на этот публичный сервер, чтобы оставить отзыв. Follow подтверждает сохранённый интерес, а не вход в игру. Операторы не могут оценивать свой сервер.",

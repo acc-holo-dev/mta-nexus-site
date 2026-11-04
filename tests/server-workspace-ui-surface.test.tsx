@@ -43,6 +43,7 @@ vi.mock("@nexus/ui", async () => {
       disabled,
       onClick,
       className,
+      size,
     }: {
       children: ReactNode;
       type?: "button" | "submit";
@@ -51,6 +52,7 @@ vi.mock("@nexus/ui", async () => {
       disabled?: boolean;
       onClick?: () => void;
       className?: string;
+      size?: string;
     }) =>
       createElement(
         "button",
@@ -58,6 +60,7 @@ vi.mock("@nexus/ui", async () => {
           type,
           "data-ui": "button",
           "data-variant": variant || "primary",
+          "data-size": size || "md",
           "aria-busy": isLoading || undefined,
           disabled: disabled || isLoading || undefined,
           onClick,
@@ -65,6 +68,10 @@ vi.mock("@nexus/ui", async () => {
         },
         children,
       ),
+    EmptyState: ({ title, description }: { title: string; description?: string }) =>
+      createElement("div", { "data-ui": "empty-state" }, title, description),
+    ErrorState: ({ title, action }: { title: string; action?: ReactNode }) =>
+      createElement("div", { role: "alert", "data-ui": "error-state" }, title, action),
     Input: ({
       label,
       id,
