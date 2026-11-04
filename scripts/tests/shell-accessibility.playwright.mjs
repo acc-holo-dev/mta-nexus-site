@@ -780,7 +780,13 @@ for (const locale of ["en", "ru"]) {
     await page.goto("/notifications");
     await waitForReadyCapture(page);
     const inboxCopy = notificationInboxCopy(locale);
-    const categorySelect = page.getByLabel(inboxCopy.category, { exact: true });
+    // getByLabel(..., { exact: true }) fails on this wrap-<label> select: label textContent
+    // includes every <option> string, while the a11y name stays inboxCopy.category alone.
+    // Prefer combobox role (same pattern as directory.browser.mjs selects).
+    const categorySelect = page.getByRole("combobox", {
+      name: inboxCopy.category,
+      exact: true,
+    });
     await expect(categorySelect).toBeVisible();
     const categoryValues = await categorySelect
       .locator("option")
