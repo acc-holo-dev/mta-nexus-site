@@ -26,102 +26,104 @@ export function ResourcePublisherFilters({
     dictionary = getDictionary(locale),
     labels = dictionary.authorResources;
   return (
-    <section className="space-y-4" aria-label={copy.filters}>
-      <form
-        action="/workspace/resources"
-        method="get"
-        className="nexus-panel grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        <input type="hidden" name="status" value={query.status} />
-        <Input
-          id="publisher-search"
-          name="q"
-          label={copy.search}
-          defaultValue={query.q}
-          maxLength={120}
-        />
-        <div className="space-y-1.5">
-          <label htmlFor="publisher-type" className={nativeLabelClass}>
-            {copy.type}
-          </label>
-          <select
-            id="publisher-type"
-            name="type"
-            defaultValue={query.type}
-            className={controlClass}
-          >
-            <option value="all">{copy.all}</option>
-            {PRODUCT_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {dictionary.publishing[PRODUCT_PUBLISHING_KEYS[type]]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-1.5">
-          <label htmlFor="publisher-scope" className={nativeLabelClass}>
-            {copy.scope}
-          </label>
-          <select
-            id="publisher-scope"
-            name="scope"
-            defaultValue={query.scope}
-            className={controlClass}
-          >
-            {["all", "personal", "organization"].map((scope) => (
-              <option key={scope} value={scope}>
-                {copy[scope as "all" | "personal" | "organization"]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-1.5">
-          <label htmlFor="publisher-readiness" className={nativeLabelClass}>
-            {copy.readinessLabel}
-          </label>
-          <select
-            id="publisher-readiness"
-            name="readiness"
-            defaultValue={query.readiness}
-            className={controlClass}
-          >
-            <option value="all">{copy.all}</option>
-            {RESOURCE_READINESS.map((value) => (
-              <option key={value} value={value}>
-                {copy.readiness[value]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-1.5">
-          <label htmlFor="publisher-sort" className={nativeLabelClass}>
-            {copy.sort}
-          </label>
-          <select
-            id="publisher-sort"
-            name="sort"
-            defaultValue={query.sort}
-            className={controlClass}
-          >
-            {["updated", "created", "title"].map((sort) => (
-              <option key={sort} value={sort}>
-                {copy[sort as "updated" | "created" | "title"]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-end gap-4">
-          <Button type="submit" className="min-h-11">
-            {copy.apply}
-          </Button>
-          <Link
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            href="/workspace/resources"
-          >
-            {copy.reset}
-          </Link>
-        </div>
-      </form>
+    <section className="space-y-4">
+      <search aria-label={copy.filters}>
+        <form
+          action="/workspace/resources"
+          method="get"
+          className="nexus-panel grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          <input type="hidden" name="status" value={query.status} />
+          <Input
+            id="publisher-search"
+            name="q"
+            label={copy.search}
+            defaultValue={query.q}
+            maxLength={120}
+          />
+          <div className="space-y-1.5">
+            <label htmlFor="publisher-type" className={nativeLabelClass}>
+              {copy.type}
+            </label>
+            <select
+              id="publisher-type"
+              name="type"
+              defaultValue={query.type}
+              className={controlClass}
+            >
+              <option value="all">{copy.all}</option>
+              {PRODUCT_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {dictionary.publishing[PRODUCT_PUBLISHING_KEYS[type]]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="publisher-scope" className={nativeLabelClass}>
+              {copy.scope}
+            </label>
+            <select
+              id="publisher-scope"
+              name="scope"
+              defaultValue={query.scope}
+              className={controlClass}
+            >
+              {["all", "personal", "organization"].map((scope) => (
+                <option key={scope} value={scope}>
+                  {copy[scope as "all" | "personal" | "organization"]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="publisher-readiness" className={nativeLabelClass}>
+              {copy.readinessLabel}
+            </label>
+            <select
+              id="publisher-readiness"
+              name="readiness"
+              defaultValue={query.readiness}
+              className={controlClass}
+            >
+              <option value="all">{copy.all}</option>
+              {RESOURCE_READINESS.map((value) => (
+                <option key={value} value={value}>
+                  {copy.readiness[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="publisher-sort" className={nativeLabelClass}>
+              {copy.sort}
+            </label>
+            <select
+              id="publisher-sort"
+              name="sort"
+              defaultValue={query.sort}
+              className={controlClass}
+            >
+              {["updated", "created", "title"].map((sort) => (
+                <option key={sort} value={sort}>
+                  {copy[sort as "updated" | "created" | "title"]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-end gap-4">
+            <Button type="submit" className="min-h-11">
+              {copy.apply}
+            </Button>
+            <Link
+              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              href="/workspace/resources"
+            >
+              {copy.reset}
+            </Link>
+          </div>
+        </form>
+      </search>
       <nav aria-label={labels.status} className="flex flex-wrap gap-2">
         {(["all", "draft", "pending_review", "published", "suspended", "archived"] as const).map(
           (status) => (

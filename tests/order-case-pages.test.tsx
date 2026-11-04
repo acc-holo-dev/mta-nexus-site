@@ -148,6 +148,7 @@ it("preserves filters in archive pagination", async () => {
       query: { reviewStatus: "refund_recommended", threadStatus: "open" },
     }),
   );
+  expect(html).toContain(`<search aria-label="${orderCaseCopy("en").filters}"`);
   expect(html).toContain("reviewStatus=refund_recommended&amp;threadStatus=open&amp;page=2");
   expect(state.page).toHaveBeenCalledWith(
     state.actor,
@@ -156,6 +157,20 @@ it("preserves filters in archive pagination", async () => {
     expect.objectContaining({ threadStatus: "open" }),
   );
 });
+it.each(["en", "ru"] as const)(
+  "names the order-case filter search landmark in %s",
+  async (locale) => {
+    state.locale = locale;
+    const copy = orderCaseCopy(locale);
+    const html = renderToStaticMarkup(await OrderCaseListPage({ query: {} }));
+    expect(html).toContain(`<search aria-label="${copy.filters}"`);
+    expect(html).toContain('name="reviewStatus"');
+    expect(html).toContain('name="threadStatus"');
+    expect(html).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain(copy.apply);
+  },
+);
 it("hides staff controls for self-review and scopes inaccessible case details", async () => {
   const html = renderToStaticMarkup(
     await OrderCaseDetailPage({ caseId: "sup_a", query: {}, staff: true }),

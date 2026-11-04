@@ -393,7 +393,13 @@ export function SupportCenter({
             />
           </label>
 
-          <Button type="submit" disabled={creating} isLoading={creating} variant="primary">
+          <Button
+            type="submit"
+            size="touch"
+            disabled={creating}
+            isLoading={creating}
+            variant="primary"
+          >
             <MessageSquareText className="h-4 w-4" aria-hidden="true" />
             {creating ? copy.creating : copy.create}
           </Button>
@@ -427,68 +433,67 @@ export function SupportCenter({
         />
       ) : null}
 
-      <form action={basePath} method="get">
-        <fieldset
-          className="nexus-panel grid min-w-0 gap-4 p-4 sm:grid-cols-2"
-          aria-label={copy.staffFilters}
-        >
-          <label className="block min-w-0 space-y-1.5 sm:col-span-2">
-            <span className="font-label text-secondary">{workspaceCopy.search}</span>
-            <input
-              type="search"
-              name="q"
-              maxLength={120}
-              defaultValue={initialFilters.q}
-              className={`${platformFieldClass} min-w-0 w-full`}
-            />
-          </label>
-          <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.filterStatus}</span>
-            <select
-              name="status"
-              value={staffStatus}
-              onChange={(event) => {
-                setStaffStatus(event.target.value as SupportCaseStatus | "");
-              }}
-              className={platformFieldClass}
-            >
-              <option value="">{copy.allStatuses}</option>
-              <option value="open">{copy.open}</option>
-              <option value="resolved">{copy.resolved}</option>
-              <option value="closed">{copy.closed}</option>
-            </select>
-          </label>
-          <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.category}</span>
-            <select
-              name="category"
-              value={staffCategory}
-              onChange={(event) => {
-                setStaffCategory(event.target.value);
-              }}
-              className={platformFieldClass}
-            >
-              <option value="">{copy.allCategories}</option>
-              {categories.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="flex flex-wrap gap-4 sm:col-span-2">
-            <Button type="submit" size="touch" variant="outline">
-              {workspaceCopy.apply}
-            </Button>
-            <Link
-              href={basePath}
-              className="inline-flex min-h-11 items-center py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {workspaceCopy.reset}
-            </Link>
-          </div>
-        </fieldset>
-      </form>
+      <search aria-label={copy.staffFilters}>
+        <form action={basePath} method="get">
+          <fieldset className="nexus-panel grid min-w-0 gap-4 p-4 sm:grid-cols-2">
+            <label className="block min-w-0 space-y-1.5 sm:col-span-2">
+              <span className="font-label text-secondary">{workspaceCopy.search}</span>
+              <input
+                type="search"
+                name="q"
+                maxLength={120}
+                defaultValue={initialFilters.q}
+                className={`${platformFieldClass} min-w-0 w-full`}
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="font-label text-secondary">{copy.filterStatus}</span>
+              <select
+                name="status"
+                value={staffStatus}
+                onChange={(event) => {
+                  setStaffStatus(event.target.value as SupportCaseStatus | "");
+                }}
+                className={platformFieldClass}
+              >
+                <option value="">{copy.allStatuses}</option>
+                <option value="open">{copy.open}</option>
+                <option value="resolved">{copy.resolved}</option>
+                <option value="closed">{copy.closed}</option>
+              </select>
+            </label>
+            <label className="block space-y-1.5">
+              <span className="font-label text-secondary">{copy.category}</span>
+              <select
+                name="category"
+                value={staffCategory}
+                onChange={(event) => {
+                  setStaffCategory(event.target.value);
+                }}
+                className={platformFieldClass}
+              >
+                <option value="">{copy.allCategories}</option>
+                {categories.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex flex-wrap gap-4 sm:col-span-2">
+              <Button type="submit" size="touch" variant="outline">
+                {workspaceCopy.apply}
+              </Button>
+              <Link
+                href={basePath}
+                className="inline-flex min-h-11 items-center py-2 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {workspaceCopy.reset}
+              </Link>
+            </div>
+          </fieldset>
+        </form>
+      </search>
 
       <section className="space-y-3" aria-busy={loading}>
         <h2 className="font-heading text-primary">

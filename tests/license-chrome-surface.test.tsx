@@ -40,6 +40,7 @@ describe("license chrome surface", () => {
           },
         }),
       );
+      expect(html).toContain(`<search aria-label="${copy.filters}"`);
       expect(html).toContain(copy.apply);
       expect(html).toContain("rounded-lg");
       expect(html).toContain("text-accent");

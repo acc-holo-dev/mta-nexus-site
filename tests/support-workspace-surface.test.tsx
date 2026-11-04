@@ -76,6 +76,7 @@ it("renders URL-based escaped search inputs and role-specific create forms", () 
       />
     </LocaleProvider>,
   );
+  expect(html).toContain(`<search aria-label="${getDictionary("en").support.staffFilters}"`);
   expect(html).toContain('method="get"');
   expect(html).toContain('name="q"');
   expect(html).toContain("&lt;script&gt;");
@@ -90,6 +91,7 @@ it("renders URL-based escaped search inputs and role-specific create forms", () 
       <SupportCenter staffMode />
     </LocaleProvider>,
   );
+  expect(staff).toContain(`<search aria-label="${getDictionary("en").support.staffFilters}"`);
   expect(staff).not.toContain(getDictionary("en").support.newCase);
 });
 it("gates server-rendered support pages before showing private controls", async () => {
