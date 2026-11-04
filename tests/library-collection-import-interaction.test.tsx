@@ -1,5 +1,6 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -29,20 +30,15 @@ vi.mock("react", async (original) => ({
   },
 }));
 
+import { LibraryCollectionBatchForm } from "../apps/web/src/components/library-collection-batch";
 import { LibraryCollectionImport } from "../apps/web/src/components/library-collection-import";
 import { LibraryCollectionReconcileForm } from "../apps/web/src/components/library-collection-reconcile";
-import { LibraryCollectionBatchForm } from "../apps/web/src/components/library-collection-batch";
 import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
-type Element = ReactElement<Record<string, unknown>>;
+import { type FlatTestElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
+
+type Element = FlatTestElement;
 function nodes(node: ReactNode): Element[] {
-  if (Array.isArray(node)) return node.flatMap(nodes);
-  if (!node || typeof node !== "object" || !("props" in node)) return [];
-  const e = node as Element;
-  const type = e.type as { displayName?: string } | string;
-  if (typeof type === "object" && type?.displayName === "Button") {
-    return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
-  }
-  return [e, ...nodes(e.props.children as ReactNode)];
+  return flattenReactTestTree(node);
 }
 const collection = { id: "lcol_a", name: "Destination", status: "active" as const, revision: 7 };
 const manifest = () => ({

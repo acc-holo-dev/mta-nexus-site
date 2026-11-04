@@ -1,15 +1,15 @@
 "use client";
 import type { LibrarySelectionBatchCommand, LibrarySelectionBatchPreview } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
 } from "../lib/library-selection-batches-confirmation";
 import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 export function LibrarySelectionBatchControls({
   collectionId,
   locale,
@@ -165,6 +165,7 @@ export function LibrarySelectionBatchControls({
           onClick={() => void review()}
           disabled={!ids.length}
           variant="outline"
+          className="min-h-11"
         >
           {busy ? c.busy : c.preview}
         </Button>
@@ -209,25 +210,39 @@ export function LibrarySelectionBatchControls({
             disabled={busy || saved || !confirmed || !preview.changedCount}
             onClick={() => void apply()}
             variant="outline"
+            className="min-h-11"
           >
             {busy ? c.busy : saved ? c.saved : frozen ? c.retry : c.apply}
           </Button>
         </section>
       )}
       {frozen && !saved && <p role="note">{c.frozen}</p>}
-      {error && (
-        <div>
-          <p role="alert" className="text-danger">
-            {error}
-          </p>
-          <a
-            href={`/workspace/library/collections/${encodeURIComponent(collectionId)}/versions`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.reload}
-          </a>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={c.actionErrorDescription}
+          action={
+            frozen && !saved ? (
+              <Button
+                type="button"
+                disabled={busy || !confirmed || !preview?.changedCount}
+                onClick={() => void apply()}
+                variant="outline"
+                className="min-h-11"
+              >
+                {c.retry}
+              </Button>
+            ) : (
+              <a
+                href={`/workspace/library/collections/${encodeURIComponent(collectionId)}/versions`}
+                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {c.reload}
+              </a>
+            )
+          }
+        />
+      ) : null}
       {saved && <p role="status">{c.saved}</p>}
     </section>
   );

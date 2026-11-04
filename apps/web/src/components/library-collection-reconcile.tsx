@@ -1,6 +1,6 @@
 "use client";
 import type { LibraryCollectionChangesPreview, LibraryCollectionCommand } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -166,7 +166,9 @@ export function LibraryCollectionReconcileForm({
       <p>
         {m.planned}: {nextCount} / {shown.itemLimit}
       </p>
-      {!capacity && <p role="alert">{c.fullCollection}</p>}
+      {!capacity ? (
+        <ErrorState title={c.fullCollection} description={c.capacityErrorDescription} />
+      ) : null}
       <fieldset disabled={frozen || busy || !!saved || !writable} className="space-y-3">
         <legend>{c.selected}</legend>
         <ul className="space-y-2">
@@ -231,6 +233,7 @@ export function LibraryCollectionReconcileForm({
           (!pending.current && (!acknowledged || !selected.length || !capacity || !writable))
         }
         variant="outline"
+        className="min-h-11"
       >
         {busy
           ? c.busy
@@ -243,19 +246,36 @@ export function LibraryCollectionReconcileForm({
                 : c["reconcile-items"]}
       </Button>
       {frozen && !saved && <p role="note">{c.frozen}</p>}
-      {error && <p role="alert">{error}</p>}
-      {(error || saved) && (
+      {error ? (
+        <ErrorState
+          title={error}
+          description={c.actionErrorDescription}
+          action={
+            <a
+              href={
+                pending.current?.reloadHref ??
+                returnHref ??
+                collectionHref(shown.collection.id, "reconcile")
+              }
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.reload}
+            </a>
+          }
+        />
+      ) : null}
+      {saved ? (
         <a
           href={
             pending.current?.reloadHref ??
             returnHref ??
             collectionHref(shown.collection.id, "reconcile")
           }
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.reload}
         </a>
-      )}
+      ) : null}
       {saved && (
         <div>
           <p role="status" aria-live="polite">

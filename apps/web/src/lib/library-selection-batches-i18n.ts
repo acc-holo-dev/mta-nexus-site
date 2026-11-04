@@ -26,6 +26,8 @@ export function librarySelectionBatchesCopy(locale: string) {
           "Результат запроса неизвестен. Можно повторить только тот же запрос или обновить страницу.",
         error:
           "Группа изменилась или операция недоступна. Обновите страницу и просмотрите изменения заново.",
+        actionErrorDescription:
+          "Неудачный групповой выбор версий — это не сохранённое изменение. Повторите тот же запрос или обновите страницу.",
         invalid:
           "Выберите от 1 до 20 разных доступных ресурсов и подтвердите просмотренные изменения.",
         archived: "Коллекция в архиве. Восстановите её, чтобы менять выбор версий.",
@@ -62,6 +64,8 @@ export function librarySelectionBatchesCopy(locale: string) {
         unavailable: "Resource unavailable for batch selection",
         frozen: "The request outcome is unknown. Retry only the same request or reload the page.",
         error: "The batch changed or is unavailable. Reload the page and review changes again.",
+        actionErrorDescription:
+          "A failed version batch is not a saved selection change. Retry the same request or reload the page.",
         invalid: "Choose 1 to 20 distinct available resources and confirm the reviewed changes.",
         archived: "This collection is archived. Restore it before changing selected versions.",
         empty: "No version selection operations",

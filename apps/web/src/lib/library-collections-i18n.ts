@@ -103,6 +103,10 @@ const en = {
   retry:
     "The result could not be confirmed. Retry the same operation or reload to check the current state.",
   retryAction: "Retry same operation",
+  actionErrorDescription:
+    "A failed collection command is not a saved change. Retry the same operation or reload the current state.",
+  capacityErrorDescription:
+    "A capacity limit is not a saved membership change. Free space or choose another destination before retrying.",
   frozen: "The submitted operation is fixed for safe retries.",
   reload: "Reload current state",
   saved: "Saved",
@@ -215,6 +219,10 @@ const ru: typeof en = {
   retry:
     "Результат не удалось подтвердить. Повторите ту же операцию или обновите страницу для проверки текущего состояния.",
   retryAction: "Повторить ту же операцию",
+  actionErrorDescription:
+    "Неудачная команда коллекции — это не сохранённое изменение. Повторите ту же операцию или обновите текущее состояние.",
+  capacityErrorDescription:
+    "Лимит вместимости — это не сохранённое изменение состава. Освободите место или выберите другое назначение перед повтором.",
   frozen: "Отправленная операция зафиксирована для безопасного повтора.",
   reload: "Обновить состояние",
   saved: "Сохранено",

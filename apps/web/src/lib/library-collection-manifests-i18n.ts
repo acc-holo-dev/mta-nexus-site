@@ -29,6 +29,8 @@ const en = {
   capacity: "Free reference slots",
   frozen:
     "This import attempt is fixed. Retry the same submitted selection, or reload to review another file.",
+  previewErrorDescription:
+    "A failed import preview is not an applied membership change. Fix the file if needed, then retry the review.",
   result: "Import preview",
   current: "Current destination",
   retained: "Existing entries and contents are preserved.",
@@ -62,6 +64,8 @@ const ru: typeof en = {
   capacity: "Свободных мест для ссылок",
   frozen:
     "Попытка импорта зафиксирована. Повторите ту же отправленную выборку или обновите страницу для проверки другого файла.",
+  previewErrorDescription:
+    "Неудачный предпросмотр импорта — это не применённое изменение состава. Исправьте файл при необходимости и повторите проверку.",
   result: "Предпросмотр импорта",
   current: "Текущее назначение",
   retained: "Существующие записи и состав сохраняются.",

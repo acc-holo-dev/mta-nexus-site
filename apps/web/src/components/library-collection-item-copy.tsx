@@ -1,7 +1,7 @@
 "use client";
 import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus/domain";
 import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -238,7 +238,9 @@ export function LibraryCollectionItemCopyForm({
             {LIBRARY_COLLECTION_ITEM_LIMIT}
           </p>
         )}
-        {overCapacity && <p role="alert">{c.quota}</p>}
+        {overCapacity ? (
+          <ErrorState title={c.quota} description={c.capacityErrorDescription} />
+        ) : null}
         <ActionConfirmCheckbox
           id={`${source.id}-${action}-confirm`}
           checked={confirmed}
@@ -258,6 +260,7 @@ export function LibraryCollectionItemCopyForm({
           }
           isLoading={busy}
           variant="outline"
+          className="min-h-11"
         >
           {busy ? c.busy : frozen ? c.retryAction : c[action]}
         </Button>
@@ -275,18 +278,32 @@ export function LibraryCollectionItemCopyForm({
             type="button"
             disabled={busy}
             onClick={() => router.refresh()}
-            className="h-auto rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="h-auto min-h-11 rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {c.reload}
           </Button>
         </div>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-warning">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={c.actionErrorDescription}
+          action={
+            frozen && !blocked && !saved ? (
+              <Button
+                type="button"
+                disabled={busy}
+                onClick={() => router.refresh()}
+                className="h-auto min-h-11 rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                variant="ghost"
+              >
+                {c.reload}
+              </Button>
+            ) : undefined
+          }
+        />
+      ) : null}
       {saved && (
         <div className="space-y-2">
           <p role="status">{c.saved}</p>

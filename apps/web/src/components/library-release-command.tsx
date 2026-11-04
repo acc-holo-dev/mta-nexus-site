@@ -1,9 +1,10 @@
 "use client";
 import type { LibraryReleaseCommand } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import type { Locale } from "../lib/i18n";
 import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
@@ -11,7 +12,6 @@ import {
 } from "../lib/library-release-request";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedLibraryRelease } from "../lib/resource-release-control-confirmation";
-import type { Locale } from "../lib/i18n";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
@@ -156,19 +156,50 @@ export function LibraryReleaseCommandStatus({
               disabled={busy}
               onClick={() => void send(pending)}
               variant="outline"
+              className="min-h-11"
             >
               {copy.retrySame}
             </Button>
           ) : null}
-          <Button type="button" disabled={busy} onClick={() => router.refresh()} variant="outline">
+          <Button
+            type="button"
+            disabled={busy}
+            onClick={() => router.refresh()}
+            variant="outline"
+            className="min-h-11"
+          >
             {copy.reloadState}
           </Button>
         </div>
       ) : null}
       {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
+        <ErrorState
+          title={error}
+          description={copy.errors.actionErrorDescription}
+          action={
+            pending && !blocked && !saved ? (
+              <Button
+                type="button"
+                disabled={busy}
+                onClick={() => void send(pending)}
+                variant="outline"
+                className="min-h-11"
+              >
+                {copy.retrySame}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                disabled={busy}
+                onClick={() => router.refresh()}
+                variant="outline"
+                className="min-h-11"
+              >
+                {copy.reloadState}
+              </Button>
+            )
+          }
+        />
       ) : null}
       {saved ? (
         <div className="space-y-2">
@@ -178,7 +209,7 @@ export function LibraryReleaseCommandStatus({
           <Button
             type="button"
             onClick={() => router.refresh()}
-            className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
           >
             {copy.reloadState}

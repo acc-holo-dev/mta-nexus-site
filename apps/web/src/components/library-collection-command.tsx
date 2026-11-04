@@ -4,7 +4,7 @@ import type {
   LibraryCollectionCopyPreview,
   LibraryCollectionSnapshot,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -175,7 +175,12 @@ export function LibraryCollectionCommandForm({
           />
         </label>
       )}
-      <Button type="submit" disabled={busy || saved || blocked} variant="outline">
+      <Button
+        type="submit"
+        disabled={busy || saved || blocked}
+        variant="outline"
+        className="min-h-11"
+      >
         {busy
           ? c.busy
           : saved
@@ -191,19 +196,20 @@ export function LibraryCollectionCommandForm({
           {c.frozen}
         </p>
       )}
-      {error && (
-        <div className="space-y-2">
-          <p role="alert" className="text-sm text-warning">
-            {error}
-          </p>
-          <a
-            href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection?.id)}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {c.reload}
-          </a>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={c.actionErrorDescription}
+          action={
+            <a
+              href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection?.id)}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {c.reload}
+            </a>
+          }
+        />
+      ) : null}
       {saved && (
         <p role="status" className="sr-only">
           {c.saved}
