@@ -38,8 +38,8 @@ import DetailLoading from "../apps/web/src/app/admin/commerce/reconciliation/[id
 import Detail from "../apps/web/src/app/admin/commerce/reconciliation/[id]/page";
 import ReviewLoading from "../apps/web/src/app/admin/commerce/reconciliation/loading";
 import Review from "../apps/web/src/app/admin/commerce/reconciliation/page";
-import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
 import FinanceLoading from "../apps/web/src/app/workspace/finance/loading";
+import Statement, { metadata } from "../apps/web/src/app/workspace/finance/page";
 import { getFinancialCopy } from "../apps/web/src/lib/financial-i18n";
 
 const now = new Date("2026-10-11T00:00:00Z"),
@@ -211,7 +211,9 @@ it("shows an honest recovery state when workspace statements fail to load", asyn
   state.statement.mockRejectedValueOnce(new Error("statements unavailable"));
   state.scopes.mockResolvedValueOnce({ scopes: [], page: 1, totalPages: 1, total: 0 });
   const copy = getFinancialCopy("en");
-  const html = renderToStaticMarkup(await Statement({ searchParams: Promise.resolve({ page: "2" }) }));
+  const html = renderToStaticMarkup(
+    await Statement({ searchParams: Promise.resolve({ page: "2" }) }),
+  );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.statementsLoadUnavailable);
   expect(html).toContain("overflow-x-clip");

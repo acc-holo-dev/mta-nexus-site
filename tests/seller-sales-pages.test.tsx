@@ -32,10 +32,10 @@ vi.mock("../apps/web/src/lib/services/seller-sales-service", () => ({
   sellerSalesService: { report: state.report, detail: state.detail, scopes: state.scopes },
 }));
 
-import Detail from "../apps/web/src/app/workspace/sales/report/[id]/page";
 import DetailLoading from "../apps/web/src/app/workspace/sales/report/[id]/loading";
-import Page, { metadata } from "../apps/web/src/app/workspace/sales/report/page";
+import Detail from "../apps/web/src/app/workspace/sales/report/[id]/page";
 import ReportLoading from "../apps/web/src/app/workspace/sales/report/loading";
+import Page, { metadata } from "../apps/web/src/app/workspace/sales/report/page";
 import { sellerSalesCopy } from "../apps/web/src/lib/seller-sales-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
@@ -261,5 +261,7 @@ it("clips honest sales loading shells on narrow layouts", async () => {
     expect(html).toContain("min-w-0");
     expect(html).toContain("overflow-x-clip");
   }
-  expect(renderToStaticMarkup(await DetailLoading())).toContain(sellerSalesCopy("en").detailLoading);
+  expect(renderToStaticMarkup(await DetailLoading())).toContain(
+    sellerSalesCopy("en").detailLoading,
+  );
 });
