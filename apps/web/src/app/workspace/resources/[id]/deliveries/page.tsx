@@ -1,11 +1,12 @@
 import { AppError, RESOURCE_DELIVERY_STATUSES } from "@nexus/domain";
-import { Button, fieldClass } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { formatHistoryDate } from "../../../../../lib/commerce-history-format";
+import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { resourceDeliveriesCopy } from "../../../../../lib/resource-deliveries-i18n";
 import {
@@ -14,6 +15,11 @@ import {
 } from "../../../../../lib/resource-deliveries-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -35,6 +41,7 @@ export default async function PublisherDeliveriesPage({
     searchParams,
   ]);
   const copy = resourceDeliveriesCopy(locale),
+    dictionary = getDictionary(locale),
     returnParams = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {
     if (value === undefined) continue;
@@ -64,17 +71,31 @@ export default async function PublisherDeliveriesPage({
   }
   const result = await resourceDeliveriesService.publisher(user, id, query).catch((error) => {
     if (error instanceof AppError && error.statusCode === 404) notFound();
-    throw error;
+    return null;
   });
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const href = (page: number) =>
     `?${new URLSearchParams({ days: query.days, page: String(page) })}`;
   const filtered = query.days !== "all";
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link
-        href={`/workspace/resources/${encodeURIComponent(id)}`}
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.publisherTitle}</h1>
@@ -93,7 +114,7 @@ export default async function PublisherDeliveriesPage({
             ))}
           </select>
         </label>
-        <Button type="submit" variant="outline" className="text-sm">
+        <Button type="submit" variant="outline" className="min-h-11 text-sm">
           {copy.apply}
         </Button>
       </form>
@@ -146,36 +167,35 @@ export default async function PublisherDeliveriesPage({
           </table>
         </div>
       ) : (
-        <div className="space-y-3 text-secondary">
-          <p>{result.counts.all === 0 ? copy.publisherEmptyNever : copy.emptyFiltered}</p>
-          {filtered && result.counts.all > 0 ? (
-            <Link
-              href={`?${new URLSearchParams({ days: "all", page: "1" })}`}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.clearFilters}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={result.counts.all === 0 ? copy.publisherEmptyNever : copy.emptyFiltered}
+          description={
+            result.counts.all === 0 ? copy.publisherEmptyNeverHint : copy.emptyFilteredHint
+          }
+          action={
+            filtered && result.counts.all > 0 ? (
+              <Link
+                href={`?${new URLSearchParams({ days: "all", page: "1" })}`}
+                className={navLinkClass}
+              >
+                {copy.clearFilters}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
-            <Link
-              href={href(result.page - 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page - 1)} className={navLinkClass}>
               {copy.previous}
             </Link>
           ) : null}
-          <span>
+          <span className="inline-flex min-h-11 items-center">
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link
-              href={href(result.page + 1)}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={href(result.page + 1)} className={navLinkClass}>
               {copy.next}
             </Link>
           ) : null}

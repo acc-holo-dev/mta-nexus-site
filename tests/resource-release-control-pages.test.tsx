@@ -402,3 +402,12 @@ it("shows the author a reason and review requirement without staff action contro
   state.managed.mockResolvedValue(null);
   await expect(Publisher(input)).rejects.toThrow("NEXT_NOT_FOUND");
 });
+it("shows an honest publisher recovery state when restriction history fails", async () => {
+  state.publisher.mockRejectedValue(new Error("history unavailable"));
+  const copy = getResourceReleaseControlCopy("en");
+  const html = renderToStaticMarkup(await Publisher(input));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("page=2");
+});

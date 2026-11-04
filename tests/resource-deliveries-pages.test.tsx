@@ -226,3 +226,17 @@ it("invalid filters cause no repository query and foreign receipt IDs are not fo
     "NEXT_NOT_FOUND",
   );
 });
+it("shows an honest publisher recovery state when delivery evidence fails", async () => {
+  state.publisher.mockRejectedValue(new Error("publisher unavailable"));
+  const copy = resourceDeliveriesCopy("en");
+  const html = renderToStaticMarkup(
+    await Publisher({
+      params: Promise.resolve({ id: "prd_a" }),
+      searchParams: Promise.resolve({ days: "7", page: "2" }),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("days=7");
+});

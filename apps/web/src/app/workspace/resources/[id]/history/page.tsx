@@ -1,4 +1,5 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -14,7 +15,11 @@ import {
 } from "../../../../../lib/resource-publisher-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { resourcePublisherService } from "../../../../../lib/services/resource-publisher-service";
+
 export const dynamic = "force-dynamic";
+const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${getResourcePublisherCopy(await getRequestLocale()).history} | MTA NEXUS`,
@@ -57,16 +62,30 @@ export default async function Page({
     .history(actor, id, query)
     .catch((error: unknown) => {
       if (error instanceof AppError && error.statusCode === 404) notFound();
-      throw error;
+      return null;
     });
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link href={returnPath} className={navLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
   const href = (page: number, kind = query.kind) =>
     `?${new URLSearchParams({ kind, page: String(page) })}`;
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
-      <Link
-        href={`/workspace/resources/${encodeURIComponent(id)}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.history}</h1>
@@ -111,25 +130,33 @@ export default async function Page({
           ))}
         </ol>
       ) : (
-        <div role="status" className="space-y-3 text-secondary">
-          <p>{query.kind !== "all" ? copy.emptyFiltered : copy.empty}</p>
-          {query.kind !== "all" ? (
-            <Link
-              href={href(1, "all")}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          ) : null}
-        </div>
+        <EmptyState
+          title={query.kind !== "all" ? copy.emptyFiltered : copy.empty}
+          description={query.kind !== "all" ? copy.emptyFilteredHint : copy.emptyHint}
+          action={
+            query.kind !== "all" ? (
+              <Link href={href(1, "all")} className={navLinkClass}>
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {result.totalPages > 1 && (
-        <nav className="flex gap-4 text-sm" aria-label={copy.page}>
-          {result.page > 1 && <Link href={href(result.page - 1)}>{copy.previous}</Link>}
-          <span>
+        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.page}>
+          {result.page > 1 && (
+            <Link href={href(result.page - 1)} className={navLinkClass}>
+              {copy.previous}
+            </Link>
+          )}
+          <span className="inline-flex min-h-11 items-center">
             {result.page} / {result.totalPages}
           </span>
-          {result.page < result.totalPages && <Link href={href(result.page + 1)}>{copy.next}</Link>}
+          {result.page < result.totalPages && (
+            <Link href={href(result.page + 1)} className={navLinkClass}>
+              {copy.next}
+            </Link>
+          )}
         </nav>
       )}
     </div>

@@ -1,6 +1,7 @@
 import type { Locale } from "./i18n";
 
 const en = {
+  loadUnavailable: "Resource delivery evidence is temporarily unavailable. Please try again.",
   title: "Download history",
   loading: "Loading download history…",
   publisherTitle: "Resource deliveries",
@@ -19,7 +20,10 @@ const en = {
   empty: "No delivery receipts match these filters.",
   emptyNever: "You have no delivery receipts yet.",
   publisherEmptyNever: "No delivery activity has been recorded for this resource yet.",
+  publisherEmptyNeverHint:
+    "Authorized download starts for this resource appear here after they are recorded.",
   emptyFiltered: "No delivery receipts match these filters.",
+  emptyFilteredHint: "Try another period or show all recorded deliveries.",
   clearFilters: "Clear filters",
   privateResource: "Resource currently unavailable",
   version: "Version",
@@ -53,6 +57,7 @@ const en = {
   periodAll: "All time",
 };
 const ru: typeof en = {
+  loadUnavailable: "Сведения о передачах ресурса временно недоступны. Попробуйте ещё раз.",
   title: "История скачиваний",
   loading: "Загрузка истории скачиваний…",
   publisherTitle: "Передачи ресурса",
@@ -71,7 +76,10 @@ const ru: typeof en = {
   empty: "Нет передач по выбранным фильтрам.",
   emptyNever: "Записей о передачах пока нет.",
   publisherEmptyNever: "Для этого ресурса передачи пока не зафиксированы.",
+  publisherEmptyNeverHint:
+    "Разрешённые начала скачивания этого ресурса появятся здесь после их записи.",
   emptyFiltered: "Нет передач по выбранным фильтрам.",
+  emptyFilteredHint: "Выберите другой период или покажите все записи.",
   clearFilters: "Сбросить фильтры",
   privateResource: "Ресурс сейчас недоступен",
   version: "Версия",

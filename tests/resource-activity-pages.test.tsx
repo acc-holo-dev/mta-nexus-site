@@ -39,10 +39,10 @@ vi.mock("../apps/web/src/lib/services/resource-activity-service", () => ({
 }));
 
 import History, { metadata as historyMeta } from "../apps/web/src/app/workspace/acquisitions/page";
-import { getDictionary } from "../apps/web/src/lib/i18n";
 import Activity, {
   metadata as activityMeta,
 } from "../apps/web/src/app/workspace/resources/[id]/activity/page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import {
   acquisitionPage,
   acquisitionSource,
@@ -150,6 +150,16 @@ it("does not query commerce data before login", async () => {
 it("hides activity when current management permission is lost", async () => {
   state.report.mockRejectedValue(new NotFoundError("Resource", "prd_a"));
   await expect(Activity(activityInput)).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("shows an honest recovery state when publisher activity fails", async () => {
+  const { getResourceActivityCopy } = await import("../apps/web/src/lib/resource-activity-i18n");
+  state.report.mockRejectedValue(new Error("activity unavailable"));
+  const copy = getResourceActivityCopy("en");
+  const html = renderToStaticMarkup(await Activity(activityInput));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("days=7");
 });
 it("normalizes ambiguous UI filters without accepting unsupported periods", () => {
   expect(acquisitionSource(["cart", "direct"])).toBe("all");

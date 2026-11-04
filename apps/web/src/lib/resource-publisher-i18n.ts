@@ -1,5 +1,8 @@
+import type { Locale } from "./i18n";
+
 const copy = {
   en: {
+    loadUnavailable: "This resource workspace is temporarily unavailable. Please try again.",
     search: "Resource title or slug",
     filters: "Publisher filters",
     apply: "Apply filters",
@@ -37,6 +40,8 @@ const copy = {
     back: "Back to resource",
     empty: "No recorded events.",
     emptyFiltered: "No recorded events match this filter.",
+    emptyHint: "Editorial and publication events appear here after they are recorded.",
+    emptyFilteredHint: "Try another event kind or show all recorded events.",
     changes: "Editorial changes",
     publication: "Publication actions",
     previous: "Previous",
@@ -57,6 +62,7 @@ const copy = {
     },
   },
   ru: {
+    loadUnavailable: "Кабинет ресурса временно недоступен. Попробуйте ещё раз.",
     search: "Название или slug ресурса",
     filters: "Фильтры кабинета",
     apply: "Применить",
@@ -94,6 +100,8 @@ const copy = {
     back: "К ресурсу",
     empty: "Записанных событий нет.",
     emptyFiltered: "По этому фильтру записанных событий нет.",
+    emptyHint: "Здесь появляются зафиксированные изменения и действия публикации.",
+    emptyFilteredHint: "Выберите другой тип события или покажите все записи.",
     changes: "Изменения карточки",
     publication: "Действия публикации",
     previous: "Назад",
@@ -114,4 +122,4 @@ const copy = {
     },
   },
 };
-export const getResourcePublisherCopy = (locale: "ru" | "en") => copy[locale];
+export const getResourcePublisherCopy = (locale: Locale) => copy[locale];

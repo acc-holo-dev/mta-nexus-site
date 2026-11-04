@@ -1,3 +1,5 @@
+import type { Locale } from "./i18n";
+
 const copy = {
   en: {
     updates: "Library versions and updates",
@@ -32,6 +34,9 @@ const copy = {
     pendingHash: "Reviewed SHA-256",
     pendingSize: "Reviewed archive size (bytes)",
     empty: "No resources match this filter.",
+    emptyHint:
+      "Suspension and return-to-draft decisions appear here when they affect this resource.",
+    moderationHistoryEmpty: "No publication restrictions recorded yet.",
     emptyInventory: "Your library has no resources yet.",
     emptyFiltered: "No resources match this filter.",
     noVersions: "No approved version is currently available.",
@@ -119,6 +124,9 @@ const copy = {
     pendingHash: "Проверенный SHA-256",
     pendingSize: "Проверенный размер архива (байт)",
     empty: "Нет ресурсов по этому фильтру.",
+    emptyHint:
+      "Здесь появляются решения о приостановке и возврате в черновик, если они затронули ресурс.",
+    moderationHistoryEmpty: "Ограничений публикации пока не зафиксировано.",
     emptyInventory: "В вашей библиотеке пока нет ресурсов.",
     emptyFiltered: "Нет ресурсов по этому фильтру.",
     noVersions: "Одобренных доступных версий сейчас нет.",
@@ -174,23 +182,23 @@ const copy = {
     },
   },
 } as const;
-export function getResourceReleaseControlCopy(locale: string) {
+export function getResourceReleaseControlCopy(locale: Locale) {
   return locale === "ru" ? copy.ru : copy.en;
 }
-export function resourceStatusLabel(locale: string, status: string) {
+export function resourceStatusLabel(locale: Locale, status: string) {
   const localized = getResourceReleaseControlCopy(locale);
   const known = (["draft", "pending_review", "published", "suspended", "archived"] as const).find(
     (value) => value === status,
   );
   return known ? localized[known] : localized.unknown;
 }
-export function resourceReleaseControlError(locale: string, code: unknown) {
+export function resourceReleaseControlError(locale: Locale, code: unknown) {
   const errors = getResourceReleaseControlCopy(locale).errors;
   return typeof code === "string" && Object.hasOwn(errors, code)
     ? errors[code as keyof typeof errors]
     : errors.fallback;
 }
-export function resourceModerationLabel(locale: string, action: string) {
+export function resourceModerationLabel(locale: Locale, action: string) {
   const copy = getResourceReleaseControlCopy(locale);
   return action === "product.moderation_suspended"
     ? copy.suspend

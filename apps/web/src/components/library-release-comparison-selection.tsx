@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@nexus/ui";
 import { useRef, useState } from "react";
+import type { Locale } from "../lib/i18n";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
@@ -12,7 +13,7 @@ export function LibraryReleaseComparisonSelection({
   target,
 }: {
   productId: string;
-  locale: string;
+  locale: Locale;
   selection: { revision: number; mode: "latest" | "fixed"; buildId: string | null };
   target: { id: string; version: string; sha256Hash: string; fileSizeBytes: number };
 }) {
