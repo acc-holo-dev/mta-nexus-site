@@ -5,7 +5,11 @@ import { getRequestLocale } from "../../lib/i18n-server";
 export default async function Loading() {
   const copy = getDictionary(await getRequestLocale()).articles;
   return (
-    <section className="space-y-8" aria-busy="true" aria-labelledby="articles-loading-heading">
+    <section
+      className="min-w-0 space-y-8 overflow-x-clip"
+      aria-busy="true"
+      aria-labelledby="articles-loading-heading"
+    >
       <header className="space-y-2 border-b border-base pb-6">
         <h1
           id="articles-loading-heading"

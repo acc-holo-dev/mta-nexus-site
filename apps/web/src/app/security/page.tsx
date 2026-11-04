@@ -1,3 +1,4 @@
+import { EmptyState } from "@nexus/ui";
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -9,6 +10,12 @@ import { authService } from "../../lib/services/auth-service";
 import { securityCenterService } from "../../lib/services/security-center-service";
 
 export const dynamic = "force-dynamic";
+
+const pageShellClass = "min-w-0 max-w-4xl space-y-8 overflow-x-clip";
+const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";
+const panelShellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm";
+const settingsActionClass =
+  "inline-flex min-h-11 items-center gap-2 self-start rounded-lg border border-base px-3 text-xs font-semibold text-secondary hover:border-strong hover:text-primary focus-visible:outline-2 focus-visible:outline-accent";
 
 export default async function SecurityPage() {
   const locale = await getRequestLocale();
@@ -31,28 +38,22 @@ export default async function SecurityPage() {
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
-    <div className="max-w-4xl space-y-8">
-      <div className="flex flex-col justify-between gap-4 border-b border-base pb-6 sm:flex-row sm:items-start">
-        <div>
-          <h1 className="flex items-center gap-2.5 font-display text-primary">
-            <ShieldCheck className="h-6 w-6 text-accent" aria-hidden="true" />
+    <div className={pageShellClass}>
+      <div className="flex min-w-0 flex-col justify-between gap-4 overflow-x-clip border-b border-base pb-6 sm:flex-row sm:items-start">
+        <div className="min-w-0">
+          <h1 className="flex min-w-0 items-center gap-2.5 break-words font-display text-primary">
+            <ShieldCheck className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
             {copy.title}
           </h1>
           <p className="mt-1 max-w-2xl font-caption text-muted">{copy.description}</p>
         </div>
-        <Link
-          href="/settings"
-          className="inline-flex min-h-10 items-center gap-2 self-start rounded-lg border border-base px-3 text-xs font-semibold text-secondary hover:border-strong hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
-        >
+        <Link href="/settings" className={settingsActionClass}>
           <Settings className="h-4 w-4" aria-hidden="true" />
           {copy.manageSettings}
         </Link>
       </div>
 
-      <section
-        aria-labelledby="security-recovery-heading"
-        className="nexus-panel p-5 shadow-nexus-sm"
-      >
+      <section aria-labelledby="security-recovery-heading" className={recoveryPanelClass}>
         <div className="flex items-center gap-2">
           <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
           <h2 id="security-recovery-heading" className="text-sm font-semibold text-primary">
@@ -69,10 +70,7 @@ export default async function SecurityPage() {
         </p>
       </section>
 
-      <section
-        aria-labelledby="security-sessions-heading"
-        className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-      >
+      <section aria-labelledby="security-sessions-heading" className={panelShellClass}>
         <div className="flex items-center gap-2">
           <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />
           <h2 id="security-sessions-heading" className="text-sm font-semibold text-primary">
@@ -80,11 +78,11 @@ export default async function SecurityPage() {
           </h2>
         </div>
         <p className="text-xs text-muted">{copy.sessionsDescription}</p>
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2 overflow-x-clip">
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-base bg-inset px-3 py-3"
+              className="flex min-w-0 flex-wrap items-start justify-between gap-3 overflow-x-clip rounded-md border border-base bg-inset px-3 py-3"
             >
               <div className="min-w-0">
                 <p className="break-words text-xs text-primary">
@@ -109,10 +107,7 @@ export default async function SecurityPage() {
         </div>
       </section>
 
-      <section
-        aria-labelledby="security-activity-heading"
-        className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-      >
+      <section aria-labelledby="security-activity-heading" className={panelShellClass}>
         <div className="flex items-center gap-2">
           <Clock3 className="h-4 w-4 text-accent" aria-hidden="true" />
           <h2 id="security-activity-heading" className="text-sm font-semibold text-primary">
@@ -122,14 +117,17 @@ export default async function SecurityPage() {
         <p className="text-xs text-muted">{copy.activityDescription}</p>
 
         {activity.length > 0 ? (
-          <ol className="divide-y divide-base">
+          <ol className="min-w-0 divide-y divide-base overflow-x-clip">
             {activity.map((event) => (
-              <li key={event.id} className="flex flex-wrap justify-between gap-3 py-3">
+              <li
+                key={event.id}
+                className="flex min-w-0 flex-wrap justify-between gap-3 overflow-x-clip py-3"
+              >
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-primary">
+                  <p className="break-words text-sm font-medium text-primary">
                     {copy.activityLabels[securityActivityLabelKey(event)]}
                   </p>
-                  <p className="mt-0.5 text-xs text-muted">
+                  <p className="mt-0.5 break-words text-xs text-muted">
                     {event.userAgent || event.targetType}
                     {event.ipAddress ? ` · ${event.ipAddress}` : ""}
                   </p>
@@ -144,7 +142,11 @@ export default async function SecurityPage() {
             ))}
           </ol>
         ) : (
-          <p className="text-sm text-muted">{copy.noActivity}</p>
+          <EmptyState
+            title={copy.noActivity}
+            description={copy.activityDescription}
+            icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
+          />
         )}
       </section>
     </div>
