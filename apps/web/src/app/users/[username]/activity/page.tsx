@@ -1,6 +1,9 @@
 import { PublicProfileActivity } from "../../../../components/public-profile-activity";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { publicationCopy } from "../../../../lib/publication-feed-copy";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -15,5 +18,15 @@ export default async function UserActivity({
   params: Promise<{ username: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return PublicProfileActivity({ kind: "user", handle: (await params).username, searchParams });
+  return (
+    <div className={pageShellClass}>
+      {
+        await PublicProfileActivity({
+          kind: "user",
+          handle: (await params).username,
+          searchParams,
+        })
+      }
+    </div>
+  );
 }
