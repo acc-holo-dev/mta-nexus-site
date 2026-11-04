@@ -22,8 +22,10 @@ vi.mock("../apps/web/src/lib/services/resource-media-service", () => ({
   resourceMediaService: { managed: state.managed },
 }));
 
+import AdminResourceMediaLoading from "../apps/web/src/app/admin/resources/[id]/media/loading";
 import { ResourceMediaEditor } from "../apps/web/src/components/resource-media-editor";
 import { ResourceMediaScreen } from "../apps/web/src/components/resource-media-screen";
+import { resourceMediaCopy } from "../apps/web/src/lib/resource-media-i18n";
 
 const initial: ManagedResourceMedia = {
   product: {
@@ -90,4 +92,27 @@ it("removes editing controls from a withdrawn resource", () => {
 it("hides missing rights with the existing not-found boundary", async () => {
   state.managed.mockRejectedValue(new AppError("Denied", 404, "NOT_FOUND"));
   await expect(ResourceMediaScreen({ productId: "prd_a" })).rejects.toThrow("NOT_FOUND");
+});
+it("shows an honest recovery state when gallery data fails", async () => {
+  state.managed.mockRejectedValue(new Error("gallery unavailable"));
+  const copy = resourceMediaCopy("en");
+  const html = renderToStaticMarkup(await ResourceMediaScreen({ productId: "prd_a" }));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/workspace/resources/prd_a/media"');
+  expect(html).not.toContain("Private");
+});
+it("shows an honest staff recovery state without inventing gallery content", async () => {
+  state.managed.mockRejectedValue(new Error("gallery unavailable"));
+  const copy = resourceMediaCopy("en");
+  const html = renderToStaticMarkup(await ResourceMediaScreen({ productId: "prd_a", staff: true }));
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain('href="/admin/resources/prd_a/media"');
+  expect(html).not.toContain("Private");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await AdminResourceMediaLoading());
+  expect(html).toContain("min-w-0 max-w-5xl");
+  expect(html).toContain("overflow-x-clip");
 });

@@ -27,8 +27,10 @@ vi.mock("../apps/web/src/lib/services/resource-build-workspace-service", () => (
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
 
+import AdminResourceBuildLoading from "../apps/web/src/app/admin/resources/[id]/builds/[buildId]/loading";
 import { generateMetadata } from "../apps/web/src/app/workspace/resources/[id]/builds/[buildId]/page";
 import { ResourceBuildScreen } from "../apps/web/src/components/resource-build-screen";
+import { getResourceBuildWorkspaceCopy } from "../apps/web/src/lib/resource-build-workspace-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private resource>", slug: "resource", status: "published" },
@@ -117,6 +119,33 @@ it.each([403, 404])("hides inaccessible detail on %s", async (status) => {
   await expect(ResourceBuildScreen({ productId: "prd_a", buildId: "bld_a" })).rejects.toThrow(
     "NOT_FOUND",
   );
+});
+it("shows an honest recovery state when version detail fails", async () => {
+  state.detail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getResourceBuildWorkspaceCopy("en");
+  const html = renderToStaticMarkup(
+    await ResourceBuildScreen({ productId: "prd_a", buildId: "bld_a" }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("/workspace/resources/prd_a/builds/bld_a");
+  expect(html).not.toContain("<Private resource>");
+});
+it("shows an honest staff recovery state without inventing build content", async () => {
+  state.detail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getResourceBuildWorkspaceCopy("en");
+  const html = renderToStaticMarkup(
+    await ResourceBuildScreen({ productId: "prd_a", buildId: "bld_a", staff: true }),
+  );
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain('href="/admin/resources/prd_a/builds/bld_a"');
+  expect(html).not.toContain("<Private resource>");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await AdminResourceBuildLoading());
+  expect(html).toContain("min-w-0 max-w-5xl");
+  expect(html).toContain("overflow-x-clip");
 });
 it("does not expose edit or resubmit controls for quarantined or retired builds", async () => {
   for (const status of ["quarantined", "retired"]) {

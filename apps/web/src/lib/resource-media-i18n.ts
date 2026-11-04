@@ -1,6 +1,7 @@
 const copies = {
   en: {
     title: "Resource gallery",
+    loadUnavailable: "Resource gallery is temporarily unavailable. Please try again.",
     back: "Back to resource",
     signIn: "Sign in",
     signInRequired: "Sign in to view the gallery",
@@ -50,6 +51,7 @@ const copies = {
   },
   ru: {
     title: "Галерея ресурса",
+    loadUnavailable: "Галерея ресурса временно недоступна. Попробуйте ещё раз.",
     back: "Назад к ресурсу",
     signIn: "Войти",
     signInRequired: "Войдите для просмотра галереи",

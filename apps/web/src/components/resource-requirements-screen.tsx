@@ -1,8 +1,9 @@
 import { AppError, type ResourceRequirementsScope } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../lib/resource-requirements-query";
@@ -10,6 +11,44 @@ import { authService } from "../lib/services/auth-service";
 import { resourceRequirementsService } from "../lib/services/resource-requirements-service";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceRequirementsReportBody } from "./resource-requirements-report-body";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+function requirementsAccessError(error: unknown): "missing" | "failed" {
+  if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
+  return "failed";
+}
+
+function ResourceRequirementsLoadError({
+  locale,
+  backHref,
+  retryHref,
+}: {
+  locale: "en" | "ru";
+  backHref: string;
+  retryHref: string;
+}) {
+  const copy = resourceRequirementsCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <section className={pageShellClass}>
+      <Link href={backHref} className={navLinkClass}>
+        {copy.back}
+      </Link>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </section>
+  );
+}
+
 export async function ResourceRequirementsScreen({
   productId,
   scope,
@@ -20,6 +59,7 @@ export async function ResourceRequirementsScreen({
   raw: Record<string, string | string[] | undefined>;
 }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
+  const copy = resourceRequirementsCopy(locale);
   const actor = await authService.getSession(store.get("nexus_session")?.value);
   const requirementsBase =
     scope === "library"
@@ -27,36 +67,24 @@ export async function ResourceRequirementsScreen({
       : scope === "publisher"
         ? `/workspace/resources/${encodeURIComponent(productId)}/requirements`
         : `/admin/resources/${encodeURIComponent(productId)}/requirements`;
-  if (!actor) {
-    const params = new URLSearchParams();
-    for (const [key, value] of Object.entries(raw)) {
-      if (Array.isArray(value)) for (const entry of value) params.append(key, entry);
-      else if (value !== undefined) params.append(key, value);
-    }
-    const query = params.toString();
-    const returnPath = query ? `${requirementsBase}?${query}` : requirementsBase;
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-  }
-  if (scope === "moderator" && !["admin", "moderator"].includes(actor.role)) notFound();
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {
     if (Array.isArray(value)) for (const entry of value) params.append(key, entry);
     else if (value !== undefined) params.append(key, value);
   }
+  const queryString = params.toString();
+  const retryHref = queryString ? `${requirementsBase}?${queryString}` : requirementsBase;
+  if (!actor) {
+    const returnPath = retryHref;
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
+  if (scope === "moderator" && !["admin", "moderator"].includes(actor.role)) notFound();
   let query: ReturnType<typeof resourceRequirementsQuery>;
   try {
     query = resourceRequirementsQuery(params, scope);
   } catch {
     notFound();
   }
-  const report = await resourceRequirementsService
-    .report(actor.id, productId, scope, query)
-    .catch((error: unknown) => {
-      if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-      throw error;
-    });
-  const copy = resourceRequirementsCopy(locale),
-    root = report.nodes.find((node) => node.slug === report.rootSlug);
   const back =
     scope === "library"
       ? query.returnFrom && query.previewBuildId
@@ -65,6 +93,16 @@ export async function ResourceRequirementsScreen({
       : scope === "publisher"
         ? `/workspace/resources/${encodeURIComponent(productId)}/compatibility`
         : `/admin/resources/${encodeURIComponent(productId)}`;
+  const report = await resourceRequirementsService
+    .report(actor.id, productId, scope, query)
+    .catch((error: unknown) => {
+      if (requirementsAccessError(error) === "missing") notFound();
+      return null;
+    });
+  if (!report) {
+    return <ResourceRequirementsLoadError locale={locale} backHref={back} retryHref={retryHref} />;
+  }
+  const root = report.nodes.find((node) => node.slug === report.rootSlug);
   const api =
     scope === "library"
       ? `/api/library/${encodeURIComponent(productId)}/requirements`
@@ -72,11 +110,8 @@ export async function ResourceRequirementsScreen({
         ? `/api/products/${encodeURIComponent(productId)}/requirements`
         : `/api/admin/resources/${encodeURIComponent(productId)}/requirements`;
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <Link
-        href={back}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={back} className={navLinkClass}>
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.title}</h1>

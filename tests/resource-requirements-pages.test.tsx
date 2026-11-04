@@ -36,7 +36,9 @@ vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
   ),
 }));
 
+import AdminResourceRequirementsLoading from "../apps/web/src/app/admin/resources/[id]/requirements/loading";
 import { ResourceRequirementsScreen as screen } from "../apps/web/src/components/resource-requirements-screen";
+import { resourceRequirementsCopy } from "../apps/web/src/lib/resource-requirements-i18n";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",
@@ -160,3 +162,37 @@ it.each(["en", "ru"])(
     expect(html).toContain('data-cart="prd_b"');
   },
 );
+it("shows an honest recovery state when the preparation report fails", async () => {
+  state.report.mockRejectedValue(new Error("report unavailable"));
+  const copy = resourceRequirementsCopy("en");
+  const html = renderToStaticMarkup(
+    await screen({ productId: "prd_a", scope: "library", raw: { targetMta: "1.6.0" } }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("targetMta=1.6.0");
+  expect(html).not.toContain("Private");
+});
+it("shows an honest staff recovery state for moderator requirements", async () => {
+  state.actor = { id: "usr_staff", role: "moderator" };
+  state.report.mockRejectedValue(new Error("report unavailable"));
+  const copy = resourceRequirementsCopy("en");
+  const html = renderToStaticMarkup(
+    await screen({
+      productId: "prd_a",
+      scope: "moderator",
+      raw: { buildId: "bld_a", targetMta: "1.6.0" },
+    }),
+  );
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(
+    'href="/admin/resources/prd_a/requirements?buildId=bld_a&amp;targetMta=1.6.0"',
+  );
+  expect(html).not.toContain("Private");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await AdminResourceRequirementsLoading());
+  expect(html).toContain("min-w-0 max-w-5xl");
+  expect(html).toContain("overflow-x-clip");
+});

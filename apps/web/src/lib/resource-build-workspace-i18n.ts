@@ -1,6 +1,7 @@
 const copy = {
   en: {
     title: "Resource version",
+    loadUnavailable: "Resource version details are temporarily unavailable. Please try again.",
     back: "Back to resource",
     reviewBack: "Back to moderation",
     manage: "Manage version",
@@ -70,6 +71,7 @@ const copy = {
   },
   ru: {
     title: "Версия ресурса",
+    loadUnavailable: "Сведения о версии ресурса временно недоступны. Попробуйте ещё раз.",
     back: "К ресурсу",
     reviewBack: "К модерации",
     manage: "Управлять версией",

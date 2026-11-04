@@ -25,6 +25,7 @@ vi.mock("../apps/web/src/lib/services/build-package-service", () => ({
 }));
 
 import { buildPackageSummary } from "@nexus/domain";
+import AdminResourceBuildPackageLoading from "../apps/web/src/app/admin/resources/[id]/builds/[buildId]/package/loading";
 import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
@@ -109,6 +110,43 @@ it("fails closed on duplicate queries and current authority errors", async () =>
   await expect(
     BuildPackageScreen({ productId: "prd_a", buildId: "bld_a", searchParams: Promise.resolve({}) }),
   ).rejects.toThrow("NOT_FOUND");
+});
+it("shows an honest recovery state when package inventory fails", async () => {
+  state.page.mockRejectedValue(new Error("inventory unavailable"));
+  const copy = buildPackageCopy("en");
+  const html = renderToStaticMarkup(
+    await BuildPackageScreen({
+      productId: "prd_a",
+      buildId: "bld_a",
+      searchParams: Promise.resolve({ page: "2", filter: "changed", baseline: "bld_b" }),
+    }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("filter=changed");
+  expect(html).toContain("baseline=bld_b");
+  expect(html).not.toContain("Private title");
+});
+it("shows an honest staff recovery state without inventing package files", async () => {
+  state.page.mockRejectedValue(new Error("inventory unavailable"));
+  const copy = buildPackageCopy("en");
+  const html = renderToStaticMarkup(
+    await BuildPackageScreen({
+      productId: "prd_a",
+      buildId: "bld_a",
+      staff: true,
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain('href="/admin/resources/prd_a/builds/bld_a/package"');
+  expect(html).not.toContain("Private title");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  const html = renderToStaticMarkup(await AdminResourceBuildPackageLoading());
+  expect(html).toContain("min-w-0 max-w-5xl");
+  expect(html).toContain("overflow-x-clip");
 });
 it("offers reset when a filtered inventory page has no files", async () => {
   state.page.mockResolvedValue({

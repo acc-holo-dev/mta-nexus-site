@@ -1,14 +1,53 @@
 import { AppError } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../lib/build-package-query";
+import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { buildPackageService } from "../lib/services/build-package-service";
 import { PlatformSignIn } from "./platform-sign-in";
+
+const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+function packageAccessError(error: unknown): "missing" | "failed" {
+  if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
+  return "failed";
+}
+
+function BuildPackageLoadError({
+  locale,
+  backHref,
+  retryHref,
+}: {
+  locale: "en" | "ru";
+  backHref: string;
+  retryHref: string;
+}) {
+  const copy = buildPackageCopy(locale),
+    dictionary = getDictionary(locale);
+  return (
+    <section className={pageShellClass}>
+      <Link href={backHref} className={navLinkClass}>
+        {copy.back}
+      </Link>
+      <ErrorState
+        title={copy.loadUnavailable}
+        action={
+          <Link href={retryHref} className={navLinkClass}>
+            {dictionary.errors.retry}
+          </Link>
+        }
+      />
+    </section>
+  );
+}
+
 export async function BuildPackageScreen({
   productId,
   buildId,
@@ -39,14 +78,14 @@ export async function BuildPackageScreen({
   }
   const query = parseBuildPackageQuery(queryParams);
   if (!query) notFound();
-  let detail: Awaited<ReturnType<typeof buildPackageService.page>>;
+  const base = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}`;
+  let detail: Awaited<ReturnType<typeof buildPackageService.page>> | null = null;
   try {
     detail = await buildPackageService.page(actor, productId, buildId, query, staff);
   } catch (error) {
-    if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
-    throw error;
+    if (packageAccessError(error) === "missing") notFound();
+    return <BuildPackageLoadError locale={locale} backHref={base} retryHref={returnPath} />;
   }
-  const base = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}`;
   const pageBase = `${base}/package`;
   const labels = {
     all: copy.all,
@@ -61,11 +100,8 @@ export async function BuildPackageScreen({
       ? [detail.baseline, ...detail.candidates]
       : detail.candidates;
   return (
-    <div className="space-y-6">
-      <Link
-        href={base}
-        className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellClass}>
+      <Link href={base} className={navLinkClass}>
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -119,10 +155,7 @@ export async function BuildPackageScreen({
         <Button type="submit" disabled={options.length === 0} variant="outline">
           {copy.apply}
         </Button>
-        <Link
-          href={pageBase}
-          className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={pageBase} className={navLinkClass}>
           {copy.reset}
         </Link>
       </form>
@@ -174,7 +207,7 @@ export async function BuildPackageScreen({
                 filter: "all",
                 page: 1,
               })}
-              className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
             >
               {copy.reset}
             </Link>
@@ -185,7 +218,7 @@ export async function BuildPackageScreen({
         <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
           {detail.page > 1 && (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,
@@ -201,7 +234,7 @@ export async function BuildPackageScreen({
           </span>
           {detail.page < detail.totalPages && (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,
