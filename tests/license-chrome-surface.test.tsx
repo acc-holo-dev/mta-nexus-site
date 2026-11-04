@@ -44,6 +44,9 @@ describe("license chrome surface", () => {
       expect(html).toContain("rounded-lg");
       expect(html).toContain("text-accent");
       expect(html).toContain('type="submit"');
+      expect(html).toContain("min-h-11");
+      expect(html).toContain("min-w-0");
+      expect(html).toContain("overflow-x-clip");
     },
   );
 
@@ -74,6 +77,9 @@ describe("license chrome surface", () => {
     expect(html).toContain(copy.refresh);
     expect(html).toContain("rounded-lg");
     expect(html).toContain("bg-accent");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
     expect(html).toMatch(/id="[^"]+-confirm"/u);
     expect(html).toMatch(/for="[^"]+-confirm"/u);
     expect(html).toContain('type="checkbox"');

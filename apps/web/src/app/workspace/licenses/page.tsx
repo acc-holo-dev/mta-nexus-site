@@ -1,24 +1,31 @@
 import { licenseRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import { KeyRound } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HistoryShell } from "../../../components/commerce-history-ui";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { LicenseArchiveFilters } from "../../../components/license-archive-filters";
+import { PlatformSignIn } from "../../../components/platform-sign-in";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
   licenseStatusLabel,
 } from "../../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { licenseArchiveQuery, licenseArchiveUrl } from "../../../lib/license-archive-query";
 import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 import { authService } from "../../../lib/services/auth-service";
+
+const pageShellClass = "min-w-0 overflow-x-clip";
+const navLinkClass =
+  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function hasNonDefaultLicenseFilters(filters: ReturnType<typeof licenseArchiveQuery>) {
   return (
@@ -44,6 +51,7 @@ export default async function LicensesHistoryPage({
 }) {
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getCommerceHistoryCopy(locale);
+  const dictionary = getDictionary(locale);
   const user = await authService.getSession(store.get("nexus_session")?.value);
   if (!user) {
     const returnParams = new URLSearchParams();
@@ -69,120 +77,142 @@ export default async function LicensesHistoryPage({
     if (error instanceof AppError && error.statusCode === 400) notFound();
     throw error;
   }
-  const result = await licenseRepository.pageUserHistory(user.id, filters.page, filters);
+  const retryHref = licenseArchiveUrl(filters);
+  const filtersActive = hasNonDefaultLicenseFilters(filters);
+  const result = await licenseRepository
+    .pageUserHistory(user.id, filters.page, filters)
+    .catch(() => null);
+  if (!result) {
+    return (
+      <div className={pageShellClass}>
+        <HistoryShell copy={copy} area="licenses">
+          <ErrorState
+            title={copy.loadUnavailable}
+            action={
+              <Link href={retryHref} className={navLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </HistoryShell>
+      </div>
+    );
+  }
   const now = new Date();
+  const maintenance = getLicenseMaintenanceCopy(locale);
+  const control = getLicenseControlCopy(locale);
 
   return (
-    <HistoryShell copy={copy} area="licenses">
-      <LicenseArchiveFilters query={filters} page={result.page} locale={locale} />
-      <p role="note" className="text-sm text-muted">
-        {copy.licenseNotice}
-      </p>
-      {can(user, "admin.moderation") && (
-        <Link
-          href="/admin/licenses"
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {getLicenseControlCopy(locale).moderation}
-        </Link>
-      )}
-      {result.licenses.length === 0 ? (
-        <div className="space-y-3 py-12 text-sm text-secondary">
-          <p>
-            {hasNonDefaultLicenseFilters(filters) ? copy.emptyLicensesFiltered : copy.emptyLicenses}
-          </p>
-          {hasNonDefaultLicenseFilters(filters) && (
-            <Link
-              href="/workspace/licenses"
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {getLicenseMaintenanceCopy(locale).clear}
-            </Link>
-          )}
-        </div>
-      ) : (
-        <ol className="space-y-3">
-          {result.licenses.map((license) => (
-            <li key={license.id} className="nexus-panel space-y-3 p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <h2 className="break-words text-base font-semibold text-primary">
-                  {license.productTitle}
-                </h2>
-                <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">
-                  {licenseStatusLabel(
-                    license.effectiveStatus ??
-                      effectiveLicenseStatus(license.status, license.expiresAt, now),
-                    copy.licenseStatuses,
-                  )}
-                </span>
-              </div>
-              <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                <div>
-                  <dt className="text-muted">{copy.issued}</dt>
-                  <dd className="text-primary">
-                    <time dateTime={license.createdAt.toISOString()}>
-                      {formatHistoryDate(license.createdAt, locale)}
-                    </time>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted">{copy.expires}</dt>
-                  <dd className="text-primary">
-                    {license.expiresAt ? (
-                      <time dateTime={license.expiresAt.toISOString()}>
-                        {formatHistoryDate(license.expiresAt, locale)}
-                      </time>
-                    ) : (
-                      copy.never
+    <div className={pageShellClass}>
+      <HistoryShell copy={copy} area="licenses">
+        <LicenseArchiveFilters query={filters} page={result.page} locale={locale} />
+        <p role="note" className="text-sm text-muted">
+          {copy.licenseNotice}
+        </p>
+        {can(user, "admin.moderation") && (
+          <Link href="/admin/licenses" className={navLinkClass}>
+            {control.moderation}
+          </Link>
+        )}
+        {result.licenses.length === 0 ? (
+          <EmptyState
+            title={filtersActive ? copy.emptyLicensesFiltered : copy.emptyLicenses}
+            description={copy.licenseNotice}
+            icon={<KeyRound className="h-6 w-6" aria-hidden="true" />}
+            action={
+              filtersActive ? (
+                <Link href="/workspace/licenses" className={navLinkClass}>
+                  {maintenance.clear}
+                </Link>
+              ) : undefined
+            }
+          />
+        ) : (
+          <ol className="space-y-3">
+            {result.licenses.map((license) => (
+              <li key={license.id} className="nexus-panel min-w-0 space-y-3 p-5">
+                <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                  <h2 className="min-w-0 break-words text-base font-semibold text-primary">
+                    {license.productTitle}
+                  </h2>
+                  <span className="rounded-md border border-base px-2 py-1 text-xs text-secondary">
+                    {licenseStatusLabel(
+                      license.effectiveStatus ??
+                        effectiveLicenseStatus(license.status, license.expiresAt, now),
+                      copy.licenseStatuses,
                     )}
-                  </dd>
+                  </span>
                 </div>
-                <div>
-                  <dt className="text-muted">{copy.model}</dt>
-                  <dd className="break-words text-primary">{license.model.replaceAll("_", " ")}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted">{copy.binding}</dt>
-                  <dd className="text-primary">
-                    {license.serverBound ? copy.bound : copy.unbound}
-                  </dd>
-                </div>
-              </dl>
+                <dl className="grid min-w-0 gap-3 text-sm sm:grid-cols-2">
+                  <div className="min-w-0">
+                    <dt className="text-muted">{copy.issued}</dt>
+                    <dd className="text-primary">
+                      <time dateTime={license.createdAt.toISOString()}>
+                        {formatHistoryDate(license.createdAt, locale)}
+                      </time>
+                    </dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className="text-muted">{copy.expires}</dt>
+                    <dd className="text-primary">
+                      {license.expiresAt ? (
+                        <time dateTime={license.expiresAt.toISOString()}>
+                          {formatHistoryDate(license.expiresAt, locale)}
+                        </time>
+                      ) : (
+                        copy.never
+                      )}
+                    </dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className="text-muted">{copy.model}</dt>
+                    <dd className="break-words text-primary">
+                      {license.model.replaceAll("_", " ")}
+                    </dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className="text-muted">{copy.binding}</dt>
+                    <dd className="text-primary">
+                      {license.serverBound ? copy.bound : copy.unbound}
+                    </dd>
+                  </div>
+                </dl>
+                <Link href={`/workspace/licenses/${license.id}`} className={navLinkClass}>
+                  {control.manage}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        )}
+        {result.totalPages > 1 && (
+          <nav
+            aria-label={copy.page}
+            className="flex min-w-0 flex-wrap justify-between gap-4 text-sm"
+          >
+            {result.page > 1 ? (
               <Link
-                href={`/workspace/licenses/${license.id}`}
-                className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={licenseArchiveUrl({ ...filters, page: result.page - 1 })}
+                className={navLinkClass}
               >
-                {getLicenseControlCopy(locale).manage}
+                {copy.previous}
               </Link>
-            </li>
-          ))}
-        </ol>
-      )}
-      {result.totalPages > 1 && (
-        <nav aria-label={copy.page} className="flex justify-between gap-4 text-sm">
-          {result.page > 1 ? (
-            <Link
-              href={licenseArchiveUrl({ ...filters, page: result.page - 1 })}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.previous}
-            </Link>
-          ) : (
-            <span />
-          )}
-          <span>
-            {copy.page} {result.page} {copy.of} {result.totalPages}
-          </span>
-          {result.page < result.totalPages && (
-            <Link
-              href={licenseArchiveUrl({ ...filters, page: result.page + 1 })}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.next}
-            </Link>
-          )}
-        </nav>
-      )}
-    </HistoryShell>
+            ) : (
+              <span />
+            )}
+            <span>
+              {copy.page} {result.page} {copy.of} {result.totalPages}
+            </span>
+            {result.page < result.totalPages && (
+              <Link
+                href={licenseArchiveUrl({ ...filters, page: result.page + 1 })}
+                className={navLinkClass}
+              >
+                {copy.next}
+              </Link>
+            )}
+          </nav>
+        )}
+      </HistoryShell>
+    </div>
   );
 }

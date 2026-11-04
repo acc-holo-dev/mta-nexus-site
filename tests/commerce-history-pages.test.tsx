@@ -44,9 +44,13 @@ vi.mock("next/link", async () => {
   };
 });
 
+import LicensesLoading from "../apps/web/src/app/workspace/licenses/loading";
 import Licenses, { metadata as licensesMeta } from "../apps/web/src/app/workspace/licenses/page";
 import Purchases, { metadata as purchasesMeta } from "../apps/web/src/app/workspace/purchases/page";
 import Sales, { metadata as salesMeta } from "../apps/web/src/app/workspace/sales/page";
+import { getCommerceHistoryCopy } from "../apps/web/src/lib/commerce-history-i18n";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getLicenseMaintenanceCopy } from "../apps/web/src/lib/license-maintenance-i18n";
 
 const date = new Date("2026-10-09T10:00:00.000Z");
 const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });
@@ -235,5 +239,60 @@ describe("private legacy commerce pages", () => {
     for (const metadata of [purchasesMeta, licensesMeta, salesMeta]) {
       expect(metadata.robots).toMatchObject({ index: false, follow: false });
     }
+  });
+
+  it("recovers with ErrorState when license archive fails to load", async () => {
+    state.licenses.mockRejectedValue(new Error("db unavailable"));
+    const copy = getCommerceHistoryCopy("en");
+    const html = renderToStaticMarkup(
+      await Licenses({
+        searchParams: Promise.resolve({
+          page: "2",
+          status: "expiring",
+          binding: "bound",
+          term: "finite",
+          sort: "expires_soon",
+          q: "alpha",
+        }),
+      }),
+    );
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.loadUnavailable);
+    expect(html).toContain(getDictionary("en").errors.retry);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain(
+      'href="/workspace/licenses?page=2&amp;status=expiring&amp;binding=bound&amp;term=finite&amp;sort=expires_soon&amp;q=alpha"',
+    );
+    expect(html).not.toContain("PRIVATE-LICENSE-KEY");
+  });
+
+  it("renders EmptyState for an empty filtered license archive", async () => {
+    state.licenses.mockResolvedValue({
+      licenses: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      pageSize: 20,
+    });
+    const copy = getCommerceHistoryCopy("en");
+    const maintenance = getLicenseMaintenanceCopy("en");
+    const html = renderToStaticMarkup(
+      await Licenses({
+        searchParams: Promise.resolve({ status: "expired", q: "missing" }),
+      }),
+    );
+    expect(html).toContain(copy.emptyLicensesFiltered);
+    expect(html).toContain(copy.licenseNotice);
+    expect(html).toContain(maintenance.clear);
+    expect(html).toContain('href="/workspace/licenses"');
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+  });
+
+  it("clips the honest license archive loading shell on narrow layouts", async () => {
+    const html = renderToStaticMarkup(await LicensesLoading());
+    expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
   });
 });

@@ -44,18 +44,20 @@ vi.mock("../apps/web/src/components/license-control-panel", () => ({
   },
 }));
 
+import AdminLicenseHistoryLoading from "../apps/web/src/app/admin/licenses/[id]/history/loading";
 import ModeratorPage from "../apps/web/src/app/admin/licenses/[id]/page";
 import LicensesLoading from "../apps/web/src/app/admin/licenses/loading";
 import MaintenanceLoading from "../apps/web/src/app/admin/licenses/maintenance/loading";
 import MaintenancePage from "../apps/web/src/app/admin/licenses/maintenance/page";
 import QueuePage from "../apps/web/src/app/admin/licenses/page";
-import OwnerPage, { metadata } from "../apps/web/src/app/workspace/licenses/[id]/page";
-import AdminLicenseHistoryLoading from "../apps/web/src/app/admin/licenses/[id]/history/loading";
 import WorkspaceLicenseHistoryLoading from "../apps/web/src/app/workspace/licenses/[id]/history/loading";
+import OwnerLicenseLoading from "../apps/web/src/app/workspace/licenses/[id]/loading";
+import OwnerPage, { metadata } from "../apps/web/src/app/workspace/licenses/[id]/page";
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
 } from "../apps/web/src/components/license-history-page";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../apps/web/src/lib/license-maintenance-i18n";
 
@@ -283,9 +285,36 @@ it("clips honest loading shells on narrow layouts", async () => {
     expect(html).toContain("min-w-0 max-w-5xl");
     expect(html).toContain("overflow-x-clip");
   }
-  for (const Loading of [WorkspaceLicenseHistoryLoading, AdminLicenseHistoryLoading]) {
+  for (const Loading of [
+    WorkspaceLicenseHistoryLoading,
+    AdminLicenseHistoryLoading,
+    OwnerLicenseLoading,
+  ]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-4xl");
     expect(html).toContain("overflow-x-clip");
   }
+});
+it("shows an honest recovery state when owner license detail fails", async () => {
+  state.detail.mockRejectedValue(new Error("detail unavailable"));
+  const copy = getLicenseControlCopy("en");
+  const html = renderToStaticMarkup(await OwnerPage(params));
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain(getDictionary("en").errors.retry);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).toContain('href="/workspace/licenses/lic_a"');
+  expect(html).not.toContain(license.key);
+  expect(state.servers).not.toHaveBeenCalled();
+});
+it("renders EmptyState when owner license detail has no recorded actions", async () => {
+  state.detail.mockResolvedValue({ ...license, history: [] });
+  const copy = getLicenseControlCopy("en");
+  const html = renderToStaticMarkup(await OwnerPage(params));
+  expect(html).toContain(copy.noHistory);
+  expect(html).toContain(copy.policy);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain("min-h-11");
+  expect(html).not.toContain(license.key);
 });
