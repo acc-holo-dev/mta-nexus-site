@@ -66,6 +66,8 @@
     "legal:check": "node scripts/check-legal-surfaces.mjs",
     "observability:ready": "node scripts/run-observability-readiness.mjs",
     "observability:verify": "node scripts/check-observability-readiness-evidence.mjs",
+    "observability:live-drill:verify": "node scripts/check-observability-live-drill-evidence.mjs",
+    "recovery:acceptance:verify": "node scripts/check-production-recovery-acceptance-evidence.mjs",
     "analyze:unused": "knip",
     "analyze:architecture": "depcruise --config .dependency-cruiser.cjs apps/web/src packages",
     "analyze:bundle": "pnpm --filter @nexus/web exec next experimental-analyze --output",

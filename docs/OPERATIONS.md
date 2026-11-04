@@ -1127,7 +1127,8 @@ owner-filled `observability_live_drill` evidence with real owner/channel/thresho
 `signalAt → alertAt → humanReceivedAt → recoveryAt` timestamps on the target environment
 does. Validate with
 [`validateObservabilityLiveDrillEvidence`](../scripts/observability-evidence-lib.mjs) /
-`node scripts/check-observability-live-drill-evidence.mjs`; fixture shape in
+`pnpm observability:live-drill:verify` (or
+`node scripts/check-observability-live-drill-evidence.mjs`); fixture shape in
 [`scripts/fixtures/observability-live-drill-accept.json`](../scripts/fixtures/observability-live-drill-accept.json).
 Mis-submitting readiness JSON to the live-drill validator is rejected.
 
@@ -1190,7 +1191,8 @@ Owner acceptance uses `production_recovery_acceptance` evidence
 ([`production-recovery-acceptance-evidence.mjs`](../scripts/production-recovery-acceptance-evidence.mjs))
 with agreed RPO/RTO (minutes), retention + verified off-host location, restore access/break-glass,
 and measured restore timestamps/data loss checked against those targets. Validate with
-`node scripts/check-production-recovery-acceptance-evidence.mjs`. Checklist before recording
+`pnpm recovery:acceptance:verify` (or
+`node scripts/check-production-recovery-acceptance-evidence.mjs`). Checklist before recording
 acceptance:
 
 1. Owner documents RPO/RTO, retention, off-host independence from the primary host, and who may restore.
