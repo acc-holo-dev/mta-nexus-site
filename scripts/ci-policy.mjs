@@ -142,7 +142,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const files =
     process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
       ? []
-      : execFileSync("git", ["diff", "--name-only", "-z", base, head], { encoding: "utf8" })
+      : // Include both paths of a rename so a move cannot hide the higher-risk source.
+        execFileSync("git", ["diff", "--no-renames", "--name-only", "-z", base, head], {
+          encoding: "utf8",
+        })
           .split("\0")
           .filter(Boolean);
   const policy = classifyChanges(files, {
