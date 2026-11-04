@@ -282,3 +282,57 @@ it("clips honest loading shells on narrow layouts", async () => {
     expect(html).toContain("overflow-x-clip");
   }
 });
+it.each(["en", "ru"] as const)(
+  "public %s reviews show EmptyState when the list is empty",
+  async (locale) => {
+    state.locale = locale;
+    state.actor = null;
+    state.publicPage.mockResolvedValueOnce({
+      reviews: [],
+      page: 1,
+      totalPages: 1,
+      total: 0,
+    });
+    const copy = resourceReviewCopy(locale);
+    const html = renderToStaticMarkup(
+      await Public({
+        params: Promise.resolve({ slug: "resource" }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(html).toContain(copy.empty);
+    expect(html).toContain(copy.emptyHint);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+  },
+);
+it.each(["en", "ru"] as const)(
+  "public %s reviews show ErrorState recovery when the page read fails",
+  async (locale) => {
+    state.locale = locale;
+    state.actor = null;
+    state.publicPage.mockRejectedValueOnce(new Error("database-secret"));
+    const copy = resourceReviewCopy(locale);
+    const html = renderToStaticMarkup(
+      await Public({
+        params: Promise.resolve({ slug: "resource" }),
+        searchParams: Promise.resolve({ page: "2" }),
+      }),
+    );
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.pageUnavailable);
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain('href="/market/resource/reviews?page=2"');
+    expect(html).not.toContain("database-secret");
+  },
+);
+it("clips the public reviews loading shell", async () => {
+  const { default: MarketReviewsLoading } = await import(
+    "../apps/web/src/app/market/[slug]/reviews/loading"
+  );
+  const html = renderToStaticMarkup(await MarketReviewsLoading());
+  expect(html).toContain("min-w-0");
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain(resourceReviewCopy("en").pageLoading);
+});

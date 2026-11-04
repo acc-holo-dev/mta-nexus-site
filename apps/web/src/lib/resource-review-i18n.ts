@@ -7,6 +7,7 @@ const en = {
   reports: "My review reports",
   queue: "Review report queue",
   loading: "Loading review reports…",
+  pageLoading: "Loading reviews…",
   subtitle:
     "Reviews reflect acquired access, including free resources and legacy licenses. This does not confirm payment, install, or gameplay.",
   published: "Published",
@@ -27,6 +28,10 @@ const en = {
   saved: "Saved",
   unavailable: "Resource unavailable",
   empty: "No reviews yet.",
+  emptyHint:
+    "Published reviews from readers with acquired access will appear here. An empty list is not a load failure.",
+  pageUnavailable:
+    "Resource reviews are temporarily unavailable. This does not mean there are no reviews.",
   access:
     "Current library access and a safe published version are required to publish. Access is not proof of install or gameplay. Publishers and managers cannot review their own resources.",
   ownerConflict:
@@ -85,6 +90,7 @@ const ru: typeof en = {
   reports: "Мои жалобы на отзывы",
   queue: "Жалобы на отзывы ресурсов",
   loading: "Загрузка жалоб на отзывы…",
+  pageLoading: "Загрузка отзывов…",
   subtitle:
     "Отзывы опираются на доступ к ресурсу, включая бесплатные ресурсы и старые лицензии. Это не подтверждение оплаты, установки или игровой сессии.",
   published: "Опубликован",
@@ -105,6 +111,9 @@ const ru: typeof en = {
   saved: "Сохранено",
   unavailable: "Ресурс недоступен",
   empty: "Отзывов пока нет.",
+  emptyHint:
+    "Опубликованные отзывы читателей с доступом появятся здесь. Пустой список — не сбой загрузки.",
+  pageUnavailable: "Отзывы о ресурсе временно недоступны. Это не означает, что отзывов нет.",
   access:
     "Для публикации нужен действующий доступ в библиотеке и безопасная опубликованная версия. Доступ не доказывает установку или игру. Издатели и управляющие не могут оценивать свои ресурсы.",
   ownerConflict:

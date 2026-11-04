@@ -16,7 +16,12 @@ export const releaseHistoryCopy = {
     title: "Release history",
     back: "Back to resource",
     intro: "Published, safely scanned builds and their recorded integrity information.",
+    loading: "Loading release history…",
     noBuilds: "No released builds are currently available.",
+    noBuildsHint:
+      "Empty history is not a catalog outage. Published, safely scanned builds will appear here when available.",
+    loadUnavailable:
+      "Release history is temporarily unavailable. This does not mean there are no builds.",
     version: "Version",
     released: "Released",
     size: "Size",
@@ -43,7 +48,11 @@ export const releaseHistoryCopy = {
     title: "История версий",
     back: "Вернуться к ресурсу",
     intro: "Опубликованные сборки с безопасной проверкой и данными о целостности.",
+    loading: "Загрузка истории версий…",
     noBuilds: "Сейчас нет доступных опубликованных сборок.",
+    noBuildsHint:
+      "Пустая история — не сбой каталога. Опубликованные сборки с безопасной проверкой появятся здесь, когда будут доступны.",
+    loadUnavailable: "История версий временно недоступна. Это не означает, что сборок нет.",
     version: "Версия",
     released: "Опубликована",
     size: "Размер",

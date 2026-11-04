@@ -68,6 +68,7 @@ describe("free resource catalog as rendered for visitors", () => {
     );
 
     expect(html).toContain("There are no resources on this page.");
+    expect(html).toContain("beyond the available results");
     expect(html).toContain("Previous");
     expect(html).toContain("type=api");
     expect(html).toContain("q=maps");
@@ -75,6 +76,8 @@ describe("free resource catalog as rendered for visitors", () => {
     expect(html).toContain("Back to page 1 with the same filters");
     expect(html).toContain("Clear search only");
     expect(html).toContain("Show all categories");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain("overflow-x-clip");
   });
 
   it("explains zero results with active filters without wiping every parameter on partial reset", async () => {
@@ -86,11 +89,36 @@ describe("free resource catalog as rendered for visitors", () => {
       }),
     );
     expect(html).toContain("Nothing matches the active Market filters");
+    expect(html).toContain("not a catalog outage");
     expect(html).toContain("Active filters");
     expect(html).toContain("Resource categories: Scripts");
     expect(html).toContain("Sort resources: Top Rated");
     expect(html).toContain("Search resources: missing");
     expect(html).toContain('href="/market?type=script&amp;sort=rating"');
     expect(html).toContain('href="/market?type=all&amp;sort=rating&amp;q=missing"');
+  });
+
+  it("shows ErrorState recovery when the catalog read fails", async () => {
+    mocks.locale = "en";
+    mocks.listPublicPage.mockRejectedValueOnce(new Error("database-secret"));
+    const html = renderToStaticMarkup(
+      await MarketPage({
+        searchParams: Promise.resolve({ type: "script", sort: "rating", q: "maps", page: "2" }),
+      }),
+    );
+    expect(html).toContain('role="alert"');
+    expect(html).toContain("temporarily unavailable");
+    expect(html).toContain("does not mean there are no resources");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
+    expect(html).toContain('href="/market?type=script&amp;sort=rating&amp;q=maps&amp;page=2"');
+    expect(html).not.toContain("database-secret");
+  });
+
+  it("clips the catalog loading shell on narrow layouts", async () => {
+    mocks.locale = "en";
+    const html = renderToStaticMarkup(await MarketLoading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
   });
 });

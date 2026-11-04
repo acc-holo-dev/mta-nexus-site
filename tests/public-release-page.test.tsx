@@ -86,6 +86,7 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
 
 import ReleasePage, { metadata } from "../apps/web/src/app/market/[slug]/versions/page";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getReleaseHistoryCopy } from "../apps/web/src/lib/public-release-history";
 
 const release = {
   id: "bld_clean_1",
@@ -231,8 +232,56 @@ describe("public safely published version archive", () => {
     const html = renderToStaticMarkup(await page("2"));
     expect(html).toContain('href="/market/safe-release/versions"');
     expect(html).toContain('href="/market/safe-release/versions?page=3"');
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain("min-h-11");
     expect(metadata.robots).toMatchObject({ index: false, follow: false });
     await page(["1", "2"]);
     expect(state.history).toHaveBeenLastCalledWith("prd_release", 1);
+  });
+
+  it.each(["en", "ru"] as const)(
+    "shows EmptyState when no published builds are available in %s",
+    async (locale) => {
+      state.locale = locale;
+      state.history.mockResolvedValueOnce({
+        releases: [],
+        page: 1,
+        pageSize: 12,
+        totalPages: 1,
+        total: 0,
+      });
+      const copy = getReleaseHistoryCopy(locale);
+      const html = renderToStaticMarkup(await page());
+      expect(html).toContain(copy.noBuilds);
+      expect(html).toContain(copy.noBuildsHint);
+      expect(html).toContain("overflow-x-clip");
+    },
+  );
+
+  it.each(["en", "ru"] as const)(
+    "shows ErrorState recovery when release history fails in %s",
+    async (locale) => {
+      state.locale = locale;
+      state.history.mockRejectedValueOnce(new Error("database-secret"));
+      const copy = getReleaseHistoryCopy(locale);
+      const html = renderToStaticMarkup(await page("2"));
+      expect(html).toContain('role="alert"');
+      expect(html).toContain(copy.loadUnavailable);
+      expect(html).toContain("overflow-x-clip");
+      expect(html).toContain("min-h-11");
+      expect(html).toContain('href="/market/safe-release/versions?page=2"');
+      expect(html).not.toContain("database-secret");
+      expect(html).not.toContain('data-testid="build-provenance"');
+    },
+  );
+
+  it("clips the public versions loading shell", async () => {
+    const { default: VersionsLoading } = await import(
+      "../apps/web/src/app/market/[slug]/versions/loading"
+    );
+    const html = renderToStaticMarkup(await VersionsLoading());
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("overflow-x-clip");
+    expect(html).toContain(getReleaseHistoryCopy("en").loading);
   });
 });
