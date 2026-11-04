@@ -190,8 +190,11 @@ export function LicenseControlPanel({
     }
   }
 
+  const ghostLinkClass =
+    "inline-flex min-h-11 items-center h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
   return (
-    <section className="nexus-panel space-y-4 p-5">
+    <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <h2 className="text-lg font-semibold text-primary">
         {moderation ? copy.moderation : copy.title}
       </h2>
@@ -203,9 +206,9 @@ export function LicenseControlPanel({
         </>
       )}
       {actions.length > 0 && (
-        <form onSubmit={submit} className="space-y-4">
-          <fieldset disabled={busy || refreshing} className="space-y-4">
-            <label className="block text-sm text-secondary" htmlFor={`${fieldId}-action`}>
+        <form onSubmit={submit} className="min-w-0 space-y-4">
+          <fieldset disabled={busy || refreshing} className="min-w-0 space-y-4">
+            <label className="block min-w-0 text-sm text-secondary" htmlFor={`${fieldId}-action`}>
               {copy.action}
               <select
                 id={`${fieldId}-action`}
@@ -224,8 +227,11 @@ export function LicenseControlPanel({
               </select>
             </label>
             {action === "bind" && (
-              <div className="space-y-2">
-                <label className="block text-sm text-secondary" htmlFor={`${fieldId}-server`}>
+              <div className="min-w-0 space-y-2">
+                <label
+                  className="block min-w-0 text-sm text-secondary"
+                  htmlFor={`${fieldId}-server`}
+                >
                   {copy.server}
                   <select
                     id={`${fieldId}-server`}
@@ -246,25 +252,25 @@ export function LicenseControlPanel({
                 {servers.servers.length === 0 && (
                   <p className="text-sm text-muted">{copy.noServers}</p>
                 )}
-                <div className="flex gap-4 text-sm">
+                <div className="flex min-w-0 flex-wrap gap-4 text-sm">
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-auto px-0 text-sm text-accent"
+                    className={ghostLinkClass}
                     disabled={loadingServers || servers.page <= 1}
                     onClick={() => void loadServers(servers.page - 1)}
                   >
                     {copy.previous}
                   </Button>
-                  <span>
+                  <span className="inline-flex min-h-11 items-center">
                     {servers.page} / {servers.totalPages}
                   </span>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-auto px-0 text-sm text-accent"
+                    className={ghostLinkClass}
                     disabled={loadingServers || servers.page >= servers.totalPages}
                     onClick={() => void loadServers(servers.page + 1)}
                   >
@@ -274,7 +280,7 @@ export function LicenseControlPanel({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-auto px-0 text-sm text-accent"
+                    className={ghostLinkClass}
                     disabled={loadingServers}
                     onClick={() => void loadServers(servers.page)}
                   >
@@ -289,7 +295,7 @@ export function LicenseControlPanel({
                 {copy.recoveryNote} · {copy.endpointRevision}: {license.currentEndpointRevision}
               </p>
             )}
-            <label htmlFor={`${fieldId}-reason`} className="block text-sm text-secondary">
+            <label htmlFor={`${fieldId}-reason`} className="block min-w-0 text-sm text-secondary">
               {copy.reason}
               <textarea
                 id={`${fieldId}-reason`}
@@ -306,12 +312,17 @@ export function LicenseControlPanel({
               id={`${fieldId}-confirm`}
               checked={confirmed}
               onCheckedChange={setConfirmed}
-              labelClassName="flex items-start gap-2 text-sm text-secondary"
+              labelClassName="flex min-h-11 items-start gap-2 text-sm text-secondary"
               checkboxClassName={actionConfirmCheckboxFocusClass}
             >
               {copy.confirm}
             </ActionConfirmCheckbox>
-            <Button type="submit" disabled={!confirmed || loadingServers} isLoading={busy}>
+            <Button
+              type="submit"
+              className="min-h-11"
+              disabled={!confirmed || loadingServers}
+              isLoading={busy}
+            >
               {busy ? copy.pending : copy.submit}
             </Button>
           </fieldset>
@@ -335,12 +346,12 @@ export function LicenseControlPanel({
         variant="ghost"
         disabled={busy}
         onClick={() => router.refresh()}
-        className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={ghostLinkClass}
       >
         {copy.refresh}
       </Button>
       {secret && (
-        <div className="space-y-3 rounded-md border border-base p-4">
+        <div className="min-w-0 space-y-3 overflow-x-clip rounded-md border border-base p-4">
           <p className="text-sm text-primary">{copy.tokenOnce}</p>
           <p className="text-sm text-secondary">{copy.tokenPolicy}</p>
           <input
@@ -361,12 +372,12 @@ export function LicenseControlPanel({
               )}
             </time>
           </p>
-          <div className="flex gap-4 text-sm">
+          <div className="flex min-w-0 flex-wrap gap-4 text-sm">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-auto px-0 text-sm text-accent"
+              className={ghostLinkClass}
               onClick={() => {
                 void navigator.clipboard
                   .writeText(secret.value)
@@ -380,7 +391,7 @@ export function LicenseControlPanel({
               type="button"
               variant="ghost"
               size="sm"
-              className="h-auto px-0 text-sm text-accent"
+              className={ghostLinkClass}
               onClick={() => setSecret(null)}
             >
               {copy.hide}
