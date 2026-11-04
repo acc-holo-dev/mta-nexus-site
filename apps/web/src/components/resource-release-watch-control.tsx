@@ -1,6 +1,6 @@
 "use client";
 import type { ResourceReleaseWatch, ResourceReleaseWatchCommand } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -200,7 +200,7 @@ export function ResourceReleaseWatchControl({
       {!hasAccess && acquireHref ? (
         <Link
           href={acquireHref}
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.acquireRequired}
         </Link>
@@ -212,7 +212,7 @@ export function ResourceReleaseWatchControl({
           onClick={save}
           disabled={busy || saved || (!canToggle && !watch.enabled)}
           isLoading={busy}
-          className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {busy ? copy.busy : watch.enabled ? copy.unwatch : copy.watch}
         </Button>
@@ -229,7 +229,7 @@ export function ResourceReleaseWatchControl({
               onClick={save}
               disabled={busy}
               isLoading={busy}
-              className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {busy ? copy.busy : copy.retrySame}
             </Button>
@@ -239,17 +239,13 @@ export function ResourceReleaseWatchControl({
             variant="outline"
             onClick={() => router.refresh()}
             disabled={busy}
-            className="text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.reloadState}
           </Button>
         </div>
       )}
-      {error ? (
-        <p role="alert" className="text-sm text-secondary">
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
       {saved ? (
         <p role="status" className="text-sm text-success">
           {copy.saved}
@@ -259,14 +255,14 @@ export function ResourceReleaseWatchControl({
         <div className="flex flex-wrap gap-3 text-sm">
           <Link
             href={settingsHref}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             {copy.settings}
           </Link>
           {surface === "detail" ? (
             <Link
               href="/workspace/library/watches"
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.watchCenter}
             </Link>

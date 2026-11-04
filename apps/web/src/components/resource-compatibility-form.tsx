@@ -1,6 +1,6 @@
 "use client";
 import type { Product } from "@nexus/domain";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -122,11 +122,7 @@ export function ResourceCompatibilityForm({
       <Button type="submit" isLoading={busy} disabled={disabled} className="min-h-11">
         {busy ? copy.working : copy.save}
       </Button>
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}

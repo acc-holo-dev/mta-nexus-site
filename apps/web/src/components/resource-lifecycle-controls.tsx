@@ -9,7 +9,7 @@ import {
   resourceLifecycleTarget,
   unavailableBuildSupportHref,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { resourceLifecycleSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -177,7 +177,7 @@ export function ResourceLifecycleControls({
           </p>
           <Link
             href={unavailableBuildSupportHref()}
-            className="mt-2 inline-flex text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="mt-2 inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             onClick={() =>
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }
@@ -194,7 +194,7 @@ export function ResourceLifecycleControls({
           {product.status === "suspended" ? (
             <Link
               href={unavailableBuildSupportHref()}
-              className="inline-flex text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               onClick={() => stashSupportObjectContext({ productId: product.id })}
             >
               {locale === "ru" ? "Открыть обращение" : "Open a support case"}
@@ -281,11 +281,7 @@ export function ResourceLifecycleControls({
           </Button>
         </form>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.updated}

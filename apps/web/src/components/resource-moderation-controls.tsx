@@ -5,7 +5,7 @@ import {
   resourceModerationTarget,
   unavailableBuildSupportHref,
 } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { resourceModerationCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -160,7 +160,7 @@ export function ResourceModerationControls({
           </p>
           <Link
             href={unavailableBuildSupportHref()}
-            className="mt-2 inline-flex text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className="mt-2 inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             onClick={() =>
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }
@@ -194,11 +194,7 @@ export function ResourceModerationControls({
           {release ? copy.confirmRelease : copy.confirmSuspend}
         </ActionConfirmCheckbox>
       </fieldset>
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved ? (
         <p role="status" className="text-sm text-success">
           {copy.saved}

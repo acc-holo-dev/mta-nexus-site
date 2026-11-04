@@ -83,6 +83,8 @@ const en = {
   identityHint: "Identity verification does not certify skills or resource quality.",
   decisionUnavailable:
     "The decision could not be confirmed. Reload the moderation queue before trying again.",
+  decisionFailedDescription:
+    "A failed decision is not an approved or rejected application. Reload the queue before retrying.",
   stateChanged: "This application has already changed. Reload the moderation queue.",
 };
 const ru: Record<keyof typeof en, string> = {
@@ -169,6 +171,8 @@ const ru: Record<keyof typeof en, string> = {
   identityHint: "Подтверждение личности не удостоверяет навыки или качество ресурсов.",
   decisionUnavailable:
     "Решение не удалось подтвердить. Перезагрузите очередь модерации перед повторным действием.",
+  decisionFailedDescription:
+    "Неуспешное решение не одобряет и не отклоняет заявку. Обновите очередь перед повтором.",
   stateChanged: "Состояние заявки уже изменилось. Перезагрузите очередь модерации.",
 };
 export const verificationCopy = (locale: Locale) => (locale === "ru" ? ru : en);

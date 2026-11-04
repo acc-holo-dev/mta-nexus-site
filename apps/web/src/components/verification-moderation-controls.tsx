@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -119,7 +119,7 @@ export function VerificationModerationControls({
           type="button"
           disabled={!hasNotes || pending !== null || blocked}
           onClick={() => void decide("approve")}
-          className="min-h-9 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
+          className="min-h-11 gap-1.5 border-[color:var(--nexus-success)]/25 bg-success-soft text-[11px] text-success"
           variant="outline"
         >
           {pending === "approve" ? (
@@ -134,7 +134,7 @@ export function VerificationModerationControls({
           type="button"
           disabled={!hasNotes || pending !== null || blocked}
           onClick={() => void decide("reject")}
-          className="min-h-9 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
+          className="min-h-11 gap-1.5 border-[color:var(--nexus-danger)]/25 bg-danger-soft text-[11px] text-danger"
           variant="outline"
         >
           {pending === "reject" ? (
@@ -147,12 +147,24 @@ export function VerificationModerationControls({
       </div>
 
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
-      {error && (
-        <p role="alert" className="text-[11px] text-danger">
-          {error}
-        </p>
-      )}
-      {blocked && pending === null && (
+      {error ? (
+        <ErrorState
+          title={error}
+          description={verificationCopy(locale).decisionFailedDescription}
+          action={
+            blocked && pending === null ? (
+              <Button
+                type="button"
+                onClick={() => router.refresh()}
+                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                variant="ghost"
+              >
+                {verificationCopy(locale).reload}
+              </Button>
+            ) : null
+          }
+        />
+      ) : blocked && pending === null ? (
         <Button
           type="button"
           onClick={() => router.refresh()}
@@ -161,7 +173,7 @@ export function VerificationModerationControls({
         >
           {verificationCopy(locale).reload}
         </Button>
-      )}
+      ) : null}
     </div>
   );
 }

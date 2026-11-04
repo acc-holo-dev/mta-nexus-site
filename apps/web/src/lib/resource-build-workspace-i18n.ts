@@ -21,6 +21,8 @@ const copy = {
     working: "Saving…",
     saved: "Changes saved.",
     failed: "Could not confirm the change. Reload the saved state before trying again.",
+    failedDescription:
+      "A failed moderation decision is not a changed build state. Reload before retrying.",
     reload: "Reload saved state",
     conflict: "This version changed. Reload before continuing.",
     unavailable: "Resource is withdrawn. Editing and submission are unavailable.",
@@ -92,6 +94,8 @@ const copy = {
     saved: "Изменения сохранены.",
     failed:
       "Не удалось подтвердить изменение. Загрузите сохранённое состояние перед повторной попыткой.",
+    failedDescription:
+      "Неуспешное решение модерации не меняет состояние сборки. Обновите страницу перед повтором.",
     reload: "Загрузить сохранённое состояние",
     conflict: "Версия изменилась. Обновите страницу перед продолжением.",
     unavailable: "Ресурс снят с публикации. Редактирование и отправка недоступны.",

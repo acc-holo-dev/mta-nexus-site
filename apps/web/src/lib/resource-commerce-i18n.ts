@@ -46,6 +46,8 @@ const copy = {
     reason: "Reason",
     confirm: "I understand the effect of this action",
     updated: "Resource state updated.",
+    actionFailedDescription:
+      "A failed lifecycle action is not a changed publication state. Reload before retrying.",
     history: "Publication history",
     errors: {
       RESOURCE_CART_FULL: "The cart holds at most 20 resources. Remove an item first.",
@@ -118,6 +120,8 @@ const copy = {
     reason: "Причина",
     confirm: "Я понимаю последствия этого действия",
     updated: "Состояние ресурса обновлено.",
+    actionFailedDescription:
+      "Неуспешное действие жизненного цикла не меняет состояние публикации. Обновите страницу перед повтором.",
     history: "История публикации",
     errors: {
       RESOURCE_CART_FULL: "В корзине может быть до 20 ресурсов. Сначала уберите один из них.",

@@ -134,7 +134,15 @@ it("does not confirm partial or foreign acknowledgements", async () => {
   });
   await click("Stop selected watches");
   expect(h.refresh).not.toHaveBeenCalled();
-  expect(render().some((n) => n.props.role === "alert")).toBe(true);
+  expect(
+    render().some((n) => {
+      const type = n.type as { displayName?: string; name?: string } | string;
+      return (
+        typeof type === "function" &&
+        (type.displayName === "ErrorState" || type.name === "ErrorState")
+      );
+    }),
+  ).toBe(true);
 });
 it("requires reload after a revision conflict and clears acknowledgement when selection changes", async () => {
   reviewed();

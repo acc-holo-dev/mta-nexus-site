@@ -33,6 +33,8 @@ const copies = {
     lightboxExpand: "View larger in gallery",
     dirty: "Save or reload your order and caption changes before uploading or removing an image.",
     error: "The operation could not be confirmed. Reload the gallery before retrying.",
+    errorDescription:
+      "A failed gallery change is not an updated media set. Reload before uploading or saving again.",
     errors: {
       RESOURCE_MEDIA_CONFLICT: "The resource changed. Reload the gallery before continuing.",
       RESOURCE_MEDIA_DUPLICATE: "This image is already in the gallery.",
@@ -84,6 +86,8 @@ const copies = {
     dirty:
       "Сохраните порядок и подписи или обновите галерею перед загрузкой и удалением изображения.",
     error: "Результат операции не подтверждён. Обновите галерею перед повтором.",
+    errorDescription:
+      "Неуспешное изменение галереи не обновляет набор медиа. Обновите страницу перед новой загрузкой или сохранением.",
     errors: {
       RESOURCE_MEDIA_CONFLICT: "Ресурс изменился. Обновите галерею перед продолжением.",
       RESOURCE_MEDIA_DUPLICATE: "Это изображение уже есть в галерее.",

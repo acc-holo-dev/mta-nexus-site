@@ -4,7 +4,7 @@ import {
   RESOURCE_MEDIA_INPUT_BYTES,
   RESOURCE_MEDIA_LIMIT,
 } from "@nexus/domain";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
@@ -101,11 +101,23 @@ export function ResourceMediaEditor({
           {copy.readonly}
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-danger">
-          {error}
-        </p>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.errorDescription}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={busy}
+              onClick={() => void execute("GET")}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reload}
+            </Button>
+          }
+        />
+      ) : null}
       {message && (
         <p role="status" className="text-secondary">
           {message}
@@ -116,7 +128,13 @@ export function ResourceMediaEditor({
           {copy.busy}
         </p>
       )}
-      <Button type="button" variant="outline" disabled={busy} onClick={() => void execute("GET")}>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={busy}
+        onClick={() => void execute("GET")}
+        className="min-h-11"
+      >
         {copy.reload}
       </Button>
       {!items.length && <p className="text-muted">{copy.empty}</p>}

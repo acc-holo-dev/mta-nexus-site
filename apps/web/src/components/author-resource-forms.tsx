@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { editProductDetailsSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useState } from "react";
@@ -371,28 +371,32 @@ export function AuthorResourceForms({
   return (
     <div className="grid items-start gap-6 lg:grid-cols-2">
       <div className="space-y-2 lg:col-span-2">
-        {conflict && (
-          <div role="alert" className="space-y-3 rounded-lg border border-base bg-surface p-4">
-            <p>{copy.draftConflict}</p>
-            <div className="flex flex-wrap gap-3">
-              <Button type="button" onClick={recoverDraft}>
-                {copy.restoreDraft}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setDetails(baseline);
-                  setConflict(null);
-                  setRecovered(false);
-                  setSaved(false);
-                }}
-              >
-                {copy.discardDraft}
-              </Button>
-            </div>
-          </div>
-        )}
+        {conflict ? (
+          <ErrorState
+            title={copy.draftConflict}
+            description={copy.draftConflictDescription}
+            action={
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button type="button" className="min-h-11" onClick={recoverDraft}>
+                  {copy.restoreDraft}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  onClick={() => {
+                    setDetails(baseline);
+                    setConflict(null);
+                    setRecovered(false);
+                    setSaved(false);
+                  }}
+                >
+                  {copy.discardDraft}
+                </Button>
+              </div>
+            }
+          />
+        ) : null}
         {recovered && (
           <p role="status" className="text-sm text-secondary">
             {copy.draftRestored}
@@ -403,11 +407,12 @@ export function AuthorResourceForms({
             {copy.unsaved}
           </p>
         )}
-        {storageFailed && (
-          <p role="alert" className="text-sm text-error">
-            {copy.draftUnavailable}
-          </p>
-        )}
+        {storageFailed ? (
+          <ErrorState
+            title={copy.draftUnavailable}
+            description={copy.draftUnavailableDescription}
+          />
+        ) : null}
         {(fileSelected || hasAuthorVersionDraft(versionDraft)) && (
           <p className="text-sm text-muted">{copy.fileReselect}</p>
         )}
@@ -416,7 +421,7 @@ export function AuthorResourceForms({
         id="author-resource-details"
         onSubmit={save}
         aria-label={copy.edit}
-        className="space-y-4 rounded-lg border border-base bg-surface p-5"
+        className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
         <p className="text-sm text-secondary">
@@ -471,11 +476,7 @@ export function AuthorResourceForms({
             onChange={(event) => changeDetails("tagsText", event.target.value)}
           />
         </fieldset>
-        {error && (
-          <p role="alert" className="text-sm text-error">
-            {error}
-          </p>
-        )}
+        {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
         {saved && !refreshPending && !conflict && (
           <p role="status" className="text-sm text-success">
             {copy.saved}
@@ -494,7 +495,7 @@ export function AuthorResourceForms({
         id="author-resource-version"
         onSubmit={upload}
         aria-label={copy.newVersion}
-        className="space-y-4 rounded-lg border border-base bg-surface p-5"
+        className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.newVersion}</h2>
         <p className="text-sm text-secondary">
@@ -571,11 +572,9 @@ export function AuthorResourceForms({
             </span>
           </div>
         </fieldset>
-        {uploadError && (
-          <p role="alert" className="text-sm text-error">
-            {uploadError}
-          </p>
-        )}
+        {uploadError ? (
+          <ErrorState title={uploadError} description={copy.uploadFailedDescription} />
+        ) : null}
         {submitted && (
           <p role="status" className="text-sm text-success">
             {copy.versionSubmitted}
@@ -668,7 +667,7 @@ export function RetireBuildForm({
             className={textareaClass}
           />
         </div>
-        {error && <p role="alert">{error}</p>}
+        {error ? <ErrorState title={error} description={copy.retireFailedDescription} /> : null}
         <Button type="submit" isLoading={pending} className="min-h-11">
           {pending ? copy.retiring : copy.retire}
         </Button>

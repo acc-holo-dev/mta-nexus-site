@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 
 import { Archive, LoaderCircle, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -152,7 +152,7 @@ export function ContentModerationControls({
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
           onClick={() => void moderate("publish")}
-          className="min-h-9 gap-1.5 bg-success-soft text-success text-[11px]"
+          className="min-h-11 gap-1.5 bg-success-soft text-success text-[11px]"
           variant="outline"
         >
           {pending === "publish" ? (
@@ -167,7 +167,7 @@ export function ContentModerationControls({
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "archived"}
           onClick={() => void moderate("archive")}
-          className="min-h-9 gap-1.5 text-[11px]"
+          className="min-h-11 gap-1.5 text-[11px]"
           variant="outline"
         >
           {pending === "archive" ? (
@@ -193,22 +193,23 @@ export function ContentModerationControls({
           {moderationCopy(locale).reload}
         </a>
       )}
-      {error && (
-        <div className="space-y-2">
-          <p role="alert" className="text-[11px] text-danger">
-            {error}
-          </p>
-          <Button
-            type="button"
-            disabled={pending !== null}
-            onClick={() => router.refresh()}
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            variant="ghost"
-          >
-            {moderationCopy(locale).reload}
-          </Button>
-        </div>
-      )}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={moderationCopy(locale).decisionFailedDescription}
+          action={
+            <Button
+              type="button"
+              disabled={pending !== null}
+              onClick={() => router.refresh()}
+              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              variant="ghost"
+            >
+              {moderationCopy(locale).reload}
+            </Button>
+          }
+        />
+      ) : null}
     </div>
   );
 }

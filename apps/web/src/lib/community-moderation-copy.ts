@@ -38,6 +38,8 @@ const en = {
   archive: "Archive",
   saved: "The decision was saved. Reload the current version before another decision.",
   reload: "Reload saved version",
+  decisionFailedDescription:
+    "A failed decision is not a recorded moderation outcome. Reload the saved version before retrying.",
   uncertain: "The decision could not be confirmed. Reload saved state before retrying.",
   changed: "The publication changed. Reload and review the current version.",
   large:
@@ -84,6 +86,8 @@ const ru: Record<keyof typeof en, string> = {
   archive: "Архивировать",
   saved: "Решение сохранено. Загрузите текущую версию перед следующим решением.",
   reload: "Загрузить сохранённую версию",
+  decisionFailedDescription:
+    "Неуспешное решение не записывает исход модерации. Загрузите сохранённую версию перед повтором.",
   uncertain: "Не удалось подтвердить решение. Загрузите сохранённое состояние перед повтором.",
   changed: "Публикация изменилась. Загрузите и проверьте текущую версию.",
   large:

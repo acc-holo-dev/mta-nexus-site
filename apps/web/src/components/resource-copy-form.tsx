@@ -1,6 +1,6 @@
 "use client";
 import type { ResourceCopyCommand, ResourceCopyPreview } from "@nexus/domain";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { resourceCopyCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -106,18 +106,14 @@ export function ResourceCopyForm({
           {c.frozen}
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-warning">
-          {error}
-        </p>
-      )}
+      {error ? <ErrorState title={error} description={c.errorDescription} /> : null}
       <div className="flex flex-wrap gap-4">
         <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? c.busy : c.create}
         </Button>
         <Link
           href={`/workspace/resources/${encodeURIComponent(preview.source.id)}/copies`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {c.history}
         </Link>
