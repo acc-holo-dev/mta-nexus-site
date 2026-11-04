@@ -1,4 +1,6 @@
 import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import { KeyRound } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -6,6 +8,7 @@ import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { formatHistoryDate, licenseStatusLabel } from "../../../../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../../../lib/commerce-history-i18n";
+import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getLicenseMaintenanceCopy } from "../../../../lib/license-maintenance-i18n";
 import { licenseRuntimePage } from "../../../../lib/license-runtime-query";
@@ -39,17 +42,50 @@ export default async function Page({
     if (error instanceof AppError && error.statusCode === 400) notFound();
     throw error;
   }
+  const returnHref =
+    page > 1 ? `/admin/licenses/maintenance?page=${page}` : "/admin/licenses/maintenance";
+  let forbidden = false;
   const result = await licenseControlService.maintenance(actor, page).catch((error: unknown) => {
-      if (error instanceof AppError && error.statusCode === 403) notFound();
-      throw error;
-    }),
-    copy = getLicenseMaintenanceCopy(locale),
-    history = getCommerceHistoryCopy(locale);
+    if (error instanceof AppError && error.statusCode === 403) {
+      forbidden = true;
+      return null;
+    }
+    return null;
+  });
+  if (forbidden) notFound();
+  const copy = getLicenseMaintenanceCopy(locale),
+    history = getCommerceHistoryCopy(locale),
+    dictionary = getDictionary(locale);
+
+  if (!result) {
+    return (
+      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+        <Link
+          href="/admin/licenses"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          action={
+            <Link
+              href={returnHref}
+              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
+    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
       <Link
         href="/admin/licenses"
-        className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         {copy.back}
       </Link>
@@ -71,10 +107,10 @@ export default async function Page({
       {result.items.length ? (
         <ol className="space-y-3">
           {result.items.map((license) => (
-            <li key={license.id} className="nexus-panel space-y-2 p-4">
+            <li key={license.id} className="nexus-panel min-w-0 space-y-2 p-4">
               <Link
                 href={`/admin/licenses/${encodeURIComponent(license.id)}`}
-                className="break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="inline-flex min-h-11 items-center break-words text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {license.productTitle}
               </Link>
@@ -91,16 +127,32 @@ export default async function Page({
           ))}
         </ol>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <EmptyState
+          title={copy.empty}
+          description={copy.worker}
+          icon={<KeyRound className="h-6 w-6" aria-hidden="true" />}
+        />
       )}
       {result.totalPages > 1 && (
-        <nav aria-label={copy.currentPage} className="flex gap-4 text-sm">
-          {result.page > 1 && <Link href={`?page=${result.page - 1}`}>{copy.previous}</Link>}
-          <span>
+        <nav aria-label={copy.currentPage} className="flex flex-wrap gap-4 text-sm">
+          {result.page > 1 && (
+            <Link
+              href={`?page=${result.page - 1}`}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.previous}
+            </Link>
+          )}
+          <span className="inline-flex min-h-11 items-center">
             {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={`?page=${result.page + 1}`}>{copy.next}</Link>
+            <Link
+              href={`?page=${result.page + 1}`}
+              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.next}
+            </Link>
           )}
         </nav>
       )}

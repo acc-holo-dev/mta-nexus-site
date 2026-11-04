@@ -9,7 +9,7 @@ export default async function Loading() {
   const history = getCommerceHistoryCopy(locale);
   return (
     <section
-      className="mx-auto max-w-5xl space-y-6 py-8"
+      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
       aria-busy="true"
       aria-labelledby="admin-licenses-loading-heading"
     >

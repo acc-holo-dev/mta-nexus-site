@@ -77,6 +77,8 @@ const copy = {
     search: "Search license or resource",
     searchButton: "Search",
     empty: "No licenses found.",
+    loadUnavailable: "License moderation is temporarily unavailable. Please try again.",
+    clearFilters: "Clear filters",
     checkEndpoint:
       'Check API: POST /api/licenses/check; Authorization: Bearer <token>; JSON body: {"serverId":"bound server ID"}. Reject failed checks and recheck every 60 seconds.',
     errors: {
@@ -180,6 +182,8 @@ const copy = {
     search: "Поиск лицензии или ресурса",
     searchButton: "Найти",
     empty: "Лицензии не найдены.",
+    loadUnavailable: "Модерация лицензий временно недоступна. Попробуйте ещё раз.",
+    clearFilters: "Сбросить фильтры",
     checkEndpoint:
       'API проверки: POST /api/licenses/check; Authorization: Bearer <token>; JSON: {"serverId":"ID привязанного сервера"}. Отклоняйте неуспешные проверки и повторяйте их каждые 60 секунд.',
     errors: {

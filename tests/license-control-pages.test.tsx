@@ -1,12 +1,18 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
-  user: { id: "usr_a", role: "user" } as { id: string; role: "user" | "moderator" } | null,
+  user: { id: "usr_a", role: "user" } as {
+    id: string;
+    role: "user" | "moderator" | "admin";
+  } | null,
   locale: "en" as "ru" | "en",
   detail: vi.fn(),
   servers: vi.fn(),
   moderationDetail: vi.fn(),
   moderationPage: vi.fn(),
+  maintenance: vi.fn(),
   panel: vi.fn(),
   history: vi.fn(),
 }));
@@ -27,6 +33,7 @@ vi.mock("../apps/web/src/lib/services/license-control-service", () => ({
     servers: state.servers,
     moderationDetail: state.moderationDetail,
     moderationPage: state.moderationPage,
+    maintenance: state.maintenance,
     history: state.history,
   },
 }));
@@ -36,13 +43,20 @@ vi.mock("../apps/web/src/components/license-control-panel", () => ({
     return <section>Controls</section>;
   },
 }));
-import OwnerPage, { metadata } from "../apps/web/src/app/workspace/licenses/[id]/page";
+
 import ModeratorPage from "../apps/web/src/app/admin/licenses/[id]/page";
+import LicensesLoading from "../apps/web/src/app/admin/licenses/loading";
+import MaintenanceLoading from "../apps/web/src/app/admin/licenses/maintenance/loading";
+import MaintenancePage from "../apps/web/src/app/admin/licenses/maintenance/page";
 import QueuePage from "../apps/web/src/app/admin/licenses/page";
+import OwnerPage, { metadata } from "../apps/web/src/app/workspace/licenses/[id]/page";
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
 } from "../apps/web/src/components/license-history-page";
+import { getLicenseControlCopy } from "../apps/web/src/lib/license-control-i18n";
+import { getLicenseMaintenanceCopy } from "../apps/web/src/lib/license-maintenance-i18n";
+
 const params = { params: Promise.resolve({ id: "lic_a" }) };
 const license = {
   id: "lic_a",
@@ -82,6 +96,14 @@ beforeEach(() => {
     .mockResolvedValue({ servers: [{ id: "srv_a", name: "Server A" }], page: 1, totalPages: 1 });
   state.panel.mockReset();
   state.moderationPage.mockReset().mockResolvedValue({ licenses: [], page: 1, totalPages: 1 });
+  state.maintenance.mockReset().mockResolvedValue({
+    expired: 0,
+    expiring: 0,
+    unknownTerms: 0,
+    items: [],
+    page: 1,
+    totalPages: 1,
+  });
   state.history.mockReset().mockResolvedValue({
     license: { id: "lic_a", productTitle: license.productTitle },
     items: [
@@ -190,4 +212,61 @@ it("passes only observed recovery capability and endpoint revision to the client
     currentEndpointRevision: 3,
   });
   expect(JSON.stringify(state.panel.mock.calls.at(-1))).not.toContain("DO-NOT-SERIALIZE");
+});
+it("shows an honest recovery state when the moderator queue fails", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.moderationPage.mockRejectedValue(new Error("queue unavailable"));
+  const copy = getLicenseControlCopy("en");
+  const html = renderToStaticMarkup(
+    await QueuePage({ searchParams: Promise.resolve({ page: "2", status: "active", q: "alpha" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/licenses?status=active&amp;q=alpha&amp;page=2"');
+  expect(html).not.toContain(license.key);
+});
+it("renders an empty moderator queue with clear-filters recovery when filters are active", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  const copy = getLicenseControlCopy("en");
+  const html = renderToStaticMarkup(
+    await QueuePage({
+      searchParams: Promise.resolve({ status: "expired", q: "alpha", page: "1" }),
+    }),
+  );
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.clearFilters);
+  expect(html).toContain('href="/admin/licenses"');
+  expect(html).toContain("overflow-x-clip");
+});
+it("rejects stale staff privilege before loading the moderator queue", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.moderationPage.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
+  await expect(QueuePage({ searchParams: Promise.resolve({}) })).rejects.toThrow("NOT_FOUND");
+});
+it("shows an honest recovery state when license maintenance inventory fails", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.maintenance.mockRejectedValue(new Error("maintenance unavailable"));
+  const copy = getLicenseMaintenanceCopy("en");
+  const html = renderToStaticMarkup(
+    await MaintenancePage({ searchParams: Promise.resolve({ page: "2" }) }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(copy.loadUnavailable);
+  expect(html).toContain("overflow-x-clip");
+  expect(html).toContain('href="/admin/licenses/maintenance?page=2"');
+});
+it("renders empty maintenance inventory without inventing due licenses", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  const copy = getLicenseMaintenanceCopy("en");
+  const html = renderToStaticMarkup(await MaintenancePage({ searchParams: Promise.resolve({}) }));
+  expect(html).toContain(copy.empty);
+  expect(html).toContain("overflow-x-clip");
+});
+it("clips honest loading shells on narrow layouts", async () => {
+  for (const Loading of [LicensesLoading, MaintenanceLoading]) {
+    const html = renderToStaticMarkup(await Loading());
+    expect(html).toContain("min-w-0 max-w-5xl");
+    expect(html).toContain("overflow-x-clip");
+  }
 });

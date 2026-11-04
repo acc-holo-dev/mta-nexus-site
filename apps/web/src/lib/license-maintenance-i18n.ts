@@ -1,4 +1,5 @@
 import type { LicenseTermNotificationData } from "@nexus/domain";
+
 const copy = {
   en: {
     filters: "License filters",
@@ -43,6 +44,7 @@ const copy = {
       "The recorded license term ends within three days. Automatic renewal is unavailable.",
     back: "License moderation",
     currentPage: "Current page",
+    loadUnavailable: "License term processing is temporarily unavailable. Please try again.",
   },
   ru: {
     filters: "Фильтры лицензий",
@@ -87,6 +89,7 @@ const copy = {
       "Учётный срок лицензии заканчивается в течение трёх дней. Автоматическое продление недоступно.",
     back: "Модерация лицензий",
     currentPage: "Текущая страница",
+    loadUnavailable: "Обработка сроков лицензий временно недоступна. Попробуйте ещё раз.",
   },
 };
 export const getLicenseMaintenanceCopy = (locale: "ru" | "en") => copy[locale];
