@@ -11,6 +11,7 @@ export const community = {
     startTitle: "Start a community topic",
     startDescription:
       "Ask a clear question or share something useful with MTA players and creators.",
+    backToCommunity: "Back to community",
     type: "Type",
     question: "Question",
     discussion: "Discussion",
@@ -20,6 +21,8 @@ export const community = {
     publishing: "Publishing…",
     publish: "Publish topic",
     createError: "Could not create topic",
+    createErrorDescription:
+      "A failed publish is not a created topic. Fix the form if needed, then retry.",
   },
   explore: {
     title: "Explore the MTA ecosystem",

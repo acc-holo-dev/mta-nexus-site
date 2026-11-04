@@ -1,6 +1,7 @@
 "use client";
 
-import { Avatar, Button } from "@nexus/ui";
+import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui";
+import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -32,6 +33,12 @@ import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-fee
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 import { GuestAuthLinks } from "./guest-auth-links";
+
+const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
+const navLinkClass =
+  "inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const ghostActionClass =
+  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export function ContentDiscussion({
   slug,
@@ -309,9 +316,10 @@ export function ContentDiscussion({
       setSubmitting(false);
     }
   }
+  const emptyFiltered = Boolean(activeQuery.current);
   return (
-    <section id="discussion" className="nexus-panel space-y-5 p-5 sm:p-6">
-      <div className="nexus-panel space-y-3 p-4">
+    <section id="discussion" className={shellClass}>
+      <div className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4">
         <ContentFollowControls
           contentId={contentId}
           title={title ?? slug}
@@ -329,16 +337,10 @@ export function ContentDiscussion({
           }
         />
         <div className="flex flex-wrap gap-4">
-          <Link
-            href="/workspace/saved?type=content"
-            className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/saved?type=content" className={navLinkClass}>
             {followCopy(locale).content}
           </Link>
-          <Link
-            href="/settings#notification-heading"
-            className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/settings#notification-heading" className={navLinkClass}>
             {followCopy(locale).notificationSettings}
           </Link>
         </div>
@@ -352,7 +354,7 @@ export function ContentDiscussion({
           {ownDiscussionCopy(locale).title}
         </Link>
       )}
-      <h2 className="font-heading text-primary">
+      <h2 className="min-w-0 break-words font-heading text-primary">
         {copy.title} ({displayCount})
       </h2>
       <search aria-label={copy.search}>
@@ -362,7 +364,7 @@ export function ContentDiscussion({
             // Search refreshes the list only; the compose draft stays in React state.
             void load(false, search.trim());
           }}
-          className="flex flex-wrap items-end gap-3"
+          className="flex min-w-0 flex-wrap items-end gap-3"
         >
           <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
             <span>{copy.search}</span>
@@ -378,6 +380,7 @@ export function ContentDiscussion({
           <Button
             type="submit"
             variant="secondary"
+            className="min-h-11"
             disabled={loading || submitting || !!managingId}
           >
             {copy.applySearch}
@@ -387,19 +390,19 @@ export function ContentDiscussion({
           <p className="mt-2 text-xs text-muted">{copy.searchKeepsDraft}</p>
         )}
       </search>
-      <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
+      <form onSubmit={submit} className="min-w-0 space-y-3" aria-busy={submitting}>
         {draftRestoreNotice ? (
           <p role="status" aria-live="polite" className="text-sm text-secondary">
             {workspaceCopy.draftRestored}
           </p>
         ) : null}
         {reply && (
-          <div className="flex flex-wrap items-center gap-3 rounded-lg bg-accent-soft p-3 text-sm text-secondary">
-            <span>
+          <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg bg-accent-soft p-3 text-sm text-secondary">
+            <span className="min-w-0 break-words">
               {copy.replying} {reply.name}
             </span>
             <Button
-              className="h-auto px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={ghostActionClass}
               variant="ghost"
               type="button"
               disabled={submitting}
@@ -412,7 +415,7 @@ export function ContentDiscussion({
             </Button>
           </div>
         )}
-        <label className="block space-y-1 text-sm text-secondary">
+        <label className="block min-w-0 space-y-1 text-sm text-secondary">
           <span>{copy.label}</span>
           <textarea
             ref={textarea}
@@ -435,6 +438,7 @@ export function ContentDiscussion({
           <Button
             type="submit"
             isLoading={submitting}
+            className="min-h-11"
             disabled={text.trim().length < 2 || loading || !!managingId}
           >
             {submitting
@@ -538,7 +542,7 @@ export function ContentDiscussion({
               {comment.text}
             </p>
             <Link
-              className="inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={navLinkClass}
               href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
             >
               {copy.permalink}
@@ -552,7 +556,7 @@ export function ContentDiscussion({
               />
             )}
             <Button
-              className="h-auto px-0 text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={ghostActionClass}
               variant="ghost"
               type="button"
               disabled={submitting || !!managingId}
@@ -630,48 +634,64 @@ export function ContentDiscussion({
           </article>
         ))}
       </div>
-      {page && !page.items.length && (
-        <div className="space-y-3 text-sm text-muted">
-          <p>{activeQuery.current ? copy.noMatches : copy.first}</p>
-          {activeQuery.current ? (
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              disabled={loading || submitting || !!managingId}
-              onClick={() => {
-                setSearch("");
-                void load(false, "");
-              }}
-            >
-              {copy.clearSearch}
-            </Button>
-          ) : null}
-        </div>
-      )}
-      {readError && (
-        <div className="space-y-2">
-          <p role="alert" className="text-sm text-danger">
-            {readError}
-          </p>
-          {(readError === copy.focusMissing || focusedId) && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              disabled={loading || submitting || !!managingId}
-              onClick={returnToDiscussion}
-            >
-              {copy.returnDiscussion}
-            </Button>
-          )}
-        </div>
-      )}
+      {page && !page.items.length && !readError ? (
+        <EmptyState
+          title={emptyFiltered ? copy.noMatches : copy.first}
+          description={emptyFiltered ? copy.noMatchesDescription : copy.firstDescription}
+          icon={<MessageSquare className="h-6 w-6" />}
+          action={
+            emptyFiltered ? (
+              <Button
+                type="button"
+                variant="ghost"
+                className={ghostActionClass}
+                disabled={loading || submitting || !!managingId}
+                onClick={() => {
+                  setSearch("");
+                  void load(false, "");
+                }}
+              >
+                {copy.clearSearch}
+              </Button>
+            ) : undefined
+          }
+        />
+      ) : null}
+      {readError ? (
+        <ErrorState
+          title={readError}
+          description={readError === copy.unavailable ? copy.unavailableDescription : undefined}
+          action={
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {(readError === copy.focusMissing || focusedId) && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className={ghostActionClass}
+                  disabled={loading || submitting || !!managingId}
+                  onClick={returnToDiscussion}
+                >
+                  {copy.returnDiscussion}
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                className={ghostActionClass}
+                disabled={loading || submitting || !!managingId}
+                onClick={() => void load(false, activeQuery.current)}
+              >
+                {copy.retry}
+              </Button>
+            </div>
+          }
+        />
+      ) : null}
       <div className="flex flex-wrap gap-3">
         {page?.hasMore && (
           <Button
             type="button"
-            size="sm"
+            className="min-h-11"
             isLoading={loading}
             disabled={submitting || !!managingId}
             onClick={() => void load(true)}
@@ -679,15 +699,17 @@ export function ContentDiscussion({
             {loading ? copy.loading : copy.older}
           </Button>
         )}
-        <Button
-          type="button"
-          variant="ghost"
-          disabled={loading || submitting || !!managingId}
-          className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          onClick={() => void load(false, "")}
-        >
-          {!page || readError ? copy.retry : copy.latest}
-        </Button>
+        {!readError ? (
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={loading || submitting || !!managingId}
+            className={ghostActionClass}
+            onClick={() => void load(false, "")}
+          >
+            {!page ? copy.retry : copy.latest}
+          </Button>
+        ) : null}
       </div>
     </section>
   );

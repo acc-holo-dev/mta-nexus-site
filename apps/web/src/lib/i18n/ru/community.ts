@@ -11,6 +11,7 @@ export const community = {
     startTitle: "Начать обсуждение",
     startDescription:
       "Задайте понятный вопрос или поделитесь полезной информацией с игроками и авторами MTA.",
+    backToCommunity: "К сообществу",
     type: "Тип",
     question: "Вопрос",
     discussion: "Обсуждение",
@@ -20,6 +21,8 @@ export const community = {
     publishing: "Публикация…",
     publish: "Опубликовать тему",
     createError: "Не удалось создать тему",
+    createErrorDescription:
+      "Неудачная публикация не создаёт тему. Исправьте форму при необходимости и повторите.",
   },
   explore: {
     title: "Обзор экосистемы MTA",

@@ -6,6 +6,7 @@ const en = {
   search: "Search comments or authors",
   applySearch: "Search",
   noMatches: "No matching comments.",
+  noMatchesDescription: "Clear the search to see the full discussion again.",
   clearSearch: "Clear search",
   focusMissing:
     "This comment link is unavailable. The publication may still be open — return to the full discussion.",
@@ -43,8 +44,12 @@ const en = {
   older: "Load older comments",
   loading: "Loading comments…",
   unavailable: "Unable to load comments. Try again.",
+  unavailableDescription:
+    "A load failure is not an empty discussion. Retry to fetch the latest comments for this publication.",
   retry: "Try again",
   first: "Start the discussion with a comment.",
+  firstDescription:
+    "Comments stay with this publication. Share a useful reply when you are ready — an empty thread is not a load failure.",
   anonymous: "Community member",
   parent: "In reply to",
   missingParent: "Comment no longer available",
@@ -67,6 +72,7 @@ const ru: Record<keyof typeof en, string> = {
   search: "Поиск по комментариям и авторам",
   applySearch: "Найти",
   noMatches: "Подходящих комментариев нет.",
+  noMatchesDescription: "Очистите поиск, чтобы снова увидеть полное обсуждение.",
   clearSearch: "Очистить поиск",
   focusMissing:
     "Ссылка на комментарий недоступна. Публикация может быть открыта — вернитесь к общему обсуждению.",
@@ -105,8 +111,12 @@ const ru: Record<keyof typeof en, string> = {
   older: "Загрузить старые комментарии",
   loading: "Загрузка комментариев…",
   unavailable: "Не удалось загрузить комментарии. Попробуйте ещё раз.",
+  unavailableDescription:
+    "Ошибка загрузки — это не пустое обсуждение. Повторите запрос, чтобы получить актуальные комментарии к этой публикации.",
   retry: "Повторить",
   first: "Начните обсуждение первым комментарием.",
+  firstDescription:
+    "Комментарии остаются у этой публикации. Когда будете готовы, оставьте полезный ответ — пустая ветка не означает ошибку загрузки.",
   anonymous: "Участник сообщества",
   parent: "В ответ на",
   missingParent: "Комментарий больше недоступен",

@@ -107,12 +107,12 @@ export default async function ArticleDetailPage({
   });
 
   return (
-    <article className="mx-auto max-w-4xl space-y-8">
+    <article className="mx-auto min-w-0 max-w-4xl space-y-8 overflow-x-clip">
       <Link
         href={isCommunity ? "/community" : "/articles"}
-        className="inline-flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary"
+        className="inline-flex min-h-11 items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
-        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+        <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         <span>{isCommunity ? getDiscussionCopy(locale).backCommunity : copy.back}</span>
       </Link>
 

@@ -129,12 +129,17 @@ it.each(["en", "ru"] as const)(
     expect(html).toMatch(/maxlength="5000"/iu);
   },
 );
-it("distinguishes initial read failure from an empty discussion", () => {
+it("distinguishes ErrorState read failure from EmptyState empty discussion", () => {
+  const copy = getDiscussionCopy("en");
   const failure = renderToStaticMarkup(
     <ContentDiscussion slug="article" contentId="content" locale="en" count={0} initial={null} />,
   );
   expect(failure).toContain('role="alert"');
-  expect(failure).not.toContain(getDiscussionCopy("en").first);
+  expect(failure).toContain(copy.unavailable);
+  expect(failure).toContain(copy.unavailableDescription);
+  expect(failure).toContain(copy.retry);
+  expect(failure).toContain("overflow-x-clip");
+  expect(failure).not.toContain(copy.first);
   const empty = renderToStaticMarkup(
     <ContentDiscussion
       slug="article"
@@ -144,5 +149,8 @@ it("distinguishes initial read failure from an empty discussion", () => {
       initial={{ items: [], hasMore: false, nextCursor: null }}
     />,
   );
-  expect(empty).toContain(getDiscussionCopy("en").first);
+  expect(empty).toContain(copy.first);
+  expect(empty).toContain(copy.firstDescription);
+  expect(empty).toContain("overflow-x-clip");
+  expect(empty).not.toContain('role="alert"');
 });

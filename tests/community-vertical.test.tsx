@@ -50,6 +50,7 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   },
 }));
 
+import NewCommunityTopicPage from "../apps/web/src/app/community/new/page";
 import CommunityPage from "../apps/web/src/app/community/page";
 import { CommunityTopicForm } from "../apps/web/src/components/community-topic-form";
 import { Sidebar } from "../apps/web/src/components/sidebar";
@@ -183,5 +184,18 @@ describe("community topic submission behavior", () => {
     expect(form).toContain('option value="question"');
     expect(form).toContain('option value="post"');
     expect(form).not.toContain('name="status"');
+    expect(form).toContain("min-w-0");
+    expect(form).toContain("overflow-x-clip");
+    expect(form).toContain("min-h-11");
+  });
+
+  it("clips the community topic create shell with a touch-sized back link", async () => {
+    const copy = getDictionary("en").community;
+    const html = renderToStaticMarkup(await NewCommunityTopicPage());
+    expect(html).toContain("min-w-0 max-w-3xl space-y-6 overflow-x-clip");
+    expect(html).toContain(copy.startTitle);
+    expect(html).toContain(copy.backToCommunity);
+    expect(html).toContain('href="/community"');
+    expect(html).toContain("min-h-11");
   });
 });
