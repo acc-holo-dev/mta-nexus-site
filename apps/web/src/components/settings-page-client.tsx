@@ -32,6 +32,37 @@ type Notice = {
   error: boolean;
 };
 
+type SessionSnapshot = { actorId: string; sessions: SettingsSession[] };
+
+function isRecoveryEmail(value: unknown): value is SettingsRecoveryEmail {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const data = value as Record<string, unknown>;
+  return (
+    typeof data.actorId === "string" &&
+    data.actorId.length > 0 &&
+    data.actorId.length <= 128 &&
+    data.actorId.trim() === data.actorId &&
+    typeof data.email === "string" &&
+    typeof data.verified === "boolean" &&
+    (data.verifiedAt === null || typeof data.verifiedAt === "string") &&
+    typeof data.eligible === "boolean"
+  );
+}
+
+function parseSessionSnapshot(value: unknown): SessionSnapshot | null {
+  if (!value || typeof value !== "object") return null;
+  const data = value as Record<string, unknown>;
+  if (
+    typeof data.actorId !== "string" ||
+    !data.actorId ||
+    data.actorId.length > 128 ||
+    data.actorId.trim() !== data.actorId ||
+    !Array.isArray(data.sessions)
+  )
+    return null;
+  return { actorId: data.actorId, sessions: data.sessions };
+}
+
 const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-8 overflow-x-clip";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -43,7 +74,7 @@ export function SettingsPageClient() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
-  const [sessions, setSessions] = useState<SettingsSession[] | null>(null);
+  const [sessionSnapshot, setSessionSnapshot] = useState<SessionSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [signedOut, setSignedOut] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -57,6 +88,7 @@ export function SettingsPageClient() {
   });
   const [recoveryEmail, setRecoveryEmail] = useState<SettingsRecoveryEmail | null>(null);
   const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [preferenceActorId, setPreferenceActorId] = useState<string | null>(null);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const preferenceLabels = useMemo(
@@ -112,14 +144,14 @@ export function SettingsPageClient() {
     setNotice(null);
 
     Promise.all([
-      settingsClientRequest<{ preferences: NotificationPreferences }>(
+      settingsClientRequest<{ actorId: string; preferences: NotificationPreferences }>(
         "/api/notifications/preferences",
         "GET",
         undefined,
         copy.backendUnavailable,
         copy.unreadableResponse,
       ),
-      settingsClientRequest<{ sessions: SettingsSession[] }>(
+      settingsClientRequest<unknown>(
         "/api/auth/sessions",
         "GET",
         undefined,
@@ -137,18 +169,24 @@ export function SettingsPageClient() {
       .then(([preferenceData, sessionData, recovery]) => {
         if (!active) return;
         const confirmedPreferences = parseNotificationPreferences(preferenceData.preferences);
+        const confirmedSessions = parseSessionSnapshot(sessionData);
         if (
           !confirmedPreferences ||
-          !Array.isArray(sessionData.sessions) ||
-          typeof recovery.email !== "string" ||
-          typeof recovery.verified !== "boolean" ||
-          typeof recovery.eligible !== "boolean"
+          typeof preferenceData.actorId !== "string" ||
+          preferenceData.actorId.length === 0 ||
+          preferenceData.actorId.length > 128 ||
+          preferenceData.actorId.trim() !== preferenceData.actorId ||
+          !confirmedSessions ||
+          preferenceData.actorId !== confirmedSessions.actorId ||
+          !isRecoveryEmail(recovery) ||
+          recovery.actorId !== preferenceData.actorId
         ) {
           throw new Error(copy.invalidResponse);
         }
 
         setPreferences(confirmedPreferences);
-        setSessions(sessionData.sessions);
+        setPreferenceActorId(preferenceData.actorId);
+        setSessionSnapshot(confirmedSessions);
         setRecoveryEmail(recovery);
         setSignedOut(false);
       })
@@ -156,7 +194,8 @@ export function SettingsPageClient() {
         if (!active) return;
 
         setPreferences(null);
-        setSessions(null);
+        setPreferenceActorId(null);
+        setSessionSnapshot(null);
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
         setRecoveryPassword("");
@@ -198,8 +237,9 @@ export function SettingsPageClient() {
         error.message === "Authentication required"
       ) {
         setSignedOut(true);
-        setSessions(null);
+        setSessionSnapshot(null);
         setPreferences(null);
+        setPreferenceActorId(null);
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
         setRecoveryPassword("");
@@ -218,13 +258,14 @@ export function SettingsPageClient() {
   async function refreshAfterSuccess(text: string) {
     setNotice({ text, error: false });
     try {
-      const data = await requestSettings<{ sessions: SettingsSession[] }>("/api/auth/sessions");
-      if (!Array.isArray(data.sessions)) {
+      const data = await requestSettings<unknown>("/api/auth/sessions");
+      const confirmedSessions = parseSessionSnapshot(data);
+      if (!confirmedSessions) {
         throw new Error(copy.invalidSessionResponse);
       }
-      setSessions(data.sessions);
+      setSessionSnapshot(confirmedSessions);
     } catch {
-      setSessions(null);
+      setSessionSnapshot(null);
       setNotice({
         text: `${text} ${copy.sessionRefreshFailed}`,
         error: true,
@@ -234,14 +275,31 @@ export function SettingsPageClient() {
 
   function requestRecoveryEmail(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!recoveryEmail) return;
+    const expectedActorId = recoveryEmail.actorId;
     void perform(async () => {
-      const data = await requestSettings<{
-        accepted: boolean;
-        alreadyVerified: boolean;
-        expiresAt?: string;
-      }>("/api/auth/email-verification", "POST", {
-        currentPassword: recoveryPassword,
-      });
+      const invalidateRecoveryAccount = () => {
+        setRecoveryEmail(null);
+        setPreferences(null);
+        setPreferenceActorId(null);
+        setSessionSnapshot(null);
+        setPassword({ currentPassword: "", newPassword: "" });
+        setRecoveryPassword("");
+        setLoadError(true);
+      };
+      let data: { accepted: boolean; alreadyVerified: boolean; expiresAt?: string };
+      try {
+        data = await requestSettings("/api/auth/email-verification", "POST", {
+          currentPassword: recoveryPassword,
+          expectedActorId,
+        });
+      } catch (error) {
+        if (error instanceof SettingsRequestError && error.status === 409) {
+          invalidateRecoveryAccount();
+          throw new SettingsRequestError(copy.recoveryAccountChanged, 409);
+        }
+        throw error;
+      }
 
       setRecoveryPassword("");
 
@@ -249,6 +307,14 @@ export function SettingsPageClient() {
         const refreshed = await requestSettings<SettingsRecoveryEmail>(
           "/api/auth/email-verification",
         );
+        if (
+          !isRecoveryEmail(refreshed) ||
+          !recoveryEmail ||
+          refreshed.actorId !== recoveryEmail.actorId
+        ) {
+          invalidateRecoveryAccount();
+          throw new SettingsRequestError(copy.recoveryAccountChanged, 409);
+        }
         setRecoveryEmail(refreshed);
         setNotice({
           text: copy.recoveryAlreadyVerified,
@@ -300,6 +366,8 @@ export function SettingsPageClient() {
   }
 
   async function revokeSession(sessionId: string, sessionLabel: string) {
+    if (!sessionSnapshot) return;
+    const expectedActorId = sessionSnapshot.actorId;
     if (
       !(await confirmAction({
         title: copy.endSessionConfirmTitle,
@@ -317,7 +385,7 @@ export function SettingsPageClient() {
         success: boolean;
         scope: string;
         sessionId: string;
-      }>("/api/auth/sessions", "DELETE", { sessionId });
+      }>("/api/auth/sessions", "DELETE", { sessionId, expectedActorId });
       if (data.success !== true || data.scope !== "single" || data.sessionId !== sessionId) {
         throw new SettingsRequestError(copy.unconfirmedSessionRevocation, 502);
       }
@@ -326,6 +394,8 @@ export function SettingsPageClient() {
   }
 
   async function revokeOthers() {
+    if (!sessionSnapshot) return;
+    const expectedActorId = sessionSnapshot.actorId;
     if (
       !(await confirmAction({
         title: copy.endOtherSessionsConfirmTitle,
@@ -343,7 +413,7 @@ export function SettingsPageClient() {
         success: boolean;
         scope: string;
         revokedCount: number;
-      }>("/api/auth/sessions", "DELETE", { allOther: true });
+      }>("/api/auth/sessions", "DELETE", { allOther: true, expectedActorId });
 
       if (
         data.success !== true ||
@@ -361,16 +431,27 @@ export function SettingsPageClient() {
   }
 
   function updatePreference(key: keyof NotificationPreferences, value: boolean) {
+    if (!preferenceActorId) return;
     void perform(async () => {
-      const data = await requestSettings<{
-        success: boolean;
-        preferences: NotificationPreferences;
-      }>("/api/notifications/preferences", "PATCH", {
-        [key]: value,
-      });
+      let data: { success: boolean; actorId: string; preferences: NotificationPreferences };
+      try {
+        data = await requestSettings("/api/notifications/preferences", "PATCH", {
+          expectedActorId: preferenceActorId,
+          [key]: value,
+        });
+      } catch (error) {
+        if (error instanceof SettingsRequestError && error.status === 409) {
+          setPreferences(null);
+          setPreferenceActorId(null);
+          throw new SettingsRequestError(copy.preferenceAccountChanged, 409);
+        }
+        throw error;
+      }
 
       const confirmedPreferences = confirmedNotificationPreferences(data);
-      if (!confirmedPreferences) {
+      if (!confirmedPreferences || data.actorId !== preferenceActorId) {
+        setPreferences(null);
+        setPreferenceActorId(null);
         throw new SettingsRequestError(copy.requestUnconfirmed, 502);
       }
 
@@ -512,7 +593,7 @@ export function SettingsPageClient() {
 
       <SettingsActiveSessions
         copy={copy}
-        sessions={sessions}
+        sessions={sessionSnapshot?.sessions ?? null}
         pending={pending}
         dateLocale={dateLocale}
         onReload={() => setRevision((current) => current + 1)}

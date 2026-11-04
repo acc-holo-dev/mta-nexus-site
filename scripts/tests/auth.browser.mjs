@@ -410,12 +410,18 @@ check(
         await request(alice, "/api/auth/sessions", "DELETE", {
           sessionId: foreignId,
           userId: bobUser.id,
+          expectedActorId: aliceUser.id,
         })
       ).status,
       400,
     );
     assert.equal(
-      (await request(alice, "/api/auth/sessions", "DELETE", { sessionId: foreignId })).status,
+      (
+        await request(alice, "/api/auth/sessions", "DELETE", {
+          sessionId: foreignId,
+          expectedActorId: aliceUser.id,
+        })
+      ).status,
       404,
     );
     assert(

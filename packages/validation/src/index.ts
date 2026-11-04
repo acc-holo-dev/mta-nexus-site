@@ -1,23 +1,26 @@
 import {
+  isValidMtaAddress,
+  normalizeMtaAddress,
+  normalizeResourceVersionForStorage,
   PRODUCT_TYPES,
   RESOURCE_VERSION_PATTERN,
   SUPPORT_CASE_CATEGORIES,
   SUPPORT_CASE_STATUSES,
-  normalizeMtaAddress,
-  normalizeResourceVersionForStorage,
-  isValidMtaAddress,
 } from "@nexus/domain";
 import { z } from "zod";
+
 export * from "./commercial-plans";
 export * from "./resource-release-control";
 export * from "./resource-release-watches";
+
 import { mtaVersionSchema } from "./mta-version";
 import { resourceCompatibilitySchema } from "./resource-management";
-export * from "./mta-version";
-export * from "./resource-management";
-export * from "./resource-commerce";
-export * from "./license-control";
+
 export * from "./library-collections";
+export * from "./license-control";
+export * from "./mta-version";
+export * from "./resource-commerce";
+export * from "./resource-management";
 
 /** New resource release version: SemVer-like; optional leading `v` stripped for storage/uniqueness. */
 export const resourceVersionSchema = z
@@ -89,6 +92,11 @@ export const changePasswordSchema = z
 export const requestRecoveryEmailVerificationSchema = z
   .object({
     currentPassword: z.string().min(1, "Current password is required").max(128),
+    expectedActorId: z
+      .string()
+      .min(1)
+      .max(128)
+      .refine((value) => value.trim() === value),
   })
   .strict();
 
@@ -452,13 +460,13 @@ export const resourceCopyCommandSchema = z
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
   })
   .strict();
-export * from "./resource-reviews";
-export * from "./resource-qa";
-export * from "./server-reviews";
-export * from "./resource-build-workspace";
-export * from "./order-cases";
-export * from "./resource-media";
-export * from "./plan-reviews";
-export * from "./subscriptions";
 
 export * from "./library-selection-batches";
+export * from "./order-cases";
+export * from "./plan-reviews";
+export * from "./resource-build-workspace";
+export * from "./resource-media";
+export * from "./resource-qa";
+export * from "./resource-reviews";
+export * from "./server-reviews";
+export * from "./subscriptions";

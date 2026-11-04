@@ -157,6 +157,7 @@ describe("notification API request correlation", () => {
     const read = await preferencesGET(request("/api/notifications/preferences"));
     expect(read.status).toBe(200);
     expectPrivateCorrelation(read);
+    expect(await read.json()).toMatchObject({ actorId: "usr_notifications" });
 
     const invalid = await preferencesPATCH(
       request("/api/notifications/preferences", "PATCH", { follow: "yes" }),
@@ -166,6 +167,7 @@ describe("notification API request correlation", () => {
 
     const updated = await preferencesPATCH(
       request("/api/notifications/preferences", "PATCH", {
+        expectedActorId: "usr_notifications",
         followsEnabled: true,
         contentEnabled: true,
         serverEnabled: true,
@@ -174,6 +176,27 @@ describe("notification API request correlation", () => {
     );
     expect(updated.status).toBe(200);
     expectPrivateCorrelation(updated);
+    expect(await updated.json()).toMatchObject({ actorId: "usr_notifications" });
+    expect(notificationRepository.updatePreferences).toHaveBeenCalledWith("usr_notifications", {
+      followsEnabled: true,
+      contentEnabled: true,
+      serverEnabled: true,
+      systemEnabled: true,
+    });
+  });
+
+  it("rejects stale or absent preference account identity without updating another account", async () => {
+    for (const payload of [
+      { expectedActorId: "usr_previous", followsEnabled: false },
+      { followsEnabled: false },
+    ]) {
+      const response = await preferencesPATCH(
+        request("/api/notifications/preferences", "PATCH", payload),
+      );
+      expect(response.status).toBe("expectedActorId" in payload ? 409 : 400);
+      expectPrivateCorrelation(response);
+    }
+    expect(notificationRepository.updatePreferences).not.toHaveBeenCalled();
   });
 
   it("rejects non-JSON and oversized preference updates without saving", async () => {

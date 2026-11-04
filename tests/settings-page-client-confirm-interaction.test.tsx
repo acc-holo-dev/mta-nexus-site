@@ -5,6 +5,7 @@ const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
   cleanups: [] as Array<undefined | (() => void)>,
+  effect: null as null | (() => undefined | (() => void)),
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
@@ -30,8 +31,9 @@ vi.mock("react", async (original) => ({
     return harness.slots[index];
   },
   useMemo: (factory: () => unknown) => factory(),
-  useEffect: () => {
-    // Loaded settings state is seeded below; skip the network bootstrap for confirm coverage.
+  useEffect: (effect: () => undefined | (() => void)) => {
+    // Individual bootstrap tests invoke the effect explicitly.
+    harness.effect = effect;
   },
 }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/settings" }));
@@ -97,7 +99,7 @@ const otherSession = {
 function seedLoadedSettings() {
   harness.slots = [
     preferences,
-    [otherSession],
+    { actorId: "usr_owner", sessions: [otherSession] },
     false,
     false,
     false,
@@ -107,12 +109,14 @@ function seedLoadedSettings() {
     { current: false },
     { currentPassword: "current-pass", newPassword: "replacement-pass" },
     {
+      actorId: "usr_owner",
       email: "member@example.com",
       verified: true,
       verifiedAt: "2026-09-01T00:00:00.000Z",
       eligible: true,
     },
     "",
+    "usr_owner",
   ];
 }
 
@@ -128,10 +132,79 @@ beforeEach(() => {
   vi.clearAllMocks();
   harness.cursor = 0;
   harness.cleanups = [];
+  harness.effect = null;
   seedLoadedSettings();
   confirmAction.mockResolvedValue(true);
   harness.fetch.mockReset();
   vi.stubGlobal("fetch", harness.fetch);
+});
+
+it("does not render recovery email from another account during settings load", async () => {
+  harness.fetch
+    .mockResolvedValueOnce(response({ actorId: "usr_owner", preferences }))
+    .mockResolvedValueOnce(response({ actorId: "usr_owner", sessions: [otherSession] }))
+    .mockResolvedValueOnce(
+      response({
+        actorId: "usr_other",
+        email: "other@example.com",
+        verified: true,
+        verifiedAt: null,
+        eligible: true,
+      }),
+    );
+  render();
+  if (!harness.effect) throw new Error("Missing settings loading effect");
+  harness.cleanups.push(harness.effect());
+  await vi.waitFor(() => expect(findNamed(render(), "ErrorState")).toBeDefined());
+  expect(render().some((node) => componentName(node.type) === "SettingsRecoveryEmailSection")).toBe(
+    false,
+  );
+});
+
+it("discards a recovery status fetched after an account switch", async () => {
+  harness.fetch
+    .mockResolvedValueOnce(response({ accepted: false, alreadyVerified: true }))
+    .mockResolvedValueOnce(
+      response({
+        actorId: "usr_other",
+        email: "other@example.com",
+        verified: true,
+        verifiedAt: null,
+        eligible: true,
+      }),
+    );
+  const section = findNamed(render(), "SettingsRecoveryEmailSection");
+  (section.props.onSubmit as (event: { preventDefault: () => void }) => void)({
+    preventDefault() {},
+  });
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalled());
+  expect(harness.fetch.mock.calls[0][1].body).toBe(
+    JSON.stringify({ currentPassword: "", expectedActorId: "usr_owner" }),
+  );
+  await vi.waitFor(() => expect(findNamed(render(), "ErrorState")).toBeDefined());
+  expect(render().some((node) => componentName(node.type) === "SettingsRecoveryEmailSection")).toBe(
+    false,
+  );
+  expect(findNamed(render(), "ErrorState").props.title).toBe(
+    getDictionary("en").settings.recoveryAccountChanged,
+  );
+});
+
+it("hides stale settings when recovery email request rejects a switched account", async () => {
+  harness.fetch.mockResolvedValueOnce(
+    response({ code: "ACTOR_CHANGED", error: "Account changed" }, 409),
+  );
+  const section = findNamed(render(), "SettingsRecoveryEmailSection");
+  (section.props.onSubmit as (event: { preventDefault: () => void }) => void)({
+    preventDefault() {},
+  });
+  await vi.waitFor(() => expect(findNamed(render(), "ErrorState")).toBeDefined());
+  expect(render().some((node) => componentName(node.type) === "SettingsRecoveryEmailSection")).toBe(
+    false,
+  );
+  expect(findNamed(render(), "ErrorState").props.title).toBe(
+    getDictionary("en").settings.recoveryAccountChanged,
+  );
 });
 
 afterEach(() => {
@@ -139,11 +212,58 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+it("binds preference changes to the account whose settings were loaded", async () => {
+  harness.fetch.mockResolvedValueOnce(
+    response({
+      success: true,
+      actorId: "usr_owner",
+      preferences: { ...preferences, followsEnabled: false },
+    }),
+  );
+  const section = findNamed(render(), "SettingsNotificationPreferencesSection");
+  (section.props.onPreferenceChange as (key: string, value: boolean) => void)(
+    "followsEnabled",
+    false,
+  );
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledOnce());
+  expect(harness.fetch).toHaveBeenCalledWith(
+    "/api/notifications/preferences",
+    expect.objectContaining({
+      method: "PATCH",
+      body: JSON.stringify({ expectedActorId: "usr_owner", followsEnabled: false }),
+    }),
+  );
+  await vi.waitFor(() =>
+    expect(
+      findNamed(render(), "SettingsNotificationPreferencesSection").props.preferences,
+    ).toMatchObject({ followsEnabled: false }),
+  );
+});
+
+it("disables preference edits and offers reload when the account changed", async () => {
+  harness.fetch.mockResolvedValueOnce(
+    response({ code: "ACTOR_CHANGED", error: "Account changed" }, 409),
+  );
+  const section = findNamed(render(), "SettingsNotificationPreferencesSection");
+  (section.props.onPreferenceChange as (key: string, value: boolean) => void)(
+    "followsEnabled",
+    false,
+  );
+  await vi.waitFor(() =>
+    expect(
+      findNamed(render(), "SettingsNotificationPreferencesSection").props.preferences,
+    ).toBeNull(),
+  );
+  expect(findNamed(render(), "ErrorState").props.title).toBe(
+    getDictionary("en").settings.preferenceAccountChanged,
+  );
+});
+
 it("confirms a password change before posting the update", async () => {
   const copy = getDictionary("en").settings;
   harness.fetch
     .mockResolvedValueOnce(response({ success: true, revokedSessionCount: 2 }))
-    .mockResolvedValueOnce(response({ sessions: [otherSession] }));
+    .mockResolvedValueOnce(response({ actorId: "usr_owner", sessions: [otherSession] }));
 
   const form = findNamed(render(), "SettingsPasswordForm");
   await (form.props.onSubmit as (event: { preventDefault: () => void }) => Promise<void>)({
@@ -185,7 +305,7 @@ it("confirms ending another session before DELETE", async () => {
   const copy = getDictionary("en").settings;
   harness.fetch
     .mockResolvedValueOnce(response({ success: true, scope: "single", sessionId: otherSession.id }))
-    .mockResolvedValueOnce(response({ sessions: [] }));
+    .mockResolvedValueOnce(response({ actorId: "usr_owner", sessions: [] }));
 
   const sessions = findNamed(render(), "SettingsActiveSessions");
   await (sessions.props.onRevokeSession as (sessionId: string, label: string) => Promise<void>)(
@@ -207,7 +327,7 @@ it("confirms ending another session before DELETE", async () => {
     "/api/auth/sessions",
     expect.objectContaining({
       method: "DELETE",
-      body: JSON.stringify({ sessionId: otherSession.id }),
+      body: JSON.stringify({ sessionId: otherSession.id, expectedActorId: "usr_owner" }),
     }),
   );
 });
@@ -226,7 +346,7 @@ it("confirms ending all other sessions before DELETE", async () => {
   const copy = getDictionary("en").settings;
   harness.fetch
     .mockResolvedValueOnce(response({ success: true, scope: "others", revokedCount: 1 }))
-    .mockResolvedValueOnce(response({ sessions: [] }));
+    .mockResolvedValueOnce(response({ actorId: "usr_owner", sessions: [] }));
 
   const sessions = findNamed(render(), "SettingsActiveSessions");
   await (sessions.props.onRevokeOthers as () => Promise<void>)();
@@ -245,7 +365,27 @@ it("confirms ending all other sessions before DELETE", async () => {
     "/api/auth/sessions",
     expect.objectContaining({
       method: "DELETE",
-      body: JSON.stringify({ allOther: true }),
+      body: JSON.stringify({ allOther: true, expectedActorId: "usr_owner" }),
+    }),
+  );
+});
+
+it("keeps the actor from the confirmed session list if the account changes during confirmation", async () => {
+  let confirm!: (value: boolean) => void;
+  confirmAction.mockReturnValueOnce(new Promise<boolean>((resolve) => (confirm = resolve)));
+  harness.fetch.mockResolvedValueOnce(response({ error: "Account changed" }, 409));
+  const sessions = findNamed(render(), "SettingsActiveSessions");
+  const pending = (sessions.props.onRevokeOthers as () => Promise<void>)();
+  harness.slots[1] = { actorId: "usr_other", sessions: [otherSession] };
+  render();
+  confirm(true);
+  await pending;
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledOnce());
+  expect(harness.fetch).toHaveBeenCalledWith(
+    "/api/auth/sessions",
+    expect.objectContaining({
+      method: "DELETE",
+      body: JSON.stringify({ allOther: true, expectedActorId: "usr_owner" }),
     }),
   );
 });

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     const preferences = await notificationRepository.getPreferences(user.id);
-    return json(context, { preferences });
+    return json(context, { actorId: user.id, preferences });
   } catch (error) {
     logRequestEvent({
       level: "error",
@@ -79,7 +79,26 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     }
 
     const body = await readBoundedJson(request, 4 * 1024);
-    const parsed = notificationPreferencesSchema.safeParse(body);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return json(context, { error: "Invalid notification preferences" }, 400);
+    }
+    const { expectedActorId, ...changes } = body as Record<string, unknown>;
+    if (
+      typeof expectedActorId !== "string" ||
+      expectedActorId.length === 0 ||
+      expectedActorId.length > 128 ||
+      expectedActorId.trim() !== expectedActorId
+    ) {
+      return json(context, { error: "Invalid notification preferences" }, 400);
+    }
+    if (expectedActorId !== user.id) {
+      return json(
+        context,
+        { error: "Account changed. Reload settings.", code: "ACTOR_CHANGED" },
+        409,
+      );
+    }
+    const parsed = notificationPreferencesSchema.safeParse(changes);
     if (!parsed.success) {
       return json(
         context,
@@ -94,6 +113,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     const preferences = await notificationRepository.updatePreferences(user.id, parsed.data);
     return json(context, {
       success: true,
+      actorId: user.id,
       preferences,
     });
   } catch (error: unknown) {

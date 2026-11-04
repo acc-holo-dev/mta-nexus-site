@@ -244,6 +244,8 @@ export const admin = {
     retry: "Try again",
     saving: "Saving account changes...",
     notificationPreferences: "Notification preferences",
+    preferenceAccountChanged:
+      "The signed-in account changed. Reload settings before editing notifications.",
     notificationDescription:
       "These switches control whether NEXUS creates inbox messages for each category. Turning a category off suppresses new inbox entries; it does not store a backlog for later delivery. Security messages stay on regardless of these switches. Per-publication mute/snooze on a discussion is separate from these category switches and never blocks security or account notices. Browser push for this device is separate below and does not change inbox or watch settings.",
     newFollowers: "Followers and followed discussions",
@@ -277,6 +279,8 @@ export const admin = {
     webPushError: "Web Push state could not be confirmed. Try checking again.",
     webPushLoading: "Checking browser push...",
     recoveryEmail: "Recovery email",
+    recoveryAccountChanged:
+      "The signed-in account changed. Reload settings before checking recovery email.",
     recoveryNotVerified: "Not verified for recovery yet.",
     recoveryUnavailable: "Recovery email verification is unavailable for this account.",
     recoveryPassword: "Current password for recovery email",

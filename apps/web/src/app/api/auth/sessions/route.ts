@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     const sessions = await authService.listSessions(user.id);
 
     return json(context, {
+      actorId: user.id,
       sessions: sessions.map((session) => ({
         ...session,
         isCurrent: session.id === currentSessionId,
@@ -90,6 +91,10 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
         },
         400,
       );
+    }
+
+    if (command.expectedActorId !== user.id) {
+      return json(context, { error: "Account changed. Reload settings and try again." }, 409);
     }
 
     if (command.scope === "others") {

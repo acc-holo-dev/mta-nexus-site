@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const status = await authService.getRecoveryEmailStatus(current.user.id);
     if (!status) return json({ error: "Authentication required" }, 401);
     return json({
+      actorId: current.user.id,
       email: status.email,
       verified: status.verified,
       verifiedAt: status.verifiedAt,
@@ -50,6 +51,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         { error: "Email verification validation failed", details: parsed.error.format() },
         400,
       );
+    }
+    if (parsed.data.expectedActorId !== current.user.id) {
+      return json({ error: "Account changed. Reload settings.", code: "ACTOR_CHANGED" }, 409);
     }
     const result = await authService.requestRecoveryEmailVerification({
       userId: current.user.id,

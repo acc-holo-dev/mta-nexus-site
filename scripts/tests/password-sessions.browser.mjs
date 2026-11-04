@@ -295,12 +295,22 @@ check("P5 old password fails and new password signs in on another browser", asyn
 check("P6 selected session is ended in UI and its cookie no longer authorizes", async () => {
   const target = (await list(guest)).data.sessions.find((s) => s.isCurrent).id;
   assert.equal(
-    (await request(bob, "/api/auth/sessions", "DELETE", { sessionId: target, userId: aliceId }))
-      .status,
+    (
+      await request(bob, "/api/auth/sessions", "DELETE", {
+        sessionId: target,
+        userId: aliceId,
+        expectedActorId: bobId,
+      })
+    ).status,
     400,
   );
   assert.equal(
-    (await request(bob, "/api/auth/sessions", "DELETE", { sessionId: target })).status,
+    (
+      await request(bob, "/api/auth/sessions", "DELETE", {
+        sessionId: target,
+        expectedActorId: bobId,
+      })
+    ).status,
     404,
   );
   assert.equal((await session(guest)).data.user.id, aliceId);
@@ -351,16 +361,31 @@ check(
   async () => {
     const current = (await list(alice)).data.sessions.find((s) => s.isCurrent).id;
     assert.equal(
-      (await request(alice, "/api/auth/sessions", "DELETE", { sessionId: current })).status,
+      (
+        await request(alice, "/api/auth/sessions", "DELETE", {
+          sessionId: current,
+          expectedActorId: aliceId,
+        })
+      ).status,
       409,
     );
     assert.equal(
-      (await request(bob, "/api/auth/sessions", "DELETE", { sessionId: current, userId: aliceId }))
-        .status,
+      (
+        await request(bob, "/api/auth/sessions", "DELETE", {
+          sessionId: current,
+          userId: aliceId,
+          expectedActorId: bobId,
+        })
+      ).status,
       400,
     );
     assert.equal(
-      (await request(bob, "/api/auth/sessions", "DELETE", { sessionId: current })).status,
+      (
+        await request(bob, "/api/auth/sessions", "DELETE", {
+          sessionId: current,
+          expectedActorId: bobId,
+        })
+      ).status,
       404,
     );
     assert.equal(

@@ -8,6 +8,7 @@ export type SettingsSession = {
 };
 
 export type SettingsRecoveryEmail = {
+  actorId: string;
   email: string;
   verified: boolean;
   verifiedAt: string | null;

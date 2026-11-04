@@ -85,6 +85,7 @@ describe("session listing HTTP contract", () => {
     expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
 
     const body = await response.json();
+    expect(body.actorId).toBe("usr_owner");
     expect(body.sessions).toEqual([
       {
         id: "ses_current",
@@ -137,11 +138,19 @@ describe("session revocation command matrix", () => {
     null,
     [],
     {},
+    { allOther: true },
+    { sessionId: "ses_other" },
+    { allOther: true, expectedActorId: "" },
+    { allOther: true, expectedActorId: " usr_owner" },
+    { allOther: true, expectedActorId: "u".repeat(129) },
+    { allOther: true, expectedActorId: "usr_owner", extra: true },
     { allOther: false },
     { allOther: true, sessionId: "ses_other" },
     { sessionId: "" },
     { sessionId: " ".repeat(4) },
     { sessionId: "s".repeat(129) },
+    { sessionId: "s".repeat(129), expectedActorId: "usr_owner" },
+    { sessionId: " ", expectedActorId: "usr_owner" },
     { sessionId: 42 },
     { sessionId: "ses_other", extra: true },
     JSON.parse('{"__proto__":{}}'),
@@ -156,7 +165,9 @@ describe("session revocation command matrix", () => {
   });
 
   it("returns the exact owned session ID after single revocation", async () => {
-    const response = await DELETE(request({ sessionId: "ses_other" }));
+    const response = await DELETE(
+      request({ sessionId: "ses_other", expectedActorId: "usr_owner" }),
+    );
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       success: true,
@@ -168,20 +179,24 @@ describe("session revocation command matrix", () => {
   });
 
   it("blocks current and unowned sessions", async () => {
-    const current = await DELETE(request({ sessionId: "ses_current" }));
+    const current = await DELETE(
+      request({ sessionId: "ses_current", expectedActorId: "usr_owner" }),
+    );
     expect(current.status).toBe(409);
     expect(revokeSession).not.toHaveBeenCalled();
     expect(authService.getSessionIdentity).toHaveBeenCalledOnce();
     expect(authService.getCurrentSessionId).not.toHaveBeenCalled();
 
     state.owned = false;
-    const unowned = await DELETE(request({ sessionId: "ses_foreign" }));
+    const unowned = await DELETE(
+      request({ sessionId: "ses_foreign", expectedActorId: "usr_owner" }),
+    );
     expect(unowned.status).toBe(404);
     expect(revokeOthers).not.toHaveBeenCalled();
   });
 
   it("revokes only other sessions when requested explicitly", async () => {
-    const response = await DELETE(request({ allOther: true }));
+    const response = await DELETE(request({ allOther: true, expectedActorId: "usr_owner" }));
     expect(await response.json()).toEqual({
       success: true,
       scope: "others",
@@ -190,6 +205,20 @@ describe("session revocation command matrix", () => {
     expect(revokeOthers).toHaveBeenCalledWith("usr_owner", "token_owner");
     expect(revokeSession).not.toHaveBeenCalled();
   });
+
+  it.each([{ allOther: true }, { sessionId: "ses_other" }])(
+    "rejects %j after the authenticated account changes",
+    async (action) => {
+      const listed = await GET(listRequest());
+      expect((await listed.json()).actorId).toBe("usr_owner");
+      state.user = { id: "usr_other" };
+      const response = await DELETE(request({ ...action, expectedActorId: "usr_owner" }));
+      expect(response.status).toBe(409);
+      expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+      expect(revokeSession).not.toHaveBeenCalled();
+      expect(revokeOthers).not.toHaveBeenCalled();
+    },
+  );
 
   it("does not revoke when unauthenticated or rate limited", async () => {
     state.user = null;
