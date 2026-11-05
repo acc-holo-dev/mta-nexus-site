@@ -1,6 +1,6 @@
 "use client";
 import { CONTENT_REACTION_EMOJI, CONTENT_REACTIONS, type ContentReaction } from "@nexus/domain";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -213,14 +213,12 @@ export function ContentReactions({
           {copy.my}
         </Link>
       )}
-      {message && (
-        <p
-          role={blocked ? "alert" : "status"}
-          className={`text-xs ${blocked ? "text-danger" : "text-success"}`}
-        >
+      {message && blocked ? <ErrorState title={message} /> : null}
+      {message && !blocked ? (
+        <p role="status" className="text-xs text-success">
           {message}
         </p>
-      )}
+      ) : null}
       <p className="text-xs text-muted">{copy.scope}</p>
     </section>
   );

@@ -119,11 +119,14 @@ it("shows sign-in for guests and disables votes for an author while allowing old
   expect(own.match(/disabled=""/gu)).toHaveLength(3);
   expect(own).toContain(reactionCopy("ru").remove);
 });
-it("keeps writes disabled with an explicit error when saved state cannot load", () => {
+it("keeps writes disabled with an explicit ErrorState when saved state cannot load", () => {
   const html = renderToStaticMarkup(
     <ContentReactions slug="guide" contentId="content" initial={null} locale="en" />,
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain("bg-danger-soft");
+  expect(html).toContain(reactionCopy("en").unavailable);
+  expect(html).not.toContain('<p role="alert"');
   expect(html.match(/disabled=""/gu)).toHaveLength(3);
   expect(html).not.toContain('aria-pressed="true"');
 });
