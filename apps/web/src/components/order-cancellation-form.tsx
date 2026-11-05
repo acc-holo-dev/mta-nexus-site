@@ -193,13 +193,16 @@ export function OrderCancellationForm({
   return (
     <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <h2 className="text-xl font-semibold text-primary">{copy.cancel}</h2>
-      {ready === scope && retry && (
-        <p role="note">
-          {locale === "ru"
-            ? "Результат предыдущего запроса не подтверждён. Повторите только сохранённый запрос."
-            : "The previous request was not confirmed. Retry only the saved request."}
-        </p>
-      )}
+      {ready === scope && retry ? (
+        <ErrorState
+          id="order-cancellation-unconfirmed"
+          title={
+            locale === "ru"
+              ? "Результат предыдущего запроса не подтверждён. Повторите только сохранённый запрос."
+              : "The previous request was not confirmed. Retry only the saved request."
+          }
+        />
+      ) : null}
       <fieldset disabled={busy || retry || saved || ready !== scope} className="space-y-4">
         <label htmlFor={`${field}-reason`} className="block space-y-2">
           <span className="text-sm">{copy.reason}</span>
