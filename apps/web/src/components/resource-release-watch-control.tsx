@@ -187,16 +187,8 @@ export function ResourceReleaseWatchControl({
           <p className="text-xs text-muted">{copy.limit}</p>
         </>
       ) : null}
-      {!commerceEnabled ? (
-        <p role="note" className="text-sm text-warning">
-          {copy.suppressed}
-        </p>
-      ) : null}
-      {disabledReason ? (
-        <p role="note" className="text-sm text-warning">
-          {disabledReason}
-        </p>
-      ) : null}
+      {!commerceEnabled ? <ErrorState title={copy.suppressed} /> : null}
+      {disabledReason ? <ErrorState title={disabledReason} /> : null}
       {!hasAccess && acquireHref ? (
         <Link
           href={acquireHref}
