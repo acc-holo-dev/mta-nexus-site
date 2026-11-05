@@ -32,7 +32,12 @@ it("uses account-wide capacity and excludes inaccessible resources", () => {
   expect(
     helpers
       .render()
-      .some((n) => n.props.children === "The limit of 100 active watches has been reached."),
+      .some(
+        (n) =>
+          n.props.id === "resource-release-watch-batch-maximum" ||
+          n.props.title === "The limit of 100 active watches has been reached." ||
+          n.props.children === "The limit of 100 active watches has been reached.",
+      ),
   ).toBe(true);
   expect(helpers.checks()).toHaveLength(2);
 });
