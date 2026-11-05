@@ -108,11 +108,11 @@ export function ServerConnectControls({
       ) : null}
       {copyMessage === copy.copyUnavailable ? (
         <ErrorState id="server-connect-copy-unavailable" title={copy.copyUnavailable} />
-      ) : copyMessage ? (
+      ) : (
         <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
           {copyMessage}
         </p>
-      ) : null}
+      )}
     </div>
   );
 }
