@@ -41,7 +41,7 @@ export function OwnDiscussionDetail({
       {!comment.available ? (
         <ErrorState id="own-discussion-publication-unavailable" title={copy.hiddenNote} />
       ) : null}
-      {!comment.editable && <p className="text-sm text-muted">{copy.readOnly}</p>}
+      {!comment.editable && <ErrorState id="own-discussion-readonly" title={copy.readOnly} />}
       <time dateTime={comment.createdAt} className="text-xs text-muted">
         {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
           timeZone: "UTC",
