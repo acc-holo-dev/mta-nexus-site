@@ -117,6 +117,8 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   const detail = renderToStaticMarkup(
     <CommunityReportDetailView id="report" initial={{ ...row, target: null }} locale="en" />,
   );
+  expect(detail).toContain('role="alert"');
+  expect(detail).toContain('id="community-report-target-missing"');
   expect(detail).toContain(communityReportCopy("en").missing);
   expect(detail).not.toContain(communityReportCopy("en").remove_comment);
   const detailFailure = renderToStaticMarkup(
