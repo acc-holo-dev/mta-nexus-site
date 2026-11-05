@@ -89,6 +89,7 @@ export default async function VerificationPage({
       </header>
       <VerificationWorkspace
         key={`${actor.id}:${JSON.stringify(filters)}:${JSON.stringify(teamFilters)}`}
+        actorId={actor.id}
         initial={initial}
         initialTeams={initialTeams}
         filters={filters}

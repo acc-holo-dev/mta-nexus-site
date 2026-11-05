@@ -58,6 +58,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
       ...browserMutationHeaders(),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
+      "x-nexus-actor-id": "actor",
       ...headers,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -221,4 +222,18 @@ it("rate-limits every read/write before service work", async () => {
     mocks.decide,
   ])
     expect(fn).not.toHaveBeenCalled();
+});
+it("rejects writes and bound reads from a different displayed actor", async () => {
+  const other = { "x-nexus-actor-id": "other" };
+  expect((await POST(request("POST", application, "", other))).status).toBe(409);
+  expect((await overview(request("GET", undefined, "", other))).status).toBe(409);
+  expect((await targets(request("GET", undefined, "", other))).status).toBe(409);
+  expect(mocks.apply).not.toHaveBeenCalled();
+  expect(mocks.overview).not.toHaveBeenCalled();
+  expect(mocks.targets).not.toHaveBeenCalled();
+});
+it("requires the displayed actor precondition for verification submission", async () => {
+  const response = await POST(request("POST", application, "", { "x-nexus-actor-id": "" }));
+  expect(response.status).toBe(428);
+  expect(mocks.apply).not.toHaveBeenCalled();
 });

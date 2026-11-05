@@ -1,29 +1,55 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
   auditEvents,
+  licenseRuntimeBindings as bindings,
   builds,
+  resourceCartRepository as cart,
+  licenseControlsRepository as controls,
   db,
   entitlements,
-  licenseControlsRepository as controls,
-  licenseRuntimeBindings as bindings,
   licenses,
   products,
   resourceAcquisitionEvents,
   resourceCartAcquisitions,
   resourceCartItems,
-  resourceCartRepository as cart,
   serverRepository,
+  servers,
   sessionRepository,
   sessions,
   userRepository,
   users,
 } from "@nexus/db";
-import { and, asc, eq, sql } from "drizzle-orm";
-import { expect, it } from "vitest";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
 
 const id = (prefix: string) => `${prefix}_${randomUUID().replaceAll("-", "")}`;
+const fixtureUsers: string[] = [];
+const fixtureProducts: string[] = [];
+const fixtureServers: string[] = [];
+const fixtureLicenses: string[] = [];
+
+afterEach(async () => {
+  if (fixtureUsers.length) {
+    await db.delete(auditEvents).where(inArray(auditEvents.actorId, fixtureUsers));
+    await db.delete(entitlements).where(inArray(entitlements.subjectId, fixtureUsers));
+  }
+  // Bindings cascade with their parent license; their guard disallows deleting them first.
+  if (fixtureLicenses.length)
+    await db.delete(licenses).where(inArray(licenses.id, fixtureLicenses));
+  if (fixtureProducts.length)
+    await db.delete(products).where(inArray(products.id, fixtureProducts));
+  if (fixtureServers.length) await db.delete(servers).where(inArray(servers.id, fixtureServers));
+  // Sessions, cart receipts and acquisition events cascade with the account.
+  if (fixtureUsers.length) await db.delete(users).where(inArray(users.id, fixtureUsers));
+  fixtureUsers.length = 0;
+  fixtureProducts.length = 0;
+  fixtureServers.length = 0;
+  fixtureLicenses.length = 0;
+});
+
 async function account(role: "user" | "moderator" = "moderator") {
   const userId = id("usr_license_session");
+  fixtureUsers.push(userId);
   const token = id("token");
   const sessionId = id("ses");
   await userRepository.create({
@@ -54,6 +80,9 @@ async function fixture() {
   const productId = id("prd_z_license");
   const serverId = id("srv_license");
   const licenseId = id("lic_session");
+  fixtureProducts.push(productId);
+  fixtureServers.push(serverId);
+  fixtureLicenses.push(licenseId);
   const expiresAt = new Date(Date.now() + 86400000);
   await db.insert(products).values({
     id: productId,
@@ -307,6 +336,7 @@ for (const scenario of ["owner", "moderator", "revoked"] as const) {
   it(`completes a two-resource cart competing with a ${scenario} license command using the same session`, async () => {
     const f = await fixture();
     const firstId = id("prd_a_cart");
+    fixtureProducts.push(firstId);
     await db.insert(products).values({
       id: firstId,
       authorId: f.userId,

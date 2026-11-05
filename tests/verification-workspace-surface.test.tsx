@@ -74,6 +74,7 @@ it.each(["ru", "en"] as const)(
   (locale) => {
     const html = renderToStaticMarkup(
       <VerificationWorkspace
+        actorId="actor"
         initial={overview}
         initialTeams={{
           items: [{ id: "org", name: "Team", slug: "team", verified: false, pending: true }],
@@ -101,6 +102,7 @@ it("offers clear organization search when managed teams are empty", () => {
   const copy = verificationCopy("en");
   const html = renderToStaticMarkup(
     <VerificationWorkspace
+      actorId="actor"
       initial={overview}
       initialTeams={{ items: [], page: 1, hasMore: false }}
       filters={filters}
@@ -124,6 +126,7 @@ it("offers a clear filter or alternate view when history is empty", () => {
   };
   const filtered = renderToStaticMarkup(
     <VerificationWorkspace
+      actorId="actor"
       initial={emptyOverview}
       initialTeams={{ items: [], page: 1, hasMore: false }}
       filters={filters}
@@ -139,6 +142,7 @@ it("offers a clear filter or alternate view when history is empty", () => {
   );
   const alternate = renderToStaticMarkup(
     <VerificationWorkspace
+      actorId="actor"
       initial={emptyOverview}
       initialTeams={{ items: [], page: 1, hasMore: false }}
       filters={{ page: 1, view: "pending", type: undefined, query: "" }}
@@ -155,6 +159,7 @@ it("shows errors without presenting a failed read as empty history or editable d
   const copy = verificationCopy("en");
   const html = renderToStaticMarkup(
     <VerificationWorkspace
+      actorId="actor"
       initial={null}
       initialTeams={null}
       filters={filters}

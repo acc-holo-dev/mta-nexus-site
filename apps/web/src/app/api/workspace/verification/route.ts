@@ -15,6 +15,9 @@ export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,
     async (actor) => {
+      const expected = request.headers.get("x-nexus-actor-id");
+      if (expected !== null && expected !== actor.id)
+        throw new AppError("Actor changed", 409, "ACTOR_CHANGED");
       const filters = verificationFilters(request.nextUrl.searchParams);
       await verificationRate(actor.id, "search");
       return verificationWorkspaceService.overview(actor, filters);
@@ -27,6 +30,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
+      const expected = request.headers.get("x-nexus-actor-id");
+      if (!expected) throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (expected !== actor.id) throw new AppError("Actor changed", 409, "ACTOR_CHANGED");
       requireServerJsonContentType(request);
       const parsed = verificationApplicationSchema.safeParse(await readBoundedJson(request));
       if (!parsed.success) throw new AppError("Invalid application", 400, "VALIDATION_ERROR");

@@ -6,7 +6,11 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import type { Locale } from "../lib/i18n";
 import { getDictionary } from "../lib/i18n";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import {
+  PlatformRequestError,
+  platformFieldClass,
+  platformRequest,
+} from "../lib/user-platform-client";
 import { verificationApplicationsCopy } from "../lib/verification-applications-copy";
 import {
   VERIFICATION_TYPES,
@@ -31,12 +35,14 @@ const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-
 const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
 
 export function VerificationWorkspace({
+  actorId,
   initial,
   initialTeams,
   filters,
   teamFilters,
   locale,
 }: {
+  actorId: string;
   initial: VerificationOverview | null;
   initialTeams: VerificationTargets | null;
   filters: VerificationQuery;
@@ -54,9 +60,89 @@ export function VerificationWorkspace({
     [readError, setReadError] = useState(initial && initialTeams ? "" : copy.unavailable),
     [writeError, setWriteError] = useState(""),
     [savedId, setSavedId] = useState("");
+  const [verifiedKey, setVerifiedKey] = useState("");
+  const [visibleKey, setVisibleKey] = useState(
+    () => `nexus:verification-application:v1:${actorId}`,
+  );
+  const [intent, setIntent] = useState<z.infer<typeof verificationApplicationSchema> | null>(null);
+  const intentRef = useRef<z.infer<typeof verificationApplicationSchema> | null>(null);
+  const identityEpoch = useRef(0);
+  const identityKey = `nexus:verification-application:v1:${actorId}`;
+  const currentKey = useRef(identityKey);
+  if (currentKey.current !== identityKey) identityEpoch.current += 1;
+  currentKey.current = identityKey;
+  const localeRef = useRef(locale);
+  localeRef.current = locale;
   const guard = useRef(false),
     controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
+  useEffect(() => {
+    let alive = true;
+    controller.current?.abort();
+    setVerifiedKey("");
+    setIntent(null);
+    intentRef.current = null;
+    setTarget(null);
+    setProof("");
+    setNotes("");
+    setWriteError("");
+    setSavedId("");
+    if (visibleKey !== identityKey) {
+      setOverview(initial?.profile.id === actorId ? initial : null);
+      setTeams(initial?.profile.id === actorId ? initialTeams : null);
+    }
+    async function restore() {
+      try {
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        const data = await response.json();
+        if (!response.ok || data?.authenticated !== true || data?.user?.id !== actorId)
+          throw new Error("identity");
+        const raw = sessionStorage.getItem(identityKey);
+        if (raw) {
+          if (raw.length > 10_000) throw new Error("storage");
+          const item = JSON.parse(raw);
+          const parsed = verificationApplicationSchema.safeParse(item.request);
+          if (
+            item.actorId !== actorId ||
+            !parsed.success ||
+            typeof item.targetName !== "string" ||
+            item.targetName.length > 200 ||
+            (parsed.data.targetType !== "organization" && parsed.data.targetId !== actorId)
+          )
+            throw new Error("storage");
+          if (alive) {
+            intentRef.current = parsed.data;
+            setIntent(parsed.data);
+            setTarget({
+              type: parsed.data.targetType,
+              id: parsed.data.targetId,
+              name: item.targetName,
+            });
+            setProof(parsed.data.proofUrl);
+            setNotes(parsed.data.notes);
+          }
+        }
+        if (alive) {
+          setVisibleKey(identityKey);
+          setVerifiedKey(identityKey);
+        }
+      } catch {
+        if (alive)
+          setWriteError(
+            localeRef.current === "ru"
+              ? "Не удалось проверить аккаунт или восстановить заявку."
+              : "Could not verify the account or restore the application.",
+          );
+      }
+    }
+    void restore();
+    return () => {
+      alive = false;
+    };
+  }, [actorId, identityKey, initial, initialTeams, visibleKey]);
   const historyParams = new URLSearchParams({ page: String(filters.page), view: filters.view });
   if (filters.type) historyParams.set("type", filters.type);
   const teamParams = new URLSearchParams({ page: String(teamFilters.page), q: teamFilters.query });
@@ -76,6 +162,7 @@ export function VerificationWorkspace({
         undefined,
         controller.current?.signal,
         verificationError,
+        { "x-nexus-actor-id": actorId },
       ),
       platformRequest(
         `/api/workspace/verification/targets?${teamParams}`,
@@ -84,6 +171,7 @@ export function VerificationWorkspace({
         undefined,
         controller.current?.signal,
         verificationError,
+        { "x-nexus-actor-id": actorId },
       ),
     ]);
     const parsed = verificationOverviewSchema.safeParse(history),
@@ -94,6 +182,7 @@ export function VerificationWorkspace({
       parsed.data.history.page !== filters.page ||
       parsed.data.history.view !== filters.view ||
       teamPage.data.page !== teamFilters.page ||
+      parsed.data.profile.id !== actorId ||
       (overview && parsed.data.profile.id !== overview.profile.id)
     )
       throw new Error(copy.unavailable);
@@ -116,7 +205,7 @@ export function VerificationWorkspace({
     }
   }
   function choose(value: Target) {
-    if (guard.current) return;
+    if (guard.current || intentRef.current || verifiedKey !== identityKey) return;
     setTarget(value);
     setProof("");
     setNotes("");
@@ -125,16 +214,38 @@ export function VerificationWorkspace({
   }
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!target || guard.current) return;
-    const parsed = verificationApplicationSchema.safeParse({
-      targetType: target.type,
-      targetId: target.id,
-      proofUrl: proof,
-      notes,
-    });
+    if (!target || guard.current || verifiedKey !== identityKey) return;
+    const requestEpoch = identityEpoch.current;
+    const firstAttempt = !intentRef.current;
+    const parsed = verificationApplicationSchema.safeParse(
+      intentRef.current ?? {
+        targetType: target.type,
+        targetId: target.id,
+        proofUrl: proof,
+        notes,
+      },
+    );
     if (!parsed.success) {
       setWriteError(copy.invalid);
       return;
+    }
+    if (firstAttempt) {
+      try {
+        sessionStorage.setItem(
+          identityKey,
+          JSON.stringify({ actorId, request: parsed.data, targetName: target.name }),
+        );
+      } catch {
+        setVerifiedKey("");
+        setWriteError(
+          locale === "ru"
+            ? "Не удалось сохранить данные восстановления. Заявка не отправлена."
+            : "Could not save recovery data. The application was not sent.",
+        );
+        return;
+      }
+      intentRef.current = parsed.data;
+      setIntent(parsed.data);
     }
     guard.current = true;
     setPending(true);
@@ -149,7 +260,9 @@ export function VerificationWorkspace({
         parsed.data,
         controller.current.signal,
         verificationMutationError,
+        { "x-nexus-actor-id": actorId },
       );
+      if (requestEpoch !== identityEpoch.current) return;
       const confirmed = z
         .object({
           id: z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/u),
@@ -159,6 +272,13 @@ export function VerificationWorkspace({
         })
         .safeParse(response);
       if (!confirmed.success) throw new Error(copy.mutationUnavailable);
+      try {
+        sessionStorage.removeItem(identityKey);
+        intentRef.current = null;
+        setIntent(null);
+      } catch {
+        /* Retain recovery intent if storage is unavailable. */
+      }
       setSavedId(confirmed.data.id);
       setProof("");
       setNotes("");
@@ -193,12 +313,47 @@ export function VerificationWorkspace({
         setReadError(copy.unavailable);
       }
     } catch (caught) {
+      if (requestEpoch !== identityEpoch.current) return;
+      if (caught instanceof PlatformRequestError && caught.code === "ACTOR_CHANGED")
+        setVerifiedKey("");
+      if (
+        firstAttempt &&
+        caught instanceof PlatformRequestError &&
+        [
+          "VALIDATION_ERROR",
+          "ACTOR_CHANGED",
+          "ACTOR_ID_REQUIRED",
+          "UNAUTHORIZED",
+          "FORBIDDEN",
+          "RATE_LIMIT_EXCEEDED",
+          "VERIFICATION_PENDING",
+          "REQUEST_BODY_TOO_LARGE",
+          "UNSUPPORTED_MEDIA_TYPE",
+        ].includes(String(caught.code))
+      ) {
+        try {
+          sessionStorage.removeItem(identityKey);
+          intentRef.current = null;
+          setIntent(null);
+        } catch {
+          /* Keep the original request locked. */
+        }
+      }
+      if (caught instanceof PlatformRequestError && caught.code === "VERIFICATION_PENDING") {
+        setWriteError(
+          locale === "ru"
+            ? "Для этой цели уже есть заявка. Её автор и содержание не подтверждены."
+            : "An application already exists for this target. Its author and contents are unconfirmed.",
+        );
+        return;
+      }
       setWriteError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
     } finally {
       guard.current = false;
       setPending(false);
     }
   }
+  if (visibleKey !== identityKey) return <ErrorState title={copy.unavailable} />;
   const profile = overview?.profile,
     developer = !!profile && ["developer", "admin"].includes(profile.role);
   return (
@@ -240,6 +395,7 @@ export function VerificationWorkspace({
           }
         />
       ) : null}
+      {verifiedKey !== identityKey && writeError ? <ErrorState title={writeError} /> : null}
       {profile && (
         <section className="nexus-panel space-y-3 p-5">
           <h2 className="font-heading text-primary">{copy.current}</h2>
@@ -256,7 +412,13 @@ export function VerificationWorkspace({
             type="button"
             variant="secondary"
             className="min-h-11"
-            disabled={pending || profile.identityVerified || profile.identityPending}
+            disabled={
+              pending ||
+              Boolean(intent) ||
+              verifiedKey !== identityKey ||
+              profile.identityVerified ||
+              profile.identityPending
+            }
             onClick={() => choose({ type: "user", id: profile.id, name: profile.name })}
           >
             {copy.apply} · {copy.user}
@@ -280,6 +442,8 @@ export function VerificationWorkspace({
                 className="min-h-11"
                 disabled={
                   pending ||
+                  Boolean(intent) ||
+                  verifiedKey !== identityKey ||
                   profile.experienceVerified ||
                   profile.experiencePending ||
                   !profile.hasSpecialties
@@ -353,7 +517,13 @@ export function VerificationWorkspace({
                 type="button"
                 variant="secondary"
                 className="min-h-11"
-                disabled={pending || team.pending || team.verified}
+                disabled={
+                  pending ||
+                  Boolean(intent) ||
+                  verifiedKey !== identityKey ||
+                  team.pending ||
+                  team.verified
+                }
                 onClick={() => choose({ type: "organization", id: team.id, name: team.name })}
               >
                 {copy.choose}
@@ -407,6 +577,7 @@ export function VerificationWorkspace({
                   required
                   maxLength={2048}
                   disabled={pending}
+                  readOnly={Boolean(intent)}
                   onChange={(event) => setProof(event.target.value)}
                 />
               </label>
@@ -420,6 +591,7 @@ export function VerificationWorkspace({
                   minLength={10}
                   maxLength={1000}
                   disabled={pending}
+                  readOnly={Boolean(intent)}
                   onChange={(event) => setNotes(event.target.value)}
                 />
               </label>
@@ -427,18 +599,30 @@ export function VerificationWorkspace({
                 type="submit"
                 className="min-h-11"
                 isLoading={pending}
-                disabled={pending || notes.trim().length < 10 || !proof.trim()}
+                disabled={
+                  pending ||
+                  verifiedKey !== identityKey ||
+                  notes.trim().length < 10 ||
+                  !proof.trim()
+                }
               >
                 {copy.submit}
               </Button>
               {writeError ? <ErrorState title={writeError} /> : null}
+              {intent ? (
+                <p role="status">
+                  {locale === "ru"
+                    ? "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки."
+                    : "The submission result is unconfirmed. Only an exact retry of the original application is available."}
+                </p>
+              ) : null}
             </form>
           )}
           <Button
             type="button"
             className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             variant="ghost"
-            disabled={pending}
+            disabled={pending || Boolean(intent)}
             onClick={() => setTarget(null)}
           >
             {copy.cancel}
