@@ -85,17 +85,19 @@ export function createLibraryCollectionsInteractionHelpers(
   confirmAction: ConfirmActionMock,
 ) {
   function render(
-    action: "create" | "archive" | "remove" | "duplicate" = "remove",
+    action: "create" | "archive" | "remove" | "duplicate" | "restore" = "remove",
     preview = defaultPreview,
     overrides: Partial<Parameters<LibraryCollectionCommandFormComponent>[0]> = {},
   ) {
     harness.cursor = 0;
+    const collectionForAction =
+      action === "restore" ? { ...collection, status: "archived" as const } : collection;
     return flattenReactTestTree(
       LibraryCollectionCommandForm({
         locale: "en",
         actorId: "usr_a",
         action,
-        ...(action === "create" ? {} : { collection }),
+        ...(action === "create" ? {} : { collection: collectionForAction }),
         productId: "prd_a",
         ...(action === "duplicate" ? { copyPreview: preview } : {}),
         ...overrides,

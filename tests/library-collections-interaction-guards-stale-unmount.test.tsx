@@ -50,6 +50,7 @@ it("aborts on unmount and ignores late confirmation", async () => {
   );
   const tree = render(),
     pending = submit(tree);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalled());
   const init = harness.fetch.mock.calls[0]?.[1] as RequestInit;
   harness.cleanup?.();
   expect(init.signal?.aborted).toBe(true);

@@ -199,15 +199,37 @@ export function LibraryCollectionCommandForm({
       setError(c.invalid);
       return;
     }
-    if (!pending.current && (action === "archive" || action === "duplicate")) {
+    if (
+      !pending.current &&
+      (action === "archive" ||
+        action === "duplicate" ||
+        action === "restore" ||
+        action === "remove")
+    ) {
       confirming.current = true;
       let accepted = false;
       try {
+        const title =
+          action === "archive"
+            ? c.archive
+            : action === "duplicate"
+              ? c.duplicate
+              : action === "restore"
+                ? c.restore
+                : c.remove;
+        const consequences =
+          action === "archive"
+            ? c.archiveConfirm
+            : action === "duplicate"
+              ? c.copyConfirm
+              : action === "restore"
+                ? c.restoreConfirm
+                : c.removeConfirm;
         accepted = await confirmAction({
-          title: action === "archive" ? c.archive : c.duplicate,
+          title,
           object: collection?.name ?? name,
-          consequences: action === "archive" ? c.archiveConfirm : c.copyConfirm,
-          confirmLabel: action === "archive" ? c.archive : c.duplicate,
+          consequences,
+          confirmLabel: title,
           cancelLabel: c.back,
           closeLabel: c.back,
         });
