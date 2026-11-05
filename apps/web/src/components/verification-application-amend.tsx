@@ -144,7 +144,7 @@ export function VerificationApplicationAmend({
           {busy ? labels.loading : copy.amend}
         </Button>
       </fieldset>
-      {notice && !saved ? <ErrorState title={notice} /> : null}
+      {notice && !saved ? <ErrorState id="verification-amend-notice" title={notice} /> : null}
       {notice && saved ? (
         <p role="status" className="text-sm text-success">
           {notice}
