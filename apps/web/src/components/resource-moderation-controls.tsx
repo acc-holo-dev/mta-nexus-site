@@ -126,11 +126,13 @@ export function ResourceModerationControls({
         <p role="note" className="text-sm text-secondary">
           {copy.moderationNote}
         </p>
-        <p className="text-sm text-warning">
-          {locale === "ru"
-            ? "Для текущего статуса нет разрешённого moderation-перехода."
-            : "No moderation transition is allowed for the current status."}
-        </p>
+        <ErrorState
+          title={
+            locale === "ru"
+              ? "Для текущего статуса нет разрешённого moderation-перехода."
+              : "No moderation transition is allowed for the current status."
+          }
+        />
       </div>
     );
   }
