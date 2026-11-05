@@ -10,7 +10,7 @@ vi.mock("@nexus/security", () => ({
   generateId: () => "fol_a",
 }));
 vi.mock("@nexus/db", () => ({
-  followWorkspaceRepository: { setFollowing: vi.fn(), states: vi.fn() },
+  followWorkspaceRepository: { setFollowingAuthenticated: vi.fn(), states: vi.fn() },
   socialRepository: { isFollowing: vi.fn() },
 }));
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({

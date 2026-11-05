@@ -11,6 +11,9 @@ import {
   reports,
   auditEvents,
   resourceReviewsRepository as repo,
+  resourceQaRepository,
+  organizations,
+  organizationMembers,
   reportRepository,
   sessionRepository,
 } from "@nexus/db";
@@ -24,6 +27,7 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
     staff = id("usr_staff"),
     productId = id("prd");
   const actors = [buyer, reporter, publisher, staff];
+  const organizationId = id("org");
   try {
     await db.insert(users).values(
       actors.map((actor) => ({
@@ -52,6 +56,20 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
       currency: "USD",
       licenseModel: "unlimited",
     });
+    await db.insert(organizations).values({
+      id: organizationId,
+      name: "Review team",
+      slug: organizationId,
+      ownerId: publisher,
+    });
+    await db.insert(organizationMembers).values({
+      id: id("mem"),
+      organizationId,
+      userId: buyer,
+      role: "owner",
+      permissions: ["manage_products"],
+    });
+    await db.update(products).set({ organizationId }).where(eq(products.id, productId));
     await db.insert(builds).values({
       id: id("bld"),
       productId,
@@ -91,6 +109,17 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
         resourceId: productId,
       })),
     );
+    const answer = (actorId: string) =>
+      resourceQaRepository.answer({
+        actorId,
+        productId,
+        threadId: id("rqt_missing"),
+        answerId: id("rqa"),
+        auditId: id("aud_qa"),
+        command: { action: "answer", body: "Useful answer", expectedThreadRevision: 1 },
+      });
+    await expect(answer(buyer)).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(answer(publisher)).rejects.toMatchObject({ code: "NOT_FOUND" });
     await expect(command(publisher, 0)).rejects.toMatchObject({ code: "REVIEW_ACCESS_REQUIRED" });
     const first = await command(buyer, 0, 5, id("aud_initial"));
     expect(first).toMatchObject({ revision: 1, ratingCount: 1, ratingAverage: 50 });
@@ -197,6 +226,7 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
     await db.delete(auditEvents).where(inArray(auditEvents.actorId, actors));
     await db.delete(entitlements).where(eq(entitlements.resourceId, productId));
     await db.delete(products).where(eq(products.id, productId));
+    await db.delete(organizations).where(eq(organizations.id, organizationId));
     await db.delete(users).where(inArray(users.id, actors));
   }
 });

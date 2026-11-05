@@ -19,7 +19,12 @@ export function GET(request: NextRequest, context: { params: Promise<{ id: strin
       if (before !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(before))
         throw new AppError("Invalid cursor", 400, "VALIDATION_ERROR");
       if (!(await consumeRateLimit("search", user.id)).success) throw new RateLimitExceededError();
-      const result = await supportActivityRepository.history(id, user.id, before);
+      const result = await supportActivityRepository.history(
+        id,
+        user.id,
+        before,
+        request.cookies.get("nexus_session")?.value ?? "",
+      );
       return supportActivitySchema.parse({
         ...result,
         items: result.items.map((item) => ({ ...item, createdAt: item.createdAt.toISOString() })),

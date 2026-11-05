@@ -117,6 +117,23 @@ async function fixture() {
   return { actor, org, product, session, token, key, create, cleanup };
 }
 
+it("rejects a stale owner membership when linking a resource", async () => {
+  const f = await fixture();
+  try {
+    await db
+      .update(organizationMembers)
+      .set({ role: "owner", permissions: ["manage_products"] })
+      .where(eq(organizationMembers.userId, f.actor));
+    await expect(f.create("stale")).rejects.toMatchObject({ code: "NOT_FOUND" });
+    expect(await db.select().from(content).where(eq(content.authorId, f.actor))).toHaveLength(0);
+    expect(
+      await db.select().from(auditEvents).where(eq(auditEvents.actorId, f.actor)),
+    ).toHaveLength(0);
+  } finally {
+    await f.cleanup();
+  }
+});
+
 it("rejects product authority revoked while creation waits, without content or audit", async () => {
   const f = await fixture();
   const locked = deferred(),

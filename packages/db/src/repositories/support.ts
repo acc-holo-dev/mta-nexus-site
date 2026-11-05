@@ -21,6 +21,7 @@ import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import {
   assertSupportObjectContext,
+  assertSupportReadSession,
   supportAccess,
   supportActor,
   type SupportObjectContext,
@@ -99,9 +100,12 @@ export class SupportCaseRepository {
     page = 1,
     pageSize = 25,
     filters: StaffSupportFilters = {},
+    currentToken?: string,
   ): Promise<SupportPage<SupportCase>> {
     return db.transaction(
       async (tx) => {
+        if (currentToken !== undefined)
+          await assertSupportReadSession(tx, requesterId, currentToken);
         const boundedSize = normalizePageSize(pageSize, 25, 100);
         const [countRow] = await tx
           .select({ total: count() })
@@ -140,6 +144,7 @@ export class SupportCaseRepository {
     pageSize = 25,
     filters: StaffSupportFilters = {},
     actorId?: string,
+    currentToken?: string,
   ): Promise<
     SupportPage<{
       supportCase: SupportCase;
@@ -149,6 +154,8 @@ export class SupportCaseRepository {
   > {
     return db.transaction(
       async (tx) => {
+        if (currentToken !== undefined)
+          await assertSupportReadSession(tx, actorId ?? "", currentToken);
         if (actorId && !(await supportActor(tx, actorId, false)).staff)
           throw new AppError("Staff required", 403, "FORBIDDEN");
         const boundedSize = normalizePageSize(pageSize, 25, 100);
@@ -213,9 +220,10 @@ export class SupportCaseRepository {
     });
   }
 
-  async authorizedThread(caseId: string, actorId: string, page = 1) {
+  async authorizedThread(caseId: string, actorId: string, page = 1, currentToken?: string) {
     return db.transaction(
       async (tx) => {
+        if (currentToken !== undefined) await assertSupportReadSession(tx, actorId, currentToken);
         const { actor, supportCase } = await supportAccess(tx, caseId, actorId, false);
         const messages = await this.pageMessagesWithin(tx, caseId, page, 100);
         return {

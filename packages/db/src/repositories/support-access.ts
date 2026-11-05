@@ -1,11 +1,35 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { AppError, NotFoundError } from "@nexus/domain";
 import type { db } from "../client";
-import { builds, products, resourceDeliveryReceipts, supportCases, users } from "../schema";
+import {
+  builds,
+  products,
+  resourceDeliveryReceipts,
+  sessions,
+  supportCases,
+  users,
+} from "../schema";
+import { digestSessionToken } from "./sessions";
 import { lockUserDownloadAccess } from "./entitlements";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+export async function assertSupportReadSession(tx: Transaction, actorId: string, token: string) {
+  if (!token) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+  const [session] = await tx
+    .select({ id: sessions.id })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.userId, actorId),
+        eq(sessions.token, digestSessionToken(token)),
+        sql`${sessions.expiresAt} > clock_timestamp()`,
+      ),
+    )
+    .limit(1);
+  if (!session) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+}
 
 export type SupportObjectContext = {
   productId: string;

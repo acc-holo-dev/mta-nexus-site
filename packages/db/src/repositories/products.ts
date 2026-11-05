@@ -1,23 +1,23 @@
+import type { AuditEvent, Product, ProductType, User } from "@nexus/domain";
+import { AppError, ForbiddenError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import type { SQL } from "drizzle-orm";
-import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
-import {
-  assertProductMutationAuthority,
-  assertBuildModerationAuthority,
-} from "./product-mutation-authority";
-import { lockInitiatingSession } from "./initiating-session";
-import { containsPattern } from "./search-pattern";
+import { and, asc, count, desc, eq, gte, ilike, inArray, lte, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   builds,
-  products,
-  organizations,
   organizationMembers,
+  organizations,
+  products,
   users,
 } from "../schema";
-import { AppError } from "@nexus/domain";
+import { lockInitiatingSession } from "./initiating-session";
+import {
+  assertBuildModerationAuthority,
+  assertProductMutationAuthority,
+} from "./product-mutation-authority";
 import { resourceModerationRepository } from "./resource-moderation";
-import type { AuditEvent, Product, ProductType, User } from "@nexus/domain";
+import { containsPattern } from "./search-pattern";
 
 function hasSafePublishedBuild() {
   return sql`exists (
@@ -32,6 +32,14 @@ function hasSafePublishedBuild() {
   )`;
 }
 
+function hasProductOrganizationGrant(membership: { role: string; permissions: string[] }) {
+  return (
+    membership.role === "admin" ||
+    (["member", "developer"].includes(membership.role) &&
+      membership.permissions.includes("manage_products"))
+  );
+}
+
 /** Same scope for listing, private reads and audited metadata writes. */
 export function managedProductCondition(actor: Pick<User, "id" | "role">): SQL {
   // Admin scope is always rechecked against the live users row — never trust a
@@ -44,8 +52,9 @@ export function managedProductCondition(actor: Pick<User, "id" | "role">): SQL {
     or exists (select 1 from ${organizationMembers}
       where ${organizationMembers.organizationId} = ${products.organizationId}
         and ${organizationMembers.userId} = ${actor.id}
-        and (${organizationMembers.role} in ('owner', 'admin')
-          or ${organizationMembers.permissions} @> '["manage_products"]'::jsonb))
+        and (${organizationMembers.role} = 'admin'
+          or (${organizationMembers.role} in ('member', 'developer')
+            and ${organizationMembers.permissions} @> '["manage_products"]'::jsonb)))
   )`;
 }
 
@@ -440,11 +449,107 @@ export class ProductRepository {
     return rows[0] as unknown as Product;
   }
 
+  /** Read only an actor's matching draft after locking its current grants and session. */
+  async findCreatedDraftForReplay(
+    slug: string,
+    actorId: string,
+    currentToken: string,
+  ): Promise<Product | null> {
+    return db.transaction(async (tx) => {
+      const [product] = await tx
+        .select()
+        .from(products)
+        .where(
+          and(
+            eq(products.slug, slug),
+            eq(products.authorId, actorId),
+            eq(products.status, "draft"),
+            eq(products.price, 0),
+          ),
+        )
+        .for("share")
+        .limit(1);
+      const [organization] = product?.organizationId
+        ? await tx
+            .select({ ownerId: organizations.ownerId })
+            .from(organizations)
+            .where(eq(organizations.id, product.organizationId))
+            .for("share")
+            .limit(1)
+        : [];
+      const [actor] = await tx
+        .select({ id: users.id, role: users.role })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share")
+        .limit(1);
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      if (product?.organizationId && actor.role !== "admin" && organization?.ownerId !== actor.id) {
+        if (!organization) throw new NotFoundError("Resource", product.id);
+        const [membership] = await tx
+          .select({ role: organizationMembers.role, permissions: organizationMembers.permissions })
+          .from(organizationMembers)
+          .where(
+            and(
+              eq(organizationMembers.organizationId, product.organizationId),
+              eq(organizationMembers.userId, actor.id),
+            ),
+          )
+          .for("share")
+          .limit(1);
+        if (!membership || !hasProductOrganizationGrant(membership))
+          throw new NotFoundError("Resource", product.id);
+      }
+      await lockInitiatingSession(tx, actor.id, currentToken);
+      return (product as unknown as Product | undefined) ?? null;
+    });
+  }
+
   async createWithAudit(
     data: Omit<Product, "createdAt" | "updatedAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Product> {
     return db.transaction(async (tx) => {
+      const [organization] = data.organizationId
+        ? await tx
+            .select({ ownerId: organizations.ownerId })
+            .from(organizations)
+            .where(eq(organizations.id, data.organizationId))
+            .for("share")
+            .limit(1)
+        : [];
+      if (data.organizationId && !organization)
+        throw new NotFoundError("Organization", data.organizationId);
+      const [actor] = await tx
+        .select({ id: users.id, role: users.role, isVerified: users.isVerified })
+        .from(users)
+        .where(eq(users.id, audit.actorId))
+        .for("share")
+        .limit(1);
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      if (data.authorId !== actor.id)
+        throw new ForbiddenError("Resource author must be the authenticated account");
+      if (actor.role !== "admin" && actor.role !== "developer" && !actor.isVerified)
+        throw new ForbiddenError("You must have developer privileges to create products");
+      if (data.organizationId && organization && organization.ownerId !== actor.id) {
+        const [membership] = await tx
+          .select({ role: organizationMembers.role, permissions: organizationMembers.permissions })
+          .from(organizationMembers)
+          .where(
+            and(
+              eq(organizationMembers.organizationId, data.organizationId),
+              eq(organizationMembers.userId, actor.id),
+            ),
+          )
+          .for("share")
+          .limit(1);
+        if (!membership || !hasProductOrganizationGrant(membership))
+          throw new ForbiddenError(
+            "You do not have permission to create resources for this organization",
+          );
+      }
+      await lockInitiatingSession(tx, actor.id, currentToken);
       const now = new Date();
       const rows = await tx
         .insert(products)
@@ -454,6 +559,7 @@ export class ProductRepository {
       if (!product) throw new Error("Product insert did not return a row");
 
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await lockInitiatingSession(tx, actor.id, currentToken);
       return product as unknown as Product;
     });
   }

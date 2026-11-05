@@ -23,7 +23,7 @@ beforeEach(() => {
 });
 it("passes the actor and staff-only requirement to the existing authorization boundary", async () => {
   expect(await service.page(id, "owner", base, true)).toEqual(value);
-  expect(page).toHaveBeenCalledExactlyOnceWith(id, "owner", base, true);
+  expect(page).toHaveBeenCalledExactlyOnceWith(id, "owner", base, true, undefined);
 });
 it.each([
   { supportCase: { ...value.supportCase, id: `sup_${"c".repeat(24)}` } },

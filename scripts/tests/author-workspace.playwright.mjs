@@ -157,6 +157,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     async () => (await (await fetch("/api/auth/session")).json()).user.id,
   );
   const pendingCreationKey = `nexus:pending-resource-draft:v2:${encodeURIComponent(creatingActorId)}`;
+  const submissionIntentKey = `nexus:resource-submission:v1:${encodeURIComponent(creatingActorId)}`;
   await page.goto("/workspace/resources/new");
   await page.locator('[name="title"]').fill(title);
   await page.locator('[name="slug"]').fill(slug);
@@ -203,8 +204,15 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
       page.getByRole("alert").filter({ hasText: "Could not create resource" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Submit free resource for review", exact: true }),
+      page.getByRole("button", { name: "Retry original submission", exact: true }),
     ).toBeEnabled();
+    assert.equal(
+      await page.evaluate(
+        (key) => JSON.parse(sessionStorage.getItem(key)).request.slug,
+        submissionIntentKey,
+      ),
+      slug,
+    );
     await expect(page.locator('[name="title"]')).toHaveValue(title);
     await expect(page.locator('[name="slug"]')).toHaveValue(slug);
     await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
@@ -236,7 +244,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
       pendingBuildUrl.test(new URL(response.url()).pathname) &&
       response.request().method() === "POST",
   );
-  await page.getByRole("button", { name: "Submit free resource for review", exact: true }).click();
+  await page.getByRole("button", { name: "Retry original submission", exact: true }).click();
   const createResponse = await created;
   assert.equal(createResponse.status(), 200);
   const { product, reusedDraft } = await createResponse.json();
@@ -245,9 +253,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(product.slug, committedProduct.slug);
   assert.equal((await failedFirstBuild).status(), 201);
   await expect(
-    page
-      .getByRole("alert")
-      .filter({ hasText: "Resource was created, but the build could not be submitted" }),
+    page.getByRole("alert").filter({ hasText: "Could not confirm the original build" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Resource submitted for review", exact: true }),
@@ -293,13 +299,11 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await logout(page);
   await login(page, process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
   await page.goto("/workspace/resources/new");
-  const retry = page.getByRole("button", { name: "Retry build submission", exact: true });
+  const retry = page.getByRole("button", { name: "Retry original submission", exact: true });
   await expect(retry).toBeEnabled();
   await expect(page.getByRole("status").filter({ hasText: slug })).toBeVisible();
   assert.equal(await page.locator('[name="file"]').evaluate((input) => input.files?.length), 0);
   // Browsers cannot restore a selected archive after navigation; reselect explicitly.
-  await page.locator('[name="version"]').fill("1.0.0");
-  await page.locator('[name="releaseNotes"]').fill(firstNotes);
   await page
     .locator('[name="file"]')
     .setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
@@ -326,9 +330,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     await retry.click();
     assert.equal((await failed).status(), 201);
     await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "Resource was created, but the build could not be submitted" }),
+      page.getByRole("alert").filter({ hasText: "Could not confirm the original build" }),
     ).toBeVisible();
     await expect(retry).toBeEnabled();
     await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
@@ -348,8 +350,6 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await expect(retry).toBeEnabled();
   await expect(page.getByRole("status").filter({ hasText: slug })).toBeVisible();
   assert.equal(await page.locator('[name="file"]').evaluate((input) => input.files?.length), 0);
-  await page.locator('[name="version"]').fill("1.0.0");
-  await page.locator('[name="releaseNotes"]').fill(firstNotes);
   await page
     .locator('[name="file"]')
     .setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
@@ -372,9 +372,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     await retry.click();
     assert.equal((await lostReply).status(), 503);
     await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "Resource was created, but the build could not be submitted" }),
+      page.getByRole("alert").filter({ hasText: "Could not confirm the original build" }),
     ).toBeVisible();
     await expect(retry).toBeEnabled();
     await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");

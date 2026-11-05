@@ -17,9 +17,14 @@ export function authorDetailsMutationRequest(
   });
 }
 
-export function authorBuildUploadRequest(body: FormData, signal: AbortSignal): RequestInit {
+export function authorBuildUploadRequest(
+  body: FormData,
+  signal: AbortSignal,
+  actorId: string,
+): RequestInit {
   return privateRequest({
     method: "POST",
+    headers: { "x-nexus-actor-id": actorId },
     body,
     signal,
   });

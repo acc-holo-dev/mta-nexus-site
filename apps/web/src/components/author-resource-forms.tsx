@@ -318,7 +318,7 @@ export function AuthorResourceForms({
     try {
       const response = await fetch(
         `/api/products/${product.id}/builds`,
-        authorBuildUploadRequest(data, AbortSignal.timeout(120_000)),
+        authorBuildUploadRequest(data, AbortSignal.timeout(120_000), actorId),
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {

@@ -93,8 +93,9 @@ export async function lockContentCreationAuthority(
       !(product.organizationId
         ? owner(product.organizationId) ||
           (!!membership &&
-            (["owner", "admin"].includes(membership.role) ||
-              membership.permissions.includes("manage_products")))
+            (membership.role === "admin" ||
+              (["member", "developer"].includes(membership.role) &&
+                membership.permissions.includes("manage_products"))))
         : product.authorId === actor.id)
     )
       throw new NotFoundError("Resource", product.id);

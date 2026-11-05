@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { Follow, ObjectMuteDuration } from "@nexus/domain";
-import { AppError, NotFoundError } from "@nexus/domain";
+import { AppError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import { and, asc, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
@@ -17,6 +17,7 @@ import {
 import { trustedCleanScanCondition } from "./build-safety";
 import { containsPattern } from "./search-pattern";
 import { userFollowNotice } from "./user-follow-notice";
+import { lockInitiatingSession } from "./initiating-session";
 
 type TargetType = Follow["targetType"];
 type Cursor = { createdAt: string; id: string };
@@ -486,6 +487,7 @@ class FollowWorkspaceRepository {
     };
   }
 
+  /** Trusted internal callers only. HTTP mutations must use setFollowingAuthenticated. */
   async setFollowing(
     actorId: string,
     targetType: TargetType,
@@ -493,6 +495,31 @@ class FollowWorkspaceRepository {
     following: boolean,
     id: string,
     options: { notifyComments?: boolean } = {},
+  ) {
+    return this.setFollowingWithin(actorId, targetType, targetId, following, id, options);
+  }
+
+  async setFollowingAuthenticated(
+    actorId: string,
+    targetType: TargetType,
+    targetId: string,
+    following: boolean,
+    id: string,
+    options: { notifyComments?: boolean },
+    token: string,
+  ) {
+    if (!token) throw new UnauthorizedError();
+    return this.setFollowingWithin(actorId, targetType, targetId, following, id, options, token);
+  }
+
+  private async setFollowingWithin(
+    actorId: string,
+    targetType: TargetType,
+    targetId: string,
+    following: boolean,
+    id: string,
+    options: { notifyComments?: boolean },
+    token?: string,
   ) {
     if (following && targetType === "user" && targetId === actorId)
       throw new AppError("Cannot follow yourself", 400, "SELF_FOLLOW");
@@ -511,8 +538,20 @@ class FollowWorkspaceRepository {
         eq(follows.targetType, targetType),
         eq(follows.targetId, targetId),
       );
+      const checkSession = async () => {
+        if (token === undefined) return;
+        const [actor] = await tx
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, actorId))
+          .for("share");
+        if (!actor) throw new UnauthorizedError();
+        await lockInitiatingSession(tx, actorId, token);
+      };
       if (!following) {
+        await checkSession();
         await tx.delete(follows).where(key);
+        await checkSession();
         return { following: false, created: false, notifyComments: false };
       }
       // Share-lock the target through commit so a simultaneous archive,
@@ -574,6 +613,7 @@ class FollowWorkspaceRepository {
           break;
       }
       if (!target.length) throw new NotFoundError("Follow target");
+      await checkSession();
       const [created] = await tx
         .insert(follows)
         .values({
@@ -598,6 +638,7 @@ class FollowWorkspaceRepository {
           .where(key)
           .limit(1);
         if (!existing) throw new AppError("Follow could not be confirmed", 503, "UNCONFIRMED");
+        await checkSession();
         return {
           following: true,
           created: false,
@@ -612,6 +653,7 @@ class FollowWorkspaceRepository {
           .limit(1);
         if (follower) await userFollowNotice(tx, created.id, targetId, follower.username);
       }
+      await checkSession();
       return { following: true, created: true, notifyComments: created.notifyComments };
     });
   }

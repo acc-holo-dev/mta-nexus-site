@@ -46,8 +46,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    if (!user) {
+    const token = request.cookies.get("nexus_session")?.value;
+    const user = await authService.getSession(token);
+    if (!user || !token) {
       return supportPrivateJson(
         context,
         request,
@@ -63,6 +64,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       id,
       user.id,
       values[0] ? Number(values[0]) : 1,
+      token,
     );
     const messages = access.messages;
     return supportPrivateJson(context, request, {

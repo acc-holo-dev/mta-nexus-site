@@ -24,7 +24,7 @@ vi.mock("next/server", async (original) => ({
 }));
 vi.mock("@nexus/db", () => ({
   followWorkspaceRepository: {
-    setFollowing: mocks.setFollowing,
+    setFollowingAuthenticated: mocks.setFollowing,
     states: mocks.states,
     contentStates: mocks.contentStates,
     muteState: mocks.muteState,
@@ -253,6 +253,7 @@ it("allows removing an unavailable target and translates fresh availability deni
     false,
     "generated",
     {},
+    "test",
   );
   mocks.setFollowing.mockRejectedValue(new AppError("Target does not exist", 404, "NOT_FOUND"));
   const denied = await POST(request("/api/follow", "POST", body, "ru"));
@@ -299,6 +300,7 @@ it.each([POST, DELETE])(
       handler === POST,
       "generated",
       handler === POST ? { notifyComments: undefined } : {},
+      "test",
     );
     expect(state.callbacks).toHaveLength(0);
   },

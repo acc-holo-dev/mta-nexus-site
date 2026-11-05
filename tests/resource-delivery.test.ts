@@ -80,6 +80,7 @@ describe("free resource delivery lifecycle", () => {
         compatibility: { mtaMinVersion: "1.6.0" },
       },
       author,
+      `tok_${author.id}`,
     );
   });
 

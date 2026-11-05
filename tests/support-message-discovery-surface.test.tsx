@@ -154,6 +154,7 @@ it("delegates the staff-only requirement to a fresh server-side grant check", as
     "old-staff",
     { group: "all", query: "", focus: undefined, until: undefined, cursor: undefined },
     true,
+    "session",
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(`/admin/support/${id}/messages`);

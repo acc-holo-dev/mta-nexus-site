@@ -2,9 +2,21 @@ import { supportMessageDiscoveryRepository } from "@nexus/db";
 import { AppError, type SupportMessageFilters } from "@nexus/domain";
 import { supportMessagePageSchema } from "../support-message-discovery-contract";
 export const supportMessageDiscoveryService = {
-  async page(caseId: string, actorId: string, filters: SupportMessageFilters, staffOnly = false) {
+  async page(
+    caseId: string,
+    actorId: string,
+    filters: SupportMessageFilters,
+    staffOnly = false,
+    currentToken?: string,
+  ) {
     const result = supportMessagePageSchema.safeParse(
-      await supportMessageDiscoveryRepository.page(caseId, actorId, filters, staffOnly),
+      await supportMessageDiscoveryRepository.page(
+        caseId,
+        actorId,
+        filters,
+        staffOnly,
+        currentToken,
+      ),
     );
     if (
       !result.success ||

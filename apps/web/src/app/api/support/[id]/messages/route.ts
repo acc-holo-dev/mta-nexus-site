@@ -16,7 +16,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       if (!filters)
         throw new AppError("Invalid message filters", 400, "CHANGE_HISTORY_FILTER_INVALID");
       if (!(await consumeRateLimit("search", actor.id)).success) throw new RateLimitExceededError();
-      return supportMessageDiscoveryService.page(id, actor.id, filters);
+      return supportMessageDiscoveryService.page(
+        id,
+        actor.id,
+        filters,
+        false,
+        request.cookies.get("nexus_session")?.value ?? "",
+      );
     },
     200,
     supportMessageError,

@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
-  confirmedAuthorBuild,
-  confirmedAuthorDetails,
-  confirmedRetiredBuild,
-} from "../apps/web/src/lib/author-resource-response";
-import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
 } from "../apps/web/src/lib/author-resource-requests";
+import {
+  confirmedAuthorBuild,
+  confirmedAuthorDetails,
+  confirmedRetiredBuild,
+} from "../apps/web/src/lib/author-resource-response";
 
 const details = {
   title: "A resource",
@@ -146,13 +146,13 @@ describe("author resource client mutation policy", () => {
     body.set("file", new Blob(["build"]), "resource.zip");
     const signal = new AbortController().signal;
 
-    const request = authorBuildUploadRequest(body, signal);
+    const request = authorBuildUploadRequest(body, signal, "usr_author");
 
     expect(request.method).toBe("POST");
     expect(request.cache).toBe("no-store");
     expect(request.credentials).toBe("same-origin");
     expect(request.body).toBe(body);
-    expect(request.headers).toBeUndefined();
+    expect(request.headers).toEqual({ "x-nexus-actor-id": "usr_author" });
     expect(request.signal).toBe(signal);
   });
 

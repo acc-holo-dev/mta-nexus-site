@@ -5,9 +5,10 @@ import {
   db,
   followWorkspaceRepository as repository,
   publicDirectoryRepository,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { follows, organizations, servers, users } from "../packages/db/src/schema";
+import { follows, notifications, organizations, servers, users } from "../packages/db/src/schema";
 const actorIds: string[] = [],
   orgIds: string[] = [],
   serverIds: string[] = [];
@@ -31,6 +32,86 @@ async function actor(role = "user") {
   actorIds.push(user.id);
   return user;
 }
+it.each([true, false])(
+  "rejects a revoked initiating session after waiting for the follow lock: %s",
+  async (following) => {
+    const follower = await actor(),
+      target = await actor();
+    const token = `token_${randomUUID()}`;
+    await sessionRepository.create({
+      id: `ses_${randomUUID()}`,
+      userId: follower.id,
+      token,
+      expiresAt: new Date("2099-01-01"),
+    });
+    if (!following)
+      await repository.setFollowing(follower.id, "user", target.id, true, `fol_${randomUUID()}`);
+    let release!: () => void, ready!: () => void;
+    const released = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const locked = new Promise<void>((resolve) => {
+      ready = resolve;
+    });
+    let pid = 0;
+    const blocker = db.transaction(async (tx) => {
+      const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+      pid = Number(row.pid);
+      const key = JSON.stringify([follower.id, "user", target.id]);
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${key}, 0))`);
+      ready();
+      await released;
+    });
+    try {
+      await Promise.race([locked, blocker]);
+      const result = repository
+        .setFollowingAuthenticated(
+          follower.id,
+          "user",
+          target.id,
+          following,
+          `fol_${randomUUID()}`,
+          {},
+          token,
+        )
+        .then(
+          () => null,
+          (error: unknown) => error,
+        );
+      const deadline = Date.now() + 3000;
+      let blocked = false;
+      while (Date.now() < deadline) {
+        const [row] = await db.execute<{ blocked: boolean }>(
+          sql`select exists(select 1 from pg_stat_activity where datname=current_database() and ${pid}=any(pg_blocking_pids(pid))) as blocked`,
+        );
+        if (row?.blocked) {
+          blocked = true;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      expect(blocked).toBe(true);
+      await sessionRepository.delete(token);
+      release();
+      await blocker;
+      expect(await result).toMatchObject({ code: "UNAUTHORIZED" });
+      const rows = await db
+        .select()
+        .from(follows)
+        .where(and(eq(follows.followerId, follower.id), eq(follows.targetId, target.id)));
+      expect(rows).toHaveLength(following ? 0 : 1);
+      const notices = await db
+        .select()
+        .from(notifications)
+        .where(eq(notifications.recipientId, target.id));
+      expect(notices).toHaveLength(following ? 0 : 1);
+    } finally {
+      release();
+      await blocker.catch(() => {});
+    }
+  },
+  15000,
+);
 it("serializes concurrent repeated follows into one row and one creation signal", async () => {
   const follower = await actor(),
     target = await actor();

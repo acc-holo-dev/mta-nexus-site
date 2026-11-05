@@ -58,6 +58,7 @@ it("binds the read to the session actor and exact case, roles and literal search
     "owner",
     { group: "staff", query: "100%_", until: undefined, focus: undefined, cursor: undefined },
     false,
+    "test",
   );
 });
 it("downloads only the displayed private page with preserved cutoff and safe headers", async () => {

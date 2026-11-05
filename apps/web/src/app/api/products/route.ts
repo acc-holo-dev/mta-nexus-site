@@ -122,7 +122,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user) {
+    if (!user || !token) {
       return privateJson(
         context,
         {
@@ -133,6 +133,15 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    const expectedActor = request.headers.get("x-nexus-actor-id");
+    if (!expectedActor)
+      return privateJson(
+        context,
+        { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+        428,
+      );
+    if (expectedActor !== user.id)
+      return privateJson(context, { error: "Actor changed", code: "ACTOR_CHANGED" }, 409);
     requireServerJsonContentType(request);
 
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
@@ -183,6 +192,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           screenshots: [],
         },
         user,
+        token,
       );
     } catch (error: unknown) {
       const isDuplicate = isUniqueConstraintViolation(error, [
@@ -191,7 +201,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       ]);
 
       if (isDuplicate) {
-        const existingDraft = await productService.getProductPreviewBySlug(parsed.data.slug, user);
+        const existingDraft = await productService.findCreatedDraftForReplay(
+          parsed.data.slug,
+          user,
+          token,
+        );
         if (
           existingDraft?.authorId === user.id &&
           existingDraft.status === "draft" &&

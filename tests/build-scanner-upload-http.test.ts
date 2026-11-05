@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
-import packageFixtures from "./fixtures/build-packages.json";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import packageFixtures from "./fixtures/build-packages.json";
 
 const scan = vi.hoisted(() => vi.fn());
 const uploadAsset = vi.hoisted(() => vi.fn());
@@ -64,7 +64,10 @@ function uploadRequest(mtaVersionTarget?: string) {
 
   return new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
     method: "POST",
-    headers: browserMutationHeaders({ cookie: "nexus_session=tok_scanner" }),
+    headers: browserMutationHeaders({
+      cookie: "nexus_session=tok_scanner",
+      "x-nexus-actor-id": "usr_scanner_author",
+    }),
     body: form,
   });
 }
@@ -110,7 +113,10 @@ describe("build upload scanner HTTP behavior", () => {
     const response = await POST(
       new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
         method: "POST",
-        headers: browserMutationHeaders({ cookie: "nexus_session=tok_scanner" }),
+        headers: browserMutationHeaders({
+          cookie: "nexus_session=tok_scanner",
+          "x-nexus-actor-id": "usr_scanner_author",
+        }),
         body: form,
       }),
       context,

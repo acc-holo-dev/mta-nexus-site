@@ -47,7 +47,7 @@ it.each(["en", "ru"] as const)("renders localized build constraints in %s", (loc
 
 it("locks new resource form honesty to ErrorState without ad-hoc alerts", () => {
   expect(source).toContain("ErrorState");
-  expect(source).toContain("createErrorDescription");
+  expect(source).toContain("The submission may have completed");
   expect(source).not.toContain('role="alert"');
 });
 

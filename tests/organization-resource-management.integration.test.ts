@@ -12,6 +12,7 @@ import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { productService } from "../apps/web/src/lib/services/product-service";
 import { serverService } from "../apps/web/src/lib/services/server-service";
+import { assertProductMutationAuthority } from "../packages/db/src/repositories/product-mutation-authority";
 
 describe("organization resource management integration", () => {
   it("allows direct organization owner and manage_products member without requiring owner membership row", async () => {
@@ -20,6 +21,7 @@ describe("organization resource management integration", () => {
     const managerId = `usr_authz_manager_${suffix}`;
     const creatorId = `usr_authz_creator_${suffix}`;
     const outsiderId = `usr_authz_outsider_${suffix}`;
+    const staleId = `usr_authz_stale_${suffix}`;
     const organizationId = `org_authz_${suffix}`;
     const productId = `prd_authz_${suffix}`;
 
@@ -28,6 +30,7 @@ describe("organization resource management integration", () => {
       [managerId, "manager"],
       [creatorId, "creator"],
       [outsiderId, "outsider"],
+      [staleId, "stale"],
     ] as const) {
       await userRepository.create({
         id,
@@ -49,6 +52,14 @@ describe("organization resource management integration", () => {
       organizationId,
       userId: managerId,
       role: "member",
+      permissions: ["manage_products"],
+      createdAt: new Date(),
+    });
+    await db.insert(organizationMembers).values({
+      id: `om_authz_stale_${suffix}`,
+      organizationId,
+      userId: staleId,
+      role: "owner",
       permissions: ["manage_products"],
       createdAt: new Date(),
     });
@@ -82,19 +93,40 @@ describe("organization resource management integration", () => {
     const manager = await userRepository.findById(managerId);
     const creator = await userRepository.findById(creatorId);
     const outsider = await userRepository.findById(outsiderId);
-    expect(owner && manager && creator && outsider && product).toBeTruthy();
-    if (!owner || !manager || !creator || !outsider || !product) return;
+    const stale = await userRepository.findById(staleId);
+    expect(owner && manager && creator && outsider && stale && product).toBeTruthy();
+    if (!owner || !manager || !creator || !outsider || !stale || !product) return;
 
     expect(await productService.canManageProduct(product, owner)).toBe(true);
     expect(await productService.canManageProduct(product, manager)).toBe(true);
     expect(await productService.canManageProduct(product, creator)).toBe(false);
     expect(await productService.canManageProduct(product, outsider)).toBe(false);
+    expect(await productService.canManageProduct(product, stale)).toBe(false);
+    await expect(
+      db.transaction((tx) =>
+        assertProductMutationAuthority(
+          tx,
+          { ...product, organizationId: product.organizationId ?? null },
+          stale.id,
+        ),
+      ),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(
+      db.transaction((tx) =>
+        assertProductMutationAuthority(
+          tx,
+          { ...product, organizationId: product.organizationId ?? null },
+          manager.id,
+        ),
+      ),
+    ).resolves.toMatchObject({ id: manager.id });
 
     expect((await productService.getProductPreviewBySlug(product.slug, owner))?.id).toBe(productId);
     expect((await productService.getProductPreviewBySlug(product.slug, manager))?.id).toBe(
       productId,
     );
     expect(await productService.getProductPreviewBySlug(product.slug, outsider)).toBeNull();
+    expect(await productService.getProductPreviewBySlug(product.slug, stale)).toBeNull();
   });
 
   it("requires explicit server-management rights for organization server creation", async () => {
@@ -257,6 +289,12 @@ describe("organization resource management integration", () => {
       displayName: "Org Product Manager",
       role: "developer",
     });
+    await sessionRepository.create({
+      id: `ses_${managerId}`,
+      userId: managerId,
+      token: `tok_${managerId}`,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
 
     await organizationRepository.create({
       id: organizationId,
@@ -296,6 +334,7 @@ describe("organization resource management integration", () => {
         compatibility: { dependencies: [] },
       },
       manager,
+      `tok_${managerId}`,
     );
 
     expect(product.authorId).toBe(managerId);

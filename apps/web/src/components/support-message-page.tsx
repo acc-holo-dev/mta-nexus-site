@@ -48,7 +48,13 @@ export async function SupportMessagePage({
     if (!filters)
       throw new AppError("Invalid message filters", 400, "CHANGE_HISTORY_FILTER_INVALID");
     if (!(await consumeRateLimit("search", actor.id)).success) throw new RateLimitExceededError();
-    const page = await supportMessageDiscoveryService.page(id, actor.id, filters, staff);
+    const page = await supportMessageDiscoveryService.page(
+      id,
+      actor.id,
+      filters,
+      staff,
+      store.get("nexus_session")?.value ?? "",
+    );
     return <SupportMessageBrowser page={page} filters={filters} locale={locale} staff={staff} />;
   } catch (error) {
     return (

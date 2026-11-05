@@ -5,7 +5,7 @@ import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mut
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   createProduct: vi.fn(),
-  getProductPreviewBySlug: vi.fn(),
+  findCreatedDraftForReplay: vi.fn(),
   consumeRateLimit: vi.fn(),
 }));
 
@@ -16,7 +16,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService: {
     createProduct: mocks.createProduct,
-    getProductPreviewBySlug: mocks.getProductPreviewBySlug,
+    findCreatedDraftForReplay: mocks.findCreatedDraftForReplay,
   },
 }));
 
@@ -48,7 +48,12 @@ function expectPrivate(response: Response) {
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/products", {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=token",
+      "x-nexus-actor-id": "usr_creator",
+    },
     body: JSON.stringify(body),
   });
 }
@@ -68,6 +73,20 @@ describe("resource creation HTTP errors", () => {
     vi.unstubAllEnvs();
   });
 
+  it("rejects missing or changed actor before creating", async () => {
+    for (const [header, status] of [
+      [null, 428],
+      ["usr_other", 409],
+    ] as const) {
+      const input = request(validResourceInput);
+      if (header) input.headers.set("x-nexus-actor-id", header);
+      else input.headers.delete("x-nexus-actor-id");
+      const response = await POST(input);
+      expect(response.status).toBe(status);
+    }
+    expect(mocks.createProduct).not.toHaveBeenCalled();
+  });
+
   it("returns a stable code for invalid resource details before creation", async () => {
     const response = await POST(request({}));
 
@@ -83,7 +102,12 @@ describe("resource creation HTTP errors", () => {
     const response = await POST(
       new NextRequest("http://nexus.test/api/products", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+        headers: {
+          ...browserMutationHeaders(),
+          "content-type": "text/plain",
+          cookie: "nexus_session=token",
+          "x-nexus-actor-id": "usr_creator",
+        },
         body: JSON.stringify(validResourceInput),
       }),
     );
@@ -110,7 +134,7 @@ describe("resource creation HTTP errors", () => {
       constraint_name: "products_slug_unique",
       detail: "private database constraint detail",
     });
-    mocks.getProductPreviewBySlug.mockResolvedValueOnce({
+    mocks.findCreatedDraftForReplay.mockResolvedValueOnce({
       id: "prd_other_author",
       slug: "resource-title",
       authorId: "usr_other",
@@ -146,7 +170,7 @@ describe("resource creation HTTP errors", () => {
       compatibility: { dependencies: [] },
     };
     mocks.createProduct.mockRejectedValueOnce(error);
-    mocks.getProductPreviewBySlug.mockResolvedValueOnce(existingDraft);
+    mocks.findCreatedDraftForReplay.mockResolvedValueOnce(existingDraft);
 
     const response = await POST(request(validResourceInput));
 
@@ -155,9 +179,10 @@ describe("resource creation HTTP errors", () => {
       product: existingDraft,
       reusedDraft: true,
     });
-    expect(mocks.getProductPreviewBySlug).toHaveBeenCalledWith(
+    expect(mocks.findCreatedDraftForReplay).toHaveBeenCalledWith(
       "resource-title",
       expect.objectContaining({ id: "usr_creator" }),
+      "token",
     );
   });
 
@@ -165,7 +190,7 @@ describe("resource creation HTTP errors", () => {
     mocks.createProduct.mockRejectedValueOnce({
       cause: { code: "23505", constraint_name: "products_slug_unique" },
     });
-    mocks.getProductPreviewBySlug.mockResolvedValueOnce({
+    mocks.findCreatedDraftForReplay.mockResolvedValueOnce({
       id: "prd_existing_draft",
       ...validResourceInput,
       authorId: "usr_creator",
@@ -194,7 +219,7 @@ describe("resource creation HTTP errors", () => {
       const response = await POST(request(validResourceInput));
       expect(response.status).toBe(500);
       expect(await response.json()).toMatchObject({ code: "RESOURCE_CREATION_FAILED" });
-      expect(mocks.getProductPreviewBySlug).not.toHaveBeenCalled();
+      expect(mocks.findCreatedDraftForReplay).not.toHaveBeenCalled();
     } finally {
       consoleError.mockRestore();
     }

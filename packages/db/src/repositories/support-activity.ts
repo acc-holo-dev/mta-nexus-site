@@ -2,13 +2,14 @@ import { and, desc, eq, sql, type SQL } from "drizzle-orm";
 import { AppError } from "@nexus/domain";
 import { db } from "../client";
 import { auditEvents } from "../schema";
-import { supportAccess } from "./support-access";
+import { assertSupportReadSession, supportAccess } from "./support-access";
 class SupportActivityRepository {
-  async history(id: string, actorId: string, before?: string) {
+  async history(id: string, actorId: string, before?: string, currentToken?: string) {
     if (before && !/^[a-zA-Z0-9_-]{1,128}$/u.test(before))
       throw new AppError("Invalid cursor", 400, "VALIDATION_ERROR");
     return db.transaction(
       async (tx) => {
+        if (currentToken !== undefined) await assertSupportReadSession(tx, actorId, currentToken);
         await supportAccess(tx, id, actorId, false);
         // Status timeline only: message audits lack from/to and belong in the thread UI /
         // Security Center projection, not this status-change feed.

@@ -151,6 +151,10 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
+function privateGet(url: string) {
+  return new NextRequest(url, { headers: { cookie: "nexus_session=initiating-token" } });
+}
+
 describe("support HTTP authorization and privacy", () => {
   it.each([
     ["create", "POST", createCase],
@@ -252,7 +256,7 @@ describe("support HTTP authorization and privacy", () => {
   });
 
   it("keeps unauthenticated and authenticated case lists private", async () => {
-    const request = new NextRequest("https://nexus.test/api/support");
+    const request = privateGet("https://nexus.test/api/support");
     const denied = await listCases(request);
     expect(denied.status).toBe(401);
     expectPrivate(denied);
@@ -268,12 +272,12 @@ describe("support HTTP authorization and privacy", () => {
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.pageByRequester).toHaveBeenCalledWith("usr_member", 1);
+    expect(mocks.pageByRequester).toHaveBeenCalledWith("usr_member", 1, 25, {}, "initiating-token");
   });
 
   it("requires moderation capability for the staff queue", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
-    const request = new NextRequest("https://nexus.test/api/support?scope=staff");
+    const request = privateGet("https://nexus.test/api/support?scope=staff");
 
     const denied = await listCases(request);
     expect(denied.status).toBe(403);
@@ -297,7 +301,7 @@ describe("support HTTP authorization and privacy", () => {
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.pageStaff).toHaveBeenCalledWith(1, 25, {}, "usr_member");
+    expect(mocks.pageStaff).toHaveBeenCalledWith(1, 25, {}, "usr_member", "initiating-token");
   });
 
   it("filters authorized staff queues with the same bounded page metadata", async () => {
@@ -312,9 +316,7 @@ describe("support HTTP authorization and privacy", () => {
     });
 
     const response = await listCases(
-      new NextRequest(
-        "https://nexus.test/api/support?scope=staff&page=3&status=open&category=payment",
-      ),
+      privateGet("https://nexus.test/api/support?scope=staff&page=3&status=open&category=payment"),
     );
     expect(response.status).toBe(200);
     expectPrivate(response);
@@ -327,6 +329,7 @@ describe("support HTTP authorization and privacy", () => {
         category: "payment",
       },
       "usr_staff",
+      "initiating-token",
     );
     expect(mocks.pageByRequester).not.toHaveBeenCalled();
   });
@@ -341,7 +344,7 @@ describe("support HTTP authorization and privacy", () => {
     mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
     mocks.can.mockReturnValue(true);
     const response = await listCases(
-      new NextRequest(`https://nexus.test/api/support?scope=staff&${query}`),
+      privateGet(`https://nexus.test/api/support?scope=staff&${query}`),
     );
     expect(response.status).toBe(400);
     expectPrivate(response);
@@ -354,7 +357,7 @@ describe("support HTTP authorization and privacy", () => {
     mocks.can.mockReturnValue(true);
     mocks.authorizedThread.mockRejectedValue(new AppError("Hidden", 404, "NOT_FOUND"));
 
-    const request = new NextRequest(`https://nexus.test/api/support/${caseId}`);
+    const request = privateGet(`https://nexus.test/api/support/${caseId}`);
     const hidden = await getCase(request, params);
     expect(hidden.status).toBe(404);
     expectPrivate(hidden);
@@ -375,14 +378,36 @@ describe("support HTTP authorization and privacy", () => {
     const allowed = await getCase(request, params);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.authorizedThread).toHaveBeenCalledWith(caseId, "usr_member", 1);
+    expect(mocks.authorizedThread).toHaveBeenCalledWith(
+      caseId,
+      "usr_member",
+      1,
+      "initiating-token",
+    );
     expect(mocks.findById).not.toHaveBeenCalled();
     expect(mocks.can).not.toHaveBeenCalled();
   });
 
+  it("returns 401 without private data if the initiating session expires before a read", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.authorizedThread.mockRejectedValueOnce(
+      new AppError("Authentication required", 401, "UNAUTHORIZED"),
+    );
+    const response = await getCase(privateGet(`https://nexus.test/api/support/${caseId}`), params);
+    expect(response.status).toBe(401);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
+    expect(mocks.authorizedThread).toHaveBeenCalledWith(
+      caseId,
+      "usr_member",
+      1,
+      "initiating-token",
+    );
+  });
+
   it("rejects invalid page queries before reading private cases", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
-    const response = await listCases(new NextRequest("https://nexus.test/api/support?page=0"));
+    const response = await listCases(privateGet("https://nexus.test/api/support?page=0"));
     expect(response.status).toBe(400);
     expectPrivate(response);
     expect(mocks.pageByRequester).not.toHaveBeenCalled();
@@ -398,11 +423,16 @@ describe("support HTTP authorization and privacy", () => {
     });
 
     const response = await getCase(
-      new NextRequest(`https://nexus.test/api/support/${caseId}?messagePage=7`),
+      privateGet(`https://nexus.test/api/support/${caseId}?messagePage=7`),
       params,
     );
     expect(response.status).toBe(200);
-    expect(mocks.authorizedThread).toHaveBeenCalledWith(caseId, "usr_member", 7);
+    expect(mocks.authorizedThread).toHaveBeenCalledWith(
+      caseId,
+      "usr_member",
+      7,
+      "initiating-token",
+    );
     expect(await response.json()).toMatchObject({
       messagePage: 7,
       messageTotalPages: 7,
@@ -419,7 +449,7 @@ describe("support HTTP authorization and privacy", () => {
   ])("rejects malformed private message pagination %s", async (query) => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     const response = await getCase(
-      new NextRequest(`https://nexus.test/api/support/${caseId}?${query}`),
+      privateGet(`https://nexus.test/api/support/${caseId}?${query}`),
       params,
     );
     expect(response.status).toBe(400);
@@ -430,10 +460,7 @@ describe("support HTTP authorization and privacy", () => {
   it("limits private thread reads before loading message bodies", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     mocks.rate.mockResolvedValue({ success: false });
-    const response = await getCase(
-      new NextRequest(`https://nexus.test/api/support/${caseId}`),
-      params,
-    );
+    const response = await getCase(privateGet(`https://nexus.test/api/support/${caseId}`), params);
     expect(response.status).toBe(429);
     expectPrivate(response);
     expect(mocks.authorizedThread).not.toHaveBeenCalled();
@@ -994,16 +1021,20 @@ describe("support requester workspace lifecycle", () => {
   it("applies requester search and status/category filters inside the authenticated scope", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     const response = await listCases(
-      new NextRequest(
-        "https://nexus.test/api/support?q=Access&status=resolved&category=account&page=2",
-      ),
+      privateGet("https://nexus.test/api/support?q=Access&status=resolved&category=account&page=2"),
     );
     expect(response.status).toBe(200);
-    expect(mocks.pageByRequester).toHaveBeenCalledWith("usr_member", 2, 25, {
-      query: "Access",
-      status: "resolved",
-      category: "account",
-    });
+    expect(mocks.pageByRequester).toHaveBeenCalledWith(
+      "usr_member",
+      2,
+      25,
+      {
+        query: "Access",
+        status: "resolved",
+        category: "account",
+      },
+      "initiating-token",
+    );
     expect(mocks.pageStaff).not.toHaveBeenCalled();
   });
   it.each(["resolved", "open"])(

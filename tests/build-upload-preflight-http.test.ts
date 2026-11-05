@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import packageFixtures from "./fixtures/build-packages.json";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import packageFixtures from "./fixtures/build-packages.json";
 
 const preflight = vi.hoisted(() => vi.fn());
 const releaseBuild = vi.hoisted(() => vi.fn());
@@ -59,6 +59,7 @@ function invalidBodyRequest() {
     method: "POST",
     headers: browserMutationHeaders({
       cookie: "nexus_session=tok_attacker",
+      "x-nexus-actor-id": "usr_attacker",
       "content-type": "application/json",
     }),
     body: JSON.stringify({ intentionally: "not multipart" }),
@@ -70,6 +71,7 @@ function oversizedDeclaredRequest() {
     method: "POST",
     headers: browserMutationHeaders({
       cookie: "nexus_session=tok_attacker",
+      "x-nexus-actor-id": "usr_attacker",
       "content-type": "multipart/form-data; boundary=nexus-boundary",
       "content-length": String(65 * 1024 * 1024 + 1),
     }),
@@ -91,6 +93,7 @@ function oversizedChunkedRequest() {
     method: "POST",
     headers: browserMutationHeaders({
       cookie: "nexus_session=tok_attacker",
+      "x-nexus-actor-id": "usr_attacker",
       "content-type": "multipart/form-data; boundary=nexus-boundary",
     }),
     body,
@@ -114,6 +117,7 @@ function validChunkedRequest() {
     method: "POST",
     headers: browserMutationHeaders({
       cookie: "nexus_session=tok_attacker",
+      "x-nexus-actor-id": "usr_attacker",
       "content-type": "multipart/form-data; boundary=nexus-boundary",
     }),
     body: new ReadableStream<Uint8Array>({
@@ -204,6 +208,7 @@ describe("build upload authorization HTTP preflight", () => {
       method: "POST",
       headers: browserMutationHeaders({
         cookie: "nexus_session=tok_attacker",
+        "x-nexus-actor-id": "usr_attacker",
         "content-type": "multipart/form-data; boundary=nexus-boundary",
       }),
       body: "not a multipart body",

@@ -247,8 +247,9 @@ export async function moderatePending(
         or exists (select 1 from ${organizationMembers}
           where ${organizationMembers.organizationId} = ${product.organizationId}
             and ${organizationMembers.userId} = ${users.id}
-            and (${organizationMembers.role} in ('owner', 'admin')
-              or ${organizationMembers.permissions} @> '["manage_products"]'::jsonb))
+            and (${organizationMembers.role} = 'admin'
+              or (${organizationMembers.role} in ('member', 'developer')
+                and ${organizationMembers.permissions} @> '["manage_products"]'::jsonb)))
       )
       order by ${users.id}
     `);
@@ -271,8 +272,9 @@ export async function moderatePending(
         or exists (select 1 from ${organizationMembers}
           where ${organizationMembers.organizationId} = ${product.organizationId}
             and ${organizationMembers.userId} = ${users.id}
-            and (${organizationMembers.role} in ('owner', 'admin')
-              or ${organizationMembers.permissions} @> '["manage_products"]'::jsonb))
+            and (${organizationMembers.role} = 'admin'
+              or (${organizationMembers.role} in ('member', 'developer')
+                and ${organizationMembers.permissions} @> '["manage_products"]'::jsonb)))
       ) and not exists (select 1 from ${notificationPreferences}
         where ${notificationPreferences.userId} = ${users.id}
           and ${notificationPreferences.systemEnabled} = false)

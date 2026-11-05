@@ -43,9 +43,9 @@ export async function assertProductMutationAuthority(
       .for("share");
     if (
       membership &&
-      (membership.role === "owner" ||
-        membership.role === "admin" ||
-        membership.permissions.includes("manage_products"))
+      (membership.role === "admin" ||
+        (["member", "developer"].includes(membership.role) &&
+          membership.permissions.includes("manage_products")))
     )
       return actor;
   }

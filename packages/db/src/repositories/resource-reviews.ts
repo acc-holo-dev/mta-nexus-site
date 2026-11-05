@@ -114,8 +114,9 @@ async function reviewGate(
     actor.role === "admin" ||
     organization?.ownerId === actorId ||
     (membership &&
-      (["owner", "admin"].includes(membership.role) ||
-        membership.permissions.includes("manage_products")))
+      (membership.role === "admin" ||
+        (["member", "developer"].includes(membership.role) &&
+          membership.permissions.includes("manage_products"))))
   )
     return { reason: "owner_conflict", access: null };
   const access = await lockUserDownloadAccess(tx, actorId, product.id);

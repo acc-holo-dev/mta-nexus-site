@@ -72,6 +72,19 @@ export const POST = withBrowserMutation(
         );
       }
 
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        return privateJson(
+          context,
+          { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+          { status: 428 },
+        );
+      if (expectedActor !== user.id)
+        return privateJson(
+          context,
+          { error: "Actor changed", code: "ACTOR_CHANGED" },
+          { status: 409 },
+        );
       const rateLimit = await consumeRateLimit("buildUpload", user.id);
       if (!rateLimit.success) {
         return privateJson(

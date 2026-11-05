@@ -297,3 +297,5 @@ Delist/archive UX: unlist доступен; history/buyer records survive; publi
 Смежные контракты без дублирования: [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md) + [handbook/13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
 
 **Пока DOC-04 не завершён, исходные главы handbook остаются авторитетными** при любом расхождении с этим черновиком. Этот файл — интегрированный DOC-05 draft subject contract, не разрешение удалять handbook и не активация commerce.
+
+Resource creation (`POST /api/products`) and build submission (`POST /api/products/:id/builds`) require `X-Nexus-Actor-Id` matching the authenticated session. Missing headers return 428; changed accounts return 409. Clients must keep the original actor and exact submission when a response is lost. The author form keeps an actor-scoped pending intent and requires the same filename and SHA-256 after a reload; an exact retry can recover the existing draft or pending build. A failed recovery attempt, including rate limiting, does not establish that an earlier request failed.

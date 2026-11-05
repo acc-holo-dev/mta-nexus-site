@@ -37,7 +37,7 @@ it("binds private status history to the session and validates the narrow result"
   expect(response.status).toBe(200);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
-  expect(mocks.history).toHaveBeenCalledWith(id, "actor", "audit_before");
+  expect(mocks.history).toHaveBeenCalledWith(id, "actor", "audit_before", "test");
   expect((await response.json()).items[0]).toEqual({
     id: "audit",
     from: "open",

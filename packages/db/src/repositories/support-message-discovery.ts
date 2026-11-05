@@ -4,12 +4,18 @@ import { db } from "../client";
 import { supportCaseMessages } from "../schema";
 import { changeHistoryContext, changeHistoryWindow } from "./private-change-history-window";
 import { containsPattern } from "./search-pattern";
-import { supportAccess } from "./support-access";
+import { assertSupportReadSession, supportAccess } from "./support-access";
 
 const messageId = (value: string) => /^spm_[a-f0-9]{24}$/u.test(value);
 const messageTime = sql<string>`to_char(${supportCaseMessages.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
 export const supportMessageDiscoveryRepository = {
-  async page(caseId: string, actorId: string, filters: SupportMessageFilters, staffOnly = false) {
+  async page(
+    caseId: string,
+    actorId: string,
+    filters: SupportMessageFilters,
+    staffOnly = false,
+    currentToken?: string,
+  ) {
     if (!/^sup_[a-f0-9]{24}$/u.test(caseId))
       throw new AppError("Support case not found", 404, "NOT_FOUND");
     const history = { ...filters, period: "all" as const };
@@ -30,6 +36,7 @@ export const supportMessageDiscoveryRepository = {
       throw new AppError("Invalid message filters", 400, "CHANGE_HISTORY_FILTER_INVALID");
     return db.transaction(
       async (tx) => {
+        if (currentToken !== undefined) await assertSupportReadSession(tx, actorId, currentToken);
         const { actor, supportCase } = await supportAccess(tx, caseId, actorId, false);
         if (staffOnly && !actor.staff) throw new AppError("Staff required", 403, "FORBIDDEN");
         const until = await changeHistoryWindow(tx, history);

@@ -107,13 +107,14 @@ function mutation(request: NextRequest, following: boolean) {
       if (!parsed.success) throw new AppError("Invalid follow command", 400, "VALIDATION_ERROR");
       const { targetType, targetId, notifyComments } = parsed.data;
       // Follower inbox notice commits in the same follow transaction; no after().
-      const result = await followWorkspaceRepository.setFollowing(
+      const result = await followWorkspaceRepository.setFollowingAuthenticated(
         actor.id,
         targetType,
         targetId,
         following,
         generateId("fol"),
         following && targetType === "content" ? { notifyComments } : {},
+        request.cookies.get("nexus_session")?.value ?? "",
       );
       return {
         success: true,

@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import packageFixtures from "./fixtures/build-packages.json";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError, ForbiddenError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import packageFixtures from "./fixtures/build-packages.json";
 
 const mocks = vi.hoisted(() => ({
   authorize: vi.fn(),
@@ -33,6 +33,7 @@ vi.mock("@nexus/storage", () => ({
   storageService: { uploadAsset: mocks.upload, deleteAsset: mocks.remove },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: vi.fn(async () => ({ success: true })) }));
+
 import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
 
 function request() {
@@ -46,7 +47,10 @@ function request() {
   form.set("mtaVersionTarget", "1.6.0");
   return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
     method: "POST",
-    headers: browserMutationHeaders({ cookie: "nexus_session=tok_author" }),
+    headers: browserMutationHeaders({
+      cookie: "nexus_session=tok_author",
+      "x-nexus-actor-id": "usr_author",
+    }),
     body: form,
   });
 }
@@ -76,6 +80,19 @@ describe("exact build upload retry HTTP", () => {
       new AppError("This resource version already exists", 409, "BUILD_VERSION_EXISTS"),
     );
     mocks.recover.mockResolvedValue(existing);
+  });
+
+  it("rejects missing or changed actor before upload", async () => {
+    for (const [header, status] of [
+      [null, 428],
+      ["usr_other", 409],
+    ] as const) {
+      const input = request();
+      if (header) input.headers.set("x-nexus-actor-id", header);
+      else input.headers.delete("x-nexus-actor-id");
+      expect((await POST(input, context)).status).toBe(status);
+    }
+    expect(mocks.upload).not.toHaveBeenCalled();
   });
 
   it("cleans the redundant upload before confirming the original identity without storage details", async () => {

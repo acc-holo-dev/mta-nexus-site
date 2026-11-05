@@ -20,8 +20,9 @@ import { supportQuery } from "../../../lib/support-workspace-contract";
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
   try {
-    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    if (!user)
+    const token = request.cookies.get("nexus_session")?.value;
+    const user = await authService.getSession(token);
+    if (!user || !token)
       return supportPrivateJson(
         context,
         request,
@@ -47,7 +48,13 @@ export async function GET(request: NextRequest) {
       ...(filters.q ? { query: filters.q } : {}),
     };
     if (staff) {
-      const result = await supportCaseRepository.pageStaff(filters.page, 25, selection, user.id);
+      const result = await supportCaseRepository.pageStaff(
+        filters.page,
+        25,
+        selection,
+        user.id,
+        token,
+      );
       return supportPrivateJson(context, request, {
         cases: result.items.map((row) => ({
           ...row.supportCase,
@@ -58,9 +65,13 @@ export async function GET(request: NextRequest) {
         total: result.total,
       });
     }
-    const result = Object.keys(selection).length
-      ? await supportCaseRepository.pageByRequester(user.id, filters.page, 25, selection)
-      : await supportCaseRepository.pageByRequester(user.id, filters.page);
+    const result = await supportCaseRepository.pageByRequester(
+      user.id,
+      filters.page,
+      25,
+      selection,
+      token,
+    );
     return supportPrivateJson(context, request, {
       cases: result.items,
       page: result.page,

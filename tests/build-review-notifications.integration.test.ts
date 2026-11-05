@@ -212,7 +212,7 @@ it("rolls back build, product and audit when notification storage fails, then pe
 it("notifies current organization managers once, respecting revocation and preferences", async () => {
   const f = await fixture();
   const orgId = `org_${f.productId}`;
-  const roles = ["owner", "manager", "admin", "reader"] as const;
+  const roles = ["owner", "manager", "admin", "reader", "stale"] as const;
   for (const role of roles)
     await userRepository.create({
       id: `${f.authorId}_${role}`,
@@ -229,8 +229,9 @@ it("notifies current organization managers once, respecting revocation and prefe
       id: `mem_${f.buildId}_${role}`,
       organizationId: orgId,
       userId: `${f.authorId}_${role}`,
-      role: role === "admin" ? "admin" : "member",
-      permissions: role === "manager" || role === "reader" ? ["manage_products"] : [],
+      role: role === "admin" ? "admin" : role === "stale" ? "owner" : "member",
+      permissions:
+        role === "manager" || role === "reader" || role === "stale" ? ["manage_products"] : [],
     })),
   );
   const { products } = await import("../packages/db/src/schema");

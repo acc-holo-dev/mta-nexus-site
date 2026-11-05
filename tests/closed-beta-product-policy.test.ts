@@ -95,7 +95,7 @@ describe("open free-beta product behavior", () => {
   });
 
   it("rejects paid product creation before permission or persistence work", async () => {
-    await expect(service.createProduct(createInput(1500), actor)).rejects.toMatchObject({
+    await expect(service.createProduct(createInput(1500), actor, "session")).rejects.toMatchObject({
       statusCode: 422,
       code: "PAID_RESOURCES_DISABLED",
     });

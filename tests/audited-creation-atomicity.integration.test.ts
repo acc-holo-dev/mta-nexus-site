@@ -75,6 +75,7 @@ describe("audited creation atomicity", () => {
           targetId: productId,
           targetType: "product",
         },
+        token,
       ),
     ).rejects.toBeTruthy();
     expect(await productRepository.findById(productId)).toBeNull();

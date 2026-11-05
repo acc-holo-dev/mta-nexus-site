@@ -112,8 +112,9 @@ async function isManagerOrStaff(
     .for("share");
   return Boolean(
     membership &&
-      (["owner", "admin"].includes(membership.role) ||
-        membership.permissions.includes("manage_products")),
+      (membership.role === "admin" ||
+        (["member", "developer"].includes(membership.role) &&
+          membership.permissions.includes("manage_products"))),
   );
 }
 

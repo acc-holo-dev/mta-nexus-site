@@ -1,9 +1,4 @@
-import {
-  buildRepository,
-  organizationRepository,
-  productLifecycleRepository,
-  productRepository,
-} from "@nexus/db";
+import { buildRepository, productLifecycleRepository, productRepository } from "@nexus/db";
 import type {
   Build,
   BuildPackageEvidence,
@@ -207,6 +202,14 @@ export class ProductService {
     return (await this.getProductDetailAccessBySlug(slug, actor))?.product ?? null;
   }
 
+  async findCreatedDraftForReplay(
+    slug: string,
+    actor: User,
+    currentToken: string,
+  ): Promise<Product | null> {
+    return productRepository.findCreatedDraftForReplay(slug, actor.id, currentToken);
+  }
+
   async getProductDetailAccessBySlug(
     slug: string,
     actor: User | null,
@@ -268,6 +271,7 @@ export class ProductService {
       "id" | "ratingAverage" | "ratingCount" | "salesCount" | "createdAt" | "updatedAt"
     >,
     actor: User,
+    currentToken: string,
   ): Promise<Product> {
     if (input.price !== 0) {
       throw new AppError(
@@ -281,30 +285,12 @@ export class ProductService {
       throw new ForbiddenError("You must have developer privileges to create products");
     }
 
-    if (input.organizationId) {
-      const organization = await organizationRepository.findById(input.organizationId);
-      if (!organization) throw new NotFoundError("Organization", input.organizationId);
-
-      const memberships = await organizationRepository.listUserMemberships(actor.id);
-      const membership = memberships.find((item) => item.organizationId === input.organizationId);
-      const canManageProducts =
-        organization.ownerId === actor.id ||
-        membership?.role === "owner" ||
-        membership?.role === "admin" ||
-        membership?.permissions.includes("manage_products");
-
-      if (!canManageProducts) {
-        throw new ForbiddenError(
-          "You do not have permission to create resources for this organization",
-        );
-      }
-    }
-
     const id = generateId("prd");
     const product = await productRepository.createWithAudit(
       {
         ...input,
         id,
+        authorId: actor.id,
         price: 0,
         currency: "USD",
         licenseModel: "unlimited",
@@ -321,6 +307,7 @@ export class ProductService {
         targetType: "product",
         details: { title: input.title, price: 0 },
       },
+      currentToken,
     );
 
     await publishCommittedEvent(() => ({

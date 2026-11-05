@@ -27,7 +27,7 @@ vi.mock("@nexus/security", () => ({
 }));
 vi.mock("@nexus/db", async () => ({
   followWorkspaceRepository: {
-    setFollowing: vi.fn(
+    setFollowingAuthenticated: vi.fn(
       async (
         _actor: string,
         _type: string,
