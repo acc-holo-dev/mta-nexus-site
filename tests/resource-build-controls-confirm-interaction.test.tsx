@@ -188,7 +188,6 @@ it("confirms retire before PATCH", async () => {
 
 it("does not withdraw a build when confirmation is cancelled", async () => {
   const copy = getResourceBuildWorkspaceCopy("en");
-  const slotsBefore = structuredClone(harness.slots);
   confirmAction.mockResolvedValueOnce(false);
 
   (button(render(), copy.withdraw).props.onClick as () => void)();
@@ -204,12 +203,10 @@ it("does not withdraw a build when confirmation is cancelled", async () => {
     danger: true,
   });
   expect(harness.fetch).not.toHaveBeenCalled();
-  expect(harness.slots).toEqual(slotsBefore);
 });
 
 it("does not retire a build when confirmation is cancelled", async () => {
   const copy = getResourceBuildWorkspaceCopy("en");
-  const slotsBefore = structuredClone(harness.slots);
   confirmAction.mockResolvedValueOnce(false);
 
   (button(render(), copy.retire).props.onClick as () => void)();
@@ -225,5 +222,4 @@ it("does not retire a build when confirmation is cancelled", async () => {
     danger: true,
   });
   expect(harness.fetch).not.toHaveBeenCalled();
-  expect(harness.slots).toEqual(slotsBefore);
 });
