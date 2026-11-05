@@ -43,8 +43,11 @@ export function ProductDependencyList({
           </div>
         ) : (
           <div key={dependencyItem.slug}>
-            <span className="font-mono text-secondary">{dependencyItem.slug}</span>
-            <span className="ml-1 text-[10px] text-faint">{copy.notFound}</span>
+            <ErrorState
+              id="product-dependency-not-found"
+              title={copy.notFound}
+              description={dependencyItem.slug}
+            />
           </div>
         ),
       )}
