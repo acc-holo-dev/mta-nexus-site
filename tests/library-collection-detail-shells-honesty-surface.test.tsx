@@ -87,15 +87,19 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
   );
 });
 
-it("locks collection requirements back/check touch targets and structured withheld messaging", () => {
+it("locks collection requirements back/check touch targets and withheld ErrorState notice", () => {
   const source = read("apps/web/src/components/collection-requirements-screen.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toContain("inline-flex min-h-11 items-center");
-  expect(source).toContain("bg-danger-soft");
-  expect(source).toContain("border-[color:var(--nexus-danger)]/20");
   expect(source).toContain("unavailableItemCount");
-  expect(source).toContain("c.withheld");
   expect(source).toContain("c.unavailable");
+  expect(source).toContain("description={c.withheld}");
+  expect(source).toContain('className="items-stretch py-4"');
+  expect(source).toMatch(
+    /unavailableItemCount > 0 && \(\s*<ErrorState[\s\S]*?title=\{`\$\{c\.unavailable\}: \$\{result\.unavailableItemCount\}`\}/u,
+  );
+  expect(source).not.toContain("bg-danger-soft");
+  expect(source).not.toContain('role="alert"');
   expect(source).not.toMatch(/role="note"\s+className="text-danger"/u);
 });
 

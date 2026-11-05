@@ -132,15 +132,11 @@ export async function CollectionRequirementsScreen({
         <dd>{result.unavailableItemCount}</dd>
       </dl>
       {result.unavailableItemCount > 0 && (
-        <aside
-          role="note"
-          className="rounded-lg border border-[color:var(--nexus-danger)]/20 bg-danger-soft p-4 text-sm text-danger"
-        >
-          <p className="font-semibold">
-            {c.unavailable}: {result.unavailableItemCount}
-          </p>
-          <p className="mt-1">{c.withheld}</p>
-        </aside>
+        <ErrorState
+          title={`${c.unavailable}: ${result.unavailableItemCount}`}
+          description={c.withheld}
+          className="items-stretch py-4"
+        />
       )}
       <ResourceRequirementsReportBody
         report={result.report}

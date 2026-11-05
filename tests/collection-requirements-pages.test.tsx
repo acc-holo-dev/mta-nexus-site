@@ -36,9 +36,9 @@ vi.mock("../apps/web/src/components/resource-cart-controls", () => ({
   ),
 }));
 
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { collectionRequirementsCopy } from "../apps/web/src/lib/collection-requirements-i18n";
 import { CollectionRequirementsScreen as screen } from "../apps/web/src/components/collection-requirements-screen";
+import { collectionRequirementsCopy } from "../apps/web/src/lib/collection-requirements-i18n";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",
@@ -107,7 +107,7 @@ it.each(["ru", "en"])("renders shared preparation and exact downloads in %s", as
   expect(html).toContain("/api/library/collections/lcol_a/requirements/export?targetMta=1.6.0");
   expect(state.report).toHaveBeenCalledWith("usr_a", "lcol_a", { targetMta: "1.6.0" });
 });
-it("shows withheld members without claiming that no obstacles exist", async () => {
+it("shows withheld members through ErrorState without claiming that no obstacles exist", async () => {
   const result = fixture();
   result.unavailableItemCount = 1;
   result.state = "blocked";
@@ -115,8 +115,12 @@ it("shows withheld members without claiming that no obstacles exist", async () =
     ...result,
     report: { ...result.report, nodes: [], issues: [], order: [] },
   });
+  const copy = collectionRequirementsCopy("en");
   const html = renderToStaticMarkup(await screen(props));
-  expect(html).toContain("Their private details are hidden");
+  expect(html).toContain('role="alert"');
+  expect(html).toContain(`${copy.unavailable}: 1`);
+  expect(html).toContain(copy.withheld);
+  expect(html).toContain("bg-danger-soft");
   expect(html).not.toContain("No obstacles found");
   expect(html).not.toContain("data-build=");
 });
