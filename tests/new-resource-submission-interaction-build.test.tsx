@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest";
 import {
   createNewResourceSubmissionInteractionHelpers,
-  FakeFormData,
+  type FakeFormData,
   fields,
   mockReactHooks,
   reply,
