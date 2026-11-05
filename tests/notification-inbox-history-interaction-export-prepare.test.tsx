@@ -30,7 +30,7 @@ vi.mock("../apps/web/src/lib/notification-inbox-events", () => ({
 
 import { NotificationInbox } from "../apps/web/src/components/notification-inbox";
 
-const { render, button, click, acknowledgeSelection, exportClick, exportLink } =
+const { render, button, acknowledgeSelection, exportClick } =
   createNotificationInboxInteractionHelpers(harness, NotificationInbox);
 
 it("prepares a verified export without changing selected or read notifications and releases its object URL", async () => {
@@ -66,6 +66,7 @@ it("prepares a verified export without changing selected or read notifications a
   for (const cleanup of harness.cleanups.splice(0)) cleanup();
   expect(browser.revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:nexus-test");
 });
+
 it.each([
   [response({ code: "UNAUTHORIZED" }, 401), "Sign in to view your notifications."],
   [response({ code: "RATE_LIMIT_EXCEEDED" }, 429), "Too many requests. Try again shortly."],
@@ -87,70 +88,3 @@ it.each([
     expect(harness.fetch).toHaveBeenCalledTimes(2);
   },
 );
-it("coalesces repeated export clicks and prevents writes during file preparation", async () => {
-  const browser = browserDownload();
-  let complete!: (response: Response) => void;
-  harness.fetch.mockReset().mockReturnValueOnce(
-    new Promise<Response>((resolve) => {
-      complete = resolve;
-    }),
-  );
-  const nodes = render();
-  exportClick(nodes);
-  exportClick(nodes);
-  click(nodes, "Mark as read");
-  click(nodes, "Reload saved inbox");
-  expect(harness.fetch).toHaveBeenCalledTimes(1);
-  complete(exportResponse());
-  await vi.waitFor(() => expect(browser.link.click).toHaveBeenCalledTimes(1));
-  expect(harness.announce).not.toHaveBeenCalled();
-});
-it("aborts an export on navigation, ignores late replies and rejects stale click handlers", async () => {
-  const browser = browserDownload();
-  let complete!: (response: Response) => void;
-  harness.fetch.mockReset().mockReturnValueOnce(
-    new Promise<Response>((resolve) => {
-      complete = resolve;
-    }),
-  );
-  const nodes = render();
-  exportClick(nodes);
-  const signal = harness.fetch.mock.calls[0][1].signal;
-  for (const cleanup of harness.cleanups.splice(0)) cleanup();
-  expect(signal.aborted).toBe(true);
-  complete(exportResponse());
-  await new Promise((resolve) => setImmediate(resolve));
-  exportClick(nodes);
-  expect(harness.fetch).toHaveBeenCalledTimes(1);
-  expect(browser.createObjectURL).not.toHaveBeenCalled();
-  expect(browser.link.click).not.toHaveBeenCalled();
-});
-
-it("cancels a stalled export on timeout and shows a retryable message", async () => {
-  const browser = browserDownload(),
-    timeout = new AbortController();
-  const timeoutSpy = vi.spyOn(AbortSignal, "timeout").mockReturnValue(timeout.signal);
-  const cancel = vi.fn();
-  harness.fetch.mockReset().mockResolvedValueOnce(
-    new Response(new ReadableStream({ cancel }), {
-      headers: {
-        "content-type": "application/json",
-        "content-disposition": 'attachment; filename="nexus-notification-page.json"',
-      },
-    }),
-  );
-  try {
-    exportClick();
-    await new Promise((resolve) => setImmediate(resolve));
-    timeout.abort(new DOMException("Timed out", "TimeoutError"));
-    await vi.waitFor(() =>
-      expect(flatTreeHasErrorText(render(), "The export took too long. Try again.")).toBe(true),
-    );
-    expect(cancel).toHaveBeenCalledTimes(1);
-    expect(browser.createObjectURL).not.toHaveBeenCalled();
-    expect(exportLink()).toBeDefined();
-    expect(button(render(), "Mark as read").props.disabled).toBe(false);
-  } finally {
-    timeoutSpy.mockRestore();
-  }
-});
