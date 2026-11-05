@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `6641b17e` — tip advanced after meta-inspector ErrorState (#576) and tip honesty (#591); tip CI not claimed verified-green under rapid merges;
 - `48b89589` — tip advanced after cart item unavailable ErrorState (#579); tip CI not claimed verified-green under rapid merges;
 - `c51536dd` — tip advanced after settings-recovery (#570), license-binding (#572), directory-stale (#577), build-provenance (#569), and membership-history (#571); tip CI not claimed verified-green under rapid merges;
 - `420b6172` — tip advanced after tip honesty (#568) on 0c751391 residual wave; tip CI not claimed verified-green under rapid merges;
