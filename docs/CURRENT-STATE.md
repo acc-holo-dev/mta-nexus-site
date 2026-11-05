@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `fcb993bd` — tip advanced after resource-media readonly ErrorState (#552) and tip honesty (#555); tip CI not claimed verified-green under rapid merges;
 - `ae906295` — tip advanced after library-collections-http split (#547) and support-sla ErrorState (#549); tip CI not claimed verified-green under rapid merges (Actions may cancel under concurrent tip merges);
 - `5df7c793` — tip advanced after community-report detail confirm-cancel (#545) and metadata reviewRequired (#544); tip CI not claimed verified-green under rapid merges;
 - `80259a63` — tip advanced after tip honesty (#542) on a74b9d2e residual wave; tip CI not claimed verified-green under rapid merges;
