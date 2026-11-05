@@ -113,40 +113,42 @@ export default async function LicensesModerationPage({
           {getLicenseMaintenanceCopy(locale).maintenance}
         </Link>
       )}
-      <form className="flex min-w-0 flex-wrap items-end gap-3" method="get">
-        <input
-          name="q"
-          defaultValue={text}
-          maxLength={120}
-          aria-label={copy.search}
-          placeholder={copy.search}
-          className={fieldClass}
-        />
-        <select
-          name="status"
-          defaultValue={status}
-          aria-label={history.status}
-          className={fieldClass}
-        >
-          <option value="">{copy.all}</option>
-          {Object.entries(history.licenseStatuses).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <Button type="submit" className="min-h-11">
-          {copy.searchButton}
-        </Button>
-        {filtersActive ? (
-          <Link
-            href="/admin/licenses"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      <search aria-label={copy.search}>
+        <form className="flex min-w-0 flex-wrap items-end gap-3" method="get">
+          <input
+            name="q"
+            defaultValue={text}
+            maxLength={120}
+            aria-label={copy.search}
+            placeholder={copy.search}
+            className={fieldClass}
+          />
+          <select
+            name="status"
+            defaultValue={status}
+            aria-label={history.status}
+            className={fieldClass}
           >
-            {copy.clearFilters}
-          </Link>
-        ) : null}
-      </form>
+            <option value="">{copy.all}</option>
+            {Object.entries(history.licenseStatuses).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <Button type="submit" className="min-h-11">
+            {copy.searchButton}
+          </Button>
+          {filtersActive ? (
+            <Link
+              href="/admin/licenses"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.clearFilters}
+            </Link>
+          ) : null}
+        </form>
+      </search>
       {result.licenses.length ? (
         <ol className="space-y-3">
           {result.licenses.map((license) => (
