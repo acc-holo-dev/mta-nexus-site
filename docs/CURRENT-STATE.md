@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `8efb1bd1` — tip advanced after tip honesty (#781) on 173ae7fa; tip CI not claimed verified-green under rapid merges;
 - `173ae7fa` — tip advanced after server-report-batch suite split (#774) following tip f752a934 (tip honesty #777 + context-trust-team #769); tip CI not claimed verified-green under rapid merges;
 - `b7d627a3` — tip advanced after verification-application-readonly ErrorState honesty (#768) following tip honesty (#775) on 00889858; tip CI not claimed verified-green under rapid merges;
 - `00889858` — tip advanced after tip honesty (#773) and own-discussion readonly ErrorState (#770); tip CI not claimed verified-green under rapid merges;
