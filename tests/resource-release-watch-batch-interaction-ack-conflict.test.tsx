@@ -1,8 +1,5 @@
 import { expect, it, vi } from "vitest";
-import {
-  type FlatTestElement,
-  flatTreeHasErrorText,
-} from "./helpers/flatten-react-test-tree";
+import { type FlatTestElement, flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
 import {
   createResourceReleaseWatchBatchInteractionHelpers,
   mockReactHooks,
