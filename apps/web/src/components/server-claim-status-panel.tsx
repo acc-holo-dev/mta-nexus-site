@@ -1,4 +1,5 @@
 import type { ManagedServerClaimStatus } from "@nexus/db";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import { getServerClaimStatusCopy } from "../lib/server-claim-status-view";
@@ -54,9 +55,9 @@ export function ServerClaimStatusPanel({
                   </time>
                 </p>
               )}
-              {!status.isVerified && !request.proofMatchesServer && (
-                <p className="text-xs leading-relaxed text-warning">{copy.outdated}</p>
-              )}
+              {!status.isVerified && !request.proofMatchesServer ? (
+                <ErrorState title={copy.outdated} />
+              ) : null}
               {!status.isVerified && (
                 <p className="text-xs leading-relaxed text-muted">
                   {waiting ? copy.wait : copy.retry}
