@@ -71,6 +71,15 @@ export const resolvedDetail = {
   },
 };
 
+export const followingDetail = {
+  ...openDetail,
+  thread: {
+    ...openDetail.thread,
+    following: true,
+    followRevision: 2,
+  },
+};
+
 const page = {
   threads: [
     {
@@ -136,7 +145,7 @@ function descendants(node: ReactNode): Element[] {
 
 function seed(
   harness: ResourceQaPanelConfirmHarness,
-  detail: typeof openDetail | typeof resolvedDetail,
+  detail: typeof openDetail | typeof resolvedDetail | typeof followingDetail,
 ) {
   // page, readError, selectedId, pendingThreadId, detail, loadingDetail, loadingPage,
   // question, buildId, answer, writeError, busy, loginHref, registerHref, writeGuard
@@ -164,7 +173,7 @@ export function createResourceQaPanelConfirmInteractionHelpers(
   ResourceQaPanel: ResourceQaPanelComponent,
   confirmAction: ConfirmActionMock,
 ) {
-  function render(detail: typeof openDetail | typeof resolvedDetail) {
+  function render(detail: typeof openDetail | typeof resolvedDetail | typeof followingDetail) {
     seed(harness, detail);
     harness.cursor = 0;
     return descendants(

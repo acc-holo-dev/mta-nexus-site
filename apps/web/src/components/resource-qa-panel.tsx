@@ -296,6 +296,19 @@ export function ResourceQaPanel({
 
   async function onFollow(enabled: boolean) {
     if (!detail) return;
+    if (
+      !enabled &&
+      !(await confirmAction({
+        title: copy.unfollowConfirmTitle,
+        object: detail.thread.body,
+        consequences: copy.unfollowConfirm,
+        confirmLabel: copy.unfollow,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
     const ok = await mutate(
       `${base}/${encodeURIComponent(detail.thread.id)}/follow`,
       {
