@@ -15,7 +15,7 @@ type Element = ReactElement<Record<string, unknown>>;
 
 type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
-export const time = "2026-10-11T00:00:00.000Z";
+const time = "2026-10-11T00:00:00.000Z";
 export const later = "2026-10-11T00:00:01.000Z";
 
 export const initial = {
