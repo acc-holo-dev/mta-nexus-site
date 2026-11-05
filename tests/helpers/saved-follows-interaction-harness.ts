@@ -21,7 +21,7 @@ type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
 type Element = ReactElement<Record<string, unknown>>;
 
-export const initialPage: FollowPage = {
+const initialPage: FollowPage = {
   items: [
     {
       id: "f",
