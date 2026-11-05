@@ -148,10 +148,12 @@ export default async function ReactionsPage({
                       {item.title}
                     </Link>
                   ) : (
-                    <>
-                      <p className="font-semibold text-muted">{copy.hidden}</p>
-                      <p className="text-xs text-muted">{copy.hiddenDescription}</p>
-                    </>
+                    <ErrorState
+                      id="workspace-reactions-publication-unavailable"
+                      title={copy.hidden}
+                      description={copy.hiddenDescription}
+                      className="items-start py-4 text-left"
+                    />
                   )}
                   <p className="mt-2 text-sm text-secondary">
                     <span aria-hidden="true">{CONTENT_REACTION_EMOJI[item.reaction]}</span>{" "}
