@@ -21,7 +21,7 @@ const variant = {
   status: "published" as const,
 };
 
-export const managed = {
+const managed = {
   anchorProductId: "prd_a",
   group: { id: "vgrp_a", revision: 2, title: "Original group", variants: [variant] },
 };
