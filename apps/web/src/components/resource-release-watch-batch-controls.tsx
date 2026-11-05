@@ -91,13 +91,7 @@ export function ResourceReleaseWatchBatchControls({
     confirm = resume ? copy.confirmResume : enabling ? copy.confirmEnroll : copy.confirmBatch,
     apply = resume ? copy.applyResume : enabling ? copy.applyEnroll : copy.applyBatch;
   async function send() {
-    if (
-      lock.current ||
-      settled.current ||
-      saved ||
-      blocked ||
-      (!pending && !selected.length)
-    )
+    if (lock.current || settled.current || saved || blocked || (!pending && !selected.length))
       return;
     const command = frozen.current ?? {
       ...(collection ? { expectedCollectionRevision: collection.revision } : {}),
