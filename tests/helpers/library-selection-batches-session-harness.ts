@@ -22,7 +22,6 @@ import { asc, eq, sql } from "drizzle-orm";
 import { expect } from "vitest";
 import type { ResourceTransaction } from "../../packages/db/src/transaction";
 
-export type { LibrarySelectionBatchCommand };
 export {
   batches,
   builds,
