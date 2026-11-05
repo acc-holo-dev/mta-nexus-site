@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `00899a76` / #492 — order-case-review actor suite split;
 - `d69eb9ca` / #493 — notification-inbox-history export suite split;
 - `ae73431f` / #488 — library-collections guards suite split;
 - `ab0eed56` / #487 — library-collection-item-copy suite split;
