@@ -110,6 +110,7 @@ it.each(["ru", "en"] as const)(
       }),
     );
     expect(html).toContain(discussionReportsCopy(locale).title);
+    expect(html).toContain(`<search aria-label="${discussionReportsCopy(locale).search}"`);
     expect(html).toContain(discussionReportsCopy(locale).removed);
     expect(html).toContain("&lt;script&gt;unsafe&lt;/script&gt;");
     expect(html).toContain("/admin/reports/report");

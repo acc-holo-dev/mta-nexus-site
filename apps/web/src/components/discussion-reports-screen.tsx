@@ -153,47 +153,49 @@ export async function DiscussionReportsScreen({
           {copy.removed}
         </p>
       )}
-      <form action={path} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
-        <label className="space-y-1 text-sm text-primary">
-          <span>{copy.search}</span>
-          <input
-            className={platformFieldClass}
-            name="q"
-            type="search"
-            maxLength={100}
-            defaultValue={filters?.query}
-          />
-        </label>
-        <label className="space-y-1 text-sm text-primary">
-          <span>{copy.view}</span>
-          <select className={platformFieldClass} name="view" defaultValue={filters?.view}>
-            <option value="pending">{copy.pending}</option>
-            <option value="history">{copy.history}</option>
-          </select>
-        </label>
-        <label className="space-y-1 text-sm text-primary">
-          <span>{copy.type}</span>
-          <select className={platformFieldClass} name="type" defaultValue={filters?.type ?? ""}>
-            <option value="">{copy.all}</option>
-            {REPORT_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {labels[type]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="flex flex-wrap items-end gap-3 self-end">
-          <Button className="min-h-11" type="submit">
-            {copy.apply}
-          </Button>
-          <Link
-            href={path}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.clear}
-          </Link>
-        </div>
-      </form>
+      <search aria-label={copy.search}>
+        <form action={path} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
+          <label className="space-y-1 text-sm text-primary">
+            <span>{copy.search}</span>
+            <input
+              className={platformFieldClass}
+              name="q"
+              type="search"
+              maxLength={100}
+              defaultValue={filters?.query}
+            />
+          </label>
+          <label className="space-y-1 text-sm text-primary">
+            <span>{copy.view}</span>
+            <select className={platformFieldClass} name="view" defaultValue={filters?.view}>
+              <option value="pending">{copy.pending}</option>
+              <option value="history">{copy.history}</option>
+            </select>
+          </label>
+          <label className="space-y-1 text-sm text-primary">
+            <span>{copy.type}</span>
+            <select className={platformFieldClass} name="type" defaultValue={filters?.type ?? ""}>
+              <option value="">{copy.all}</option>
+              {REPORT_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {labels[type]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex flex-wrap items-end gap-3 self-end">
+            <Button className="min-h-11" type="submit">
+              {copy.apply}
+            </Button>
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.clear}
+            </Link>
+          </div>
+        </form>
+      </search>
       {data.items.length === 0 ? (
         <EmptyState
           title={emptyFiltered ? copy.emptyFiltered : copy.empty}

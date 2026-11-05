@@ -122,6 +122,7 @@ it.each(["en", "ru"] as const)(
       <CommunityReportGroups page={page} filters={filters} locale={locale} />,
     );
     expect(html).toContain(reportGroupsCopy(locale).title);
+    expect(html).toContain(`<search aria-label="${reportGroupsCopy(locale).search}"`);
     expect(html).toContain('method="get"');
     expect(html).toContain('name="period"');
     expect(html).toContain("border border-base bg-surface text-secondary");
@@ -176,6 +177,7 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain(reportGroupsCopy(locale).publicationTitle);
+    expect(html).toContain(`<search aria-label="${reportGroupsCopy(locale).search}"`);
     expect(html).toContain(reportBatchCopy(locale).publicationHelp);
     expect(html).toContain(reportBatchCopy(locale).preview);
     expect(html).toContain("border border-base bg-surface text-secondary");

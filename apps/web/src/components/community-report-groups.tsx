@@ -48,69 +48,75 @@ export function CommunityReportGroups({
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.order}</p>
       </header>
-      <form
-        method="get"
-        action={path}
-        className="nexus-panel grid min-w-0 gap-3 p-4 sm:grid-cols-2"
-      >
-        <label className="space-y-1 text-sm text-secondary">
-          <span>{copy.search}</span>
-          <input
-            name="q"
-            type="search"
-            maxLength={80}
-            defaultValue={filters.query}
-            className={platformFieldClass}
-          />
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          <span>{copy.period}</span>
-          <select name="period" defaultValue={filters.period} className={platformFieldClass}>
-            {CHANGE_HISTORY_PERIODS.map((period) => (
-              <option key={period} value={period}>
-                {privateChangeHistoryCopy(locale).periods[period]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          <span>{copy.view}</span>
-          <select name="view" defaultValue={filters.view} className={platformFieldClass}>
-            <option value="pending">{copy.pending}</option>
-            <option value="history">{copy.history}</option>
-          </select>
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          <span>{copy.target}</span>
-          <select name="target" defaultValue={filters.target ?? ""} className={platformFieldClass}>
-            <option value="">{copy.all}</option>
-            <option value="content">{labels.content}</option>
-            <option value="comment">{labels.comment}</option>
-          </select>
-        </label>
-        <label className="space-y-1 text-sm text-secondary">
-          <span>{copy.type}</span>
-          <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
-            <option value="">{copy.all}</option>
-            {REPORT_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {labels[type]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="flex items-end gap-4">
-          <Button type="submit" className="min-h-11" variant="outline">
-            {copy.apply}
-          </Button>
-          <Link
-            href={path}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {copy.reset}
-          </Link>
-        </div>
-      </form>
+      <search aria-label={copy.search}>
+        <form
+          method="get"
+          action={path}
+          className="nexus-panel grid min-w-0 gap-3 p-4 sm:grid-cols-2"
+        >
+          <label className="space-y-1 text-sm text-secondary">
+            <span>{copy.search}</span>
+            <input
+              name="q"
+              type="search"
+              maxLength={80}
+              defaultValue={filters.query}
+              className={platformFieldClass}
+            />
+          </label>
+          <label className="space-y-1 text-sm text-secondary">
+            <span>{copy.period}</span>
+            <select name="period" defaultValue={filters.period} className={platformFieldClass}>
+              {CHANGE_HISTORY_PERIODS.map((period) => (
+                <option key={period} value={period}>
+                  {privateChangeHistoryCopy(locale).periods[period]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-sm text-secondary">
+            <span>{copy.view}</span>
+            <select name="view" defaultValue={filters.view} className={platformFieldClass}>
+              <option value="pending">{copy.pending}</option>
+              <option value="history">{copy.history}</option>
+            </select>
+          </label>
+          <label className="space-y-1 text-sm text-secondary">
+            <span>{copy.target}</span>
+            <select
+              name="target"
+              defaultValue={filters.target ?? ""}
+              className={platformFieldClass}
+            >
+              <option value="">{copy.all}</option>
+              <option value="content">{labels.content}</option>
+              <option value="comment">{labels.comment}</option>
+            </select>
+          </label>
+          <label className="space-y-1 text-sm text-secondary">
+            <span>{copy.type}</span>
+            <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
+              <option value="">{copy.all}</option>
+              {REPORT_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {labels[type]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex items-end gap-4">
+            <Button type="submit" className="min-h-11" variant="outline">
+              {copy.apply}
+            </Button>
+            <Link
+              href={path}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {copy.reset}
+            </Link>
+          </div>
+        </form>
+      </search>
       <PrivateChangeHistoryCutoff until={page.until} locale={locale} />
       {page.items.length === 0 ? (
         <EmptyState

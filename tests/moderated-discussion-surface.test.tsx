@@ -94,6 +94,7 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain(locale === "ru" ? "Модерация обсуждения" : "Discussion moderation");
+    expect(html).toContain(`<search aria-label="${moderationCopy(locale).search}"`);
     expect(html).toContain("&lt;script&gt;unsafe&lt;/script&gt;");
     expect(html).toContain("/admin/community/post/discussion/comment");
     expect(html).toContain("q=word&amp;author=writer&amp;cursor=continuation");

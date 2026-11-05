@@ -265,66 +265,68 @@ export async function CommunityModerationScreen({
       </header>
       {parsed.success && filters ? (
         <>
-          <form
-            method="get"
-            action="/admin/community"
-            className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-          >
-            <label className="min-w-44 flex-1 space-y-1 text-xs text-muted">
-              {copy.search}
-              <input
-                type="search"
-                name="q"
-                maxLength={100}
-                defaultValue={filters.query}
-                className={`${platformFieldClass} min-h-11`}
-              />
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.author}
-              <input
-                name="author"
-                maxLength={128}
-                defaultValue={filters.author}
-                className={`${platformFieldClass} min-h-11`}
-              />
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.status}
-              <select
-                name="status"
-                defaultValue={filters.status ?? "all"}
-                className={`${platformFieldClass} min-h-11`}
-              >
-                {(["draft", "published", "archived", "all"] as const).map((status) => (
-                  <option key={status} value={status}>
-                    {copy[status]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.type}
-              <select
-                name="type"
-                defaultValue={filters.type ?? ""}
-                className={`${platformFieldClass} min-h-11`}
-              >
-                <option value="">{copy.all}</option>
-                {PUBLICATION_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {types[type]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Button className="min-h-11" type="submit" variant="primary">
-              {copy.apply}
-            </Button>
-            <Link className={focusLink} href="/admin/community">
-              {copy.reset}
-            </Link>
-          </form>
+          <search aria-label={copy.search}>
+            <form
+              method="get"
+              action="/admin/community"
+              className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+            >
+              <label className="min-w-44 flex-1 space-y-1 text-xs text-muted">
+                {copy.search}
+                <input
+                  type="search"
+                  name="q"
+                  maxLength={100}
+                  defaultValue={filters.query}
+                  className={`${platformFieldClass} min-h-11`}
+                />
+              </label>
+              <label className="space-y-1 text-xs text-muted">
+                {copy.author}
+                <input
+                  name="author"
+                  maxLength={128}
+                  defaultValue={filters.author}
+                  className={`${platformFieldClass} min-h-11`}
+                />
+              </label>
+              <label className="space-y-1 text-xs text-muted">
+                {copy.status}
+                <select
+                  name="status"
+                  defaultValue={filters.status ?? "all"}
+                  className={`${platformFieldClass} min-h-11`}
+                >
+                  {(["draft", "published", "archived", "all"] as const).map((status) => (
+                    <option key={status} value={status}>
+                      {copy[status]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1 text-xs text-muted">
+                {copy.type}
+                <select
+                  name="type"
+                  defaultValue={filters.type ?? ""}
+                  className={`${platformFieldClass} min-h-11`}
+                >
+                  <option value="">{copy.all}</option>
+                  {PUBLICATION_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {types[type]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Button className="min-h-11" type="submit" variant="primary">
+                {copy.apply}
+              </Button>
+              <Link className={focusLink} href="/admin/community">
+                {copy.reset}
+              </Link>
+            </form>
+          </search>
           {!parsed.data.items.length ? (
             <EmptyState
               title={copy.empty}

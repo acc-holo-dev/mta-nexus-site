@@ -84,47 +84,49 @@ export async function PublicationReportsPage({
             <p className="mt-2 text-xs text-muted">{labels.truncated}</p>
           )}
         </details>
-        <form method="get" action={path} className="nexus-panel grid gap-3 p-4 sm:grid-cols-2">
-          <label className="space-y-1 text-sm text-secondary">
-            <span>{copy.search}</span>
-            <input
-              name="q"
-              type="search"
-              maxLength={80}
-              defaultValue={filters.query ?? ""}
-              className={platformFieldClass}
-            />
-          </label>
-          <label className="space-y-1 text-sm text-secondary">
-            <span>{copy.view}</span>
-            <select name="view" defaultValue={filters.view} className={platformFieldClass}>
-              <option value="pending">{labels.pending}</option>
-              <option value="history">{labels.history}</option>
-            </select>
-          </label>
-          <label className="space-y-1 text-sm text-secondary">
-            <span>{copy.type}</span>
-            <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
-              <option value="">{copy.all}</option>
-              {REPORT_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {labels[type]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="flex flex-wrap items-end gap-3">
-            <Button type="submit" className="min-h-11" variant="outline">
-              {copy.apply}
-            </Button>
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.reset}
-            </Link>
-          </div>
-        </form>
+        <search aria-label={copy.search}>
+          <form method="get" action={path} className="nexus-panel grid gap-3 p-4 sm:grid-cols-2">
+            <label className="space-y-1 text-sm text-secondary">
+              <span>{copy.search}</span>
+              <input
+                name="q"
+                type="search"
+                maxLength={80}
+                defaultValue={filters.query ?? ""}
+                className={platformFieldClass}
+              />
+            </label>
+            <label className="space-y-1 text-sm text-secondary">
+              <span>{copy.view}</span>
+              <select name="view" defaultValue={filters.view} className={platformFieldClass}>
+                <option value="pending">{labels.pending}</option>
+                <option value="history">{labels.history}</option>
+              </select>
+            </label>
+            <label className="space-y-1 text-sm text-secondary">
+              <span>{copy.type}</span>
+              <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
+                <option value="">{copy.all}</option>
+                {REPORT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {labels[type]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex flex-wrap items-end gap-3">
+              <Button type="submit" className="min-h-11" variant="outline">
+                {copy.apply}
+              </Button>
+              <Link
+                href={path}
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reset}
+              </Link>
+            </div>
+          </form>
+        </search>
         <DiscussionReportBatch
           key={`${actor.id}:${id}:${JSON.stringify(filters)}:${data.items.map((item) => `${item.id}:${item.status}`).join("|")}`}
           contentId={id}
