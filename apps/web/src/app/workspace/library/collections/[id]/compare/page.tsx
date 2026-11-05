@@ -263,9 +263,12 @@ export default async function Page({
               {h.referenceNote}
             </p>
             {!writableDestination ? (
-              <p role="note">{h.destinationReadOnly}</p>
+              <ErrorState
+                id="library-collection-compare-destination-readonly"
+                title={h.destinationReadOnly}
+              />
             ) : !transferable.length ? (
-              <p role="note">{h.noSourceItems}</p>
+              <ErrorState id="library-collection-compare-no-source-items" title={h.noSourceItems} />
             ) : (
               <LibraryCollectionItemCopyForm
                 key={`${id}:${report.source.revision}:${comparison.destination.id}:${comparison.destination.revision}:${comparison.page}:${comparison.filter}:${comparison.q}:${comparison.transfer}`}
