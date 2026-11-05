@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `c1dd178d` — tip advanced after tip honesty (#789) for 2ce9fcac; tip CI not claimed verified-green under rapid merges;
 - `2ce9fcac` — tip advanced after tip honesty (#787) for bb3e1d65 and organization-governance suite split (#780); tip CI not claimed verified-green under rapid merges;
 - `bb3e1d65` — tip advanced after tip honesty (#786) for ac8845be and resource-build-withdrawn ErrorState honesty (#783); tip CI not claimed verified-green under rapid merges;
 - `ac8845be` — tip advanced after author-resource-details-readonly ErrorState honesty (#776) following tip honesty (#785) on 519e1c0d / tip f8d03f6a; tip CI not claimed verified-green under rapid merges;
