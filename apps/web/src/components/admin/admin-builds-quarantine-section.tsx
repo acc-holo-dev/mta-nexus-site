@@ -1,4 +1,4 @@
-import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
+import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { adminStatusLabel, adminStatusTone } from "../../app/admin/status-labels";
@@ -234,9 +234,11 @@ export function AdminBuildsQuarantineSection({
                   </code>
                   {build.status === "quarantined" && (
                     <>
-                      <p className="whitespace-pre-wrap font-caption text-danger">
-                        {copy.quarantineReason}: {build.quarantineReason}
-                      </p>
+                      <ErrorState
+                        id="admin-build-quarantine-reason"
+                        title={copy.quarantineReason}
+                        description={build.quarantineReason ?? undefined}
+                      />
                       {build.quarantinedAt && (
                         <p className="font-caption text-faint">
                           {copy.quarantinedAt}:{" "}
