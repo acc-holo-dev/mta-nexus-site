@@ -37,9 +37,7 @@ it("keeps session-check loading on role=status without treating unknowns as soft
 it("locks outdated/mismatched claim proof to ErrorState without soft text-warning", () => {
   expect(statusSource).toContain('import { ErrorState } from "@nexus/ui"');
   expect(statusSource).toContain("!request.proofMatchesServer");
-  expect(statusSource).toContain(
-    '<ErrorState id="server-claim-outdated" title={copy.outdated} />',
-  );
+  expect(statusSource).toContain('<ErrorState id="server-claim-outdated" title={copy.outdated} />');
   expect(statusSource).not.toContain(
     'className="text-xs leading-relaxed text-warning">{copy.outdated}</p>',
   );

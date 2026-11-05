@@ -13,9 +13,7 @@ const source = readFileSync(
 it("locks outdated claim proof notice to ErrorState with stable id", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="server-claim-outdated"');
-  expect(source).toContain(
-    '<ErrorState id="server-claim-outdated" title={copy.outdated} />',
-  );
+  expect(source).toContain('<ErrorState id="server-claim-outdated" title={copy.outdated} />');
   expect(source).toContain("!request.proofMatchesServer");
   expect(source).not.toContain(
     'className="text-xs leading-relaxed text-warning">{copy.outdated}</p>',
