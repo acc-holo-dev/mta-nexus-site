@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `5562a44e` — tip advanced after tip honesty (#600) on be0084cd; tip CI not claimed verified-green under rapid merges;
 - `be0084cd` — tip advanced after library collection item unavailable (#582) and tip honesty (#598); tip CI not claimed verified-green under rapid merges;
 - `d918ed7a` — tip advanced after publication-readiness blocked/pending ErrorState (#573) and tip honesty (#596); tip CI not claimed verified-green under rapid merges;
 - `e4ba204d` — tip advanced after market publisherUnavailable (#581), server clipboard (#578), version-help (#575), and tip honesty (#595); tip CI not claimed verified-green under rapid merges;
