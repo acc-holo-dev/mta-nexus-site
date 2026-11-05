@@ -19,7 +19,18 @@ mkdir -p "$EVIDENCE_HOST"
 
 echo "Ensuring postgres is healthy…"
 "${COMPOSE[@]}" up -d postgres
-"${COMPOSE[@]}" wait postgres
+for _ in $(seq 1 60); do
+  health="$("${COMPOSE[@]}" ps postgres --format '{{.Health}}' 2>/dev/null || true)"
+  if [[ "$health" == "healthy" ]]; then
+    break
+  fi
+  sleep 2
+done
+health="$("${COMPOSE[@]}" ps postgres --format '{{.Health}}' 2>/dev/null || true)"
+if [[ "$health" != "healthy" ]]; then
+  echo "Postgres is not healthy (status=${health:-unknown}); refusing soak." >&2
+  exit 1
+fi
 
 # App applies migrations on start; required before soak schema access.
 if ! "${COMPOSE[@]}" ps app --status running --quiet 2>/dev/null | grep -q .; then
@@ -40,8 +51,32 @@ if [[ "$health" != "healthy" ]]; then
   exit 1
 fi
 
-echo "Stopping push-worker so it does not race the soak dispatcher…"
-"${COMPOSE[@]}" stop push-worker >/dev/null 2>&1 || true
+if ! worker_running="$("${COMPOSE[@]}" ps push-worker --status running --quiet)"; then
+  echo "Cannot determine push-worker state; refusing soak." >&2
+  exit 1
+fi
+restore_worker=0
+cleanup() {
+  local status=$?
+  trap - EXIT
+  if [[ "$restore_worker" == 1 ]]; then
+    echo "Restoring the previously running push-worker…"
+    if ! "${COMPOSE[@]}" start push-worker; then
+      echo "Failed to restore push-worker; restart it manually." >&2
+      if [[ "$status" == 0 ]]; then status=1; fi
+    fi
+  fi
+  exit "$status"
+}
+trap cleanup EXIT
+if [[ -n "$worker_running" ]]; then
+  restore_worker=1
+  echo "Stopping push-worker so it does not race the soak dispatcher…"
+  if ! "${COMPOSE[@]}" stop push-worker; then
+    echo "Could not stop push-worker; refusing soak." >&2
+    exit 1
+  fi
+fi
 
 echo "Running soak in the compose network (durationMs=${DURATION_MS})…"
 "${COMPOSE[@]}" run --rm --no-deps \
@@ -60,4 +95,3 @@ echo "Running soak in the compose network (durationMs=${DURATION_MS})…"
 
 node scripts/check-web-push-soak-evidence.mjs "${EVIDENCE_HOST}/web-push-soak-evidence.json"
 echo "Soak evidence verified at ${EVIDENCE_HOST}/web-push-soak-evidence.json"
-echo "Optional: docker compose -p ${PROJECT} -f compose.yaml start push-worker"
