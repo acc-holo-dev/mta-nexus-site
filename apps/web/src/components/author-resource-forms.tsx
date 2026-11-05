@@ -424,11 +424,14 @@ export function AuthorResourceForms({
         className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
-        <p className="text-sm text-secondary">
-          {uploadBlocked
-            ? getResourcePublisherCopy(locale).readonly
-            : getResourcePublisherCopy(locale).editNote}
-        </p>
+        {uploadBlocked ? (
+          <ErrorState
+            id="author-resource-details-readonly"
+            title={getResourcePublisherCopy(locale).readonly}
+          />
+        ) : (
+          <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
+        )}
         <fieldset
           disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
           className="space-y-4"
