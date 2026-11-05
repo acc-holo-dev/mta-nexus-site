@@ -212,6 +212,7 @@ export async function ResourceBuildScreen({
         {history.length === 0 ? (
           <EmptyState
             title={copy.noHistory}
+            description={copy.history}
             icon={<History className="h-6 w-6" aria-hidden="true" />}
           />
         ) : (
