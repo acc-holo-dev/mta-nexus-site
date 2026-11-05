@@ -1,4 +1,4 @@
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import {
@@ -9,8 +9,8 @@ import {
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
 import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
 import {
-  LibraryCollectionsPagination,
   type LibraryCollectionsActor,
+  LibraryCollectionsPagination,
   type LibraryCollectionsQuery,
   type LibraryCollectionsView,
   libraryCollectionsFieldClass,
@@ -43,40 +43,45 @@ export async function LibraryCollectionsItemTransferView({
         {c.source}: {result.source.name} · {c[result.source.status]} · {c.revision}{" "}
         {result.source.revision}
       </p>
-      <form method="get" className="flex flex-wrap items-end gap-3">
-        <label className="grid gap-1">
-          {c.search}
-          <input
-            name="q"
-            defaultValue={result.q}
-            maxLength={80}
-            className={libraryCollectionsFieldClass}
-          />
-        </label>
-        <Button type="submit" variant="outline">
-          {c.apply}
-        </Button>
-        {result.q && (
-          <Link
-            href={collectionHref(id, view)}
-            className={`text-sm ${libraryCollectionsLinkClass}`}
-          >
-            {c.clear}
-          </Link>
-        )}
-      </form>
-      {!result.items.length && (
-        <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
-          <p>{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
+      <search aria-label={c.search}>
+        <form method="get" className="flex flex-wrap items-end gap-3">
+          <label className="grid gap-1">
+            {c.search}
+            <input
+              name="q"
+              defaultValue={result.q}
+              maxLength={80}
+              className={`min-h-11 ${libraryCollectionsFieldClass}`}
+            />
+          </label>
+          <Button type="submit" variant="outline">
+            {c.apply}
+          </Button>
           {result.q && (
             <Link
               href={collectionHref(id, view)}
-              className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
+              className={`text-sm ${libraryCollectionsLinkClass}`}
             >
               {c.clear}
             </Link>
           )}
-        </div>
+        </form>
+      </search>
+      {!result.items.length && (
+        <EmptyState
+          title={result.q ? c.emptyFilteredItems : c.emptyItems}
+          description={c.emptyItemsHint}
+          action={
+            result.q ? (
+              <Link
+                href={collectionHref(id, view)}
+                className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
+              >
+                {c.clear}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       <LibraryCollectionItemCopyForm
         key={JSON.stringify([
