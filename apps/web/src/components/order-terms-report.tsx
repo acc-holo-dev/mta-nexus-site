@@ -1,10 +1,19 @@
 import type { OrderTermsReport } from "@nexus/domain";
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
 import { formatFinancialMinor } from "../lib/financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../lib/order-terms-i18n";
 import { sellerSalesTime } from "../lib/seller-sales-i18n";
+
+// Honesty residual: consistency flags via ErrorState.
+const ORDER_TERMS_FLAG_IDS = {
+  amountMismatch: "order-terms-amount-mismatch",
+  currencyMismatch: "order-terms-currency-mismatch",
+  negativeValues: "order-terms-negative-values",
+  unsupportedCurrency: "order-terms-unsupported-currency",
+} as const;
+
 export function OrderTermsReportView({
   report,
   scope,
@@ -66,11 +75,11 @@ export function OrderTermsReportView({
           </div>
         </dl>
         {flags.length ? (
-          <ul className="space-y-2 text-sm text-warning">
+          <div className="space-y-3">
             {flags.map((key) => (
-              <li key={key}>{c[key]}</li>
+              <ErrorState key={key} id={ORDER_TERMS_FLAG_IDS[key]} title={c[key]} />
             ))}
-          </ul>
+          </div>
         ) : (
           <p className="text-sm text-secondary">{c.clear}</p>
         )}
