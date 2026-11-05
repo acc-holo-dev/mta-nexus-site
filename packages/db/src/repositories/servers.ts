@@ -8,13 +8,23 @@ import {
   type Server,
   type ServerStatus,
   type ServerVisibility,
+  UnauthorizedError,
   type User,
 } from "@nexus/domain";
 import { and, asc, count, desc, eq, exists, gt, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, organizationMembers, organizations, servers, users } from "../schema";
+import {
+  auditEvents,
+  organizationMembers,
+  organizations,
+  servers,
+  sessions,
+  users,
+} from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import { lockServerManagementGrants, managedServerScope } from "./server-management-scope";
+import { digestSessionToken } from "./sessions";
 
 export type ManagedServerFilters = {
   query?: string;
@@ -120,6 +130,52 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
 }
 
 export class ServerRepository {
+  async findCreatedForRecovery(actorId: string, nonce: string, token: string) {
+    if (!token) return null;
+    const rows = await db
+      .select({ id: servers.id })
+      .from(servers)
+      .innerJoin(
+        auditEvents,
+        and(
+          exists(
+            db
+              .select({ id: sessions.id })
+              .from(sessions)
+              .where(
+                and(
+                  eq(sessions.userId, actorId),
+                  eq(sessions.token, digestSessionToken(token)),
+                  gt(sessions.expiresAt, sql`clock_timestamp()`),
+                ),
+              ),
+          ),
+          eq(auditEvents.targetId, servers.id),
+          eq(auditEvents.targetType, "server"),
+          eq(auditEvents.action, "server.created"),
+          eq(auditEvents.actorType, "user"),
+          eq(auditEvents.actorId, actorId),
+          sql`${auditEvents.details}->>'creationNonce' = ${nonce}`,
+        ),
+      )
+      .where(
+        and(
+          exists(db.select({ id: users.id }).from(users).where(eq(users.id, actorId))),
+          or(
+            managedServerScope(actorId),
+            exists(
+              db
+                .select({ id: users.id })
+                .from(users)
+                .where(and(eq(users.id, actorId), eq(users.role, "admin"))),
+            ),
+          ),
+        ),
+      )
+      .limit(2);
+    return rows.length === 1 ? rows[0] : null;
+  }
+
   async findManagedDetails(id: string, actorId: string) {
     if (!id || !actorId) throw new RangeError("Server and actor IDs are required");
     const [row] = await db
@@ -551,14 +607,15 @@ export class ServerRepository {
   async createWithAudit(
     server: Omit<Server, "createdAt" | "updatedAt">,
     audit: Omit<AuditEvent, "createdAt">,
-    actorRole?: User["role"],
+    currentToken: string,
   ): Promise<Server> {
     return db.transaction(async (tx) => {
+      let organization: { ownerId: string } | undefined;
       if (server.organizationId) {
         // Lock both authority records until the server and audit commit.
         // Concurrent organization transfers, role updates and revocations
         // therefore cannot invalidate a permission read before the write.
-        const [organization] = await tx
+        [organization] = await tx
           .select({ ownerId: organizations.ownerId })
           .from(organizations)
           .where(eq(organizations.id, server.organizationId))
@@ -567,7 +624,19 @@ export class ServerRepository {
         if (!organization) {
           throw new NotFoundError("Organization", server.organizationId);
         }
-        if (actorRole !== "admin" && organization.ownerId !== audit.actorId) {
+      }
+      const [actor] = await tx
+        .select({ id: users.id, role: users.role })
+        .from(users)
+        .where(eq(users.id, audit.actorId))
+        .for("share")
+        .limit(1);
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      if (!server.organizationId && server.ownerId !== actor.id) {
+        throw new ForbiddenError("Server owner must be the authenticated account");
+      }
+      if (server.organizationId && organization) {
+        if (actor.role !== "admin" && organization.ownerId !== actor.id) {
           const [membership] = await tx
             .select({
               role: organizationMembers.role,
@@ -577,7 +646,7 @@ export class ServerRepository {
             .where(
               and(
                 eq(organizationMembers.organizationId, server.organizationId),
-                eq(organizationMembers.userId, audit.actorId),
+                eq(organizationMembers.userId, actor.id),
               ),
             )
             .for("share")
@@ -589,6 +658,7 @@ export class ServerRepository {
           }
         }
       }
+      await lockInitiatingSession(tx, actor.id, currentToken);
       const now = new Date();
       const rows = await tx
         .insert(servers)
@@ -598,6 +668,7 @@ export class ServerRepository {
       if (!created) throw new Error("Server insert did not return a row");
 
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await lockInitiatingSession(tx, actor.id, currentToken);
       return created as unknown as Server;
     });
   }

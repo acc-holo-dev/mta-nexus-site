@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
@@ -21,6 +21,7 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
   matchesMtaEndpoint: vi.fn(),
   mtaLiveStatus: vi.fn(),
 }));
+
 import { POST } from "../apps/web/src/app/api/servers/route";
 
 beforeEach(() => {
@@ -41,6 +42,8 @@ describe("server registration request-body safety", () => {
           ...browserMutationHeaders(),
           "Content-Type": "application/json",
           cookie: "nexus_session=valid",
+          "x-nexus-actor-id": "usr_test",
+          "x-nexus-creation-nonce": "a".repeat(32),
         },
         body: JSON.stringify(body),
       }),
@@ -66,6 +69,8 @@ describe("server registration request-body safety", () => {
           ...browserMutationHeaders(),
           "Content-Type": type,
           cookie: "nexus_session=valid",
+          "x-nexus-actor-id": "usr_test",
+          "x-nexus-creation-nonce": "a".repeat(32),
         },
         body: JSON.stringify({
           name: "Nexus",

@@ -1,17 +1,18 @@
 import { randomBytes } from "node:crypto";
-import { and, eq } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
   buildRepository,
-  productRepository,
-  userRepository,
   notificationRepository,
+  productRepository,
   sessionRepository,
+  userRepository,
   webPushOutbox,
   webPushSubscriptionRepository,
 } from "@nexus/db";
+import { and, eq } from "drizzle-orm";
+import { expect, it } from "vitest";
 import { db } from "../packages/db/src/client";
 import { auditEvents, builds, organizationMembers, organizations } from "../packages/db/src/schema";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 async function fixture() {
   const suffix = randomBytes(6).toString("hex");
@@ -158,7 +159,7 @@ it("commits approval and one author notification atomically, even with simultane
 
 it("keeps a rejection successful when system notifications are disabled", async () => {
   const f = await fixture();
-  await notificationRepository.updatePreferences(f.authorId, { systemEnabled: false });
+  await setNotificationPreferencesForTest(f.authorId, { systemEnabled: false });
   expect(
     await buildRepository.moderatePending(
       f.buildId,
@@ -243,7 +244,7 @@ it("notifies current organization managers once, respecting revocation and prefe
         eq(organizationMembers.userId, `${f.authorId}_reader`),
       ),
     );
-  await notificationRepository.updatePreferences(`${f.authorId}_admin`, { systemEnabled: false });
+  await setNotificationPreferencesForTest(`${f.authorId}_admin`, { systemEnabled: false });
   await buildRepository.moderatePending(
     f.buildId,
     "reject",

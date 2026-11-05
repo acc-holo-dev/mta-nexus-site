@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
-import { describe, expect, it } from "vitest";
 import { notificationRepository, userRepository } from "@nexus/db";
+import { describe, expect, it } from "vitest";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 describe("notification preference serialization", () => {
   it("suppresses preference-controlled inbox creation after a confirmed disable", async () => {
@@ -15,7 +16,7 @@ describe("notification preference serialization", () => {
       role: "user",
     });
 
-    await notificationRepository.updatePreferences(userId, {
+    await setNotificationPreferencesForTest(userId, {
       systemEnabled: false,
     });
 
@@ -46,7 +47,7 @@ describe("notification preference serialization", () => {
       displayName: "Security Notification",
       role: "user",
     });
-    await notificationRepository.updatePreferences(userId, {
+    await setNotificationPreferencesForTest(userId, {
       followsEnabled: false,
       contentEnabled: false,
       serverEnabled: false,

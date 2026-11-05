@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
 import type { Notification, NotificationCategory, NotificationPreferences } from "@nexus/domain";
-import { AppError, NotFoundError } from "@nexus/domain";
+import { AppError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import { and, asc, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { notificationPreferences, notifications } from "../schema";
+import { notificationPreferences, notifications, users } from "../schema";
 import { discussionPushReceipt, withDiscussionPushReceipt } from "./discussion-push-receipt";
 import { followWorkspaceRepository } from "./follow-workspace";
+import { lockInitiatingSession } from "./initiating-session";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { containsPattern } from "./search-pattern";
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
@@ -242,9 +243,17 @@ export class NotificationRepository {
         "followsEnabled" | "contentEnabled" | "serverEnabled" | "commerceEnabled" | "systemEnabled"
       >
     >,
+    currentToken: string,
   ): Promise<NotificationPreferences> {
     return db.transaction(async (tx) => {
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, userId))
+        .for("share");
+      if (!actor) throw new UnauthorizedError("Authentication required");
       await lockNotificationPreferencesForUsers(tx, [userId]);
+      await lockInitiatingSession(tx, userId, currentToken);
       const rows = await tx
         .select()
         .from(notificationPreferences)
@@ -278,6 +287,7 @@ export class NotificationRepository {
       if (!stored) {
         throw new Error("Notification preferences update returned no row");
       }
+      await lockInitiatingSession(tx, userId, currentToken);
       return stored as unknown as NotificationPreferences;
     });
   }

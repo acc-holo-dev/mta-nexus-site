@@ -75,6 +75,7 @@ async function fixture() {
 function submission(f: Awaited<ReturnType<typeof fixture>>) {
   return {
     actorId: f.reporter.id,
+    currentToken: f.reporter.currentToken,
     id: id("rpt"),
     auditId: id("aud"),
     targetType: "comment" as const,

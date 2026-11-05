@@ -115,7 +115,7 @@ describe("server forms use the same editable MTA metadata", () => {
   });
 
   it("makes map name available when registering a new server", () => {
-    const html = renderToStaticMarkup(createElement(RegisterServerForm));
+    const html = renderToStaticMarkup(createElement(RegisterServerForm, { actorId: "usr_owner" }));
     expect(html).toContain('name="mapName"');
     expect(html).toContain("Map name");
     expect(html).toContain('name="httpPort"');

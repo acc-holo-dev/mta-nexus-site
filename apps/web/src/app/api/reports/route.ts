@@ -1,10 +1,4 @@
-import {
-  contentRepository,
-  productRepository,
-  reportRepository,
-  serverRepository,
-  userRepository,
-} from "@nexus/db";
+import { reportRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createReportSchema } from "@nexus/validation";
@@ -102,20 +96,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(context, { error: "You cannot report your own account" }, { status: 422 });
     }
 
-    const targetExists =
-      parsed.data.targetType === "product"
-        ? await productRepository.findById(parsed.data.targetId)
-        : parsed.data.targetType === "server"
-          ? await serverRepository.findById(parsed.data.targetId)
-          : parsed.data.targetType === "content"
-            ? await contentRepository.findById(parsed.data.targetId)
-            : parsed.data.targetType === "comment"
-              ? await contentRepository.findCommentById(parsed.data.targetId)
-              : await userRepository.findById(parsed.data.targetId);
-    if (!targetExists) {
-      return privateJson(context, { error: "Report target was not found" }, { status: 404 });
-    }
-
     const reportId = generateId("rpt");
     const result = await reportRepository.createWithAudit(
       {
@@ -165,6 +145,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "REQUEST_BODY_TIMEOUT",
         "UNAUTHORIZED",
         "FORBIDDEN",
+        "NOT_FOUND",
+        "REPORT_OWN_TARGET",
       ].includes(error.code)
     ) {
       return privateJson(

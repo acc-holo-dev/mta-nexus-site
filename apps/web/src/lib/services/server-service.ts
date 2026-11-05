@@ -90,6 +90,10 @@ class ServerService {
     return serverRepository.findById(id);
   }
 
+  async recoverCreatedServer(actorId: string, nonce: string, token: string) {
+    return serverRepository.findCreatedForRecovery(actorId, nonce, token);
+  }
+
   async getManagedServerDetails(id: string, actor: User) {
     return serverRepository.findManagedDetails(id, actor.id);
   }
@@ -100,6 +104,8 @@ class ServerService {
       "id" | "status" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt"
     >,
     actor: User,
+    creationNonce?: string,
+    currentToken?: string,
   ): Promise<Server> {
     if (!can(actor, "server.create")) throw new ForbiddenError("Not authorized to create server");
 
@@ -129,9 +135,14 @@ class ServerService {
           action: "server.created",
           targetId: id,
           targetType: "server",
-          details: { name: input.name, ip: ipAddress, port: input.port },
+          details: {
+            name: input.name,
+            ip: ipAddress,
+            port: input.port,
+            ...(creationNonce ? { creationNonce } : {}),
+          },
         },
-        actor.role,
+        currentToken ?? "",
       );
     } catch (error) {
       throwServerMutationConflict(error);

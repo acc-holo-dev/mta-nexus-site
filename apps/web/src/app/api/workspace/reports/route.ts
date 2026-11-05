@@ -30,7 +30,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       const parsed = communityReportCreateSchema.safeParse(await readBoundedJson(request));
       if (!parsed.success) throw new AppError("Invalid report", 400, "VALIDATION_ERROR");
       await reportRateLimit(actor.id, "report");
-      return communityReportService.submit(actor, parsed.data);
+      return communityReportService.submit(
+        actor,
+        parsed.data,
+        request.cookies.get("nexus_session")?.value ?? "",
+      );
     },
     200,
     communityReportMutationError,

@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-import { and, eq } from "drizzle-orm";
 import {
   db,
   organizationMembers,
@@ -7,8 +5,11 @@ import {
   productRepository,
   serverRepository,
   servers,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { and, eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 import { productService } from "../apps/web/src/lib/services/product-service";
 import { serverService } from "../apps/web/src/lib/services/server-service";
 
@@ -116,6 +117,12 @@ describe("organization resource management integration", () => {
         displayName: `Server Authz ${label}`,
         role: "user",
       });
+      await sessionRepository.create({
+        id: `ses_${id}`,
+        userId: id,
+        token: `tok_${id}`,
+        expiresAt: new Date(Date.now() + 60_000),
+      });
     }
 
     await organizationRepository.create({
@@ -162,6 +169,8 @@ describe("organization resource management integration", () => {
           mediaUrls: [],
         },
         developer,
+        undefined,
+        `tok_${developerId}`,
       ),
     ).rejects.toMatchObject({
       statusCode: 403,
@@ -180,6 +189,8 @@ describe("organization resource management integration", () => {
         mediaUrls: [],
       },
       manager,
+      undefined,
+      `tok_${managerId}`,
     );
 
     expect(created.organizationId).toBe(organizationId);
@@ -219,6 +230,8 @@ describe("organization resource management integration", () => {
           mediaUrls: [],
         },
         manager,
+        undefined,
+        `tok_${managerId}`,
       ),
     ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
     expect(await serverRepository.findBySlug(`revoked-org-server-${suffix}`)).toBeNull();
@@ -320,6 +333,12 @@ describe("organization resource management integration", () => {
       displayName: "Legacy Org Owner",
       role: "user",
     });
+    await sessionRepository.create({
+      id: `ses_${orgOwnerId}`,
+      userId: orgOwnerId,
+      token: `tok_${orgOwnerId}`,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
     await userRepository.create({
       id: legacyOwnerId,
       email: `legacy_server_owner_${suffix}@nexus.test`,
@@ -349,6 +368,8 @@ describe("organization resource management integration", () => {
         mediaUrls: [],
       },
       organizationOwner,
+      undefined,
+      `tok_${orgOwnerId}`,
     );
 
     // Simulate a historical ownerId directly; production update deliberately

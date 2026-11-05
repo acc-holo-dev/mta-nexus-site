@@ -3,6 +3,7 @@ import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, reportNotificationDeliveries, reports, users } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
+import { lockPublicReportTarget } from "./report-target";
 
 export class ReportRepository {
   async countOpen(): Promise<number> {
@@ -100,6 +101,7 @@ export class ReportRepository {
       const lockKey = `report:${data.reporterId}:${data.targetType}:${data.targetId}`;
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
       if (audit.actorId !== data.reporterId) throw new ForbiddenError();
+      await lockPublicReportTarget(tx, data.targetType, data.targetId, data.reporterId);
       const [actor] = await tx
         .select({ id: users.id })
         .from(users)

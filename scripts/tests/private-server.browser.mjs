@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
-import { createRequire } from "node:module";
 import { randomBytes } from "node:crypto";
 import { writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+import { test } from "node:test";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
@@ -27,16 +27,19 @@ test("J2-11 private profile is absent from public HTML and metadata; public/unli
   const guest = await guestContext.newPage();
   const phases = [];
   let status = "FAIL";
-  const send = (page, path, method = "GET", body) =>
+  const send = (page, path, method = "GET", body, headers = {}) =>
     page.evaluate(
-      async ({ path, method, body }) => {
+      async ({ path, method, body, headers }) => {
         const response = await fetch(path, {
           method,
           cache: "no-store",
           credentials: "same-origin",
           ...(body === undefined
             ? {}
-            : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
+            : {
+                headers: { "Content-Type": "application/json", ...headers },
+                body: JSON.stringify(body),
+              }),
         });
         const text = await response.text();
         let data = null;
@@ -47,7 +50,7 @@ test("J2-11 private profile is absent from public HTML and metadata; public/unli
         }
         return { status: response.status, data, text };
       },
-      { path, method, body },
+      { path, method, body, headers },
     );
   try {
     await owner.goto("/auth/login");
@@ -59,16 +62,27 @@ test("J2-11 private profile is absent from public HTML and metadata; public/unli
       password: `Ci-${randomBytes(24).toString("hex")}`,
     });
     assert.equal(user.status, 201, "Create only a synthetic account through the real API");
+    const session = await send(owner, "/api/auth/session");
+    assert.equal(session.status, 200);
+    assert.equal(session.data.authenticated, true);
+    const actorId = session.data.user.id;
+    assert.equal(typeof actorId, "string");
     const name = `Boundary profile ${nonce}`;
     const description = `Private boundary description ${nonce}`;
-    const created = await send(owner, "/api/servers", "POST", {
-      name,
-      description,
-      slug: `boundary-${nonce}`,
-      ipAddress: "192.0.2.103",
-      port: 22003,
-      visibility: "private",
-    });
+    const created = await send(
+      owner,
+      "/api/servers",
+      "POST",
+      {
+        name,
+        description,
+        slug: `boundary-${nonce}`,
+        ipAddress: "192.0.2.103",
+        port: 22003,
+        visibility: "private",
+      },
+      { "x-nexus-actor-id": actorId, "x-nexus-creation-nonce": randomBytes(16).toString("hex") },
+    );
     assert.equal(created.status, 201);
     const server = created.data.server;
     async function verifyPrivate(phase) {

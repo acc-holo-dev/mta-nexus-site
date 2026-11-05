@@ -7,6 +7,7 @@ import {
   userRepository,
   verificationRepository,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PATCH as updateServer } from "../apps/web/src/app/api/servers/[id]/route";
@@ -19,6 +20,7 @@ function jsonRequest(
   method: "POST" | "PATCH",
   token: string,
   body: Record<string, unknown>,
+  actorId?: string,
 ) {
   return new NextRequest(url, {
     method,
@@ -26,6 +28,12 @@ function jsonRequest(
       ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: `nexus_session=${token}`,
+      ...(method === "POST"
+        ? {
+            "x-nexus-actor-id": actorId ?? token.replace("tok_srv_register_", "usr_srv_register_"),
+            "x-nexus-creation-nonce": "a".repeat(32),
+          }
+        : {}),
     },
     body: JSON.stringify(body),
   });
@@ -142,6 +150,78 @@ describe("server ownership hardening integration", () => {
       isVerified: false,
       gameplayTags: [],
       mediaUrls: [],
+    });
+
+    const registration = await registerServer(
+      jsonRequest(
+        "http://nexus.test/api/servers",
+        "POST",
+        managerToken,
+        {
+          name: "Recovery server",
+          slug: `recovery-${suffix.replace(/[^a-z0-9-]/g, "-")}`,
+          ipAddress: "198.51.100.204",
+          port: port + 1,
+          organizationId,
+          visibility: "private",
+        },
+        managerId,
+      ),
+    );
+    expect(registration.status).toBe(201);
+    const created = await registration.json();
+    expect(
+      await serverRepository.findCreatedForRecovery(managerId, "a".repeat(32), managerToken),
+    ).toEqual({
+      id: created.server.id,
+    });
+    expect(
+      await serverRepository.findCreatedForRecovery(outsiderId, "a".repeat(32), outsiderToken),
+    ).toBeNull();
+    expect(
+      await serverRepository.findCreatedForRecovery(managerId, "a".repeat(32), outsiderToken),
+    ).toBeNull();
+    const expiredToken = `tok_expired_${suffix}`;
+    await sessionRepository.create({
+      id: `ses_expired_${suffix}`,
+      userId: managerId,
+      token: expiredToken,
+      expiresAt: new Date("2000-01-01"),
+    });
+    expect(
+      await serverRepository.findCreatedForRecovery(managerId, "a".repeat(32), expiredToken),
+    ).toBeNull();
+    const replacementToken = `tok_replacement_${suffix}`;
+    await sessionRepository.create({
+      id: `ses_replacement_${suffix}`,
+      userId: managerId,
+      token: replacementToken,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+    await sessionRepository.delete(managerToken);
+    expect(
+      await serverRepository.findCreatedForRecovery(managerId, "a".repeat(32), managerToken),
+    ).toBeNull();
+    expect(
+      await serverRepository.findCreatedForRecovery(managerId, "a".repeat(32), replacementToken),
+    ).toEqual({ id: created.server.id });
+    await sessionRepository.create({
+      id: `ses_manager_${suffix}`,
+      userId: managerId,
+      token: managerToken,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+    await db.delete(organizationMembers).where(eq(organizationMembers.id, `om_server_${suffix}`));
+    expect(
+      await serverRepository.findCreatedForRecovery(managerId, "a".repeat(32), managerToken),
+    ).toBeNull();
+    await db.insert(organizationMembers).values({
+      id: `om_server_${suffix}`,
+      organizationId,
+      userId: managerId,
+      role: "member",
+      permissions: ["manage_servers"],
+      createdAt: new Date(),
     });
 
     const ownerUpdate = await updateServer(

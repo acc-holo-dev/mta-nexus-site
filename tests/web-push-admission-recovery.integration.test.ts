@@ -10,17 +10,18 @@ import { notificationRepository } from "../packages/db/src/repositories/notifica
 import { sessionRepository } from "../packages/db/src/repositories/sessions";
 import { userRepository } from "../packages/db/src/repositories/users";
 import {
-  WebPushAdmissionRecoveryRepository,
   webPushAdmissionRecoveryRepository as recovery,
+  WebPushAdmissionRecoveryRepository,
 } from "../packages/db/src/repositories/web-push-admission-recovery";
 import { webPushSubscriptionRepository } from "../packages/db/src/repositories/web-push-subscriptions";
 import {
+  webPushAdmissionRecovery as intents,
   notifications,
   users,
-  webPushAdmissionRecovery as intents,
   webPushOutbox,
   webPushSubscriptions,
 } from "../packages/db/src/schema";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 const actors: string[] = [];
 const triggers: { name: string; table: string }[] = [];
@@ -352,7 +353,7 @@ it.each(["read", "preference", "revoked session", "expired", "deleted"] as const
     const f = await pendingFixture();
     if (reason === "read") await notificationRepository.markAsRead(f.notificationId, f.userId);
     if (reason === "preference")
-      await notificationRepository.updatePreferences(f.userId, { systemEnabled: false });
+      await setNotificationPreferencesForTest(f.userId, { systemEnabled: false });
     if (reason === "revoked session") await sessionRepository.deleteById(f.sessionId, f.userId);
     if (reason === "expired") {
       await db.execute(

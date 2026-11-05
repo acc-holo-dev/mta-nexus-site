@@ -125,9 +125,26 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user) {
+    if (!user || !token) {
       return privateJson(context, { error: "Authentication required" }, 401);
     }
+
+    const expectedActor = request.headers.get("x-nexus-actor-id");
+    if (!expectedActor)
+      return privateJson(
+        context,
+        { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+        428,
+      );
+    if (expectedActor !== user.id)
+      return privateJson(context, { error: "Actor changed", code: "ACTOR_CHANGED" }, 409);
+    const nonce = request.headers.get("x-nexus-creation-nonce");
+    if (!nonce || !/^[a-f0-9]{32}$/u.test(nonce))
+      return privateJson(
+        context,
+        { error: "Invalid creation nonce", code: "INVALID_CREATION_NONCE" },
+        400,
+      );
 
     requireServerJsonContentType(request);
     const parsed = serverRegistrationSchema.safeParse(await readBoundedJson(request));
@@ -148,6 +165,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         ownerId: parsed.data.organizationId ? undefined : user.id,
       },
       user,
+      nonce,
+      token,
     );
     return privateJson(context, { server }, 201);
   } catch (error: unknown) {

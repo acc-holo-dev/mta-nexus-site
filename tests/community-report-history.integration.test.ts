@@ -70,15 +70,16 @@ async function fixture() {
   await db
     .insert(comments)
     .values({ id: commentId, contentId: id, authorId: author.id, text: "Comment body" });
-  const report = await submit(owner.id, commentId);
+  const report = await submit(owner, commentId);
   return { author, owner, staff, id, commentId, report };
 }
-async function submit(actorId: string, commentId: string) {
+async function submit(actor: { id: string; currentToken: string }, commentId: string) {
   const id = key("rpt");
   reportIds.push(id);
   return repository.submit({
     id,
-    actorId,
+    actorId: actor.id,
+    currentToken: actor.currentToken,
     auditId: key("aud"),
     targetType: "comment",
     targetId: commentId,
@@ -270,7 +271,7 @@ it("keeps malformed legacy evidence neutral, bounds Unicode notes and excludes n
 it("retains real batch decision context only for staff and preserves requester history after comment removal", async () => {
   const f = await fixture(),
     other = await actor(),
-    second = await submit(other.id, f.commentId);
+    second = await submit(other, f.commentId);
   const input = {
     items: [
       { id: f.report.id, expectedStatus: "open" as const },

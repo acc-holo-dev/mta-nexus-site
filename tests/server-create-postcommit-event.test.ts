@@ -43,12 +43,25 @@ beforeEach(() => {
 });
 
 describe("server creation after durable write", () => {
+  it("stores the creation nonce only in the same transactional audit write", async () => {
+    vi.spyOn(eventBus, "publish").mockResolvedValueOnce(undefined);
+    await serverService.createServer(input, actor, "a".repeat(32), "session");
+    expect(mocks.insert).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        actorId: actor.id,
+        action: "server.created",
+        details: expect.objectContaining({ creationNonce: "a".repeat(32) }),
+      }),
+      "session",
+    );
+  });
   it("returns the stored server even when event dispatch rejects", async () => {
     const publish = vi
       .spyOn(eventBus, "publish")
       .mockRejectedValueOnce(new Error("subscriber failed with private payload"));
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
-    const stored = await serverService.createServer(input, actor);
+    const stored = await serverService.createServer(input, actor, undefined, "session");
     expect(stored).toMatchObject({ id: "srv_test", name: "Test Server" });
     expect(mocks.insert).toHaveBeenCalledTimes(1);
     expect(publish).toHaveBeenCalledOnce();
@@ -68,7 +81,9 @@ describe("server creation after durable write", () => {
     mocks.insert.mockRejectedValueOnce({
       cause: { code: "23505", constraint },
     });
-    await expect(serverService.createServer(input, actor)).rejects.toMatchObject({
+    await expect(
+      serverService.createServer(input, actor, undefined, "session"),
+    ).rejects.toMatchObject({
       statusCode: 409,
       code,
     });
@@ -102,14 +117,19 @@ describe("server creation after durable write", () => {
 
   it("canonicalizes MTA endpoints for both audited creation and managed edits", async () => {
     const variant = "  PLAY.Example.COM.  ";
-    const created = await serverService.createServer({ ...input, ipAddress: variant }, actor);
+    const created = await serverService.createServer(
+      { ...input, ipAddress: variant },
+      actor,
+      undefined,
+      "session",
+    );
     expect(created.ipAddress).toBe("play.example.com");
     expect(mocks.insert).toHaveBeenLastCalledWith(
       expect.objectContaining({ ipAddress: "play.example.com" }),
       expect.objectContaining({
         details: expect.objectContaining({ ip: "play.example.com" }),
       }),
-      "user",
+      "session",
     );
 
     await serverService.updateServer("srv_1", { ipAddress: variant }, actor);
@@ -126,7 +146,7 @@ describe("server creation after durable write", () => {
     "rejects invalid server address %j before writing",
     async (invalid) => {
       await expect(
-        serverService.createServer({ ...input, ipAddress: invalid }, actor),
+        serverService.createServer({ ...input, ipAddress: invalid }, actor, undefined, "session"),
       ).rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
       expect(mocks.insert).not.toHaveBeenCalled();
 
@@ -138,11 +158,16 @@ describe("server creation after durable write", () => {
   );
 
   it("canonicalizes personal and organizational ownership before persistence", async () => {
-    await serverService.createServer({ ...input, ownerId: "usr_forged" }, actor);
+    await serverService.createServer(
+      { ...input, ownerId: "usr_forged" },
+      actor,
+      undefined,
+      "session",
+    );
     expect(mocks.insert).toHaveBeenLastCalledWith(
       expect.objectContaining({ ownerId: "usr_1" }),
       expect.anything(),
-      "user",
+      "session",
     );
     await serverService.createServer(
       {
@@ -151,18 +176,22 @@ describe("server creation after durable write", () => {
         ownerId: "usr_forged",
       },
       actor,
+      undefined,
+      "session",
     );
     expect(mocks.insert).toHaveBeenLastCalledWith(
       expect.objectContaining({ ownerId: undefined, organizationId: "org_1" }),
       expect.anything(),
-      "user",
+      "session",
     );
   });
 
   it("does not dispatch an event if the durable transaction fails", async () => {
     const publish = vi.spyOn(eventBus, "publish").mockResolvedValue();
     mocks.insert.mockRejectedValueOnce(new Error("database unavailable"));
-    await expect(serverService.createServer(input, actor)).rejects.toThrow("database unavailable");
+    await expect(serverService.createServer(input, actor, undefined, "session")).rejects.toThrow(
+      "database unavailable",
+    );
     expect(publish).not.toHaveBeenCalled();
   });
 });

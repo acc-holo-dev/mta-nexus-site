@@ -107,11 +107,12 @@ async function teamArchive(f: Awaited<ReturnType<typeof fixture>>) {
   );
   return author.history(f.item.id, f.owner.id, undefined, f.team.id);
 }
-async function report(actorId: string, commentId: string) {
+async function report(actor: { id: string; currentToken: string }, commentId: string) {
   return reportsRepository.submit({
     id: id("rpt"),
     auditId: id("aud"),
-    actorId,
+    actorId: actor.id,
+    currentToken: actor.currentToken,
     targetType: "comment",
     targetId: commentId,
     type: "spam",
@@ -257,8 +258,8 @@ it("removes an archived comment with full Unicode version, keeps other reports p
   const f = await fixture(),
     text = `${"🙂".repeat(5000)}tail`,
     c = await comment(f, text),
-    first = await report(f.reporter.id, c.id),
-    second = await report(f.owner.id, c.id);
+    first = await report(f.reporter, c.id),
+    second = await report(f.owner, c.id);
   await db.update(content).set({ status: "archived" }).where(eq(content.id, f.item.id));
   const preview = await reportsRepository.detail({ actorId: f.staff.id, staff: true }, first.id);
   expect(Array.from(preview.target?.text ?? "")).toHaveLength(5000);
@@ -291,7 +292,7 @@ it("removes an archived comment with full Unicode version, keeps other reports p
 it("rolls back comment/counter/notification when the later report audit fails", async () => {
   const f = await fixture(),
     c = await comment(f),
-    r = await report(f.reporter.id, c.id),
+    r = await report(f.reporter, c.id),
     duplicate = audit(f.staff.id, f.item.id, "fixture.audit");
   await db.insert(auditEvents).values(duplicate);
   const command = { ...decision(f, r.id, c.id, c.text), auditId: duplicate.id };

@@ -137,11 +137,12 @@ async function fixture() {
     })
     .returning();
   await db.update(content).set({ commentCount: 1 }).where(eq(content.id, item.id));
-  async function submit(actorId: string) {
+  async function submit(actor: { id: string; currentToken: string }) {
     return reportsRepository.submit({
       id: id("rpt"),
       auditId: id("aud"),
-      actorId,
+      actorId: actor.id,
+      currentToken: actor.currentToken,
       targetType: "comment",
       targetId: c[0].id,
       type: "spam",
@@ -149,9 +150,9 @@ async function fixture() {
       evidenceUrls: [],
     });
   }
-  const a = await submit(reporter.id),
-    b = await submit(owner.id),
-    third = await submit(manager.id);
+  const a = await submit(reporter),
+    b = await submit(owner),
+    third = await submit(manager);
   return {
     owner,
     manager,

@@ -8,7 +8,6 @@ import {
 } from "@nexus/db";
 import { asc, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it, vi } from "vitest";
-import { notificationRepository } from "../packages/db/src/repositories/notifications";
 import {
   reportNotificationDeliveryRepository as delivery,
   ReportNotificationDeliveryRepository,
@@ -22,6 +21,7 @@ import {
   users,
   webPushOutbox,
 } from "../packages/db/src/schema";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 const actors: string[] = [];
 const reportIds: string[] = [];
@@ -85,6 +85,7 @@ async function command(community = false) {
     });
     const input = {
       actorId: reporterId,
+      currentToken: `tok_${reporterId}`,
       id: reportId,
       auditId,
       targetType: "content" as const,
@@ -100,11 +101,12 @@ async function command(community = false) {
       create: () => communityReportsRepository.submit(input),
     };
   }
+  const targetId = await actor();
   const data = {
     id: reportId,
     reporterId,
-    targetType: "product" as const,
-    targetId: id("prd"),
+    targetType: "user" as const,
+    targetId,
     type: "scam" as const,
     reason: "PRIVATE_REPORT_REASON",
     evidenceUrls: ["https://example.invalid/PRIVATE_EVIDENCE"],
@@ -379,7 +381,7 @@ it("uses current staff roles and the fixed account horizon, with safe generic li
     .update(users)
     .set({ createdAt: new Date("2002-01-01T00:00:00Z") })
     .where(eq(users.id, late));
-  await notificationRepository.updatePreferences(promoted, {
+  await setNotificationPreferencesForTest(promoted, {
     followsEnabled: false,
     contentEnabled: false,
     commerceEnabled: false,

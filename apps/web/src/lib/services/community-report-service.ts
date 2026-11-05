@@ -159,12 +159,17 @@ class CommunityReportService {
     if (staff && !can(actor, "admin.moderation")) throw new ForbiddenError();
     return { actorId: actor.id, staff };
   }
-  async submit(actor: User, input: z.infer<typeof communityReportCreateSchema>) {
+  async submit(
+    actor: User,
+    input: z.infer<typeof communityReportCreateSchema>,
+    currentToken: string,
+  ) {
     const result = await communityReportsRepository.submit({
       ...input,
       actorId: actor.id,
       id: generateId("rpt"),
       auditId: generateId("aud"),
+      currentToken,
     });
     return { ...result, targetType: input.targetType, targetId: input.targetId };
   }

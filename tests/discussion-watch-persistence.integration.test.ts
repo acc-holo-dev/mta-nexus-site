@@ -29,6 +29,7 @@ import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-r
 import { notifyDiscussionReplies } from "../apps/web/src/lib/services/discussion-follow-notification-service";
 import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
 import { discussionPushReceipt } from "../packages/db/src/repositories/discussion-push-receipt";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 const actors: string[] = [];
 afterEach(async () => {
@@ -238,11 +239,11 @@ it("applies independent follow/content preferences and retains current direct pa
     writer = await actor(),
     item = await publication(owner.id);
   await Promise.all([subscribe(owner.id, item.id), subscribe(reader.id, item.id)]);
-  await notificationRepository.updatePreferences(owner.id, {
+  await setNotificationPreferencesForTest(owner.id, {
     followsEnabled: false,
     contentEnabled: true,
   });
-  await notificationRepository.updatePreferences(reader.id, {
+  await setNotificationPreferencesForTest(reader.id, {
     followsEnabled: false,
     contentEnabled: true,
   });
@@ -257,7 +258,7 @@ it("applies independent follow/content preferences and retains current direct pa
   await followsRepository.setFollowing(owner.id, "content", item.id, false, "unused");
   const second = await reply(item.id, writer.id);
   expect((await deliver(owner.id, item.id, second.id)).state).toBe("stored");
-  await notificationRepository.updatePreferences(owner.id, { contentEnabled: false });
+  await setNotificationPreferencesForTest(owner.id, { contentEnabled: false });
   const third = await reply(item.id, writer.id);
   expect((await deliver(owner.id, item.id, third.id)).state).toBe("suppressed");
 });
@@ -490,7 +491,7 @@ it("rolls optional jobs back with their failed receipt, then repairs once withou
       .update(webPushSubscriptions)
       .set({ createdAt: sql`${notice.createdAt}::timestamptz + interval '1 second'` })
       .where(eq(webPushSubscriptions.id, lateId));
-    await notificationRepository.updatePreferences(reader.id, { followsEnabled: false });
+    await setNotificationPreferencesForTest(reader.id, { followsEnabled: false });
     expect(
       (
         await notificationRepository.createDiscussionReplyWithPush({
@@ -501,7 +502,7 @@ it("rolls optional jobs back with their failed receipt, then repairs once withou
         })
       ).state,
     ).toBe("suppressed");
-    await notificationRepository.updatePreferences(reader.id, { followsEnabled: true });
+    await setNotificationPreferencesForTest(reader.id, { followsEnabled: true });
     const recovered = await Promise.all(
       Array.from({ length: 4 }, () =>
         notificationRepository.createDiscussionReplyWithPush({

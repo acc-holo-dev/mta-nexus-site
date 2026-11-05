@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { UnauthorizedError } from "@nexus/domain";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
@@ -31,11 +32,11 @@ const notificationRepository = vi.hoisted(() => ({
 
 const pushRepository = vi.hoisted(() => ({
   listForSession: vi.fn(async () => []),
-  upsertWithResult: vi.fn(async () => ({
+  upsertAuthenticated: vi.fn(async () => ({
     status: "stored",
     subscription: {},
   })),
-  removeForSession: vi.fn(async () => true),
+  removeAuthenticated: vi.fn(async () => true),
 }));
 
 vi.mock("../../../lib/services/auth-service", () => ({
@@ -180,12 +181,16 @@ describe("notification API request correlation", () => {
     expect(updated.status).toBe(200);
     expectPrivateCorrelation(updated);
     expect(await updated.json()).toMatchObject({ actorId: "usr_notifications" });
-    expect(notificationRepository.updatePreferences).toHaveBeenCalledWith("usr_notifications", {
-      followsEnabled: true,
-      contentEnabled: true,
-      serverEnabled: true,
-      systemEnabled: true,
-    });
+    expect(notificationRepository.updatePreferences).toHaveBeenCalledWith(
+      "usr_notifications",
+      {
+        followsEnabled: true,
+        contentEnabled: true,
+        serverEnabled: true,
+        systemEnabled: true,
+      },
+      "notification-token",
+    );
   });
 
   it("rejects stale or absent preference account identity without updating another account", async () => {
@@ -202,11 +207,36 @@ describe("notification API request correlation", () => {
     expect(notificationRepository.updatePreferences).not.toHaveBeenCalled();
   });
 
+  it("returns a private 401 when the initiating session is no longer valid", async () => {
+    notificationRepository.updatePreferences.mockRejectedValueOnce(
+      new UnauthorizedError("Authentication required"),
+    );
+    const response = await preferencesPATCH(
+      request("/api/notifications/preferences", "PATCH", {
+        expectedActorId: "usr_notifications",
+        followsEnabled: false,
+        contentEnabled: true,
+        serverEnabled: true,
+        systemEnabled: true,
+      }),
+    );
+    expect(response.status).toBe(401);
+    expectPrivateCorrelation(response);
+    expect(await response.json()).toMatchObject({
+      error: "Authentication required",
+      code: "UNAUTHORIZED",
+    });
+  });
+
   it("rejects non-JSON and oversized preference updates without saving", async () => {
     const wrongMedia = await preferencesPATCH(
       new NextRequest("https://nexus.test/api/notifications/preferences", {
         method: "PATCH",
-        headers: { ...browserMutationHeaders(), "content-type": "text/plain" },
+        headers: {
+          ...browserMutationHeaders(),
+          "content-type": "text/plain",
+          cookie: "nexus_session=notification-token",
+        },
         body: JSON.stringify({ followsEnabled: true }),
       }),
     );
@@ -263,8 +293,8 @@ describe("notification API request correlation", () => {
     expectPrivateCorrelation(response);
     expect(authService.getSessionIdentity).toHaveBeenCalledOnce();
     expect(pushRepository.listForSession).not.toHaveBeenCalled();
-    expect(pushRepository.upsertWithResult).not.toHaveBeenCalled();
-    expect(pushRepository.removeForSession).not.toHaveBeenCalled();
+    expect(pushRepository.upsertAuthenticated).not.toHaveBeenCalled();
+    expect(pushRepository.removeAuthenticated).not.toHaveBeenCalled();
   });
 
   it("returns correlated private failures without exposing raw errors", async () => {

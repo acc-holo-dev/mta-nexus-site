@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
@@ -18,8 +18,8 @@ vi.mock("@nexus/db", () => ({
     getPreferences: vi.fn(),
   },
   webPushSubscriptionRepository: {
-    upsertWithResult: vi.fn(),
-    removeForSession: vi.fn(),
+    upsertAuthenticated: vi.fn(),
+    removeAuthenticated: vi.fn(),
     listForSession: vi.fn(),
   },
 }));

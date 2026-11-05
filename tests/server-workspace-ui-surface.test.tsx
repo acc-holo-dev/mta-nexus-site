@@ -123,7 +123,9 @@ describe("server workspace UI surface", () => {
     (locale) => {
       localeState.locale = locale;
       const copy = getDictionary(locale).serverRegistration;
-      const html = renderToStaticMarkup(createElement(RegisterServerForm));
+      const html = renderToStaticMarkup(
+        createElement(RegisterServerForm, { actorId: "usr_owner" }),
+      );
 
       expect(html).toContain(copy.title);
       expect(html).toContain('data-ui="input"');

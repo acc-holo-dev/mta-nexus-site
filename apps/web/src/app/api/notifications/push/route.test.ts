@@ -30,8 +30,8 @@ vi.mock("@nexus/db", () => ({
         endpoint,
       })),
     ),
-    upsertWithResult: vi.fn(),
-    removeForSession: vi.fn(),
+    upsertAuthenticated: vi.fn(),
+    removeAuthenticated: vi.fn(),
   },
 }));
 
@@ -57,7 +57,9 @@ vi.mock("../../../../lib/services/web-push-endpoint-policy", () => ({
 }));
 
 import { webPushSubscriptionRepository } from "@nexus/db";
+import { UnauthorizedError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
 import { DELETE, GET, POST } from "./route";
 
 function fingerprint(endpoint: string) {
@@ -145,8 +147,47 @@ describe("Web Push mutation body boundaries", () => {
       expect(oversized.status).toBe(413);
       expect(await oversized.json()).toMatchObject({ code: "REQUEST_BODY_TOO_LARGE" });
       expect(oversized.headers.get("cache-control")).toBe("private, no-store");
-      expect(webPushSubscriptionRepository.upsertWithResult).not.toHaveBeenCalled();
-      expect(webPushSubscriptionRepository.removeForSession).not.toHaveBeenCalled();
+      expect(webPushSubscriptionRepository.upsertAuthenticated).not.toHaveBeenCalled();
+      expect(webPushSubscriptionRepository.removeAuthenticated).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ["POST", POST],
+    ["DELETE", DELETE],
+  ] as const)(
+    "returns private 401 if the initiating session is no longer valid during %s",
+    async (method, handler) => {
+      vi.mocked(parseWebPushSubscription).mockReturnValue({
+        endpoint: state.endpoints[0],
+        p256dh: "key",
+        auth: "auth",
+        expirationAt: null,
+      });
+      const mutate =
+        method === "POST"
+          ? webPushSubscriptionRepository.upsertAuthenticated
+          : webPushSubscriptionRepository.removeAuthenticated;
+      vi.mocked(mutate).mockRejectedValueOnce(new UnauthorizedError("Authentication required"));
+      const result = await handler(
+        new NextRequest("https://nexus.test/api/notifications/push", {
+          method,
+          headers: {
+            ...browserMutationHeaders(),
+            cookie: "nexus_session=secret-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            expectedActorId: "usr_1",
+            expectedSessionId: "ses_1",
+            endpoint: state.endpoints[0],
+          }),
+        }),
+      );
+      expect(result.status).toBe(401);
+      expect(result.headers.get("cache-control")).toBe("private, no-store");
+      expect(JSON.stringify(await result.json())).not.toContain("secret-token");
+      expect(mutate).toHaveBeenCalledOnce();
     },
   );
 
@@ -178,8 +219,8 @@ describe("Web Push mutation body boundaries", () => {
         expect(await response.json()).toMatchObject({ code: "PUSH_IDENTITY_CHANGED" });
       }
       expect((await call({ endpoint: state.endpoints[0] })).status).toBe(400);
-      expect(webPushSubscriptionRepository.upsertWithResult).not.toHaveBeenCalled();
-      expect(webPushSubscriptionRepository.removeForSession).not.toHaveBeenCalled();
+      expect(webPushSubscriptionRepository.upsertAuthenticated).not.toHaveBeenCalled();
+      expect(webPushSubscriptionRepository.removeAuthenticated).not.toHaveBeenCalled();
     },
   );
 });

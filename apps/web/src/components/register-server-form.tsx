@@ -2,7 +2,7 @@
 
 import { normalizeMtaAddress } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedCreatedServer } from "../lib/server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../lib/server-mutation-errors";
@@ -14,13 +14,124 @@ import { useNexusLocale } from "./locale-context";
 
 const nativeLabelClass = "block font-label uppercase text-secondary";
 
-export function RegisterServerForm() {
+export function RegisterServerForm({ actorId }: { actorId: string }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.serverRegistration;
+  const [organizationsLoading, setOrganizationsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [pending, setPending] = useState<{ nonce: string; fields: Record<string, string> } | null>(
+    null,
+  );
+  const [recoveryMessage, setRecoveryMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const busyRef = useRef(false);
+  const slot = `nexus:server-registration:v1:${actorId}`;
+  const message = (ru: string, en: string) => (locale === "ru" ? ru : en);
+  useEffect(() => {
+    let alive = true;
+    async function verify() {
+      try {
+        const response = await fetch("/api/auth/session", privateApiRequest());
+        const data = await response.json();
+        if (!response.ok || data?.authenticated !== true || data?.user?.id !== actorId)
+          throw new Error("identity");
+        const raw = sessionStorage.getItem(slot);
+        if (raw) {
+          const item = JSON.parse(raw);
+          if (
+            raw.length > 30000 ||
+            item.actorId !== actorId ||
+            !/^[a-f0-9]{32}$/u.test(item.nonce) ||
+            !item.fields ||
+            typeof item.fields !== "object" ||
+            Array.isArray(item.fields) ||
+            Object.values(item.fields).some((v) => typeof v !== "string")
+          )
+            throw new Error("storage");
+          if (alive) setPending({ nonce: item.nonce, fields: item.fields });
+        }
+        if (alive) setVerified(true);
+      } catch {
+        if (alive)
+          setRecoveryMessage(
+            locale === "ru"
+              ? "Не удалось проверить сессию или восстановить черновик. Обновите страницу и войдите в исходный аккаунт."
+              : "Could not verify your session or restore the draft. Refresh and sign in to the original account.",
+          );
+      }
+    }
+    void verify();
+    return () => {
+      alive = false;
+    };
+  }, [actorId, slot, locale]);
+  useEffect(() => {
+    if (!pending || !verified || !formRef.current || organizationsLoading) return;
+    for (const [name, value] of Object.entries(pending.fields)) {
+      const field = formRef.current.elements.namedItem(name);
+      if (
+        field instanceof HTMLInputElement ||
+        field instanceof HTMLTextAreaElement ||
+        field instanceof HTMLSelectElement
+      )
+        field.value = value;
+    }
+  }, [pending, verified, organizationsLoading]);
+
+  async function recover() {
+    if (!pending || busyRef.current) return;
+    busyRef.current = true;
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/servers/recovery?nonce=${encodeURIComponent(pending.nonce)}`,
+        { ...privateApiRequest(), headers: { "x-nexus-actor-id": actorId } },
+      );
+      const result = await response.json();
+      if (response.status === 401 || result?.code === "ACTOR_CHANGED") {
+        setVerified(false);
+        throw new Error(
+          message(
+            "Сессия изменилась. Войдите в исходный аккаунт.",
+            "The session changed. Sign in to the original account.",
+          ),
+        );
+      }
+      if (!response.ok)
+        throw new Error(
+          message(
+            "Не удалось проверить результат. Попробуйте ещё раз.",
+            "Could not check the result. Try again.",
+          ),
+        );
+      if (
+        typeof result?.server?.id === "string" &&
+        /^[A-Za-z0-9_-]{1,128}$/u.test(result.server.id)
+      ) {
+        window.addEventListener("pagehide", () => sessionStorage.removeItem(slot), { once: true });
+        window.location.assign(`/workspace/servers/${encodeURIComponent(result.server.id)}`);
+        return;
+      }
+      setRecoveryMessage(
+        message(
+          "Запись пока не подтверждена. Запрос ещё может завершиться; повторное создание заблокировано. Проверьте список серверов позже.",
+          "The listing is not confirmed yet. The request may still complete; creating another is blocked. Check your server list later.",
+        ),
+      );
+    } catch (error) {
+      setRecoveryMessage(
+        error instanceof Error
+          ? error.message
+          : message("Не удалось проверить результат.", "Could not check the result."),
+      );
+    } finally {
+      busyRef.current = false;
+      setLoading(false);
+    }
+  }
   const [error, setError] = useState<string | null>(null);
   const [organizations, setOrganizations] = useState<ServerOrganizationOption[]>([]);
-  const [organizationsLoading, setOrganizationsLoading] = useState(true);
   const [organizationsFailed, setOrganizationsFailed] = useState(false);
 
   useEffect(() => {
@@ -48,7 +159,8 @@ export function RegisterServerForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (loading) return;
+    if (loading || busyRef.current || pending || !verified) return;
+    busyRef.current = true;
 
     setLoading(true);
     setError(null);
@@ -87,14 +199,22 @@ export function RegisterServerForm() {
         visibility: String(form.get("visibility") || "public"),
         ...(organizationId ? { organizationId } : {}),
       };
-      const response = await fetch(
-        "/api/servers",
-        privateApiRequest({
-          method: "POST",
-          json: command,
-          timeoutMs: 15_000,
-        }),
+      const nonce = crypto.randomUUID().replaceAll("-", "");
+      const fields = Object.fromEntries(
+        [...form.entries()].filter(
+          (entry): entry is [string, string] => typeof entry[1] === "string",
+        ),
       );
+      sessionStorage.setItem(slot, JSON.stringify({ actorId, nonce, fields }));
+      setPending({ nonce, fields });
+      const response = await fetch("/api/servers", {
+        ...privateApiRequest({ method: "POST", json: command, timeoutMs: 15_000 }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-nexus-actor-id": actorId,
+          "x-nexus-creation-nonce": nonce,
+        },
+      });
       const data = await response.json().catch(() => null);
       const serverId = confirmedCreatedServer(
         response.status,
@@ -103,6 +223,14 @@ export function RegisterServerForm() {
         organizationId || null,
       );
       if (!serverId) {
+        if (response.status === 401 || data?.code === "ACTOR_CHANGED") setVerified(false);
+        if (
+          [400, 403, 409, 413, 415, 428, 429].includes(response.status) &&
+          data?.code !== "ACTOR_CHANGED"
+        ) {
+          sessionStorage.removeItem(slot);
+          setPending(null);
+        }
         throw new Error(
           serverMutationErrorMessage(
             data,
@@ -117,10 +245,12 @@ export function RegisterServerForm() {
           ),
         );
       }
+      window.addEventListener("pagehide", () => sessionStorage.removeItem(slot), { once: true });
       window.location.assign(`/workspace/servers/${encodeURIComponent(serverId)}`);
     } catch (caught) {
       setError(caught instanceof Error && caught.message ? caught.message : copy.unexpectedError);
       setLoading(false);
+      busyRef.current = false;
     }
   }
 
@@ -131,9 +261,34 @@ export function RegisterServerForm() {
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </div>
 
-      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={message(
+            "Результат создания мог остаться неподтверждённым. Проверьте его перед дальнейшими действиями.",
+            "The result may be unconfirmed. Check it before taking further action.",
+          )}
+        />
+      ) : null}
+      {recoveryMessage ? <p role="status">{recoveryMessage}</p> : null}
+      {verified && pending ? (
+        <div role="status">
+          <p>
+            {message(
+              "Результат создания неизвестен. Черновик сохранён, повторное создание заблокировано.",
+              "The creation result is unknown. Your draft is saved and creating another is blocked.",
+            )}
+          </p>
+          <Button type="button" disabled={loading} onClick={recover}>
+            {message("Проверить результат", "Check result")}
+          </Button>
+        </div>
+      ) : null}
 
       <form
+        ref={formRef}
+        hidden={!verified}
+        style={!verified ? { display: "none" } : undefined}
         onSubmit={submit}
         aria-busy={loading}
         className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
@@ -146,9 +301,9 @@ export function RegisterServerForm() {
             id="server-organization"
             name="organizationId"
             defaultValue=""
-            disabled={loading || organizationsLoading || organizationsFailed}
+            disabled={loading || !!pending || organizationsLoading || organizationsFailed}
             className={fieldControlClass({
-              disabled: loading || organizationsLoading || organizationsFailed,
+              disabled: loading || !!pending || organizationsLoading || organizationsFailed,
               className: "min-h-11",
             })}
           >
@@ -177,6 +332,7 @@ export function RegisterServerForm() {
           minLength={3}
           maxLength={100}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -190,6 +346,7 @@ export function RegisterServerForm() {
           autoCapitalize="none"
           spellCheck={false}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <div className="space-y-1.5 sm:col-span-2">
@@ -202,8 +359,9 @@ export function RegisterServerForm() {
             rows={4}
             maxLength={5000}
             disabled={loading}
+            readOnly={!!pending}
             className={fieldControlClass({
-              disabled: loading,
+              disabled: loading || !!pending,
               className: "h-auto min-h-28",
             })}
           />
@@ -216,6 +374,7 @@ export function RegisterServerForm() {
           label={copy.websiteUrl}
           placeholder="https://..."
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -225,6 +384,7 @@ export function RegisterServerForm() {
           label={copy.discordUrl}
           placeholder="https://discord.gg/..."
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -234,6 +394,7 @@ export function RegisterServerForm() {
           label={copy.rulesUrl}
           placeholder="https://..."
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -243,6 +404,7 @@ export function RegisterServerForm() {
           maxLength={64}
           defaultValue={locale === "ru" ? "Русский" : "English"}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -252,6 +414,7 @@ export function RegisterServerForm() {
           maxLength={64}
           placeholder={locale === "ru" ? "Европа" : "Europe"}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <div className="sm:col-span-2">
@@ -262,6 +425,7 @@ export function RegisterServerForm() {
             maxLength={500}
             placeholder="roleplay, economy, freeroam"
             disabled={loading}
+            readOnly={!!pending}
           />
         </div>
 
@@ -276,8 +440,9 @@ export function RegisterServerForm() {
             maxLength={3000}
             placeholder="https://..."
             disabled={loading}
+            readOnly={!!pending}
             className={fieldControlClass({
-              disabled: loading,
+              disabled: loading || !!pending,
               className: "h-auto min-h-24",
             })}
           />
@@ -292,6 +457,7 @@ export function RegisterServerForm() {
           autoCapitalize="none"
           spellCheck={false}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -300,6 +466,7 @@ export function RegisterServerForm() {
           label={copy.gameMode}
           maxLength={64}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -308,6 +475,7 @@ export function RegisterServerForm() {
           label={copy.mapName}
           maxLength={64}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -319,6 +487,7 @@ export function RegisterServerForm() {
           max={65535}
           defaultValue={22003}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -330,6 +499,7 @@ export function RegisterServerForm() {
           max={65535}
           defaultValue={22005}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <Input
@@ -341,6 +511,7 @@ export function RegisterServerForm() {
           max={4096}
           defaultValue={128}
           disabled={loading}
+          readOnly={!!pending}
         />
 
         <div className="space-y-1.5">
@@ -351,9 +522,9 @@ export function RegisterServerForm() {
             id="server-visibility"
             name="visibility"
             defaultValue="public"
-            disabled={loading}
+            disabled={loading || !!pending}
             className={fieldControlClass({
-              disabled: loading,
+              disabled: loading || !!pending,
               className: "min-h-11",
             })}
           >
@@ -363,7 +534,12 @@ export function RegisterServerForm() {
           </select>
         </div>
 
-        <Button type="submit" isLoading={loading} className="min-h-11 sm:col-span-2">
+        <Button
+          type="submit"
+          disabled={!!pending}
+          isLoading={loading}
+          className="min-h-11 sm:col-span-2"
+        >
           {loading ? copy.creating : copy.create}
         </Button>
       </form>

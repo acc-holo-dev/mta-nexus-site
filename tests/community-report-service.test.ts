@@ -93,14 +93,14 @@ it("returns target-bound confirmations for new and idempotent report submissions
     reason: "Spam content",
     evidenceUrls: [],
   };
-  expect(await service.submit(actor, input)).toEqual({
+  expect(await service.submit(actor, input, "session")).toEqual({
     id: "report",
     created: false,
     targetType: "content",
     targetId: "content",
   });
   expect(mocks.submit).toHaveBeenCalledWith(
-    expect.objectContaining({ ...input, actorId: "actor" }),
+    expect.objectContaining({ ...input, actorId: "actor", currentToken: "session" }),
   );
 });
 it("denies nonstaff writes and passes actor identity and independent audit IDs to the transaction", async () => {

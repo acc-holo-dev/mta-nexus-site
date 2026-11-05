@@ -3,24 +3,33 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
   organization: { ownerId: "usr_owner" } as { ownerId: string } | null,
   membership: null as { role: string; permissions: string[] } | null,
-  selected: 0,
+  actorId: "usr_owner",
+  actorRole: "user",
   locks: [] as string[],
   inserted: [] as Record<string, unknown>[],
+}));
+
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: vi.fn(async () => {}),
 }));
 
 vi.mock("../packages/db/src/client", () => ({
   db: {
     transaction: async (handler: (tx: unknown) => Promise<unknown>) => {
       const tx = {
-        select: () => ({
+        select: (fields: Record<string, unknown>) => ({
           from: () => ({
             where: () => ({
               for: (mode: string) => {
                 state.locks.push(mode);
-                const index = state.selected++;
                 return {
                   limit: async () => {
-                    const row = index === 0 ? state.organization : state.membership;
+                    const row =
+                      "ownerId" in fields
+                        ? state.organization
+                        : "permissions" in fields
+                          ? state.membership
+                          : { id: state.actorId, role: state.actorRole };
                     return row ? [row] : [];
                   },
                 };
@@ -57,20 +66,24 @@ const server = (organizationId: string | undefined = "org_1") => ({
   gameplayTags: [] as string[],
   ...(organizationId ? { organizationId } : {}),
 });
-const audit = (actorId: string) => ({
-  id: "aud_1",
-  actorId,
-  actorType: "user" as const,
-  action: "server.created",
-  targetId: "srv_1",
-  targetType: "server",
-  details: { fields: ["name"] },
-});
+const audit = (actorId: string) => {
+  state.actorId = actorId;
+  return {
+    id: "aud_1",
+    actorId,
+    actorType: "user" as const,
+    action: "server.created",
+    targetId: "srv_1",
+    targetType: "server",
+    details: { fields: ["name"] },
+  };
+};
 
 beforeEach(() => {
   state.organization = { ownerId: "usr_owner" };
   state.membership = null;
-  state.selected = 0;
+  state.actorId = "usr_owner";
+  state.actorRole = "user";
   state.locks = [];
   state.inserted = [];
 });
@@ -79,10 +92,12 @@ describe("atomic server create authority", () => {
   const repository = new ServerRepository();
 
   it("keeps direct organization ownership locked through both inserts", async () => {
-    await expect(repository.createWithAudit(server(), audit("usr_owner"))).resolves.toMatchObject({
+    await expect(
+      repository.createWithAudit(server(), audit("usr_owner"), "session"),
+    ).resolves.toMatchObject({
       id: "srv_1",
     });
-    expect(state.locks).toEqual(["share"]);
+    expect(state.locks).toEqual(["share", "share"]);
     expect(state.inserted).toHaveLength(2);
   });
 
@@ -91,10 +106,10 @@ describe("atomic server create authority", () => {
     { role: "member", permissions: ["manage_servers"] },
   ])("accepts delegated rights under locked membership: %j", async (membership) => {
     state.membership = membership;
-    await expect(repository.createWithAudit(server(), audit("usr_manager"))).resolves.toMatchObject(
-      { id: "srv_1" },
-    );
-    expect(state.locks).toEqual(["share", "share"]);
+    await expect(
+      repository.createWithAudit(server(), audit("usr_manager"), "session"),
+    ).resolves.toMatchObject({ id: "srv_1" });
+    expect(state.locks).toEqual(["share", "share", "share"]);
     expect(state.inserted).toHaveLength(2);
   });
 
@@ -105,25 +120,30 @@ describe("atomic server create authority", () => {
     { role: "developer", permissions: ["view_servers"] },
   ])("rejects absent or revoked membership before any inserts: %j", async (membership) => {
     state.membership = membership;
-    await expect(repository.createWithAudit(server(), audit("usr_manager"))).rejects.toMatchObject({
+    await expect(
+      repository.createWithAudit(server(), audit("usr_manager"), "session"),
+    ).rejects.toMatchObject({
       statusCode: 403,
       code: "FORBIDDEN",
     });
-    expect(state.locks).toEqual(["share", "share"]);
+    expect(state.locks).toEqual(["share", "share", "share"]);
     expect(state.inserted).toHaveLength(0);
   });
 
   it("allows a platform administrator to create a server in an existing organization", async () => {
+    state.actorRole = "admin";
     await expect(
-      repository.createWithAudit(server(), audit("usr_admin"), "admin"),
+      repository.createWithAudit(server(), audit("usr_admin"), "session"),
     ).resolves.toMatchObject({ id: "srv_1" });
-    expect(state.locks).toEqual(["share"]);
+    expect(state.locks).toEqual(["share", "share"]);
     expect(state.inserted).toHaveLength(2);
   });
 
   it("rejects nonexistent organizations and does not persist an audit", async () => {
     state.organization = null;
-    await expect(repository.createWithAudit(server(), audit("usr_manager"))).rejects.toMatchObject({
+    await expect(
+      repository.createWithAudit(server(), audit("usr_manager"), "session"),
+    ).rejects.toMatchObject({
       statusCode: 404,
       code: "NOT_FOUND",
     });
@@ -132,9 +152,13 @@ describe("atomic server create authority", () => {
 
   it("keeps personal registrations independent from organization lookups", async () => {
     await expect(
-      repository.createWithAudit({ ...server(), organizationId: undefined }, audit("usr_owner")),
+      repository.createWithAudit(
+        { ...server(), organizationId: undefined, ownerId: "usr_owner" },
+        audit("usr_owner"),
+        "session",
+      ),
     ).resolves.toMatchObject({ id: "srv_1" });
-    expect(state.locks).toEqual([]);
+    expect(state.locks).toEqual(["share"]);
     expect(state.inserted).toHaveLength(2);
   });
 });

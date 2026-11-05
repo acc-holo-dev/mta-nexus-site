@@ -11,6 +11,7 @@ import {
 import type { Product, User } from "@nexus/domain";
 import { beforeAll, describe, expect, it } from "vitest";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 describe("Nexus 1.2 Public Platform Journeys", () => {
   const ts = Date.now().toString(36);
@@ -112,7 +113,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     expect(unreadFeed).toHaveLength(1);
     expect(unreadFeed[0].isRead).toBe(false);
 
-    await notificationRepository.updatePreferences(devUser.id, { followsEnabled: false });
+    await setNotificationPreferencesForTest(devUser.id, { followsEnabled: false });
     const suppressed = await notificationRepository.create({
       id: `not_suppressed_${Date.now()}`,
       recipientId: devUser.id,
@@ -124,7 +125,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
     expect(suppressed).toBeNull();
 
-    await notificationRepository.updatePreferences(devUser.id, {
+    await setNotificationPreferencesForTest(devUser.id, {
       followsEnabled: true,
       systemEnabled: false,
     });
@@ -139,7 +140,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
     expect(securityNotification).not.toBeNull();
 
-    await notificationRepository.updatePreferences(devUser.id, { systemEnabled: true });
+    await setNotificationPreferencesForTest(devUser.id, { systemEnabled: true });
   });
 
   it("Resource Journey: Claim a free product and receive a download entitlement", async () => {

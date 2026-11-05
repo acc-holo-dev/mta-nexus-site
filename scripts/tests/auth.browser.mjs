@@ -142,16 +142,19 @@ function check(name, body) {
 
 // Same-origin fetch from the actual browser: real cookies, TLS and server routes.
 // No route.fulfill(), service mocks or test-only authentication bypasses.
-async function request(actor, path, method = "GET", body) {
+async function request(actor, path, method = "GET", body, headers = {}) {
   return actor.page.evaluate(
-    async ({ path, method, body }) => {
+    async ({ path, method, body, headers }) => {
       const response = await fetch(path, {
         method,
         cache: "no-store",
         credentials: "same-origin",
         ...(body === undefined
           ? {}
-          : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
+          : {
+              headers: { "Content-Type": "application/json", ...headers },
+              body: JSON.stringify(body),
+            }),
       });
       const text = await response.text();
       let data = null;
@@ -167,7 +170,7 @@ async function request(actor, path, method = "GET", body) {
         cacheControl: response.headers.get("cache-control"),
       };
     },
-    { path, method, body },
+    { path, method, body, headers },
   );
 }
 
@@ -436,14 +439,23 @@ check("J2-05 private server management and workspace remain owner-scoped", async
     [alice, people[0], "192.0.2.101"],
     [bob, people[1], "192.0.2.102"],
   ]) {
-    const created = await request(actor, "/api/servers", "POST", {
-      name: `Private ${person.username}`,
-      slug: `private-${person.username.replaceAll("_", "-")}`,
-      description: `Private owner note ${person.username}`,
-      ipAddress: ip,
-      port: 22003,
-      visibility: "private",
-    });
+    const created = await request(
+      actor,
+      "/api/servers",
+      "POST",
+      {
+        name: `Private ${person.username}`,
+        slug: `private-${person.username.replaceAll("_", "-")}`,
+        description: `Private owner note ${person.username}`,
+        ipAddress: ip,
+        port: 22003,
+        visibility: "private",
+      },
+      {
+        "x-nexus-actor-id": actor === alice ? aliceUser.id : bobUser.id,
+        "x-nexus-creation-nonce": randomBytes(16).toString("hex"),
+      },
+    );
     assert.equal(created.status, 201, "Synthetic private listing creation");
     assert.equal(
       created.data.server.ownerId,

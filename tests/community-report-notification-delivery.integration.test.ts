@@ -19,6 +19,7 @@ import {
   users,
   webPushOutbox,
 } from "../packages/db/src/schema";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 const actors: string[] = [];
 const triggers: { table: string; name: string }[] = [];
@@ -91,12 +92,13 @@ async function fixture() {
 async function submit(
   f: Awaited<ReturnType<typeof fixture>>,
   targetType: "comment" | "content" = "comment",
-  reporterId = f.reporter.id,
+  reporter = f.reporter,
 ) {
   return repository.submit({
     id: id("rpt"),
     auditId: id("aud"),
-    actorId: reporterId,
+    actorId: reporter.id,
+    currentToken: reporter.currentToken,
     targetType,
     targetId: targetType === "comment" ? f.comment.id : f.publication.id,
     type: "abuse",
@@ -171,7 +173,7 @@ it("commits a private security outcome and push job with the decision, preservin
   const f = await fixture();
   const report = await submit(f);
   await device(f.reporter.id);
-  await notificationRepository.updatePreferences(f.reporter.id, {
+  await setNotificationPreferencesForTest(f.reporter.id, {
     followsEnabled: false,
     contentEnabled: false,
     commerceEnabled: false,
@@ -255,7 +257,7 @@ it.each(["comment", "content"] as const)(
     const f = await fixture();
     const second = await actor();
     const firstReport = await submit(f, targetType);
-    const secondReport = await submit(f, targetType, second.id);
+    const secondReport = await submit(f, targetType, second);
     const input = {
       items: [firstReport, secondReport].map((report) => ({
         id: report.id,

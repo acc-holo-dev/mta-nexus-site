@@ -1,12 +1,21 @@
-import { AppError, NotFoundError } from "@nexus/domain";
+import { AppError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, comments, content, reportNotificationDeliveries, reports } from "../schema";
+import {
+  auditEvents,
+  comments,
+  content,
+  reportNotificationDeliveries,
+  reports,
+  users,
+} from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 
 export async function submit(input: {
   actorId: string;
   id: string;
   auditId: string;
+  currentToken: string;
   targetType: "content" | "comment";
   targetId: string;
   type: string;
@@ -46,6 +55,14 @@ export async function submit(input: {
       authorId = comment.authorId;
     }
     if (authorId === input.actorId) throw new AppError("Own target", 422, "REPORT_OWN_TARGET");
+    const [actor] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, input.actorId))
+      .for("share")
+      .limit(1);
+    if (!actor) throw new UnauthorizedError();
+    await lockInitiatingSession(tx, actor.id, input.currentToken);
     const [existing] = await tx
       .select({ id: reports.id })
       .from(reports)
@@ -58,7 +75,10 @@ export async function submit(input: {
         ),
       )
       .limit(1);
-    if (existing) return { id: existing.id, created: false };
+    if (existing) {
+      await lockInitiatingSession(tx, actor.id, input.currentToken);
+      return { id: existing.id, created: false };
+    }
     await tx.insert(reports).values({
       id: input.id,
       reporterId: input.actorId,
@@ -84,6 +104,7 @@ export async function submit(input: {
     await tx
       .insert(reportNotificationDeliveries)
       .values({ reportId: input.id, createdAt, community: true });
+    await lockInitiatingSession(tx, actor.id, input.currentToken);
     return { id: input.id, created: true };
   });
 }

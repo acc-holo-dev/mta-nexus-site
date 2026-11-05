@@ -10,6 +10,7 @@ import {
 } from "@nexus/db";
 import { beforeAll, describe, expect, it } from "vitest";
 import { drainPublicationNotificationDelivery } from "../apps/web/src/lib/services/server-follow-notification-service";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 describe("server follower publication notification integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -76,7 +77,7 @@ describe("server follower publication notification integration", () => {
       targetId: serverId,
     });
 
-    await notificationRepository.updatePreferences(disabledId, {
+    await setNotificationPreferencesForTest(disabledId, {
       serverEnabled: false,
     });
 

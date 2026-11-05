@@ -1,3 +1,4 @@
+import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
@@ -24,7 +25,21 @@ export async function generateMetadata() {
 
 export default async function RegisterServerPage() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
-  const actor = await authService.getSession(store.get("nexus_session")?.value).catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <ErrorState
+        title={locale === "ru" ? "Не удалось проверить сессию" : "Could not check your session"}
+        description={
+          locale === "ru"
+            ? "Обновите страницу и попробуйте снова."
+            : "Refresh the page and try again."
+        }
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/servers/new" />;
   const copy = getManagedServerCopy(locale);
   return (
@@ -32,7 +47,7 @@ export default async function RegisterServerPage() {
       <Link href="/workspace/servers" className={navLinkClass}>
         ← {copy.title}
       </Link>
-      <RegisterServerForm />
+      <RegisterServerForm key={actor.id} actorId={actor.id} />
     </div>
   );
 }

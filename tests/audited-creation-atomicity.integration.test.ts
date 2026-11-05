@@ -105,6 +105,7 @@ describe("audited creation atomicity", () => {
           targetId: serverId,
           targetType: "server",
         },
+        token,
       ),
     ).rejects.toBeTruthy();
     expect(await serverRepository.findById(serverId)).toBeNull();

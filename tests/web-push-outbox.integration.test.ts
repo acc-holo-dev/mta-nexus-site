@@ -1,6 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { and, eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   db,
   notificationRepository,
@@ -10,6 +8,9 @@ import {
   webPushOutbox,
   webPushSubscriptionRepository,
 } from "@nexus/db";
+import { and, eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
+import { setNotificationPreferencesForTest } from "./helpers/notification-preferences-fixture";
 
 describe("durable Web Push outbox", () => {
   it("commits inbox notification and one job per active subscription atomically", async () => {
@@ -111,7 +112,7 @@ describe("durable Web Push outbox", () => {
       auth: "auth",
       expirationAt: null,
     });
-    await notificationRepository.updatePreferences(userId, {
+    await setNotificationPreferencesForTest(userId, {
       followsEnabled: false,
     });
 

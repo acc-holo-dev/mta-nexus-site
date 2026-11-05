@@ -106,11 +106,11 @@ it("blocks anonymous access, forged actor scope and repeated filters", async () 
 });
 it("normalizes writes and returns the confirmed result for a new or duplicate report", async () => {
   expect((await POST(request("POST", report))).status).toBe(200);
-  expect(mocks.submit).toHaveBeenCalledWith(actor, {
-    ...report,
-    reason: "Abuse details",
-    evidenceUrls: [],
-  });
+  expect(mocks.submit).toHaveBeenCalledWith(
+    actor,
+    { ...report, reason: "Abuse details", evidenceUrls: [] },
+    "test",
+  );
   mocks.submit.mockResolvedValue({ id: "report", created: false });
   expect((await POST(request("POST", report))).status).toBe(200);
 });

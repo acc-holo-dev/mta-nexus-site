@@ -81,8 +81,8 @@ describe("report write and notification lookup", () => {
     const data: Omit<Report, "createdAt" | "resolvedAt"> = {
       id: "rpt_1",
       reporterId: "member_1",
-      targetType: "product",
-      targetId: "prd_1",
+      targetType: "user",
+      targetId: "member_2",
       type: "scam",
       reason: "An unsafe product",
       evidenceUrls: [],

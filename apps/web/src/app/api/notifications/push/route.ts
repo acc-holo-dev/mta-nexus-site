@@ -38,7 +38,9 @@ function publicKey() {
 
 async function requireSession(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
-  return authService.getSessionIdentity(token);
+  if (!token) return null;
+  const identity = await authService.getSessionIdentity(token);
+  return identity ? { ...identity, token } : null;
 }
 
 function checkExpectedIdentity(
@@ -165,16 +167,19 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const stored = await webPushSubscriptionRepository.upsertWithResult({
-      id: generateId("wps"),
-      userId: authenticated.user.id,
-      sessionId: authenticated.sessionId,
-      endpoint: parsed.endpoint,
-      p256dh: parsed.p256dh,
-      auth: parsed.auth,
-      expirationAt: parsed.expirationAt,
-      userAgent: request.headers.get("user-agent"),
-    });
+    const stored = await webPushSubscriptionRepository.upsertAuthenticated(
+      {
+        id: generateId("wps"),
+        userId: authenticated.user.id,
+        sessionId: authenticated.sessionId,
+        endpoint: parsed.endpoint,
+        p256dh: parsed.p256dh,
+        auth: parsed.auth,
+        expirationAt: parsed.expirationAt,
+        userAgent: request.headers.get("user-agent"),
+      },
+      authenticated.token,
+    );
 
     if (stored.status !== "stored") {
       const endpointConflict = stored.status === "endpoint_conflict";
@@ -204,6 +209,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "INVALID_BODY_LENGTH",
         "REQUEST_BODY_TOO_LARGE",
         "REQUEST_BODY_TIMEOUT",
+        "UNAUTHORIZED",
       ].includes(error.code)
     ) {
       return json(context, { error: error.message, code: error.code }, error.statusCode);
@@ -278,9 +284,10 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(context, { error: "Invalid Web Push endpoint" }, 400);
     }
 
-    const removed = await webPushSubscriptionRepository.removeForSession(
+    const removed = await webPushSubscriptionRepository.removeAuthenticated(
       authenticated.user.id,
       authenticated.sessionId,
+      authenticated.token,
       normalizedEndpoint,
     );
     return json(context, {
@@ -298,6 +305,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
         "INVALID_BODY_LENGTH",
         "REQUEST_BODY_TOO_LARGE",
         "REQUEST_BODY_TIMEOUT",
+        "UNAUTHORIZED",
       ].includes(error.code)
     ) {
       return json(context, { error: error.message, code: error.code }, error.statusCode);

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
-    if (!user) {
+    if (!token || !user) {
       return json(context, { error: "Authentication required" }, 401);
     }
 
@@ -62,7 +62,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
-    if (!user) {
+    if (!token || !user) {
       return json(context, { error: "Authentication required" }, 401);
     }
 
@@ -110,7 +110,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const preferences = await notificationRepository.updatePreferences(user.id, parsed.data);
+    const preferences = await notificationRepository.updatePreferences(user.id, parsed.data, token);
     return json(context, {
       success: true,
       actorId: user.id,
@@ -124,6 +124,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
         "INVALID_BODY_LENGTH",
         "REQUEST_BODY_TOO_LARGE",
         "REQUEST_BODY_TIMEOUT",
+        "UNAUTHORIZED",
       ].includes(error.code)
     ) {
       return json(context, { error: error.message, code: error.code }, error.statusCode);

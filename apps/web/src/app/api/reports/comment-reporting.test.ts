@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { AppError, NotFoundError } from "@nexus/domain";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
@@ -72,10 +73,10 @@ describe("comment abuse reporting", () => {
     vi.unstubAllEnvs();
   });
 
-  it("creates a report only after the comment target exists", async () => {
+  it("creates a report through the transactional target check", async () => {
     const response = await POST(request());
     expect(response.status).toBe(201);
-    expect(mocks.findComment).toHaveBeenCalledWith("cmt_1");
+    expect(mocks.findComment).not.toHaveBeenCalled();
     expect(mocks.createWithAudit).toHaveBeenCalledWith(
       expect.objectContaining({
         reporterId: "usr_reporter",
@@ -88,13 +89,22 @@ describe("comment abuse reporting", () => {
   });
 
   it("returns 404 and performs no write when the comment is missing", async () => {
-    mocks.findComment.mockResolvedValueOnce(null);
+    mocks.createWithAudit.mockRejectedValueOnce(new NotFoundError("Report target"));
     const response = await POST(request("cmt_missing"));
     expect(response.status).toBe(404);
     expect(await response.json()).toMatchObject({
-      error: "Report target was not found",
+      error: "Report target not found",
     });
-    expect(mocks.createWithAudit).not.toHaveBeenCalled();
+    expect(mocks.createWithAudit).toHaveBeenCalledOnce();
+  });
+
+  it("returns the canonical own-target error", async () => {
+    mocks.createWithAudit.mockRejectedValueOnce(
+      new AppError("Own target", 422, "REPORT_OWN_TARGET"),
+    );
+    const response = await POST(request());
+    expect(response.status).toBe(422);
+    expect(await response.json()).toMatchObject({ error: "Own target", code: "REPORT_OWN_TARGET" });
   });
 
   it("rejects unsupported target types before target lookup", async () => {
