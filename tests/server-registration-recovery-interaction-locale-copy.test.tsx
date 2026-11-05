@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { findTestButton } from "./helpers/flatten-react-test-tree";
+import { findTestButton, flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
 import {
   createServerRegistrationRecoveryInteractionHelpers,
   mockReactHooks,
@@ -34,12 +34,6 @@ it("explains an inconclusive recovery in Russian without enabling another creati
   h.fetch.mockResolvedValueOnce(response({ server: null }));
   const check = findTestButton(render(), "Проверить результат");
   await (check.props.onClick as () => Promise<void>)();
-  expect(
-    render().some(
-      (node) =>
-        node.props.role === "status" &&
-        String(node.props.children).includes("Запись пока не подтверждена"),
-    ),
-  ).toBe(true);
+  expect(flatTreeHasErrorText(render(), "Запись пока не подтверждена")).toBe(true);
   expect(findTestButton(render(), "Создать карточку").props.disabled).toBe(true);
 });
