@@ -61,6 +61,7 @@ function request() {
       "content-type": "application/json",
       cookie: "nexus_session=test-session",
       "Idempotency-Key": "a1b2c3d4-e5f6-4789-a012-3456789abcde",
+      "x-nexus-actor-id": "usr_commenter",
     },
     body: JSON.stringify({ text: "Useful comment" }),
   });

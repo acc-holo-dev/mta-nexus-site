@@ -45,7 +45,13 @@ it("sends a scoped reply with a frozen Idempotency-Key and confirms persistence"
     async (_url: RequestInfo | URL, _init?: RequestInit) =>
       new Response(
         JSON.stringify({
-          comment: { id: "reply", contentId: "content", text: "Reply text", parentId: "parent" },
+          comment: {
+            id: "cmt_12345678123442348234123456789abc",
+            authorId: "usr_a",
+            contentId: "content",
+            text: "Reply text",
+            parentId: "parent",
+          },
           replayed: false,
         }),
         { status: 201 },
@@ -59,12 +65,13 @@ it("sends a scoped reply with a frozen Idempotency-Key and confirms persistence"
         text: " Reply text ",
         parentId: "parent",
         intentKey: INTENT,
+        expectedActorId: "usr_a",
         locale: "ru",
         fallbackError: "error",
       },
       fetchImpl,
     ),
-  ).toBe("reply");
+  ).toBe("cmt_12345678123442348234123456789abc");
   expect(fetchImpl.mock.calls[0][1]?.headers).toMatchObject({
     "Idempotency-Key": INTENT,
   });
@@ -79,7 +86,14 @@ it.each([
 ])("does not confirm a mismatched saved reply %j", async (comment) => {
   const fetchImpl = vi.fn(
     async () =>
-      new Response(JSON.stringify({ comment: { id: "reply", ...comment } }), { status: 201 }),
+      new Response(
+        JSON.stringify({
+          comment: { id: "cmt_12345678123442348234123456789abc", authorId: "usr_a", ...comment },
+        }),
+        {
+          status: 201,
+        },
+      ),
   );
   await expect(
     submitContentCommentRequest(
@@ -89,6 +103,7 @@ it.each([
         text: "Reply text",
         parentId: "parent",
         intentKey: INTENT,
+        expectedActorId: "usr_a",
         fallbackError: "Unconfirmed",
       },
       fetchImpl,
@@ -112,6 +127,7 @@ it.each(["en", "ru"] as const)(
           contentId: "content",
           text: "Guest draft",
           intentKey: INTENT,
+          expectedActorId: "usr_a",
           locale,
           fallbackError: "fallback",
         },
@@ -143,3 +159,34 @@ it.each(["en", "ru"] as const)(
     expect(notice.message).toContain("Article");
   },
 );
+it("does not confirm a different comment id even if all other fields match", async () => {
+  const fetchImpl = vi.fn(
+    async () =>
+      new Response(
+        JSON.stringify({
+          comment: {
+            id: "cmt_foreign",
+            authorId: "usr_a",
+            contentId: "content",
+            text: "Reply text",
+            parentId: "parent",
+          },
+        }),
+        { status: 201 },
+      ),
+  );
+  await expect(
+    submitContentCommentRequest(
+      {
+        slug: "article",
+        contentId: "content",
+        text: "Reply text",
+        parentId: "parent",
+        intentKey: INTENT,
+        expectedActorId: "usr_a",
+        fallbackError: "Unconfirmed",
+      },
+      fetchImpl,
+    ),
+  ).rejects.toThrow("Unconfirmed");
+});

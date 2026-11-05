@@ -41,6 +41,7 @@ export async function submitContentCommentRequest(
     text: string;
     fallbackError: string;
     intentKey: string;
+    expectedActorId: string;
     parentId?: string;
     contentId?: string;
     locale?: Locale;
@@ -51,6 +52,8 @@ export async function submitContentCommentRequest(
   if (normalized.length < 2 || normalized.length > 5000) {
     throw new RangeError("Comment text must contain 2..5000 characters");
   }
+  if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(input.expectedActorId))
+    throw new RangeError("Expected actor is required");
   const intentKey = parseCommentIntentKey(input.intentKey);
   if (!intentKey) {
     throw new RangeError("Comment intent key must be a UUIDv4 Idempotency-Key");
@@ -63,6 +66,7 @@ export async function submitContentCommentRequest(
     headers: {
       "Content-Type": "application/json",
       "Idempotency-Key": intentKey,
+      "x-nexus-actor-id": input.expectedActorId,
     },
     body: JSON.stringify({
       text: normalized,
@@ -75,10 +79,12 @@ export async function submitContentCommentRequest(
   const payload = await response.json().catch(() => null);
   const id = confirmedCommentId(response.status, payload);
   const confirmed =
-    !input.contentId ||
-    (payload?.comment?.contentId === input.contentId &&
-      payload?.comment?.text === normalized &&
-      (payload?.comment?.parentId ?? undefined) === input.parentId);
+    id === `cmt_${intentKey.replaceAll("-", "")}` &&
+    payload?.comment?.authorId === input.expectedActorId &&
+    (!input.contentId ||
+      (payload?.comment?.contentId === input.contentId &&
+        payload?.comment?.text === normalized &&
+        (payload?.comment?.parentId ?? undefined) === input.parentId));
   if (!id || !confirmed) {
     const code = readCommentSubmitCode(payload);
     const message =

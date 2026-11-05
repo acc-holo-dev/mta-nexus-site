@@ -73,8 +73,13 @@ export const POST = withBrowserMutation(
     try {
       const { slug } = await params;
       if (!validSlug(slug)) throw new NotFoundError("Content");
-      const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
-      if (!user) throw new UnauthorizedError();
+      const token = request.cookies.get("nexus_session")?.value;
+      const user = await authService.getSession(token);
+      if (!user || !token) throw new UnauthorizedError();
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (expectedActor !== user.id) throw new AppError("Actor changed", 409, "ACTOR_CHANGED");
       if (request.headers.get("sec-fetch-site") === "cross-site")
         throw new AppError("Cross-site mutation forbidden", 403, "FORBIDDEN");
       if (!(await consumeRateLimit("commentCreation", user.id)).success)
@@ -102,6 +107,7 @@ export const POST = withBrowserMutation(
           intentKey,
         },
         user,
+        token,
       );
       return jsonWithRequestId(
         context,

@@ -22,7 +22,10 @@ const captured = vi.hoisted(() => ({
   selectCalls: 0,
   review: vi.fn(),
   parentLock: true,
+  lockSession: vi.fn(),
 }));
+
+vi.mock("./initiating-session", () => ({ lockInitiatingSession: captured.lockSession }));
 
 vi.mock("./resource-reviews", () => ({
   resourceReviewsRepository: { command: captured.review },
@@ -38,8 +41,12 @@ vi.mock("../client", () => ({
             from(table: unknown) {
               return {
                 where() {
+                  if (table === users) return { for: async () => [{ id: "usr_1" }] };
                   return {
                     limit() {
+                      if (table === comments && captured.insertConflict) {
+                        return Promise.resolve(captured.existing ? [captured.existing] : []);
+                      }
                       return {
                         for: async () => {
                           if (table === comments) {
@@ -107,6 +114,7 @@ vi.mock("../client", () => ({
 }));
 
 import { ContentRepository } from "./content";
+import { users } from "../schema";
 
 describe("article comment intent protocol", () => {
   beforeEach(() => {
@@ -120,6 +128,7 @@ describe("article comment intent protocol", () => {
     captured.selectCalls = 0;
     captured.parentLock = true;
     captured.review.mockReset();
+    captured.lockSession.mockReset();
   });
 
   it("accepts only canonical UUIDv4 intent keys", () => {
@@ -133,6 +142,7 @@ describe("article comment intent protocol", () => {
       intentKey: INTENT,
       contentId: "cnt_1",
       authorId: "usr_1",
+      currentToken: "session-token",
       text: "Useful comment",
       audit: {
         id: "aud_1",
@@ -152,6 +162,8 @@ describe("article comment intent protocol", () => {
     expect(captured.inserts).toEqual([comments, discussionNotificationDeliveries, auditEvents]);
     expect(captured.updateTable).toBe(content);
     expect(captured.selectCalls).toBe(0);
+    expect(captured.lockSession).toHaveBeenCalledTimes(2);
+    expect(captured.lockSession).toHaveBeenCalledWith(expect.anything(), "usr_1", "session-token");
     const increment = captured.updateValues?.commentCount;
     expect(increment).toBeTruthy();
     expect(new PgDialect().sqlToQuery(increment as SQL).sql).toContain("+ 1");
@@ -172,6 +184,7 @@ describe("article comment intent protocol", () => {
       intentKey: INTENT,
       contentId: "cnt_1",
       authorId: "usr_1",
+      currentToken: "session-token",
       text: "Useful comment",
       audit: {
         id: "aud_1",
@@ -186,7 +199,8 @@ describe("article comment intent protocol", () => {
     expect(result).toMatchObject({ kind: "replayed", comment: { id: COMMENT_ID } });
     expect(captured.inserts).toEqual([comments]);
     expect(captured.updateTable).toBeNull();
-    expect(captured.selectCalls).toBe(1);
+    expect(captured.selectCalls).toBe(0);
+    expect(captured.lockSession).toHaveBeenCalledTimes(2);
   });
 
   it("rejects payload mismatch on a reused intent key without creating another comment", async () => {
@@ -204,6 +218,7 @@ describe("article comment intent protocol", () => {
         intentKey: INTENT,
         contentId: "cnt_1",
         authorId: "usr_1",
+        currentToken: "session-token",
         text: "Different text",
         audit: {
           id: "aud_1",

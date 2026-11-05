@@ -51,7 +51,7 @@ function request(method: string, body?: unknown, query = "", locale = "en", head
       ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: `nexus_locale=${locale};nexus_session=test`,
       "content-type": "application/json",
-      ...(method === "POST" ? { "Idempotency-Key": INTENT } : {}),
+      ...(method === "POST" ? { "Idempotency-Key": INTENT, "x-nexus-actor-id": "commenter" } : {}),
       ...headers,
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -123,6 +123,7 @@ it("persists a reply with transactional fanout instead of after() dispatch", asy
       intentKey: INTENT,
     },
     state.actor,
+    "test",
   );
   expect(mocks.notify).not.toHaveBeenCalled();
   expect(state.after).toHaveLength(0);
@@ -193,6 +194,7 @@ it("replays the same intent after a lost response without a second create call s
   expect(mocks.add).toHaveBeenCalledWith(
     { contentId: "content", text: "Same intent", intentKey: INTENT },
     state.actor,
+    "test",
   );
 });
 it("rejects payload mismatch on a reused intent key", async () => {
@@ -254,5 +256,18 @@ it("rejects oversized bodies and rate-limited writes", async () => {
   expect((await POST(request("POST", { text: "x".repeat(40000) }), context)).status).toBe(413);
   mocks.rate.mockResolvedValue({ success: false });
   expect((await POST(request("POST", { text: "reply" }), context)).status).toBe(429);
+  expect(mocks.add).not.toHaveBeenCalled();
+});
+it("binds comment creation to the actor displayed on the page", async () => {
+  const missing = await POST(
+    request("POST", { text: "A useful reply" }, "", "en", { "x-nexus-actor-id": "" }),
+    context,
+  );
+  expect(missing.status).toBe(428);
+  const changed = await POST(
+    request("POST", { text: "A useful reply" }, "", "en", { "x-nexus-actor-id": "other" }),
+    context,
+  );
+  expect(changed.status).toBe(409);
   expect(mocks.add).not.toHaveBeenCalled();
 });

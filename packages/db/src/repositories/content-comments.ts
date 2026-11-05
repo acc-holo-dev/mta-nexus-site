@@ -1,7 +1,14 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { AppError, NotFoundError, type AuditEvent, type Comment } from "@nexus/domain";
+import {
+  AppError,
+  NotFoundError,
+  UnauthorizedError,
+  type AuditEvent,
+  type Comment,
+} from "@nexus/domain";
 import { db } from "../client";
-import { auditEvents, comments, content, discussionNotificationDeliveries } from "../schema";
+import { auditEvents, comments, content, discussionNotificationDeliveries, users } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 
 const uuidV4 = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u;
 
@@ -58,6 +65,7 @@ export class ContentCommentsRepository {
     intentKey: string;
     contentId: string;
     authorId: string;
+    currentToken: string;
     text: string;
     parentId?: string;
     audit: Omit<AuditEvent, "createdAt">;
@@ -75,7 +83,7 @@ export class ContentCommentsRepository {
       text,
     };
 
-    const created = await db.transaction(async (tx) => {
+    return db.transaction(async (tx): Promise<ArticleCommentMutationResult> => {
       const [target] = await tx
         .select({ status: content.status })
         .from(content)
@@ -100,6 +108,14 @@ export class ContentCommentsRepository {
         if (!parent) throw new AppError("Parent not found", 400, "COMMENT_PARENT_NOT_FOUND");
       }
 
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.authorId))
+        .for("share");
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, input.authorId, input.currentToken);
+
       const createdAt = sql<Date>`clock_timestamp()`;
       const [inserted] = await tx
         .insert(comments)
@@ -115,7 +131,14 @@ export class ContentCommentsRepository {
         .onConflictDoNothing()
         .returning();
 
-      if (!inserted) return null;
+      if (!inserted) {
+        const [existing] = await tx.select().from(comments).where(eq(comments.id, id)).limit(1);
+        if (!existing) throw new Error("Missing comment after idempotent conflict");
+        await lockInitiatingSession(tx, input.authorId, input.currentToken);
+        return matchesIntent(existing, expected)
+          ? { kind: "replayed", comment: existing as unknown as Comment }
+          : { kind: "key_conflict" };
+      }
 
       await tx
         .update(content)
@@ -135,19 +158,9 @@ export class ContentCommentsRepository {
         createdAt,
       });
 
-      return inserted as unknown as Comment;
+      await lockInitiatingSession(tx, input.authorId, input.currentToken);
+      return { kind: "created", comment: inserted as unknown as Comment };
     });
-
-    if (created) return { kind: "created", comment: created };
-
-    const [existing] = await db.select().from(comments).where(eq(comments.id, id)).limit(1);
-    if (!existing) {
-      throw new Error("Missing comment after idempotent conflict");
-    }
-    if (!matchesIntent(existing, expected)) {
-      return { kind: "key_conflict" };
-    }
-    return { kind: "replayed", comment: existing as unknown as Comment };
   }
 }
 

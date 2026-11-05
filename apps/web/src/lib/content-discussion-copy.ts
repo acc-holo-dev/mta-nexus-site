@@ -2,6 +2,7 @@ import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
 
 const en = {
+  countUnavailable: "Comment total unavailable until refresh.",
   reloadSaved: "Reload saved comment",
   search: "Search comments or authors",
   applySearch: "Search",
@@ -73,6 +74,7 @@ const en = {
   formErrorHint: "The result could not be confirmed. Check the saved comment before trying again.",
 };
 const ru: Record<keyof typeof en, string> = {
+  countUnavailable: "Общее число комментариев станет доступно после обновления страницы.",
   reloadSaved: "Загрузить сохранённый комментарий",
   search: "Поиск по комментариям и авторам",
   applySearch: "Найти",

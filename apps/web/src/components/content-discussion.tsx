@@ -40,6 +40,18 @@ const navLinkClass =
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
+function readScopedDiscussionDraft(contentId: string, actorId: string | null) {
+  const own = readDiscussionComposeDraft(contentId, { actorId });
+  if (own || !actorId) return own;
+  const guest = readDiscussionComposeDraft(contentId, { actorId: null });
+  if (!guest) return null;
+  const { version: _version, savedAt, intentKey: _intentKey, ...draft } = guest;
+  if (!writeDiscussionComposeDraft({ ...draft, savedAt }, { actorId, requirePersistence: true }))
+    return null;
+  clearDiscussionComposeDraft(contentId, { actorId: null });
+  return { ...guest, intentKey: undefined };
+}
+
 export function ContentDiscussion({
   slug,
   title,
@@ -80,8 +92,9 @@ export function ContentDiscussion({
   const [writeNeedsSignIn, setWriteNeedsSignIn] = useState(false);
   const [published, setPublished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const actorId = viewer?.id ?? null;
   const [composeBootstrap] = useState(() => {
-    const stored = readDiscussionComposeDraft(contentId);
+    const stored = readScopedDiscussionDraft(contentId, actorId);
     if (!stored)
       return {
         text: "",
@@ -103,8 +116,8 @@ export function ContentDiscussion({
   const [text, setText] = useState(composeBootstrap.text);
   const [reply, setReply] = useState<{ id: string; name: string } | null>(composeBootstrap.reply);
   const [draftRestoreNotice, setDraftRestoreNotice] = useState(composeBootstrap.restored);
-  const loadedComposeFor = useRef(contentId);
-  const [displayCount, setDisplayCount] = useState(count);
+  const loadedComposeFor = useRef(`${contentId}:${actorId ?? "guest"}`);
+  const [displayCount, setDisplayCount] = useState<number | null>(count);
   const [managingId, setManagingId] = useState<string | null>(null);
   const [managementSuccess, setManagementSuccess] = useState("");
   const readGuard = useRef(false);
@@ -115,14 +128,17 @@ export function ContentDiscussion({
     text: string;
     parentId?: string;
   } | null>(composeBootstrap.pendingIntent);
+  const [pendingWrite, setPendingWrite] = useState(
+    Boolean(composeBootstrap.pendingIntent && actorId),
+  );
   const textarea = useRef<HTMLTextAreaElement>(null);
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
   function persistComposeDraft(nextText = text, nextReply = reply) {
     const normalized = nextText.trimEnd();
     if (normalized.length < 1) {
       pendingIntent.current = null;
-      clearDiscussionComposeDraft(contentId);
-      return;
+      clearDiscussionComposeDraft(contentId, { actorId });
+      return true;
     }
     const trimmed = normalized.slice(0, 5000);
     const parentId = nextReply?.id;
@@ -134,14 +150,17 @@ export function ContentDiscussion({
       parseCommentIntentKey(pending.key)
         ? pending.key
         : undefined;
-    writeDiscussionComposeDraft({
-      contentId,
-      text: trimmed,
-      ...(nextReply
-        ? { parentId: nextReply.id, parentName: nextReply.name }
-        : { parentId: undefined, parentName: undefined }),
-      ...(intentKey ? { intentKey } : {}),
-    });
+    return writeDiscussionComposeDraft(
+      {
+        contentId,
+        text: trimmed,
+        ...(nextReply
+          ? { parentId: nextReply.id, parentName: nextReply.name }
+          : { parentId: undefined, parentName: undefined }),
+        ...(intentKey ? { intentKey } : {}),
+      },
+      { actorId, requirePersistence: Boolean(intentKey) },
+    );
   }
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
   useEffect(() => {
@@ -157,9 +176,10 @@ export function ContentDiscussion({
     };
   }, []);
   useEffect(() => {
-    if (loadedComposeFor.current === contentId) return;
-    loadedComposeFor.current = contentId;
-    const stored = readDiscussionComposeDraft(contentId);
+    const scope = `${contentId}:${actorId ?? "guest"}`;
+    if (loadedComposeFor.current === scope) return;
+    loadedComposeFor.current = scope;
+    const stored = readScopedDiscussionDraft(contentId, actorId);
     if (stored) {
       setText(stored.text);
       const parentId = stored.parentId;
@@ -169,13 +189,15 @@ export function ContentDiscussion({
         ? { key: intentKey, text: stored.text.trim(), parentId }
         : null;
       setDraftRestoreNotice(true);
+      setPendingWrite(Boolean(intentKey && actorId));
       return;
     }
     pendingIntent.current = null;
+    setPendingWrite(false);
     setText("");
     setReply(null);
     setDraftRestoreNotice(false);
-  }, [contentId, copy.anonymous]);
+  }, [contentId, actorId, copy.anonymous]);
   useEffect(() => {
     if (focusedId)
       document.getElementById(`comment-${focusedId}`)?.scrollIntoView({ block: "center" });
@@ -271,12 +293,19 @@ export function ContentDiscussion({
       setWriteError(copy.invalid);
       return;
     }
+    if (!actorId) {
+      persistComposeDraft(normalized, reply);
+      setWriteError(copy.signIn);
+      setWriteNeedsSignIn(true);
+      return;
+    }
     writeGuard.current = true;
     setSubmitting(true);
     setWriteError("");
     setWriteNeedsSignIn(false);
     setPublished(false);
     const parentId = reply?.id;
+    const firstAttempt = !pendingIntent.current;
     const frozen =
       pendingIntent.current &&
       pendingIntent.current.text === normalized &&
@@ -284,6 +313,18 @@ export function ContentDiscussion({
         ? pendingIntent.current
         : { key: createCommentIntentKey(), text: normalized, parentId };
     pendingIntent.current = frozen;
+    if (!persistComposeDraft(normalized, reply)) {
+      if (firstAttempt) pendingIntent.current = null;
+      writeGuard.current = false;
+      setSubmitting(false);
+      setWriteError(
+        locale === "ru"
+          ? "Не удалось сохранить черновик для восстановления. Комментарий не отправлен."
+          : "Could not save recovery data. The comment was not sent.",
+      );
+      return;
+    }
+    setPendingWrite(true);
     try {
       await submitContentCommentRequest({
         slug,
@@ -291,19 +332,36 @@ export function ContentDiscussion({
         parentId,
         text: normalized,
         intentKey: frozen.key,
+        expectedActorId: actorId,
         locale,
         fallbackError: copy.writeUnavailable,
       });
       pendingIntent.current = null;
-      clearDiscussionComposeDraft(contentId);
+      setPendingWrite(false);
+      clearDiscussionComposeDraft(contentId, { actorId });
       setText("");
       setReply(null);
       setDraftRestoreNotice(false);
       setPublished(true);
-      setDisplayCount((current) => current + 1);
+      setDisplayCount(null);
       // Saved state is independent from a subsequent read failure.
       await load(false, "");
     } catch (caught) {
+      if (
+        firstAttempt &&
+        caught instanceof ContentCommentSubmitError &&
+        [
+          "UNAUTHORIZED",
+          "FORBIDDEN",
+          "VALIDATION_ERROR",
+          "COMMENT_PARENT_NOT_FOUND",
+          "ACTOR_ID_REQUIRED",
+          "RATE_LIMIT_EXCEEDED",
+        ].includes(String(caught.code))
+      ) {
+        pendingIntent.current = null;
+        setPendingWrite(false);
+      }
       // Keep draft + frozen intent so a lost-response retry reuses one key.
       // Guest 401 / auth return must keep text for the author without auto-publish.
       persistComposeDraft(normalized, reply);
@@ -355,7 +413,12 @@ export function ContentDiscussion({
         </Link>
       )}
       <h2 className="min-w-0 break-words font-heading text-primary">
-        {copy.title} ({displayCount})
+        {copy.title}
+        {displayCount !== null ? (
+          ` (${displayCount})`
+        ) : (
+          <span className="ml-2 text-sm text-muted">{copy.countUnavailable}</span>
+        )}
       </h2>
       <search aria-label={copy.search}>
         <form
@@ -405,7 +468,7 @@ export function ContentDiscussion({
               className={ghostActionClass}
               variant="ghost"
               type="button"
-              disabled={submitting}
+              disabled={submitting || pendingWrite}
               onClick={() => {
                 setReply(null);
                 persistComposeDraft(text, null);
@@ -425,7 +488,7 @@ export function ContentDiscussion({
             maxLength={5000}
             rows={4}
             placeholder={copy.placeholder}
-            disabled={submitting || !!managingId}
+            disabled={submitting || !!managingId || pendingWrite}
             value={text}
             onChange={(event) => {
               const next = event.target.value;
@@ -560,7 +623,7 @@ export function ContentDiscussion({
               className={ghostActionClass}
               variant="ghost"
               type="button"
-              disabled={submitting || !!managingId}
+              disabled={submitting || !!managingId || pendingWrite}
               onClick={() => {
                 const nextReply = {
                   id: comment.id,
@@ -619,7 +682,7 @@ export function ContentDiscussion({
                         : current,
                     );
                     if (value === undefined) {
-                      setDisplayCount((current) => Math.max(0, current - 1));
+                      setDisplayCount(null);
                       if (reply?.id === comment.id) setReply(null);
                     }
                     setManagementSuccess(

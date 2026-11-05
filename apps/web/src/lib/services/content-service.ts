@@ -143,6 +143,7 @@ export class ContentService {
       intentKey?: string;
     },
     actor: User,
+    currentToken: string,
   ): Promise<{ comment: Comment; replayed: boolean }> {
     if (input.contentId) {
       const target = await contentRepository.findById(input.contentId);
@@ -172,6 +173,7 @@ export class ContentService {
         intentKey: input.intentKey,
         contentId: input.contentId,
         authorId: actor.id,
+        currentToken,
         text: input.text,
         parentId: input.parentId,
         audit: {

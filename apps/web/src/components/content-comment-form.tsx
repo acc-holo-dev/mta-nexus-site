@@ -6,7 +6,7 @@ import { type FormEvent, useRef, useState } from "react";
 import { createCommentIntentKey, submitContentCommentRequest } from "../lib/content-comment-client";
 import { useNexusLocale } from "./locale-context";
 
-export function ContentCommentForm({ slug }: { slug: string }) {
+export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: string }) {
   const router = useRouter();
   const { dictionary } = useNexusLocale();
   const copy = dictionary.articles;
@@ -32,6 +32,7 @@ export function ContentCommentForm({ slug }: { slug: string }) {
         slug,
         text: normalized,
         intentKey: frozen.key,
+        expectedActorId: actorId,
         fallbackError: copy.commentError,
       });
 

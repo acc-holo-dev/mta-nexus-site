@@ -17,7 +17,7 @@ export type DiscussionComposeDraft = {
 
 export type DiscussionComposeDraftStore = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
-const PREFIX = "nexus:discussion:compose:v1:";
+const PREFIX = "nexus:discussion:compose:v2:";
 const TTL_MS = 24 * 60 * 60 * 1000;
 const CONTENT_ID = /^[a-zA-Z0-9_-]{1,128}$/u;
 const PARENT_ID = /^[a-zA-Z0-9_-]{1,128}$/u;
@@ -33,8 +33,8 @@ const fallbackStore: DiscussionComposeDraftStore = {
   },
 };
 
-function discussionComposeDraftSlot(contentId: string): string {
-  return `${PREFIX}${contentId}`;
+function discussionComposeDraftSlot(contentId: string, actorId?: string | null): string {
+  return `${PREFIX}${actorId ? `user:${actorId}` : "guest"}:${contentId}`;
 }
 
 function resolveStore(store?: DiscussionComposeDraftStore | null): DiscussionComposeDraftStore {
@@ -66,7 +66,7 @@ export function parseDiscussionComposeDraft(
       typeof draft.savedAt !== "number" ||
       !Number.isSafeInteger(draft.savedAt) ||
       draft.savedAt > now ||
-      now - draft.savedAt > TTL_MS
+      (now - draft.savedAt > TTL_MS && !parseCommentIntentKey(draft.intentKey))
     ) {
       return null;
     }
@@ -98,11 +98,11 @@ export function parseDiscussionComposeDraft(
 
 export function readDiscussionComposeDraft(
   contentId: string,
-  options?: { store?: DiscussionComposeDraftStore | null; now?: number },
+  options?: { store?: DiscussionComposeDraftStore | null; now?: number; actorId?: string | null },
 ): DiscussionComposeDraft | null {
   if (!CONTENT_ID.test(contentId)) return null;
   const store = resolveStore(options?.store);
-  const slot = discussionComposeDraftSlot(contentId);
+  const slot = discussionComposeDraftSlot(contentId, options?.actorId);
   try {
     const parsed = parseDiscussionComposeDraft(store.getItem(slot), contentId, options?.now);
     if (!parsed) {
@@ -120,10 +120,23 @@ export function readDiscussionComposeDraft(
 
 export function writeDiscussionComposeDraft(
   draft: Omit<DiscussionComposeDraft, "version" | "savedAt"> & { savedAt?: number },
-  options?: { store?: DiscussionComposeDraftStore | null; now?: number },
+  options?: {
+    store?: DiscussionComposeDraftStore | null;
+    now?: number;
+    actorId?: string | null;
+    requirePersistence?: boolean;
+  },
 ): boolean {
   const text = draft.text.trimEnd();
   if (!CONTENT_ID.test(draft.contentId) || text.length < 1 || text.length > 5000) return false;
+  if (options?.actorId && !CONTENT_ID.test(options.actorId)) return false;
+  if (options?.requirePersistence && options.store === undefined) {
+    try {
+      if (typeof sessionStorage === "undefined") return false;
+    } catch {
+      return false;
+    }
+  }
   const store = resolveStore(options?.store);
   const intentKey = draft.intentKey ? parseCommentIntentKey(draft.intentKey) : null;
   const payload: DiscussionComposeDraft = {
@@ -136,8 +149,10 @@ export function writeDiscussionComposeDraft(
     savedAt: draft.savedAt ?? options?.now ?? Date.now(),
   };
   try {
-    store.setItem(discussionComposeDraftSlot(draft.contentId), JSON.stringify(payload));
-    return true;
+    const key = discussionComposeDraftSlot(draft.contentId, options?.actorId);
+    const raw = JSON.stringify(payload);
+    store.setItem(key, raw);
+    return !options?.requirePersistence || store.getItem(key) === raw;
   } catch {
     return false;
   }
@@ -145,11 +160,13 @@ export function writeDiscussionComposeDraft(
 
 export function clearDiscussionComposeDraft(
   contentId: string,
-  options?: { store?: DiscussionComposeDraftStore | null },
+  options?: { store?: DiscussionComposeDraftStore | null; actorId?: string | null },
 ): void {
   if (!CONTENT_ID.test(contentId)) return;
   try {
-    resolveStore(options?.store).removeItem(discussionComposeDraftSlot(contentId));
+    resolveStore(options?.store).removeItem(
+      discussionComposeDraftSlot(contentId, options?.actorId),
+    );
   } catch {
     // Ignore unavailable storage.
   }

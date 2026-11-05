@@ -16,8 +16,8 @@ vi.mock("./locale-context", () => ({
   }),
 }));
 
-import { ContentCommentForm } from "./content-comment-form";
 import { submitContentCommentRequest } from "../lib/content-comment-client";
+import { ContentCommentForm } from "./content-comment-form";
 
 describe("content discussion form", () => {
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe("content discussion form", () => {
   it.each(["en", "ru"] as const)("renders the localized protected comment form in %s", (locale) => {
     state.locale = locale;
     const html = renderToStaticMarkup(
-      createElement(ContentCommentForm, { slug: "hello world/one" }),
+      createElement(ContentCommentForm, { slug: "hello world/one", actorId: "usr_a" }),
     );
     const copy = getDictionary(locale).articles;
     expect(html).toContain(copy.joinDiscussion);
@@ -42,10 +42,15 @@ describe("content discussion form", () => {
   it("POSTs normalized text with Idempotency-Key to the encoded comment endpoint", async () => {
     const fetchImpl = vi.fn(
       async (_url: RequestInfo | URL, _init?: RequestInit) =>
-        new Response(JSON.stringify({ comment: { id: "cmt_confirmed" } }), {
-          status: 201,
-          headers: { "content-type": "application/json" },
-        }),
+        new Response(
+          JSON.stringify({
+            comment: { id: "cmt_12345678123442348234123456789abc", authorId: "usr_a" },
+          }),
+          {
+            status: 201,
+            headers: { "content-type": "application/json" },
+          },
+        ),
     );
 
     await expect(
@@ -54,11 +59,12 @@ describe("content discussion form", () => {
           slug: "hello world/one",
           text: "  Useful comment  ",
           intentKey: INTENT,
+          expectedActorId: "usr_a",
           fallbackError: "Could not publish",
         },
         fetchImpl,
       ),
-    ).resolves.toBe("cmt_confirmed");
+    ).resolves.toBe("cmt_12345678123442348234123456789abc");
 
     const [url, init] = fetchImpl.mock.calls[0] ?? [];
     expect(url).toBe("/api/content/hello%20world%2Fone/comments");
@@ -69,6 +75,7 @@ describe("content discussion form", () => {
       headers: {
         "Content-Type": "application/json",
         "Idempotency-Key": INTENT,
+        "x-nexus-actor-id": "usr_a",
       },
       body: JSON.stringify({ text: "Useful comment" }),
     });
@@ -89,6 +96,7 @@ describe("content discussion form", () => {
           slug: "article",
           text: "Valid text",
           intentKey: INTENT,
+          expectedActorId: "usr_a",
           fallbackError: "Could not publish",
         },
         fetchImpl,
@@ -106,6 +114,7 @@ describe("content discussion form", () => {
             slug: "article",
             text,
             intentKey: INTENT,
+            expectedActorId: "usr_a",
             fallbackError: "Could not publish",
           },
           fetchImpl,
