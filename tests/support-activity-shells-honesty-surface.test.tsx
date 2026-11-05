@@ -141,11 +141,13 @@ it("locks support case/filter/message controls to touch targets without min-h-10
     "apps/web/src/components/support-case-actions.tsx",
     "apps/web/src/components/support-center.tsx",
     "apps/web/src/components/support-message-browser.tsx",
+    "apps/web/src/components/support-case-thread.tsx",
   ] as const;
   for (const path of touchSurfaces) {
     const source = read(path);
     expect(source, path).toMatch(/min-h-11|size="touch"/u);
     expect(source, path).not.toContain("min-h-10");
+    expect(source, path).not.toContain("min-h-9");
   }
   expect(read("apps/web/src/components/support-case-actions.tsx")).toContain('size="touch"');
   expect(read("apps/web/src/components/support-center.tsx")).toContain('size="touch"');
@@ -153,6 +155,16 @@ it("locks support case/filter/message controls to touch targets without min-h-10
     "inline-flex min-h-11 items-center",
   );
   expect(read("apps/web/src/components/support-message-browser.tsx")).toContain('size="touch"');
+});
+
+it("locks publication feed tags and copyable code CTAs to min-h-11", () => {
+  const feed = read("apps/web/src/components/publication-feed.tsx");
+  expect(feed).toContain("inline-flex min-h-11 items-center break-all");
+  expect(feed).not.toContain("min-h-8");
+  expect(read("apps/web/src/components/copyable-plain-code-block.tsx")).toContain(
+    'className="min-h-11"',
+  );
+  expect(read("apps/web/src/components/community-report-form.tsx")).not.toContain("min-h-9");
 });
 
 it("locks support-center create-case primary submit to size=touch", () => {

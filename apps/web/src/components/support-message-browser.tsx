@@ -144,7 +144,7 @@ export function SupportMessageBrowser({
               {message.truncated && <p className="mt-2 text-xs text-muted">{copy.truncated}</p>}
               <Link
                 href={`${path}?focus=${message.id}#message-${message.id}`}
-                className="mt-2 inline-flex min-h-9 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="mt-2 inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {copy.link}
               </Link>
