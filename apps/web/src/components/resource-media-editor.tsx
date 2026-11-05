@@ -118,11 +118,7 @@ export function ResourceMediaEditor({
   }
   return (
     <div className="space-y-5" aria-busy={busy}>
-      {readonly && (
-        <p role="note" className="text-warning">
-          {copy.readonly}
-        </p>
-      )}
+      {readonly ? <ErrorState id="resource-media-readonly" title={copy.readonly} /> : null}
       {error ? (
         <ErrorState
           title={error}
