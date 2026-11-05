@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
 
-export type ResourceQaPanelConfirmHarness = {
+type ResourceQaPanelConfirmHarness = {
   slots: unknown[];
   cursor: number;
   fetch: Mock;
@@ -9,16 +9,16 @@ export type ResourceQaPanelConfirmHarness = {
 
 type Element = ReactElement<Record<string, unknown>>;
 
-export type ResourceQaPanelComponent = (props: {
+type ResourceQaPanelComponent = (props: {
   productId: string;
   locale: "en" | "ru";
   authenticated: boolean;
   canManage: boolean;
-  builds: unknown[];
+  builds: [];
   initial: typeof page;
 }) => ReactNode;
 
-export type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
+type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
 export const productId = "prd_aaaaaaaaaaaaaaaaaaaaaaaa";
 export const threadId = "rqa_thread";
