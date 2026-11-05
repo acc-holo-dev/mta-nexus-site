@@ -310,6 +310,26 @@ export function evaluateReleaseManifest(
       reason: "Release manifest migration hashes are missing.",
     };
   }
+  const migrationNames = new Set();
+  for (const migration of manifest.migrations) {
+    if (
+      !migration ||
+      typeof migration !== "object" ||
+      Array.isArray(migration) ||
+      typeof migration.name !== "string" ||
+      !/^[a-zA-Z0-9][a-zA-Z0-9._-]*\.sql$/u.test(migration.name) ||
+      typeof migration.sha256 !== "string" ||
+      !/^[a-f0-9]{64}$/u.test(migration.sha256) ||
+      migrationNames.has(migration.name)
+    ) {
+      return {
+        ok: false,
+        status: "blocked",
+        reason: "Release manifest migration names and SHA-256 hashes must be valid and unique.",
+      };
+    }
+    migrationNames.add(migration.name);
+  }
   const image = manifest.image ?? {};
   if (image.sourceSha && image.sourceSha !== sha) {
     return {

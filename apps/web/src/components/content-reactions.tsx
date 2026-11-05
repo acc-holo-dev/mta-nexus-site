@@ -37,52 +37,91 @@ export function ContentReactions({
     [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const busy = useRef(false),
     alive = useRef(true),
-    request = useRef<AbortController | null>(null);
+    request = useRef<AbortController | null>(null),
+    epoch = useRef(0);
+  const scope = `${contentId}:${slug}:${initial?.actorId ?? "guest"}`;
+  const previousScope = useRef(scope),
+    readyScope = useRef(scope);
+  if (previousScope.current !== scope) {
+    previousScope.current = scope;
+    epoch.current++;
+  }
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh auth return paths after client navigation.
   useEffect(() => {
     const path = currentBrowserReturnPath();
     setLoginHref(authEntryHref("login", path));
     setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
+  // scope identifies the publication and actor; changing other props must not replace an active request.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scope is the identity boundary.
   useEffect(() => {
     alive.current = true;
+    readyScope.current = scope;
+    request.current?.abort();
+    busy.current = false;
+    setState(initial);
+    setPending(false);
+    setBlocked(!initial);
+    setMessage(initial ? "" : copy.unavailable);
     return () => {
       alive.current = false;
       request.current?.abort();
     };
-  }, []);
+  }, [scope]);
   async function send(reaction?: ContentReaction | null) {
-    if (busy.current || (reaction !== undefined && (!state?.authenticated || blocked))) return;
     if (
-      reaction === null &&
-      !(await confirmAction({
-        title: copy.removeConfirmTitle,
-        object: state?.reaction ? copy[state.reaction] : copy.title,
-        consequences: copy.removeConfirm,
-        confirmLabel: copy.remove,
-        cancelLabel: copy.cancel,
-        closeLabel: copy.cancel,
-        danger: false,
-      }))
+      readyScope.current !== scope ||
+      previousScope.current !== scope ||
+      busy.current ||
+      (reaction !== undefined && (!state?.actorId || blocked))
     )
       return;
+    const operationEpoch = epoch.current;
+    const actorId = state?.actorId;
+    busy.current = true;
+    try {
+      if (
+        reaction === null &&
+        !(await confirmAction({
+          title: copy.removeConfirmTitle,
+          object: state?.reaction ? copy[state.reaction] : copy.title,
+          consequences: copy.removeConfirm,
+          confirmLabel: copy.remove,
+          cancelLabel: copy.cancel,
+          closeLabel: copy.cancel,
+          danger: false,
+        }))
+      )
+        return;
+    } catch {
+      if (alive.current && operationEpoch === epoch.current) {
+        setBlocked(true);
+        setMessage(copy.uncertain);
+      }
+      return;
+    } finally {
+      if (operationEpoch === epoch.current) busy.current = false;
+    }
+    if (!alive.current || operationEpoch !== epoch.current || busy.current) return;
     busy.current = true;
     setPending(true);
     setMessage("");
     const controller = new AbortController();
     request.current = controller;
     try {
-      const response = await fetch(
-        `/api/content/${encodeURIComponent(slug)}/reactions`,
-        privateApiRequest({
+      const response = await fetch(`/api/content/${encodeURIComponent(slug)}/reactions`, {
+        ...privateApiRequest({
           method: reaction === undefined ? "GET" : "PUT",
           ...(reaction !== undefined ? { json: { reaction } } : {}),
           signal: controller.signal,
           timeoutMs: 15_000,
         }),
-      );
+        ...(reaction !== undefined
+          ? { headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId ?? "" } }
+          : {}),
+      });
       const data = await response.json().catch(() => null);
-      if (!alive.current) return;
+      if (!alive.current || operationEpoch !== epoch.current || controller.signal.aborted) return;
       if (!response.ok) {
         setBlocked(true);
         setMessage(reactionError(locale, data?.code));
@@ -95,7 +134,7 @@ export function ContentReactions({
         setState(parsed.data);
         setBlocked(false);
       } else {
-        const confirmed = confirmedReactionMutation(data, contentId, slug, reaction);
+        const confirmed = confirmedReactionMutation(data, contentId, slug, reaction, actorId ?? "");
         if (!confirmed) throw new Error("Unconfirmed mutation");
         setState((current) =>
           current ? { ...current, reaction: confirmed.reaction, counts: confirmed.counts } : null,
@@ -104,19 +143,22 @@ export function ContentReactions({
         setMessage(reaction === null ? copy.removed : copy.saved);
       }
     } catch {
-      if (alive.current) {
+      if (alive.current && operationEpoch === epoch.current && !controller.signal.aborted) {
         setBlocked(true);
         setMessage(reaction === undefined ? copy.unavailable : copy.uncertain);
       }
     } finally {
-      busy.current = false;
-      if (alive.current) setPending(false);
+      if (operationEpoch === epoch.current) {
+        busy.current = false;
+        if (alive.current && !controller.signal.aborted) setPending(false);
+      }
     }
   }
+  const shownState = readyScope.current === scope ? state : null;
   return (
     <section className="space-y-3" aria-label={copy.title} aria-busy={pending}>
       <p className="text-sm text-secondary">
-        {!state ? copy.unknownCounts : state.self ? copy.own : copy.choose}
+        {!shownState ? copy.unknownCounts : shownState.self ? copy.own : copy.choose}
       </p>
       <div className="flex flex-wrap gap-2">
         {CONTENT_REACTIONS.map((reaction) => (
@@ -124,17 +166,17 @@ export function ContentReactions({
             key={reaction}
             type="button"
             variant="outline"
-            className={`min-h-11 gap-2 ${state?.reaction === reaction ? "bg-accent-soft text-accent" : "bg-inset"}`}
-            aria-pressed={state ? state.reaction === reaction : undefined}
-            disabled={pending || blocked || !state?.authenticated || state.self}
-            onClick={() => void send(state?.reaction === reaction ? null : reaction)}
+            className={`min-h-11 gap-2 ${shownState?.reaction === reaction ? "bg-accent-soft text-accent" : "bg-inset"}`}
+            aria-pressed={shownState ? shownState.reaction === reaction : undefined}
+            disabled={pending || blocked || !shownState?.authenticated || shownState.self}
+            onClick={() => void send(shownState?.reaction === reaction ? null : reaction)}
           >
             <span aria-hidden="true">{CONTENT_REACTION_EMOJI[reaction]}</span>
             {copy[reaction]}{" "}
-            <span className="font-numeric">{state ? state.counts[reaction] : "—"}</span>
+            <span className="font-numeric">{shownState ? shownState.counts[reaction] : "—"}</span>
           </Button>
         ))}
-        {state?.reaction && (
+        {shownState?.reaction && (
           <Button
             type="button"
             variant="outline"
@@ -155,7 +197,7 @@ export function ContentReactions({
           {pending ? copy.saving : copy.reload}
         </Button>
       </div>
-      {state && !state.authenticated && (
+      {shownState && !shownState.authenticated && (
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -163,7 +205,7 @@ export function ContentReactions({
           createAccountLabel={workspace.createAccount}
         />
       )}
-      {state?.authenticated && (
+      {shownState?.authenticated && (
         <Link
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href="/workspace/reactions"

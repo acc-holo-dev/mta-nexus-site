@@ -54,9 +54,10 @@ beforeEach(() => {
   });
 });
 it("uses session identity and generated IDs for explicit desired-state writes", async () => {
-  await service.set(actor, "guide", "thanks");
+  await service.set(actor, "guide", "thanks", "token");
   expect(mocks.set).toHaveBeenCalledWith({
     actorId: "actor",
+    currentToken: "token",
     slug: "guide",
     reaction: "thanks",
     reactionId: expect.stringMatching(/^rea_[a-f0-9]{24}$/u),
@@ -67,17 +68,24 @@ it.each(["../draft", "GUIDE", "", "x".repeat(201)])(
   "rejects invalid publication %s before querying",
   async (slug) => {
     await expect(service.state(slug)).rejects.toMatchObject({ code: "NOT_FOUND" });
-    await expect(service.set(actor, slug, null)).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(service.set(actor, slug, null, "token")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
     expect(mocks.state).not.toHaveBeenCalled();
     expect(mocks.set).not.toHaveBeenCalled();
   },
 );
 it("makes own cleanup idempotent without revealing any private target metadata", async () => {
-  expect(await service.remove(actor, "content")).toEqual({ contentId: "content", removed: true });
+  expect(await service.remove(actor, "content", "token")).toEqual({
+    contentId: "content",
+    removed: true,
+  });
   expect(mocks.set).toHaveBeenCalledWith(
     expect.objectContaining({ actorId: "actor", contentId: "content", reaction: null }),
   );
-  await expect(service.remove(actor, "../other")).rejects.toMatchObject({ code: "NOT_FOUND" });
+  await expect(service.remove(actor, "../other", "token")).rejects.toMatchObject({
+    code: "NOT_FOUND",
+  });
 });
 it("preserves exact cursor time and returns a narrow personal DTO", async () => {
   const page = await service.page(actor, { query: "Lua", reaction: "thanks" });

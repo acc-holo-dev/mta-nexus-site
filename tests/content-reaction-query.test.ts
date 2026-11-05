@@ -4,6 +4,10 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   failAudit: false,
   notice: vi.fn(),
+  session: vi.fn(),
+}));
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: state.session,
 }));
 vi.mock("../packages/db/src/repositories/content-reaction-notice", () => ({
   contentReactionNotice: state.notice,
@@ -37,6 +41,7 @@ import { publicUserTrustRepository as trust } from "../packages/db/src/repositor
 import { authorContentRepository } from "../packages/db/src/repositories/author-content";
 const command = {
   actorId: "actor",
+  currentToken: "actor-token",
   slug: "guide",
   reaction: "helpful" as "helpful" | "thanks" | null,
   reactionId: "new",
@@ -92,6 +97,8 @@ it("serializes writes on publication, pair and live account, then saves desired 
     "insert",
     "update",
   ]);
+  expect(state.session).toHaveBeenCalledTimes(2);
+  expect(state.session.mock.calls[0]?.slice(1)).toEqual(["actor", "actor-token"]);
   expect(state.notice).toHaveBeenCalledOnce();
   expect(writes().at(-1)?.sql).not.toMatch(/updated_at|published_at|status|reputation/u);
   expect(writes()[2].params).toContain("content.reaction_changed");
@@ -144,6 +151,7 @@ it("allows actor-scoped removal from an archived or missing target", async () =>
   expect(
     await reactions.set({
       actorId: "actor",
+      currentToken: "actor-token",
       contentId: "content",
       reaction: null,
       reactionId: "new",
@@ -155,6 +163,7 @@ it("allows actor-scoped removal from an archived or missing target", async () =>
   await expect(
     reactions.set({
       actorId: "actor",
+      currentToken: "actor-token",
       contentId: "missing",
       reaction: null,
       reactionId: "new",
@@ -168,6 +177,7 @@ it("does not touch or report another private target when no own reaction exists"
   expect(
     await reactions.set({
       actorId: "actor",
+      currentToken: "actor-token",
       contentId: "content",
       reaction: null,
       reactionId: "new",
@@ -257,4 +267,11 @@ it("computes card helpful counts from current reaction rows instead of legacy co
   expect(state.queries[0].sql).toContain("select distinct on (r.user_id)");
   expect(state.queries[0].sql).toContain("current_reactions.emoji = '👍'");
   expect(state.queries[0].sql).not.toContain('"like_count"');
+});
+
+it("rejects a missing initiating token before opening a transaction", async () => {
+  await expect(reactions.set({ ...command, currentToken: "" })).rejects.toMatchObject({
+    code: "UNAUTHORIZED",
+  });
+  expect(state.queries).toHaveLength(0);
 });

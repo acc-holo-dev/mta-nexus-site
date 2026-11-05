@@ -6,6 +6,7 @@ const harness = vi.hoisted(() => ({
   cursor: 0,
   cleanups: [] as (() => void)[],
   fetch: vi.fn(),
+  actorId: "actor",
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
@@ -46,6 +47,7 @@ const saved = {
   contentId: "content",
   slug: "guide",
   authenticated: true,
+  actorId: "actor",
   self: false,
   reaction: "thanks" as const,
   counts: { helpful: 2, thanks: 3, insight: 0 },
@@ -70,7 +72,7 @@ function render() {
     ContentReactions({
       slug: "guide",
       contentId: "content",
-      initial: saved,
+      initial: { ...saved, actorId: harness.actorId },
       locale: "en",
     }),
   );
@@ -87,6 +89,7 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
+  harness.actorId = "actor";
   confirmAction.mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
 });
@@ -97,6 +100,7 @@ it("confirms before clearing a reaction", async () => {
     new Response(
       JSON.stringify({
         contentId: "content",
+        actorId: "actor",
         slug: "guide",
         reaction: null,
         counts: { helpful: 2, thanks: 2, insight: 0 },
@@ -126,4 +130,33 @@ it("keeps the reaction when confirmation is cancelled", async () => {
   confirmAction.mockResolvedValueOnce(false);
   await (removeButton(render()).props.onClick as () => Promise<void>)();
   expect(harness.fetch).not.toHaveBeenCalled();
+});
+
+it("does not apply a delayed public mutation after account changes", async () => {
+  let complete!: (response: Response) => void;
+  harness.fetch.mockReturnValueOnce(
+    new Promise<Response>((resolve) => {
+      complete = resolve;
+    }),
+  );
+  const pending = (removeButton(render()).props.onClick as () => Promise<void>)();
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledOnce());
+  expect(harness.fetch.mock.calls[0][1].headers["x-nexus-actor-id"]).toBe("actor");
+  harness.actorId = "other";
+  render();
+  complete(
+    new Response(
+      JSON.stringify({
+        contentId: "content",
+        actorId: "actor",
+        slug: "guide",
+        reaction: null,
+        counts: { helpful: 2, thanks: 2, insight: 0 },
+        changed: true,
+      }),
+      { status: 200 },
+    ),
+  );
+  await pending;
+  expect(removeButton(render())).toBeDefined();
 });

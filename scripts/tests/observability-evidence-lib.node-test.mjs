@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -49,6 +49,33 @@ test("buildObservabilityReadinessEvidence passes on this repo with alert env", (
     validateObservabilityReadinessEvidence(evidence, { repoRoot: process.cwd() }).ok,
     true,
   );
+});
+
+test("readiness accepts exactly the worker's threshold syntax and ranges", () => {
+  const worker = readFileSync("packages/db/scripts/run-web-push-dispatcher.ts", "utf8");
+  const cases = [
+    ["WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT", 99, "99"],
+    ["WEB_PUSH_QUEUE_ALERT_DUE_JOBS", 50_000, "50_000"],
+    ["WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS", 86_400, "86_400"],
+  ];
+  for (const [key, max, workerMax] of cases) {
+    assert.match(worker, new RegExp(`"${key}"\\s*,\\s*[^,]+,\\s*1\\s*,\\s*${workerMax}\\s*,`, "u"));
+    for (const value of ["1", String(max), " 01 "]) {
+      const evidence = buildObservabilityReadinessEvidence({
+        repoRoot: process.cwd(),
+        env: { ...alertEnv, [key]: value },
+      });
+      assert.equal(evidence.verdict.passed, true, `${key}=${value}`);
+    }
+    for (const value of ["", "0", String(Number(max) + 1), "1.5", "1e2", "-1", "NaN"]) {
+      const evidence = buildObservabilityReadinessEvidence({
+        repoRoot: process.cwd(),
+        env: { ...alertEnv, [key]: value },
+      });
+      assert.equal(evidence.verdict.passed, false, `${key}=${value}`);
+      assert.equal(evidence.alerts[key], "missing");
+    }
+  }
 });
 
 test("readiness rejects missing, malformed or contradictory failures", () => {

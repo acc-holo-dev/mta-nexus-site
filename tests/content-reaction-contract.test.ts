@@ -12,6 +12,7 @@ import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
 import { trustCopy } from "../apps/web/src/lib/public-user-trust-copy";
 const mutation = {
   contentId: "content",
+  actorId: "actor",
   slug: "guide",
   reaction: "helpful",
   counts: { helpful: 1, thanks: 0, insight: 0 },
@@ -30,7 +31,9 @@ it.each(["helpful", "thanks", "insight", null])("accepts explicit desired state 
   expect(reactionCommandSchema.safeParse({ reaction }).success).toBe(true),
 );
 it("confirms only the exact saved target and desired reaction", () => {
-  expect(confirmedReactionMutation(mutation, "content", "guide", "helpful")).toEqual(mutation);
+  expect(confirmedReactionMutation(mutation, "content", "guide", "helpful", "actor")).toEqual(
+    mutation,
+  );
   for (const value of [
     { ...mutation, contentId: "other" },
     { ...mutation, slug: "other" },
@@ -39,14 +42,20 @@ it("confirms only the exact saved target and desired reaction", () => {
     { ...mutation, changed: undefined },
     null,
   ])
-    expect(confirmedReactionMutation(value, "content", "guide", "helpful")).toBeNull();
-  expect(confirmedReactionRemoval({ contentId: "content", removed: true }, "content")).toBe(true);
+    expect(confirmedReactionMutation(value, "content", "guide", "helpful", "actor")).toBeNull();
+  expect(
+    confirmedReactionRemoval(
+      { contentId: "content", removed: true, actorId: "actor" },
+      "content",
+      "actor",
+    ),
+  ).toBe(true);
   for (const value of [
     { contentId: "other", removed: true },
     { contentId: "content", removed: false },
     { contentId: "content", removed: true, title: "private" },
   ])
-    expect(confirmedReactionRemoval(value, "content")).toBe(false);
+    expect(confirmedReactionRemoval(value, "content", "actor")).toBe(false);
 });
 it.each([
   "actorId=victim",

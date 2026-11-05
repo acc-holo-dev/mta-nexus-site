@@ -66,6 +66,7 @@
 | Events   | Только eligible actors (verified entities, servers, orgs, staff — configurable); не право «купить рекламой» (CD-004)                                    |
 | Groups   | Public и private/invite-only; **отличны** от Organization и server ownership (CD-002)                                                                   |
 - **текущий runtime:** `/community` (+ `/community/new`) на content types `post`/`question`; обсуждения/комментарии у публикаций; editorial `/articles`; workspace content/feed/discussions; follows; in-app notifications + Web Push; reactions (ограниченный набор). Отдельного `/forum`, hub Events/Groups, calendar social events **нет**.
+- **Реакции:** запись и удаление через API требуют `X-Nexus-Actor-Id` исходного пользователя; клиенты должны передавать его и проверять `actorId` в подтверждении.
 - **Создание темы:** `POST /api/content` требует `X-Nexus-Actor-Id` с ID текущего пользователя. При потере ответа форма сохраняет исходный запрос в текущей вкладке и проверяет его результат; пустой результат сам по себе не подтверждает отсутствие публикации.
 - **proposal:** полная Forum IA и Community Feed как в таблице выше.
 - **hard rule:** наличие/org team pages ≠ groups/clans; наличие ≠ DM.

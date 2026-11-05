@@ -7,6 +7,8 @@ import {
   publicUserTrustRepository,
   contentRepository,
   userRepository,
+  sessionRepository,
+  sessions,
 } from "@nexus/db";
 import {
   auditEvents,
@@ -23,6 +25,7 @@ import {
 } from "../packages/db/src/schema";
 import { contentReactionService } from "../apps/web/src/lib/services/content-reaction-service";
 import { parseReactionPage } from "../apps/web/src/lib/content-reaction-contract";
+const tokens = new Map<string, string>();
 const actorIds: string[] = [],
   contentIds: string[] = [],
   organizationIds: string[] = [],
@@ -37,6 +40,7 @@ afterEach(async () => {
   if (organizationIds.length)
     await db.delete(organizations).where(inArray(organizations.id, organizationIds));
   if (actorIds.length) await db.delete(users).where(inArray(users.id, actorIds));
+  tokens.clear();
   actorIds.length = contentIds.length = organizationIds.length = serverIds.length = 0;
 });
 async function actor() {
@@ -48,6 +52,14 @@ async function actor() {
     displayName: "Reaction writer",
   });
   actorIds.push(result.id);
+  const token = `reaction-token-${suffix}`;
+  await sessionRepository.create({
+    id: `ses_reaction_${suffix}`,
+    userId: result.id,
+    token,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
+  tokens.set(result.id, token);
   return result;
 }
 async function publication(authorId: string, extra = {}) {
@@ -72,7 +84,14 @@ const command = (
   actorId: string,
   slug: string,
   reaction: "helpful" | "thanks" | "insight" | null,
-) => ({ actorId, slug, reaction, reactionId: randomUUID(), auditId: randomUUID() });
+) => ({
+  actorId,
+  currentToken: tokens.get(actorId) ?? "",
+  slug,
+  reaction,
+  reactionId: randomUUID(),
+  auditId: randomUUID(),
+});
 const ownRows = (actorId: string, id: string) =>
   db
     .select()
@@ -163,11 +182,11 @@ it("masks archived/missing target metadata and allows only own idempotent cleanu
   await expect(repository.set(command(reader.id, item.slug, "thanks"))).rejects.toMatchObject({
     code: "NOT_FOUND",
   });
-  await contentReactionService.remove(other, item.id);
+  await contentReactionService.remove(other, item.id, tokens.get(other.id) ?? "");
   expect(await ownRows(reader.id, item.id)).toHaveLength(1);
   await db.delete(content).where(eq(content.id, item.id));
-  await contentReactionService.remove(reader, item.id);
-  await contentReactionService.remove(reader, item.id);
+  await contentReactionService.remove(reader, item.id, tokens.get(reader.id) ?? "");
+  await contentReactionService.remove(reader, item.id, tokens.get(reader.id) ?? "");
   expect(await ownRows(reader.id, item.id)).toHaveLength(0);
 });
 it("rolls back reaction/counter when audit fails and honors author's disabled content notifications", async () => {
@@ -300,3 +319,163 @@ it("public helpful counts ignore a legacy cache and an account's deleted reactio
     await contentRepository.findPublishedBySlug(item.slug, { incrementView: false }),
   ).toHaveProperty("likeCount", 0);
 });
+
+function deferred() {
+  let resolve: () => void = () => undefined;
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
+it("rolls back reaction, count, audit and notice when the initiating session expires during an audit write", async () => {
+  const author = await actor(),
+    reader = await actor(),
+    item = await publication(author.id),
+    input = command(reader.id, item.slug, "helpful"),
+    expiresAt = new Date(Date.now() + 2000),
+    locked = deferred(),
+    release = deferred();
+  await db.update(sessions).set({ expiresAt }).where(eq(sessions.userId, reader.id));
+  let blockerPid = 0;
+  const blocker = db
+    .transaction(async (tx) => {
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: reader.id,
+        actorType: "user",
+        targetType: "content",
+        targetId: item.id,
+        action: "fixture.collision",
+        details: {},
+      });
+      const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+      blockerPid = row.pid;
+      locked.resolve();
+      await release.promise;
+      throw new Error("rollback fixture blocker");
+    })
+    .catch((error: unknown) => {
+      if (!(error instanceof Error) || error.message !== "rollback fixture blocker") throw error;
+    });
+  await Promise.race([
+    locked.promise,
+    blocker.then(() => {
+      throw new Error("Blocker exited before locking");
+    }),
+  ]);
+  const pending = repository.set(input).then(
+    (value) => ({ value }),
+    (error: unknown) => ({ error }),
+  );
+  try {
+    await expect
+      .poll(
+        async () => {
+          const [row] = await db.execute<{ waiting: boolean }>(sql`select exists(
+        select 1 from pg_stat_activity where datname=current_database()
+        and ${blockerPid}=any(pg_blocking_pids(pid)) and wait_event_type='Lock'
+      ) as waiting`);
+          return row.waiting;
+        },
+        { timeout: 5000, interval: 10 },
+      )
+      .toBe(true);
+    await expect
+      .poll(
+        async () => {
+          const [row] = await db.execute<{ expired: boolean }>(
+            sql`select clock_timestamp()>=${expiresAt}::timestamptz as expired`,
+          );
+          return row.expired;
+        },
+        { timeout: 5000, interval: 10 },
+      )
+      .toBe(true);
+  } finally {
+    release.resolve();
+    await blocker;
+  }
+  expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
+  expect(await ownRows(reader.id, item.id)).toHaveLength(0);
+  expect(await db.select().from(auditEvents).where(eq(auditEvents.targetId, item.id))).toHaveLength(
+    0,
+  );
+  expect(
+    await db.select().from(notifications).where(eq(notifications.recipientId, author.id)),
+  ).toHaveLength(0);
+  const [saved] = await db.select().from(content).where(eq(content.id, item.id));
+  expect(saved.likeCount).toBe(0);
+}, 15000);
+
+it("rejects a revoked initiating session for desired-state replay and empty cleanup", async () => {
+  const author = await actor(),
+    reader = await actor(),
+    item = await publication(author.id);
+  const input = command(reader.id, item.slug, "helpful");
+  await repository.set(input);
+  await sessionRepository.delete(input.currentToken);
+  await expect(repository.set(input)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  await expect(
+    repository.set({
+      ...input,
+      slug: undefined,
+      contentId: `missing_${randomUUID()}`,
+      reaction: null,
+    }),
+  ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  expect(await ownRows(reader.id, item.id)).toHaveLength(1);
+});
+
+it("rejects revocation while waiting for the publication lock", async () => {
+  const author = await actor(),
+    reader = await actor(),
+    item = await publication(author.id),
+    input = command(reader.id, item.slug, "helpful"),
+    locked = deferred(),
+    release = deferred();
+  let blockerPid = 0;
+  const blocker = db.transaction(async (tx) => {
+    await tx.select().from(content).where(eq(content.id, item.id)).for("update");
+    const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+    blockerPid = row.pid;
+    locked.resolve();
+    await release.promise;
+  });
+  await Promise.race([
+    locked.promise,
+    blocker.then(() => {
+      throw new Error("Blocker exited before locking");
+    }),
+  ]);
+  const pending = repository.set(input).then(
+    (value) => ({ value }),
+    (error: unknown) => ({ error }),
+  );
+  try {
+    await expect
+      .poll(
+        async () => {
+          const [row] = await db.execute<{ waiting: boolean }>(sql`select exists(
+        select 1 from pg_stat_activity where datname=current_database()
+        and ${blockerPid}=any(pg_blocking_pids(pid)) and wait_event_type='Lock'
+      ) as waiting`);
+          return row.waiting;
+        },
+        { timeout: 5000, interval: 10 },
+      )
+      .toBe(true);
+    await sessionRepository.delete(input.currentToken);
+  } finally {
+    release.resolve();
+    await blocker;
+  }
+  expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
+  expect(await ownRows(reader.id, item.id)).toHaveLength(0);
+  expect(await db.select().from(auditEvents).where(eq(auditEvents.targetId, item.id))).toHaveLength(
+    0,
+  );
+  expect(
+    await db.select().from(notifications).where(eq(notifications.recipientId, author.id)),
+  ).toHaveLength(0);
+}, 15000);

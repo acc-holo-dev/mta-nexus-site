@@ -11,24 +11,26 @@ import { generateId } from "@nexus/security";
 import type { ReactionPage, ReactionPageQuery, ReactionState } from "../content-reaction-contract";
 const validSlug = (slug: string) => /^[a-z0-9-]{1,200}$/u.test(slug);
 class ContentReactionService {
-  async state(slug: string, actorId?: string): Promise<ReactionState> {
+  async state(slug: string, actorId?: string): Promise<ReactionState & { actorId: string | null }> {
     if (!validSlug(slug)) throw new NotFoundError("Content");
-    return contentReactionsRepository.state(slug, actorId);
+    return { ...(await contentReactionsRepository.state(slug, actorId)), actorId: actorId ?? null };
   }
-  async set(actor: User, slug: string, reaction: ContentReaction | null) {
+  async set(actor: User, slug: string, reaction: ContentReaction | null, currentToken: string) {
     if (!validSlug(slug)) throw new NotFoundError("Content");
     return contentReactionsRepository.set({
       actorId: actor.id,
+      currentToken,
       slug,
       reaction,
       reactionId: generateId("rea"),
       auditId: generateId("aud"),
     });
   }
-  async remove(actor: User, contentId: string) {
+  async remove(actor: User, contentId: string, currentToken: string) {
     if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(contentId)) throw new NotFoundError("Reaction");
     await contentReactionsRepository.set({
       actorId: actor.id,
+      currentToken,
       contentId,
       reaction: null,
       reactionId: generateId("rea"),

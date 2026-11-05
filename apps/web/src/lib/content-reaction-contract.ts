@@ -11,18 +11,22 @@ const counts = z
     insight: z.number().int().nonnegative(),
   })
   .strict();
-export const reactionStateSchema = z
+const reactionStateObject = z
   .object({
     contentId: z.string().min(1).max(128),
     slug: z.string().min(1).max(200),
     authenticated: z.boolean(),
+    actorId: z.string().min(1).max(128).nullable(),
     self: z.boolean(),
     reaction: z.enum(CONTENT_REACTIONS).nullable(),
     counts,
   })
   .strict();
+export const reactionStateSchema = reactionStateObject.refine(
+  (value) => value.authenticated === (value.actorId !== null),
+);
 export type ReactionState = z.infer<typeof reactionStateSchema>;
-const reactionMutationSchema = reactionStateSchema
+const reactionMutationSchema = reactionStateObject
   .omit({ authenticated: true, self: true })
   .extend({ changed: z.boolean() })
   .strict();
@@ -31,21 +35,23 @@ export function confirmedReactionMutation(
   contentId: string,
   slug: string,
   reaction: (typeof CONTENT_REACTIONS)[number] | null,
+  actorId: string,
 ) {
   const parsed = reactionMutationSchema.safeParse(value);
   return parsed.success &&
+    parsed.data.actorId === actorId &&
     parsed.data.contentId === contentId &&
     parsed.data.slug === slug &&
     parsed.data.reaction === reaction
     ? parsed.data
     : null;
 }
-export function confirmedReactionRemoval(value: unknown, contentId: string) {
+export function confirmedReactionRemoval(value: unknown, contentId: string, actorId: string) {
   const parsed = z
-    .object({ contentId: z.string(), removed: z.literal(true) })
+    .object({ contentId: z.string(), removed: z.literal(true), actorId: z.string() })
     .strict()
     .safeParse(value);
-  return parsed.success && parsed.data.contentId === contentId;
+  return parsed.success && parsed.data.contentId === contentId && parsed.data.actorId === actorId;
 }
 const cursorSchema = discussionCursorSchema
   .extend({ context: z.string().regex(/^[a-f0-9]{64}$/u), version: z.literal(1) })

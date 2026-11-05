@@ -44,6 +44,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
       ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
+      "x-nexus-actor-id": "actor",
       ...headers,
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
@@ -79,7 +80,7 @@ it.each(["helpful", "thanks", "insight", null])(
   "persists an explicit desired reaction %s through the server service",
   async (reaction) => {
     expect((await PUT(request("PUT", { reaction }), publication)).status).toBe(200);
-    expect(mocks.set).toHaveBeenCalledWith(actor, "guide", reaction);
+    expect(mocks.set).toHaveBeenCalledWith(actor, "guide", reaction, "test");
     expect(mocks.rate).toHaveBeenCalledWith("contentReaction", "actor");
   },
 );
@@ -124,8 +125,8 @@ it("scopes private history and unavailable-target cleanup to the session account
   });
   const response = await DELETE(request("DELETE", {}), cleanup);
   expect(response.status).toBe(200);
-  expect(await response.json()).toEqual({ contentId: "content", removed: true });
-  expect(mocks.remove).toHaveBeenCalledWith(actor, "content");
+  expect(await response.json()).toEqual({ contentId: "content", removed: true, actorId: "actor" });
+  expect(mocks.remove).toHaveBeenCalledWith(actor, "content", "test");
   expect((await DELETE(request("DELETE", { actorId: "victim" }), cleanup)).status).toBe(400);
 });
 it("denies anonymous private history and cleanup", async () => {
@@ -172,6 +173,19 @@ it("limits reads and both mutation paths with shared policies", async () => {
   expect((await trust(request(), profile)).status).toBe(429);
   expect((await PUT(request("PUT", { reaction: null }), publication)).status).toBe(429);
   expect((await DELETE(request("DELETE", {}), cleanup)).status).toBe(429);
+  expect(mocks.set).not.toHaveBeenCalled();
+  expect(mocks.remove).not.toHaveBeenCalled();
+});
+
+it.each(["PUT", "DELETE"] as const)("rejects an unbound or changed actor on %s", async (method) => {
+  const handler = (headers: Record<string, string>) =>
+    method === "PUT"
+      ? PUT(request(method, { reaction: "thanks" }, "", headers), publication)
+      : DELETE(request(method, {}, "", headers), cleanup);
+  expect((await handler({ "x-nexus-actor-id": "" })).status).toBe(428);
+  const response = await handler({ "x-nexus-actor-id": "other" });
+  expect(response.status).toBe(409);
+  expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
   expect(mocks.set).not.toHaveBeenCalled();
   expect(mocks.remove).not.toHaveBeenCalled();
 });

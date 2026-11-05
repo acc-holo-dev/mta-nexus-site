@@ -10,6 +10,7 @@ import {
 import { db } from "../client";
 import { auditEvents, content, reactions, users } from "../schema";
 import { containsPattern } from "./search-pattern";
+import { lockInitiatingSession } from "./initiating-session";
 import { contentReactionNotice } from "./content-reaction-notice";
 import { currentContentReactionRow } from "./content-reaction-count";
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -111,12 +112,14 @@ class ContentReactionsRepository {
   }
   async set(input: {
     actorId: string;
+    currentToken: string;
     slug?: string;
     contentId?: string;
     reaction: ContentReaction | null;
     reactionId: string;
     auditId: string;
   }) {
+    if (!input.currentToken) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
     if (
       !!input.slug === !!input.contentId ||
       (input.contentId && input.reaction !== null) ||
@@ -167,6 +170,7 @@ class ContentReactionsRepository {
         .orderBy(desc(reactions.createdAt), desc(reactions.id))
         .for("update")
         .limit(2);
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       if (input.contentId && !existing.length)
         return {
           contentId,
@@ -209,6 +213,7 @@ class ContentReactionsRepository {
           .update(content)
           .set({ likeCount: summary.helpful })
           .where(eq(content.id, contentId));
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       return {
         contentId,
         slug: item?.status === "published" ? item.slug : null,

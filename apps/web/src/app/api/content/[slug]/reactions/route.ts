@@ -1,4 +1,4 @@
-import { AppError, RateLimitExceededError } from "@nexus/domain";
+import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
@@ -34,13 +34,28 @@ export const PUT = withBrowserMutation(
     return userPlatformApi(
       request,
       async (actor) => {
+        const token = request.cookies.get("nexus_session")?.value;
+        if (!token) throw new UnauthorizedError();
+        const expected = request.headers.get("x-nexus-actor-id");
+        if (!expected) throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+        if (expected !== actor.id) throw new AppError("Actor changed", 409, "ACTOR_CHANGED");
         validQuery(request);
         if (!(await consumeRateLimit("contentReaction", actor.id)).success)
           throw new RateLimitExceededError();
         requireServerJsonContentType(request);
         const parsed = reactionCommandSchema.safeParse(await readBoundedJson(request, 4 * 1024));
         if (!parsed.success) throw new AppError("Invalid reaction", 400, "VALIDATION_ERROR");
-        return contentReactionService.set(actor, (await params).slug, parsed.data.reaction);
+        return {
+          ...(await contentReactionService.set(
+            actor,
+            (
+              await params
+            ).slug,
+            parsed.data.reaction,
+            token,
+          )),
+          actorId: actor.id,
+        };
       },
       200,
       reactionError,

@@ -164,7 +164,13 @@ export default async function ReactionsPage({
                     UTC
                   </time>
                 </div>
-                <ReactionRemoval contentId={item.contentId} locale={locale} reloadHref={latest} />
+                <ReactionRemoval
+                  key={`${actor.id}:${item.contentId}`}
+                  actorId={actor.id}
+                  contentId={item.contentId}
+                  locale={locale}
+                  reloadHref={latest}
+                />
               </div>
             </li>
           ))}

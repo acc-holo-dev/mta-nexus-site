@@ -289,6 +289,29 @@ test("OPS-08 release manifest accepts unresolved image digests without authorizi
   assert.equal(ok.productionAuthorized, false);
 });
 
+test("release manifest requires valid unique migration names and SHA-256 hashes", () => {
+  const valid = { name: "0001_example.sql", sha256: "c".repeat(64) };
+  for (const migrations of [
+    [{}],
+    [null],
+    ["0001.sql"],
+    [{ ...valid, name: "../0001_example.sql" }],
+    [{ ...valid, name: "nested\\0001_example.sql" }],
+    [{ ...valid, name: "0001_example.txt" }],
+    [{ ...valid, sha256: "not-a-hash" }],
+    [{ ...valid, sha256: "C".repeat(64) }],
+    [valid, { ...valid }],
+  ]) {
+    const result = evaluateReleaseManifest(sampleManifest({ migrations }));
+    assert.equal(result.ok, false);
+    assert.equal(result.releaseCandidateTechnical, undefined);
+    assert.match(result.reason, /migration names and SHA-256/u);
+  }
+  assert.equal(evaluateReleaseManifest(sampleManifest({ migrations: [valid] })).ok, true);
+  const actualMigrations = listMigrationEvidence(join(process.cwd(), "packages/db/migrations"));
+  assert.equal(evaluateReleaseManifest(sampleManifest({ migrations: actualMigrations })).ok, true);
+});
+
 test("OPS-08 release manifest blocks missing or mismatched digest SHA schema and unknown versions", () => {
   assert.match(evaluateReleaseManifest(sampleManifest({ sha: "deadbeef" })).reason, /SHA/u);
   assert.match(

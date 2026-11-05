@@ -25,6 +25,18 @@ export const OBSERVABILITY_ALERT_ENV_KEYS = Object.freeze([
   "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS",
 ]);
 
+// Mirrors readQueueAlertThreshold in packages/db/scripts/run-web-push-dispatcher.ts.
+const ALERT_THRESHOLD_LIMITS = Object.freeze({
+  WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT: [1, 99],
+  WEB_PUSH_QUEUE_ALERT_DUE_JOBS: [1, 50_000],
+  WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS: [1, 86_400],
+});
+
+function validAlertThreshold(key, value) {
+  const limits = ALERT_THRESHOLD_LIMITS[key];
+  return !!limits && Number.isSafeInteger(value) && value >= limits[0] && value <= limits[1];
+}
+
 /** Literal strings that must appear in docs/OPERATIONS.md (match probe alert names). */
 export const OBSERVABILITY_RUNBOOK_MENTIONS = Object.freeze([
   "report_delivery_failed",
@@ -94,7 +106,7 @@ export function buildObservabilityReadinessEvidence({
   for (const key of OBSERVABILITY_ALERT_ENV_KEYS) {
     const raw = env[key]?.trim() ?? "";
     const value = Number(raw);
-    const configured = raw !== "" && Number.isFinite(value) && value > 0;
+    const configured = /^[0-9]+$/u.test(raw) && validAlertThreshold(key, value);
     alerts[key] = configured ? "configured" : "missing";
     if (!configured) failures.push(`alert_env:${key}`);
   }
@@ -334,8 +346,8 @@ export function validateObservabilityLiveDrillEvidence(evidence, { now = Date.no
         reason: `threshold key ${key} is not in the live-drill whitelist`,
       };
     }
-    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-      return { ok: false, reason: `threshold ${key} must be a positive number` };
+    if (!validAlertThreshold(key, value)) {
+      return { ok: false, reason: `threshold ${key} must be an integer within the worker limits` };
     }
   }
   const timeline = evidence?.timeline;

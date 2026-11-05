@@ -41,6 +41,7 @@ const saved = {
   contentId: "content",
   slug: "guide",
   authenticated: true,
+  actorId: "actor",
   self: false,
   reaction: "thanks" as const,
   counts: { helpful: 2, thanks: 3, insight: 0 },
@@ -98,7 +99,7 @@ it("shows sign-in for guests and disables votes for an author while allowing old
     <ContentReactions
       slug="guide"
       contentId="content"
-      initial={{ ...saved, authenticated: false, reaction: null }}
+      initial={{ ...saved, authenticated: false, actorId: null, reaction: null }}
       locale="en"
     />,
   );

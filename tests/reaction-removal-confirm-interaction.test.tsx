@@ -6,6 +6,7 @@ const harness = vi.hoisted(() => ({
   cursor: 0,
   cleanups: [] as Array<undefined | (() => void)>,
   fetch: vi.fn(),
+  actorId: "actor",
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
@@ -68,6 +69,7 @@ function render() {
   return descendants(
     ReactionRemoval({
       contentId: "content_aaaaaaaaaaaaaaaaaaaaaa",
+      actorId: harness.actorId,
       reloadHref: "/workspace/reactions",
       locale: "en",
     }),
@@ -91,6 +93,7 @@ beforeEach(() => {
   harness.cleanups = [];
   confirmAction.mockResolvedValue(true);
   harness.fetch.mockReset();
+  harness.actorId = "actor";
   vi.stubGlobal("fetch", harness.fetch);
 });
 
@@ -102,7 +105,7 @@ afterEach(() => {
 it("confirms workspace reaction removal before DELETE", async () => {
   const copy = reactionCopy("en");
   const contentId = "content_aaaaaaaaaaaaaaaaaaaaaa";
-  harness.fetch.mockResolvedValueOnce(response({ contentId, removed: true }));
+  harness.fetch.mockResolvedValueOnce(response({ contentId, removed: true, actorId: "actor" }));
 
   await (removeButton(render()).props.onClick as () => Promise<void>)();
   await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(1));
@@ -126,4 +129,25 @@ it("keeps the workspace reaction when confirmation is cancelled", async () => {
   confirmAction.mockResolvedValueOnce(false);
   await (removeButton(render()).props.onClick as () => Promise<void>)();
   expect(harness.fetch).not.toHaveBeenCalled();
+});
+
+it("does not apply a delayed removal response to another account", async () => {
+  let complete!: (value: Response) => void;
+  harness.fetch.mockReturnValueOnce(
+    new Promise<Response>((resolve) => {
+      complete = resolve;
+    }),
+  );
+  const pending = (removeButton(render()).props.onClick as () => Promise<void>)();
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledOnce());
+  expect(
+    (harness.fetch.mock.calls[0][1].headers as Record<string, string>)["x-nexus-actor-id"],
+  ).toBe("actor");
+  harness.actorId = "other";
+  render();
+  complete(
+    response({ contentId: "content_aaaaaaaaaaaaaaaaaaaaaa", removed: true, actorId: "actor" }),
+  );
+  await pending;
+  expect(render().some((node) => node.props.children === reactionCopy("en").removed)).toBe(false);
 });

@@ -72,6 +72,33 @@ test("live drill rejects missing, malformed or contradictory failures", () => {
   }
 });
 
+test("live drill threshold values obey the worker's integer bounds", () => {
+  for (const [key, max] of [
+    ["WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT", 99],
+    ["WEB_PUSH_QUEUE_ALERT_DUE_JOBS", 50_000],
+    ["WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS", 86_400],
+  ]) {
+    for (const value of [1, max]) {
+      assert.equal(
+        validateObservabilityLiveDrillEvidence(liveDrill({ thresholds: { [key]: value } }), {
+          now: fixtureNow,
+        }).ok,
+        true,
+        `${key}=${value}`,
+      );
+    }
+    for (const value of [0, max + 1, 1.5, "1", Number.NaN, Number.POSITIVE_INFINITY]) {
+      assert.equal(
+        validateObservabilityLiveDrillEvidence(liveDrill({ thresholds: { [key]: value } }), {
+          now: fixtureNow,
+        }).ok,
+        false,
+        `${key}=${value}`,
+      );
+    }
+  }
+});
+
 test("accepts old and clock-skewed live drills but rejects a future drill", () => {
   const now = Date.parse("2030-01-01T00:00:00.000Z");
   assert.equal(validateObservabilityLiveDrillEvidence(liveDrill(), { now }).ok, true);
