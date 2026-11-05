@@ -14,7 +14,7 @@ it("locks suppressed/disabled release-watch notices to ErrorState and keeps succ
   expect(source).toContain("{!commerceEnabled ? <ErrorState title={copy.suppressed} /> : null}");
   expect(source).toContain("{disabledReason ? <ErrorState title={disabledReason} /> : null}");
   expect(source).toContain(
-    '{error ? <ErrorState title={error} description={copy.failedDescription} /> : null}',
+    "{error ? <ErrorState title={error} description={copy.failedDescription} /> : null}",
   );
   expect(source).toContain('role="status"');
   expect(source).toContain("{copy.saved}");
