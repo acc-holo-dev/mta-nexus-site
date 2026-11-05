@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `e4ba204d` — tip advanced after market publisherUnavailable (#581), server clipboard (#578), version-help (#575), and tip honesty (#595); tip CI not claimed verified-green under rapid merges;
 - `6641b17e` — tip advanced after meta-inspector ErrorState (#576) and tip honesty (#591); tip CI not claimed verified-green under rapid merges;
 - `48b89589` — tip advanced after cart item unavailable ErrorState (#579); tip CI not claimed verified-green under rapid merges;
 - `c51536dd` — tip advanced after settings-recovery (#570), license-binding (#572), directory-stale (#577), build-provenance (#569), and membership-history (#571); tip CI not claimed verified-green under rapid merges;
