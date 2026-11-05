@@ -16,7 +16,7 @@ import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
 } from "../lib/resource-release-control-i18n";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 import { stashSupportObjectContext } from "./support-center";
 
@@ -43,7 +43,6 @@ export function ResourceModerationControls({
   const action = release ? "release" : "suspend";
   const target = resourceModerationTarget(status, action);
   const [reason, setReason] = useState(""),
-    [confirmed, setConfirmed] = useState(false),
     [busy, setBusy] = useState(false),
     [saved, setSaved] = useState(false),
     [error, setError] = useState("");
@@ -55,7 +54,6 @@ export function ResourceModerationControls({
     ) {
       observedStatus.current = product.status;
       observedRevision.current = product.updatedAt;
-      setConfirmed(false);
       setSaved(false);
       setError("");
     }
@@ -82,10 +80,22 @@ export function ResourceModerationControls({
       reason,
       expectedUpdatedAt: product.updatedAt,
     });
-    if (!confirmed || !parsed.success) {
+    if (!parsed.success) {
       setError(copy.errors.RESOURCE_MODERATION_INVALID);
       return;
     }
+    if (
+      !(await confirmAction({
+        title: release ? copy.release : copy.suspend,
+        object: product.id,
+        consequences: release ? copy.confirmRelease : copy.confirmSuspend,
+        confirmLabel: release ? copy.release : copy.suspend,
+        cancelLabel: copy.back,
+        closeLabel: copy.back,
+        ...(release ? { danger: false } : {}),
+      }))
+    )
+      return;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -185,14 +195,6 @@ export function ResourceModerationControls({
             className={textareaClass}
           />
         </div>
-        <ActionConfirmCheckbox
-          id={`${field}-confirm`}
-          checked={confirmed}
-          onCheckedChange={setConfirmed}
-          required
-        >
-          {release ? copy.confirmRelease : copy.confirmSuspend}
-        </ActionConfirmCheckbox>
       </fieldset>
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved ? (
@@ -205,7 +207,7 @@ export function ResourceModerationControls({
             : ""}
         </p>
       ) : null}
-      <Button type="submit" isLoading={busy} disabled={saved || !confirmed} className="min-h-11">
+      <Button type="submit" isLoading={busy} disabled={saved} className="min-h-11">
         {busy ? copy.saving : release ? copy.release : copy.suspend}
       </Button>
     </form>
