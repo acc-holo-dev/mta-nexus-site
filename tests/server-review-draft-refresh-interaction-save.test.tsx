@@ -40,6 +40,9 @@ it("keeps a confirmed save when the public review list fails to refresh", async 
   (form.props.onSubmit as (event: unknown) => void)({ preventDefault() {} });
   await vi.waitFor(() => expect(harness.slots[2]).toBe(true));
   expect(harness.slots[10]).toBe(true);
-  expect(harness.slots[9]).toContain(serverReviewCopy("en").saved);
+  expect((harness.slots[9] as { text: string; error: boolean }).text).toContain(
+    serverReviewCopy("en").saved,
+  );
+  expect((harness.slots[9] as { text: string; error: boolean }).error).toBe(false);
   if (typeof cleanup === "function") cleanup();
 });

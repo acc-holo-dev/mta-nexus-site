@@ -37,6 +37,8 @@ type PublicPage = {
   totalPages: number;
 };
 
+type Notice = { text: string; error: boolean };
+
 export function ServerReviewPanel({
   serverId,
   initialPage,
@@ -68,7 +70,7 @@ export function ServerReviewPanel({
   const [text, setText] = useState("");
   const [rating, setRating] = useState(5);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("");
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
@@ -130,7 +132,7 @@ export function ServerReviewPanel({
       setPage(initialPage ?? null);
       setUnavailable(loadState === "unavailable" || initialPage == null);
       setConfirmed(false);
-      setMessage("");
+      setNotice(null);
       setBusy(false);
       setRetrying(false);
       setConflict(false);
@@ -161,14 +163,14 @@ export function ServerReviewPanel({
   }, [serverId]);
 
   useEffect(() => {
-    if (!message && !unavailable) return;
+    if (!notice || notice.error) return;
     statusRef.current?.focus();
-  }, [message, unavailable]);
+  }, [notice]);
 
   async function retryLoad() {
     if (retrying) return;
     setRetrying(true);
-    setMessage("");
+    setNotice(null);
     const scope = scopeGeneration.current;
     try {
       const response = await fetch(
@@ -186,7 +188,6 @@ export function ServerReviewPanel({
     } catch {
       if (scope !== scopeGeneration.current) return;
       setUnavailable(true);
-      setMessage(loadCopy.unavailable);
     } finally {
       if (scope === scopeGeneration.current) setRetrying(false);
     }
@@ -196,7 +197,7 @@ export function ServerReviewPanel({
     if (busy || confirmed || (action === "save" && conflict)) return;
     const scope = scopeGeneration.current;
     setBusy(true);
-    setMessage("");
+    setNotice(null);
     mineRequest.current += 1;
     const expectedRevision =
       action === "save" ? draftRevision.current : (mine?.review?.revision ?? 0);
@@ -219,7 +220,7 @@ export function ServerReviewPanel({
           setConflict(true);
           setLatest(null);
         }
-        setMessage(serverReviewError(locale, value?.code));
+        setNotice({ text: serverReviewError(locale, value?.code), error: true });
         return;
       }
       if (!confirmedServerReview(value, expectedRevision, action)) {
@@ -240,7 +241,7 @@ export function ServerReviewPanel({
           author: previous?.review?.author ?? null,
         },
       }));
-      setMessage(`${copy.saved}. ${loadCopy.reloadReason}`);
+      setNotice({ text: `${copy.saved}. ${loadCopy.reloadReason}`, error: false });
       try {
         const refreshed = await fetch(
           `/api/servers/${encodeURIComponent(serverId)}/reviews?page=${page?.page ?? 1}`,
@@ -255,7 +256,7 @@ export function ServerReviewPanel({
         if (scope === scopeGeneration.current) setUnavailable(true);
       }
     } catch {
-      if (scope === scopeGeneration.current) setMessage(copy.unknown);
+      if (scope === scopeGeneration.current) setNotice({ text: copy.unknown, error: true });
     } finally {
       if (scope === scopeGeneration.current) setBusy(false);
     }
@@ -285,9 +286,10 @@ export function ServerReviewPanel({
       )
         throw new Error("Invalid review state");
       setLatest({ review: value.review, canReview: value.canReview });
-      setMessage(copy.changed);
+      setNotice({ text: copy.changed, error: true });
     } catch {
-      if (scope === scopeGeneration.current) setMessage(copy.latestUnavailable);
+      if (scope === scopeGeneration.current)
+        setNotice({ text: copy.latestUnavailable, error: true });
     } finally {
       if (scope === scopeGeneration.current) setCheckingLatest(false);
     }
@@ -465,15 +467,33 @@ export function ServerReviewPanel({
             )}
           </>
         )}
-        <p
-          ref={statusRef}
-          id={statusId}
-          role="status"
-          tabIndex={-1}
-          className="text-sm outline-none"
-        >
-          {message}
-        </p>
+        {notice?.error ? (
+          <ErrorState
+            id="server-review-write-error"
+            title={notice.text}
+            action={
+              <Button
+                type="button"
+                variant="ghost"
+                className={`${ghostActionClass} text-accent`}
+                onClick={() => router.refresh()}
+              >
+                {copy.reload}
+              </Button>
+            }
+          />
+        ) : null}
+        {notice && !notice.error ? (
+          <p
+            ref={statusRef}
+            id={statusId}
+            role="status"
+            tabIndex={-1}
+            className="text-sm outline-none"
+          >
+            {notice.text}
+          </p>
+        ) : null}
         {conflict && (
           <div className="space-y-2 text-sm">
             <Button
@@ -504,7 +524,7 @@ export function ServerReviewPanel({
                       draftRevision.current = latest.review?.revision ?? 0;
                       setConflict(false);
                       setLatest(null);
-                      setMessage("");
+                      setNotice(null);
                     }}
                   >
                     {copy.useLatest}
