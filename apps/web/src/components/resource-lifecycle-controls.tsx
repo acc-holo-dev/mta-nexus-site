@@ -249,13 +249,6 @@ export function ResourceLifecycleControls({
           </div>
           <p id={`${fieldId}-note`} className="text-sm text-secondary">
             {notes[action]}
-            {action === "restore" ? (
-              <span className="mt-1 block text-warning">
-                {locale === "ru"
-                  ? "После восстановления ресурс станет черновиком, а не снова опубликованным."
-                  : "Restore returns a draft. It does not republish the resource."}
-              </span>
-            ) : null}
             {target ? (
               <span className="mt-1 block">
                 {locale === "ru" ? "Следующее состояние" : "Next status"}: {target}
@@ -267,6 +260,16 @@ export function ResourceLifecycleControls({
               </span>
             ) : null}
           </p>
+          {action === "restore" ? (
+            <ErrorState
+              id="resource-lifecycle-restore-draft"
+              title={
+                locale === "ru"
+                  ? "После восстановления ресурс станет черновиком, а не снова опубликованным."
+                  : "Restore returns a draft. It does not republish the resource."
+              }
+            />
+          ) : null}
           <div className="space-y-1.5">
             <label htmlFor={`${fieldId}-reason`} className={nativeLabelClass}>
               {copy.reason}
