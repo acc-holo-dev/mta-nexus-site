@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `c9f53a75` — tip advanced after tip honesty (#767), collection history current-unavailable ErrorState (#761), and organization-resource-management suite split (#763); tip CI not claimed verified-green under rapid merges;
 - `f6f32a60` — tip advanced after tip honesty (#766) on c863a6c6; tip CI not claimed verified-green under rapid merges;
 - `c863a6c6` — tip advanced after tip honesty (#765) and library-collection-command-sessions suite split (#751); tip CI not claimed verified-green under rapid merges;
 - `7b1d1626` — tip advanced after tip honesty (#762) and verification-applications (#756) / security-activity (#757) suite splits; tip CI not claimed verified-green under rapid merges;
