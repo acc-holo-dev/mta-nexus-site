@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `32be59b1` — tip advanced after tip honesty (#654) on 0fac6bcc; tip CI not claimed verified-green under rapid merges;
 - `0fac6bcc` — tip advanced after tip honesty (#647) on 57de2c6b; tip CI not claimed verified-green under rapid merges;
 - `57de2c6b` — tip advanced after #640/#646 suite splits and #644 library-collection-compare transfer blocker ErrorStates; tip CI not claimed verified-green under rapid merges;
 - `ef354b40` — tip advanced after #637 library-resource-collections soft notes and #643 mta-master-directory-unavailable; tip CI not claimed verified-green under rapid merges;
