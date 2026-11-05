@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `8b8ec064` — tip advanced after tip honesty (#690) on f88a90c6; tip CI not claimed verified-green under rapid merges;
 - `f88a90c6` — tip advanced after tip honesty (#689) on 61ea5891; tip CI not claimed verified-green under rapid merges;
 - `61ea5891` — tip advanced after tip honesty (#685) covering #681/#682/#683 on 7d74b598; tip CI not claimed verified-green under rapid merges;
 - `7d74b598` — tip advanced after copy-move suite split (#682) and own-discussion ErrorState (#683) following #681; tip CI not claimed verified-green under rapid merges;
