@@ -12,7 +12,7 @@ type Element = FlatTestElement;
 
 /** Exact fixture literals so real editor props stay assignable under strictFunctionTypes. */
 export const productId = "prd_a";
-export const reportId = "rpt_a";
+const reportId = "rpt_a";
 
 export const originalReview = {
   text: "Original review",
