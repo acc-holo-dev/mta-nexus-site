@@ -144,16 +144,14 @@ it("rolls back report and notification if the session expires while the audit in
   const blocker = db.transaction(async (tx) => {
     const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
     pid = Number(row.pid);
-    await tx
-      .insert(auditEvents)
-      .values({
-        id: f.auditId,
-        actorId: f.actorId,
-        actorType: "user",
-        action: "fixture",
-        targetId: f.reportId,
-        targetType: "report",
-      });
+    await tx.insert(auditEvents).values({
+      id: f.auditId,
+      actorId: f.actorId,
+      actorType: "user",
+      action: "fixture",
+      targetId: f.reportId,
+      targetType: "report",
+    });
     locked.resolve();
     await release.promise;
     throw new Error("rollback fixture");

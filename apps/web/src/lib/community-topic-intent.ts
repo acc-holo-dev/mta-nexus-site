@@ -1,6 +1,6 @@
 import type { CommunityTopicSubmission } from "./community-topic-submission";
 
-export type CommunityTopicDraft = {
+type CommunityTopicDraft = {
   title: string;
   body: string;
   type: "post" | "question";
@@ -16,10 +16,7 @@ function slot(actorId: string) {
   return `nexus:community-topic:intent:v1:${actorId}`;
 }
 
-export function parseCommunityTopicIntent(
-  raw: string,
-  actorId: string,
-): CommunityTopicIntent | null {
+function parseCommunityTopicIntent(raw: string, actorId: string): CommunityTopicIntent | null {
   if (!/^[A-Za-z0-9_-]{1,128}$/u.test(actorId) || raw.length > 60_000) return null;
   try {
     const item = JSON.parse(raw) as {
