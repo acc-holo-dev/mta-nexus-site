@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `2ff10b8a` — tip advanced after tip honesty (#752) and admin build quarantine reason ErrorState (#745); tip CI not claimed verified-green under rapid merges;
 - `d33f3379` — tip advanced after tip honesty (#750) on f74fd532; tip CI not claimed verified-green under rapid merges;
 - `f74fd532` — tip advanced after order-cancellation unconfirmed (#741) and resource-build quarantined ErrorState (#742); tip CI not claimed verified-green under rapid merges;
 - `45cfab13` — tip advanced after tip honesty (#748) on ac9fd04e; tip CI not claimed verified-green under rapid merges;
