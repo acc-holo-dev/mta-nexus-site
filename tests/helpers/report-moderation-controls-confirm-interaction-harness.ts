@@ -11,9 +11,7 @@ type ReportModerationControlsConfirmHarness = {
 type Element = ReactElement<Record<string, unknown>>;
 
 /** Props match fixture literals so ReportModerationControls stays assignable under strictFunctionTypes. */
-type ReportModerationControlsComponent = (props: {
-  reportId: typeof reportId;
-}) => ReactNode;
+type ReportModerationControlsComponent = (props: { reportId: typeof reportId }) => ReactNode;
 
 type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
