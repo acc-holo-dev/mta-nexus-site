@@ -141,9 +141,7 @@ export function ResourceReviewEditor({
     <section className="nexus-panel space-y-4 p-5">
       <p className="text-sm text-secondary">{copy.access}</p>
       {eligibilityNote ? (
-        <p role="note" className="text-sm text-warning">
-          {eligibilityNote}
-        </p>
+        <ErrorState id="resource-review-eligibility" title={eligibilityNote} />
       ) : null}
       {review && <p>{resourceReviewState(locale, review.status)}</p>}
       {review?.moderationReason && (
