@@ -239,28 +239,28 @@ export function MtaMasterServerDirectory({
       <div className="nexus-panel space-y-3 p-4">
         <div>
           <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
-          <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
-            {loading ? (
-              copy.loading
-            ) : directory ? (
-              <>
-                {directory.total.toLocaleString(dateLocale)} {copy.publicServersLabel}.{" "}
-                {validDate ? (
-                  <>
-                    {copy.updated}{" "}
-                    <time dateTime={directory.fetchedAt}>
-                      {fetchedDate.toLocaleString(dateLocale)}
-                    </time>
-                    .
-                  </>
-                ) : (
-                  copy.updateUnknown
-                )}
-              </>
-            ) : (
-              copy.unavailable
-            )}
-          </p>
+          {loading ? (
+            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
+              {copy.loading}
+            </p>
+          ) : directory ? (
+            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
+              {directory.total.toLocaleString(dateLocale)} {copy.publicServersLabel}.{" "}
+              {validDate ? (
+                <>
+                  {copy.updated}{" "}
+                  <time dateTime={directory.fetchedAt}>
+                    {fetchedDate.toLocaleString(dateLocale)}
+                  </time>
+                  .
+                </>
+              ) : (
+                copy.updateUnknown
+              )}
+            </p>
+          ) : (
+            <ErrorState id="mta-master-directory-unavailable" title={copy.unavailable} />
+          )}
         </div>
 
         <search aria-label={copy.search}>
