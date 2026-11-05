@@ -401,25 +401,30 @@ export function CommercialPlanForm({
         </p>
       ) : null}
       {marker ? (
-        <div className="space-y-2" role="note">
-          <p>
-            {locale === "ru"
+        <ErrorState
+          id="commercial-plan-operation-unknown"
+          title={
+            locale === "ru"
               ? "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки."
-              : "The previous operation result is unknown. Check the list and history before clearing this warning."}{" "}
-            <code>{marker.slug}</code>
-          </p>
-          <a href="/admin/commerce/plans" className="underline">
-            {copy.back}
-          </a>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={() => void clearMarker()}
-          >
-            {locale === "ru" ? "Я проверил результат" : "I checked the result"}
-          </Button>
-        </div>
+              : "The previous operation result is unknown. Check the list and history before clearing this warning."
+          }
+          description={marker.slug}
+          action={
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a href="/admin/commerce/plans" className="underline">
+                {copy.back}
+              </a>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={busy}
+                onClick={() => void clearMarker()}
+              >
+                {locale === "ru" ? "Я проверил результат" : "I checked the result"}
+              </Button>
+            </div>
+          }
+        />
       ) : null}
       {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {saved ? (
