@@ -291,11 +291,9 @@ export function MtaMasterServerDirectory({
         <p className="text-xs text-secondary">{copy.connectHint}</p>
       </div>
 
-      {directory?.isStale && !loading && (
-        <p role="status" className="nexus-panel bg-warning-soft p-4 text-sm text-secondary">
-          {copy.stale}
-        </p>
-      )}
+      {directory?.isStale && !loading ? (
+        <ErrorState id="mta-master-directory-stale" title={copy.stale} />
+      ) : null}
 
       {error && (
         <ErrorState
