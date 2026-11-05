@@ -3,6 +3,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
+/** Honesty lock for order-terms consistency flags ErrorState. */
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = readFileSync(join(root, "apps/web/src/components/order-terms-report.tsx"), "utf8");
 
