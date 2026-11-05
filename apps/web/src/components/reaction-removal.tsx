@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import { confirmedReactionRemoval } from "../lib/content-reaction-contract";
 import { reactionCopy, reactionError } from "../lib/content-reaction-copy";
@@ -126,14 +126,12 @@ export function ReactionRemoval({
           {phase === "saving" ? copy.saving : copy.remove}
         </Button>
       )}
-      {message && (
-        <p
-          role={phase === "blocked" ? "alert" : "status"}
-          className={`text-xs ${phase === "blocked" ? "text-danger" : "text-success"}`}
-        >
+      {message && phase === "blocked" ? <ErrorState title={message} /> : null}
+      {message && phase !== "blocked" ? (
+        <p role="status" className="text-xs text-success">
           {message}
         </p>
-      )}
+      ) : null}
       {(phase === "blocked" || phase === "removed") && (
         <a
           href={reloadHref}
