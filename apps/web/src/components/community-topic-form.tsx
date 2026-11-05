@@ -402,11 +402,7 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
           </div>
         ) : null}
 
-        {pending && (
-          <p role="status" className="text-sm text-secondary">
-            {recoveryNotice || copy.topicPending}
-          </p>
-        )}
+        {pending ? <ErrorState title={recoveryNotice || copy.topicPending} /> : null}
         {pending && (
           <Button type="button" variant="outline" disabled={busy} onClick={() => void checkSaved()}>
             {copy.topicCheck}
