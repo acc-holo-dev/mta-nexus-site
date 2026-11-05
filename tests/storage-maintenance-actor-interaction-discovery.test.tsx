@@ -30,7 +30,7 @@ it("does not show namespaces returned for another administrator", async () => {
   h.fetch.mockResolvedValueOnce(
     reply({ actorId: "usr_b", owners: ["private_owner"], nextOffset: null, limited: false }),
   );
-  click(renderDiscovery(), "List namespaces");
+  click(renderDiscovery(), "List directories");
   await vi.waitFor(() => expect(renderDiscovery().some((n) => n.props.title)).toBe(true));
   expect(h.fetch.mock.calls[0][1].headers["x-nexus-actor-id"]).toBe("usr_a");
   expect(renderDiscovery().some((n) => n.props.children === "private_owner")).toBe(false);
