@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `00889858` — tip advanced after tip honesty (#773) and own-discussion readonly ErrorState (#770); tip CI not claimed verified-green under rapid merges;
 - `14d474f7` — tip advanced after tip honesty (#772) on 6d802299; tip CI not claimed verified-green under rapid merges;
 - `6d802299` — tip advanced after tip honesty (#771) and resource-release-watches suite split (#764); tip CI not claimed verified-green under rapid merges;
 - `c9f53a75` — tip advanced after tip honesty (#767), collection history current-unavailable ErrorState (#761), and organization-resource-management suite split (#763); tip CI not claimed verified-green under rapid merges;
