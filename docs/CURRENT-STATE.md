@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `1ed26d2b` — tip advanced after tip honesty (#661) covering #648/#650/#652/#653 on 68db442d; tip CI not claimed verified-green under rapid merges;
 - `68db442d` — tip advanced after #648 selection-missing and suite splits #650/#652/#653; tip CI not claimed verified-green under rapid merges;
 - `dffcb78c` — tip advanced after tip honesty (#658) on 42afab9c; tip CI not claimed verified-green under rapid merges;
 - `42afab9c` — tip advanced after tip honesty (#657) on a1c69040; tip CI not claimed verified-green under rapid merges;
