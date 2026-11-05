@@ -37,6 +37,12 @@ async function actor() {
     displayName: "Team member",
   });
   actorIds.push(user.id);
+  await sessionRepository.create({
+    id: `ses_${randomUUID()}`,
+    userId: user.id,
+    token: `org-test-${user.id}`,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   return user;
 }
 function audit(user: User, id: string, action = "organization.member_updated") {
@@ -84,6 +90,7 @@ it("commits one concurrent team operation and advances the same profile revision
         false,
         `mem_${randomUUID()}`,
         audit(owner, org.id, "organization.member_added"),
+        `org-test-${owner.id}`,
       ),
     ),
   );
@@ -116,6 +123,7 @@ it("preserves unrelated commercial grants and prevents an administrator takeover
     false,
     `mem_${randomUUID()}`,
     audit(owner, org.id),
+    `org-test-${owner.id}`,
   );
   const added = await teams.addMember(
     org.id,
@@ -126,6 +134,7 @@ it("preserves unrelated commercial grants and prevents an administrator takeover
     true,
     `mem_${randomUUID()}`,
     audit(owner, org.id),
+    `org-test-${owner.id}`,
   );
   await db
     .update(organizationMembers)
@@ -144,6 +153,7 @@ it("preserves unrelated commercial grants and prevents an administrator takeover
       owner.id,
       null,
       audit(admin, org.id),
+      `org-test-${admin.id}`,
     ),
   ).rejects.toMatchObject({ code: "MEMBER_PROTECTED" });
   const changed = await teams.changeMember(
@@ -153,6 +163,7 @@ it("preserves unrelated commercial grants and prevents an administrator takeover
     member.id,
     { role: "member", managesServers: false },
     audit(admin, org.id),
+    `org-test-${admin.id}`,
   );
   const [stored] = await db
     .select()
@@ -170,6 +181,7 @@ it("preserves unrelated commercial grants and prevents an administrator takeover
     member.id,
     changed.organization.updatedAt,
     audit(member, org.id, "organization.member_left"),
+    `org-test-${member.id}`,
   );
   await expect(teams.getWorkspace(org.id, member.id)).rejects.toMatchObject({ code: "FORBIDDEN" });
 });
@@ -191,6 +203,7 @@ it("rolls back a membership mutation and revision when audit persistence fails",
       false,
       `mem_${randomUUID()}`,
       { ...audit(owner, org.id), id: existingAudit.id },
+      `org-test-${owner.id}`,
     ),
   ).rejects.toBeDefined();
   const stored = await teams.getWorkspace(org.id, owner.id);

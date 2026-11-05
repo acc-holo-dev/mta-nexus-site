@@ -4,16 +4,19 @@ import {
   organizationApi,
   organizationId,
   organizationInput,
+  organizationMutationToken,
 } from "../../../../../../lib/organization-workspace-api";
 import { organizationWorkspaceService } from "../../../../../../lib/services/organization-workspace-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
-    return organizationApi(request, async (user) =>
-      organizationWorkspaceService.leave(
+    return organizationApi(request, async (user) => {
+      const token = organizationMutationToken(request, user);
+      return organizationWorkspaceService.leave(
         organizationId((await context.params).id),
         await organizationInput(request, user),
         user,
-      ),
-    );
+        token,
+      );
+    });
   },
 );

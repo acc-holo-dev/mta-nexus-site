@@ -32,6 +32,18 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
+vi.mock("../packages/db/src/repositories/initiating-session", async (original) => {
+  const actual =
+    await original<typeof import("../packages/db/src/repositories/initiating-session")>();
+  return {
+    lockInitiatingSession: (
+      tx: Parameters<typeof actual.lockInitiatingSession>[0],
+      actor: string,
+      token: string,
+    ) =>
+      token === "unit-token" ? Promise.resolve() : actual.lockInitiatingSession(tx, actor, token),
+  };
+});
 vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
   enqueueWebPushWithRecoveryWithin: state.push,
 }));
@@ -245,6 +257,7 @@ it("records access notices in the same transaction for team changes and uses saf
   state.rows = [
     [org()],
     [["target", "target", "Target", null]],
+    [["owner"]],
     [["membership"]],
     [org({ updatedAt: later })],
   ];
@@ -264,6 +277,7 @@ it("records access notices in the same transaction for team changes and uses saf
       targetId: "org",
       action: "organization.member_added",
     },
+    "unit-token",
   );
   const notice = writes("notifications")[0];
   expect(notice.params).toContain("Organization org: added.");

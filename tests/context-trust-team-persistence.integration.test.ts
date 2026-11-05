@@ -13,6 +13,7 @@ import {
   publicContextTrustRepository as trust,
   servers,
   userRepository,
+  sessionRepository,
   users,
   verificationRequests,
 } from "@nexus/db";
@@ -43,6 +44,12 @@ async function actor(role = "user") {
     role,
   });
   actorIds.push(user.id);
+  await sessionRepository.create({
+    id: `ses_${randomUUID()}`,
+    userId: user.id,
+    token: `org-test-${user.id}`,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   return user;
 }
 async function organization(ownerId: string) {
@@ -309,6 +316,7 @@ it("filters effective admin/delegated access and reflects existing role commands
     reader.id,
     { role: "developer", managesServers: true },
     audit(owner.id, org.id),
+    `org-test-${owner.id}`,
   );
   expect(
     (
@@ -339,6 +347,7 @@ it("filters effective admin/delegated access and reflects existing role commands
       admin.id,
       null,
       audit(reader.id, org.id),
+      `org-test-${reader.id}`,
     ),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   await expect(
@@ -349,6 +358,7 @@ it("filters effective admin/delegated access and reflects existing role commands
       reader.id,
       null,
       audit(owner.id, org.id),
+      `org-test-${owner.id}`,
     ),
   ).rejects.toMatchObject({ code: "CONFLICT" });
   const notice = await db
@@ -377,6 +387,7 @@ it("honors current ownership and membership revocation and retains the prior dir
       next.id,
       { role: "admin", managesServers: true },
       duplicate,
+      `org-test-${owner.id}`,
     ),
   ).rejects.toThrow();
   expect(

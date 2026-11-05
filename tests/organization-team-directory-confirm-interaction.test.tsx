@@ -176,6 +176,7 @@ it("confirms member removal before DELETE", async () => {
     "DELETE",
     { expectedUpdatedAt: organization.updatedAt },
     expect.any(AbortSignal),
+    { "x-nexus-actor-id": actorId },
   );
 });
 

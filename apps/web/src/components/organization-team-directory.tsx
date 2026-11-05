@@ -71,6 +71,7 @@ export function OrganizationTeamDirectory({
         fields ? "PATCH" : "DELETE",
         { expectedUpdatedAt: data.organization.updatedAt, ...(fields ?? {}) },
         request.signal,
+        { "x-nexus-actor-id": actorId },
       );
       const committed = confirmsOrganizationMemberMutation(result, data.organization, {
         userId: member.id,
@@ -92,6 +93,7 @@ export function OrganizationTeamDirectory({
           "GET",
           undefined,
           request.signal,
+          { "x-nexus-actor-id": actorId },
         ),
       );
       if (!refreshed.success || refreshed.data.organization.id !== data.organization.id)
@@ -178,6 +180,7 @@ export function OrganizationTeamDirectory({
                 "GET",
                 undefined,
                 signal,
+                { "x-nexus-actor-id": actorId },
               ),
             );
             if (

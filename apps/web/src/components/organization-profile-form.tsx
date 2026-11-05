@@ -330,6 +330,10 @@ export function OrganizationProfileForm({
         await platformRequest(
           `/api/workspace/organizations/${encodeURIComponent(base.id)}`,
           locale,
+          "GET",
+          undefined,
+          undefined,
+          { "x-nexus-actor-id": actorId },
         ),
       );
       if (

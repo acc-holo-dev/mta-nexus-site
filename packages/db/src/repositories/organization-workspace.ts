@@ -500,6 +500,7 @@ class OrganizationWorkspaceRepository {
     managesServers: boolean,
     memberId: string,
     audit: Audit,
+    token: string,
   ) {
     return db.transaction(async (tx) => {
       const current = await writable(tx, id, actorId, expected);
@@ -514,6 +515,13 @@ class OrganizationWorkspaceRepository {
       if (!target) throw new AppError("User not found", 404, "MEMBER_NOT_FOUND");
       if (target.id === current.organization.ownerId)
         throw new AppError("Owner is protected", 403, "MEMBER_PROTECTED");
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+      await lockInitiatingSession(tx, actorId, token);
       const inserted = await tx
         .insert(organizationMembers)
         .values({
@@ -530,17 +538,25 @@ class OrganizationWorkspaceRepository {
       if (!inserted.length) throw new AppError("Already a member", 409, "MEMBER_EXISTS");
       const organization = await record(tx, id, audit, { userId: target.id, role, managesServers });
       await storeOrganizationAccessNotice(tx, organization, target.id, "added", audit.id);
+      await lockInitiatingSession(tx, actorId, token);
       return { organization, member: { ...target, role, managesServers } };
     });
   }
 
-  async leave(id: string, actorId: string, expected: Date, audit: Audit) {
+  async leave(id: string, actorId: string, expected: Date, audit: Audit, token: string) {
     return db.transaction(async (tx) => {
       const current = await organizationWorkspaceAccess(tx, id, actorId, true);
       if (current.organization.ownerId === actorId)
         throw new AppError("Owner is protected", 403, "MEMBER_PROTECTED");
       if (current.organization.updatedAt.getTime() !== expected.getTime())
         throw new AppError("Organization changed", 409, "CONFLICT");
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+      await lockInitiatingSession(tx, actorId, token);
       const removed = await tx
         .delete(organizationMembers)
         .where(
@@ -550,6 +566,7 @@ class OrganizationWorkspaceRepository {
       if (!removed.length) throw new AppError("Member not found", 404, "MEMBER_NOT_FOUND");
       const organization = await record(tx, id, audit, { userId: actorId, from: current.role });
       await storeOrganizationAccessNotice(tx, organization, actorId, "left", audit.id);
+      await lockInitiatingSession(tx, actorId, token);
       return { organization, userId: actorId, removed: true };
     });
   }
@@ -561,6 +578,7 @@ class OrganizationWorkspaceRepository {
     userId: string,
     fields: { role: OrganizationTeamRole; managesServers: boolean } | null,
     audit: Audit,
+    token: string,
   ) {
     return db.transaction(async (tx) => {
       const current = await writable(tx, id, actorId, expected);
@@ -587,6 +605,13 @@ class OrganizationWorkspaceRepository {
         )
       )
         throw new AppError("Role is protected", 403, "MEMBER_PROTECTED");
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+      await lockInitiatingSession(tx, actorId, token);
       if (fields)
         await tx
           .update(organizationMembers)
@@ -609,6 +634,7 @@ class OrganizationWorkspaceRepository {
         fields ? "updated" : "removed",
         audit.id,
       );
+      await lockInitiatingSession(tx, actorId, token);
       return {
         organization,
         userId,

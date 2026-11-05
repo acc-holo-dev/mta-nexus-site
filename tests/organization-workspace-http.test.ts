@@ -174,6 +174,32 @@ it("passes immutable profile identity and an optimistic revision to the write pa
     ).status,
   ).toBe(400);
 });
+it("rejects a changed actor before team mutations and private workspace refresh", async () => {
+  const other = { "x-nexus-actor-id": "other" };
+  expect(
+    (
+      await add(
+        request(
+          "POST",
+          { username: "member", role: "member", managesServers: false, expectedUpdatedAt: version },
+          "en",
+          other,
+        ),
+        context,
+      )
+    ).status,
+  ).toBe(409);
+  expect(
+    (await remove(request("DELETE", { expectedUpdatedAt: version }, "en", other), context)).status,
+  ).toBe(409);
+  expect(
+    (await leave(request("POST", { expectedUpdatedAt: version }, "en", other), context)).status,
+  ).toBe(409);
+  expect((await workspace(request("GET", undefined, "en", other), context)).status).toBe(409);
+  expect(mocks.addMember).not.toHaveBeenCalled();
+  expect(mocks.changeMember).not.toHaveBeenCalled();
+  expect(mocks.leave).not.toHaveBeenCalled();
+});
 it("adds a bounded exact username and delegated server permission", async () => {
   expect(
     (
@@ -197,6 +223,7 @@ it("adds a bounded exact username and delegated server permission", async () => 
     true,
     "mem_new",
     expect.objectContaining({ action: "organization.member_added" }),
+    "test",
   );
 });
 it("requires a revision for member changes and deletion", async () => {
@@ -218,6 +245,7 @@ it("requires a revision for member changes and deletion", async () => {
     "member",
     null,
     expect.objectContaining({ action: "organization.member_removed" }),
+    "test",
   );
   expect((await remove(request("DELETE", {}), context)).status).toBe(400);
 });
@@ -268,6 +296,7 @@ it("scopes voluntary exit to the session user and a required revision", async ()
     "owner",
     new Date(version),
     expect.objectContaining({ action: "organization.member_left" }),
+    "test",
   );
   expect(
     (await leave(request("POST", { expectedUpdatedAt: version, userId: "victim" }), context))

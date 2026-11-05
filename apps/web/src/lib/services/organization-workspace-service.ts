@@ -122,7 +122,7 @@ class OrganizationWorkspaceService {
       ),
     );
   }
-  async add(id: string, input: unknown, user: User) {
+  async add(id: string, input: unknown, user: User, token: string) {
     const fields = parse(memberAddSchema, input);
     const result = await organizationWorkspaceRepository.addMember(
       id,
@@ -133,6 +133,7 @@ class OrganizationWorkspaceService {
       fields.managesServers,
       generateId("mem"),
       audit(user, id, "organization.member_added"),
+      token,
     );
     return {
       ...result,
@@ -140,18 +141,26 @@ class OrganizationWorkspaceService {
       member: { ...result.member, avatarUrl: safeExternalWebUrl(result.member.avatarUrl) ?? null },
     };
   }
-  async leave(id: string, input: unknown, user: User) {
+  async leave(id: string, input: unknown, user: User, token: string) {
     const { expectedUpdatedAt } = parse(memberRemoveSchema, input);
     const result = await organizationWorkspaceRepository.leave(
       id,
       user.id,
       new Date(expectedUpdatedAt),
       audit(user, id, "organization.member_left"),
+      token,
     );
     return { ...result, organization: editableOrganization(result.organization) };
   }
 
-  async change(id: string, userId: string, input: unknown, user: User, remove = false) {
+  async change(
+    id: string,
+    userId: string,
+    input: unknown,
+    user: User,
+    remove: boolean,
+    token: string,
+  ) {
     const fields = remove ? null : parse(memberUpdateSchema, input);
     const expectedUpdatedAt =
       fields?.expectedUpdatedAt ?? parse(memberRemoveSchema, input).expectedUpdatedAt;
@@ -162,6 +171,7 @@ class OrganizationWorkspaceService {
       userId,
       fields ? { role: fields.role, managesServers: fields.managesServers } : null,
       audit(user, id, remove ? "organization.member_removed" : "organization.member_updated"),
+      token,
     );
     return { ...result, organization: editableOrganization(result.organization) };
   }

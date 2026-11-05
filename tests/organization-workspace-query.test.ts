@@ -27,6 +27,18 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+vi.mock("../packages/db/src/repositories/initiating-session", async (original) => {
+  const actual =
+    await original<typeof import("../packages/db/src/repositories/initiating-session")>();
+  return {
+    lockInitiatingSession: (
+      tx: Parameters<typeof actual.lockInitiatingSession>[0],
+      actor: string,
+      token: string,
+    ) =>
+      token === "unit-token" ? Promise.resolve() : actual.lockInitiatingSession(tx, actor, token),
+  };
+});
 vi.mock("../packages/db/src/repositories/organization-access-notice", () => ({
   storeOrganizationAccessNotice: vi.fn(),
 }));
@@ -136,14 +148,14 @@ it("denies developer profile writes after reading live role", async () => {
 it("protects owner removal regardless of membership records", async () => {
   state.rows = [[orgRow()], []];
   await expect(
-    repository.changeMember("org", "owner", version, "owner", null, audit),
+    repository.changeMember("org", "owner", version, "owner", null, audit, "unit-token"),
   ).rejects.toMatchObject({ code: "MEMBER_PROTECTED" });
   expect(state.queries.some((q) => q.sql.startsWith("delete"))).toBe(false);
 });
 it("prevents administrators from promoting peers or removing administrators", async () => {
   state.rows = [[orgRow()], [["admin"]], [memberRow({ role: "admin" })]];
   await expect(
-    repository.changeMember("org", "administrator", version, "target", null, audit),
+    repository.changeMember("org", "administrator", version, "target", null, audit, "unit-token"),
   ).rejects.toMatchObject({ code: "MEMBER_PROTECTED" });
   expect(state.queries).toHaveLength(3);
 });
@@ -151,6 +163,7 @@ it("retains commercial/custom permissions during a server permission change", as
   state.rows = [
     [orgRow()],
     [memberRow()],
+    [["owner"]],
     [],
     [orgRow({ updatedAt: new Date(version.getTime() + 1).toISOString() })],
     [],
@@ -162,25 +175,46 @@ it("retains commercial/custom permissions during a server permission change", as
     "target",
     { role: "member", managesServers: false },
     audit,
+    "unit-token",
   );
   expect(result).toMatchObject({ userId: "target", role: "member", managesServers: false });
   expect(state.queries[1].sql).toContain("for update");
-  expect(state.queries[2].params).toContain(JSON.stringify(["manage_products", "custom"]));
+  expect(state.queries[3].params).toContain(JSON.stringify(["manage_products", "custom"]));
   expect(state.queries.at(-1)?.sql).toContain('insert into "audit_events"');
 });
 it("rejects duplicate member creation without revision/audit writes", async () => {
-  state.rows = [[orgRow()], [["target", "target", "Target", null]], []];
+  state.rows = [[orgRow()], [["target", "target", "Target", null]], [["owner"]], []];
   await expect(
-    repository.addMember("org", "owner", version, "target", "member", false, "mem", audit),
+    repository.addMember(
+      "org",
+      "owner",
+      version,
+      "target",
+      "member",
+      false,
+      "mem",
+      audit,
+      "unit-token",
+    ),
   ).rejects.toMatchObject({ code: "MEMBER_EXISTS" });
   expect(state.queries[1].sql).toContain("for share");
-  expect(state.queries[2].sql).toContain("on conflict");
-  expect(state.queries).toHaveLength(3);
+  expect(state.queries[3].sql).toContain("on conflict");
+  expect(state.queries).toHaveLength(4);
 });
 it("does not look up an account before rejecting an unauthorized administrator grant", async () => {
   state.rows = [[orgRow()], [["admin"]]];
   await expect(
-    repository.addMember("org", "admin", version, "target", "admin", false, "mem", audit),
+    repository.addMember(
+      "org",
+      "admin",
+      version,
+      "target",
+      "admin",
+      false,
+      "mem",
+      audit,
+      "unit-token",
+    ),
   ).rejects.toMatchObject({ code: "MEMBER_PROTECTED" });
   expect(state.queries).toHaveLength(2);
 });
@@ -215,25 +249,34 @@ it("lets a regular member revoke only their own membership under the organizatio
     [orgRow()],
     [["member"]],
     [["actor"]],
+    [["actor"]],
     [orgRow({ updatedAt: new Date(version.getTime() + 1).toISOString() })],
     [],
   ];
-  const result = await repository.leave("org", "actor", version, { ...audit, actorId: "actor" });
+  const result = await repository.leave(
+    "org",
+    "actor",
+    version,
+    { ...audit, actorId: "actor" },
+    "unit-token",
+  );
   expect(result).toMatchObject({ userId: "actor", removed: true });
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries[1].sql).toContain("for share");
-  expect(state.queries[2].params).toEqual(["org", "actor"]);
-  expect(state.queries[2].sql).toContain('delete from "organization_members"');
+  expect(state.queries[3].params).toEqual(["org", "actor"]);
+  expect(state.queries[3].sql).toContain('delete from "organization_members"');
 });
 it("prevents the owner from leaving and rejects stale voluntary exits", async () => {
   state.rows = [[orgRow()]];
-  await expect(repository.leave("org", "owner", version, audit)).rejects.toMatchObject({
+  await expect(
+    repository.leave("org", "owner", version, audit, "unit-token"),
+  ).rejects.toMatchObject({
     code: "MEMBER_PROTECTED",
   });
   state.queries = [];
   state.rows = [[orgRow()], [["developer"]]];
   await expect(
-    repository.leave("org", "actor", new Date(version.getTime() - 1), audit),
+    repository.leave("org", "actor", new Date(version.getTime() - 1), audit, "unit-token"),
   ).rejects.toMatchObject({ code: "CONFLICT" });
   expect(state.queries).toHaveLength(2);
 });

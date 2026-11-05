@@ -4,12 +4,14 @@ import {
   organizationApi,
   organizationId,
   organizationInput,
+  organizationMutationToken,
 } from "../../../../../../../lib/organization-workspace-api";
 import { organizationWorkspaceService } from "../../../../../../../lib/services/organization-workspace-service";
 
 type Context = { params: Promise<{ id: string; userId: string }> };
 function mutation(request: NextRequest, context: Context, remove: boolean) {
   return organizationApi(request, async (user) => {
+    const token = organizationMutationToken(request, user);
     const { id, userId } = await context.params;
     return organizationWorkspaceService.change(
       organizationId(id),
@@ -17,6 +19,7 @@ function mutation(request: NextRequest, context: Context, remove: boolean) {
       await organizationInput(request, user),
       user,
       remove,
+      token,
     );
   });
 }

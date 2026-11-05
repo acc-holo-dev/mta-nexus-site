@@ -164,6 +164,8 @@ it("confirms leaving an organization before POST", async () => {
     "en",
     "POST",
     { expectedUpdatedAt: organization.updatedAt },
+    undefined,
+    { "x-nexus-actor-id": "usr_member" },
   );
   expect(harness.push).toHaveBeenCalledWith("/workspace/organizations");
   expect(harness.refresh).toHaveBeenCalledOnce();

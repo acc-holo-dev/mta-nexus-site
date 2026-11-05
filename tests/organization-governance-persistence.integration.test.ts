@@ -112,6 +112,7 @@ async function fixture(role: "member" | "admin" = "member") {
     true,
     `mem_${randomUUID()}`,
     audit(owner, id, "organization.member_added"),
+    currentToken,
   );
   return { owner, target, currentToken, expectedPasswordHash, org: added.organization };
 }
@@ -209,6 +210,7 @@ it("denies administrator takeover and rejects a removed recipient or changed tea
     f.target.id,
     null,
     audit(f.owner, f.org.id, "organization.member_removed"),
+    f.currentToken,
   );
   await expect(transfer(f)).rejects.toMatchObject({ code: "CONFLICT" });
   const fresh = (await teams.getWorkspace(f.org.id, f.owner.id)).organization;
@@ -303,6 +305,7 @@ it("rejects history after administrator access is revoked and keeps removed-acce
     f.target.id,
     null,
     audit(f.owner, f.org.id, "organization.member_removed"),
+    f.currentToken,
   );
   await expect(governance.history(f.org.id, f.target.id)).rejects.toMatchObject({
     code: "FORBIDDEN",

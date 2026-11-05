@@ -4,6 +4,7 @@ import {
   organizationApi,
   organizationId,
   organizationInput,
+  organizationCheckReadActor,
 } from "../../../../../lib/organization-workspace-api";
 import { parseOrganizationPage } from "../../../../../lib/organization-workspace-contract";
 import { organizationWorkspaceService } from "../../../../../lib/services/organization-workspace-service";
@@ -11,6 +12,7 @@ import { organizationWorkspaceService } from "../../../../../lib/services/organi
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {
   return organizationApi(request, async (user) => {
+    organizationCheckReadActor(request, user);
     const { id } = await context.params;
     const filters = parseOrganizationPage(request.nextUrl.searchParams);
     return organizationWorkspaceService.get(organizationId(id), user, filters.page, filters.query);

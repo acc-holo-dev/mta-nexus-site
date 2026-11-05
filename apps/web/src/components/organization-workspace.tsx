@@ -77,10 +77,17 @@ export function OrganizationWorkspacePanel({
     setError("");
     setMessage("");
     try {
-      const result = await platformRequest(path + suffix, locale, method, {
-        ...fields,
-        expectedUpdatedAt: data.organization.updatedAt,
-      });
+      const result = await platformRequest(
+        path + suffix,
+        locale,
+        method,
+        {
+          ...fields,
+          expectedUpdatedAt: data.organization.updatedAt,
+        },
+        undefined,
+        { "x-nexus-actor-id": actorId },
+      );
       const committed = confirmsOrganizationMemberMutation(
         result,
         data.organization,
@@ -94,7 +101,9 @@ export function OrganizationWorkspacePanel({
       const filters = new URLSearchParams({ page: String(data.page), q: query });
       try {
         const refreshed = organizationWorkspaceSchema.safeParse(
-          await platformRequest(`${path}?${filters}`, locale),
+          await platformRequest(`${path}?${filters}`, locale, "GET", undefined, undefined, {
+            "x-nexus-actor-id": actorId,
+          }),
         );
         if (!refreshed.success || refreshed.data.organization.id !== data.organization.id)
           throw new Error(copy.unavailable);
@@ -129,9 +138,16 @@ export function OrganizationWorkspacePanel({
     setBusy(true);
     setError("");
     try {
-      const result = await platformRequest(`${path}/leave`, locale, "POST", {
-        expectedUpdatedAt: data.organization.updatedAt,
-      });
+      const result = await platformRequest(
+        `${path}/leave`,
+        locale,
+        "POST",
+        {
+          expectedUpdatedAt: data.organization.updatedAt,
+        },
+        undefined,
+        { "x-nexus-actor-id": actorId },
+      );
       const organization = editableOrganizationSchema.safeParse(result.organization);
       if (
         !organization.success ||
