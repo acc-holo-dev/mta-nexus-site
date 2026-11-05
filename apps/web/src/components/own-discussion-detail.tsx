@@ -1,4 +1,5 @@
 "use client";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { OwnDiscussion } from "../lib/discussion-workspace-contract";
@@ -37,7 +38,9 @@ export function OwnDiscussionDetail({
       <h1 className="min-w-0 break-words text-xl font-bold text-primary">
         {comment.title ?? copy.hidden}
       </h1>
-      {!comment.available && <p className="text-sm text-muted">{copy.hiddenNote}</p>}
+      {!comment.available ? (
+        <ErrorState id="own-discussion-publication-unavailable" title={copy.hiddenNote} />
+      ) : null}
       {!comment.editable && <p className="text-sm text-muted">{copy.readOnly}</p>}
       <time dateTime={comment.createdAt} className="text-xs text-muted">
         {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

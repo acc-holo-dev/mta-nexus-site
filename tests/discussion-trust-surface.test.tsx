@@ -102,6 +102,8 @@ it.each(["en", "ru"] as const)(
       copy = ownDiscussionCopy(locale),
       actions = getDiscussionCopy(locale);
     expect(html).toContain(copy.hiddenNote);
+    expect(html).toContain('id="own-discussion-publication-unavailable"');
+    expect(html).toContain('role="alert"');
     expect(html).toContain(copy.readOnly);
     expect(html).toContain(actions.remove);
     expect(html).not.toContain(`>${actions.edit}</button>`);
