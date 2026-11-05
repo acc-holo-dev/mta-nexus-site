@@ -69,7 +69,7 @@ export function licenseControlHttpRequest(
   });
 }
 
-export function resetLicenseControlHttpState() {
+function resetLicenseControlHttpState() {
   licenseControlHttpState.user = { id: "usr_a", role: "user" };
   licenseControlHttpState.allowed = true;
   for (const mock of [
