@@ -1,5 +1,6 @@
 import { AppError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import { History } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -208,23 +209,29 @@ export async function ResourceBuildScreen({
       )}
       <section className="space-y-3">
         <h2 className="text-xl text-primary">{copy.history}</h2>
-        {history.length === 0 && <p className="text-secondary">{copy.noHistory}</p>}
-        <ol className="space-y-3">
-          {history.map((event) => (
-            <li key={event.id} className="rounded-lg border border-base p-4">
-              <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
-              {event.reason && (
-                <p className="whitespace-pre-wrap break-words text-secondary">{event.reason}</p>
-              )}
-              <time
-                dateTime={new Date(event.createdAt).toISOString()}
-                className="text-sm text-muted"
-              >
-                {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
-              </time>
-            </li>
-          ))}
-        </ol>
+        {history.length === 0 ? (
+          <EmptyState
+            title={copy.noHistory}
+            icon={<History className="h-6 w-6" aria-hidden="true" />}
+          />
+        ) : (
+          <ol className="space-y-3">
+            {history.map((event) => (
+              <li key={event.id} className="rounded-lg border border-base p-4">
+                <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
+                {event.reason && (
+                  <p className="whitespace-pre-wrap break-words text-secondary">{event.reason}</p>
+                )}
+                <time
+                  dateTime={new Date(event.createdAt).toISOString()}
+                  className="text-sm text-muted"
+                >
+                  {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
+                </time>
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
     </div>
   );
