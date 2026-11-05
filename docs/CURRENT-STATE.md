@@ -6,6 +6,11 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `bb33df83` / #333 — content reaction alerts through ErrorState;
+- `f38d469c` / #332 — public profile notice errors through ErrorState;
+- `cdb4b406` / #331 — connect and root error CTAs touch size;
+- `d7ddb2fb` / #334 — resource build uncertain messages through ErrorState;
+- `5163f05a` / #340 — tip honesty through #330;
 - `4a7cd4ec` / #330 — commercial plan recovery confirm cancel coverage;
 - `4512a34b` / #328 — admin license moderation filter search landmark;
 - `9b11f68c` / #336 — tracker honesty rebuild for landed FLOW/UX/OPS defaults;
@@ -52,7 +57,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `4a7cd4ecf94b13e5d82b319f3b3cb5510d2faae0` / #330 after #328 landmark and #336/#337 docs. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `bb33df83` / #333 after #331–#334 ErrorState/touch wave. Tip CI may cancel under rapid merges; format:check may still be red until tracker artifact format lands. Do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
@@ -101,7 +106,7 @@
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #330 в tip `origin/main`. CI на этом SHA не означает production readiness.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #333 в tip `origin/main`. CI на этом SHA не означает production readiness.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
