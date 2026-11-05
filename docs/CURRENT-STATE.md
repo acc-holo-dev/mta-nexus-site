@@ -6,6 +6,9 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `bc55b14e` / #377 — support-actor-binding interaction suite split;
+- `c0bac986` / #374 — report/quarantine confirm cancel harden;
+- `2358e102` / #388 — tip honesty through #387;
 - `a5be8975` / #387 — tip honesty through #385/#371/#359;
 - `4f6a3bd4` / #385 — tip honesty through #383;
 - `3d9d922c` / #371 — residual library filter search landmarks;
@@ -92,7 +95,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `a5be8975f990091e08ceb2d054150bfa68e0c6d7` / #387 tip honesty after EmptyState/landmarks wave. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `bc55b14eb37f026ccab87a71e0c01681e8615a76` after #377/#374. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
