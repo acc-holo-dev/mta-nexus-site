@@ -185,7 +185,9 @@ export function ResourceReleaseWatchBatchControls({
       <h2>{title}</h2>
       <p className="text-sm text-secondary">{note}</p>
       <p className="text-xs text-muted">{copy.batchLimit}</p>
-      {enabling && capacity === 0 && <p role="note">{copy.maximum}</p>}
+      {enabling && capacity === 0 ? (
+        <ErrorState id="resource-release-watch-batch-maximum" title={copy.maximum} />
+      ) : null}
       {enabling && skipped.length > 0 ? (
         <div className="space-y-2" role="note">
           <p className="text-sm text-muted">{copy.skippedNote}</p>
