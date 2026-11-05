@@ -6,6 +6,8 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `95e0756e` / #347 — tip honesty through #333 (format debt noted);
+- `5297b6ab` / #346 — biome-format tracker honesty artifacts;
 - `bb33df83` / #333 — content reaction alerts through ErrorState;
 - `f38d469c` / #332 — public profile notice errors through ErrorState;
 - `cdb4b406` / #331 — connect and root error CTAs touch size;
@@ -57,7 +59,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `bb33df83` / #333 after #331–#334 ErrorState/touch wave. Tip CI may cancel under rapid merges; format:check may still be red until tracker artifact format lands. Do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `95e0756e` / #347 after #346 tracker format fix and #331–#334 ErrorState/touch wave. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
