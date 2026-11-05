@@ -56,7 +56,7 @@ export function ServerClaimStatusPanel({
                 </p>
               )}
               {!status.isVerified && !request.proofMatchesServer ? (
-                <ErrorState title={copy.outdated} />
+                <ErrorState id="server-claim-outdated" title={copy.outdated} />
               ) : null}
               {!status.isVerified && (
                 <p className="text-xs leading-relaxed text-muted">
