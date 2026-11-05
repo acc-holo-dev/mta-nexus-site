@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `0631e737` — tip advanced after tip honesty (#804) for a915472e after #793; tip CI not claimed verified-green under rapid merges;
 - `a915472e` — tip advanced after web-push-admission suite split (#793) following tip honesty (#800) on e8041e9d; tip CI not claimed verified-green under rapid merges;
 - `e8041e9d` — tip advanced after public-user-trust-hidden ErrorState honesty (#788) following tip honesty (#798) on 878bf100; tip CI not claimed verified-green under rapid merges;
 - `878bf100` — tip advanced after tip honesty (#797) for f4a44484; tip CI not claimed verified-green under rapid merges;
