@@ -220,11 +220,17 @@ export function LibraryMembershipBatchForm({
                   {cannotAdd ? (
                     <ErrorState id="library-membership-cannot-add" title={h.cannotAdd} />
                   ) : null}
-                  {readOnly && (
-                    <p className="text-xs text-muted">
-                      {collection.status === "archived" ? c.archivedNote : c.revisionLocked}
-                    </p>
-                  )}
+                  {readOnly &&
+                    (collection.status === "archived" ? (
+                      <p role="note" className="text-xs text-muted">
+                        {c.archivedNote}
+                      </p>
+                    ) : (
+                      <ErrorState
+                        id="library-membership-revision-locked"
+                        title={c.revisionLocked}
+                      />
+                    ))}
                 </li>
               );
             })}
