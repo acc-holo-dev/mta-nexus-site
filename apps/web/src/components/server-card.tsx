@@ -1,7 +1,7 @@
 "use client";
 
 import type { Server } from "@nexus/domain";
-import { Button, TrustBadge } from "@nexus/ui";
+import { Button, ErrorState, TrustBadge } from "@nexus/ui";
 import { Copy, Gamepad2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -74,9 +74,13 @@ function CopyAddressControl({
         <Copy className="h-3.5 w-3.5" aria-hidden="true" />
         {copying ? copy.copying : copy.copyAddress}
       </Button>
-      <p role="status" className="text-[11px] text-secondary [overflow-wrap:anywhere]">
-        {copyMessage}
-      </p>
+      {copyMessage === copy.copyUnavailable ? (
+        <ErrorState id="server-card-copy-unavailable" title={copy.copyUnavailable} />
+      ) : copyMessage ? (
+        <p role="status" className="text-[11px] text-secondary [overflow-wrap:anywhere]">
+          {copyMessage}
+        </p>
+      ) : null}
     </div>
   );
 }
