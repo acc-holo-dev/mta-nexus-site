@@ -231,7 +231,7 @@ export function ResourceCompatibilityForm({
           <p id={`${field}-hint`} className="text-xs text-muted">
             {copy.dependencyHint}
           </p>
-          {product.suspended && <p className="text-warning">{copy.errors.PRODUCT_STATE_CHANGED}</p>}
+          {product.suspended ? <ErrorState title={copy.errors.PRODUCT_STATE_CHANGED} /> : null}
           <Button type="submit" isLoading={busy} disabled={disabled} className="min-h-11">
             {busy ? copy.working : copy.save}
           </Button>
