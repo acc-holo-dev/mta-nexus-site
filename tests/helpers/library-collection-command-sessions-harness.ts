@@ -164,7 +164,6 @@ export async function fixture() {
   };
 }
 
-export type LibraryCollectionCommandSessionsFixture = Awaited<ReturnType<typeof fixture>>;
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 

@@ -4,7 +4,10 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(join(root, "apps/web/src/app/admin/support/layout.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "apps/web/src/app/admin/support/layout.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: admin support access-denied muted copy → ErrorState. */
 it("locks admin support access denied to ErrorState with home recovery", () => {
