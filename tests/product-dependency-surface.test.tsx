@@ -1,10 +1,10 @@
+import { buildResourceVersionHelp, splitInstructionPlainText } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
-import { buildResourceVersionHelp, splitInstructionPlainText } from "@nexus/domain";
-import { buildProductDependencyResolution } from "../apps/web/src/lib/product-dependency-resolution";
 import { ProductDependencyList } from "../apps/web/src/components/product-dependency-list";
 import { ResourceVersionHelpSection } from "../apps/web/src/components/resource-version-help-section";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+import { buildProductDependencyResolution } from "../apps/web/src/lib/product-dependency-resolution";
 
 const mocks = vi.hoisted(() => ({
   findPublishedFreeBySlugs: vi.fn(),
@@ -141,8 +141,11 @@ describe("resource dependency resolution behavior", () => {
         locale="en"
       />,
     );
-    expect(unavailable).toContain("core-ui, missing-pack");
     expect(unavailable).toContain(copy.resolutionUnavailable);
+    expect(unavailable).toContain('role="alert"');
+    expect(unavailable).toContain("bg-danger-soft");
+    expect(unavailable).not.toContain("core-ui, missing-pack");
+    expect(unavailable).not.toContain('class="text-[10px] text-warning"');
 
     const empty = renderToStaticMarkup(
       <ProductDependencyList declared={[]} resolution={null} locale="en" />,

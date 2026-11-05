@@ -1,3 +1,4 @@
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
 import type { ProductDependencyResolution } from "../lib/product-dependency-resolution";
@@ -18,12 +19,7 @@ export function ProductDependencyList({
   }
 
   if (!resolution) {
-    return (
-      <div className="space-y-1 text-right">
-        <div className="font-mono text-secondary">{declared.join(", ")}</div>
-        <div className="text-[10px] text-warning">{copy.resolutionUnavailable}</div>
-      </div>
-    );
+    return <ErrorState title={copy.resolutionUnavailable} />;
   }
 
   return (
