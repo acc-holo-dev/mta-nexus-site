@@ -550,7 +550,9 @@ export function ServerDetailsForm({
       {foreignActor && notice?.error && <ErrorState title={notice.text} />}
       {needsCheck && !foreignActor && (
         <div className="space-y-2">
-          {!lastSavedAt && <p className="text-sm text-muted">{copy.missingRevision}</p>}
+          {!lastSavedAt ? (
+            <ErrorState id="server-details-missing-revision" title={copy.missingRevision} />
+          ) : null}
           <Button
             type="button"
             variant="outline"
