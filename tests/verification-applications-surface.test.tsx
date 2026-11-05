@@ -131,6 +131,8 @@ it.each(["approved", "rejected", "server"])(
     const html = renderToStaticMarkup(await Detail(params));
     expect(html).not.toContain("<form");
     expect(html).toContain(verificationApplicationsCopy("en").readOnly);
+    expect(html).toContain('id="verification-application-readonly"');
+    expect(html).toContain('role="alert"');
   },
 );
 it("rejects duplicate filters and does not read private data without a session", async () => {
