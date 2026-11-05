@@ -7,7 +7,7 @@
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
 - `b632098f` — tip advanced after new-resource unknown ErrorState (#523) and suite-split/confirm residual merges (#503/#504/#516/#521); tip CI not claimed verified-green under rapid merges;
-- residual honesty/confirm/split remotes still awaiting PR open under ManagePullRequest rate limit (community-topic, moderation-blocked, library restore/remove, QA unfollow, account-challenges, eligibility ErrorStates);
+- residual honesty/confirm/split PRs opened for community-topic, moderation-blocked, library restore/remove, QA unfollow, account-challenges, eligibility ErrorStates, and moderated-discussion remove cancel;
 - `724d05ee` / #499 — build-package legacy/no-baseline ErrorState;
 - `013e12a6` / #498 — resource-build withdrawn ErrorState;
 - `10ff59ba` / #502 — build-package-evidence ErrorState truncated references;
