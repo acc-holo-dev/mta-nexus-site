@@ -187,11 +187,14 @@ export function ResourceCompatibilityForm({
   return (
     <form onSubmit={submit} aria-busy={busy} className="nexus-panel space-y-4 p-5">
       <p className="text-sm text-secondary">{copy.compatibilityNote}</p>
-      <p className="text-sm text-secondary">
-        {product.suspended
-          ? getResourcePublisherCopy(locale).readonly
-          : getResourcePublisherCopy(locale).editNote}
-      </p>
+      {product.suspended ? (
+        <ErrorState
+          id="resource-compatibility-suspended-readonly"
+          title={getResourcePublisherCopy(locale).readonly}
+        />
+      ) : (
+        <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
+      )}
       {!foreignActor && identityVerified && (
         <>
           <Input
