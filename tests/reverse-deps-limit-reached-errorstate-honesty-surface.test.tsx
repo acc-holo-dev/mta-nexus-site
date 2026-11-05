@@ -26,9 +26,7 @@ it("locks reverse-dependency limitReached to ErrorState without soft warning", (
   expect(source).toContain(
     '<ErrorState id="reverse-deps-limit-reached" title={copy.limitReached} />',
   );
-  expect(source).not.toContain(
-    '<p className="text-[10px] text-warning">{copy.limitReached}</p>',
-  );
+  expect(source).not.toContain('<p className="text-[10px] text-warning">{copy.limitReached}</p>');
   expect(source).not.toMatch(/limitReached[\s\S]{0,120}action=/u);
 });
 
