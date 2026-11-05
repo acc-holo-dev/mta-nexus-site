@@ -179,15 +179,47 @@ it("confirms build reject before posting the admin action", async () => {
   expect(harness.refresh).toHaveBeenCalledOnce();
 });
 
-it("skips approve and reject when confirmation is cancelled", async () => {
+it("does not approve a build when confirmation is cancelled", async () => {
   const copy = getDictionary("en").admin;
-  confirmAction.mockResolvedValue(false);
+  const labels = verificationCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
 
   (actionButton(render(), copy.approve).props.onClick as () => void)();
-  seedControls();
-  (actionButton(render(), copy.reject).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
 
-  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(2));
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.approve,
+    object: buildId,
+    consequences: copy.approveBuildConfirm,
+    confirmLabel: copy.approve,
+    cancelLabel: labels.cancel,
+    closeLabel: labels.cancel,
+    danger: false,
+  });
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(harness.refresh).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
+});
+
+it("does not reject a build when confirmation is cancelled", async () => {
+  const copy = getDictionary("en").admin;
+  const labels = verificationCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
+
+  (actionButton(render(), copy.reject).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
+
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.reject,
+    object: buildId,
+    consequences: copy.rejectBuildConfirm,
+    confirmLabel: copy.reject,
+    cancelLabel: labels.cancel,
+    closeLabel: labels.cancel,
+  });
+  expect(harness.fetch).not.toHaveBeenCalled();
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
 });
