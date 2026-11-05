@@ -1079,7 +1079,9 @@ beta, authorize production deployment, or activate paid marketplace/DRM.
    (backup-restore and release-upgrade artifacts are published only when
    `plan.outputs.full=true`; retention is 14 days).
 2. On a clean checkout of that SHA run `pnpm beta:fetch` (or
-   `pnpm beta:fetch <sha>`). It uses `gh` to download retained
+   `pnpm beta:fetch <sha>`). A 7–64 character hexadecimal prefix must resolve
+   to one local commit; missing or ambiguous commits are refused before contacting
+   GitHub. The resolved full SHA is used to find the CI run. It uses `gh` to download retained
    `ci-evidence-<sha>`, `release-upgrade-<sha>-<attempt>`, and
    `backup-restore-<sha>-<attempt>` into local `artifacts/ci-evidence.json`,
    `artifacts/release-upgrade.json`, and `artifacts/backup-restore-evidence.json`.

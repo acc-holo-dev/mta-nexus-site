@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { PlanReviewTerms } from "../../../components/plan-review-terms";
 import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { SubscriptionControls } from "../../../components/subscription-controls";
+import { SubscriptionRecovery } from "../../../components/subscription-recovery";
 import { SubscriptionFeeEstimator } from "../../../components/subscription-fee-estimator";
 import { subscriptionNavLinkClass } from "../../../components/subscription-workspace-recovery";
 import { getDictionary } from "../../../lib/i18n";
@@ -62,6 +63,7 @@ export default async function SubscriptionAccountPage({
     return (
       <section className={pageShellClass}>
         <h1 className="font-display">{c.title}</h1>
+        <SubscriptionRecovery key={actor.id} actorId={actor.id} />
         <nav className="flex flex-wrap gap-4">
           <Link href="/subscriptions" className={subscriptionNavLinkClass}>
             {c.catalog}
@@ -137,6 +139,7 @@ export default async function SubscriptionAccountPage({
             {s.status === "expired" && <p role="note">{c.expiredNote}</p>}
             {s.status === "active" && (
               <SubscriptionControls
+                key={`${actor.id}:${s.id}`}
                 action="cancel"
                 actorId={actor.id}
                 planId={s.planId}

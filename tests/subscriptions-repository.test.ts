@@ -102,6 +102,7 @@ it("activates with stable request/account locks and database-generated terms and
     [grantValues()],
     [receiptValues()],
     [],
+    sessionRow(),
   ];
   const result = await repo.command("usr_a", activation, currentToken);
   expect(result.replayed).toBe(false);
@@ -195,6 +196,7 @@ it("retires an expired row before creating a new period and records expiry atomi
     [grantValues()],
     [receiptValues()],
     [],
+    sessionRow(),
   ];
   expect((await repo.command("usr_a", activation, currentToken)).replayed).toBe(false);
   expect(writes()[0]?.sql).toContain('update "account_subscriptions"');
@@ -217,6 +219,7 @@ it("ends a live period and appends a cancellation receipt without changing its t
     [grantValues(ended)],
     [receiptValues(saved)],
     [],
+    sessionRow(),
   ];
   expect(
     (await repo.command("usr_a", cancellation, currentToken)).receipt.subscription.cancelledAt,

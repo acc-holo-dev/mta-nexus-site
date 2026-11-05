@@ -50,7 +50,7 @@ const en = {
   retry:
     "The result could not be confirmed. Retry this fixed request or check subscription history.",
   frozen:
-    "The request is fixed for safe retries. Check history before reloading to change the selection.",
+    "The request is saved for safe retries. Check subscription history if its result remains unknown.",
   invalid: "Check the plan, account and request details.",
   changed: "The published plan changed. Reload and review its current version.",
   alreadyActive:
@@ -78,7 +78,7 @@ const en = {
   proceeds: "Estimated seller proceeds",
   estimateFailed: "The fee estimate could not be confirmed. Try again.",
   formErrorHint:
-    "No subscription, payment or commission change was recorded. Retry the same request or reload the current account state.",
+    "The result may be unknown. Retry the saved request or check subscription history.",
   actions: { activate: "Free plan activated", cancel: "Subscription ended" },
   statuses: { active: "Active", expired: "Expired", cancelled: "Ended" },
 };
@@ -131,7 +131,7 @@ const ru: typeof en = {
   retry:
     "Результат не удалось подтвердить. Повторите зафиксированный запрос или проверьте историю подписки.",
   frozen:
-    "Запрос зафиксирован для безопасного повтора. Проверьте историю перед обновлением страницы и сменой выбора.",
+    "Запрос сохранён для безопасного повтора. Если результат неизвестен, проверьте историю подписки.",
   invalid: "Проверьте тариф, аккаунт и данные запроса.",
   changed: "Опубликованный тариф изменился. Обновите страницу и проверьте его актуальную версию.",
   alreadyActive:
@@ -159,7 +159,7 @@ const ru: typeof en = {
   proceeds: "Расчётная сумма продавцу",
   estimateFailed: "Расчёт комиссии не удалось подтвердить. Попробуйте снова.",
   formErrorHint:
-    "Подписка, платёж или комиссия не изменялись. Повторите тот же запрос или обновите текущее состояние аккаунта.",
+    "Результат может быть неизвестен. Повторите сохранённый запрос или проверьте историю подписки.",
   actions: { activate: "Бесплатный тариф подключён", cancel: "Подписка прекращена" },
   statuses: { active: "Действует", expired: "Истекла", cancelled: "Прекращена" },
 };

@@ -37,6 +37,31 @@ export function normalizeCandidateSha(value) {
   return /^[a-f0-9]{7,64}$/u.test(sha) ? sha : null;
 }
 
+/** Resolve a local commit before asking GitHub, which filters runs by full SHA. */
+export function resolveCandidateCommit(sha, { root = process.cwd(), execGit = spawnSync } = {}) {
+  const prefix = normalizeCandidateSha(sha);
+  if (!prefix) throw new Error("Candidate SHA must contain 7–64 hexadecimal characters.");
+  const result = execGit(
+    "git",
+    ["rev-parse", "--verify", "--end-of-options", `${prefix}^{commit}`],
+    {
+      cwd: root,
+      encoding: "utf8",
+      shell: false,
+      timeout: 10_000,
+    },
+  );
+  const resolved = result.stdout?.trim().toLowerCase();
+  if (
+    result.error ||
+    result.status !== 0 ||
+    !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/u.test(resolved ?? "") ||
+    !resolved.startsWith(prefix)
+  )
+    throw new Error("Candidate SHA must resolve to one unambiguous local commit.");
+  return resolved;
+}
+
 export function pickArtifactName(names, { namePrefix, sha, requireAttemptSuffix }) {
   const matches = names
     .filter((name) => typeof name === "string")
@@ -137,7 +162,7 @@ export function selectSuccessfulRun(runs, sha) {
   const normalized = sha.toLowerCase();
   const candidates = (runs ?? [])
     .filter((run) => typeof run?.headSha === "string")
-    .filter((run) => run.headSha.toLowerCase().startsWith(normalized))
+    .filter((run) => run.headSha.toLowerCase() === normalized)
     .filter((run) => run.conclusion === "success" && run.status === "completed")
     .sort((a, b) => String(b.createdAt ?? "").localeCompare(String(a.createdAt ?? "")));
   return candidates[0] ?? null;
@@ -185,6 +210,7 @@ export function fetchBetaCandidateEvidence({
   sha,
   root = process.cwd(),
   gh = createGhRunner(),
+  resolveCommit = resolveCandidateCommit,
   targets = BETA_CANDIDATE_ARTIFACT_TARGETS,
 } = {}) {
   const candidateSha = normalizeCandidateSha(sha);
@@ -192,11 +218,19 @@ export function fetchBetaCandidateEvidence({
     throw new Error("Exact candidate SHA is required (7–64 hex).");
   }
 
-  const runs = gh.listRuns(candidateSha);
-  const run = selectSuccessfulRun(runs, candidateSha);
+  const resolvedSha = resolveCommit(candidateSha, { root });
+  if (
+    typeof resolvedSha !== "string" ||
+    !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/u.test(resolvedSha) ||
+    !resolvedSha.startsWith(candidateSha)
+  )
+    throw new Error("Candidate SHA must resolve to one unambiguous local commit.");
+
+  const runs = gh.listRuns(resolvedSha);
+  const run = selectSuccessfulRun(runs, resolvedSha);
   if (!run) {
     throw new Error(
-      `No successful ci.yml run found for commit ${candidateSha}. Wait for full_acceptance before fetching ROADMAP 19 evidence.`,
+      `No successful ci.yml run found for commit ${resolvedSha}. Wait for full_acceptance before fetching ROADMAP 19 evidence.`,
     );
   }
 

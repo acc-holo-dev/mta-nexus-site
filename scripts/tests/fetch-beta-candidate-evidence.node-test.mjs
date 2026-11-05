@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -18,10 +19,76 @@ import {
   installStagedArtifacts,
   normalizeCandidateSha,
   pickArtifactName,
+  resolveCandidateCommit,
   selectSuccessfulRun,
 } from "../fetch-beta-candidate-evidence-lib.mjs";
 
 const sha = "d".repeat(40);
+
+test("short local commit IDs resolve to a full SHA before querying GitHub", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-beta-fetch-git-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const env = {
+    ...process.env,
+    GIT_CONFIG_NOSYSTEM: "1",
+    GIT_CONFIG_GLOBAL: join(root, "missing-global-config"),
+    GIT_AUTHOR_NAME: "Test",
+    GIT_AUTHOR_EMAIL: "test@example.invalid",
+    GIT_COMMITTER_NAME: "Test",
+    GIT_COMMITTER_EMAIL: "test@example.invalid",
+  };
+  const git = (...args) => execFileSync("git", args, { cwd: root, env, encoding: "utf8" }).trim();
+  git("init", "-q");
+  writeFileSync(join(root, "fixture.txt"), "commit fixture\n");
+  git("add", "fixture.txt");
+  git("commit", "-qm", "fixture");
+  const full = git("rev-parse", "HEAD");
+  const short = git("rev-parse", "--short=12", "HEAD");
+  let queried;
+  assert.throws(
+    () =>
+      fetchBetaCandidateEvidence({
+        sha: short,
+        root,
+        gh: {
+          listRuns(value) {
+            queried = value;
+            return [];
+          },
+        },
+      }),
+    /No successful ci\.yml run/u,
+  );
+  assert.equal(queried, full);
+  assert.throws(
+    () => resolveCandidateCommit("0".repeat(40), { root }),
+    /unambiguous local commit/u,
+  );
+  assert.throws(
+    () =>
+      resolveCandidateCommit(short, {
+        root,
+        execGit: () => ({ status: 128, stdout: "", stderr: "ambiguous argument" }),
+      }),
+    /unambiguous local commit/u,
+  );
+  let called = false;
+  assert.throws(
+    () =>
+      fetchBetaCandidateEvidence({
+        sha: "0".repeat(40),
+        root,
+        gh: {
+          listRuns: () => {
+            called = true;
+            return [];
+          },
+        },
+      }),
+    /unambiguous local commit/u,
+  );
+  assert.equal(called, false);
+});
 
 test("failed downloads leave the complete previous evidence untouched", (t) => {
   const root = mkdtempSync(join(tmpdir(), "nexus-beta-fetch-download-"));
@@ -40,7 +107,10 @@ test("failed downloads leave the complete previous evidence untouched", (t) => {
         writeFileSync(join(directory, "evidence.json"), "new");
       },
     };
-    assert.throws(() => fetchBetaCandidateEvidence({ sha, root, gh }), /download failed/u);
+    assert.throws(
+      () => fetchBetaCandidateEvidence({ sha, root, gh, resolveCommit: (value) => value }),
+      /download failed/u,
+    );
     for (const [index, path] of paths.entries()) {
       assert.equal(readFileSync(path, "utf8"), `previous-${index}`);
     }
@@ -117,9 +187,16 @@ test("successful run selection requires completed success for the candidate SHA"
           createdAt: "2026-10-30T11:00:00Z",
         },
       ],
-      sha.slice(0, 12),
+      sha,
     )?.databaseId,
     2,
+  );
+  assert.equal(
+    selectSuccessfulRun(
+      [{ headSha: sha, conclusion: "success", status: "completed" }],
+      sha.slice(0, 12),
+    ),
+    null,
   );
   assert.equal(selectSuccessfulRun([], sha), null);
 });
@@ -151,7 +228,10 @@ test("fetch installs retained JSON only and fails honestly when backup-restore i
         throw new Error("should not download when backup-restore is absent");
       },
     };
-    assert.throws(() => fetchBetaCandidateEvidence({ sha, root, gh }), /backup_restore/u);
+    assert.throws(
+      () => fetchBetaCandidateEvidence({ sha, root, gh, resolveCommit: (value) => value }),
+      /backup_restore/u,
+    );
 
     gh.listArtifacts = () => [
       { name: `ci-evidence-${sha}`, expired: false },
@@ -185,7 +265,7 @@ test("fetch installs retained JSON only and fails honestly when backup-restore i
       downloads.set(name, true);
     };
 
-    const result = fetchBetaCandidateEvidence({ sha, root, gh });
+    const result = fetchBetaCandidateEvidence({ sha, root, gh, resolveCommit: (value) => value });
     assert.equal(result.runId, 99);
     assert.equal(result.sha, sha);
     assert.equal(downloads.size, BETA_CANDIDATE_ARTIFACT_TARGETS.length);

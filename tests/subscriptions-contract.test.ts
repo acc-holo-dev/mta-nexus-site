@@ -5,7 +5,9 @@ import {
 } from "@nexus/domain";
 import { subscriptionCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
+import { createHash } from "node:crypto";
 import {
+  expectedSubscriptionReceiptId,
   confirmedSubscriptionEstimate,
   confirmedSubscriptionReceipt,
 } from "../apps/web/src/lib/subscription-confirmation";
@@ -192,4 +194,29 @@ it("provides independent RU/EN lifecycle and recovery copy", () => {
     ])
       expect(subscriptionError(locale, code)).not.toBe(c.retry);
   }
+});
+
+it("binds subscription receipts to the original actor and request", async () => {
+  const expectedId = `srec_${createHash("sha256")
+    .update(JSON.stringify({ actorId: "usr_a", requestId: activation.requestId }))
+    .digest("hex")}`;
+  expect(await expectedSubscriptionReceiptId("usr_a", activation.requestId)).toBe(expectedId);
+  const body = JSON.parse(JSON.stringify({ receipt, replayed: true }));
+  expect(
+    confirmedSubscriptionReceipt(body, activation, "usr_a", {
+      terms,
+      planId: activation.planId,
+      planRevision: 2,
+      receiptId: expectedId,
+    }),
+  ).toBeNull();
+  body.receipt.id = expectedId;
+  expect(
+    confirmedSubscriptionReceipt(body, activation, "usr_a", {
+      terms,
+      planId: activation.planId,
+      planRevision: 2,
+      receiptId: expectedId,
+    }),
+  ).toBe(expectedId);
 });

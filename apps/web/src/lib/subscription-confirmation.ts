@@ -8,6 +8,13 @@ import {
 
 const object = (v: unknown): Record<string, unknown> | null =>
   v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
+export async function expectedSubscriptionReceiptId(actorId: string, requestId: string) {
+  const bytes = new TextEncoder().encode(
+    JSON.stringify({ actorId, requestId: requestId.toLowerCase() }),
+  );
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return `srec_${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+}
 export function confirmedSubscriptionReceipt(
   value: unknown,
   command: SubscriptionCommand,
@@ -18,6 +25,7 @@ export function confirmedSubscriptionReceipt(
     planRevision: number;
     startedAt?: string;
     expiresAt?: string;
+    receiptId?: string;
   },
 ) {
   const body = object(value),
@@ -32,6 +40,7 @@ export function confirmedSubscriptionReceipt(
     typeof body?.replayed !== "boolean" ||
     typeof receipt?.id !== "string" ||
     !/^srec_[a-f0-9]{64}$/u.test(receipt.id) ||
+    (expected.receiptId !== undefined && receipt.id !== expected.receiptId) ||
     receipt.action !== command.action ||
     typeof receipt.createdAt !== "string" ||
     !Number.isFinite(Date.parse(receipt.createdAt)) ||

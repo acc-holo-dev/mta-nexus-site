@@ -278,6 +278,9 @@ export class SubscriptionsRepository {
               price: 0,
             },
           });
+          // The session can expire while a write waits on another transaction.
+          // Roll back the period, receipt and audit together in that case.
+          await lockInitiatingSession(tx, actorId, currentToken);
           return { receipt, replayed: false };
         },
         { isolationLevel: "read committed" },

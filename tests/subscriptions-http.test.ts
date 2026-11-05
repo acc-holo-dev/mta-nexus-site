@@ -49,6 +49,7 @@ const post = (
     headers: {
       ...browserMutationHeaders(),
       cookie: "nexus_session=subscription-token",
+      "x-nexus-actor-id": "usr_a",
       ...headers,
     },
     body: JSON.stringify(body),
@@ -179,4 +180,20 @@ it("bounds exported bytes", async () => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+});
+
+it("requires the original actor before executing subscription writes", async () => {
+  expect(
+    (
+      await POST(
+        post(activation, "", { "content-type": "application/json", "x-nexus-actor-id": "" }),
+      )
+    ).status,
+  ).toBe(428);
+  const response = await POST(
+    post(activation, "", { "content-type": "application/json", "x-nexus-actor-id": "usr_b" }),
+  );
+  expect(response.status).toBe(409);
+  expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+  expect(state.command).not.toHaveBeenCalled();
 });
