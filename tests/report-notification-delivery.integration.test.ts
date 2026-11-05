@@ -1,6 +1,4 @@
 import { createHash, randomUUID } from "node:crypto";
-import { asc, eq, inArray, sql } from "drizzle-orm";
-import { afterEach, expect, it, vi } from "vitest";
 import {
   communityReportsRepository,
   db,
@@ -8,16 +6,18 @@ import {
   sessionRepository,
   webPushSubscriptionRepository,
 } from "@nexus/db";
-import {
-  ReportNotificationDeliveryRepository,
-  reportNotificationDeliveryRepository as delivery,
-} from "../packages/db/src/repositories/report-notification-delivery";
+import { asc, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it, vi } from "vitest";
 import { notificationRepository } from "../packages/db/src/repositories/notifications";
+import {
+  reportNotificationDeliveryRepository as delivery,
+  ReportNotificationDeliveryRepository,
+} from "../packages/db/src/repositories/report-notification-delivery";
 import {
   auditEvents,
   content,
-  notifications,
   reportNotificationDeliveries as jobs,
+  notifications,
   reports,
   users,
   webPushOutbox,
@@ -63,6 +63,12 @@ async function actor(role = "user", prefix = "usr") {
 
 async function command(community = false) {
   const reporterId = await actor();
+  await sessionRepository.create({
+    id: `ses_${reporterId}`,
+    userId: reporterId,
+    token: `tok_${reporterId}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   const reportId = id("rpt");
   const auditId = id("aud");
   reportIds.push(reportId);
@@ -117,7 +123,7 @@ async function command(community = false) {
     reportId,
     auditId,
     reporterId,
-    create: () => reportRepository.createWithAudit(data, audit),
+    create: () => reportRepository.createWithAudit(data, audit, `tok_${reporterId}`),
   };
 }
 

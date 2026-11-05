@@ -83,6 +83,7 @@ describe("comment abuse reporting", () => {
         targetId: "cmt_1",
       }),
       expect.objectContaining({ action: "report.created" }),
+      "test",
     );
   });
 

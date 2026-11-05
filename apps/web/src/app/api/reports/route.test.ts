@@ -65,7 +65,11 @@ describe("report privacy and durable success", () => {
     const response = await POST(
       new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": "application/json",
+        },
         body: "{",
       }),
     );
@@ -79,7 +83,11 @@ describe("report privacy and durable success", () => {
     const request = (type: string, body: string) =>
       new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": type },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": type,
+        },
         body,
       });
     const unsupported = await POST(request("text/plain", "{}"));
@@ -134,7 +142,11 @@ describe("report privacy and durable success", () => {
     const response = await POST(
       new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           targetType: "product",
           targetId: "prd_test",
@@ -150,6 +162,7 @@ describe("report privacy and durable success", () => {
     expect(mocks.createWithAudit).toHaveBeenCalledWith(
       expect.objectContaining({ reporterId: "member_1", targetId: "prd_test" }),
       expect.objectContaining({ actorId: "member_1", action: "report.created" }),
+      "session",
     );
   });
 
@@ -159,7 +172,11 @@ describe("report privacy and durable success", () => {
     const response = await POST(
       new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           targetType: "product",
           targetId: "prd_test",
@@ -172,6 +189,30 @@ describe("report privacy and durable success", () => {
     privateResponse(response);
   });
 
+  it("returns a private retryable conflict for a rolled-back deadlock", async () => {
+    mocks.session.mockResolvedValue({ id: "member_1" });
+    mocks.createWithAudit.mockRejectedValueOnce({ cause: { code: "40P01" } });
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          targetType: "product",
+          targetId: "prd_test",
+          type: "scam",
+          reason: "The resource is misrepresented",
+        }),
+      }),
+    );
+    expect(response.status).toBe(409);
+    privateResponse(response);
+    expect(await response.json()).toMatchObject({ code: "REPORT_RETRY" });
+  });
+
   it("returns a conflict for a concurrent duplicate", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     mocks.createWithAudit.mockResolvedValueOnce({
@@ -181,7 +222,11 @@ describe("report privacy and durable success", () => {
     const response = await POST(
       new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: "nexus_session=session",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           targetType: "product",
           targetId: "prd_test",
@@ -211,7 +256,11 @@ describe("report privacy and durable success", () => {
       const response = await POST(
         new NextRequest("https://nexus.test/api/reports", {
           method: "POST",
-          headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+          headers: {
+            ...browserMutationHeaders(),
+            cookie: "nexus_session=session",
+            "content-type": "application/json",
+          },
           body: JSON.stringify({
             targetType: "product",
             targetId: "prd_test",

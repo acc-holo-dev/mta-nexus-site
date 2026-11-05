@@ -1,4 +1,4 @@
-import { type AuditEvent, ForbiddenError, type Report } from "@nexus/domain";
+import { type AuditEvent, ForbiddenError, type Report, UnauthorizedError } from "@nexus/domain";
 import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, reportNotificationDeliveries, reports, users } from "../schema";
@@ -94,10 +94,20 @@ export class ReportRepository {
   async createWithAudit(
     data: Omit<Report, "createdAt" | "resolvedAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<{ report: Report; created: boolean }> {
     return db.transaction(async (tx) => {
       const lockKey = `report:${data.reporterId}:${data.targetType}:${data.targetId}`;
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
+      if (audit.actorId !== data.reporterId) throw new ForbiddenError();
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, data.reporterId))
+        .for("share")
+        .limit(1);
+      if (!actor) throw new UnauthorizedError();
+      await lockInitiatingSession(tx, actor.id, currentToken);
       const [existing] = await tx
         .select()
         .from(reports)
@@ -110,7 +120,10 @@ export class ReportRepository {
           ),
         )
         .limit(1);
-      if (existing) return { report: existing as unknown as Report, created: false };
+      if (existing) {
+        await lockInitiatingSession(tx, actor.id, currentToken);
+        return { report: existing as unknown as Report, created: false };
+      }
 
       const [report] = await tx
         .insert(reports)
@@ -124,6 +137,7 @@ export class ReportRepository {
       const createdAt = sql`(select ${reports.createdAt} from ${reports} where ${reports.id} = ${report.id})`;
       await tx.insert(auditEvents).values({ ...audit, createdAt });
       await tx.insert(reportNotificationDeliveries).values({ reportId: report.id, createdAt });
+      await lockInitiatingSession(tx, actor.id, currentToken);
       return { report: report as unknown as Report, created: true };
     });
   }

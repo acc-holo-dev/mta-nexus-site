@@ -16,6 +16,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
+import { isPostgresDeadlock } from "../../../lib/postgres-error";
 import { authService } from "../../../lib/services/auth-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -67,7 +68,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
-    if (!user) {
+    if (!token || !user) {
       return privateJson(
         context,
         { error: "Authentication required to submit report" },
@@ -136,6 +137,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         targetType: "report",
         details: { type: parsed.data.type, targetType: parsed.data.targetType },
       },
+      token,
     );
     if (!result.created) {
       return privateJson(
@@ -148,6 +150,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     return privateJson(context, { success: true, report }, { status: 201 });
   } catch (error: unknown) {
+    if (isPostgresDeadlock(error))
+      return privateJson(
+        context,
+        { code: "REPORT_RETRY", error: "Please retry submitting the report" },
+        { status: 409 },
+      );
     if (
       error instanceof AppError &&
       [
@@ -155,6 +163,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "INVALID_BODY_LENGTH",
         "REQUEST_BODY_TOO_LARGE",
         "REQUEST_BODY_TIMEOUT",
+        "UNAUTHORIZED",
+        "FORBIDDEN",
       ].includes(error.code)
     ) {
       return privateJson(

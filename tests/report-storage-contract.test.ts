@@ -1,8 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
-import { PgDialect } from "drizzle-orm/pg-core";
-import type { SQL } from "drizzle-orm";
 import type { AuditEvent, Report } from "@nexus/domain";
-import { auditEvents, reports, reportNotificationDeliveries } from "../packages/db/src/schema";
+import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
+import { describe, expect, it, vi } from "vitest";
+import {
+  auditEvents,
+  reportNotificationDeliveries,
+  reports,
+  users,
+} from "../packages/db/src/schema";
 
 const captured = vi.hoisted(() => ({
   inserts: [] as unknown[],
@@ -20,13 +25,18 @@ vi.mock("../packages/db/src/client", () => ({
           captured.lock = statement;
         },
         select: () => ({
-          from: () => ({
-            where: (filter: SQL) => ({
-              limit: async () => {
-                captured.filter = filter;
-                return captured.existing ? [captured.existing] : [];
-              },
-            }),
+          from: (table: unknown) => ({
+            where: (filter: SQL) => {
+              const query = {
+                for: () => query,
+                limit: async () => {
+                  if (table === users) return [{ id: "member_1" }];
+                  captured.filter = filter;
+                  return captured.existing ? [captured.existing] : [];
+                },
+              };
+              return query;
+            },
           }),
         }),
         insert(table: unknown) {
@@ -57,6 +67,9 @@ vi.mock("../packages/db/src/client", () => ({
     },
   },
 }));
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: vi.fn(),
+}));
 
 import { ReportRepository } from "../packages/db/src/repositories/reports";
 import { UserRepository } from "../packages/db/src/repositories/users";
@@ -84,13 +97,13 @@ describe("report write and notification lookup", () => {
       targetType: "report",
       details: {},
     };
-    const result = await new ReportRepository().createWithAudit(data, audit);
+    const result = await new ReportRepository().createWithAudit(data, audit, "session");
     expect(result).toMatchObject({ report: { id: "rpt_1" }, created: true });
     expect(captured.inserts).toEqual([reports, auditEvents, reportNotificationDeliveries]);
     if (!captured.lock) throw new Error("Expected report advisory lock to be captured");
     expect(new PgDialect().sqlToQuery(captured.lock).sql).toContain("pg_advisory_xact_lock");
 
-    const duplicate = await new ReportRepository().createWithAudit(data, audit);
+    const duplicate = await new ReportRepository().createWithAudit(data, audit, "session");
     expect(duplicate).toMatchObject({ report: { id: "rpt_1" }, created: false });
     expect(captured.inserts).toEqual([reports, auditEvents, reportNotificationDeliveries]);
   });

@@ -7,6 +7,7 @@ import { eq, inArray } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
 import { db } from "../packages/db/src/client";
 import { reportRepository } from "../packages/db/src/repositories/reports";
+import { sessionRepository } from "../packages/db/src/repositories/sessions";
 import { userRepository } from "../packages/db/src/repositories/users";
 import {
   auditEvents,
@@ -42,6 +43,12 @@ it("the real worker delivers moderator inbox without VAPID or a surviving HTTP c
     .set({ createdAt: new Date("2000-01-01T00:00:00.000Z") })
     .where(inArray(users.id, actors));
   const reportId = `rpt_worker_${suffix}`;
+  await sessionRepository.create({
+    id: `ses_${actors[0]}`,
+    userId: actors[0],
+    token: `tok_${actors[0]}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   await reportRepository.createWithAudit(
     {
       id: reportId,
@@ -62,6 +69,7 @@ it("the real worker delivers moderator inbox without VAPID or a surviving HTTP c
       targetId: reportId,
       details: {},
     },
+    `tok_${actors[0]}`,
   );
   // Give this fixture an isolated audience and priority over any retained
   // sources from other suites sharing the disposable database.
