@@ -1,3 +1,4 @@
+import type { OrderCaseReviewStatus, SupportCaseStatus } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
 import { flattenReactTestTree } from "./flatten-react-test-tree";
@@ -10,14 +11,15 @@ type OrderCaseReviewActorHarness = {
   refresh: Mock;
 };
 
+/** Props match OrderCaseReviewForm so the real component stays assignable. */
 type OrderCaseReviewFormComponent = (props: {
   actorId: string;
   caseId: string;
-  reviewStatus: string;
+  reviewStatus: OrderCaseReviewStatus;
   revision: number;
   supportUpdatedAt: string;
   evidenceHash: string;
-  threadStatus: string;
+  threadStatus: SupportCaseStatus;
   canRecommendRefund: boolean;
   monetary: boolean;
   recommendationEligible: boolean;
