@@ -6,6 +6,11 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `0a67416f` — tip advanced after resource-review-pages suite split (#608); tip CI not claimed verified-green under rapid merges;
+- `dcc97b66` — tip advanced after register-server recovery (#585), order-case recommendationBlocked (#594), and community-report unknown target (#604); tip CI not claimed verified-green under rapid merges;
+- `bd8edb95` — tip advanced after claim-session (#592) and home-directory unavailable (#593); tip CI not claimed verified-green under rapid merges;
+- `46c0064c` — tip advanced after discussion countUnavailable (#606); tip CI not claimed verified-green under rapid merges;
+- `2fccf9d0` — tip advanced after security recovery ErrorState (#599) and tip honesty (#613); tip CI not claimed verified-green under rapid merges;
 - `4d180af7` — tip advanced after resource QA ask gating (#583) and tip honesty (#612); tip CI not claimed verified-green under rapid merges;
 - `34dde9ee` — tip advanced after library download/unavailableReason (#602/#603) and tip honesty (#611); tip CI not claimed verified-green under rapid merges;
 - `b6378e5e` — tip advanced after tip honesty (#610) on a3f8f7e8; tip CI not claimed verified-green under rapid merges;
