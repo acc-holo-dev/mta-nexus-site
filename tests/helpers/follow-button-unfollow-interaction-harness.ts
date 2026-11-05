@@ -22,7 +22,7 @@ type FollowButtonComponent = (props: {
   locale: "ru" | "en";
 }) => ReactElement<{ children?: ReactNode }>;
 
-export const initial = { authenticated: true, actorId: "usr_1", following: true };
+const initial = { authenticated: true, actorId: "usr_1", following: true };
 
 export const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
