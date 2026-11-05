@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,6 +28,7 @@ type Review = {
   revision: number;
   moderationReason?: string | null;
 };
+type Notice = { text: string; error: boolean };
 function Recovery({ locale }: { locale: Locale }) {
   const router = useRouter();
   return (
@@ -77,7 +78,7 @@ export function ResourceReviewEditor({
   const [text, setText] = useState(review?.text ?? ""),
     [rating, setRating] = useState(review?.rating ?? 5),
     [busy, setBusy] = useState(false),
-    [message, setMessage] = useState("");
+    [notice, setNotice] = useState<Notice | null>(null);
   const [confirmation, setConfirmation] = useState<{ revision: number; status: string } | null>(
     null,
   );
@@ -98,7 +99,7 @@ export function ResourceReviewEditor({
     if (busy || confirmed || (action === "save" && (changed || !canReview))) return;
     const expectedRevision = action === "save" && dirty ? effectiveDraftRevision : currentRevision;
     setBusy(true);
-    setMessage("");
+    setNotice(null);
     try {
       const result = await post(`/api/library/review/${encodeURIComponent(productId)}`, {
         action,
@@ -106,15 +107,15 @@ export function ResourceReviewEditor({
         ...(action === "save" ? { text: draftText, rating: draftRating } : {}),
       });
       if (!result.response.ok) {
-        setMessage(resourceReviewError(locale, result.value?.code));
+        setNotice({ text: resourceReviewError(locale, result.value?.code), error: true });
         return;
       }
       if (!confirmedReview(result.value, expectedRevision, action))
         throw new Error("Unconfirmed review");
       setConfirmation({ revision: result.value.revision, status: result.value.status });
-      setMessage(copy.saved);
+      setNotice({ text: copy.saved, error: false });
     } catch {
-      setMessage(copy.unknown);
+      setNotice({ text: copy.unknown, error: true });
     } finally {
       setBusy(false);
     }
@@ -164,7 +165,7 @@ export function ResourceReviewEditor({
             <select
               value={draftRating}
               onChange={(event) => {
-                setMessage("");
+                setNotice(null);
                 if (!dirty) {
                   setDraftRevision(currentRevision);
                   setText(review?.text ?? "");
@@ -187,7 +188,7 @@ export function ResourceReviewEditor({
             <textarea
               value={draftText}
               onChange={(event) => {
-                setMessage("");
+                setNotice(null);
                 if (!dirty) {
                   setDraftRevision(currentRevision);
                   setRating(review?.rating ?? 5);
@@ -267,9 +268,12 @@ export function ResourceReviewEditor({
           {copy.withdraw}
         </Button>
       )}
-      <p role="status" className="text-sm">
-        {message}
-      </p>
+      {notice?.error ? <ErrorState id="resource-review-editor-error" title={notice.text} /> : null}
+      {notice && !notice.error ? (
+        <p role="status" className="text-sm">
+          {notice.text}
+        </p>
+      ) : null}
       <Recovery locale={locale} />
     </section>
   );
@@ -287,7 +291,7 @@ export function ResourceReviewReportForm({
     [reason, setReason] = useState(""),
     [type, setType] = useState("spam"),
     [busy, setBusy] = useState(false),
-    [message, setMessage] = useState(""),
+    [notice, setNotice] = useState<Notice | null>(null),
     [id, setId] = useState<string | null>(null);
   return (
     <details className="text-sm">
@@ -299,21 +303,21 @@ export function ResourceReviewReportForm({
           event.preventDefault();
           if (busy || id) return;
           setBusy(true);
-          setMessage("");
+          setNotice(null);
           try {
             const result = await post(
               `/api/products/${encodeURIComponent(productId)}/reviews/${encodeURIComponent(reviewId)}/report`,
               { type, reason },
             );
             if (!result.response.ok) {
-              setMessage(resourceReviewError(locale, result.value?.code));
+              setNotice({ text: resourceReviewError(locale, result.value?.code), error: true });
               return;
             }
             if (!confirmedReviewReport(result.value)) throw new Error("Unconfirmed report");
             setId(result.value.id);
-            setMessage(copy.reportSaved);
+            setNotice({ text: copy.reportSaved, error: false });
           } catch {
-            setMessage(copy.unknown);
+            setNotice({ text: copy.unknown, error: true });
           } finally {
             setBusy(false);
           }
@@ -348,7 +352,8 @@ export function ResourceReviewReportForm({
           {busy ? copy.busy : copy.send}
         </Button>
       </form>
-      <p role="status">{message}</p>
+      {notice?.error ? <ErrorState id="resource-review-report-error" title={notice.text} /> : null}
+      {notice && !notice.error ? <p role="status">{notice.text}</p> : null}
       {id ? (
         <Link
           href={`/workspace/review-reports/${encodeURIComponent(id)}`}
@@ -384,7 +389,7 @@ export function ResourceReviewDecisionForm({
     [notes, setNotes] = useState(""),
     [action, setAction] = useState<ResourceReviewDecisionAction>("review"),
     [busy, setBusy] = useState(false),
-    [message, setMessage] = useState(""),
+    [notice, setNotice] = useState<Notice | null>(null),
     [confirmed, setConfirmed] = useState(false);
   async function submitDecision() {
     if (busy || confirmed) return;
@@ -404,7 +409,7 @@ export function ResourceReviewDecisionForm({
         return;
     }
     setBusy(true);
-    setMessage("");
+    setNotice(null);
     try {
       const result = await post(`/api/admin/commerce/reviews/${encodeURIComponent(id)}`, {
         action,
@@ -413,15 +418,15 @@ export function ResourceReviewDecisionForm({
         ...(action === "remove_review" ? { expectedRevision: revision } : {}),
       });
       if (!result.response.ok) {
-        setMessage(resourceReviewError(locale, result.value?.code));
+        setNotice({ text: resourceReviewError(locale, result.value?.code), error: true });
         return;
       }
       if (!confirmedReviewDecision(result.value, id, action))
         throw new Error("Unconfirmed decision");
       setConfirmed(true);
-      setMessage(copy.saved);
+      setNotice({ text: copy.saved, error: false });
     } catch {
-      setMessage(copy.unknown);
+      setNotice({ text: copy.unknown, error: true });
     } finally {
       setBusy(false);
     }
@@ -473,7 +478,10 @@ export function ResourceReviewDecisionForm({
       <Button type="submit" size="touch" disabled={busy || confirmed} isLoading={busy}>
         {busy ? copy.busy : copy.decide}
       </Button>
-      <p role="status">{message}</p>
+      {notice?.error ? (
+        <ErrorState id="resource-review-decision-error" title={notice.text} />
+      ) : null}
+      {notice && !notice.error ? <p role="status">{notice.text}</p> : null}
       <Recovery locale={locale} />
     </form>
   );
