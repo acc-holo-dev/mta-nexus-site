@@ -23,7 +23,7 @@ export type WebPushSettingsComponent = (props: {
 export type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
 /** Browser PushManager presence stub — module-scoped to avoid Biome component-in-hook lint. */
-export function mockPushManager() {}
+function mockPushManager() {}
 
 export const response = (body: Record<string, unknown>, status = 200) =>
   new Response(
@@ -63,7 +63,7 @@ export function mockReactHooks(harness: WebPushSettingsConfirmHarness) {
   });
 }
 
-export function descendants(node: ReactNode): Element[] {
+function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
@@ -112,7 +112,8 @@ export function createWebPushSettingsConfirmInteractionHelpers(
   function disableButtonOrEnable(nodes: Element[]) {
     return nodes.some(
       (node) =>
-        node.type === "button" && node.props.children === getDictionary("en").settings.webPushEnable,
+        node.type === "button" &&
+        node.props.children === getDictionary("en").settings.webPushEnable,
     );
   }
 
