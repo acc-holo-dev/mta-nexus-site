@@ -133,9 +133,13 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [organizations, setOrganizations] = useState<ServerOrganizationOption[]>([]);
   const [organizationsFailed, setOrganizationsFailed] = useState(false);
+  const [organizationsLoadAttempt, setOrganizationsLoadAttempt] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(organizationsLoadAttempt): Retry restarts organization lookup.
   useEffect(() => {
     const controller = new AbortController();
+    setOrganizationsLoading(true);
+    setOrganizationsFailed(false);
     async function loadOrganizations() {
       try {
         const response = await fetch(
@@ -155,7 +159,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
     }
     void loadOrganizations();
     return () => controller.abort();
-  }, []);
+  }, [organizationsLoadAttempt]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -317,11 +321,23 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           {organizationsLoading && (
             <span className="block text-xs text-muted">{copy.organizationsLoading}</span>
           )}
-          {organizationsFailed && (
-            <span role="status" className="block text-xs text-muted">
-              {copy.organizationsUnavailable}
-            </span>
-          )}
+          {organizationsFailed ? (
+            <ErrorState
+              title={copy.organizationsUnavailable}
+              className="items-stretch py-4"
+              action={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="touch"
+                  disabled={organizationsLoading}
+                  onClick={() => setOrganizationsLoadAttempt((value) => value + 1)}
+                >
+                  {dictionary.errors.retry}
+                </Button>
+              }
+            />
+          ) : null}
         </div>
 
         <Input
