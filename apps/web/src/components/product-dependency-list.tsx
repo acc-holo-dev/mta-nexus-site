@@ -39,8 +39,7 @@ export function ProductDependencyList({
           </div>
         ) : dependencyItem.status === "self_reference" ? (
           <div key={dependencyItem.slug}>
-            <span className="font-mono text-warning">{dependencyItem.slug}</span>
-            <span className="ml-1 text-[10px] text-warning">{copy.selfReference}</span>
+            <ErrorState title={copy.selfReference} description={dependencyItem.slug} />
           </div>
         ) : (
           <div key={dependencyItem.slug}>
