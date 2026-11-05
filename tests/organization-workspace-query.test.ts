@@ -123,25 +123,39 @@ it("denies nonmembers and forged legacy owner memberships", async () => {
 it("locks profile authority and rejects stale revisions before update/audit", async () => {
   state.rows = [[orgRow()]];
   await expect(
-    repository.updateProfile("org", "owner", new Date(version.getTime() - 1), fields, audit),
+    repository.updateProfile(
+      "org",
+      "owner",
+      new Date(version.getTime() - 1),
+      fields,
+      audit,
+      "unit-token",
+    ),
   ).rejects.toMatchObject({ code: "CONFLICT" });
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries).toHaveLength(1);
 });
 it("holds the current administrator grant and saves only public profile fields", async () => {
-  state.rows = [[orgRow()], [["admin"]], [orgRow({ name: fields.name })], []];
-  await repository.updateProfile("org", "admin", version, fields, { ...audit, actorId: "admin" });
+  state.rows = [[orgRow()], [["admin"]], [["admin"]], [orgRow({ name: fields.name })], []];
+  await repository.updateProfile(
+    "org",
+    "admin",
+    version,
+    fields,
+    { ...audit, actorId: "admin" },
+    "unit-token",
+  );
   expect(state.queries[1].sql).toContain("for share");
-  const update = state.queries[2].sql;
+  const update = state.queries[3].sql;
   expect(update).toContain('"name" =');
   expect(update).toContain("interval '1 millisecond'");
   expect(update).not.toMatch(/"owner_id" =|"slug" =|"is_verified" =/u);
-  expect(state.queries[3].sql).toContain('insert into "audit_events"');
+  expect(state.queries[4].sql).toContain('insert into "audit_events"');
 });
 it("denies developer profile writes after reading live role", async () => {
   state.rows = [[orgRow()], [["developer"]]];
   await expect(
-    repository.updateProfile("org", "developer", version, fields, audit),
+    repository.updateProfile("org", "developer", version, fields, audit, "unit-token"),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(state.queries).toHaveLength(2);
 });

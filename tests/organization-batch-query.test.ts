@@ -7,12 +7,17 @@ const state = vi.hoisted(() => ({
   notice: vi.fn(),
   fail: "",
 }));
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: async () => {},
+}));
 vi.mock("../packages/db/src/repositories/organization-access-notice", () => ({
   storeOrganizationAccessNotice: state.notice,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
+    if (/^select "id" from "users" where "users"\."id" = \$1 for share/u.test(sql))
+      return { rows: [[params[0]]] };
     state.queries.push({ sql, params });
     if (state.fail && sql.startsWith(`insert into "${state.fail}"`))
       throw new Error("Required write unavailable");
@@ -70,7 +75,7 @@ const audits = input.userIds.map((id) => ({
 const writes = () => state.queries.filter((query) => /^(insert|update|delete)/u.test(query.sql));
 async function preview(extra = {}, rows = members) {
   state.rows = [[org(extra)], rows];
-  return repository.previewMembers("org", "owner", input);
+  return repository.previewMembers("org", "owner", input, "unit-token");
 }
 beforeEach(() => {
   state.queries = [];
@@ -94,10 +99,15 @@ it("reviews current scoped identities without leaking permission grants and bind
   expect(state.queries[1].params).toEqual(expect.arrayContaining(["org", "a", "b"]));
   expect(writes()).toEqual([]);
   state.rows = [[org()], members];
-  const reordered = await repository.previewMembers("org", "owner", {
-    ...input,
-    userIds: ["a", "b"],
-  });
+  const reordered = await repository.previewMembers(
+    "org",
+    "owner",
+    {
+      ...input,
+      userIds: ["a", "b"],
+    },
+    "unit-token",
+  );
   expect(reordered.previewRevision).toBe(result.previewRevision);
 });
 it("writes only changed members once, retains commercial grants, bumps one version and emits existing per-member events", async () => {
@@ -109,6 +119,7 @@ it("writes only changed members once, retains commercial grants, bumps one versi
     "owner",
     { ...input, previewRevision: reviewed.previewRevision },
     audits,
+    "unit-token",
   );
   expect(result.changedUserIds).toEqual(["a"]);
   expect(result.organization.updatedAt.toISOString()).toBe(later);
@@ -138,7 +149,9 @@ it("rejects stale review, current permission changes and changed action before a
   ]) {
     state.queries = [];
     state.rows = [[org()], members];
-    await expect(repository.batchMembers("org", "owner", changed, audits)).rejects.toMatchObject({
+    await expect(
+      repository.batchMembers("org", "owner", changed, audits, "unit-token"),
+    ).rejects.toMatchObject({
       code: "CONFLICT",
     });
     expect(writes()).toEqual([]);
@@ -156,6 +169,7 @@ it("rejects stale review, current permission changes and changed action before a
       "owner",
       { ...input, previewRevision: reviewed.previewRevision },
       audits,
+      "unit-token",
     ),
   ).rejects.toMatchObject({ code: "CONFLICT" });
   expect(writes()).toEqual([]);
@@ -168,12 +182,16 @@ it.each(["owner", "admin"])(
       [["admin"]],
       [["m", "a", role, [], "alice", "Alice"], members[1]],
     ];
-    await expect(repository.previewMembers("org", "owner", input)).rejects.toMatchObject({
+    await expect(
+      repository.previewMembers("org", "owner", input, "unit-token"),
+    ).rejects.toMatchObject({
       code: "MEMBER_PROTECTED",
     });
     expect(writes()).toEqual([]);
     state.rows = [[org()], [members[0]]];
-    await expect(repository.previewMembers("org", "owner", input)).rejects.toMatchObject({
+    await expect(
+      repository.previewMembers("org", "owner", input, "unit-token"),
+    ).rejects.toMatchObject({
       code: "MEMBER_NOT_FOUND",
     });
     expect(writes()).toEqual([]);
@@ -181,24 +199,33 @@ it.each(["owner", "admin"])(
 );
 it("denies ordinary members, obsolete organization versions, duplicate and oversized selections", async () => {
   state.rows = [[org({ ownerId: "different" })], [["member"]]];
-  await expect(repository.previewMembers("org", "owner", input)).rejects.toMatchObject({
+  await expect(
+    repository.previewMembers("org", "owner", input, "unit-token"),
+  ).rejects.toMatchObject({
     code: "FORBIDDEN",
   });
   expect(state.queries).toHaveLength(2);
   state.rows = [[org({ updatedAt: later })]];
-  await expect(repository.previewMembers("org", "owner", input)).rejects.toMatchObject({
+  await expect(
+    repository.previewMembers("org", "owner", input, "unit-token"),
+  ).rejects.toMatchObject({
     code: "CONFLICT",
   });
   for (const userIds of [["a", "a"], [], Array.from({ length: 21 }, (_, i) => `user-${i}`)])
     await expect(
-      repository.previewMembers("org", "owner", { ...input, userIds }),
+      repository.previewMembers("org", "owner", { ...input, userIds }, "unit-token"),
     ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
   expect(writes()).toEqual([]);
 });
 it("preserves role when changing only delegated access and deletes a reviewed group in one command", async () => {
   const change = { action: "server_access", enabled: false } as const;
   state.rows = [[org()], members];
-  const reviewed = await repository.previewMembers("org", "owner", { ...input, change });
+  const reviewed = await repository.previewMembers(
+    "org",
+    "owner",
+    { ...input, change },
+    "unit-token",
+  );
   state.queries = [];
   state.rows = [[org()], members, [org({ updatedAt: later })]];
   await repository.batchMembers(
@@ -206,12 +233,18 @@ it("preserves role when changing only delegated access and deletes a reviewed gr
     "owner",
     { ...input, change, previewRevision: reviewed.previewRevision },
     audits,
+    "unit-token",
   );
   expect(writes()[0].params).toContain("member");
   expect(writes()[0].params).toContain(JSON.stringify(["manage_resources"]));
   const remove = { action: "remove" } as const;
   state.rows = [[org()], members];
-  const removal = await repository.previewMembers("org", "owner", { ...input, change: remove });
+  const removal = await repository.previewMembers(
+    "org",
+    "owner",
+    { ...input, change: remove },
+    "unit-token",
+  );
   state.queries = [];
   state.rows = [[org()], members, [org({ updatedAt: later })]];
   const result = await repository.batchMembers(
@@ -219,6 +252,7 @@ it("preserves role when changing only delegated access and deletes a reviewed gr
     "owner",
     { ...input, change: remove, previewRevision: removal.previewRevision },
     audits,
+    "unit-token",
   );
   expect(result.changedUserIds).toEqual(["a", "b"]);
   expect(writes().filter((query) => query.sql.startsWith("delete"))).toHaveLength(1);
@@ -240,6 +274,7 @@ it("propagates mandatory audit and inbox failures to the enclosing transaction",
       "owner",
       { ...input, previewRevision: reviewed.previewRevision },
       audits,
+      "unit-token",
     ),
   ).rejects.toThrow();
   expect(state.notice).not.toHaveBeenCalled();
@@ -252,6 +287,7 @@ it("propagates mandatory audit and inbox failures to the enclosing transaction",
       "owner",
       { ...input, previewRevision: reviewed.previewRevision },
       audits,
+      "unit-token",
     ),
   ).rejects.toThrow("Inbox unavailable");
 });

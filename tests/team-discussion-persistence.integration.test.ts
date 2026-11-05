@@ -58,7 +58,7 @@ async function team() {
     b = await actor();
   const id = `org_${randomUUID()}`;
   orgIds.push(id);
-  const token = `org-fixture-${randomUUID()}`;
+  const token = `org-fixture-${owner.id}`;
   await sessionRepository.create({
     id: `ses_${randomUUID()}`,
     userId: owner.id,
@@ -91,12 +91,18 @@ async function team() {
 }
 it("commits a reviewed group together and retains unrelated grants with one notice/event per changed member", async () => {
   const { owner, a, b, organization, input } = await team(),
-    preview = await teams.previewMembers(organization.id, owner.id, input);
+    preview = await teams.previewMembers(
+      organization.id,
+      owner.id,
+      input,
+      `org-fixture-${owner.id}`,
+    );
   const saved = await teams.batchMembers(
     organization.id,
     owner.id,
     { ...input, previewRevision: preview.previewRevision },
     [a, b].map(() => audit(owner, organization.id)),
+    `org-fixture-${owner.id}`,
   );
   expect(saved.changedUserIds.sort()).toEqual([a.id, b.id].sort());
   expect(saved.organization.updatedAt.getTime()).toBeGreaterThan(organization.updatedAt.getTime());
@@ -122,7 +128,12 @@ it("commits a reviewed group together and retains unrelated grants with one noti
 });
 it("rejects an entire batch after current grants change and rolls back all rows when mandatory audit fails", async () => {
   const { owner, a, b, organization, input } = await team(),
-    preview = await teams.previewMembers(organization.id, owner.id, input);
+    preview = await teams.previewMembers(
+      organization.id,
+      owner.id,
+      input,
+      `org-fixture-${owner.id}`,
+    );
   await db
     .update(organizationMembers)
     .set({ permissions: ["changed_custom"] })
@@ -138,9 +149,15 @@ it("rejects an entire batch after current grants change and rolls back all rows 
       owner.id,
       { ...input, previewRevision: preview.previewRevision },
       [a, b].map(() => audit(owner, organization.id)),
+      `org-fixture-${owner.id}`,
     ),
   ).rejects.toMatchObject({ code: "CONFLICT" });
-  const refreshed = await teams.previewMembers(organization.id, owner.id, input),
+  const refreshed = await teams.previewMembers(
+      organization.id,
+      owner.id,
+      input,
+      `org-fixture-${owner.id}`,
+    ),
     duplicate = audit(owner, organization.id);
   await db.insert(auditEvents).values(duplicate);
   await expect(
@@ -149,6 +166,7 @@ it("rejects an entire batch after current grants change and rolls back all rows 
       owner.id,
       { ...input, previewRevision: refreshed.previewRevision },
       [audit(owner, organization.id), duplicate],
+      `org-fixture-${owner.id}`,
     ),
   ).rejects.toThrow();
   const stored = await teams.getWorkspace(organization.id, owner.id);
@@ -163,7 +181,12 @@ it("rejects an entire batch after current grants change and rolls back all rows 
 });
 it("serializes concurrent confirmations and commits exactly one batch", async () => {
   const { owner, a, b, organization, input } = await team(),
-    preview = await teams.previewMembers(organization.id, owner.id, input);
+    preview = await teams.previewMembers(
+      organization.id,
+      owner.id,
+      input,
+      `org-fixture-${owner.id}`,
+    );
   const results = await Promise.allSettled(
     [1, 2].map(() =>
       teams.batchMembers(
@@ -171,6 +194,7 @@ it("serializes concurrent confirmations and commits exactly one batch", async ()
         owner.id,
         { ...input, previewRevision: preview.previewRevision },
         [a, b].map(() => audit(owner, organization.id)),
+        `org-fixture-${owner.id}`,
       ),
     ),
   );

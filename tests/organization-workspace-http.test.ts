@@ -164,6 +164,7 @@ it("passes immutable profile identity and an optimistic revision to the write pa
     new Date(version),
     fields,
     expect.objectContaining({ action: "organization.profile_updated" }),
+    "test",
   );
   expect(
     (
@@ -302,4 +303,14 @@ it("scopes voluntary exit to the session user and a required revision", async ()
     (await leave(request("POST", { expectedUpdatedAt: version, userId: "victim" }), context))
       .status,
   ).toBe(400);
+});
+it("rejects a profile edit from a different displayed account", async () => {
+  const response = await profile(
+    request("PATCH", { ...fields, expectedUpdatedAt: version }, "en", {
+      "x-nexus-actor-id": "other",
+    }),
+    context,
+  );
+  expect(response.status).toBe(409);
+  expect(mocks.updateProfile).not.toHaveBeenCalled();
 });

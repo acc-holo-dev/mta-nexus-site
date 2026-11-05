@@ -191,6 +191,7 @@ it("confirms ownership transfer before POST", async () => {
     },
     expect.any(AbortSignal),
     expect.any(Function),
+    { "x-nexus-actor-id": actorId },
   );
   expect(harness.onSaved).toHaveBeenCalledWith(transferResult);
 });

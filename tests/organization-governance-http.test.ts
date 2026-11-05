@@ -58,6 +58,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
     headers: {
       ...browserMutationHeaders(),
       cookie: "nexus_session=test;nexus_locale=ru",
+      "x-nexus-actor-id": "owner",
       "content-type": "application/json",
       ...headers,
     },
@@ -234,4 +235,12 @@ it("projects only safe history DTOs even when storage returns extra contact/audi
   const response = await GET(request(), context);
   expect(response.status).toBe(200);
   expect(JSON.stringify(await response.json())).not.toContain("PRIVATE");
+});
+it("rejects an ownership transfer from a different displayed account", async () => {
+  const response = await POST(
+    request("POST", transfer, "", { "x-nexus-actor-id": "other" }),
+    context,
+  );
+  expect(response.status).toBe(409);
+  expect(mocks.transfer).not.toHaveBeenCalled();
 });

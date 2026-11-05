@@ -107,6 +107,7 @@ function transferRows(
     ],
     [["session", new Date(Date.now() + 3_600_000).toISOString()]],
     [org({ ownerId: "target", updatedAt: later })],
+    [["session", new Date(Date.now() + 3_600_000).toISOString()]],
   ];
 }
 beforeEach(() => {

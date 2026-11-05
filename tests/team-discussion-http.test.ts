@@ -53,6 +53,7 @@ const request = (
     headers: {
       ...browserMutationHeaders(),
       cookie: "nexus_session=token; nexus_locale=ru",
+      "x-nexus-actor-id": "actor",
       ...(body === undefined ? {} : { "content-type": "application/json" }),
       ...headers,
     },
@@ -93,7 +94,7 @@ it("passes private bulk review and command through existing session and manageme
     expect(result.status).toBe(200);
     expect(result.headers.get("cache-control")).toBe("private, no-store");
     expect(result.headers.get("vary")).toBe("Cookie");
-    expect(method).toHaveBeenCalledWith("org", input, { id: "actor", role: "moderator" });
+    expect(method).toHaveBeenCalledWith("org", input, { id: "actor", role: "moderator" }, "token");
   }
   expect(state.rate).toHaveBeenCalledWith("organizationManagement", "actor");
 });
@@ -246,4 +247,11 @@ it("preserves related-report search/view/category scope and localizes denied rec
     code: "PUBLICATION_RESTORE_DENIED",
     error: expect.stringContaining("архив"),
   });
+});
+it("rejects changed actors before batch review and commit", async () => {
+  const headers = { "x-nexus-actor-id": "other" };
+  expect((await preview(request("POST", "", input, headers), context)).status).toBe(409);
+  expect((await batch(request("POST", "", input, headers), context)).status).toBe(409);
+  expect(state.previewMembers).not.toHaveBeenCalled();
+  expect(state.batchMembers).not.toHaveBeenCalled();
 });

@@ -89,6 +89,7 @@ async function batchPlan(
   actorId: string,
   input: BatchInput,
   write: boolean,
+  token: string,
 ) {
   if (
     input.userIds.length < 1 ||
@@ -101,6 +102,13 @@ async function batchPlan(
   if (!canManageOrganization(current.role)) throw new AppError("Access denied", 403, "FORBIDDEN");
   if (current.organization.updatedAt.getTime() !== input.expectedUpdatedAt.getTime())
     throw new AppError("Organization changed", 409, "CONFLICT");
+  const [actor] = await tx
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.id, actorId))
+    .for("share");
+  if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+  await lockInitiatingSession(tx, actorId, token);
   // Lock once in stable order. No member may disappear, change role or move scope between review and write.
   const members = await tx
     .select({
@@ -251,19 +259,22 @@ class OrganizationWorkspaceRepository {
       .limit(2);
     return rows.length === 1 ? rows[0] : null;
   }
-  async previewMembers(id: string, actorId: string, input: BatchInput) {
-    return db.transaction(async (tx) =>
-      batchPreview(await batchPlan(tx, id, actorId, input, false)),
-    );
+  async previewMembers(id: string, actorId: string, input: BatchInput, token: string) {
+    return db.transaction(async (tx) => {
+      const plan = await batchPlan(tx, id, actorId, input, false, token);
+      await lockInitiatingSession(tx, actorId, token);
+      return batchPreview(plan);
+    });
   }
   async batchMembers(
     id: string,
     actorId: string,
     input: BatchInput & { previewRevision: string },
     audits: Audit[],
+    token: string,
   ) {
     return db.transaction(async (tx) => {
-      const result = await batchPlan(tx, id, actorId, input, true);
+      const result = await batchPlan(tx, id, actorId, input, true, token);
       if (input.previewRevision !== result.previewRevision)
         throw new AppError("Team review changed", 409, "CONFLICT");
       const changed = result.plan.filter((value) => value.changed);
@@ -273,6 +284,7 @@ class OrganizationWorkspaceRepository {
         new Set(audits.map((audit) => audit.id)).size !== audits.length
       )
         throw new AppError("Invalid batch audit", 400, "VALIDATION_ERROR");
+      await lockInitiatingSession(tx, actorId, token);
       const ids = changed.map((value) => value.member.id);
       if (input.change.action === "remove") {
         await tx
@@ -331,6 +343,7 @@ class OrganizationWorkspaceRepository {
           events[index].id,
         );
       }
+      await lockInitiatingSession(tx, actorId, token);
       return {
         organization,
         changedUserIds: changed.map((value) => value.member.userId),
@@ -468,9 +481,17 @@ class OrganizationWorkspaceRepository {
     expected: Date,
     fields: OrganizationFields,
     audit: Audit,
+    token: string,
   ) {
     return db.transaction(async (tx) => {
       await writable(tx, id, actorId, expected);
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+      await lockInitiatingSession(tx, actorId, token);
       const [updated] = await tx
         .update(organizations)
         .set({
@@ -487,6 +508,7 @@ class OrganizationWorkspaceRepository {
         details: { fields: ["name", "description", "logoUrl", "websiteUrl"] },
         createdAt: new Date(),
       });
+      await lockInitiatingSession(tx, actorId, token);
       return updated;
     });
   }

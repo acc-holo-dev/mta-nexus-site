@@ -128,12 +128,22 @@ it("requires a reviewed token and validates exact changed identities, scope, ver
     expect(confirmsOrganizationBatchCommand(value, organization, preview)).toBeNull();
 });
 it("parses service input, delegates authority to the repository and gives every selected subject a unique audit", async () => {
-  await teams.previewMembers("org", input, actor);
-  expect(state.previewMembers).toHaveBeenCalledWith("org", "owner", {
-    ...input,
-    expectedUpdatedAt: new Date(time),
-  });
-  const result = await teams.batchMembers("org", { ...input, previewRevision: version }, actor);
+  await teams.previewMembers("org", input, actor, "unit-token");
+  expect(state.previewMembers).toHaveBeenCalledWith(
+    "org",
+    "owner",
+    {
+      ...input,
+      expectedUpdatedAt: new Date(time),
+    },
+    "unit-token",
+  );
+  const result = await teams.batchMembers(
+    "org",
+    { ...input, previewRevision: version },
+    actor,
+    "unit-token",
+  );
   expect(result.organization.updatedAt).toBe(later);
   const args = state.batchMembers.mock.calls[0];
   expect(args.slice(0, 2)).toEqual(["org", "owner"]);
@@ -144,7 +154,12 @@ it("parses service input, delegates authority to the repository and gives every 
     actorType: "user",
   });
   await expect(
-    teams.batchMembers("org", { ...input, previewRevision: version, actorId: "foreign" }, actor),
+    teams.batchMembers(
+      "org",
+      { ...input, previewRevision: version, actorId: "foreign" },
+      actor,
+      "unit-token",
+    ),
   ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
   expect(state.batchMembers).toHaveBeenCalledTimes(1);
 });

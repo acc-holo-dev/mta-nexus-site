@@ -2,9 +2,10 @@ import type { NextRequest } from "next/server";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
+  organizationCheckReadActor,
   organizationId,
   organizationInput,
-  organizationCheckReadActor,
+  organizationMutationToken,
 } from "../../../../../lib/organization-workspace-api";
 import { parseOrganizationPage } from "../../../../../lib/organization-workspace-contract";
 import { organizationWorkspaceService } from "../../../../../lib/services/organization-workspace-service";
@@ -19,11 +20,15 @@ export function GET(request: NextRequest, context: Context) {
   });
 }
 export const PATCH = withBrowserMutation((request: NextRequest, context: Context) => {
-  return organizationApi(request, async (user) => ({
-    organization: await organizationWorkspaceService.update(
-      organizationId((await context.params).id),
-      await organizationInput(request, user),
-      user,
-    ),
-  }));
+  return organizationApi(request, async (user) => {
+    const token = organizationMutationToken(request, user);
+    return {
+      organization: await organizationWorkspaceService.update(
+        organizationId((await context.params).id),
+        await organizationInput(request, user),
+        user,
+        token,
+      ),
+    };
+  });
 });

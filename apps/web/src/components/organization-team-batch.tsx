@@ -104,6 +104,7 @@ export function OrganizationTeamBatch({
         "POST",
         write ? { ...input, previewRevision: preview?.previewRevision } : input,
         request.signal,
+        { "x-nexus-actor-id": actorId },
       );
       if (!alive.current) return;
       if (!write) {

@@ -49,20 +49,26 @@ class OrganizationWorkspaceService {
   async recoverCreated(actorId: string, nonce: string, token: string) {
     return organizationWorkspaceRepository.findCreatedForRecovery(actorId, nonce, token);
   }
-  async previewMembers(id: string, input: unknown, user: User) {
+  async previewMembers(id: string, input: unknown, user: User, token: string) {
     const fields = parse(organizationBatchPreviewInput, input);
-    return organizationWorkspaceRepository.previewMembers(id, user.id, {
-      ...fields,
-      expectedUpdatedAt: new Date(fields.expectedUpdatedAt),
-    });
+    return organizationWorkspaceRepository.previewMembers(
+      id,
+      user.id,
+      {
+        ...fields,
+        expectedUpdatedAt: new Date(fields.expectedUpdatedAt),
+      },
+      token,
+    );
   }
-  async batchMembers(id: string, input: unknown, user: User) {
+  async batchMembers(id: string, input: unknown, user: User, token: string) {
     const fields = parse(organizationBatchCommandInput, input);
     const result = await organizationWorkspaceRepository.batchMembers(
       id,
       user.id,
       { ...fields, expectedUpdatedAt: new Date(fields.expectedUpdatedAt) },
       fields.userIds.map(() => audit(user, id, "organization.member_updated")),
+      token,
     );
     return { ...result, organization: editableOrganization(result.organization) };
   }
@@ -110,7 +116,7 @@ class OrganizationWorkspaceService {
       throw error;
     }
   }
-  async update(id: string, input: unknown, user: User) {
+  async update(id: string, input: unknown, user: User, token: string) {
     const { expectedUpdatedAt, ...fields } = parse(organizationUpdateSchema, input);
     return editableOrganization(
       await organizationWorkspaceRepository.updateProfile(
@@ -119,6 +125,7 @@ class OrganizationWorkspaceService {
         new Date(expectedUpdatedAt),
         fields,
         audit(user, id, "organization.profile_updated"),
+        token,
       ),
     );
   }

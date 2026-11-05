@@ -1,10 +1,10 @@
-import { UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { organizationGovernanceMutationError } from "../../../../../../lib/organization-governance-copy";
 import {
   organizationId,
   organizationInput,
+  organizationMutationToken,
 } from "../../../../../../lib/organization-workspace-api";
 import { organizationGovernanceService } from "../../../../../../lib/services/organization-governance-service";
 import { userPlatformApi } from "../../../../../../lib/user-platform-api";
@@ -13,8 +13,7 @@ export const POST = withBrowserMutation(
     return userPlatformApi(
       request,
       async (actor) => {
-        const currentToken = request.cookies.get("nexus_session")?.value;
-        if (!currentToken) throw new UnauthorizedError();
+        const currentToken = organizationMutationToken(request, actor);
         return organizationGovernanceService.transfer(
           organizationId((await context.params).id),
           actor,

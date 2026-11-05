@@ -87,6 +87,7 @@ export function OrganizationOwnershipTransfer({
           parsed.data,
           controller.current.signal,
           organizationGovernanceMutationError,
+          { "x-nexus-actor-id": actorId },
         ),
         data.organization,
         actorId,

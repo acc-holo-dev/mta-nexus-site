@@ -191,6 +191,7 @@ class OrganizationGovernanceRepository {
         "ownership_transferred",
         input.auditId,
       );
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       return {
         organization: updated,
         role: input.formerOwnerRole,

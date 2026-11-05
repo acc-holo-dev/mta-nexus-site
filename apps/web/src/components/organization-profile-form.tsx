@@ -229,8 +229,8 @@ export function OrganizationProfileForm({
         base ? "PATCH" : "POST",
         input.data,
         undefined,
-        nonce && actorId
-          ? { "x-nexus-actor-id": actorId, "x-nexus-creation-nonce": nonce }
+        actorId
+          ? { "x-nexus-actor-id": actorId, ...(nonce ? { "x-nexus-creation-nonce": nonce } : {}) }
           : undefined,
       );
       if (!base && identityEpoch.current !== requestEpoch) return;
