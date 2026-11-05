@@ -46,6 +46,7 @@ export default async function VerificationPage({
           <p className="mt-2 text-sm text-muted">{copy.description}</p>
         </header>
         <ErrorState
+          id="verification-workspace-unavailable"
           title={copy.unavailable}
           action={
             <Link href="/workspace/verification" className={navLinkClass}>

@@ -168,6 +168,7 @@ it("shows errors without presenting a failed read as empty history or editable d
     />,
   );
   expect(html).toContain('role="alert"');
+  expect(html).toContain('id="verification-workspace-unavailable"');
   expect(html).toContain(copy.unavailable);
   expect(html).toContain("min-h-11");
   expect(html).toContain("overflow-x-clip");
@@ -191,6 +192,7 @@ it("recovers with ErrorState when verification session probing fails", async () 
   mocks.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const html = renderToStaticMarkup(await VerificationPage({}));
   expect(html).toContain('role="alert"');
+  expect(html).toContain('id="verification-workspace-unavailable"');
   expect(html).toContain(verificationCopy("en").unavailable);
   expect(html).toContain('href="/workspace/verification"');
   expect(html).toContain("overflow-x-clip");
