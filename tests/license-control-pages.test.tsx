@@ -253,6 +253,7 @@ it("renders an empty moderator queue with clear-filters recovery when filters ar
   );
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.clearFilters);
+  expect(html).toContain(`<search aria-label="${copy.search}"`);
   expect(html).toContain('href="/admin/licenses"');
   expect(html).toContain("overflow-x-clip");
 });
