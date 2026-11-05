@@ -105,6 +105,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('id="own-discussion-publication-unavailable"');
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.readOnly);
+    expect(html).toContain('id="own-discussion-readonly"');
     expect(html).toContain(actions.remove);
     expect(html).not.toContain(`>${actions.edit}</button>`);
     expect(html).not.toContain('href="/articles/');
