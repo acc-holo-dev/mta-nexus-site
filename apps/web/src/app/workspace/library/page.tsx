@@ -228,7 +228,10 @@ export default async function ResourceLibraryPage({
                       </div>
                     </div>
                   ) : (
-                    <p className="mt-auto text-sm text-muted">{copy.unavailableReason}</p>
+                    <ErrorState
+                      id="library-item-unavailable-reason"
+                      title={copy.unavailableReason}
+                    />
                   )}
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`}
