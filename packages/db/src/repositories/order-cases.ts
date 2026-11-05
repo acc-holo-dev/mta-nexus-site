@@ -3,6 +3,7 @@ import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
+  UnauthorizedError,
   orderCaseReviewTarget,
   type OrderCaseCreate,
   type OrderCaseEvidence,
@@ -23,6 +24,7 @@ import {
   supportMutationRequests,
 } from "../schema";
 import type { ResourceTransaction } from "./entitlements";
+import { lockInitiatingSession } from "./initiating-session";
 import { historyPageBounds } from "./history-pagination";
 import { supportActor } from "./support-access";
 import { supportRequesterNotice } from "./support-requester-notice";
@@ -411,7 +413,9 @@ class OrderCasesRepository {
     auditId: string;
     statusAuditId: string;
     messageId: string;
+    currentToken: string;
   }) {
+    if (!input.currentToken) throw new UnauthorizedError();
     return db.transaction(async (tx) => {
       const [target] = await tx
         .select({ orderId: cases.orderId })
@@ -490,6 +494,8 @@ class OrderCasesRepository {
         )
           throw conflict("ORDER_CASE_RECONCILIATION_REQUIRED");
       }
+      // Lock the session after the order, actor and case locks and evidence reads.
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       const reviewStatus = orderCaseReviewTarget(action);
       const [updated] = await tx
         .update(cases)
@@ -555,6 +561,7 @@ class OrderCasesRepository {
         ticket.status === status ? "reply" : status,
         input.auditId,
       );
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       return {
         kind: "order_case_reviewed" as const,
         caseId: input.caseId,

@@ -4,6 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
   notice: vi.fn(),
+  session: vi.fn(),
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -22,6 +23,9 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: state.session,
+}));
 vi.mock("../packages/db/src/repositories/support-requester-notice", () => ({
   supportRequesterNotice: state.notice,
 }));
@@ -66,6 +70,7 @@ const create = {
 const review = {
   caseId: "sup_a",
   actorId: "usr_staff",
+  currentToken: "staff-token",
   auditId: "aud_r",
   statusAuditId: "aud_s",
   messageId: "spm_s",

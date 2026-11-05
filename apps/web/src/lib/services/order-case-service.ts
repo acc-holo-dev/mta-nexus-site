@@ -32,13 +32,14 @@ export const orderCaseService = {
       auditId: generateId("aud"),
     });
   },
-  review(caseId: string, command: OrderCaseReview, actor: User) {
+  review(caseId: string, command: OrderCaseReview, actor: User, currentToken: string) {
     return orderCasesRepository.review({
       caseId,
       command,
       actorId: actor.id,
       auditId: generateId("aud"),
       statusAuditId: generateId("aud"),
+      currentToken,
       messageId: generateId("spm"),
     });
   },

@@ -223,7 +223,7 @@ export function evaluateObservabilityEvidenceResidual({
     };
   }
   const body = readJson(path);
-  const validated = validateObservabilityReadinessEvidence(body);
+  const validated = validateObservabilityReadinessEvidence(body, { repoRoot: artifactRoot });
   if (!validated.ok) {
     return {
       status: "residual",

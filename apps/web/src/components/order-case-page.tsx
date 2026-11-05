@@ -470,6 +470,8 @@ export async function OrderCaseDetailPage({
       {staff &&
         (result.canReview ? (
           <OrderCaseReviewForm
+            key={`${actor.id}:${caseId}:${result.case.revision}:${result.case.supportUpdatedAt.toISOString()}`}
+            actorId={actor.id}
             caseId={caseId}
             reviewStatus={result.case.reviewStatus}
             revision={result.case.revision}

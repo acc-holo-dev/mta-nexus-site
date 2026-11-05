@@ -40,7 +40,13 @@ function request(
 ) {
   return new NextRequest(`http://nexus.test${path}`, {
     method,
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=token",
+      "x-nexus-actor-id": "usr_a",
+      ...headers,
+    },
     ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
   });
 }
@@ -117,6 +123,7 @@ it("binds staff review to evidence, case revision and shared conversation revisi
     "ord_a",
     { ...command, notes: "Reviewed records" },
     actor,
+    "token",
   );
   expect(mocks.rate).toHaveBeenCalledWith("moderationAction", actor.id);
   expect(
@@ -134,4 +141,22 @@ it("binds staff review to evidence, case revision and shared conversation revisi
 
 afterEach(() => {
   vi.unstubAllEnvs();
+});
+
+it("rejects review without the original actor or session before writing", async () => {
+  const command = {
+    action: "start_review",
+    expectedRevision: 1,
+    expectedSupportUpdatedAt: "2026-10-11T00:00:00.000Z",
+    expectedEvidenceHash: "a".repeat(64),
+    notes: "Reviewed records",
+  };
+  const run = (headers: Record<string, string>) =>
+    reviewPost(request("POST", "/api/admin/commerce/order-cases/sup_a", command, headers), context);
+  expect((await run({ "x-nexus-actor-id": "" })).status).toBe(428);
+  const changed = await run({ "x-nexus-actor-id": "usr_b" });
+  expect(changed.status).toBe(409);
+  expect(await changed.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+  expect((await run({ cookie: "" })).status).toBe(401);
+  expect(mocks.review).not.toHaveBeenCalled();
 });

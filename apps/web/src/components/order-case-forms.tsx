@@ -10,7 +10,7 @@ import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { orderCaseCreateSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { orderCaseActionLabel, orderCaseCopy, orderCaseKindLabel } from "../lib/order-case-i18n";
 import {
   confirmOrderCaseCreated,
@@ -210,6 +210,7 @@ export function OrderCaseCreateForm({
 }
 
 export function OrderCaseReviewForm({
+  actorId,
   caseId,
   reviewStatus,
   revision,
@@ -221,6 +222,7 @@ export function OrderCaseReviewForm({
   recommendationEligible,
   locale,
 }: {
+  actorId: string;
   caseId: string;
   reviewStatus: OrderCaseReviewStatus;
   revision: number;
@@ -239,7 +241,30 @@ export function OrderCaseReviewForm({
     [message, setMessage] = useState(""),
     [sealed, setSealed] = useState(false),
     [saved, setSaved] = useState(false);
-  const locked = useRef(false);
+  const locked = useRef(false),
+    epoch = useRef(0),
+    controller = useRef<AbortController | null>(null);
+  const identity = `${actorId}:${caseId}`;
+  const current = useRef(identity),
+    ready = useRef(identity);
+  if (current.current !== identity) {
+    current.current = identity;
+    epoch.current++;
+  }
+  useEffect(() => {
+    ready.current = identity;
+    locked.current = false;
+    controller.current?.abort();
+    setNotes("");
+    setBusy(false);
+    setMessage("");
+    setSealed(false);
+    setSaved(false);
+    return () => {
+      epoch.current++;
+      controller.current?.abort();
+    };
+  }, [identity]);
   const actions: OrderCaseReview["action"][] =
     threadStatus !== "open"
       ? ["reopen"]
@@ -254,7 +279,17 @@ export function OrderCaseReviewForm({
               : []),
           ];
   async function review(action: OrderCaseReview["action"]) {
-    if (locked.current || sealed || notes.trim().length < 3) return;
+    if (
+      ready.current !== identity ||
+      current.current !== identity ||
+      locked.current ||
+      sealed ||
+      notes.trim().length < 3
+    )
+      return;
+    const version = epoch.current,
+      abort = new AbortController();
+    controller.current = abort;
     locked.current = true;
     setBusy(true);
     setMessage("");
@@ -272,13 +307,18 @@ export function OrderCaseReviewForm({
           method: "POST",
           credentials: "same-origin",
           cache: "no-store",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },
           body: JSON.stringify(command),
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(15000)]),
         },
       );
       const data = await response.json().catch(() => null);
-      if (response.ok && confirmOrderCaseReviewed(data, caseId, command, reviewStatus)) {
+      if (version !== epoch.current || abort.signal.aborted) return;
+      if (
+        response.ok &&
+        data?.actorId === actorId &&
+        confirmOrderCaseReviewed(data, caseId, command, reviewStatus)
+      ) {
         setSaved(true);
         setMessage(copy.reviewSaved);
         setSealed(true);
@@ -293,13 +333,19 @@ export function OrderCaseReviewForm({
       );
       setSealed(true);
     } catch {
-      setMessage(copy.uncertain);
-      setSealed(true);
+      if (version === epoch.current && !abort.signal.aborted) {
+        setMessage(copy.uncertain);
+        setSealed(true);
+      }
     } finally {
-      locked.current = false;
-      setBusy(false);
+      if (version === epoch.current) {
+        locked.current = false;
+        setBusy(false);
+      }
+      if (controller.current === abort) controller.current = null;
     }
   }
+  if (ready.current !== identity) return null;
   return (
     <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5" aria-busy={busy}>
       <h2 className="text-lg font-semibold">{copy.review}</h2>

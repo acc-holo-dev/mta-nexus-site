@@ -171,6 +171,8 @@ Marketplace organic signals: relevance, sales, rating, freshness, update frequen
 
 ## 8. Trial, wishlist, support и billing UX
 
+**Текущий API рассмотрения обращения:** `POST /api/admin/commerce/order-cases/:id` требует `X-Nexus-Actor-Id` исходного сотрудника. Если результат неизвестен, форма блокирует повтор до обновления; решение не выполняет перевод денег.
+
 **цель владельца.** Trial — отдельный entitlement (не fake zero-price Purchase): время, один server, activation/download limits, feature flags, optional DRM lease, cooldown; conversion сохраняет server context. Wishlist private by default; target notifications: price drop, promotion, new stable, back in stock, opted-in seller announcement.
 
 Unified NEXUS support (не потеря контекста в произвольных DM): case связан с purchase/license/activation/resource/build/seller/payment/dispute/server integration. Seller/team внутри системы; staff escalate по policy. Seller-defined support term на SKU **отличен** от license lifetime, update entitlement и platform support. Seller response time **не** обязательный public reputation signal.

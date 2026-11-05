@@ -1,7 +1,13 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { db, userRepository, orderCasesRepository as repo } from "@nexus/db";
+import {
+  db,
+  userRepository,
+  sessionRepository,
+  sessions,
+  orderCasesRepository as repo,
+} from "@nexus/db";
 import {
   auditEvents,
   commerceOrderCases,
@@ -30,6 +36,13 @@ async function fixture() {
       username: id,
       displayName: "Order support fixture",
     });
+  const staffToken = `staff-token-${suffix}`;
+  await sessionRepository.create({
+    id: `ses_oc_${suffix}`,
+    userId: staffId,
+    token: staffToken,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   await db.insert(orders).values({
     id: orderId,
     orderNumber: `case-${suffix}`,
@@ -62,7 +75,7 @@ async function fixture() {
     },
   };
   await repo.create(input);
-  return { suffix, buyerId, staffId, orderId, input };
+  return { suffix, buyerId, staffId, staffToken, orderId, input };
 }
 async function reviewInput(
   f: Awaited<ReturnType<typeof fixture>>,
@@ -72,6 +85,7 @@ async function reviewInput(
   return {
     caseId: f.input.caseId,
     actorId: f.staffId,
+    currentToken: f.staffToken,
     auditId: `aud_r_${randomBytes(8).toString("hex")}`,
     statusAuditId: `aud_s_${randomBytes(8).toString("hex")}`,
     messageId: `spm_r_${randomBytes(8).toString("hex")}`,
@@ -201,3 +215,133 @@ it("rolls review, shared status, message and notification back when auditing fai
       .where(and(eq(notifications.recipientId, f.buyerId))),
   ).toHaveLength(0);
 });
+
+function deferred() {
+  let resolve: () => void = () => undefined;
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+async function waitBlocked(pid: number) {
+  await expect
+    .poll(
+      async () => {
+        const [row] = await db.execute<{ waiting: boolean }>(sql`select exists(
+      select 1 from pg_stat_activity where datname=current_database()
+      and ${pid}=any(pg_blocking_pids(pid)) and wait_event_type='Lock'
+    ) as waiting`);
+        return row.waiting;
+      },
+      { timeout: 5000, interval: 10 },
+    )
+    .toBe(true);
+}
+async function reviewState(f: Awaited<ReturnType<typeof fixture>>) {
+  return {
+    cases: await db
+      .select()
+      .from(commerceOrderCases)
+      .where(eq(commerceOrderCases.caseId, f.input.caseId)),
+    tickets: await db.select().from(supportCases).where(eq(supportCases.id, f.input.caseId)),
+    messages: await db
+      .select()
+      .from(supportCaseMessages)
+      .where(eq(supportCaseMessages.caseId, f.input.caseId)),
+    audits: await db.select().from(auditEvents).where(eq(auditEvents.targetId, f.input.caseId)),
+    notices: await db.select().from(notifications).where(eq(notifications.recipientId, f.buyerId)),
+  };
+}
+it("rejects a revoked staff session after waiting for the order lock", async () => {
+  const f = await fixture(),
+    input = await reviewInput(f),
+    before = await reviewState(f),
+    locked = deferred(),
+    release = deferred();
+  let pid = 0;
+  const blocker = db.transaction(async (tx) => {
+    await tx.select().from(orders).where(eq(orders.id, f.orderId)).for("update");
+    const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+    pid = row.pid;
+    locked.resolve();
+    await release.promise;
+  });
+  await Promise.race([
+    locked.promise,
+    blocker.then(() => {
+      throw new Error("Blocker exited before locking");
+    }),
+  ]);
+  const pending = repo.review(input).then(
+    (value) => ({ value }),
+    (error: unknown) => ({ error }),
+  );
+  try {
+    await waitBlocked(pid);
+    await sessionRepository.delete(f.staffToken);
+  } finally {
+    release.resolve();
+    await blocker;
+  }
+  expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
+  expect(await reviewState(f)).toEqual(before);
+}, 15000);
+it("rolls back review, status, message, audit and notice when session expires during an audit write", async () => {
+  const f = await fixture(),
+    input = await reviewInput(f),
+    before = await reviewState(f),
+    expiresAt = new Date(Date.now() + 2000),
+    locked = deferred(),
+    release = deferred();
+  await db.update(sessions).set({ expiresAt }).where(eq(sessions.userId, f.staffId));
+  let pid = 0;
+  const blocker = db
+    .transaction(async (tx) => {
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: f.staffId,
+        actorType: "admin",
+        targetType: "support_case",
+        targetId: f.input.caseId,
+        action: "fixture.collision",
+        details: {},
+      });
+      const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+      pid = row.pid;
+      locked.resolve();
+      await release.promise;
+      throw new Error("rollback fixture blocker");
+    })
+    .catch((error: unknown) => {
+      if (!(error instanceof Error) || error.message !== "rollback fixture blocker") throw error;
+    });
+  await Promise.race([
+    locked.promise,
+    blocker.then(() => {
+      throw new Error("Blocker exited before locking");
+    }),
+  ]);
+  const pending = repo.review(input).then(
+    (value) => ({ value }),
+    (error: unknown) => ({ error }),
+  );
+  try {
+    await waitBlocked(pid);
+    await expect
+      .poll(
+        async () => {
+          const [row] = await db.execute<{ expired: boolean }>(
+            sql`select clock_timestamp()>=${expiresAt}::timestamptz as expired`,
+          );
+          return row.expired;
+        },
+        { timeout: 5000, interval: 10 },
+      )
+      .toBe(true);
+  } finally {
+    release.resolve();
+    await blocker;
+  }
+  expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
+  expect(await reviewState(f)).toEqual(before);
+}, 15000);

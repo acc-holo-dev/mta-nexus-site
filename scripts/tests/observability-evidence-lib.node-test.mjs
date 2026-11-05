@@ -169,9 +169,10 @@ test("evaluateObservabilityEvidenceResidual stays residual without inventing PAS
 test("evaluateObservabilityEvidenceResidual passes only for validated evidence", () => {
   const dir = mkdtempSync(join(tmpdir(), "obs-evidence-ok-"));
   try {
+    writeMinimalCheckout(dir);
     mkdirSync(join(dir, "artifacts"), { recursive: true });
     const evidence = buildObservabilityReadinessEvidence({
-      repoRoot: process.cwd(),
+      repoRoot: dir,
       env: alertEnv,
     });
     writeFileSync(
@@ -181,6 +182,25 @@ test("evaluateObservabilityEvidenceResidual passes only for validated evidence",
     const result = evaluateObservabilityEvidenceResidual({ artifactRoot: dir });
     assert.equal(result.status, "passed");
     assert.equal(result.reason, null);
+
+    unlinkSync(join(dir, "scripts/check-web-push-worker-queue.mjs"));
+    const afterRemoval = evaluateObservabilityEvidenceResidual({ artifactRoot: dir });
+    assert.equal(afterRemoval.status, "residual");
+    assert.match(afterRemoval.reason ?? "", /checkout missing.*check-web-push-worker-queue/u);
+
+    writeFileSync(join(dir, "scripts/check-web-push-worker-queue.mjs"), "#!/usr/bin/env node\n");
+    writeFileSync(
+      join(dir, "docs/OPERATIONS.md"),
+      operationsWithNeedles(
+        OBSERVABILITY_RUNBOOK_MENTIONS.filter((n) => n !== "publication_delivery_failed"),
+      ),
+    );
+    const afterRunbookChange = evaluateObservabilityEvidenceResidual({ artifactRoot: dir });
+    assert.equal(afterRunbookChange.status, "residual");
+    assert.match(
+      afterRunbookChange.reason ?? "",
+      /runbook needle missing.*publication_delivery_failed/u,
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
