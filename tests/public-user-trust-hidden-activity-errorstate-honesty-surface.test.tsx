@@ -13,7 +13,5 @@ it("locks hidden activity notice to ErrorState", () => {
   expect(source).toMatch(
     /data\.publications === null \? \(\s*<ErrorState id="public-user-trust-hidden-activity" title=\{copy\.hiddenActivity\} \/>\s*\) : \(/u,
   );
-  expect(source).not.toContain(
-    '<p className="text-sm text-muted">{copy.hiddenActivity}</p>',
-  );
+  expect(source).not.toContain('<p className="text-sm text-muted">{copy.hiddenActivity}</p>');
 });
