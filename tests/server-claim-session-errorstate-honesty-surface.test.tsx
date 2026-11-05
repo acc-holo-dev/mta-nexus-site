@@ -9,12 +9,10 @@ const source = readFileSync(join(root, "apps/web/src/app/servers/[slug]/page.tsx
 /** Honesty lock for server detail claim-session lookup failure. */
 it("locks claim-session lookup failure to ErrorState without soft status", () => {
   expect(source).toContain('import { ErrorState, TrustBadge } from "@nexus/ui"');
-  expect(source).toContain('claimViewer === undefined');
+  expect(source).toContain("claimViewer === undefined");
   expect(source).toMatch(
     /claimViewer === undefined \? \(\s*<ErrorState\s+id="server-claim-session-unavailable"\s+title=\{/u,
   );
   expect(source).toContain("Could not check the session for server verification.");
-  expect(source).not.toMatch(
-    /claimViewer === undefined \? \(\s*<p role="status">/u,
-  );
+  expect(source).not.toMatch(/claimViewer === undefined \? \(\s*<p role="status">/u);
 });

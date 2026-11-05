@@ -42,6 +42,8 @@ vi.mock("@nexus/ui", async () => {
   return {
     TrustBadge: ({ label }: { label: string }) =>
       React.createElement("span", { "data-testid": "trust-badge" }, label),
+    ErrorState: ({ id, title }: { id?: string; title: string }) =>
+      React.createElement("div", { id, role: "alert" }, title),
   };
 });
 
