@@ -397,7 +397,9 @@ export function VerificationWorkspace({
           }
         />
       ) : null}
-      {verifiedKey !== identityKey && writeError ? <ErrorState title={writeError} /> : null}
+      {verifiedKey !== identityKey && writeError ? (
+        <ErrorState id="verification-workspace-write-failed" title={writeError} />
+      ) : null}
       {profile && (
         <section className="nexus-panel space-y-3 p-5">
           <h2 className="font-heading text-primary">{copy.current}</h2>
@@ -610,9 +612,12 @@ export function VerificationWorkspace({
               >
                 {copy.submit}
               </Button>
-              {writeError ? <ErrorState title={writeError} /> : null}
+              {writeError ? (
+                <ErrorState id="verification-workspace-write-failed" title={writeError} />
+              ) : null}
               {intent ? (
                 <ErrorState
+                  id="verification-workspace-submit-unconfirmed"
                   title={
                     locale === "ru"
                       ? "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки."
