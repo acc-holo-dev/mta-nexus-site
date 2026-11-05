@@ -15,4 +15,3 @@ it("locks evidence-changed notice to ErrorState without soft text-warning", () =
   expect(source).not.toContain('role="note" className="text-sm text-warning"');
   expect(source).not.toContain('className="text-sm text-warning">\n          {copy.changed}');
 });
-
