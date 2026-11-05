@@ -1,8 +1,8 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import assert from "node:assert/strict";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, it } from "node:test";
-import assert from "node:assert/strict";
 import { classifyTests, discoverTests } from "../test-projects.mjs";
 
 const fixtures = [];
@@ -236,7 +236,7 @@ describe("isolated and shared-database test projects", () => {
   it("keeps all current repository tests and known shared queue suites", () => {
     const groups = classifyTests(process.cwd());
     assert.deepEqual([...groups.unit, ...groups.database].sort(), discoverTests(process.cwd()));
-    assert.ok(groups.database.includes("packages/db/src/repositories/account-mail-worker.test.ts"));
+    assert.ok(groups.database.includes("tests/account-mail-worker-lease-claim.test.ts"));
     assert.ok(groups.database.includes("tests/password-change-transaction.test.ts"));
     assert.ok(groups.unit.includes("tests/market-catalog-sql.test.ts"));
   });
