@@ -497,7 +497,7 @@ export function ResourceQaPanel({
               />
             </div>
           ) : capabilities?.askReason === "access_required" ? (
-            <p className="text-xs text-muted">{copy.accessRequired}</p>
+            <ErrorState id="resource-qa-access-required" title={copy.accessRequired} />
           ) : canAsk ? (
             <form className="min-w-0 space-y-2" onSubmit={onAsk}>
               <label className="block min-w-0 space-y-1 text-xs text-muted">
@@ -539,7 +539,7 @@ export function ResourceQaPanel({
               </Button>
             </form>
           ) : !readError ? (
-            <p className="text-xs text-muted">{copy.unavailable}</p>
+            <ErrorState id="resource-qa-ask-unavailable" title={copy.unavailable} />
           ) : null}
 
           {loadingDetail ? (
