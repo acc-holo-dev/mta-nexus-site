@@ -13,7 +13,7 @@ export function deferred<T>(): Deferred<T> {
   return { promise, resolve };
 }
 
-export type ServerDetailBehaviorServer = {
+type ServerDetailBehaviorServer = {
   id: string;
   slug: string;
   name: string;
@@ -81,7 +81,7 @@ export const mocks: ServerDetailBehaviorMocks = {
   session: vi.fn(),
 };
 
-export function resetServerDetailBehavior() {
+function resetServerDetailBehavior() {
   vi.clearAllMocks();
   state.notFoundCalls = 0;
   state.server = {
