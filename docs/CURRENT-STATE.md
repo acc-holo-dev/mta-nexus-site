@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `a294f84e` — tip advanced after tip honesty (#559) on 93225fd9 residual wave; tip CI not claimed verified-green under rapid merges;
 - `93225fd9` — tip advanced after discovery-follow-surface suite split (#550); tip CI not claimed verified-green under rapid merges;
 - `ae906295` — tip advanced after library-collections-http split (#547) and support-sla ErrorState (#549); tip CI not claimed verified-green under rapid merges (Actions may cancel under concurrent tip merges);
 - `5df7c793` — tip advanced after community-report detail confirm-cancel (#545) and metadata reviewRequired (#544); tip CI not claimed verified-green under rapid merges;
