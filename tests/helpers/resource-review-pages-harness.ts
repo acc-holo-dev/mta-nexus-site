@@ -28,8 +28,8 @@ export const mocks: ResourceReviewPagesMocks = {
   reportDetail: vi.fn(),
 };
 
-export const now = new Date("2026-10-11T00:00:00Z");
-export const bounds = { page: 2, totalPages: 3, total: 41 };
+const now = new Date("2026-10-11T00:00:00Z");
+const bounds = { page: 2, totalPages: 3, total: 41 };
 export const review = {
   id: "cmt_a",
   text: "<script>private review</script>",
