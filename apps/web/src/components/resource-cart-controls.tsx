@@ -347,7 +347,9 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
           })}
         </ul>
       )}
-      {unavailable ? <ErrorState title={copy.unavailableNote} /> : null}
+      {unavailable ? (
+        <ErrorState id="resource-cart-unavailable" title={copy.unavailableNote} />
+      ) : null}
       <div className="flex min-w-0 flex-wrap gap-3">
         {uncertain ? (
           <Button
