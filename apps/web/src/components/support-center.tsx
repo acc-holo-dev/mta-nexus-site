@@ -307,7 +307,9 @@ export function SupportCenter({
         <p className="max-w-3xl text-sm text-muted">
           {staffMode ? copy.staffDescription : copy.description}
         </p>
-        {!staffMode && <p className="text-xs text-warning">{copy.noGuaranteedSla}</p>}
+        {!staffMode ? (
+          <ErrorState id="support-no-guaranteed-sla" title={copy.noGuaranteedSla} />
+        ) : null}
       </header>
 
       {!staffMode && (
