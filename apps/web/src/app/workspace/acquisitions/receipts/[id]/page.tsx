@@ -115,9 +115,7 @@ export default async function ResourceCartReceiptPage({
                   />
                 </div>
               ) : (
-                <p className="text-sm text-warning">
-                  {item.hasCurrentAccess ? copy.unavailable : copy.removed}
-                </p>
+                <ErrorState title={item.hasCurrentAccess ? copy.unavailable : copy.removed} />
               )}
               {item.downloadable ? (
                 <Link
