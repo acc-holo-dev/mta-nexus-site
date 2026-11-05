@@ -35,6 +35,9 @@ it.each(["en", "ru"] as const)(
     const nodes = render(suspended);
     expect(nodes.some((node) => node.props.title === copy.errors.PRODUCT_STATE_CHANGED)).toBe(true);
     expect(
+      nodes.some((node) => node.props.id === "resource-compatibility-suspended-readonly"),
+    ).toBe(true);
+    expect(
       nodes.some(
         (node) =>
           node.props.title === copy.errors.PRODUCT_STATE_CHANGED &&
