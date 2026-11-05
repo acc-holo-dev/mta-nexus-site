@@ -157,11 +157,14 @@ export function ResourceModerationControls({
         </div>
       </dl>
       {release ? (
-        <p className="text-sm text-warning">
-          {locale === "ru"
-            ? "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет."
-            : "Release returns a draft and requires a new review. Nothing is auto-published."}
-        </p>
+        <ErrorState
+          id="resource-moderation-release-draft"
+          title={
+            locale === "ru"
+              ? "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет."
+              : "Release returns a draft and requires a new review. Nothing is auto-published."
+          }
+        />
       ) : null}
       {selectedBuild && selectedBuild.status !== "published" ? (
         <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
