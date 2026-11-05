@@ -215,7 +215,7 @@ export function CommunityReportForm({
         type="button"
         variant="ghost"
         onClick={() => setOpen(true)}
-        className="h-auto min-h-9 px-0 text-xs text-muted underline"
+        className="h-auto min-h-11 px-0 text-xs text-muted underline"
       >
         {copy.report}
       </Button>
@@ -230,7 +230,7 @@ export function CommunityReportForm({
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-9 px-0 text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="h-auto min-h-11 px-0 text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           disabled={pending}
           onClick={() => setOpen(false)}
         >

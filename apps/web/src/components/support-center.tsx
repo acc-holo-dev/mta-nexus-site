@@ -365,7 +365,7 @@ export function SupportCenter({
                 type="button"
                 variant="ghost"
                 disabled={creating}
-                className="mt-2 h-auto min-h-9 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="mt-2 h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 onClick={() => {
                   clearSupportObjectContext();
                   setObjectContext(null);
@@ -592,7 +592,7 @@ export function SupportCenter({
           {page > 1 ? (
             <Link
               href={supportHref(basePath, initialFilters, page - 1)}
-              className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {dictionary.market.previousPage}
             </Link>
@@ -605,7 +605,7 @@ export function SupportCenter({
           {page < totalPages ? (
             <Link
               href={supportHref(basePath, initialFilters, page + 1)}
-              className="min-h-9 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {dictionary.market.nextPage}
             </Link>

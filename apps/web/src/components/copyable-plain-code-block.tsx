@@ -29,7 +29,13 @@ export function CopyablePlainCodeBlock({
       <pre className="overflow-x-auto rounded-lg border border-base bg-inset p-3 text-xs text-secondary">
         <code>{code}</code>
       </pre>
-      <Button type="button" variant="secondary" size="sm" onClick={() => void copyCode()}>
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        className="min-h-11"
+        onClick={() => void copyCode()}
+      >
         {copied ? copiedLabel : copyLabel}
       </Button>
     </div>

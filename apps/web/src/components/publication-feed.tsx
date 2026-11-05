@@ -186,7 +186,7 @@ export function PublicationFeed({
               </Link>
               <Link
                 href={publicationHref(path, { ...filters, author: item.author.username })}
-                className="rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className="inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 prefetch={false}
               >
                 {copy.onlyAuthor}
@@ -231,7 +231,7 @@ export function PublicationFeed({
                     <Link
                       href={publicationHref(path, { ...filters, tag })}
                       prefetch={false}
-                      className="inline-flex min-h-8 items-center break-all rounded-md border border-base px-2 text-xs text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className="inline-flex min-h-11 items-center break-all rounded-md border border-base px-2 text-xs text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     >
                       #{tag}
                     </Link>
@@ -242,7 +242,7 @@ export function PublicationFeed({
             <Link
               href={`/articles/${encodeURIComponent(item.slug)}#discussion`}
               prefetch={false}
-              className="rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {copy.comments}: {item.commentCount}
             </Link>

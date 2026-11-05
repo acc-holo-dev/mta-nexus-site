@@ -393,7 +393,7 @@ export function SupportCaseThread({
         />
         <Link
           href={`${backHref}/${caseId}/messages`}
-          className="inline-flex min-h-9 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {supportMessageCopy(locale).title}
         </Link>
@@ -452,7 +452,7 @@ export function SupportCaseThread({
             </p>
             <Link
               href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
-              className="mt-2 inline-flex min-h-9 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="mt-2 inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               {supportMessageCopy(locale).link}
             </Link>
