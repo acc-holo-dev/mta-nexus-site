@@ -353,7 +353,8 @@ export function VerificationWorkspace({
       setPending(false);
     }
   }
-  if (visibleKey !== identityKey) return <ErrorState title={copy.unavailable} />;
+  if (visibleKey !== identityKey)
+    return <ErrorState id="verification-workspace-unavailable" title={copy.unavailable} />;
   const profile = overview?.profile,
     developer = !!profile && ["developer", "admin"].includes(profile.role);
   return (
@@ -381,6 +382,7 @@ export function VerificationWorkspace({
       </div>
       {readError ? (
         <ErrorState
+          id="verification-workspace-unavailable"
           title={readError}
           action={
             <Button
