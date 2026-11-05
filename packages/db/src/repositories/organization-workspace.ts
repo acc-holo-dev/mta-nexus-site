@@ -11,11 +11,25 @@ import {
   NotFoundError,
   withServerManagementPermission,
 } from "@nexus/domain";
-import { and, asc, desc, eq, exists, getTableColumns, ilike, inArray, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  exists,
+  getTableColumns,
+  gt,
+  ilike,
+  inArray,
+  or,
+  sql,
+} from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, organizationMembers, organizations, users } from "../schema";
+import { auditEvents, organizationMembers, organizations, sessions, users } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 import { storeOrganizationAccessNotice } from "./organization-access-notice";
 import { containsPattern } from "./search-pattern";
+import { digestSessionToken } from "./sessions";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type OrganizationFields = {
@@ -201,6 +215,42 @@ async function record(tx: Transaction, id: string, audit: Audit, details: Record
 }
 
 class OrganizationWorkspaceRepository {
+  async findCreatedForRecovery(actorId: string, nonce: string, token: string) {
+    if (!token) return null;
+    const rows = await db
+      .select({ id: organizations.id })
+      .from(organizations)
+      .innerJoin(
+        auditEvents,
+        and(
+          eq(auditEvents.targetId, organizations.id),
+          eq(auditEvents.targetType, "organization"),
+          eq(auditEvents.action, "organization.created"),
+          eq(auditEvents.actorType, "user"),
+          eq(auditEvents.actorId, actorId),
+          sql`${auditEvents.details}->>'creationNonce' = ${nonce}`,
+        ),
+      )
+      .where(
+        and(
+          eq(organizations.ownerId, actorId),
+          exists(
+            db
+              .select({ id: sessions.id })
+              .from(sessions)
+              .where(
+                and(
+                  eq(sessions.userId, actorId),
+                  eq(sessions.token, digestSessionToken(token)),
+                  gt(sessions.expiresAt, sql`clock_timestamp()`),
+                ),
+              ),
+          ),
+        ),
+      )
+      .limit(2);
+    return rows.length === 1 ? rows[0] : null;
+  }
   async previewMembers(id: string, actorId: string, input: BatchInput) {
     return db.transaction(async (tx) =>
       batchPreview(await batchPlan(tx, id, actorId, input, false)),
@@ -376,8 +426,16 @@ class OrganizationWorkspaceRepository {
     slug: string,
     fields: OrganizationFields,
     audit: Audit,
+    token: string,
   ) {
     return db.transaction(async (tx) => {
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, ownerId))
+        .for("share");
+      if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+      await lockInitiatingSession(tx, ownerId, token);
       const [created] = await tx
         .insert(organizations)
         .values({
@@ -398,7 +456,8 @@ class OrganizationWorkspaceRepository {
         role: "owner",
         permissions: [],
       });
-      await tx.insert(auditEvents).values({ ...audit, details: {}, createdAt: new Date() });
+      await tx.insert(auditEvents).values({ ...audit, createdAt: new Date() });
+      await lockInitiatingSession(tx, ownerId, token);
       return created;
     });
   }

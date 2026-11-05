@@ -46,6 +46,9 @@ function audit(user: User, id: string, action: string) {
   };
 }
 class OrganizationWorkspaceService {
+  async recoverCreated(actorId: string, nonce: string, token: string) {
+    return organizationWorkspaceRepository.findCreatedForRecovery(actorId, nonce, token);
+  }
   async previewMembers(id: string, input: unknown, user: User) {
     const fields = parse(organizationBatchPreviewInput, input);
     return organizationWorkspaceRepository.previewMembers(id, user.id, {
@@ -86,7 +89,7 @@ class OrganizationWorkspaceService {
       })),
     };
   }
-  async create(input: unknown, user: User) {
+  async create(input: unknown, user: User, token: string, nonce: string) {
     const { slug, ...fields } = parse(organizationCreateSchema, input);
     const id = generateId("org");
     try {
@@ -96,7 +99,8 @@ class OrganizationWorkspaceService {
           user.id,
           slug,
           fields,
-          audit(user, id, "organization.created"),
+          { ...audit(user, id, "organization.created"), details: { creationNonce: nonce } },
+          token,
         ),
       );
     } catch (error) {

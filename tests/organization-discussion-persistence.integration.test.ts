@@ -1,22 +1,24 @@
 import { randomUUID } from "node:crypto";
-import { afterEach, expect, it } from "vitest";
-import { and, eq, inArray, sql } from "drizzle-orm";
 import {
-  db,
-  organizationWorkspaceRepository as teams,
-  contentRepository,
   contentDiscussionRepository,
+  contentRepository,
+  db,
+  sessionRepository,
+  organizationWorkspaceRepository as teams,
   userRepository,
 } from "@nexus/db";
+import type { User } from "@nexus/domain";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
 import {
   auditEvents,
-  organizations,
-  organizationMembers,
-  users,
   comments,
   content,
+  organizationMembers,
+  organizations,
+  users,
 } from "../packages/db/src/schema";
-import type { User } from "@nexus/domain";
+
 const actorIds: string[] = [],
   orgIds: string[] = [];
 afterEach(async () => {
@@ -50,12 +52,20 @@ function audit(user: User, id: string, action = "organization.member_updated") {
 async function organization(owner: User) {
   const id = `org_team_${randomUUID()}`;
   orgIds.push(id);
+  const token = `org-fixture-${randomUUID()}`;
+  await sessionRepository.create({
+    id: `ses_${randomUUID()}`,
+    userId: owner.id,
+    token,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   return teams.create(
     id,
     owner.id,
     `team-${randomUUID()}`,
     { name: "Test organization", description: "", logoUrl: "", websiteUrl: "" },
     audit(owner, id, "organization.created"),
+    token,
   );
 }
 it("commits one concurrent team operation and advances the same profile revision", async () => {

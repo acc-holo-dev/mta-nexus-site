@@ -177,6 +177,8 @@ Target modules claimed page: logo/banner/media; description/rules; social/websit
 
 Governance needs: invites; member roles; granular permissions; ownership transfer; billing owner; resource/server ownership; audit log; public profile; privacy settings; organization subscription/billing.
 
+**Current runtime — создание организации.** `POST /api/workspace/organizations` требует `X-Nexus-Actor-Id` с ID текущего пользователя и `X-Nexus-Creation-Nonce` из 32 строчных шестнадцатеричных символов. При неизвестном результате форма сохраняет запрос в текущей вкладке и предлагает проверить его через приватный recovery endpoint; отсутствие результата не доказывает, что исходный запрос уже завершился. Существующим API-клиентам необходимо передавать оба заголовка.
+
 ### 8.1 Workspace context switching
 
 **Owner target (49).** Единый `/workspace` с active actor context. Переключение на Organization меняет вместе: Resources, Servers, Billing, Payouts, Support, Deals, Members/permissions, Audit. Personal context остаётся отдельно доступным.

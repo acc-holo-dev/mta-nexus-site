@@ -14,7 +14,7 @@ import {
   organizationWorkspaceSchema,
 } from "../lib/organization-workspace-contract";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
-import { parseEditableProfile } from "../lib/user-platform-client";
+import { PlatformRequestError, parseEditableProfile } from "../lib/user-platform-client";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
@@ -57,6 +57,119 @@ export function OrganizationProfileForm({
   const [identityVerified, setIdentityVerified] = useState(true);
   const [restrictedVerified, setRestrictedVerified] = useState(false);
   const [serverPermits, setServerPermits] = useState(true);
+  const [creationReady, setCreationReady] = useState(Boolean(initial));
+  const [verifiedCreationKey, setVerifiedCreationKey] = useState("");
+  const [creationNonce, setCreationNonce] = useState<string | null>(null);
+  const [creationNotice, setCreationNotice] = useState("");
+  const creationKey = `nexus:organization-create:v1:${actorId ?? ""}`;
+  const currentCreationKey = useRef(creationKey);
+  const identityEpoch = useRef(0);
+  if (currentCreationKey.current !== creationKey) identityEpoch.current += 1;
+  currentCreationKey.current = creationKey;
+  const localeRef = useRef(locale);
+  localeRef.current = locale;
+  const text = (ru: string, en: string) => (locale === "ru" ? ru : en);
+  useEffect(() => {
+    if (initial) return;
+    let alive = true;
+    setCreationReady(false);
+    setCreationNonce(null);
+    setVerifiedCreationKey("");
+    setFields({ name: "", description: "", logoUrl: "", websiteUrl: "", slug: "" });
+    setDirty(false);
+    setError("");
+    setCreationNotice("");
+    async function restore() {
+      try {
+        if (!actorId) throw new Error("identity");
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        const session = await response.json();
+        if (!response.ok || session?.authenticated !== true || session?.user?.id !== actorId)
+          throw new Error("identity");
+        const raw = sessionStorage.getItem(creationKey);
+        if (raw) {
+          if (raw.length > 20_000) throw new Error("storage");
+          const item = JSON.parse(raw);
+          const parsed = organizationCreateSchema.safeParse(item.fields);
+          if (item.actorId !== actorId || !/^[a-f0-9]{32}$/u.test(item.nonce) || !parsed.success)
+            throw new Error("storage");
+          if (alive) {
+            setFields(parsed.data);
+            setCreationNonce(item.nonce);
+          }
+        }
+        if (alive) {
+          setVerifiedCreationKey(creationKey);
+          setCreationReady(true);
+        }
+      } catch {
+        if (alive)
+          setCreationNotice(
+            localeRef.current === "ru"
+              ? "Не удалось проверить сессию или восстановить черновик."
+              : "Could not verify the session or restore the draft.",
+          );
+      }
+    }
+    void restore();
+    return () => {
+      alive = false;
+    };
+  }, [actorId, creationKey, initial]);
+
+  async function recoverCreation() {
+    if (!actorId || !creationNonce || guard.current || verifiedCreationKey !== creationKey) return;
+    guard.current = true;
+    setBusy(true);
+    const requestEpoch = identityEpoch.current;
+    try {
+      const response = await platformRequest(
+        `/api/workspace/organizations/recovery?nonce=${creationNonce}`,
+        locale,
+        "GET",
+        undefined,
+        undefined,
+        { "x-nexus-actor-id": actorId },
+      );
+      if (identityEpoch.current !== requestEpoch) return;
+      const item = response.organization;
+      if (
+        item &&
+        typeof item === "object" &&
+        "id" in item &&
+        typeof item.id === "string" &&
+        /^[A-Za-z0-9_-]{1,128}$/u.test(item.id)
+      ) {
+        try {
+          sessionStorage.removeItem(creationKey);
+        } catch {
+          /* Safe to navigate after confirmed success. */
+        }
+        router.push(`/workspace/organizations/${encodeURIComponent(item.id)}`);
+        return;
+      }
+      setCreationNotice(
+        text(
+          "Организация пока не подтверждена. Исходный запрос ещё может завершиться; повторное создание заблокировано.",
+          "The organization is not confirmed yet. The original request may still complete; creating another is blocked.",
+        ),
+      );
+    } catch {
+      if (identityEpoch.current !== requestEpoch) return;
+      setCreationNotice(
+        text(
+          "Не удалось проверить результат. Войдите в исходный аккаунт и попробуйте снова.",
+          "Could not check the result. Sign in to the original account and try again.",
+        ),
+      );
+    } finally {
+      guard.current = false;
+      setBusy(false);
+    }
+  }
   const newest =
     initial && checked && Date.parse(initial.updatedAt) > Date.parse(checked.updatedAt)
       ? initial
@@ -82,7 +195,8 @@ export function OrganizationProfileForm({
       !serverPermits ||
       needsCheck ||
       changed ||
-      checked
+      checked ||
+      (!base && (!creationReady || verifiedCreationKey !== creationKey || Boolean(creationNonce)))
     )
       return;
     const { slug, ...profile } = fields;
@@ -94,11 +208,19 @@ export function OrganizationProfileForm({
       return;
     }
     guard.current = true;
+    const requestEpoch = identityEpoch.current;
     setBusy(true);
     onBusyChange?.(true);
     setError("");
     setSaved(false);
     try {
+      let nonce: string | undefined;
+      if (!base) {
+        if (!actorId) throw new Error(copy.unavailable);
+        nonce = crypto.randomUUID().replaceAll("-", "");
+        sessionStorage.setItem(creationKey, JSON.stringify({ actorId, nonce, fields: input.data }));
+        setCreationNonce(nonce);
+      }
       const response = await platformRequest(
         base
           ? `/api/workspace/organizations/${encodeURIComponent(base.id)}`
@@ -106,7 +228,12 @@ export function OrganizationProfileForm({
         locale,
         base ? "PATCH" : "POST",
         input.data,
+        undefined,
+        nonce && actorId
+          ? { "x-nexus-actor-id": actorId, "x-nexus-creation-nonce": nonce }
+          : undefined,
       );
+      if (!base && identityEpoch.current !== requestEpoch) return;
       const parsed = editableOrganizationSchema.safeParse(response.organization);
       if (!parsed.success) throw new Error(copy.unavailable);
       const organization = parsed.data;
@@ -125,6 +252,13 @@ export function OrganizationProfileForm({
       )
         throw new Error(copy.unavailable);
       setSaved(true);
+      if (!base) {
+        try {
+          sessionStorage.removeItem(creationKey);
+        } catch {
+          /* The result is confirmed. */
+        }
+      }
       setBase(organization);
       setDirty(false);
       setChecked(null);
@@ -133,6 +267,29 @@ export function OrganizationProfileForm({
       if (!initial) router.push(`/workspace/organizations/${encodeURIComponent(organization.id)}`);
       router.refresh();
     } catch (caught) {
+      if (!base && identityEpoch.current !== requestEpoch) return;
+      if (
+        !base &&
+        caught instanceof PlatformRequestError &&
+        [
+          "VALIDATION_ERROR",
+          "ACTOR_CHANGED",
+          "ACTOR_ID_REQUIRED",
+          "UNAUTHORIZED",
+          "FORBIDDEN",
+          "SLUG_CONFLICT",
+          "REQUEST_BODY_TOO_LARGE",
+          "UNSUPPORTED_MEDIA_TYPE",
+          "RATE_LIMIT_EXCEEDED",
+        ].includes(String(caught.code))
+      ) {
+        try {
+          sessionStorage.removeItem(creationKey);
+          setCreationNonce(null);
+        } catch {
+          /* Keep recovery locked if storage is unavailable. */
+        }
+      }
       setError(caught instanceof Error ? caught.message : copy.unavailable);
       if (base) setNeedsCheck(true);
     } finally {
@@ -197,9 +354,27 @@ export function OrganizationProfileForm({
     <form onSubmit={submit} className="nexus-panel space-y-4 p-5" aria-busy={busy}>
       <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
       <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
-      {showDraft ? (
+      {creationNotice && !initial && (!creationReady || verifiedCreationKey === creationKey) ? (
+        <p role="status">{creationNotice}</p>
+      ) : null}
+      {creationNonce && !initial && verifiedCreationKey === creationKey ? (
+        <Button
+          type="button"
+          variant="outline"
+          disabled={busy}
+          onClick={() => void recoverCreation()}
+        >
+          {text("Проверить результат", "Check result")}
+        </Button>
+      ) : null}
+      {showDraft && (Boolean(initial) || (creationReady && verifiedCreationKey === creationKey)) ? (
         <fieldset
-          disabled={busy || (disabled && canEdit) || !identityVerified}
+          disabled={
+            busy ||
+            (disabled && canEdit) ||
+            !identityVerified ||
+            (!initial && Boolean(creationNonce))
+          }
           className="space-y-4"
         >
           <Input

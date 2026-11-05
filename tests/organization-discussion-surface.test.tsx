@@ -44,9 +44,8 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const copy = getOrganizationCopy(locale);
     const creation = renderToStaticMarkup(<OrganizationProfileForm locale={locale} />);
-    expect(creation).toContain(copy.create);
-    expect(creation).toMatch(/maxlength="80"/iu);
-    expect(creation).toContain('type="url"');
+    expect(creation).toContain(copy.profileVerify);
+    expect(creation).not.toContain('id="organization-name"');
     const html = renderToStaticMarkup(
       <OrganizationWorkspacePanel
         initial={workspace}

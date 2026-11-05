@@ -56,6 +56,8 @@ function request(method: string, body?: unknown, locale = "en", headers = {}) {
       ...browserMutationHeaders(),
       cookie: `nexus_session=test;nexus_locale=${locale}`,
       "content-type": "application/json",
+      "x-nexus-actor-id": "owner",
+      "x-nexus-creation-nonce": "a".repeat(32),
       ...headers,
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -126,8 +128,24 @@ it("creates only an unverified personal-account-owned organization", async () =>
     "owner",
     "team",
     fields,
-    expect.objectContaining({ action: "organization.created", actorId: "owner" }),
+    expect.objectContaining({
+      action: "organization.created",
+      actorId: "owner",
+      details: { creationNonce: "a".repeat(32) },
+    }),
+    "test",
   );
+});
+it("rejects a changed or missing actor before creating an organization", async () => {
+  const changed = await create(
+    request("POST", { ...fields, slug: "team" }, "en", { "x-nexus-actor-id": "other" }),
+  );
+  expect(changed.status).toBe(409);
+  const missing = await create(
+    request("POST", { ...fields, slug: "team" }, "en", { "x-nexus-actor-id": "" }),
+  );
+  expect(missing.status).toBe(428);
+  expect(mocks.create).not.toHaveBeenCalled();
 });
 it.each([{ ownerId: "victim" }, { isVerified: true }, { permissions: ["manage_products"] }])(
   "rejects client authority injection %j",

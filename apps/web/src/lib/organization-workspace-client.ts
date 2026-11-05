@@ -8,6 +8,7 @@ export function organizationRequest(
   method = "GET",
   json?: unknown,
   signal?: AbortSignal,
+  extraHeaders?: Record<string, string>,
 ) {
   return platformRequest(
     path,
@@ -16,5 +17,6 @@ export function organizationRequest(
     json,
     signal,
     method === "GET" ? organizationError : organizationGovernanceMutationError,
+    extraHeaders,
   );
 }

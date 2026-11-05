@@ -9,6 +9,7 @@ import {
   notifications,
   organizationMembers,
   organizations,
+  sessionRepository,
   organizationWorkspaceRepository as teams,
   userRepository,
   users,
@@ -57,12 +58,20 @@ async function team() {
     b = await actor();
   const id = `org_${randomUUID()}`;
   orgIds.push(id);
+  const token = `org-fixture-${randomUUID()}`;
+  await sessionRepository.create({
+    id: `ses_${randomUUID()}`,
+    userId: owner.id,
+    token,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   const organization = await teams.create(
     id,
     owner.id,
     `team-${randomUUID()}`,
     { name: "Batch team", description: "", logoUrl: "", websiteUrl: "" },
     audit(owner, id),
+    token,
   );
   await db.insert(organizationMembers).values(
     [a, b].map((user) => ({

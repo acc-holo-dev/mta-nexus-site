@@ -101,6 +101,7 @@ async function fixture(role: "member" | "admin" = "member") {
     `ogov-${randomUUID()}`,
     { name: "Governance fixture", description: "", logoUrl: "", websiteUrl: "" },
     audit(owner, id, "organization.created"),
+    currentToken,
   );
   const added = await teams.addMember(
     id,

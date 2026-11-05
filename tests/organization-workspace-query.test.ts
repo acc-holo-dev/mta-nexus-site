@@ -185,21 +185,30 @@ it("does not look up an account before rejecting an unauthorized administrator g
   expect(state.queries).toHaveLength(2);
 });
 it("creates the owner membership and audit with an unverified profile in one transaction", async () => {
-  state.rows = [[orgRow()], [], []];
+  state.rows = [
+    [["owner"]],
+    [["session", new Date(Date.now() + 3600000).toISOString()]],
+    [orgRow()],
+    [],
+    [],
+    [["session", new Date(Date.now() + 3600000).toISOString()]],
+  ];
   await repository.create(
     "org",
     "owner",
     "team",
     { name: "Team", description: "", logoUrl: "", websiteUrl: "" },
     audit,
+    "test-token",
   );
-  expect(state.queries.map((q) => q.sql.match(/insert into "([^"]+)"/u)?.[1])).toEqual([
+  const inserts = state.queries.filter((q) => q.sql.startsWith("insert into"));
+  expect(inserts.map((q) => q.sql.match(/insert into "([^"]+)"/u)?.[1])).toEqual([
     "organizations",
     "organization_members",
     "audit_events",
   ]);
-  expect(state.queries[0].params).toContain(false);
-  expect(state.queries[1].params).toContain("owner");
+  expect(inserts[0].params).toContain(false);
+  expect(inserts[1].params).toContain("owner");
 });
 it("lets a regular member revoke only their own membership under the organization lock", async () => {
   state.rows = [

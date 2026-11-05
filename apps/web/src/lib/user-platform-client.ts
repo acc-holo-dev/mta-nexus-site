@@ -57,11 +57,19 @@ export async function platformRequest(
   json?: unknown,
   signal?: AbortSignal,
   translateError: (locale: Locale, code: unknown) => string = userPlatformError,
+  extraHeaders?: Record<string, string>,
 ) {
-  const response = await fetch(
-    path,
-    privateApiRequest({ method, json, signal, timeoutMs: 15_000 }),
-  ).catch(() => {
+  const response = await fetch(path, {
+    ...privateApiRequest({ method, json, signal, timeoutMs: 15_000 }),
+    ...(extraHeaders
+      ? {
+          headers: {
+            ...(json === undefined ? {} : { "Content-Type": "application/json" }),
+            ...extraHeaders,
+          },
+        }
+      : {}),
+  }).catch(() => {
     throw new Error(translateError(locale, "INTERNAL_ERROR"));
   });
   const data: unknown = await response.json().catch(() => null);
