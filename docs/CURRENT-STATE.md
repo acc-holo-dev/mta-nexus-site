@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `c513696c` — tip advanced after tip honesty (#624) on 54d01f17; tip CI not claimed verified-green under rapid merges;
 - `54d01f17` — tip advanced after tip honesty (#623) on c019107c; tip CI not claimed verified-green under rapid merges;
 - `c019107c` — tip advanced after tip honesty (#622) on e43d130d; tip CI not claimed verified-green under rapid merges;
 - `e43d130d` — tip advanced after tip honesty (#621) on 8bc63a60; tip CI not claimed verified-green under rapid merges;
