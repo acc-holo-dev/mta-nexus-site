@@ -48,7 +48,7 @@ export const input = {
   auditId: "aud_a",
 };
 
-export const save: ResourceVariantCommand = {
+export const save: Extract<ResourceVariantCommand, { action: "save" }> = {
   action: "save",
   expectedGroupId: null,
   expectedRevision: 0,
