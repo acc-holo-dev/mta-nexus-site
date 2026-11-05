@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `c51536dd` — tip advanced after settings-recovery (#570), license-binding (#572), directory-stale (#577), build-provenance (#569), and membership-history (#571); tip CI not claimed verified-green under rapid merges;
 - `420b6172` — tip advanced after tip honesty (#568) on 0c751391 residual wave; tip CI not claimed verified-green under rapid merges;
 - `0c751391` — tip advanced after server staleSnapshot ErrorState (#562) and build-moderation clean-scan (#567); tip CI not claimed verified-green under rapid merges;
 - `20a4f213` — tip advanced after order-case evidenceChanged ErrorState (#554) and prior residual wave (#548/#563); tip CI not claimed verified-green under rapid merges;
