@@ -1,4 +1,4 @@
-import { Button, EmptyState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
@@ -239,7 +239,7 @@ export async function LibraryCollectionsDetailView({
                 buildId={item.buildId ?? undefined}
               />
             ) : (
-              <p className="text-sm text-muted">{c.unavailableNote}</p>
+              <ErrorState id="library-collection-item-unavailable" title={c.unavailableNote} />
             )}
             <div className="flex flex-wrap gap-4 text-sm">
               <Link
