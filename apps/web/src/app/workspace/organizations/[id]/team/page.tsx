@@ -81,56 +81,58 @@ export default async function TeamPage({
       </header>
       {parsed.success && filters && (
         <>
-          <form
-            action={organizationTeamHref(id, { query: "" })}
-            method="get"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-          >
-            <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-              {copy.search}
-              <input
-                type="search"
-                name="q"
-                defaultValue={filters.query}
-                maxLength={120}
-                className={`${platformFieldClass} block min-h-11`}
-              />
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.role}
-              <select
-                name="role"
-                defaultValue={filters.role ?? ""}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                <option value="">{copy.all}</option>
-                {(["admin", "developer", "member"] as const).map((role) => (
-                  <option key={role} value={role}>
-                    {team[role]}
-                  </option>
-                ))}
-                <option value="other">{copy.other}</option>
-              </select>
-            </label>
-            <label className="space-y-1 text-xs text-muted">
-              {copy.access}
-              <select
-                name="access"
-                defaultValue={filters.access ?? ""}
-                className={`${platformFieldClass} block min-h-11`}
-              >
-                <option value="">{copy.all}</option>
-                <option value="yes">{copy.yes}</option>
-                <option value="no">{copy.no}</option>
-              </select>
-            </label>
-            <Button type="submit" className="min-h-11 font-semibold">
-              {team.filter}
-            </Button>
-            <Link href={organizationTeamHref(id, { query: "" })} className={navLinkClass}>
-              {copy.reset}
-            </Link>
-          </form>
+          <search aria-label={copy.search}>
+            <form
+              action={organizationTeamHref(id, { query: "" })}
+              method="get"
+              className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+            >
+              <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+                {copy.search}
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={filters.query}
+                  maxLength={120}
+                  className={`${platformFieldClass} block min-h-11`}
+                />
+              </label>
+              <label className="space-y-1 text-xs text-muted">
+                {copy.role}
+                <select
+                  name="role"
+                  defaultValue={filters.role ?? ""}
+                  className={`${platformFieldClass} block min-h-11`}
+                >
+                  <option value="">{copy.all}</option>
+                  {(["admin", "developer", "member"] as const).map((role) => (
+                    <option key={role} value={role}>
+                      {team[role]}
+                    </option>
+                  ))}
+                  <option value="other">{copy.other}</option>
+                </select>
+              </label>
+              <label className="space-y-1 text-xs text-muted">
+                {copy.access}
+                <select
+                  name="access"
+                  defaultValue={filters.access ?? ""}
+                  className={`${platformFieldClass} block min-h-11`}
+                >
+                  <option value="">{copy.all}</option>
+                  <option value="yes">{copy.yes}</option>
+                  <option value="no">{copy.no}</option>
+                </select>
+              </label>
+              <Button type="submit" className="min-h-11 font-semibold">
+                {team.filter}
+              </Button>
+              <Link href={organizationTeamHref(id, { query: "" })} className={navLinkClass}>
+                {copy.reset}
+              </Link>
+            </form>
+          </search>
           <OrganizationTeamDirectory
             key={`${id}:${actor.id}:${parsed.data.organization.updatedAt}:${JSON.stringify(filters)}`}
             initial={parsed.data}

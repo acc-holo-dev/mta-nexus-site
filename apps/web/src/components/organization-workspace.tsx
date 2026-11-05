@@ -333,25 +333,27 @@ export function OrganizationWorkspacePanel({
             </fieldset>
           </form>
         )}
-        <form
-          method="GET"
-          action={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
-          className="flex flex-wrap items-end gap-2"
-        >
-          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
-            <span>{copy.searchTeam}</span>
-            <input
-              type="search"
-              name="q"
-              defaultValue={query}
-              maxLength={120}
-              className={`${platformFieldClass} min-h-11`}
-            />
-          </label>
-          <Button type="submit" size="sm" className="min-h-11">
-            {copy.filter}
-          </Button>
-        </form>
+        <search aria-label={copy.searchTeam}>
+          <form
+            method="GET"
+            action={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
+            className="flex flex-wrap items-end gap-2"
+          >
+            <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+              <span>{copy.searchTeam}</span>
+              <input
+                type="search"
+                name="q"
+                defaultValue={query}
+                maxLength={120}
+                className={`${platformFieldClass} min-h-11`}
+              />
+            </label>
+            <Button type="submit" size="sm" className="min-h-11">
+              {copy.filter}
+            </Button>
+          </form>
+        </search>
         {data.members.length ? (
           <div className="space-y-3">
             {data.members.map((member) => (

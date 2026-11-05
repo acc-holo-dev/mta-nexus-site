@@ -57,6 +57,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.team);
     expect(html).toContain(copy.add);
     expect(html).toContain(copy.remove);
+    expect(html).toContain(`<search aria-label="${copy.searchTeam}"`);
     expect(html).toContain("rounded-lg");
     expect(html).toContain('value="admin"');
     expect(html).toContain("/workspace/organizations/org?q=lua&amp;page=3");
