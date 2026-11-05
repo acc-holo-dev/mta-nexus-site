@@ -42,7 +42,8 @@ type LibraryCollectionImportComponent = (props: {
   reconcile: boolean;
 }) => ReactNode;
 
-type BatchFormComponent = (props: Record<string, unknown>) => ReactNode;
+/** Used only for element-type identity; never[] keeps real form assignable. */
+type BatchFormComponent = (...args: never[]) => ReactNode;
 
 const collection: Collection = {
   id: "lcol_a",
