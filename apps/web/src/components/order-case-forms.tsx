@@ -382,7 +382,7 @@ export function OrderCaseReviewForm({
         ))}
       </div>
       {canRecommendRefund && monetary && !recommendationEligible && (
-        <p className="text-sm text-secondary">{copy.recommendationBlocked}</p>
+        <ErrorState id="order-case-recommendation-blocked" title={copy.recommendationBlocked} />
       )}
       {message ? (
         saved ? (
