@@ -15,7 +15,9 @@ it("locks publication readiness blocked and pending notices to ErrorState", () =
   expect(source).toContain("publication-readiness-blocked-");
   expect(source).toContain("publication-readiness-pending-");
   expect(source).toMatch(/title=\{copy\.states\[item\.state\]\}/);
-  expect(source).not.toMatch(
-    /item\.state === "blocked" \|\| item\.state === "pending"[\s\S]*stateTone\[item\.state\][\s\S]*copy\.states\[item\.state\]/,
+  expect(source).toMatch(
+    /item\.state === "blocked" \|\| item\.state === "pending" \? \(\s*<ErrorState/u,
   );
+  expect(source).not.toContain("text-warning");
+  expect(source).not.toContain('blocked: "text-danger"');
 });

@@ -9,10 +9,10 @@ import {
 } from "../lib/resource-publication-readiness-i18n";
 import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 
-const stateTone: Record<ResourcePublicationReadinessSummary["items"][number]["state"], string> = {
+const stateTone: Partial<
+  Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>
+> = {
   complete: "text-success",
-  blocked: "text-danger",
-  pending: "text-warning",
   not_applicable: "text-muted",
 };
 
@@ -56,7 +56,9 @@ export function ResourcePublicationReadinessPanel({
                   {item.tier === "required" ? copy.required : copy.recommendation}
                 </span>
                 {item.state === "blocked" || item.state === "pending" ? null : (
-                  <span className={`font-label uppercase text-[10px] ${stateTone[item.state]}`}>
+                  <span
+                    className={`font-label uppercase text-[10px] ${stateTone[item.state] ?? "text-muted"}`}
+                  >
                     {copy.states[item.state]}
                   </span>
                 )}
