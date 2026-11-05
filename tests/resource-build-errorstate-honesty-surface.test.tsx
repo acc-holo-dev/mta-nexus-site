@@ -21,6 +21,9 @@ it("locks resource build uncertain failures to ErrorState with touch reload", ()
 });
 
 it("locks withdrawn product notice to ErrorState without fake retry", () => {
-  expect(source).toContain("{withdrawn ? <ErrorState title={copy.unavailable} /> : null}");
+  expect(source).toContain('id="resource-build-withdrawn-unavailable"');
+  expect(source).toMatch(
+    /withdrawn \? \(\s*<ErrorState id="resource-build-withdrawn-unavailable" title=\{copy\.unavailable\} \/>\s*\) : null/u,
+  );
   expect(source).not.toContain('className="text-warning">{copy.unavailable}</p>');
 });
