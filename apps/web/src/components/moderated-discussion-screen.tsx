@@ -212,39 +212,41 @@ export async function ModeratedDiscussionScreen({
       </header>
       {"items" in data ? (
         <>
-          <form
-            action={moderatedDiscussionHref(id)}
-            className="nexus-panel grid gap-3 p-5 sm:grid-cols-2"
-          >
-            <label className="space-y-1 text-sm text-primary">
-              <span>{general.search}</span>
-              <input
-                className={platformFieldClass}
-                type="search"
-                name="q"
-                maxLength={100}
-                defaultValue={params.get("q") ?? ""}
-              />
-            </label>
-            <label className="space-y-1 text-sm text-primary">
-              <span>{general.author}</span>
-              <input
-                className={platformFieldClass}
-                name="author"
-                maxLength={128}
-                defaultValue={params.get("author") ?? ""}
-              />
-            </label>
-            <Button className="min-h-11" type="submit">
-              {general.apply}
-            </Button>
-            <Link
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={moderatedDiscussionHref(id)}
+          <search aria-label={general.search}>
+            <form
+              action={moderatedDiscussionHref(id)}
+              className="nexus-panel grid gap-3 p-5 sm:grid-cols-2"
             >
-              {general.reset}
-            </Link>
-          </form>
+              <label className="space-y-1 text-sm text-primary">
+                <span>{general.search}</span>
+                <input
+                  className={platformFieldClass}
+                  type="search"
+                  name="q"
+                  maxLength={100}
+                  defaultValue={params.get("q") ?? ""}
+                />
+              </label>
+              <label className="space-y-1 text-sm text-primary">
+                <span>{general.author}</span>
+                <input
+                  className={platformFieldClass}
+                  name="author"
+                  maxLength={128}
+                  defaultValue={params.get("author") ?? ""}
+                />
+              </label>
+              <Button className="min-h-11" type="submit">
+                {general.apply}
+              </Button>
+              <Link
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                href={moderatedDiscussionHref(id)}
+              >
+                {general.reset}
+              </Link>
+            </form>
+          </search>
           {data.items.length ? (
             <ul className="space-y-3">
               {data.items.map((item) => (

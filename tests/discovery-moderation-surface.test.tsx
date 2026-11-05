@@ -200,6 +200,7 @@ it.each(["ru", "en"] as const)(
       }),
     );
     expect(queue).toContain(moderationCopy(locale).title);
+    expect(queue).toContain(`<search aria-label="${moderationCopy(locale).search}"`);
     expect(queue).toContain('name="author"');
     expect(queue).toContain("bg-accent text-white");
     expect(queue).toContain('href="/admin/community/item"');

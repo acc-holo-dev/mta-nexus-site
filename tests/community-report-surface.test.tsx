@@ -72,6 +72,7 @@ it.each(["en", "ru"] as const)(
       />,
     );
     expect(html).toContain(communityReportCopy(locale).category);
+    expect(html).toContain(`<search aria-label="${communityReportCopy(locale).textSearch}"`);
     expect(html).toContain('name="target"');
     expect(html).toContain('name="type"');
     expect(html).toContain("page=3");
