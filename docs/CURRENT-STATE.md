@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `e552dcfd` — tip advanced after tip honesty (#630) on 3d6d040b; tip CI not claimed verified-green under rapid merges;
 - `3d6d040b` — tip advanced after tip honesty (#629) on 5bd56352; tip CI not claimed verified-green under rapid merges;
 - `5bd56352` — tip advanced after library download receipt (#615), MTA master clipboard (#619), and tip honesty (#628); tip CI not claimed verified-green under rapid merges;
 - `d9729b43` — tip advanced after resource-review report unavailable (#616) and tip honesty (#627); tip CI not claimed verified-green under rapid merges;
