@@ -15,7 +15,7 @@ export type PlanReviewRecoveryHarness = {
 };
 
 /** Exact fixture literals so real form props stay assignable under strictFunctionTypes. */
-export const terms = {
+const terms = {
   titleRu: "Тариф",
   titleEn: "Plan",
   descriptionRu: "Описание тарифа",
@@ -26,7 +26,7 @@ export const terms = {
   commissionBps: 750,
 };
 
-export const plan = {
+const plan = {
   ...terms,
   id: "cplan_a",
   slug: "plan",
