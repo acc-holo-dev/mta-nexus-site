@@ -32,6 +32,12 @@ const mocks = vi.hoisted(() => ({
   matches: vi.fn(),
   liveStatus: vi.fn(),
   reviewProps: [] as Array<Record<string, unknown>>,
+  session: vi.fn(),
+}));
+
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("../../../lib/services/auth-service", () => ({
+  authService: { getSession: mocks.session },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -87,6 +93,7 @@ vi.mock("../../../lib/services/server-review-service", () => ({
 
 vi.mock("../../../lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
+  getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));
 
 vi.mock("../../../components/server-follow-button", async () => {
@@ -162,6 +169,7 @@ describe("server detail review load honesty", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.reviewProps.length = 0;
+    mocks.session.mockResolvedValue(null);
     mocks.getServer.mockResolvedValue(state.server);
     mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
     mocks.history.mockResolvedValue(null);

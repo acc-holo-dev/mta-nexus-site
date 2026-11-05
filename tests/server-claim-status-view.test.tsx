@@ -1,20 +1,29 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+
 vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
   const { createElement } = await import("react");
   return {
     ServerClaimControlPanel: () => createElement("div", { "data-testid": "claim-controls" }),
   };
 });
+
+import type { ManagedServerClaimStatus } from "@nexus/db";
 import { ServerClaimStatusPanel } from "../apps/web/src/components/server-claim-status-panel";
 import {
   getServerClaimStatusCopy,
   serverClaimErrorMessage,
 } from "../apps/web/src/lib/server-claim-status-view";
-import type { ManagedServerClaimStatus } from "@nexus/db";
+
 const render = (status: ManagedServerClaimStatus, locale: "en" | "ru" = "en") =>
   renderToStaticMarkup(
-    <ServerClaimStatusPanel serverId="srv_a" serverName="Server" status={status} locale={locale} />,
+    <ServerClaimStatusPanel
+      serverId="srv_a"
+      serverName="Server"
+      actorId="usr_a"
+      status={status}
+      locale={locale}
+    />,
   );
 const request = {
   status: "pending" as const,

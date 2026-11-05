@@ -55,6 +55,7 @@ function request() {
     headers: {
       ...browserMutationHeaders(),
       cookie: "nexus_session=test-session",
+      "x-nexus-actor-id": "usr_claimant",
       "content-type": "application/json",
     },
   });
@@ -165,4 +166,16 @@ describe("server claim challenge issue HTTP contract", () => {
       error.mockRestore();
     }
   });
+});
+it("requires the displayed actor before issuing a challenge", async () => {
+  vi.clearAllMocks();
+  state.authenticated = true;
+  stubBrowserMutationOrigin();
+  const missing = request();
+  missing.headers.delete("x-nexus-actor-id");
+  expect((await POST(missing, { params: Promise.resolve({ id: "srv_1" }) })).status).toBe(428);
+  const changed = request();
+  changed.headers.set("x-nexus-actor-id", "usr_other");
+  expect((await POST(changed, { params: Promise.resolve({ id: "srv_1" }) })).status).toBe(409);
+  expect(issueChallenge).not.toHaveBeenCalled();
 });

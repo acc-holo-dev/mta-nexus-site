@@ -10,6 +10,8 @@ const harness = vi.hoisted(() => ({
 
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
+  useRef: (initial: unknown) => ({ current: initial }),
+  useEffect: () => {},
   useState: (initial: unknown) => {
     const index = harness.cursor++;
     if (!(index in harness.slots)) {
@@ -59,6 +61,7 @@ describe("server claim control panel honesty", () => {
       createElement(ServerClaimControlPanel, {
         serverId: "srv_a",
         serverName: "Demo",
+        expectedActorId: null,
       }),
     );
     expect(html).toContain(copy.title);
@@ -81,6 +84,7 @@ describe("server claim control panel honesty", () => {
       createElement(ServerClaimControlPanel, {
         serverId: "srv_a",
         serverName: "Demo",
+        expectedActorId: null,
       }),
     );
     expect(html).toContain(copy.createUnavailable);

@@ -7,11 +7,13 @@ import { ServerClaimControlPanel } from "./server-claim-control-panel";
 export function ServerClaimStatusPanel({
   serverId,
   serverName,
+  actorId,
   status,
   locale,
 }: {
   serverId: string;
   serverName: string;
+  actorId: string;
   status: ManagedServerClaimStatus;
   locale: Locale;
 }) {
@@ -71,7 +73,13 @@ export function ServerClaimStatusPanel({
         </section>
       )}
       {!status.isVerified && !waiting && (
-        <ServerClaimControlPanel serverId={serverId} serverName={serverName} refreshOnSuccess />
+        <ServerClaimControlPanel
+          key={`${actorId}:${serverId}`}
+          serverId={serverId}
+          serverName={serverName}
+          expectedActorId={actorId}
+          refreshOnSuccess
+        />
       )}
     </div>
   );

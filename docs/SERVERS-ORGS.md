@@ -47,6 +47,8 @@ Server-control proof и platform verification (**Verified Server**) — разн
 
 **Owner target / DECISION.** Основной proof — текущий **MTA server challenge/control proof**. DNS/website/file alternatives не добавлять «ради количества»; альтернатива — только при доказанной проблеме coverage/usability.
 
+**Current runtime.** Запросы на выдачу и проверку challenge требуют `X-Nexus-Actor-Id` исходного пользователя. Токен challenge остаётся только в памяти страницы. При потере ответа форма сохраняет в текущей вкладке только несекретный маркер неопределённого результата и блокирует повтор; восстановить потерянный токен из серверного хеша невозможно.
+
 ### 2.2 Co-owners
 
 **Owner target / DECISION.** Claimed server может иметь нескольких co-owners. Модель отделяет:

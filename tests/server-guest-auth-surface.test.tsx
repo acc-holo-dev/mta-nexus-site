@@ -146,6 +146,7 @@ it("exposes guest login and register links when claim control requires sign-in",
   ServerClaimControlPanel({
     serverId: "srv_demo",
     serverName: "Demo Server",
+    expectedActorId: null,
   });
   harness.slots[3] = true;
   harness.cursor = 0;
@@ -153,6 +154,7 @@ it("exposes guest login and register links when claim control requires sign-in",
     ServerClaimControlPanel({
       serverId: "srv_demo",
       serverName: "Demo Server",
+      expectedActorId: null,
     }),
   );
   expect(links).toHaveLength(1);

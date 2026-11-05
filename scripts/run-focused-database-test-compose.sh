@@ -23,16 +23,34 @@ for arg in "$@"; do
 done
 
 cleanup() {
+  local status=$?
+  local remaining
+  trap - EXIT
   # Never remove a pre-existing database if creation failed (e.g. a name collision).
-  [[ "$database_created" == 1 ]] || return 0
-  "${COMPOSE[@]}" exec -T postgres \
-    psql -U nexus -d postgres -v ON_ERROR_STOP=1 \
-    -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${DB_NAME}' AND pid <> pg_backend_pid();" \
-    >/dev/null 2>&1 || true
-  "${COMPOSE[@]}" exec -T postgres \
-    psql -U nexus -d postgres -v ON_ERROR_STOP=1 \
-    -c "DROP DATABASE IF EXISTS \"${DB_NAME}\";" \
-    >/dev/null 2>&1 || true
+  if [[ "$database_created" == 1 ]]; then
+    if ! "${COMPOSE[@]}" exec -T postgres \
+      psql -U nexus -d postgres -v ON_ERROR_STOP=1 \
+      -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${DB_NAME}' AND pid <> pg_backend_pid();" \
+      >/dev/null; then
+      echo "Could not terminate connections to owned test database ${DB_NAME}; attempting cleanup." >&2
+    fi
+    if ! "${COMPOSE[@]}" exec -T postgres \
+      psql -U nexus -d postgres -v ON_ERROR_STOP=1 \
+      -c "DROP DATABASE IF EXISTS \"${DB_NAME}\";" >/dev/null; then
+      echo "Could not remove owned test database ${DB_NAME}." >&2
+      if [[ "$status" == 0 ]]; then status=1; fi
+    fi
+    if ! remaining=$("${COMPOSE[@]}" exec -T postgres \
+      psql -U nexus -d postgres -v ON_ERROR_STOP=1 -At \
+      -c "SELECT 1 FROM pg_database WHERE datname = '${DB_NAME}';"); then
+      echo "Could not verify removal of owned test database ${DB_NAME}." >&2
+      if [[ "$status" == 0 ]]; then status=1; fi
+    elif [[ -n "$remaining" ]]; then
+      echo "Owned test database ${DB_NAME} still exists after cleanup." >&2
+      if [[ "$status" == 0 ]]; then status=1; fi
+    fi
+  fi
+  exit "$status"
 }
 trap cleanup EXIT
 

@@ -12,10 +12,11 @@ import { ServerHistoryPanel } from "../../../components/server-history-panel";
 import { ServerReviewPanel } from "../../../components/server-review-panel";
 import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
 import { parseServerHistoryWindow } from "../../../lib/server-history-window";
 import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
+import { authService } from "../../../lib/services/auth-service";
 import { contentService } from "../../../lib/services/content-service";
 import {
   matchesMtaEndpoint,
@@ -79,6 +80,16 @@ export default async function ServerDetailPage({
   const serverCopy = dictionary.servers;
 
   if (!server || server.visibility === "private") notFound();
+
+  let claimViewer: { id: string } | null | undefined;
+  if (!server.organizationId && !server.ownerId && !server.isVerified) {
+    try {
+      const store = await getRequestCookieStore();
+      claimViewer = await authService.getSession(store.get("nexus_session")?.value);
+    } catch {
+      claimViewer = undefined;
+    }
+  }
 
   const websiteUrl = safeExternalWebUrl(server.websiteUrl);
   const discordUrl = safeExternalWebUrl(server.discordUrl);
@@ -202,9 +213,23 @@ export default async function ServerDetailPage({
         </div>
       </div>
 
-      {!server.organizationId && !server.ownerId && !server.isVerified && (
-        <ServerClaimControlPanel serverId={server.id} serverName={server.name} />
-      )}
+      {!server.organizationId &&
+        !server.ownerId &&
+        !server.isVerified &&
+        (claimViewer === undefined ? (
+          <p role="status">
+            {locale === "ru"
+              ? "Не удалось проверить сессию для подтверждения сервера."
+              : "Could not check the session for server verification."}
+          </p>
+        ) : (
+          <ServerClaimControlPanel
+            key={`${server.id}:${claimViewer?.id ?? "guest"}`}
+            serverId={server.id}
+            serverName={server.name}
+            expectedActorId={claimViewer?.id ?? null}
+          />
+        ))}
 
       {(server.language ||
         server.region ||

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 type Deferred<T> = {
   promise: Promise<T>;
@@ -44,6 +45,12 @@ const mocks = vi.hoisted(() => ({
   updates: vi.fn(),
   matches: vi.fn(),
   liveStatus: vi.fn(),
+  session: vi.fn(),
+}));
+
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: { getSession: mocks.session },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -104,6 +111,7 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
 
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
+  getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));
 
 vi.mock("../apps/web/src/components/server-follow-button", async () => {
@@ -208,11 +216,13 @@ describe("server detail behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.notFoundCalls = 0;
+    mocks.session.mockResolvedValue(null);
     state.server = {
       ...state.server,
       visibility: "public",
       isVerified: false,
       ownerId: null,
+      organizationId: null,
     };
     mocks.getServer.mockResolvedValue(state.server);
     mocks.matches.mockReturnValue(true);
@@ -359,6 +369,35 @@ describe("server detail behavior", () => {
     const html = renderToStaticMarkup(
       await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
     );
+    expect(html).not.toContain('data-testid="server-claim"');
+  });
+  it("changes the public claim component key and actor on account refresh", async () => {
+    mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
+    mocks.history.mockResolvedValue(null);
+    mocks.updates.mockResolvedValue([]);
+    mocks.session.mockResolvedValue({ id: "usr_a" });
+    const pageA = await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) });
+    const claimA = flattenReactTestTree(pageA).find(
+      (node) => node.props.expectedActorId === "usr_a",
+    );
+    mocks.session.mockResolvedValue({ id: "usr_b" });
+    const pageB = await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) });
+    const claimB = flattenReactTestTree(pageB).find(
+      (node) => node.props.expectedActorId === "usr_b",
+    );
+    expect(claimA).toBeDefined();
+    expect(claimB).toBeDefined();
+    expect(claimA?.key).not.toBe(claimB?.key);
+  });
+  it("shows an unavailable state when the claim session lookup fails", async () => {
+    mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
+    mocks.history.mockResolvedValue(null);
+    mocks.updates.mockResolvedValue([]);
+    mocks.session.mockRejectedValueOnce(new Error("session store unavailable"));
+    const html = renderToStaticMarkup(
+      await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
+    );
+    expect(html).toContain("Could not check the session for server verification.");
     expect(html).not.toContain('data-testid="server-claim"');
   });
 });

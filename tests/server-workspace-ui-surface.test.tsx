@@ -177,6 +177,7 @@ describe("server workspace UI surface", () => {
         createElement(ServerClaimControlPanel, {
           serverId: "srv_claim",
           serverName: "Claim Target",
+          expectedActorId: null,
         }),
       );
 

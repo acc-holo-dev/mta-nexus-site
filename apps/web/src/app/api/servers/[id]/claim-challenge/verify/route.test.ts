@@ -67,6 +67,7 @@ function request(overrides: { headers?: Record<string, string>; body?: string } 
     headers: {
       ...browserMutationHeaders(),
       cookie: "nexus_session=test-session",
+      "x-nexus-actor-id": "usr_claimant",
       ...(headerOverrides ?? { "content-type": "application/json" }),
     },
     body: JSON.stringify({
@@ -197,4 +198,16 @@ describe("server claim verification HTTP", () => {
       expect(await response.json()).toHaveProperty("code", code);
     },
   );
+});
+it("requires the displayed actor before verifying a challenge", async () => {
+  vi.clearAllMocks();
+  state.authenticated = true;
+  stubBrowserMutationOrigin();
+  const missing = request();
+  missing.headers.delete("x-nexus-actor-id");
+  expect((await POST(missing, { params: Promise.resolve({ id: "srv_1" }) })).status).toBe(428);
+  const changed = request();
+  changed.headers.set("x-nexus-actor-id", "usr_other");
+  expect((await POST(changed, { params: Promise.resolve({ id: "srv_1" }) })).status).toBe(409);
+  expect(verifyChallenge).not.toHaveBeenCalled();
 });

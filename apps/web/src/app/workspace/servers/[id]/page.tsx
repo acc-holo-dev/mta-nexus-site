@@ -70,6 +70,7 @@ export default async function ServerManagementPage({
       <ServerClaimStatusPanel
         serverId={server.id}
         serverName={server.name}
+        actorId={user.id}
         status={claimStatus}
         locale={locale}
       />

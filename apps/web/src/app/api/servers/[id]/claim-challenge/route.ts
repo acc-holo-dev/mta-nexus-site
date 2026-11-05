@@ -34,6 +34,16 @@ export const POST = withBrowserMutation(
         return json(context, { error: "Authentication required" }, 401);
       }
 
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        return json(
+          context,
+          { code: "ACTOR_ID_REQUIRED", error: "Actor precondition required" },
+          428,
+        );
+      if (expectedActor !== user.id)
+        return json(context, { code: "ACTOR_CHANGED", error: "Account changed" }, 409);
+
       const rateLimit = await consumeRateLimit("serverClaimProof", user.id);
       if (!rateLimit.success) {
         return json(

@@ -52,3 +52,57 @@ esac
     }
   }
 });
+
+test("focused database cleanup verifies removal and preserves an earlier failure", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-focus-cleanup-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const docker = join(directory, "docker");
+  const log = join(directory, "calls");
+  writeFileSync(
+    docker,
+    `#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "$FOCUS_TEST_LOG"
+case "$*" in
+  *'ps postgres --format'*) echo healthy ;;
+  *'pnpm test:focus'*) [[ "$FOCUS_TEST_SCENARIO" != test-and-drop-fail ]] || exit 42 ;;
+  *'DROP DATABASE'*) [[ "$FOCUS_TEST_SCENARIO" != drop-fail && "$FOCUS_TEST_SCENARIO" != test-and-drop-fail ]] || exit 55 ;;
+  *'SELECT 1 FROM pg_database'*)
+    [[ "$FOCUS_TEST_SCENARIO" != verify-fail ]] || exit 56
+    if [[ "$FOCUS_TEST_SCENARIO" == remaining ]]; then echo 1; fi ;;
+esac
+exit 0
+`,
+  );
+  chmodSync(docker, 0o755);
+  for (const scenario of [
+    "success",
+    "drop-fail",
+    "verify-fail",
+    "remaining",
+    "test-and-drop-fail",
+  ]) {
+    writeFileSync(log, "");
+    const result = spawnSync(
+      "bash",
+      ["scripts/run-focused-database-test-compose.sh", "tests/auth-security.test.ts"],
+      {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          PATH: `${directory}:${process.env.PATH}`,
+          FOCUS_TEST_LOG: log,
+          FOCUS_TEST_SCENARIO: scenario,
+        },
+      },
+    );
+    const calls = readFileSync(log, "utf8");
+    assert.match(calls, /DROP DATABASE/u);
+    assert.match(calls, /SELECT 1 FROM pg_database/u);
+    if (scenario === "success") assert.equal(result.status, 0, result.stderr);
+    else {
+      assert.notEqual(result.status, 0, scenario);
+      assert.match(result.stderr, /owned test database/iu);
+    }
+    if (scenario === "test-and-drop-fail") assert.equal(result.status, 42);
+  }
+});

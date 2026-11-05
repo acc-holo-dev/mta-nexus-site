@@ -1,11 +1,11 @@
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
-  INTEGRATION_STAFF_PASSWORD,
   assignIntegrationStaffPassword,
+  INTEGRATION_STAFF_PASSWORD,
 } from "./integration-staff-password";
-import { NextRequest } from "next/server";
-import { eq } from "drizzle-orm";
 
 const directoryState = vi.hoisted(() => ({
   current: {
@@ -41,10 +41,10 @@ import {
   verificationRepository,
   verificationRequests,
 } from "@nexus/db";
+import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
 import { POST as issueChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/route";
 import { POST as verifyChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/verify/route";
 import { POST as genericVerification } from "../apps/web/src/app/api/verification/route";
-import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
 
 function post(url: string, token: string, body?: Record<string, unknown>) {
   return new NextRequest(url, {
@@ -52,6 +52,7 @@ function post(url: string, token: string, body?: Record<string, unknown>) {
     headers: browserMutationHeaders({
       ...(body ? { "content-type": "application/json" } : {}),
       cookie: `nexus_session=${token}`,
+      "x-nexus-actor-id": token.replace(/^tok_control_/, "usr_control_"),
     }),
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
