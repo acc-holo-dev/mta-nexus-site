@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
-/** Honesty lock for resource QA ask gating ErrorState notices. */
+/** Honesty lock for resource QA ask gating ErrorState notices (access/unavailable). */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
