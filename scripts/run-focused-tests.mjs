@@ -2,6 +2,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
+import { assertDisposableTestDatabase } from "./disposable-test-database.mjs";
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -30,14 +31,13 @@ const vitest = selected.filter((file) => !file.endsWith(".node-test.mjs"));
 const projects = vitest.length
   ? (await import("./test-projects.mjs")).classifyTests(root, vitest)
   : { unit: [], database: [] };
-if (
-  projects.database.length &&
-  (!process.env.DATABASE_URL || process.env.NEXUS_DISPOSABLE_DATABASE !== "1")
-) {
-  console.error(
-    "Database tests require DATABASE_URL and NEXUS_DISPOSABLE_DATABASE=1 for a disposable test database.",
-  );
-  process.exit(1);
+if (projects.database.length) {
+  try {
+    assertDisposableTestDatabase();
+  } catch (error) {
+    console.error(`Database tests require a disposable test database: ${error.message}`);
+    process.exit(1);
+  }
 }
 const flags = [
   ...(projects.unit.length ? ["--project", "unit"] : []),

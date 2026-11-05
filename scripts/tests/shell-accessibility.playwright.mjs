@@ -1163,6 +1163,9 @@ for (const locale of ["en", "ru"]) {
     const resourceTitle = page.getByLabel(dictionary.publishing.title, {
       exact: true,
     });
+    // The resource form becomes interactive only after session verification.
+    await expect(resourceTitle).toBeVisible();
+    await expect(resourceTitle).toBeEnabled();
     await resourceTitle.focus();
     await expect(resourceTitle).toBeFocused();
 

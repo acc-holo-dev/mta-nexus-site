@@ -67,6 +67,43 @@ test("focused database selection fails before running any tests without a dispos
     assert.ok(!existsSync(log) && !existsSync(tooling));
   }));
 
+test("focused database selection rejects unsafe URLs before dispatch and accepts supported local targets", () =>
+  fixture(({ log, tooling, run }) => {
+    const invalid = [
+      "postgres://test:test@production.example.invalid/production",
+      "postgres://test:test@localhost/production",
+      "postgres://test:test@localhost/nexus_test?host=production.example.invalid",
+      "https://localhost/nexus_test",
+    ];
+    for (const DATABASE_URL of invalid) {
+      const result = run(["tool.node-test.mjs", "database.integration.test.ts"], {
+        DATABASE_URL,
+        NEXUS_DISPOSABLE_DATABASE: "1",
+      });
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /disposable test database/u);
+      assert.ok(!existsSync(log) && !existsSync(tooling));
+    }
+    for (const DATABASE_URL of [
+      "postgres://test:test@127.0.0.1/nexus_test",
+      "postgres://test:test@postgres/nexus_focus_123_456",
+      "postgres://test:test@localhost/nexus_test_1234567890abcdef1234567890abcdef",
+    ]) {
+      const result = run(["database.integration.test.ts"], {
+        DATABASE_URL,
+        NEXUS_DISPOSABLE_DATABASE: "1",
+      });
+      assert.equal(result.status, 0, result.stderr);
+      assert.ok(existsSync(log));
+    }
+  }));
+
+test("focused unit tests do not require or inspect a database configuration", () =>
+  fixture(({ run }) => {
+    const result = run(["unit.test.ts"], { DATABASE_URL: "not-a-database-url" });
+    assert.equal(result.status, 0, result.stderr);
+  }));
+
 test("focused runner preserves Vitest failure and does not start the next test engine", () =>
   fixture(({ tooling, run }) => {
     const result = run(["unit.test.ts", "tool.node-test.mjs"], { NEXUS_TEST_EXIT: "6" });
