@@ -1,10 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 import {
   createSavedFollowsInteractionHelpers,
   mockReactHooks,
 } from "./helpers/saved-follows-interaction-harness";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],

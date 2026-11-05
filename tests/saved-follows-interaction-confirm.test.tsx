@@ -1,11 +1,11 @@
 import { expect, it, vi } from "vitest";
+import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 import {
   ack,
   createSavedFollowsInteractionHelpers,
   mockReactHooks,
   response,
 } from "./helpers/saved-follows-interaction-harness";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 
 const harness = vi.hoisted(() => ({
   slots: [] as unknown[],
