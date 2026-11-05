@@ -35,9 +35,7 @@ it("does not display a saved draft to a different signed-in actor", async () => 
   );
   render();
   for (const effect of h.effects) effect();
-  await vi.waitFor(() =>
-    expect(flatTreeHasErrorText(render(), "Could not verify")).toBe(true),
-  );
+  await vi.waitFor(() => expect(flatTreeHasErrorText(render(), "Could not verify")).toBe(true));
   expect(render().find((n) => n.type === "form")?.props.hidden).toBe(true);
   expect(sessionStorage.getItem("nexus:server-registration:v1:usr_a")).toContain("Private draft");
 });
