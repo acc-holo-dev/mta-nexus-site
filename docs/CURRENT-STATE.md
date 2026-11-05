@@ -6,7 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
-- `c1847e69` — tip advanced after workspace-reactions ErrorState (#687) and tip honesty (#696); tip CI not claimed verified-green under rapid merges;
+- `5965f41d` — tip advanced after license-command-session suite split (#686) and tip honesty (#697); tip CI not claimed verified-green under rapid merges;
 - `bc00e3e4` — tip advanced after tip honesty (#695) on 2111b741; tip CI not claimed verified-green under rapid merges;
 - `2111b741` — tip advanced after tip honesty (#694) on a07bf8b8; tip CI not claimed verified-green under rapid merges;
 - `a07bf8b8` — tip advanced after tip honesty (#693) on 4daaafc1; tip CI not claimed verified-green under rapid merges;
