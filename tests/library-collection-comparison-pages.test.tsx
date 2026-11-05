@@ -183,6 +183,8 @@ it.each(["archived", "terminal"])(
     state.comparison.mockResolvedValue(value);
     const html = await screen();
     expect(html).not.toContain("data-transfer");
+    expect(html).toContain('role="alert"');
+    expect(html).toContain('id="library-collection-compare-destination-readonly"');
     expect(html).toContain(libraryCollectionComparisonCopy("en").destinationReadOnly);
   },
 );
@@ -192,6 +194,8 @@ it("keeps destination-only pages read-only", async () => {
   state.comparison.mockResolvedValue(value);
   const html = await screen();
   expect(html).not.toContain("data-transfer");
+  expect(html).toContain('role="alert"');
+  expect(html).toContain('id="library-collection-compare-no-source-items"');
   expect(html).toContain(libraryCollectionComparisonCopy("en").noSourceItems);
 });
 it("chooses an owned comparison target before reading resources", async () => {
@@ -216,7 +220,9 @@ it("shows EmptyState when comparison filters match no references", async () => {
   expect(html).toContain(copy.emptyHint);
   expect(html).toContain("overflow-x-clip");
   expect(html).toContain("min-h-11");
-  expect(html).not.toContain('role="alert"');
+  expect(html).toContain('role="alert"');
+  expect(html).toContain('id="library-collection-compare-no-source-items"');
+  expect(html).toContain(copy.noSourceItems);
 });
 it("shows ErrorState recovery when comparison fails to load", async () => {
   const copy = libraryCollectionComparisonCopy("en");
