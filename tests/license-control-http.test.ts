@@ -53,6 +53,7 @@ import { GET as staffActivity } from "../apps/web/src/app/api/admin/licenses/[id
 import { POST as ownerAction } from "../apps/web/src/app/api/licenses/[id]/actions/route";
 import { POST as moderationAction } from "../apps/web/src/app/api/admin/licenses/[id]/route";
 import { GET as detail } from "../apps/web/src/app/api/licenses/[id]/route";
+import { GET as servers } from "../apps/web/src/app/api/licenses/[id]/servers/route";
 const context = { params: Promise.resolve({ id: "lic_a" }) };
 const revision = "2026-10-10T00:00:00.000Z";
 const updated = "2026-10-10T01:00:00.000Z";
@@ -63,6 +64,7 @@ function request(path: string, body: unknown, headers: Record<string, string> = 
       ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: "nexus_session=initiating-session",
+      "x-nexus-actor-id": "usr_a",
       ...headers,
     },
     body: JSON.stringify(body),
@@ -391,6 +393,7 @@ it("requires observed endpoint recovery and returns only binding acknowledgement
   const response = await ownerAction(request("/api/licenses/lic_a/actions", command), context);
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
+    actorId: "usr_a",
     license: { id: "lic_a", status: "active", serverBound: true, updatedAt: updated },
     binding: { endpointRevision: 3, tokenRevoked: true },
   });
@@ -534,4 +537,38 @@ it("requires the initiating cookie before consuming owner or moderation command 
   }
   expect(state.ownerCommand).not.toHaveBeenCalled();
   expect(state.moderate).not.toHaveBeenCalled();
+});
+
+it.each(["owner", "admin"] as const)(
+  "requires the originating actor for %s license mutation",
+  async (kind) => {
+    state.user = { id: "usr_a", role: kind === "admin" ? "admin" : "user" };
+    const handler = kind === "admin" ? moderationAction : ownerAction;
+    const body = { action: "revoke", reason: "Reviewed", expectedUpdatedAt: revision };
+    expect(
+      (await handler(request("/api/license", body, { "x-nexus-actor-id": "" }), context)).status,
+    ).toBe(428);
+    const response = await handler(
+      request("/api/license", body, { "x-nexus-actor-id": "usr_b" }),
+      context,
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+    expect(state.ownerCommand).not.toHaveBeenCalled();
+    expect(state.moderate).not.toHaveBeenCalled();
+  },
+);
+
+it("only returns eligible servers for the original actor", async () => {
+  const get = (actorId: string) =>
+    new NextRequest("https://nexus.test/api/licenses/lic_a/servers?page=1", {
+      headers: { cookie: "nexus_session=initiating-session", "x-nexus-actor-id": actorId },
+    });
+  expect((await servers(get(""), context)).status).toBe(428);
+  const wrong = await servers(get("usr_b"), context);
+  expect(wrong.status).toBe(409);
+  expect(state.servers).not.toHaveBeenCalled();
+  state.servers.mockResolvedValue({ servers: [], page: 1, totalPages: 1 });
+  const response = await servers(get("usr_a"), context);
+  expect(await response.json()).toMatchObject({ actorId: "usr_a", servers: [] });
 });

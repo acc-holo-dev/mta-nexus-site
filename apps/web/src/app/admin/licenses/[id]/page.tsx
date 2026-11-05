@@ -61,7 +61,8 @@ export default async function ModerateLicensePage({ params }: { params: Promise<
       </Link>
       <LicenseDetailView license={license} locale={locale} />
       <LicenseControlPanel
-        key={license.id}
+        key={`${user.id}:${license.id}`}
+        actorId={user.id}
         moderation
         license={{
           id: license.id,

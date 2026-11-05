@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
+import { isIP } from "node:net";
 import { resolve } from "node:path";
 
 export const WEB_PUSH_SOAK_KIND = "web_push_production_duration_soak";
@@ -35,6 +36,31 @@ function forbiddenCapabilityKeys(value, pathParts = []) {
     hits.push(...forbiddenCapabilityKeys(child, next));
   }
   return hits;
+}
+
+// The producer records URL.origin of a public HTTPS push endpoint, not the
+// endpoint URL or any credential-bearing part of it.
+function isCanonicalPushOrigin(value) {
+  if (typeof value !== "string" || value.length > 2048) return false;
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.replace(/^\[/u, "").replace(/\]$/u, "").replace(/\.$/u, "");
+    return (
+      url.protocol === "https:" &&
+      value === url.origin &&
+      !url.username &&
+      !url.password &&
+      !url.port &&
+      hostname.length <= 253 &&
+      hostname.includes(".") &&
+      hostname !== "localhost" &&
+      !hostname.endsWith(".localhost") &&
+      !hostname.endsWith(".local") &&
+      isIP(hostname) === 0
+    );
+  } catch {
+    return false;
+  }
 }
 
 /** Pure validation of soak evidence body. Never invents PASS for incomplete payloads. */
@@ -108,7 +134,7 @@ export function validateWebPushProviderEvidence(evidence) {
   }
   const leaked = forbiddenCapabilityKeys(evidence);
   if (leaked.length) {
-    return { ok: false, reason: `sensitive capability fields are present: ${leaked.join(", ")}` };
+    return { ok: false, reason: "sensitive capability fields are present" };
   }
   if (
     evidence?.verdict?.passed !== true ||
@@ -122,8 +148,7 @@ export function validateWebPushProviderEvidence(evidence) {
     return { ok: false, reason: "provider did not return an accepted 2xx response" };
   }
   if (
-    typeof evidence?.target?.origin !== "string" ||
-    !evidence.target.origin.startsWith("https://") ||
+    !isCanonicalPushOrigin(evidence?.target?.origin) ||
     !/^[a-f0-9]{64}$/u.test(evidence?.target?.endpointSha256 ?? "") ||
     !/^[a-f0-9]{64}$/u.test(evidence?.vapid?.publicKeySha256 ?? "")
   ) {

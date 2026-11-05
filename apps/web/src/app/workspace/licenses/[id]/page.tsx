@@ -66,7 +66,8 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
       </Link>
       <LicenseDetailView license={license} locale={locale} />
       <LicenseControlPanel
-        key={license.id}
+        key={`${user.id}:${license.id}`}
+        actorId={user.id}
         license={{
           id: license.id,
           status: license.status,

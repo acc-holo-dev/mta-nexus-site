@@ -185,6 +185,8 @@ Ownership predicates + 20-row `created_at, id` DESC. Это **не** target cart
 
 > Commerce checkout/payment/settlement → [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md). Здесь — права доступа к ресурсу.
 
+**Текущий API управления:** изменения лицензии и чтение доступных серверов требуют `X-Nexus-Actor-Id` исходного пользователя. Одноразовый runtime token показывается только в текущем экране и очищается при потере фокуса или скрытии вкладки; потерянный ответ с токеном не восстанавливается. Это не включает платный checkout.
+
 ### 6.1 License scope (**цель**, OWNER)
 
 **Одна лицензия = один MTA server.** Несколько серверов → отдельные license units. Unlimited/multi-server SKU не default без отдельного owner decision.

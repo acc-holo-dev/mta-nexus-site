@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 function build(overrides = {}) {
@@ -97,6 +97,44 @@ test("rejects capability material in evidence even with a valid checksum", () =>
   );
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /sensitive capability fields/u);
+});
+
+test("does not include untrusted parent keys in capability rejection logs", () => {
+  const result = run(
+    build({
+      debug: {
+        "sensitive-parent-key-42": { endpoint: "https://push.example.test/secret-token" },
+      },
+    }),
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /sensitive capability fields/u);
+  assert.doesNotMatch(
+    `${result.stdout}\n${result.stderr}`,
+    /sensitive-parent-key-42|secret-token/u,
+  );
+});
+
+test("rejects noncanonical or credential-bearing origins without logging their contents", () => {
+  for (const origin of [
+    "https://user:secret@push.example.test",
+    "https://push.example.test/private-secret",
+    "https://push.example.test?token=secret",
+    "https://push.example.test#secret",
+    "https://push.example.test:8443",
+    "https://127.0.0.1",
+    "https://push.local",
+    "https://PUSH.example.test",
+    "https://push.example.test/",
+    "http://push.example.test",
+    "https://",
+  ]) {
+    const result = run(build({ target: { origin, endpointSha256: "a".repeat(64) } }));
+    assert.notEqual(result.status, 0, origin);
+    assert.match(result.stderr, /identity evidence is invalid/u);
+    assert.doesNotMatch(`${result.stdout}\n${result.stderr}`, /secret|private-secret/u);
+    assert.doesNotMatch(result.stdout, /passed provider=/u);
+  }
 });
 
 test("rejects tampered provider evidence", () => {

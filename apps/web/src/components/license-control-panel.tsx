@@ -33,10 +33,12 @@ export type LicensePanelData = {
 
 export function LicenseControlPanel({
   license,
+  actorId,
   initialServers,
   moderation = false,
 }: {
   license: LicensePanelData;
+  actorId: string;
   initialServers?: ServerPage;
   moderation?: boolean;
 }) {
@@ -45,7 +47,16 @@ export function LicenseControlPanel({
   const router = useRouter();
   const fieldId = useId();
   const lock = useRef(false);
-  const serverRequest = useRef(0);
+  const serverRequest = useRef(0),
+    epoch = useRef(0),
+    abortRef = useRef<AbortController | null>(null);
+  const scope = `${actorId}:${license.id}:${moderation}`;
+  const currentScope = useRef(scope),
+    readyScope = useRef(scope);
+  if (currentScope.current !== scope) {
+    currentScope.current = scope;
+    epoch.current++;
+  }
   const actions: (LicenseOwnerAction | LicenseModerationAction)[] = moderation
     ? (["suspend", "restore", "revoke"] as const).filter(
         (action) =>
@@ -81,6 +92,57 @@ export function LicenseControlPanel({
     (!!completedRevision && Date.parse(license.updatedAt) < Date.parse(completedRevision)) ||
     uncertainRevision === license.updatedAt;
 
+  // Reset private state when identity changes, even without a remount.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scope is the identity boundary.
+  useEffect(() => {
+    readyScope.current = scope;
+    lock.current = false;
+    serverRequest.current++;
+    abortRef.current?.abort();
+    setSecret(null);
+    setCopied(false);
+    setBusy(false);
+    setLoadingServers(false);
+    setError("");
+    setCompletedRevision("");
+    setUncertainRevision("");
+    setAction(actions[0]);
+    setServers(initialServers ?? { servers: [], page: 1, totalPages: 1 });
+    setServerId("");
+    setReason("");
+    setConfirmed(false);
+    return () => {
+      epoch.current++;
+      abortRef.current?.abort();
+      serverRequest.current++;
+    };
+  }, [scope]);
+  useEffect(() => {
+    const conceal = () => {
+      setSecret(null);
+      setCopied(false);
+      if (lock.current) {
+        epoch.current++;
+        abortRef.current?.abort();
+        lock.current = false;
+        setBusy(false);
+        setUncertainRevision(license.updatedAt);
+        setError(copy.errors.fallback);
+      }
+      serverRequest.current++;
+      setLoadingServers(false);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") conceal();
+    };
+    window.addEventListener("blur", conceal);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("blur", conceal);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [license.updatedAt, copy.errors.fallback]);
+
   useEffect(() => {
     if (!secret) return;
     const timer = window.setTimeout(() => setSecret(null), 60_000);
@@ -88,18 +150,21 @@ export function LicenseControlPanel({
   }, [secret]);
 
   async function loadServers(page: number) {
+    if (readyScope.current !== scope || currentScope.current !== scope) return;
+    const operationEpoch = epoch.current;
     const sequence = ++serverRequest.current;
     setLoadingServers(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/licenses/${license.id}/servers?page=${page}`,
-        privateApiRequest(),
-      );
+      const response = await fetch(`/api/licenses/${license.id}/servers?page=${page}`, {
+        ...privateApiRequest(),
+        headers: { "x-nexus-actor-id": actorId },
+      });
       const body = await response.json().catch(() => null);
-      if (sequence !== serverRequest.current) return;
+      if (sequence !== serverRequest.current || operationEpoch !== epoch.current) return;
       if (
         !response.ok ||
+        body?.actorId !== actorId ||
         !Array.isArray(body?.servers) ||
         body.servers.length > 20 ||
         !Number.isSafeInteger(body.page) ||
@@ -120,15 +185,25 @@ export function LicenseControlPanel({
       setServers(body);
       setServerId("");
     } catch {
-      if (sequence === serverRequest.current) setError(copy.errors.fallback);
+      if (sequence === serverRequest.current && operationEpoch === epoch.current)
+        setError(copy.errors.fallback);
     } finally {
-      if (sequence === serverRequest.current) setLoadingServers(false);
+      if (sequence === serverRequest.current && operationEpoch === epoch.current)
+        setLoadingServers(false);
     }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (lock.current || refreshing || !action) return;
+    if (
+      readyScope.current !== scope ||
+      currentScope.current !== scope ||
+      lock.current ||
+      refreshing ||
+      !action
+    )
+      return;
+    const operationEpoch = epoch.current;
     const command = {
       action,
       reason,
@@ -150,14 +225,21 @@ export function LicenseControlPanel({
     setError("");
     setSecret(null);
     setCopied(false);
+    const abort = new AbortController();
+    abortRef.current = abort;
     try {
       const response = await fetch(
         moderation ? `/api/admin/licenses/${license.id}` : `/api/licenses/${license.id}/actions`,
-        privateApiRequest({ method: "POST", json: parsed.data }),
+        {
+          ...privateApiRequest({ method: "POST", json: parsed.data, signal: abort.signal }),
+          headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },
+        },
       );
       const body = await response.json().catch(() => null);
+      if (operationEpoch !== epoch.current || abort.signal.aborted) return;
       if (
         !response.ok ||
+        body?.actorId !== actorId ||
         !confirmedLicenseControl(
           body,
           license.id,
@@ -183,17 +265,23 @@ export function LicenseControlPanel({
         /* Keep the confirmed receipt and one-time token visible. */
       }
     } catch {
-      setError(copy.errors.fallback);
-      setUncertainRevision(license.updatedAt);
+      if (operationEpoch === epoch.current && !abort.signal.aborted) {
+        setError(copy.errors.fallback);
+        setUncertainRevision(license.updatedAt);
+      }
     } finally {
-      lock.current = false;
-      setBusy(false);
+      if (operationEpoch === epoch.current) {
+        lock.current = false;
+        setBusy(false);
+      }
+      if (abortRef.current === abort) abortRef.current = null;
     }
   }
 
   const ghostLinkClass =
     "inline-flex min-h-11 items-center h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
+  if (readyScope.current !== scope) return null;
   return (
     <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
       <h2 className="text-lg font-semibold text-primary">
@@ -333,7 +421,19 @@ export function LicenseControlPanel({
           </fieldset>
         </form>
       )}
-      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          title={error}
+          description={copy.formErrorHint}
+          action={
+            uncertainRevision === license.updatedAt ? (
+              <Button type="button" variant="outline" onClick={() => window.location.reload()}>
+                {copy.refresh}
+              </Button>
+            ) : undefined
+          }
+        />
+      ) : null}
       {completedRevision && !error && (
         <p
           role="status"

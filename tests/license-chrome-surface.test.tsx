@@ -55,6 +55,7 @@ describe("license chrome surface", () => {
     const copy = getLicenseControlCopy("en");
     const html = renderToStaticMarkup(
       createElement(LicenseControlPanel, {
+        actorId: "usr_a",
         license: {
           id: "lic_a",
           status: "active",
