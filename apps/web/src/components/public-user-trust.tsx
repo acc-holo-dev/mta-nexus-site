@@ -1,4 +1,4 @@
-import { Avatar } from "@nexus/ui";
+import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import type { PublicUserTrust } from "../lib/public-user-trust-contract";
@@ -99,7 +99,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
       <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
         <h2 className="font-heading text-primary">{copy.publications}</h2>
         {data.publications === null ? (
-          <p className="text-sm text-muted">{copy.hiddenActivity}</p>
+          <ErrorState id="public-user-trust-hidden-activity" title={copy.hiddenActivity} />
         ) : (
           <>
             <p className="font-numeric text-2xl font-bold text-primary">{data.publications}</p>
