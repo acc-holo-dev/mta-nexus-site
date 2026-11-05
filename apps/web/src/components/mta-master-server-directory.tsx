@@ -127,9 +127,13 @@ function ServerCard({
           </Button>
         </div>
       </div>
-      <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
-        {copyMessage}
-      </p>
+      {copyMessage === copy.copyUnavailable ? (
+        <ErrorState id="mta-master-directory-copy-unavailable" title={copy.copyUnavailable} />
+      ) : (
+        <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
+          {copyMessage}
+        </p>
+      )}
     </article>
   );
 }
