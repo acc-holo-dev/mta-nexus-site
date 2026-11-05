@@ -148,6 +148,9 @@ it("coalesces rapid writes while the first command is pending", async () => {
   finish(response({ id: "request", status: "pending", revision: next }));
   await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
 });
+function amendErrorState(locale: "en" | "ru" = "en") {
+  return render(locale).find((node) => (node.type as { name?: string }).name === "ErrorState");
+}
 it.each([
   { id: "foreign", status: "pending", revision: next },
   { id: "request", status: "approved", revision: next },
@@ -157,7 +160,13 @@ it.each([
 ])("requires reload after an uncertain acknowledgement %j", async (reply) => {
   harness.fetch.mockResolvedValue(response(reply));
   submit();
-  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  await vi.waitFor(() => expect(amendErrorState()).toBeDefined());
+  const title = String(amendErrorState()?.props.title ?? "");
+  expect(title.length).toBeGreaterThan(0);
+  expect(flatTreeHasErrorText(render(), title)).toBe(true);
+  if (reply !== null) {
+    expect(title).toBe(verificationApplicationsCopy("en").uncertain);
+  }
   expect(harness.refresh).not.toHaveBeenCalled();
   expect(render().find((node) => node.type === "fieldset")?.props.disabled).toBe(true);
   submit();
@@ -174,12 +183,10 @@ it.each(["VERIFICATION_APPLICATION_CHANGED", "VERIFICATION_AUTHORITY_CHANGED", "
   async (code) => {
     harness.fetch.mockResolvedValue(response({ code, error: "PRIVATE_SQL" }, 409));
     submit(render("ru"));
-    await vi.waitFor(() =>
-      expect(render("ru").some((node) => node.props.role === "alert")).toBe(true),
-    );
-    expect(render("ru").find((node) => node.props.role === "alert")?.props.children).not.toContain(
-      "PRIVATE_SQL",
-    );
+    await vi.waitFor(() => expect(amendErrorState("ru")).toBeDefined());
+    const title = String(amendErrorState("ru")?.props.title ?? "");
+    expect(title).not.toContain("PRIVATE_SQL");
+    expect(flatTreeHasErrorText(render("ru"), title)).toBe(true);
     expect(harness.refresh).not.toHaveBeenCalled();
   },
 );
