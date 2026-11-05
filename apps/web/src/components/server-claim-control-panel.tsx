@@ -334,23 +334,25 @@ export function ServerClaimControlPanel({
       </div>
 
       {state === "unknown_issue" || state === "unknown_verify" ? (
-        <div className="space-y-2 text-sm text-secondary" role="status">
-          <p>
-            {state === "unknown_issue"
+        <ErrorState
+          title={
+            state === "unknown_issue"
               ? locale === "ru"
                 ? "Результат создания проверки неизвестен. Токен восстановить нельзя; повтор заблокирован. Проверьте статус и обратитесь в поддержку."
                 : "The challenge result is unknown. The token cannot be recovered; retry is blocked. Check the status and contact support."
               : locale === "ru"
                 ? "Результат подтверждения неизвестен. Повтор заблокирован; проверьте заявки и обратитесь в поддержку."
-                : "The verification result is unknown. Retry is blocked; check your requests and contact support."}
-          </p>
-          <Link
-            href="/workspace/verification"
-            className="inline-flex min-h-11 items-center text-accent underline"
-          >
-            {locale === "ru" ? "Проверить заявки" : "Check requests"}
-          </Link>
-        </div>
+                : "The verification result is unknown. Retry is blocked; check your requests and contact support."
+          }
+          action={
+            <Link
+              href="/workspace/verification"
+              className="inline-flex min-h-11 items-center text-accent underline"
+            >
+              {locale === "ru" ? "Проверить заявки" : "Check requests"}
+            </Link>
+          }
+        />
       ) : !identityVisible ? (
         <p role="status">
           {locale === "ru"
