@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `c8eb4324` — tip advanced after tip honesty (#633) on 0d9f10c9; tip CI not claimed verified-green under rapid merges;
 - `0d9f10c9` — tip advanced after follow unavailable target (#617), collection move-source (#618), mta-master-directory-service suite split (#625), and tip honesty (#632); tip CI not claimed verified-green under rapid merges;
 - `5d0056a4` — tip advanced after tip honesty (#631) on e552dcfd; tip CI not claimed verified-green under rapid merges;
 - `e552dcfd` — tip advanced after tip honesty (#630) on 3d6d040b; tip CI not claimed verified-green under rapid merges;
