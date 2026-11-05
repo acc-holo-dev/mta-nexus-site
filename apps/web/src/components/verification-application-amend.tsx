@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
@@ -144,11 +144,9 @@ export function VerificationApplicationAmend({
           {busy ? labels.loading : copy.amend}
         </Button>
       </fieldset>
-      {notice ? (
-        <p
-          role={saved ? "status" : "alert"}
-          className={saved ? "text-sm text-success" : "text-sm text-danger"}
-        >
+      {notice && !saved ? <ErrorState title={notice} /> : null}
+      {notice && saved ? (
+        <p role="status" className="text-sm text-success">
           {notice}
         </p>
       ) : null}
