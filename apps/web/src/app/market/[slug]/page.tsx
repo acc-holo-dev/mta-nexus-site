@@ -300,7 +300,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </p>
         ) : null}
         {!attribution?.organization && !attribution?.author ? (
-          <p className="text-muted">{copy.publisherUnavailable}</p>
+          <ErrorState id="market-publisher-unavailable" title={copy.publisherUnavailable} />
         ) : null}
       </div>
 
