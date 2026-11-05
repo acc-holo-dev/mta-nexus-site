@@ -244,11 +244,12 @@ export function MtaMetaInspectorPanel({
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.exportCount}
               </div>
-              {inspection.summary.httpExportCount > 0 && (
-                <div className="text-[10px] text-warning">
-                  {inspection.summary.httpExportCount} {copy.httpEnabled}
-                </div>
-              )}
+              {inspection.summary.httpExportCount > 0 ? (
+                <ErrorState
+                  id="mta-meta-inspector-http-exports"
+                  title={`${inspection.summary.httpExportCount} ${copy.httpEnabled}`}
+                />
+              ) : null}
             </div>
           </div>
 
@@ -556,13 +557,11 @@ export function MtaMetaInspectorPanel({
                 {withOccurrenceKeys(inspection.issues, (issue) =>
                   JSON.stringify([issue.code, issue.severity, issue.message]),
                 ).map(({ key, item: issue }) => (
-                  <li
-                    key={key}
-                    className={
-                      issue.severity === "error" ? "text-xs text-danger" : "text-xs text-warning"
-                    }
-                  >
-                    {getMtaMetaInspectorIssueMessage(issue, copy.structuralIssues)}
+                  <li key={key}>
+                    <ErrorState
+                      id={`mta-meta-inspector-issue-${issue.severity}-${issue.code}`}
+                      title={getMtaMetaInspectorIssueMessage(issue, copy.structuralIssues)}
+                    />
                   </li>
                 ))}
               </ul>
