@@ -63,13 +63,15 @@ export function BuildPackageSummaryPanel({
               {summary.scripts.unknown}
             </p>
           )}
-          {(summary.missingReferences > 0 || summary.unresolvedReferences > 0) && (
-            <p className="text-warning">
-              {copy.references}: {copy.absent} {summary.missingReferences} · {copy.unknown}{" "}
-              {summary.unresolvedReferences}
-            </p>
-          )}
-          {summary.referencesTruncated ? <ErrorState title={copy.truncated} /> : null}
+          {summary.missingReferences > 0 || summary.unresolvedReferences > 0 ? (
+            <ErrorState
+              id="build-package-evidence-missing-refs"
+              title={`${copy.references}: ${copy.absent} ${summary.missingReferences} · ${copy.unknown} ${summary.unresolvedReferences}`}
+            />
+          ) : null}
+          {summary.referencesTruncated ? (
+            <ErrorState id="build-package-evidence-refs-truncated" title={copy.truncated} />
+          ) : null}
         </>
       )}
       <p className="text-xs text-muted">{copy.publicNote}</p>
@@ -149,27 +151,40 @@ export function BuildPackageEvidencePanel({
                 ].map((v) => (
                   <li key={JSON.stringify([v.kind, v.path, v.status])} className="break-words">
                     <code>{v.path || "—"}</code> · {v.kind} ·{" "}
-                    <span className={v.status === "present" ? "text-success" : "text-warning"}>
-                      {labels[v.status]}
-                    </span>
+                    {v.status === "present" ? (
+                      <span className="text-success">{labels[v.status]}</span>
+                    ) : (
+                      <ErrorState
+                        id={`build-package-evidence-ref-${v.kind}-${v.status}-${v.path || "empty"}`}
+                        title={labels[v.status]}
+                      />
+                    )}
                   </li>
                 ))}
               </ul>
-              {manifest.referencesTruncated ? <ErrorState title={copy.truncated} /> : null}
+              {manifest.referencesTruncated ? (
+                <ErrorState
+                  id="build-package-evidence-manifest-refs-truncated"
+                  title={copy.truncated}
+                />
+              ) : null}
               {manifest.issues.length > 0 && (
                 <>
                   <h3 className="font-semibold">{copy.issues}</h3>
-                  <ul className="list-inside list-disc text-warning">
+                  <ul className="space-y-2">
                     {[
                       ...new Map(
                         manifest.issues.map((v) => [`${v.code}:${v.severity}`, v]),
                       ).values(),
                     ].map((v) => (
                       <li key={`${v.code}:${v.severity}`}>
-                        {getMtaMetaInspectorIssueMessage(
-                          { ...v, message: copy.genericIssue },
-                          getDictionary(locale).metaInspector.structuralIssues,
-                        )}
+                        <ErrorState
+                          id={`build-package-evidence-issue-${v.code}`}
+                          title={getMtaMetaInspectorIssueMessage(
+                            { ...v, message: copy.genericIssue },
+                            getDictionary(locale).metaInspector.structuralIssues,
+                          )}
+                        />
                       </li>
                     ))}
                   </ul>
