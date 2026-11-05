@@ -30,7 +30,6 @@ export {
   notificationRepository,
   notifications,
   path,
-  randomUUID,
   recovery,
   rm,
   sessionRepository,
@@ -128,7 +127,7 @@ export async function fixture() {
 }
 
 /** Shrink queue capacity so a two-device fixture saturates admission. */
-export async function saturate() {
+async function saturate() {
   const [gate] = await db.execute(sql`select capacity from web_push_queue_gate`);
   originalCapacity ??= Number(gate.capacity);
   // A two-device fixture cannot fit even if this database has no other jobs.
