@@ -52,8 +52,19 @@ test("CI runs separate test projects and reports the selected verification scope
   const composeVerify = read("compose.verify.yaml");
   const alignedRunner = read("scripts/run-ci-aligned-vitest.mjs");
   assert.match(releaseEvidence, /scripts\/run-ci-aligned-vitest\.mjs/u);
+  assert.match(releaseEvidence, /assertDisposableTestDatabase\(\)/u);
+  assert.match(
+    releaseEvidence,
+    /"database_migrations",[^\n]*\{\s*blockedReason: databaseBlockedReason/u,
+  );
+  assert.match(
+    releaseEvidence,
+    /runGate\("tests", "node", \["scripts\/run-ci-aligned-vitest\.mjs"\], \{\s*blockedReason: databaseBlockedReason/u,
+  );
   assert.doesNotMatch(releaseEvidence, /\["test"\]/u);
   assert.match(composeVerify, /run-ci-aligned-vitest\.mjs/u);
+  assert.match(composeVerify, /NEXUS_DISPOSABLE_DATABASE: "1"/u);
+  assert.match(composeVerify, /node scripts\/disposable-test-database\.mjs\s+pnpm db:migrate/u);
   assert.doesNotMatch(composeVerify, /^\s+pnpm test$/mu);
   assert.match(alignedRunner, /delete unitEnv\.NEXT_PUBLIC_APP_URL/u);
   assert.match(alignedRunner, /test:unit/u);

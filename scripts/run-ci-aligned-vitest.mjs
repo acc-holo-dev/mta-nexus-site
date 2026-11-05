@@ -11,6 +11,7 @@
  */
 import { spawnSync } from "node:child_process";
 import process from "node:process";
+import { assertDisposableTestDatabase } from "./disposable-test-database.mjs";
 
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
@@ -27,6 +28,13 @@ function run(label, args, env) {
     return 1;
   }
   return result.status ?? 1;
+}
+
+try {
+  assertDisposableTestDatabase();
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
 }
 
 const sharedEnv = { ...process.env };

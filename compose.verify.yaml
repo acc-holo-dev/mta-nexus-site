@@ -29,6 +29,7 @@ services:
       PORT: 3000
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       DATABASE_URL: postgres://nexus:nexus_verify_secret@postgres:5432/mta_nexus_verify
+      NEXUS_DISPOSABLE_DATABASE: "1"
       AUTH_SECRET: local-verify-secret-that-is-long-enough-only-for-disposable-tests
       STORAGE_PROVIDER: local
       STORAGE_LOCAL_PATH: /data/uploads
@@ -48,6 +49,7 @@ services:
       - sh
       - -ec
       - |
+        node scripts/disposable-test-database.mjs
         pnpm db:migrate
         pnpm typecheck
         node scripts/run-ci-aligned-vitest.mjs

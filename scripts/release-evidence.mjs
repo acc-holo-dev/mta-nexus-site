@@ -1,29 +1,30 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import process from "node:process";
-import {
-  EXTERNAL_RELEASE_EVIDENCE_SPECS,
-  REQUIRED_RELEASE_GATES,
-  writeReleaseEvidence,
-  executeReleaseCommand,
-  repositoryStayedStable,
-  buildEvidenceChecksum,
-  listMigrationEvidence,
-  sha256File,
-  summarizeReleaseEvidence,
-  summarizeExternalEvidence,
-  buildReleaseManifest,
-  evaluateReleaseManifest,
-} from "./release-evidence-lib.mjs";
-import { collectRepositoryToolchain, evaluateToolchainPolicy } from "./toolchain-policy.mjs";
+import { fileURLToPath } from "node:url";
 import {
   RELEASE_UPGRADE_BASELINE_TAG,
   RELEASE_UPGRADE_TARGET_TAG,
 } from "../packages/db/scripts/release-upgrade-contract.mjs";
-import { readInfraImagePins, evaluateInfraImagePins } from "./infra-image-policy.mjs";
+import { assertDisposableTestDatabase } from "./disposable-test-database.mjs";
+import { evaluateInfraImagePins, readInfraImagePins } from "./infra-image-policy.mjs";
+import {
+  buildEvidenceChecksum,
+  buildReleaseManifest,
+  EXTERNAL_RELEASE_EVIDENCE_SPECS,
+  evaluateReleaseManifest,
+  executeReleaseCommand,
+  listMigrationEvidence,
+  REQUIRED_RELEASE_GATES,
+  repositoryStayedStable,
+  sha256File,
+  summarizeExternalEvidence,
+  summarizeReleaseEvidence,
+  writeReleaseEvidence,
+} from "./release-evidence-lib.mjs";
+import { collectRepositoryToolchain, evaluateToolchainPolicy } from "./toolchain-policy.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
@@ -115,6 +116,13 @@ const toolchainEvaluation = evaluateToolchainPolicy({
 const toolchainComplete =
   repositoryToolchain.nodePin.ok && Boolean(repositoryToolchain.pnpmPin) && toolchainEvaluation.ok;
 
+let databaseBlockedReason = null;
+try {
+  assertDisposableTestDatabase();
+} catch (error) {
+  databaseBlockedReason = error.message;
+}
+
 const gates = [
   runGate(
     "repository_identity",
@@ -145,20 +153,15 @@ const gates = [
     "scripts/tests/release-evidence.node-test.mjs",
     "scripts/tests/release-evidence-surface.node-test.mjs",
   ]),
-  runGate(
-    "database_migrations",
-    pnpmCommand,
-    ["db:migrate"],
-    process.env.DATABASE_URL
-      ? {}
-      : {
-          blockedReason: "DATABASE_URL is required to prove migrations against a database.",
-        },
-  ),
+  runGate("database_migrations", pnpmCommand, ["db:migrate"], {
+    blockedReason: databaseBlockedReason,
+  }),
   runGate("lint", pnpmCommand, ["lint"]),
   runGate("typecheck", pnpmCommand, ["typecheck"]),
   // Same Vitest split as CI (unit without APP_URL, database with APP_URL).
-  runGate("tests", "node", ["scripts/run-ci-aligned-vitest.mjs"]),
+  runGate("tests", "node", ["scripts/run-ci-aligned-vitest.mjs"], {
+    blockedReason: databaseBlockedReason,
+  }),
   runGate("next_build", pnpmCommand, ["build"]),
 ];
 
