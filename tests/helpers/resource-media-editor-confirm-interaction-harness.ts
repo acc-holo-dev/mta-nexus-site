@@ -35,10 +35,7 @@ export const initial = {
   ],
 };
 
-type ResourceMediaEditorComponent = (props: {
-  initial: typeof initial;
-  locale: "en";
-}) => ReactNode;
+type ResourceMediaEditorComponent = (props: { initial: typeof initial; locale: "en" }) => ReactNode;
 
 type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
