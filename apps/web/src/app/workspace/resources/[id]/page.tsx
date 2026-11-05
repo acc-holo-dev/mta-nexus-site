@@ -171,13 +171,11 @@ export default async function ManageResourcePage({
                   </p>
                 )}
                 {build.status === "quarantined" && build.quarantineReason && (
-                  <aside
-                    role="note"
-                    className="rounded-lg border border-[color:var(--nexus-danger)]/20 bg-danger-soft p-3 text-sm text-danger"
-                  >
-                    <p className="font-semibold">{copy.quarantine}</p>
-                    <p className="mt-1 whitespace-pre-wrap break-words">{build.quarantineReason}</p>
-                  </aside>
+                  <ErrorState
+                    id="resource-build-quarantined"
+                    title={copy.quarantine}
+                    description={build.quarantineReason}
+                  />
                 )}
                 {history.decisions
                   .filter((decision) => decision.buildId === build.id)

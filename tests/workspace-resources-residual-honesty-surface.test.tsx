@@ -86,8 +86,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(manage).toContain("overflow-x-clip");
   expect(manage).toContain("min-w-0");
   expect(manage).toContain("min-h-11");
-  expect(manage).toContain("bg-danger-soft");
-  expect(manage).toContain("border-[color:var(--nexus-danger)]/20");
+  expect(manage).toContain('id="resource-build-quarantined"');
   expect(manage).toContain("quarantineReason");
   expect(manage).not.toMatch(/className="whitespace-pre-wrap break-words text-sm text-danger"/u);
   expect(manage).not.toContain('role="alert"');
