@@ -1,4 +1,5 @@
 import type { ResourcePublicationReadinessSummary } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import {
@@ -8,10 +9,10 @@ import {
 } from "../lib/resource-publication-readiness-i18n";
 import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 
-const stateTone: Record<ResourcePublicationReadinessSummary["items"][number]["state"], string> = {
+const stateTone: Partial<
+  Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>
+> = {
   complete: "text-success",
-  blocked: "text-danger",
-  pending: "text-warning",
   not_applicable: "text-muted",
 };
 
@@ -54,18 +55,44 @@ export function ResourcePublicationReadinessPanel({
                 <span className="font-label uppercase text-[10px] text-muted">
                   {item.tier === "required" ? copy.required : copy.recommendation}
                 </span>
-                <span className={`font-label uppercase text-[10px] ${stateTone[item.state]}`}>
-                  {copy.states[item.state]}
-                </span>
+                {item.state === "blocked" || item.state === "pending" ? null : (
+                  <span
+                    className={`font-label uppercase text-[10px] ${stateTone[item.state] ?? "text-muted"}`}
+                  >
+                    {copy.states[item.state]}
+                  </span>
+                )}
               </div>
-              <p className="text-sm text-secondary">{publicationReadinessDetail(locale, item)}</p>
+              {item.state === "blocked" || item.state === "pending" ? (
+                <ErrorState
+                  id={
+                    item.state === "blocked"
+                      ? `publication-readiness-blocked-${item.id}`
+                      : `publication-readiness-pending-${item.id}`
+                  }
+                  title={copy.states[item.state]}
+                  description={publicationReadinessDetail(locale, item)}
+                  action={
+                    <Link
+                      href={item.actionPath}
+                      className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    >
+                      {copy.fix}
+                    </Link>
+                  }
+                />
+              ) : (
+                <p className="text-sm text-secondary">{publicationReadinessDetail(locale, item)}</p>
+              )}
             </div>
-            <Link
-              href={item.actionPath}
-              className="shrink-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {copy.fix}
-            </Link>
+            {item.state === "blocked" || item.state === "pending" ? null : (
+              <Link
+                href={item.actionPath}
+                className="shrink-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.fix}
+              </Link>
+            )}
           </li>
         ))}
       </ul>
