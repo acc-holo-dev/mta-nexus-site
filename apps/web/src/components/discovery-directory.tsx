@@ -123,7 +123,7 @@ export function DirectoryFilters({
         </div>
       )}
       {names && (
-        <label className="flex min-h-8 items-center gap-2 text-sm text-secondary">
+        <label className="flex min-h-11 items-center gap-2 text-sm text-secondary">
           <input type="checkbox" name="verified" value="1" defaultChecked={state.verified} />
           {copy.verified}
         </label>
