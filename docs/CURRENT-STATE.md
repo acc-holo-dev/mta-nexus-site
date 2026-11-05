@@ -6,7 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
-- `5577cdc1` — tip advanced after tip honesty (#722) on d9edfce2; tip CI not claimed verified-green under rapid merges;
+- `61d44ad0` — tip advanced after purchases cannotCancel ErrorState (#713) and tip honesty (#724); tip CI not claimed verified-green under rapid merges;
 - `bc00e3e4` — tip advanced after tip honesty (#695) on 2111b741; tip CI not claimed verified-green under rapid merges;
 - `2111b741` — tip advanced after tip honesty (#694) on a07bf8b8; tip CI not claimed verified-green under rapid merges;
 - `a07bf8b8` — tip advanced after tip honesty (#693) on 4daaafc1; tip CI not claimed verified-green under rapid merges;
