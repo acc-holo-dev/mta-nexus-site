@@ -63,6 +63,18 @@ const workspace: OrganizationWorkspace = {
   hasMore: false,
 };
 
+function componentName(type: Element["type"]): string | undefined {
+  if (typeof type === "string") return type;
+  if (typeof type === "function") {
+    const fn = type as { displayName?: string; name?: string };
+    return fn.displayName ?? fn.name;
+  }
+  if (typeof type === "object" && type !== null) {
+    return (type as { displayName?: string }).displayName;
+  }
+  return undefined;
+}
+
 /** Shared react mock factory for organization-workspace confirm suites. */
 export function mockReactHooks(harness: OrganizationWorkspaceConfirmHarness) {
   return async (original: () => Promise<typeof import("react")>) => ({
@@ -121,6 +133,12 @@ export function createOrganizationWorkspaceConfirmInteractionHelpers(
     (leaveButton(render()).props.onClick as () => void)();
   }
 
+  function memberEditor(nodes: Element[]) {
+    const found = nodes.find((node) => componentName(node.type) === "OrganizationMemberEditor");
+    if (!found) throw new Error("Missing OrganizationMemberEditor");
+    return found;
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     harness.cursor = 0;
@@ -139,5 +157,6 @@ export function createOrganizationWorkspaceConfirmInteractionHelpers(
     render,
     leaveButton,
     clickLeave,
+    memberEditor,
   };
 }
