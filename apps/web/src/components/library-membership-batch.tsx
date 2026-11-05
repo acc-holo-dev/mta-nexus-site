@@ -217,7 +217,9 @@ export function LibraryMembershipBatchForm({
                     {collection.itemCount}/{report.itemLimit} · {h.current}:{" "}
                     {collection.inCollection ? c.inCollection : c.notInCollection}
                   </p>
-                  {cannotAdd && <p className="text-xs text-muted">{h.cannotAdd}</p>}
+                  {cannotAdd ? (
+                    <ErrorState id="library-membership-cannot-add" title={h.cannotAdd} />
+                  ) : null}
                   {readOnly && (
                     <p className="text-xs text-muted">
                       {collection.status === "archived" ? c.archivedNote : c.revisionLocked}
