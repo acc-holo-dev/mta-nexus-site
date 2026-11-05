@@ -28,7 +28,7 @@ type PreviewItem = {
 };
 
 type Preview = {
-  schemaVersion: number;
+  schemaVersion: 1;
   generatedAt: string;
   collection: Collection;
   itemCount: number;
