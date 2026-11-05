@@ -1,10 +1,7 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
 import type { OrganizationTeamPage } from "../../apps/web/src/lib/organization-team-contract";
-import {
-  type FlatTestElement,
-  flattenReactTestTree,
-} from "./flatten-react-test-tree";
+import { type FlatTestElement, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type OrganizationTeamDirectoryConfirmHarness = {
   slots: unknown[];
@@ -24,7 +21,7 @@ type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 
 type Element = FlatTestElement;
 
-export const time = "2026-10-11T00:00:00.000Z";
+const time = "2026-10-11T00:00:00.000Z";
 export const later = "2026-10-11T00:00:01.000Z";
 export const actorId = "usr_owner";
 
