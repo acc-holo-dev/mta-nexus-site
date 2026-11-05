@@ -113,75 +113,77 @@ export default async function Page({
             {report.source.itemCount} / {report.itemLimit}
           </p>
         </section>
-        <form
-          method="get"
-          action={collectionHref(id, "compare")}
-          className="flex min-w-0 flex-wrap items-end gap-3"
-        >
-          <label className="grid min-w-0 max-w-full gap-1.5">
-            <span className="font-label uppercase text-secondary">{h.destination}</span>
-            <select
-              name="to"
-              defaultValue={comparison?.destination.id ?? ""}
-              required
-              className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
-            >
-              <option value="">{h.choose}</option>
-              {report.targets.map((target) => (
-                <option key={target.id} value={target.id}>
-                  {target.name} · {c[target.status]} · {target.itemCount} / {report.itemLimit}
-                </option>
-              ))}
-            </select>
-          </label>
-          {comparison && (
-            <>
-              <label className="grid min-w-0 max-w-full gap-1.5">
-                <span className="font-label uppercase text-secondary">{c.all}</span>
-                <select
-                  name="filter"
-                  defaultValue={comparison.filter}
-                  className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
-                >
-                  {LIBRARY_COLLECTION_COMPARISON_FILTERS.map((filter) => (
-                    <option key={filter} value={filter}>
-                      {h[filter]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid min-w-0 max-w-full gap-1.5">
-                <span className="font-label uppercase text-secondary">{c.search}</span>
-                <input
-                  name="q"
-                  defaultValue={comparison.q}
-                  maxLength={80}
-                  className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
-                />
-              </label>
-            </>
-          )}
-          <label className="grid min-w-0 max-w-full gap-1.5">
-            <span className="font-label uppercase text-secondary">{h.transfer}</span>
-            <select
-              name="transfer"
-              defaultValue={comparison?.transfer ?? query.transfer}
-              className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
-            >
-              <option value="copy">{c["copy-items"]}</option>
-              <option value="move">{c["move-items"]}</option>
-            </select>
-          </label>
-          <Button
-            type="submit"
-            variant="outline"
-            size="touch"
-            className="px-3"
-            disabled={!report.targets.length}
+        <search aria-label={c.search}>
+          <form
+            method="get"
+            action={collectionHref(id, "compare")}
+            className="flex min-w-0 flex-wrap items-end gap-3"
           >
-            {h.compare}
-          </Button>
-        </form>
+            <label className="grid min-w-0 max-w-full gap-1.5">
+              <span className="font-label uppercase text-secondary">{h.destination}</span>
+              <select
+                name="to"
+                defaultValue={comparison?.destination.id ?? ""}
+                required
+                className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
+              >
+                <option value="">{h.choose}</option>
+                {report.targets.map((target) => (
+                  <option key={target.id} value={target.id}>
+                    {target.name} · {c[target.status]} · {target.itemCount} / {report.itemLimit}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {comparison && (
+              <>
+                <label className="grid min-w-0 max-w-full gap-1.5">
+                  <span className="font-label uppercase text-secondary">{c.all}</span>
+                  <select
+                    name="filter"
+                    defaultValue={comparison.filter}
+                    className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
+                  >
+                    {LIBRARY_COLLECTION_COMPARISON_FILTERS.map((filter) => (
+                      <option key={filter} value={filter}>
+                        {h[filter]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="grid min-w-0 max-w-full gap-1.5">
+                  <span className="font-label uppercase text-secondary">{c.search}</span>
+                  <input
+                    name="q"
+                    defaultValue={comparison.q}
+                    maxLength={80}
+                    className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
+                  />
+                </label>
+              </>
+            )}
+            <label className="grid min-w-0 max-w-full gap-1.5">
+              <span className="font-label uppercase text-secondary">{h.transfer}</span>
+              <select
+                name="transfer"
+                defaultValue={comparison?.transfer ?? query.transfer}
+                className={`${fieldClassBlock} min-h-11 min-w-0 max-w-full`}
+              >
+                <option value="copy">{c["copy-items"]}</option>
+                <option value="move">{c["move-items"]}</option>
+              </select>
+            </label>
+            <Button
+              type="submit"
+              variant="outline"
+              size="touch"
+              className="px-3"
+              disabled={!report.targets.length}
+            >
+              {h.compare}
+            </Button>
+          </form>
+        </search>
         {!comparison ? (
           <EmptyState
             title={report.targets.length ? h.choose : c.noDestination}
