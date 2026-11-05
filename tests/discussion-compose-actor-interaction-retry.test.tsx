@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { expect, it, vi } from "vitest";
-import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 import {
   createDiscussionComposeActorInteractionHelpers,
   mockReactHooks,
 } from "./helpers/discussion-compose-actor-interaction-harness";
+import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 const h = vi.hoisted(() => ({ slots: [] as unknown[], cursor: 0, fetch: vi.fn() }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
