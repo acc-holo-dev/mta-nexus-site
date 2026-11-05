@@ -42,9 +42,7 @@ it("locks unresolved catalogue miss to ErrorState without inventing retry", () =
   expect(source).toContain("title={copy.notFound}");
   expect(source).toContain("description={dependencyItem.slug}");
   expect(source).not.toContain('text-[10px] text-faint">{copy.notFound}');
-  expect(source).not.toMatch(
-    /id="product-dependency-not-found"[\s\S]*action=/u,
-  );
+  expect(source).not.toMatch(/id="product-dependency-not-found"[\s\S]*action=/u);
 });
 
 it.each(["en", "ru"] as const)(
