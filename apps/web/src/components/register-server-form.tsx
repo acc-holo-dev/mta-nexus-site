@@ -274,19 +274,22 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           )}
         />
       ) : null}
-      {recoveryMessage ? <p role="status">{recoveryMessage}</p> : null}
+      {recoveryMessage ? (
+        <ErrorState id="register-server-session-recovery" title={recoveryMessage} />
+      ) : null}
       {verified && pending ? (
-        <div role="status">
-          <p>
-            {message(
-              "Результат создания неизвестен. Черновик сохранён, повторное создание заблокировано.",
-              "The creation result is unknown. Your draft is saved and creating another is blocked.",
-            )}
-          </p>
-          <Button type="button" disabled={loading} onClick={recover}>
-            {message("Проверить результат", "Check result")}
-          </Button>
-        </div>
+        <ErrorState
+          id="register-server-create-inconclusive"
+          title={message(
+            "Результат создания неизвестен. Черновик сохранён, повторное создание заблокировано.",
+            "The creation result is unknown. Your draft is saved and creating another is blocked.",
+          )}
+          action={
+            <Button type="button" disabled={loading} onClick={recover}>
+              {message("Проверить результат", "Check result")}
+            </Button>
+          }
+        />
       ) : null}
 
       <form
