@@ -1,4 +1,5 @@
 import type { ResourceVersionHelpProjection } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
@@ -74,7 +75,7 @@ export function ResourceVersionHelpSection({
       </div>
 
       {projection.missingAuthorContent ? (
-        <p className="text-sm text-secondary">{copy.missingBody}</p>
+        <ErrorState id="resource-version-help-missing" title={copy.missingBody} />
       ) : null}
 
       {projection.purpose ? (
