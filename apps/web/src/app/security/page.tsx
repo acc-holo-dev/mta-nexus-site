@@ -65,7 +65,10 @@ export default async function SecurityPage() {
           recoveryEmail.verified ? (
             <p className="mt-1 text-xs text-muted">{copy.recoveryVerified}</p>
           ) : (
-            <ErrorState id="security-recovery-needs-verification" title={copy.recoveryNeedsVerification} />
+            <ErrorState
+              id="security-recovery-needs-verification"
+              title={copy.recoveryNeedsVerification}
+            />
           )
         ) : (
           <ErrorState id="security-recovery-unavailable" title={copy.recoveryUnavailable} />
