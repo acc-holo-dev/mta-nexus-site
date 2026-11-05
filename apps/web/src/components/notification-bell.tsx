@@ -34,16 +34,61 @@ export function NotificationBell() {
   const mutationGeneration = useRef(0);
   const markPending = useRef(false);
   const stopPolling = useRef<(() => void) | null>(null);
+  const markController = useRef<AbortController | null>(null);
+  const foreground = useRef(true);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   useEffect(() => observeNotificationInboxChange(() => setAttempt((value) => value + 1)), []);
 
+  useEffect(() => {
+    foreground.current = true;
+    const conceal = () => {
+      foreground.current = false;
+      mutationGeneration.current++;
+      stopPolling.current?.();
+      markController.current?.abort();
+      setNotifications([]);
+      setActorId(null);
+      setUnreadCount(0);
+      setLoaded(false);
+      setAnnouncement(null);
+      setError(null);
+      setMarking(false);
+    };
+    const show = () => {
+      foreground.current = true;
+      setAttempt((value) => value + 1);
+    };
+    const visibility = () => {
+      if (document.visibilityState === "hidden") conceal();
+      else show();
+    };
+    window.addEventListener("blur", conceal);
+    window.addEventListener("focus", show);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      foreground.current = false;
+      mutationGeneration.current++;
+      stopPolling.current?.();
+      markController.current?.abort();
+      window.removeEventListener("blur", conceal);
+      window.removeEventListener("focus", show);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     if (marking) return;
-    const generation = mutationGeneration.current;
+    let generation = mutationGeneration.current;
     const stop = startVisiblePolling({
       async read(signal) {
+        generation = ++mutationGeneration.current;
+        setNotifications([]);
+        setActorId(null);
+        setUnreadCount(0);
+        setLoaded(false);
+        setError(null);
         const response = await fetch("/api/notifications?limit=6", privateApiRequest({ signal }));
         const data = await response.json().catch(() => null);
         if (
@@ -66,7 +111,7 @@ export function NotificationBell() {
         return data;
       },
       onValue(data) {
-        if (generation === mutationGeneration.current) {
+        if (generation === mutationGeneration.current && foreground.current) {
           setNotifications(data.notifications);
           setActorId(data.actorId);
           setUnreadCount(data.unreadCount);
@@ -75,7 +120,13 @@ export function NotificationBell() {
         }
       },
       onError() {
-        if (generation === mutationGeneration.current) setError(copy.loadError);
+        if (generation === mutationGeneration.current && foreground.current) {
+          setNotifications([]);
+          setActorId(null);
+          setUnreadCount(0);
+          setLoaded(false);
+          setError(copy.loadError);
+        }
       },
     });
     stopPolling.current = stop;
@@ -89,6 +140,7 @@ export function NotificationBell() {
   async function markAllRead() {
     if (markPending.current || marking || !loaded || !actorId || unreadCount === 0) return;
     markPending.current = true;
+    const initialGeneration = mutationGeneration.current;
     try {
       if (
         !(await confirmAction({
@@ -104,7 +156,11 @@ export function NotificationBell() {
       )
         return;
 
+      if (initialGeneration !== mutationGeneration.current || !foreground.current) return;
       mutationGeneration.current += 1;
+      const generation = mutationGeneration.current;
+      const controller = new AbortController();
+      markController.current = controller;
       stopPolling.current?.();
       setMarking(true);
       setError(null);
@@ -112,9 +168,14 @@ export function NotificationBell() {
       try {
         const response = await fetch(
           "/api/notifications/mark-read",
-          privateApiRequest({ method: "POST", json: { expectedActorId: actorId } }),
+          privateApiRequest({
+            method: "POST",
+            json: { expectedActorId: actorId },
+            signal: controller.signal,
+          }),
         );
         const data = await response.json().catch(() => null);
+        if (generation !== mutationGeneration.current || controller.signal.aborted) return;
         if (!response.ok || data?.success !== true || data?.scope !== "all") {
           throw new Error(copy.markError);
         }
@@ -125,10 +186,13 @@ export function NotificationBell() {
         announceNotificationInboxChange();
       } catch {
         // Recheck the server after an ambiguous response or timeout; keep last confirmed counts.
-        setAttempt((value) => value + 1);
-        setError(copy.markError);
+        if (generation === mutationGeneration.current && !controller.signal.aborted) {
+          setAttempt((value) => value + 1);
+          setError(copy.markError);
+        }
       } finally {
-        setMarking(false);
+        if (generation === mutationGeneration.current) setMarking(false);
+        if (markController.current === controller) markController.current = null;
       }
     } finally {
       markPending.current = false;

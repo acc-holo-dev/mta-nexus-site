@@ -30,7 +30,14 @@ beforeEach(() => {
   fetchMock = vi.fn(() => new Promise<Response>(() => {}));
   vi.stubGlobal("fetch", fetchMock);
   vi.stubGlobal("document", visibility);
-  vi.stubGlobal("window", { setInterval, clearInterval, setTimeout, clearTimeout });
+  vi.stubGlobal("window", {
+    addEventListener() {},
+    removeEventListener() {},
+    setInterval,
+    clearInterval,
+    setTimeout,
+    clearTimeout,
+  });
 });
 afterEach(() => {
   for (const cleanup of cleanups.splice(0)) cleanup();

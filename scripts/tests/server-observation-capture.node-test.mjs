@@ -61,6 +61,11 @@ test("capture refuses non-canonical databases", () => {
     "postgres://nexus:other@postgres:5432/mta_nexus",
     "postgres://nexus:nexus_secret@localhost:5432/mta_nexus",
     "postgres://nexus:nexus_secret@postgres:5432/production",
+    "postgres://nexus:nexus_secret@postgres:5432/mta_nexus?options=-c%20search_path%3Dother",
+    "postgres://nexus:nexus_secret@postgres:5432/mta_nexus?sslmode=disable",
+    "postgres://nexus:nexus_secret@postgres:5432/mta_nexus?",
+    "postgres://nexus:nexus_secret@postgres:5432/mta_nexus#other",
+    "postgres://nexus:nexus_secret@postgres:5432/mta_nexus#",
   ]) {
     assert.throws(
       () =>

@@ -30,7 +30,9 @@ export function assertServerObservationCaptureEnvironment(env = process.env) {
     (database.port === "" || database.port === "5432") &&
     database.username === "nexus" &&
     database.password === "nexus_secret" &&
-    database.pathname === "/mta_nexus";
+    database.pathname === "/mta_nexus" &&
+    // Reject even empty delimiters: query options can alter the driver's session.
+    !/[?#]/u.test(database.href);
 
   if (!canonicalDatabase) {
     throw new Error(

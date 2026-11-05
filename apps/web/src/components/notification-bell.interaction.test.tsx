@@ -175,6 +175,8 @@ beforeEach(() => {
     removeEventListener() {},
   });
   vi.stubGlobal("window", {
+    addEventListener() {},
+    removeEventListener() {},
     setInterval,
     clearInterval,
     setTimeout,
@@ -343,4 +345,48 @@ it("keeps destination links from marking notifications read", async () => {
         (String(url).includes("/inbox") && init?.method === "PATCH"),
     ),
   ).toBe(false);
+});
+it("does not send mark-all after unmount while confirmation is pending", async () => {
+  harness.fetch.mockResolvedValueOnce(response(sample));
+  openPopover();
+  await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
+  let finish!: (confirmed: boolean) => void;
+  confirmAction.mockReturnValueOnce(
+    new Promise<boolean>((resolve) => {
+      finish = resolve;
+    }),
+  );
+  const mark = render().find(
+    (node) => node.type === "button" && textOf(node).includes("Mark entire inbox as read"),
+  );
+  if (!mark) throw Error("Missing mark all");
+  (mark.props.onClick as () => void)();
+  for (const cleanup of harness.cleanups.splice(0)) cleanup();
+  finish(true);
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledOnce());
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+});
+it("aborts an in-flight mark-all on unmount and ignores its late response", async () => {
+  harness.fetch.mockResolvedValueOnce(response(sample));
+  openPopover();
+  await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
+  let finish!: (value: Response) => void;
+  harness.fetch.mockReturnValueOnce(
+    new Promise<Response>((resolve) => {
+      finish = resolve;
+    }),
+  );
+  const mark = render().find(
+    (node) => node.type === "button" && textOf(node).includes("Mark entire inbox as read"),
+  );
+  if (!mark) throw Error("Missing mark all");
+  (mark.props.onClick as () => void)();
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
+  const signal = harness.fetch.mock.calls[1][1].signal as AbortSignal;
+  for (const cleanup of harness.cleanups.splice(0)) cleanup();
+  expect(signal.aborted).toBe(true);
+  finish(response({ success: true, scope: "all" }));
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(harness.announce).not.toHaveBeenCalled();
 });
