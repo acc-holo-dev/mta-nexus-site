@@ -136,6 +136,7 @@ describe("notification API request correlation", () => {
     expect(anonymous.status).toBe(200);
     expectPrivateCorrelation(anonymous);
     await expect(anonymous.json()).resolves.toEqual({
+      actorId: null,
       notifications: [],
       unreadCount: 0,
     });
@@ -148,7 +149,9 @@ describe("notification API request correlation", () => {
     expect(invalid.status).toBe(400);
     expectPrivateCorrelation(invalid);
 
-    const success = await markReadPOST(request("/api/notifications/mark-read", "POST", {}));
+    const success = await markReadPOST(
+      request("/api/notifications/mark-read", "POST", { expectedActorId: "usr_notifications" }),
+    );
     expect(success.status).toBe(200);
     expectPrivateCorrelation(success);
   });

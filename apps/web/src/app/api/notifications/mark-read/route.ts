@@ -50,6 +50,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (!target) {
       return json(context, { error: "Invalid notification target" }, 400);
     }
+    if (target.expectedActorId !== user.id)
+      return json(
+        context,
+        { error: "Account changed. Reload notifications.", code: "ACCOUNT_CHANGED" },
+        409,
+      );
 
     if (target.scope === "single") {
       const updated = await notificationRepository.markAsRead(target.id, user.id);

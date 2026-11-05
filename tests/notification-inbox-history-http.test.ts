@@ -54,6 +54,7 @@ it("authenticates the history and keeps its response private with filters and lo
   expect(response.status).toBe(200);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
+  expect(await response.json()).toMatchObject({ actorId: "actor" });
   expect(state.page).toHaveBeenCalledWith(
     "actor",
     {

@@ -156,7 +156,7 @@ it("preserves explicit whole-inbox reading with a scope warning, cancellation an
   );
   expect(harness.fetch.mock.calls[0][0]).toBe("/api/notifications/mark-read");
   expect(harness.fetch.mock.calls[0][1]).toMatchObject({ method: "POST" });
-  expect(harness.fetch.mock.calls[0][1]).not.toHaveProperty("body");
+  expect(JSON.parse(harness.fetch.mock.calls[0][1].body)).toEqual({ expectedActorId: "usr_1" });
 });
 it("shows EmptyState descriptions for empty and filtered notification pages", () => {
   const emptyPage = {
@@ -171,6 +171,7 @@ it("shows EmptyState descriptions for empty and filtered notification pages", ()
     NotificationInbox({
       initialPage: emptyPage,
       filters: { query: "", state: "all", category: "all" },
+      actorId: "usr_1",
     }),
   );
   expect(
@@ -183,7 +184,9 @@ it("shows EmptyState descriptions for empty and filtered notification pages", ()
   ).toBe(true);
   harness.slots = [];
   harness.cursor = 0;
-  const filtered = flattenReactTestTree(NotificationInbox({ initialPage: emptyPage, filters }));
+  const filtered = flattenReactTestTree(
+    NotificationInbox({ initialPage: emptyPage, filters, actorId: "usr_1" }),
+  );
   const filteredEmpty = filtered.find(
     (node) =>
       node.props.title ===
@@ -223,6 +226,14 @@ it("hides empty copy while a refresh is in flight and restores it only after suc
   await vi.waitFor(() =>
     expect(render().some((node) => node.props.title === emptyFiltered)).toBe(true),
   );
+});
+it("does not replace the loaded inbox when refresh returns another account", async () => {
+  harness.fetch.mockResolvedValueOnce(response({ ...refreshed, actorId: "usr_other" }));
+  click(render(), "Reload saved inbox");
+  await vi.waitFor(() =>
+    expect(button(render(), "Mark entire inbox as read").props.disabled).toBe(true),
+  );
+  expect(harness.slots[0]).toEqual(initialPage);
 });
 it("does not send a page selection larger than twenty-five notifications", async () => {
   const oversized = {

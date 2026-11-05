@@ -210,6 +210,19 @@ describe("social and notification HTTP state contract", () => {
     expect(markSingle).not.toHaveBeenCalled();
   });
 
+  it("rejects account-wide and single mutations for a previously loaded account", async () => {
+    for (const body of [
+      '{"expectedActorId":"usr_other"}',
+      '{"id":"not_owned","expectedActorId":"usr_other"}',
+    ]) {
+      const response = await markRead(makeRequest("/api/notifications/mark-read", "POST", body));
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({ code: "ACCOUNT_CHANGED" });
+    }
+    expect(markAll).not.toHaveBeenCalled();
+    expect(markSingle).not.toHaveBeenCalled();
+  });
+
   it("reports the global unread total beyond the 100-item inbox window", async () => {
     const response = await listNotifications(makeRequest("/api/notifications?limit=100", "GET"));
     const data = await response.json();
@@ -221,12 +234,18 @@ describe("social and notification HTTP state contract", () => {
 
   it("keeps single ownership errors separate from confirmed bulk operations", async () => {
     const forbidden = await markRead(
-      makeRequest("/api/notifications/mark-read", "POST", '{"id":"not_other"}'),
+      makeRequest(
+        "/api/notifications/mark-read",
+        "POST",
+        '{"id":"not_other","expectedActorId":"usr_1"}',
+      ),
     );
     expect(forbidden.status).toBe(404);
     expect(markAll).not.toHaveBeenCalled();
 
-    const bulk = await markRead(makeRequest("/api/notifications/mark-read", "POST"));
+    const bulk = await markRead(
+      makeRequest("/api/notifications/mark-read", "POST", '{"expectedActorId":"usr_1"}'),
+    );
     expect(bulk.status).toBe(200);
     expectPrivate(bulk);
     expect(await bulk.json()).toEqual({ success: true, scope: "all" });

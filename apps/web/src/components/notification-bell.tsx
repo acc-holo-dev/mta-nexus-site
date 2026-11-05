@@ -23,6 +23,7 @@ export function NotificationBell() {
   const inboxCopy = notificationInboxCopy(locale);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [actorId, setActorId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,8 +49,16 @@ export function NotificationBell() {
         if (
           !response.ok ||
           !Array.isArray(data?.notifications) ||
+          !(
+            data?.actorId === null ||
+            (typeof data?.actorId === "string" &&
+              data.actorId.length > 0 &&
+              data.actorId.length <= 128 &&
+              data.actorId.trim() === data.actorId)
+          ) ||
           !Number.isSafeInteger(data?.unreadCount) ||
-          data.unreadCount < 0
+          data.unreadCount < 0 ||
+          (data.actorId === null && (data.unreadCount !== 0 || data.notifications.length !== 0))
         ) {
           throw new Error(copy.loadError);
         }
@@ -59,6 +68,7 @@ export function NotificationBell() {
       onValue(data) {
         if (generation === mutationGeneration.current) {
           setNotifications(data.notifications);
+          setActorId(data.actorId);
           setUnreadCount(data.unreadCount);
           setLoaded(true);
           setError(null);
@@ -77,7 +87,7 @@ export function NotificationBell() {
   }, [attempt, copy.loadError, marking]);
 
   async function markAllRead() {
-    if (markPending.current || marking || !loaded || unreadCount === 0) return;
+    if (markPending.current || marking || !loaded || !actorId || unreadCount === 0) return;
     markPending.current = true;
     try {
       if (
@@ -102,7 +112,7 @@ export function NotificationBell() {
       try {
         const response = await fetch(
           "/api/notifications/mark-read",
-          privateApiRequest({ method: "POST" }),
+          privateApiRequest({ method: "POST", json: { expectedActorId: actorId } }),
         );
         const data = await response.json().catch(() => null);
         if (!response.ok || data?.success !== true || data?.scope !== "all") {

@@ -197,7 +197,12 @@ export default async function NotificationCenterPage({
           />
         ) : null}
         {page && filters && (
-          <NotificationInbox key={randomUUID()} initialPage={page} filters={filters} />
+          <NotificationInbox
+            key={randomUUID()}
+            initialPage={page}
+            filters={filters}
+            actorId={actor.id}
+          />
         )}
       </NotificationCenterTabs>
     </div>

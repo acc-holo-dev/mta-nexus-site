@@ -23,9 +23,11 @@ import { useNexusLocale } from "./locale-context";
 export function NotificationInbox({
   initialPage,
   filters,
+  actorId,
 }: {
   initialPage: NotificationInboxPage;
   filters: NotificationInboxQuery;
+  actorId: string;
 }) {
   const { locale } = useNexusLocale(),
     copy = notificationInboxCopy(locale);
@@ -62,8 +64,11 @@ export function NotificationInbox({
       credentials: "same-origin",
       signal,
     });
-    const data = await response.json().catch(() => null),
-      parsed = notificationInboxPageSchema.safeParse(data);
+    const data = await response.json().catch(() => null);
+    if (!data || typeof data !== "object" || data.actorId !== actorId)
+      throw new Error(copy.unavailable);
+    const { actorId: _actorId, ...pageData } = data;
+    const parsed = notificationInboxPageSchema.safeParse(pageData);
     if (!response.ok || !parsed.success)
       throw new Error(notificationInboxError(locale, data?.code));
     return parsed.data;
@@ -204,12 +209,8 @@ export function NotificationInbox({
           cache: "no-store",
           credentials: "same-origin",
           signal,
-          ...(entireInbox
-            ? {}
-            : {
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(command),
-              }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entireInbox ? { expectedActorId: actorId } : command),
         },
       );
       const data = await response.json().catch(() => null);

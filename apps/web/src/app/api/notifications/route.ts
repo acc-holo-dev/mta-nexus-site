@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return json(context, {
+        actorId: null,
         notifications: [],
         unreadCount: 0,
       });
@@ -45,6 +46,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return json(context, {
+      actorId: user.id,
       notifications,
       unreadCount,
       limit,

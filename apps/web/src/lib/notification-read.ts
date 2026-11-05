@@ -1,9 +1,9 @@
-export type NotificationReadTarget = { scope: "all" } | { scope: "single"; id: string };
+export type NotificationReadTarget =
+  | { scope: "all"; expectedActorId: string }
+  | { scope: "single"; id: string; expectedActorId: string };
 
-// An empty request body means "all" for existing clients. Malformed JSON,
-// null, arrays and unexpected keys must never silently become a bulk action.
+// The actor is a precondition, never a selector: stale clients fail closed.
 export function parseNotificationReadTarget(raw: string): NotificationReadTarget | null {
-  if (raw.length === 0) return { scope: "all" };
   if (raw.length > 1024) return null;
 
   let value: unknown;
@@ -16,10 +16,18 @@ export function parseNotificationReadTarget(raw: string): NotificationReadTarget
 
   const record = value as Record<string, unknown>;
   const keys = Object.keys(record);
-  if (keys.length === 0) return { scope: "all" };
-  if (keys.length !== 1 || keys[0] !== "id") return null;
+  const expectedActorId = record.expectedActorId;
+  if (
+    typeof expectedActorId !== "string" ||
+    !expectedActorId ||
+    expectedActorId.length > 128 ||
+    expectedActorId.trim() !== expectedActorId
+  )
+    return null;
+  if (keys.length === 1 && keys[0] === "expectedActorId") return { scope: "all", expectedActorId };
+  if (keys.length !== 2 || !keys.includes("id") || !keys.includes("expectedActorId")) return null;
   if (typeof record.id !== "string") return null;
 
   const id = record.id.trim();
-  return id.length > 0 && id.length <= 128 ? { scope: "single", id } : null;
+  return id.length > 0 && id.length <= 128 ? { scope: "single", id, expectedActorId } : null;
 }

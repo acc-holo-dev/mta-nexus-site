@@ -145,6 +145,7 @@ const response = (body: unknown, status = 200) =>
     headers: { "content-type": "application/json" },
   });
 const sample = {
+  actorId: "usr_1",
   notifications: [
     {
       id: "not_1",
@@ -196,7 +197,7 @@ it("shows loading instead of empty until the first successful inbox preview", as
   expect(render().some((node) => textOf(node).includes("Loading notifications..."))).toBe(true);
   expect(render().some((node) => textOf(node).includes("No notifications yet"))).toBe(false);
   expect(bellButton().props["aria-label"]).toBe("Notifications");
-  complete(response({ notifications: [], unreadCount: 0 }));
+  complete(response({ actorId: "usr_1", notifications: [], unreadCount: 0 }));
   await vi.waitFor(() =>
     expect(render().some((node) => textOf(node).includes("No notifications yet"))).toBe(true),
   );
@@ -279,8 +280,29 @@ it("ignores repeated mark-all clicks while the confirmed request is pending", as
   click();
   expect(confirmAction).toHaveBeenCalledTimes(1);
   expect(harness.fetch).toHaveBeenCalledTimes(2);
+  expect(JSON.parse(harness.fetch.mock.calls[1][1].body)).toEqual({ expectedActorId: "usr_1" });
   finish(response({ success: true, scope: "all" }));
   await vi.waitFor(() => expect(harness.announce).toHaveBeenCalledOnce());
+});
+
+it("keeps the confirmed account if the preview changes during confirmation", async () => {
+  harness.fetch.mockResolvedValueOnce(response(sample));
+  openPopover();
+  await vi.waitFor(() => expect(bellButton().props["aria-label"]).toBe("3 unread notifications"));
+  let finish!: (confirmed: boolean) => void;
+  confirmAction.mockReturnValueOnce(new Promise<boolean>((resolve) => (finish = resolve)));
+  harness.fetch.mockResolvedValueOnce(response({ code: "ACCOUNT_CHANGED" }, 409));
+  const mark = render().find(
+    (node) => node.type === "button" && textOf(node).includes("Mark entire inbox as read"),
+  );
+  if (!mark) throw Error("Missing mark all");
+  (mark.props.onClick as () => void)();
+  harness.slots[2] = "usr_other";
+  render();
+  finish(true);
+  await vi.waitFor(() => expect(harness.fetch).toHaveBeenCalledTimes(2));
+  expect(JSON.parse(harness.fetch.mock.calls[1][1].body)).toEqual({ expectedActorId: "usr_1" });
+  expect(harness.announce).not.toHaveBeenCalled();
 });
 
 it("preserves confirmed unread counts when account-wide mark-all fails", async () => {

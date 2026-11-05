@@ -10,8 +10,8 @@ vi.mock("react", async (importOriginal) => {
     useState: (initial: unknown) => {
       const index = harness.cursor++;
       if (!(index in harness.slots)) {
-        if (index === 2) harness.slots[index] = false;
-        else if (index === 3) harness.slots[index] = true;
+        if (index === 3) harness.slots[index] = false;
+        else if (index === 4) harness.slots[index] = true;
         else harness.slots[index] = initial;
       }
       return [
@@ -43,7 +43,7 @@ it("marks the notification preview busy before the first poll completes", () => 
 });
 
 it("renders empty preview through EmptyState with honesty hint copy", () => {
-  harness.slots = [[], 0, true, true, null, null, false, 0];
+  harness.slots = [[], 0, "usr_1", true, true, null, null, false, 0];
   harness.cursor = 0;
   const html = renderToStaticMarkup(
     <LocaleProvider locale="en">

@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, expect, vi, type Mock } from "vitest";
+import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
 import {
   clickTestButton,
+  type FlattenedElement,
   findTestButton,
   flattenReactTestTree,
-  type FlattenedElement,
 } from "./flatten-react-test-tree";
 
 export type NotificationInboxHarness = {
@@ -19,6 +19,7 @@ export type NotificationInboxHarness = {
 export type NotificationInboxComponent = (props: {
   initialPage: typeof initialPage;
   filters: typeof filters;
+  actorId: string;
 }) => ReactNode;
 
 export const filters = {
@@ -64,10 +65,17 @@ export const exportReport = {
 };
 
 export const response = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json" },
-  });
+  new Response(
+    JSON.stringify(
+      body && typeof body === "object" && "items" in body && "unreadCount" in body
+        ? { actorId: "usr_1", ...body }
+        : body,
+    ),
+    {
+      status,
+      headers: { "content-type": "application/json" },
+    },
+  );
 
 export function exportResponse(value: unknown = exportReport) {
   return new Response(JSON.stringify(value), {
@@ -126,7 +134,9 @@ export function createNotificationInboxInteractionHelpers(
 ) {
   function render() {
     harness.cursor = 0;
-    return flattenReactTestTree(NotificationInbox({ initialPage, filters })) as FlattenedElement[];
+    return flattenReactTestTree(
+      NotificationInbox({ initialPage, filters, actorId: "usr_1" }),
+    ) as FlattenedElement[];
   }
 
   function selectionConfirmCheckbox(nodes = render()) {

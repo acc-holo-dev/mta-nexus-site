@@ -19,11 +19,12 @@ export async function GET(request: NextRequest) {
       if (!filters) throw new AppError("Invalid inbox filters", 400, "VALIDATION_ERROR");
       if (!(await consumeRateLimit("search", `notification-inbox:${actor.id}`)).success)
         throw new RateLimitExceededError();
-      return notificationInboxService.page(
+      const page = await notificationInboxService.page(
         actor.id,
         filters,
         resolveLocale(request.cookies.get("nexus_locale")?.value),
       );
+      return { ...page, actorId: actor.id };
     },
     200,
     notificationInboxError,

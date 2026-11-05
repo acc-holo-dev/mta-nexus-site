@@ -7,16 +7,23 @@ import { parseNotificationReadTarget } from "../apps/web/src/lib/notification-re
 
 describe("notification read target", () => {
   it.each(["", "{}", " { } "])(
-    "maps empty mark-read bodies to account-wide all-read, not page selection %j",
+    "fails closed for legacy bodies without the actor precondition %j",
     (body) => {
-      expect(parseNotificationReadTarget(body)).toEqual({ scope: "all" });
+      expect(parseNotificationReadTarget(body)).toBeNull();
     },
   );
 
   it("normalizes a single id without changing scope", () => {
-    expect(parseNotificationReadTarget('{"id":"  not_123  "}')).toEqual({
+    expect(parseNotificationReadTarget('{"id":"  not_123  ","expectedActorId":"usr_1"}')).toEqual({
       scope: "single",
       id: "not_123",
+      expectedActorId: "usr_1",
+    });
+  });
+  it("accepts an actor-bound account-wide action", () => {
+    expect(parseNotificationReadTarget('{"expectedActorId":"usr_1"}')).toEqual({
+      scope: "all",
+      expectedActorId: "usr_1",
     });
   });
 
