@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `0c751391` — tip advanced after server staleSnapshot ErrorState (#562) and build-moderation clean-scan (#567); tip CI not claimed verified-green under rapid merges;
 - `20a4f213` — tip advanced after order-case evidenceChanged ErrorState (#554) and prior residual wave (#548/#563); tip CI not claimed verified-green under rapid merges;
 - `2c3d7568` — tip advanced after moderation release-draft ErrorState (#556) and tip honesty (#561); tip CI not claimed verified-green under rapid merges;
 - `a294f84e` — tip advanced after tip honesty (#559) on 93225fd9 residual wave; tip CI not claimed verified-green under rapid merges;
