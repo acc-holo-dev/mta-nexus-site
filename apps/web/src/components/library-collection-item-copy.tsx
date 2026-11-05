@@ -160,7 +160,9 @@ export function LibraryCollectionItemCopyForm({
     }
   }
   if (!frozen && move && (source.status !== "active" || source.revision >= 2147483647))
-    return <p role="note">{c.moveSourceUnavailable}</p>;
+    return (
+      <ErrorState id="library-collection-move-source-unavailable" title={c.moveSourceUnavailable} />
+    );
   if (!destinations.length && !pending.current) return <p role="note">{c.noDestination}</p>;
   if (!items.length && !pending.current) return <p>{c.emptyItems}</p>;
   const shownMove = pending.current ? pending.current.command.action === "move-items" : move;
