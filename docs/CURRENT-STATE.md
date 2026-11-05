@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `a74b9d2e` — tip advanced after community-topic ErrorState (#527), moderation-blocked ErrorState (#529), resource-review eligibility ErrorState (#533), and tip honesty (#540); tip CI not claimed verified-green under rapid merges;
 - `792e7911` — tip advanced after discovery-search split (#510), release-watch suppressed ErrorState (#520), and tip honesty (#535); tip CI not claimed verified-green under rapid merges;
 - residual honesty/confirm PRs still in flight (#527–#534, #536–#539) after rate-limit reopen wave;
 - `b632098f` — tip advanced after new-resource unknown ErrorState (#523) and suite-split/confirm residual merges (#503/#504/#516/#521); tip CI not claimed verified-green under rapid merges;
