@@ -1,4 +1,5 @@
 import type { LibraryMembershipHistoryItem } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
@@ -34,7 +35,7 @@ export function LibraryMembershipHistoryEntry({
         {c.receipt}: {item.id}
       </code>
       {!receipt ? (
-        <p>{h.unknown}</p>
+        <ErrorState id="library-membership-history-unknown" title={h.unknown} />
       ) : (
         <>
           <code className="block break-all text-xs">
@@ -42,11 +43,23 @@ export function LibraryMembershipHistoryEntry({
           </code>
           {resource && (
             <div>
-              <p>
-                {resource.currentAvailable
-                  ? (resource.currentTitle ?? h.unavailable)
-                  : h.unavailable}
-              </p>
+              {resource.currentAvailable ? (
+                resource.currentTitle ? (
+                  <p>{resource.currentTitle}</p>
+                ) : (
+                  <ErrorState
+                    id="library-membership-history-unavailable"
+                    title={h.unavailable}
+                    description={resource.productId}
+                  />
+                )
+              ) : (
+                <ErrorState
+                  id="library-membership-history-unavailable"
+                  title={h.unavailable}
+                  description={resource.productId}
+                />
+              )}
               <code className="block break-all text-xs">{resource.productId}</code>
               {resource.currentAvailable && (
                 <Link
