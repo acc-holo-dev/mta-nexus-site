@@ -201,7 +201,12 @@ export function AccountControls() {
 
       {error ? (
         <div className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[85vw] shadow-nexus">
-          <ErrorState title={error} description={copy.errorHint} className="items-stretch py-4" />
+          <ErrorState
+            id="account-controls-session-error"
+            title={error}
+            description={copy.errorHint}
+            className="items-stretch py-4"
+          />
         </div>
       ) : null}
     </div>
