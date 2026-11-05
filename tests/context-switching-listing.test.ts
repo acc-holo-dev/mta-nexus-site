@@ -1,141 +1,37 @@
-import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  user: {
-    id: "usr_context",
-    displayName: "Context User",
-    activeContextId: "org_owned",
-  } as {
-    id: string;
-    displayName: string;
-    activeContextId?: string | null;
-  } | null,
-  allowed: true,
-}));
+vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+  const { createContextSwitchingAuthMock } = await import("./helpers/context-switching-harness");
+  return createContextSwitchingAuthMock();
+});
 
-const getSession = vi.hoisted(() => vi.fn(async () => state.user));
-const getSessionIdentity = vi.hoisted(() =>
-  vi.fn(async () => (state.user ? { user: state.user, sessionId: "ses_context" } : null)),
-);
-const switchContext = vi.hoisted(() =>
-  vi.fn(async (_userId: string, contextId: string) => ({
-    ...state.user,
-    activeContextId: contextId,
-  })),
-);
-const owned = vi.hoisted(() =>
-  vi.fn(async () => [
-    {
-      id: "org_owned",
-      name: "Owned Org",
-      slug: "owned-org",
-    },
-  ]),
-);
-const memberships = vi.hoisted(() =>
-  vi.fn(async () => [
-    {
-      organizationId: "org_owned",
-      role: "member",
-    },
-    {
-      organizationId: "org_member",
-      role: "admin",
-    },
-  ]),
-);
-const findOrganization = vi.hoisted(() =>
-  vi.fn(async (id: string) =>
-    id === "org_member"
-      ? {
-          id,
-          name: "Member Org",
-          slug: "member-org",
-        }
-      : null,
-  ),
-);
-const findSummaries = vi.hoisted(() =>
-  vi.fn(
-    async (ids: readonly string[]): Promise<Array<{ id: string; name: string; slug: string }>> =>
-      ids
-        .filter((id) => id === "org_member")
-        .map((id) => ({ id, name: "Member Org", slug: "member-org" })),
-  ),
-);
-const findUserContext = vi.hoisted(() =>
-  vi.fn(
-    async (
-      _id: string,
-      _userId: string,
-    ): Promise<{ id: string; name: string; slug: string; role: string } | null> => null,
-  ),
-);
+vi.mock("@nexus/db", async () => {
+  const { createContextSwitchingDbMock } = await import("./helpers/context-switching-harness");
+  return createContextSwitchingDbMock();
+});
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: {
-    getSession,
-    getSessionIdentity,
-    switchContext,
-  },
-}));
+vi.mock("@nexus/security", async () => {
+  const { createContextSwitchingSecurityMock } = await import(
+    "./helpers/context-switching-harness"
+  );
+  return createContextSwitchingSecurityMock();
+});
 
-vi.mock("@nexus/db", () => ({
-  organizationRepository: {
-    listOwnedByUser: owned,
-    listUserMemberships: memberships,
-    findById: findOrganization,
-    findSummariesByIds: findSummaries,
-    findUserContext,
-  },
-}));
+import { GET } from "../apps/web/src/app/api/auth/context/route";
+import {
+  contextSwitchingMocks,
+  expectContextSwitchingPrivateCorrelation as expectPrivateCorrelation,
+  contextSwitchingGetRequest as getRequest,
+  installContextSwitchingLifecycle,
+  contextSwitchingState as state,
+} from "./helpers/context-switching-harness";
 
-vi.mock("@nexus/security", () => ({
-  consumeRateLimit: vi.fn(async () => ({
-    success: state.allowed,
-  })),
-}));
+const { owned, memberships, findOrganization, findSummaries, findUserContext } =
+  contextSwitchingMocks;
 
-import { GET, POST } from "../apps/web/src/app/api/auth/context/route";
+installContextSwitchingLifecycle();
 
-function getRequest() {
-  return new NextRequest("https://nexus.test/api/auth/context", {
-    headers: {
-      cookie: "nexus_session=context-token",
-    },
-  });
-}
-
-function postRequest(body: unknown) {
-  return new NextRequest("https://nexus.test/api/auth/context", {
-    method: "POST",
-    headers: {
-      origin: "https://nexus.test",
-      "content-type": "application/json",
-      cookie: "nexus_session=context-token",
-    },
-    body: JSON.stringify(body),
-  });
-}
-
-function expectPrivateCorrelation(response: Response) {
-  expect(response.headers.get("cache-control")).toBe("private, no-store");
-  expect(response.headers.get("vary")).toBe("Cookie");
-  expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
-}
-
-describe("account context switching HTTP contract", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    state.user = {
-      id: "usr_context",
-      displayName: "Context User",
-      activeContextId: "org_owned",
-    };
-    state.allowed = true;
-  });
-
+describe("account context switching listing HTTP contract", () => {
   it("returns bounded, deduplicated owner and membership contexts", async () => {
     const response = await GET(getRequest());
     expect(response.status).toBe(200);
@@ -337,68 +233,5 @@ describe("account context switching HTTP contract", () => {
     expect(owned).not.toHaveBeenCalled();
     expect(memberships).not.toHaveBeenCalled();
     expect(findSummaries).not.toHaveBeenCalled();
-  });
-
-  it("validates and rate-limits context switches before mutation", async () => {
-    const malformed = await POST(
-      postRequest({
-        contextId: "org_member",
-        expectedActorId: "usr_context",
-        extra: true,
-      }),
-    );
-    expect(malformed.status).toBe(400);
-    expectPrivateCorrelation(malformed);
-    expect(switchContext).not.toHaveBeenCalled();
-
-    state.allowed = false;
-    const limited = await POST(
-      postRequest({ contextId: "org_member", expectedActorId: "usr_context" }),
-    );
-    expect(limited.status).toBe(429);
-    expectPrivateCorrelation(limited);
-    expect(switchContext).not.toHaveBeenCalled();
-  });
-
-  it("returns the authoritative switched context with request correlation", async () => {
-    const response = await POST(
-      postRequest({ contextId: "org_member", expectedActorId: "usr_context" }),
-    );
-
-    expect(response.status).toBe(200);
-    expectPrivateCorrelation(response);
-    await expect(response.json()).resolves.toMatchObject({
-      success: true,
-      actorId: "usr_context",
-      activeContextId: "org_member",
-    });
-    expect(getSessionIdentity).toHaveBeenCalledOnce();
-    expect(getSessionIdentity).toHaveBeenCalledWith("context-token");
-    expect(getSession).not.toHaveBeenCalled();
-    expect(switchContext).toHaveBeenCalledWith("usr_context", "org_member", "context-token");
-  });
-
-  it("does not switch context without a session identity", async () => {
-    state.user = null;
-    const response = await POST(
-      postRequest({ contextId: "org_member", expectedActorId: "usr_context" }),
-    );
-    expect(response.status).toBe(401);
-    expectPrivateCorrelation(response);
-    expect(getSessionIdentity).toHaveBeenCalledWith("context-token");
-    expect(switchContext).not.toHaveBeenCalled();
-  });
-
-  it("rejects context selection made for a previous account", async () => {
-    const response = await POST(
-      postRequest({ contextId: "personal", expectedActorId: "usr_previous" }),
-    );
-    expect(response.status).toBe(409);
-    expectPrivateCorrelation(response);
-    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
-    expect(switchContext).not.toHaveBeenCalled();
-    const oldClient = await POST(postRequest({ contextId: "personal" }));
-    expect(oldClient.status).toBe(400);
-    expect(switchContext).not.toHaveBeenCalled();
   });
 });
