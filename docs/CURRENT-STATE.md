@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `d9729b43` — tip advanced after resource-review report unavailable (#616) and tip honesty (#627); tip CI not claimed verified-green under rapid merges;
 - `e4a528e9` — tip advanced after tip honesty (#626) on c513696c; tip CI not claimed verified-green under rapid merges;
 - `c513696c` — tip advanced after tip honesty (#624) on 54d01f17; tip CI not claimed verified-green under rapid merges;
 - `54d01f17` — tip advanced after tip honesty (#623) on c019107c; tip CI not claimed verified-green under rapid merges;
