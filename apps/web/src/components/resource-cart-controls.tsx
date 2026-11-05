@@ -286,9 +286,9 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         </div>
       ) : null}
       {uncertain && !busy ? (
-        <p role="status" className="text-sm text-warning" data-cart-state="pending">
-          {receiptCopy.pending}
-        </p>
+        <div data-cart-state="pending">
+          <ErrorState title={receiptCopy.pending} />
+        </div>
       ) : null}
       {!cart.items.length ? (
         <EmptyState
@@ -347,11 +347,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
           })}
         </ul>
       )}
-      {unavailable ? (
-        <p role="status" className="text-sm text-warning">
-          {copy.unavailableNote}
-        </p>
-      ) : null}
+      {unavailable ? <ErrorState title={copy.unavailableNote} /> : null}
       <div className="flex min-w-0 flex-wrap gap-3">
         {uncertain ? (
           <Button
