@@ -22,12 +22,8 @@ it("locks server-review eligibility notices to ErrorState and keeps success as s
   expect(source).toMatch(
     /eligibility === "moderated"[\s\S]*?<ErrorState[\s\S]*?title=\{copy\.moderated\}/u,
   );
-  expect(source).not.toContain(
-    '<p className="text-xs text-warning">{copy.followRequired}</p>',
-  );
-  expect(source).not.toContain(
-    '<p className="text-xs text-warning">{copy.ownerConflict}</p>',
-  );
+  expect(source).not.toContain('<p className="text-xs text-warning">{copy.followRequired}</p>');
+  expect(source).not.toContain('<p className="text-xs text-warning">{copy.ownerConflict}</p>');
   expect(source).not.toContain('<p className="text-xs text-warning">{copy.moderated}</p>');
   expect(source).toContain('id="server-review-write-error"');
   expect(source).toContain('role="status"');
