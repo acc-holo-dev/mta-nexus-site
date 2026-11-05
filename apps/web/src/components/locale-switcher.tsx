@@ -19,9 +19,9 @@ export function LocaleSwitcher({ locale }: { locale: Locale }) {
     <Button
       type="button"
       variant="outline"
-      size="sm"
+      size="touch"
       onClick={switchLocale}
-      className="shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+      className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
       aria-label={dictionary.locale.label}
       title={dictionary.locale.label}
     >

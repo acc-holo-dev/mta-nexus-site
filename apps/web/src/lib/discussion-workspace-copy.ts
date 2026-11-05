@@ -6,6 +6,7 @@ const en = {
   description:
     "Find your comments in publications and manage their saved text. Resource purchase reviews are in their separate workspace.",
   query: "Search your text or public publication titles",
+  filters: "Comment filters",
   availability: "Publication availability",
   all: "All publications",
   available: "Public",
@@ -41,6 +42,7 @@ const ru: Record<keyof typeof en, string> = {
   description:
     "Находите свои комментарии к публикациям и управляйте сохранённым текстом. Отзывы о приобретённых ресурсах находятся в отдельном кабинете.",
   query: "Поиск по своему тексту и названиям публичных публикаций",
+  filters: "Фильтры комментариев",
   availability: "Доступность публикации",
   all: "Все публикации",
   available: "Публичные",
