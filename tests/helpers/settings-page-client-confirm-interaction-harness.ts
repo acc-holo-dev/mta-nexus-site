@@ -77,7 +77,7 @@ export function componentName(type: Element["type"]): string | undefined {
   return undefined;
 }
 
-export function descendants(node: ReactNode): Element[] {
+function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as Element;
@@ -90,7 +90,7 @@ export function findNamed(nodes: Element[], name: string) {
   return found;
 }
 
-export function seedLoadedSettings(harness: SettingsPageClientConfirmHarness) {
+function seedLoadedSettings(harness: SettingsPageClientConfirmHarness) {
   harness.slots = [
     preferences,
     { actorId: "usr_owner", sessions: [otherSession] },
