@@ -1,102 +1,29 @@
 import { sameResourcePublisher } from "@nexus/domain";
-import {
-  mtaVersionSchema,
-  resourceCompatibilitySchema,
-  resourceVariantCommandSchema,
-} from "@nexus/validation";
-import { getTableColumns } from "drizzle-orm";
+import { resourceVariantCommandSchema } from "@nexus/validation";
 import { beforeEach, expect, it, vi } from "vitest";
-import {
-  confirmedCompatibility,
-  confirmedVariantCommand,
-} from "../apps/web/src/lib/resource-management-confirmation";
 
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  results: [] as unknown[][][],
-  options: [] as unknown[],
-}));
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return { rows: state.results.shift() ?? [] };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return async (callback: (tx: typeof database) => unknown, options?: unknown) => {
-            state.options.push(options);
-            return callback(database);
-          };
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
+  const { createResourceManagementDbMock } = await import("./helpers/resource-management-harness");
+  return createResourceManagementDbMock();
 });
 
-import type { Build, ResourceVariantCommand } from "@nexus/domain";
-import { BuildReviewDownloadRepository } from "../packages/db/src/repositories/build-review-download";
-import { ResourceCompatibilityRepository } from "../packages/db/src/repositories/resource-compatibility";
 import { ResourceVariantsRepository } from "../packages/db/src/repositories/resource-variants";
-import { builds, products, productVariantGroups } from "../packages/db/src/schema";
+import { productVariantGroups } from "../packages/db/src/schema";
+import {
+  actor,
+  input,
+  parent,
+  resetResourceManagementState,
+  revision,
+  row,
+  save,
+  resourceManagementState as state,
+} from "./helpers/resource-management-harness";
 
-const variants = new ResourceVariantsRepository(),
-  compatibility = new ResourceCompatibilityRepository(),
-  review = new BuildReviewDownloadRepository();
-const revision = "2026-10-10T00:00:00.000Z",
-  updated = "2026-10-10T00:00:00.001Z";
-const actor = { id: "usr_a", role: "developer" as const };
-const input = { productId: "prd_a", actorId: actor.id, groupId: "vgrp_new", auditId: "aud_a" };
-const save: ResourceVariantCommand = {
-  action: "save",
-  expectedGroupId: null,
-  expectedRevision: 0,
-  title: "Resource editions",
-  variants: [
-    { productId: "prd_a", label: "Base" },
-    { productId: "prd_b", label: "Lite" },
-  ],
-  reason: "Group related resources",
-};
-function row(
-  table: typeof products | typeof builds | typeof productVariantGroups,
-  values: Record<string, unknown>,
-) {
-  return Object.keys(getTableColumns(table)).map((key) => values[key] ?? null);
-}
-const parent = {
-  id: "prd_a",
-  authorId: actor.id,
-  organizationId: null,
-  price: 0,
-  slug: "resource-a",
-  status: "published",
-  updatedAt: revision,
-  compatibility: {},
-};
-const artifact = {
-  id: "bld_a",
-  productId: "prd_a",
-  version: "1.0.0",
-  status: "pending_review",
-  scanStatus: "clean",
-  scanner: "scanner",
-  scannedAt: new Date(revision),
-  storageKey: "private/artifact.zip",
-  sha256Hash: "a".repeat(64),
-  fileSizeBytes: 4,
-  fileName: "artifact.zip",
-  mimeType: "application/zip",
-  isSigned: false,
-  createdAt: new Date(revision),
-} as Build;
+const variants = new ResourceVariantsRepository();
+
 beforeEach(() => {
-  state.queries = [];
-  state.results = [];
-  state.options = [];
+  resetResourceManagementState();
 });
 
 it("bounds variants, enforces unique normalized labels/IDs and rejects caller-controlled grant/pricing changes", () => {
@@ -428,155 +355,4 @@ it("removes only the group, leaving resource grants and publications intact", as
   expect(
     state.queries.filter((query) => query.sql.startsWith("delete")).map((query) => query.sql),
   ).toEqual([expect.stringContaining('delete from "product_variant_groups"')]);
-});
-it("retains the existing MTA version contract and normalizes strict dependency input", () => {
-  for (const version of ["1.6.0", "1.6.0-9.22279.0"])
-    expect(mtaVersionSchema.safeParse(version).success).toBe(true);
-  const parsed = resourceCompatibilitySchema.parse({
-    expectedUpdatedAt: revision,
-    compatibility: { dependencies: [" Resource-A "] },
-  });
-  expect(parsed.compatibility.dependencies).toEqual(["resource-a"]);
-  for (const compatibility of [
-    { mtaMinVersion: "garbage", dependencies: [] },
-    { dependencies: ["resource-a", "Resource-A"] },
-    { dependencies: ["https://nexus.test/private"] },
-    { dependencies: [], status: "published" },
-  ])
-    expect(
-      resourceCompatibilitySchema.safeParse({ expectedUpdatedAt: revision, compatibility }).success,
-    ).toBe(false);
-});
-it("saves requirements atomically with authority, millisecond CAS and audit", async () => {
-  state.results = [
-    [row(products, parent)],
-    [[actor.id, "developer"]],
-    [["prd_a", updated, { dependencies: ["resource-b"] }]],
-    [],
-  ];
-  expect(
-    await compatibility.update({
-      ...input,
-      expectedUpdatedAt: revision,
-      compatibility: { dependencies: ["resource-b"] },
-    }),
-  ).toMatchObject({ id: "prd_a", updatedAt: new Date(updated) });
-  const sql = state.queries.map((query) => query.sql).join("\n");
-  expect(sql).toContain("interval '1 millisecond'");
-  expect(sql).toContain('insert into "audit_events"');
-  expect(sql).not.toContain('update "builds"');
-});
-it.each([
-  {
-    expectedUpdatedAt: updated,
-    compatibility: { dependencies: [] },
-    code: "PRODUCT_METADATA_CONFLICT",
-  },
-  {
-    expectedUpdatedAt: revision,
-    compatibility: { dependencies: ["resource-a"] },
-    code: "RESOURCE_DEPENDENCY_SELF",
-  },
-])("rejects invalid compatibility without mutating publication ($code)", async (command) => {
-  state.results = [[row(products, parent)], [[actor.id, "developer"]]];
-  await expect(compatibility.update({ ...input, ...command })).rejects.toMatchObject({
-    code: command.code,
-  });
-  expect(
-    state.queries.every(
-      (query) => !query.sql.startsWith("update") && !query.sql.startsWith("insert"),
-    ),
-  ).toBe(true);
-});
-it("denies suspended-resource requirements changes", async () => {
-  state.results = [[row(products, { ...parent, status: "suspended" })], [[actor.id, "developer"]]];
-  await expect(
-    compatibility.update({
-      ...input,
-      expectedUpdatedAt: revision,
-      compatibility: { dependencies: [] },
-    }),
-  ).rejects.toMatchObject({ code: "PRODUCT_STATE_CHANGED" });
-});
-it("confirms exactly the requested group identity/revision and saved compatibility", () => {
-  expect(
-    confirmedVariantCommand(
-      { productId: "prd_a", groupId: "vgrp_new", revision: 1 },
-      "prd_a",
-      save,
-    ),
-  ).toBe(true);
-  expect(
-    confirmedVariantCommand(
-      { productId: "prd_b", groupId: "vgrp_new", revision: 1 },
-      "prd_a",
-      save,
-    ),
-  ).toBe(false);
-  expect(
-    confirmedVariantCommand(
-      { productId: "prd_a", groupId: "vgrp_new", revision: 2 },
-      "prd_a",
-      save,
-    ),
-  ).toBe(false);
-  const deps = { dependencies: ["resource-b"] };
-  expect(
-    confirmedCompatibility(
-      { product: { id: "prd_a", updatedAt: updated, compatibility: deps } },
-      "prd_a",
-      revision,
-      deps,
-    ),
-  ).toBe(true);
-  expect(
-    confirmedCompatibility(
-      { product: { id: "prd_a", updatedAt: revision, compatibility: deps } },
-      "prd_a",
-      revision,
-      deps,
-    ),
-  ).toBe(false);
-  expect(
-    confirmedCompatibility(
-      { product: { id: "prd_a", updatedAt: updated, compatibility: { dependencies: [] } } },
-      "prd_a",
-      revision,
-      deps,
-    ),
-  ).toBe(false);
-});
-it("authorizes reviewer evidence with live role and exact artifact before the audit commits", async () => {
-  state.results = [
-    [["prd_a"]],
-    [["moderator"]],
-    [row(builds, artifact as unknown as Record<string, unknown>)],
-    [],
-  ];
-  await review.authorize({ actorId: "usr_mod", auditId: "aud_a", expected: artifact });
-  expect(state.queries.map((query) => query.sql).join("\n")).toMatch(
-    /products[\s\S]*for share[\s\S]*users[\s\S]*for share[\s\S]*builds[\s\S]*for share[\s\S]*insert into "audit_events"/,
-  );
-});
-it("denies a reviewer whose role was revoked while opening storage", async () => {
-  state.results = [[["prd_a"]], [["user"]]];
-  await expect(
-    review.authorize({ actorId: "usr_mod", auditId: "aud_a", expected: artifact }),
-  ).rejects.toMatchObject({ statusCode: 403 });
-  expect(state.queries.every((query) => !query.sql.startsWith("insert"))).toBe(true);
-});
-it.each([
-  { status: "retired" },
-  { storageKey: "private/changed.zip" },
-  { scanStatus: "malicious" },
-  { scanner: "different" },
-  { scannedAt: new Date(updated) },
-  { sha256Hash: "b".repeat(64) },
-  { productId: "prd_b" },
-])("denies changed reviewer evidence ($status $scanStatus $storageKey)", async (changed) => {
-  state.results = [[["prd_a"]], [["moderator"]], [row(builds, { ...artifact, ...changed })]];
-  await expect(
-    review.authorize({ actorId: "usr_mod", auditId: "aud_a", expected: artifact }),
-  ).rejects.toMatchObject({ code: "BUILD_STATE_CHANGED" });
-  expect(state.queries.every((query) => !query.sql.startsWith("insert"))).toBe(true);
 });
