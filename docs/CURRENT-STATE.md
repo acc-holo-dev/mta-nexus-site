@@ -6,6 +6,11 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `fbc96ee5` / #471 — resource-release-watch-resume suite split;
+- `7aa6afda` / #469 — server-registration-recovery suite split;
+- `51f10cff` / #474 — resource-cart-controls confirm suite split;
+- `854f1913` / #470 — collection-release-watches suite split;
+- `0cbf6225` / #466 — tip honesty after compose-actor/release-watch-batch wave;
 - `e9cad4fc` / #465 — resource-release-watch-batch suite split;
 - `bcca9f4c` / #464 — discussion-compose-actor suite split;
 - `8a73063f` / #463 — resource-compatibility-draft suite split;
@@ -163,7 +168,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `e9cad4fcda1f6d91b641f48411e694b7e2d75b5b` after #465. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `fbc96ee5976cbb3c7b6adf18edcbcba081a143f1` after #471. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
