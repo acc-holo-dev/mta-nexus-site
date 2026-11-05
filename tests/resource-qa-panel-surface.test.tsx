@@ -67,7 +67,8 @@ it("explains when a signed-in reader cannot ask", () => {
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.emptyHint);
   expect(html).toContain("overflow-x-clip");
-  expect(html).not.toContain('role="alert"');
+  expect(html).toContain('id="resource-qa-ask-unavailable"');
+  expect(html).toContain('role="alert"');
 });
 
 it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
@@ -103,7 +104,8 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
   expect(empty).toContain(copy.empty);
   expect(empty).toContain(copy.emptyHint);
   expect(empty).toContain("overflow-x-clip");
-  expect(empty).not.toContain('role="alert"');
+  expect(empty).toContain('id="resource-qa-ask-unavailable"');
+  expect(empty).not.toContain(copy.unavailableDescription);
 });
 
 it("gates resolve and reopen writes behind confirmAction with localized copy", () => {
