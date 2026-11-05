@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = readFileSync(
-  join(root, "apps/web/src/components/server-review-panel.tsx"),
-  "utf8",
-);
+const source = readFileSync(join(root, "apps/web/src/components/server-review-panel.tsx"), "utf8");
 
 it("locks server review write fail/unknown/conflict to ErrorState and keeps success as status", () => {
   expect(source).toContain(
