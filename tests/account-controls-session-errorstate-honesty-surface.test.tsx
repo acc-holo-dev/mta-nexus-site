@@ -17,6 +17,6 @@ it("locks account-controls session check failure to ErrorState with stable id", 
     /<ErrorState\s+id="account-controls-session-error"\s+title=\{error\}\s+description=\{copy\.errorHint\}/u,
   );
   expect(source).not.toContain(
-    "<ErrorState title={error} description={copy.errorHint} className=\"items-stretch py-4\" />",
+    '<ErrorState title={error} description={copy.errorHint} className="items-stretch py-4" />',
   );
 });
