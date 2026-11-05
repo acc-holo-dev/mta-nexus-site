@@ -452,11 +452,9 @@ export async function OrderCaseDetailPage({
       <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
         {copy.financeNote}
       </p>
-      {result.evidenceChanged && (
-        <p role="note" className="text-sm text-warning">
-          {copy.changed}
-        </p>
-      )}
+      {result.evidenceChanged ? (
+        <ErrorState id="order-case-evidence-changed" title={copy.changed} />
+      ) : null}
       <Evidence data={result.snapshot} locale={locale} title={copy.snapshot} />
       <Evidence data={current} locale={locale} title={copy.current} />
       {staff && actor.role === "admin" && (
