@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { Copy } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
@@ -106,9 +106,13 @@ export function ServerConnectControls({
           {connectHint}
         </p>
       ) : null}
-      <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
-        {copyMessage}
-      </p>
+      {copyMessage === copy.copyUnavailable ? (
+        <ErrorState id="server-connect-copy-unavailable" title={copy.copyUnavailable} />
+      ) : (
+        <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
+          {copyMessage}
+        </p>
+      )}
     </div>
   );
 }
