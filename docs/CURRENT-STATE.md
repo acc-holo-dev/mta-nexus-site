@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `1f545167` — tip advanced after #648 library-collection-resources-selection-missing and tip honesty (#659); tip CI not claimed verified-green under rapid merges;
 - `dffcb78c` — tip advanced after tip honesty (#658) on 42afab9c; tip CI not claimed verified-green under rapid merges;
 - `42afab9c` — tip advanced after tip honesty (#657) on a1c69040; tip CI not claimed verified-green under rapid merges;
 - `a1c69040` — tip advanced after tip honesty (#656) on a3772e2f; tip CI not claimed verified-green under rapid merges;
