@@ -43,8 +43,7 @@ it("clears the recovered intent before SPA navigation without pagehide", async (
     }),
   );
   h.fetch.mockImplementation(
-    async () =>
-      new Response(JSON.stringify({ authenticated: true, user: { id: "usr_a" } })),
+    async () => new Response(JSON.stringify({ authenticated: true, user: { id: "usr_a" } })),
   );
   render();
   for (const effect of h.effects) effect();

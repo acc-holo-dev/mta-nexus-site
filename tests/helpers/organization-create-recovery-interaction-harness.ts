@@ -17,8 +17,7 @@ type OrganizationProfileFormComponent = (props: {
   actorId: string;
 }) => ReactNode;
 
-const reply = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status });
+const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 
 /** Shared react mock factory for organization-create recovery suites (use with vi.mock("react", ...)). */
 export function mockReactHooks(harness: OrganizationCreateRecoveryHarness) {
@@ -58,8 +57,8 @@ export function createOrganizationCreateRecoveryInteractionHelpers(
   }
 
   async function mount() {
-    harness.fetch.mockImplementation(
-      async () => reply({ authenticated: true, user: { id: harness.actor } }),
+    harness.fetch.mockImplementation(async () =>
+      reply({ authenticated: true, user: { id: harness.actor } }),
     );
     render();
     for (const effect of harness.effects) effect();
