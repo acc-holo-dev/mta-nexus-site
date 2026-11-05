@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `7bb3126d` / #482 — notification inbox mark-unread confirm-cancel;
 - `3088f89e` / #483 — verification moderation decide confirm-cancel;
 - `44c94467` / #467 — storage-maintenance actor suite split;
 - `878577f7` / #477 — commercial-plan-form confirm suite split;
@@ -177,7 +178,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `3088f89eec73a89ab50fca925fc92a490b79551b` after #483. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `7bb3126d0b014d44956e2618cd1e1c93eabf2209` after #482. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
