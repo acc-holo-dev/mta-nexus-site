@@ -66,6 +66,8 @@ vi.mock("@nexus/ui", async () => {
         children({ id: id ?? "field", className: "field", describedBy: undefined }),
       ),
     fieldControlClass: () => "field",
+    ErrorState: ({ id, title, children }: { id?: string; title?: string; children?: ReactNode }) =>
+      createElement("div", { id, role: "alert" }, title ?? null, children ?? null),
   };
 });
 
