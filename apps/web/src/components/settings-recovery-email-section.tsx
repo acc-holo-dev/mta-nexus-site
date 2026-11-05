@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, fieldControlClass } from "@nexus/ui";
+import { Button, ErrorState, fieldControlClass } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../lib/i18n";
@@ -41,21 +41,23 @@ export function SettingsRecoveryEmailSection({
 
       {recoveryEmail && (
         <>
-          <div className="rounded-md border border-base bg-inset px-3 py-3">
+          <div className="rounded-md border border-base bg-inset px-3 py-3 space-y-2">
             <div className="break-all text-sm text-primary">{recoveryEmail.email}</div>
-            <div className="mt-1 text-xs text-muted">
-              {recoveryEmail.verified
-                ? `${copy.verifiedForRecovery}${
-                    recoveryEmail.verifiedAt
-                      ? ` ${copy.verifiedOn} ${new Date(recoveryEmail.verifiedAt).toLocaleString(
-                          dateLocale,
-                        )}`
-                      : ""
-                  }.`
-                : recoveryEmail.eligible
-                  ? copy.recoveryNotVerified
-                  : copy.recoveryUnavailable}
-            </div>
+            {recoveryEmail.verified ? (
+              <div className="text-xs text-muted">
+                {`${copy.verifiedForRecovery}${
+                  recoveryEmail.verifiedAt
+                    ? ` ${copy.verifiedOn} ${new Date(recoveryEmail.verifiedAt).toLocaleString(
+                        dateLocale,
+                      )}`
+                    : ""
+                }.`}
+              </div>
+            ) : recoveryEmail.eligible ? (
+              <ErrorState id="settings-recovery-not-verified" title={copy.recoveryNotVerified} />
+            ) : (
+              <ErrorState id="settings-recovery-unavailable" title={copy.recoveryUnavailable} />
+            )}
           </div>
 
           {!recoveryEmail.verified && recoveryEmail.eligible && (
