@@ -10,16 +10,12 @@ it("routes market private preview and paid/disabled checkout notices through Err
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="market-private-preview"');
   expect(source).toContain("title={copy.privatePreview}");
-  expect(source).toContain(
-    "description={`${copy.resourceStatus}: ${formatProductStatus(product.status, copy)}. ${copy.notPublic}`}",
+  expect(source).toMatch(
+    /description=\{`\$\{copy\.resourceStatus\}: \$\{formatProductStatus\(product\.status, copy\)\}\. \$\{copy\.notPublic\}`\}/u,
   );
   expect(source).toContain('id="market-paid-disabled"');
-  expect(source).toContain(
-    "title={isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}",
-  );
-  expect(source).toMatch(
-    /!isPublic \? \(\s*<ErrorState\s+id="market-private-preview"/u,
-  );
+  expect(source).toContain("title={isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}");
+  expect(source).toMatch(/!isPublic \? \(\s*<ErrorState\s+id="market-private-preview"/u);
   expect(source).toMatch(
     /<ErrorState\s+id="market-paid-disabled"\s+title=\{isPublic \? dictionary\.checkout\.paidDisabled : copy\.notPublic\}/u,
   );
