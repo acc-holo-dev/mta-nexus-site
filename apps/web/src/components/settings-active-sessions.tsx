@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, EmptyState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Monitor } from "lucide-react";
 import type { getDictionary } from "../lib/i18n";
 import type { SettingsSession } from "../lib/settings-client-api";
@@ -101,7 +101,23 @@ export function SettingsActiveSessions({
           </div>
         ))}
 
-        {sessions === null && <p className="text-sm text-muted">{copy.sessionUnavailable}</p>}
+        {sessions === null ? (
+          <ErrorState
+            title={copy.sessionUnavailable}
+            action={
+              <Button
+                type="button"
+                variant="ghost"
+                size="touch"
+                disabled={pending}
+                onClick={onReload}
+                className="h-auto px-0 font-semibold text-accent"
+              >
+                {copy.reloadSettings}
+              </Button>
+            }
+          />
+        ) : null}
 
         {sessions?.length === 0 ? (
           <EmptyState title={copy.noSessions} description={copy.sessionsDescription} />
