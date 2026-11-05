@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import { formatHistoryDate, licenseStatusLabel } from "../lib/commerce-history-format";
 import { getCommerceHistoryCopy } from "../lib/commerce-history-i18n";
@@ -31,11 +31,17 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
         <div className="min-w-0">
           <dt className="text-muted">{copy.binding}</dt>
           <dd className="break-words">
-            {license.boundServerId
-              ? (license.serverName ?? copy.serverUnavailable)
-              : license.legacyServerBound
-                ? history.bound
-                : copy.noBinding}
+            {license.boundServerId ? (
+              license.serverName ? (
+                license.serverName
+              ) : (
+                <ErrorState id="license-server-unavailable" title={copy.serverUnavailable} />
+              )
+            ) : license.legacyServerBound ? (
+              history.bound
+            ) : (
+              copy.noBinding
+            )}
           </dd>
         </div>
         <div className="min-w-0">
@@ -47,11 +53,13 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
           </dd>
         </div>
       </dl>
-      {license.boundServerId && (
-        <p className="text-sm text-secondary">
-          {license.bindingReady ? copy.available : copy.changed}
-        </p>
-      )}
+      {license.boundServerId ? (
+        license.bindingReady ? (
+          <p className="text-sm text-secondary">{copy.available}</p>
+        ) : (
+          <ErrorState id="license-binding-changed" title={copy.changed} />
+        )
+      ) : null}
       <section className="min-w-0 space-y-3">
         <h2 className="text-lg font-semibold text-primary">{copy.history}</h2>
         {license.history.length === 0 ? (
