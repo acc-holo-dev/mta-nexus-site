@@ -2,7 +2,7 @@
   "schema_version": 1,
   "package_status": "active_tracker",
   "baseline_sha": "385e577e7443cf7d7b817419ce5c3b8afe87b690",
-  "as_of": "2026-11-01",
+  "as_of": "2026-11-05",
   "canonical_status": "Single working tracker: JSON-in-repo (DOC-03). Live execution_state lives only in this file. Frozen package snapshot: planning/import-baseline/. GitHub Issues import not started; requires explicit github_settings permission.",
   "tasks": [
     {
@@ -660,7 +660,7 @@
       "id": "OPS-06",
       "title": "Выбрать безопасный authoring path следующей forward-only миграции",
       "source_ids": ["ARC14"],
-      "current": "Journal содержит 88 SQL migrations до 0087, snapshots — только 0000/0001. db:generate вызывает обычный Drizzle generate. Конкретный будущий DDL не воспроизводился; текущая БД не объявлена неверной.",
+      "current": "Journal содержит 90 SQL migrations до 0089_resource_qa, snapshots — только 0000/0001. db:generate вызывает обычный Drizzle generate. Конкретный будущий DDL не воспроизводился; текущая БД не объявлена неверной.",
       "goal": "В disposable checkout проверить риск и документировать поддерживаемый manual/custom либо generator workflow.",
       "scope_files": [
         "packages/db/package.json",
@@ -715,8 +715,8 @@
       "execution_state": "done",
       "decision_refs": ["NX-002", "NX-003", "NX-004", "NX-011"],
       "release_conditions": ["before_next_schema_change_using_authoring_path"],
-      "execution_updated_on": "2026-11-01",
-      "execution_notes": "Forward-only authoring path documented/guarded; release-upgrade node tests PASS; no new generator DDL in main checkout."
+      "execution_updated_on": "2026-11-05",
+      "execution_notes": "Forward-only authoring path documented/guarded; release-upgrade node tests PASS; no new generator DDL in main checkout. Tip journal advanced to 0089_resource_qa (90 SQL) via forward-only migrations 0088/0089; retained upgrade evidence baseline still targets 0087_server_reviews."
     },
     {
       "track": "operations",
@@ -2995,8 +2995,8 @@
       "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
       "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
-      "execution_updated_on": "2026-11-01",
-      "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS."
+      "execution_updated_on": "2026-11-05",
+      "execution_notes": "Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe still open."
     },
     {
       "id": "FLOW-18",
@@ -3235,8 +3235,8 @@
       "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
       "release_conditions": ["scope_specific_acceptance_not_a_universal_launch_gate"],
-      "execution_updated_on": "2026-11-01",
-      "execution_notes": "Lifecycle UI allowed transitions; restore/release→draft not auto-publish; unavailable build→support. release-control repo/interaction PASS."
+      "execution_updated_on": "2026-11-05",
+      "execution_notes": "Lifecycle UI allowed transitions; restore/release→draft not auto-publish; unavailable build→support. release-control repo/interaction PASS. Tip FLOW-22 HTTP fresh-auth + session-actor binding (6cefa74e) remain separate from lifecycle transition UI."
     },
     {
       "id": "FLOW-21",
@@ -3312,8 +3312,8 @@
       "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
       "release_conditions": ["controlled_security_verification_before_beta"],
-      "execution_updated_on": "2026-11-01",
-      "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26)."
+      "execution_updated_on": "2026-11-05",
+      "execution_notes": "Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB remains open."
     },
     {
       "id": "FLOW-22",
@@ -3381,8 +3381,8 @@
       "execution_state": "done",
       "decision_refs": ["NX-005", "NX-006", "NX-008", "NX-011"],
       "release_conditions": ["existing_staff_policy_enforcement_before_beta"],
-      "execution_updated_on": "2026-11-01",
-      "execution_notes": "admin/actions requires current_password for all critical staff actions; build approve/reject recheck hash in txn."
+      "execution_updated_on": "2026-11-05",
+      "execution_notes": "admin/actions requires current_password for all critical staff actions; build approve/reject recheck hash in txn. Tip HTTP enforcement covered by admin-actions-fresh-auth-http; session-actor binding wave (6cefa74e) binds related staff/mutation paths to initiating/displayed session. Fresh password ≠ mandatory 2FA."
     },
     {
       "id": "UX-01",

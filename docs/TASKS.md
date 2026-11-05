@@ -543,11 +543,11 @@ Release applicability: before_using_one_image_across_runtime_origins.
 
 **Фаза:** F1. **Приоритет:** P2. **Решение:** verification_required. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Forward-only authoring path documented/guarded; release-upgrade node tests PASS; no new generator DDL in main checkout.
+**Заметка исполнения.** Forward-only authoring path documented/guarded; release-upgrade node tests PASS; no new generator DDL in main checkout. Tip journal advanced to 0089_resource_qa (90 SQL) via forward-only migrations 0088/0089; retained upgrade evidence baseline still targets 0087_server_reviews.
 
 **Исходные пункты:** ARC14. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Journal содержит 88 SQL migrations до 0087, snapshots — только 0000/0001. db:generate вызывает обычный Drizzle generate. Конкретный будущий DDL не воспроизводился; текущая БД не объявлена неверной.
+**Сейчас.** Journal содержит 90 SQL migrations до 0089_resource_qa, snapshots — только 0000/0001. db:generate вызывает обычный Drizzle generate. Конкретный будущий DDL не воспроизводился; текущая БД не объявлена неверной.
 
 **Результат.** В disposable checkout проверить риск и документировать поддерживаемый manual/custom либо generator workflow.
 
@@ -2213,7 +2213,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F2. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS.
+**Заметка исполнения.** Download labels latest vs selected; confirmed handoff only; integrity distinct. download-button + detail acquisition PASS. Tip session-actor binding wave (6cefa74e) does not change download handoff labels; F08 barrier probe still open.
 
 **Исходные пункты:** INT21, INT22. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
@@ -2385,7 +2385,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Lifecycle UI allowed transitions; restore/release→draft not auto-publish; unavailable build→support. release-control repo/interaction PASS.
+**Заметка исполнения.** Lifecycle UI allowed transitions; restore/release→draft not auto-publish; unavailable build→support. release-control repo/interaction PASS. Tip FLOW-22 HTTP fresh-auth + session-actor binding (6cefa74e) remain separate from lifecycle transition UI.
 
 **Исходные пункты:** INT28. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
@@ -2441,7 +2441,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26).
+**Заметка исполнения.** Final upload/download gates lock initiating session token before build/receipt writes; focused auth tests PASS (docker Node 26). Tip session-actor binding wave (6cefa74e) reinforces actor/session honesty on related mutations; F08 controlled multi-connection barrier probe on disposable DB remains open.
 
 **Исходные пункты:** F08. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
@@ -2498,7 +2498,7 @@ Release applicability: controlled_security_verification_before_beta.
 
 **Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** admin/actions requires current_password for all critical staff actions; build approve/reject recheck hash in txn.
+**Заметка исполнения.** admin/actions requires current_password for all critical staff actions; build approve/reject recheck hash in txn. Tip HTTP enforcement covered by admin-actions-fresh-auth-http; session-actor binding wave (6cefa74e) binds related staff/mutation paths to initiating/displayed session. Fresh password ≠ mandatory 2FA.
 
 **Исходные пункты:** F09. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 

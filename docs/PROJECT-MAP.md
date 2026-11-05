@@ -23,7 +23,7 @@ apps/web          → страницы App Router, HTTP API, UI, lib/services (~
 packages/domain   → чистые типы/ошибки/правила (не зависит от остальных пакетов)
 packages/validation → Zod/схемы входа
 packages/security → сессии, authz, идентификаторы, лимиты
-packages/db       → schema, migrations (~87 SQL), repositories (~170), workers
+packages/db       → schema, migrations (~90 SQL), repositories (~170), workers
 packages/storage  → приватные артефакты и целостность
 packages/config   → проверка env
 packages/ui       → общие UI-примитивы без серверных импортов

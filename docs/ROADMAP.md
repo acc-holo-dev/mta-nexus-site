@@ -1,6 +1,6 @@
 # Roadmap MTA NEXUS — рабочая редакция v1
 
-Сформирован из `planning/tasks.json`; вручную это представление не редактируется. База `385e577e7443cf7d7b817419ce5c3b8afe87b690`, дата 2026-11-01.
+Сформирован из `planning/tasks.json`; вручную это представление не редактируется. База `385e577e7443cf7d7b817419ce5c3b8afe87b690`, дата 2026-11-05.
 
 **Рабочий tracker (DOC-03):** `json_in_repo`. Живой статус исполнения — только в `planning/tasks.json`. Замороженный import baseline: `planning/import-baseline/`. GitHub Issues: `not_started` (нужен `github_settings`). Контракт: [TRACKER.md](../planning/TRACKER.md).
 
