@@ -12,14 +12,17 @@ const h = vi.hoisted(() => ({
   reload: vi.fn(),
   locale: "en",
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 
 const { click, ack, reviewed, setCollectionId } = createCollectionReleaseWatchesInteractionHelpers(
   h,
   ResourceReleaseWatchBatchControls,
+  confirmAction,
 );
 
 it("retains the reviewed collection endpoint when props change before a retry", async () => {

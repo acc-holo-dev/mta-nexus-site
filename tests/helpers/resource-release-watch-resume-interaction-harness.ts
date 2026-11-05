@@ -12,6 +12,8 @@ type ResourceReleaseWatchResumeInteractionHarness = {
 
 type Element = ReactElement<Record<string, unknown>>;
 
+type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
+
 type ResourceReleaseWatchBatchControlsComponent = (props: {
   items: {
     productId: string;
@@ -68,15 +70,13 @@ function nodes(n: ReactNode): Element[] {
   if (typeof type === "object" && type?.displayName === "Button") {
     return [{ ...e, type: "button" } as Element, ...nodes(e.props.children as ReactNode)];
   }
-  if (typeof type === "function" && type.displayName === "ActionConfirmCheckbox") {
-    return nodes(type(e.props));
-  }
   return [e, ...nodes(e.props.children as ReactNode)];
 }
 
 export function createResourceReleaseWatchResumeInteractionHelpers(
   harness: ResourceReleaseWatchResumeInteractionHarness,
   ResourceReleaseWatchBatchControls: ResourceReleaseWatchBatchControlsComponent,
+  confirmAction?: ConfirmActionMock,
 ) {
   let activeWatchCount = 4;
 
@@ -127,7 +127,6 @@ export function createResourceReleaseWatchResumeInteractionHelpers(
   function reviewed() {
     change(checks()[0], true);
     change(checks()[1], true);
-    change(checks().at(-1) as Element, true);
   }
 
   beforeEach(() => {
@@ -136,6 +135,7 @@ export function createResourceReleaseWatchResumeInteractionHelpers(
     harness.locale = "en";
     activeWatchCount = 4;
     vi.clearAllMocks();
+    confirmAction?.mockResolvedValue(true);
     vi.stubGlobal("fetch", harness.fetch);
     vi.stubGlobal("window", { location: { reload: harness.reload } });
   });

@@ -12,7 +12,7 @@ import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedResourceReleaseWatchBatch } from "../lib/resource-release-watch-batch-confirmation";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
-import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
+import { confirmAction } from "./confirm-action";
 export function ResourceReleaseWatchBatchControls({
   items,
   locale,
@@ -63,7 +63,6 @@ export function ResourceReleaseWatchBatchControls({
       )
     : RESOURCE_RELEASE_WATCH_BATCH_LIMIT;
   const copy = resourceReleaseWatchesCopy(locale),
-    confirmFieldId = `${collection?.id ?? (resume ? "resume" : "account")}-watch-batch-confirm`,
     router = useRouter(),
     lock = useRef(false),
     settled = useRef(false),
@@ -77,7 +76,6 @@ export function ResourceReleaseWatchBatchControls({
     [],
   );
   const [selected, setSelected] = useState<string[]>([]),
-    [confirmed, setConfirmed] = useState(false),
     [pending, setPending] = useState<
       ResourceReleaseWatchDisableCommand | ResourceReleaseWatchEnableCommand | null
     >(null),
@@ -88,13 +86,17 @@ export function ResourceReleaseWatchBatchControls({
   const frozen = useRef<
     ResourceReleaseWatchDisableCommand | ResourceReleaseWatchEnableCommand | null
   >(null);
+  const title = resume ? copy.resumeTitle : enabling ? copy.enrollTitle : copy.batchTitle,
+    note = resume ? copy.resumeNote : enabling ? copy.enrollNote : copy.batchNote,
+    confirm = resume ? copy.confirmResume : enabling ? copy.confirmEnroll : copy.confirmBatch,
+    apply = resume ? copy.applyResume : enabling ? copy.applyEnroll : copy.applyBatch;
   async function send() {
     if (
       lock.current ||
       settled.current ||
       saved ||
       blocked ||
-      (!pending && (!confirmed || !selected.length))
+      (!pending && !selected.length)
     )
       return;
     const command = frozen.current ?? {
@@ -114,6 +116,20 @@ export function ResourceReleaseWatchBatchControls({
       }
       return;
     }
+    if (
+      !frozen.current &&
+      !(await confirmAction({
+        title: enabling ? title : copy.stopConfirmTitle,
+        object: copy.title,
+        scope: `${command.items.length}`,
+        consequences: enabling ? confirm : copy.stopConfirm,
+        confirmLabel: apply,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: false,
+      }))
+    )
+      return;
     frozen.current = command;
     const requestScope = scope.current ?? {
       url: collection
@@ -170,10 +186,6 @@ export function ResourceReleaseWatchBatchControls({
     }
   }
   if (!pending && (!eligible.length || collection?.status === "archived")) return null;
-  const title = resume ? copy.resumeTitle : enabling ? copy.enrollTitle : copy.batchTitle,
-    note = resume ? copy.resumeNote : enabling ? copy.enrollNote : copy.batchNote,
-    confirm = resume ? copy.confirmResume : enabling ? copy.confirmEnroll : copy.confirmBatch,
-    apply = resume ? copy.applyResume : enabling ? copy.applyEnroll : copy.applyBatch;
   return (
     <section className="nexus-panel space-y-4 p-5">
       <h2>{title}</h2>
@@ -208,26 +220,18 @@ export function ResourceReleaseWatchBatchControls({
                     ? [...new Set([...previous, item.productId])]
                     : previous.filter((id) => id !== item.productId),
                 );
-                setConfirmed(false);
               }}
             />
             <span className="break-words">{item.title ?? copy.privateResource}</span>
           </label>
         ))}
-        <ActionConfirmCheckbox
-          id={confirmFieldId}
-          checked={confirmed}
-          onCheckedChange={setConfirmed}
-        >
-          {confirm}
-        </ActionConfirmCheckbox>
       </fieldset>
       {!pending && (
         <Button
           type="button"
           variant="outline"
           className="min-h-11"
-          disabled={busy || saved || !confirmed || !selected.length || selected.length > capacity}
+          disabled={busy || saved || !selected.length || selected.length > capacity}
           onClick={() => void send()}
         >
           {apply}

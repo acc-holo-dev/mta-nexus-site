@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { type FlatTestElement, flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
+import { flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
 import {
   createResourceReleaseWatchBatchInteractionHelpers,
   mockReactHooks,
@@ -14,22 +14,28 @@ const h = vi.hoisted(() => ({
   locale: "en",
   cleanup: null as (() => void) | null,
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
 
-const { render, checks, change, button, click, ack, reviewed } =
-  createResourceReleaseWatchBatchInteractionHelpers(h, ResourceReleaseWatchBatchControls);
+const { render, button, click, ack, reviewed } = createResourceReleaseWatchBatchInteractionHelpers(
+  h,
+  ResourceReleaseWatchBatchControls,
+  confirmAction,
+);
 
 it.each(["en", "ru"])(
-  "requires review and retries exactly the frozen sorted batch in %s",
+  "requires selection and retries exactly the frozen sorted batch in %s",
   async (locale) => {
     h.locale = locale;
     const copy = resourceReleaseWatchesCopy(locale as "en" | "ru");
     await click(copy.applyBatch);
     expect(h.fetch).not.toHaveBeenCalled();
+    expect(confirmAction).not.toHaveBeenCalled();
     reviewed();
     h.fetch.mockRejectedValueOnce(new Error("lost"));
     await click(copy.applyBatch);
@@ -41,6 +47,7 @@ it.each(["en", "ru"])(
     expect(render().find((n) => n.type === "fieldset")?.props.disabled).toBe(true);
     h.fetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ack(init) });
     await click(copy.retrySame);
+    expect(confirmAction).toHaveBeenCalledOnce();
     expect(h.fetch.mock.calls[1][1].body).toBe(init.body);
     expect(h.refresh).toHaveBeenCalledOnce();
   },
@@ -58,11 +65,8 @@ it("does not confirm partial or foreign acknowledgements", async () => {
   expect(flatTreeHasErrorText(render(), resourceReleaseWatchesCopy("en").failed)).toBe(true);
 });
 
-it("requires reload after a revision conflict and clears acknowledgement when selection changes", async () => {
+it("requires reload after a revision conflict", async () => {
   reviewed();
-  change(checks()[0], false);
-  expect(button("Stop selected watches").props.disabled).toBe(true);
-  change(checks().at(-1) as FlatTestElement, true);
   h.fetch.mockResolvedValueOnce({
     ok: false,
     status: 409,
@@ -74,4 +78,5 @@ it("requires reload after a revision conflict and clears acknowledgement when se
   ).toBe(false);
   await click("Reload current state");
   expect(h.refresh).toHaveBeenCalledOnce();
+  expect(button("Reload current state").props.disabled).toBe(false);
 });

@@ -12,21 +12,27 @@ const h = vi.hoisted(() => ({
   reload: vi.fn(),
   locale: "en",
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
 
 const { checks, change, click, ack, reviewed, setActiveWatchCount } =
-  createCollectionReleaseWatchesInteractionHelpers(h, ResourceReleaseWatchBatchControls);
+  createCollectionReleaseWatchesInteractionHelpers(
+    h,
+    ResourceReleaseWatchBatchControls,
+    confirmAction,
+  );
 
 it.each(["en", "ru"])(
   "freezes membership revision and exact watch enrollment after a lost response in %s",
   async (locale) => {
     h.locale = locale;
     const copy = resourceReleaseWatchesCopy(locale as "en" | "ru");
-    expect(checks()).toHaveLength(3);
+    expect(checks()).toHaveLength(2);
     await click(copy.applyEnroll);
     expect(h.fetch).not.toHaveBeenCalled();
     reviewed();
@@ -52,5 +58,5 @@ it("bounds checkbox choices by the remaining account-wide quota", () => {
   setActiveWatchCount(99);
   change(checks()[0], true);
   expect(checks()[1].props.disabled).toBe(true);
-  expect(checks()).toHaveLength(3);
+  expect(checks()).toHaveLength(2);
 });

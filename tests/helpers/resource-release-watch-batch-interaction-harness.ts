@@ -17,6 +17,8 @@ type ResourceReleaseWatchBatchControlsComponent = (props: {
   locale: "en" | "ru";
 }) => ReactNode;
 
+type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
+
 const items = [
   { productId: "prd_b", enabled: true, revision: 3, title: null },
   { productId: "prd_a", enabled: true, revision: 1, title: "Core" },
@@ -51,6 +53,7 @@ export function mockReactHooks(harness: ResourceReleaseWatchBatchHarness) {
 export function createResourceReleaseWatchBatchInteractionHelpers(
   harness: ResourceReleaseWatchBatchHarness,
   ResourceReleaseWatchBatchControls: ResourceReleaseWatchBatchControlsComponent,
+  confirmAction?: ConfirmActionMock,
 ) {
   type Element = FlatTestElement;
 
@@ -96,7 +99,6 @@ export function createResourceReleaseWatchBatchInteractionHelpers(
   function reviewed() {
     change(checks()[0], true);
     change(checks()[1], true);
-    change(checks().at(-1) as Element, true);
   }
 
   beforeEach(() => {
@@ -105,6 +107,7 @@ export function createResourceReleaseWatchBatchInteractionHelpers(
     harness.cleanup = null;
     harness.locale = "en";
     vi.clearAllMocks();
+    confirmAction?.mockResolvedValue(true);
     vi.stubGlobal("fetch", harness.fetch);
     vi.stubGlobal("window", { location: { reload: harness.reload } });
   });
