@@ -12,10 +12,10 @@ it("locks security recovery unavailable and needs-verification to ErrorState", (
   expect(source).toContain('id="security-recovery-needs-verification"');
   expect(source).toContain('id="security-recovery-unavailable"');
   expect(source).toMatch(
-    /<ErrorState id="security-recovery-needs-verification" title=\{copy\.recoveryNeedsVerification\}/,
+    /<ErrorState\s+id="security-recovery-needs-verification"\s+title=\{copy\.recoveryNeedsVerification\}\s*\/>/u,
   );
   expect(source).toMatch(
-    /<ErrorState id="security-recovery-unavailable" title=\{copy\.recoveryUnavailable\}/,
+    /<ErrorState\s+id="security-recovery-unavailable"\s+title=\{copy\.recoveryUnavailable\}\s*\/>/u,
   );
   expect(source).toContain('className="mt-1 text-xs text-muted">{copy.recoveryVerified}</p>');
   expect(source).not.toContain(": copy.recoveryNeedsVerification");
