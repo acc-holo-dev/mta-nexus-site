@@ -8,7 +8,8 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const recoveryDatabaseTests = [
   "tests/notification-inbox-history.integration.test.ts",
-  "tests/discussion-watch-persistence.integration.test.ts",
+  "tests/discussion-watch-persistence-follow-delivery.integration.test.ts",
+  "tests/discussion-watch-persistence-replay-repair.integration.test.ts",
   "tests/discovery-follow-persistence.integration.test.ts",
   "tests/notification-preference-serialization.integration.test.ts",
   "tests/web-push-outbox.integration.test.ts",
