@@ -86,10 +86,16 @@ async function click(label: string) {
   (button(label).props.onClick as () => void)();
   await new Promise((r) => setTimeout(r, 0));
 }
-function confirm() {
+function confirmation() {
   const input = render().find((n) => n.type === "input" && n.props.type === "checkbox");
   if (!input) throw new Error("Missing confirmation");
-  (input.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  return input;
+}
+function setConfirmation(checked: boolean) {
+  (confirmation().props.onChange as (e: unknown) => void)({ target: { checked } });
+}
+function confirm() {
+  setConfirmation(true);
 }
 beforeEach(() => {
   h.slots = [];
@@ -145,6 +151,21 @@ it.each(["en", "ru"] as const)(
     expect(h.refresh).toHaveBeenCalledOnce();
   },
 );
+it("does not choose the compared archive when confirmation is cancelled", async () => {
+  const copy = libraryReleaseComparisonCopy("en");
+  button(copy.chooseCompared);
+  const slotsBefore = structuredClone(h.slots);
+  confirm();
+  expect(button(copy.chooseCompared).props.disabled).toBe(false);
+  setConfirmation(false);
+  expect(confirmation().props.checked).toBe(false);
+  expect(button(copy.chooseCompared).props.disabled).toBe(true);
+  await click(copy.chooseCompared);
+  expect(h.fetch).not.toHaveBeenCalled();
+  expect(h.refresh).not.toHaveBeenCalled();
+  expect(h.reload).not.toHaveBeenCalled();
+  expect(h.slots).toEqual(slotsBefore);
+});
 it("requires a new comparison after archive or preference conflict", async () => {
   confirm();
   h.fetch.mockResolvedValueOnce({
