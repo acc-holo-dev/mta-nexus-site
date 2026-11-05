@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { flatTreeHasErrorText } from "./helpers/flatten-react-test-tree";
 import {
   createServerRegistrationRecoveryInteractionHelpers,
   mockReactHooks,
@@ -35,12 +36,7 @@ it("does not display a saved draft to a different signed-in actor", async () => 
   render();
   for (const effect of h.effects) effect();
   await vi.waitFor(() =>
-    expect(
-      render().some(
-        (node) =>
-          node.props.role === "status" && String(node.props.children).includes("Could not verify"),
-      ),
-    ).toBe(true),
+    expect(flatTreeHasErrorText(render(), "Could not verify")).toBe(true),
   );
   expect(render().find((n) => n.type === "form")?.props.hidden).toBe(true);
   expect(sessionStorage.getItem("nexus:server-registration:v1:usr_a")).toContain("Private draft");
