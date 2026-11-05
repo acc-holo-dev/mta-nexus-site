@@ -1,134 +1,48 @@
 import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import {
-  assignIntegrationStaffPassword,
-  INTEGRATION_STAFF_PASSWORD,
-} from "./integration-staff-password";
+import { describe, expect, it, vi } from "vitest";
 
-const directoryState = vi.hoisted(() => ({
-  current: {
-    fetchedAt: "2026-09-25T12:00:00.000Z",
-    isStale: false,
-    servers: [] as Array<{
-      address: string;
-      port: number;
-      name?: string;
-      responding?: boolean;
-    }>,
-  },
-}));
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () => {
+  const { directoryState: state } = await import("./helpers/server-control-challenge-harness");
+  return {
+    mtaMasterDirectoryService: {
+      getDirectory: vi.fn(async () => state.current),
+    },
+    matchesMtaEndpoint: (
+      server: { ipAddress: string; port: number },
+      observed: { address: string; port: number },
+    ) =>
+      server.ipAddress.toLowerCase().replace(/\.$/u, "") ===
+        observed.address.toLowerCase().replace(/\.$/u, "") && server.port === observed.port,
+  };
+});
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
-  mtaMasterDirectoryService: {
-    getDirectory: vi.fn(async () => directoryState.current),
-  },
-  matchesMtaEndpoint: (
-    server: { ipAddress: string; port: number },
-    observed: { address: string; port: number },
-  ) =>
-    server.ipAddress.toLowerCase().replace(/\.$/u, "") ===
-      observed.address.toLowerCase().replace(/\.$/u, "") && server.port === observed.port,
-}));
-
-import {
-  db,
-  serverClaimChallenges,
-  serverRepository,
-  sessionRepository,
-  userRepository,
-  verificationRepository,
-  verificationRequests,
-} from "@nexus/db";
+import { db, serverClaimChallenges, serverRepository, verificationRequests } from "@nexus/db";
 import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
 import { POST as issueChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/route";
 import { POST as verifyChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/verify/route";
 import { POST as genericVerification } from "../apps/web/src/app/api/verification/route";
+import {
+  directoryState,
+  post,
+  seedLiveControlChallenge,
+  setupServerControlChallenge,
+} from "./helpers/server-control-challenge-harness";
 
-function post(url: string, token: string, body?: Record<string, unknown>) {
-  return new NextRequest(url, {
-    method: "POST",
-    headers: browserMutationHeaders({
-      ...(body ? { "content-type": "application/json" } : {}),
-      cookie: `nexus_session=${token}`,
-      "x-nexus-actor-id": token.replace(/^tok_control_/, "usr_control_"),
-    }),
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
-}
+setupServerControlChallenge();
 
-describe("MTA server control challenge integration", () => {
-  beforeEach(() => {
-    stubBrowserMutationOrigin();
-  });
-  afterEach(() => {
-    vi.unstubAllEnvs();
-  });
+describe("MTA server control challenge: live proof and moderation", () => {
   it("requires a fresh live name token and creates exactly one moderation request", async () => {
-    const suffix = `${Date.now().toString(36)}_${process.pid}`;
-    const userId = `usr_control_${suffix}`;
-    const attackerId = `usr_control_attacker_${suffix}`;
-    const moderatorId = `usr_control_moderator_${suffix}`;
-    const sessionToken = `tok_control_${suffix}`;
-    const attackerToken = `tok_control_attacker_${suffix}`;
-    const moderatorToken = `tok_control_moderator_${suffix}`;
-    const serverId = `srv_control_${suffix}`;
-    const address = "198.51.100.211";
-    const port = 18_000 + ((Date.now() + process.pid) % 30_000);
-
-    await userRepository.create({
-      id: userId,
-      email: `server_control_${suffix}@nexus.test`,
-      username: `server_control_${suffix}`,
-      displayName: "Server Control Claimant",
-      role: "user",
-    });
-    await sessionRepository.create({
-      id: `ses_control_${suffix}`,
+    const {
       userId,
-      token: sessionToken,
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-    });
-    await userRepository.create({
-      id: attackerId,
-      email: `server_control_attacker_${suffix}@nexus.test`,
-      username: `server_control_attacker_${suffix}`,
-      displayName: "Server Control Attacker",
-      role: "user",
-    });
-    await sessionRepository.create({
-      id: `ses_control_attacker_${suffix}`,
-      userId: attackerId,
-      token: attackerToken,
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-    });
-    await userRepository.create({
-      id: moderatorId,
-      email: `server_control_moderator_${suffix}@nexus.test`,
-      username: `server_control_moderator_${suffix}`,
-      displayName: "Server Control Moderator",
-      role: "moderator",
-    });
-    await sessionRepository.create({
-      id: `ses_control_moderator_${suffix}`,
-      userId: moderatorId,
-      token: moderatorToken,
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-    });
-    await assignIntegrationStaffPassword(moderatorId);
-    await serverRepository.create({
-      id: serverId,
-      name: "Control Challenge Server",
-      slug: `control-challenge-${suffix}`,
-      ipAddress: address,
+      moderatorId,
+      sessionToken,
+      attackerToken,
+      moderatorToken,
+      serverId,
+      address,
       port,
-      status: "active",
-      visibility: "public",
-      isVerified: false,
-      gameplayTags: [],
-      mediaUrls: [],
-    });
+      staffPassword,
+    } = await seedLiveControlChallenge();
 
     const issued = await issueChallenge(
       post(`http://nexus.test/api/servers/${serverId}/claim-challenge`, sessionToken),
@@ -365,7 +279,7 @@ describe("MTA server control challenge integration", () => {
         targetId: verifiedBody.verificationRequest.id,
         action: "approve",
         notes: "Live MTA control proof reviewed.",
-        currentPassword: INTEGRATION_STAFF_PASSWORD,
+        currentPassword: staffPassword,
       }),
     );
     expect(approved.status).toBe(200);
@@ -381,95 +295,5 @@ describe("MTA server control challenge integration", () => {
       .limit(1);
     expect(resolvedRequest?.status).toBe("approved");
     expect(resolvedRequest?.reviewerId).toBe(moderatorId);
-  });
-
-  it("fails closed when a legacy pending server request has no consumed control proof", async () => {
-    const suffix = `${Date.now().toString(36)}_${process.pid}`;
-    const requesterId = `usr_legacy_claim_${suffix}`;
-    const reviewerId = `usr_legacy_reviewer_${suffix}`;
-    const serverId = `srv_legacy_claim_${suffix}`;
-    const requestId = `ver_legacy_claim_${suffix}`;
-    const port = 19_000 + ((Date.now() + process.pid) % 30_000);
-
-    await userRepository.create({
-      id: requesterId,
-      email: `legacy_claim_${suffix}@nexus.test`,
-      username: `legacy_claim_${suffix}`,
-      displayName: "Legacy Claim Requester",
-      role: "user",
-    });
-    await userRepository.create({
-      id: reviewerId,
-      email: `legacy_reviewer_${suffix}@nexus.test`,
-      username: `legacy_reviewer_${suffix}`,
-      displayName: "Legacy Claim Reviewer",
-      role: "moderator",
-    });
-    const reviewerToken = `tok_${reviewerId}`;
-    await sessionRepository.create({
-      id: `ses_${reviewerId}`,
-      userId: reviewerId,
-      token: reviewerToken,
-      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
-    });
-    await serverRepository.create({
-      id: serverId,
-      name: "Legacy Pending Claim",
-      slug: `legacy-pending-claim-${suffix}`,
-      ipAddress: "198.51.100.212",
-      port,
-      status: "active",
-      visibility: "public",
-      isVerified: false,
-      gameplayTags: [],
-      mediaUrls: [],
-    });
-
-    await db.insert(verificationRequests).values({
-      id: requestId,
-      requesterId,
-      targetType: "server",
-      targetId: serverId,
-      status: "pending",
-      notes: "Legacy pre-challenge ownership request.",
-      createdAt: new Date(),
-    });
-
-    await expect(
-      verificationRepository.resolveRequest({
-        id: requestId,
-        reviewerId,
-        decision: "approved",
-        currentToken: reviewerToken,
-        reviewNotes: "Must not approve without durable control proof.",
-      }),
-    ).rejects.toMatchObject({
-      statusCode: 409,
-      code: "CONFLICT",
-    });
-
-    const [stillPending] = await db
-      .select()
-      .from(verificationRequests)
-      .where(eq(verificationRequests.id, requestId))
-      .limit(1);
-    expect(stillPending?.status).toBe("pending");
-
-    const afterFailedApproval = await serverRepository.findById(serverId);
-    expect(afterFailedApproval?.ownerId).toBeFalsy();
-    expect(afterFailedApproval?.isVerified).toBe(false);
-
-    const rejected = await verificationRepository.resolveRequest({
-      id: requestId,
-      reviewerId,
-      decision: "rejected",
-      currentToken: reviewerToken,
-      reviewNotes: "Re-submit through the live control challenge.",
-    });
-    expect(rejected?.status).toBe("rejected");
-
-    const afterRejection = await serverRepository.findById(serverId);
-    expect(afterRejection?.ownerId).toBeFalsy();
-    expect(afterRejection?.isVerified).toBe(false);
   });
 });
