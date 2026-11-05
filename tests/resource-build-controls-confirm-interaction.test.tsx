@@ -186,12 +186,44 @@ it("confirms retire before PATCH", async () => {
   );
 });
 
-it("skips withdraw and retire when confirmation is cancelled", async () => {
+it("does not withdraw a build when confirmation is cancelled", async () => {
   const copy = getResourceBuildWorkspaceCopy("en");
-  confirmAction.mockResolvedValue(false);
-  const nodes = render();
-  (button(nodes, copy.withdraw).props.onClick as () => void)();
-  (button(nodes, copy.retire).props.onClick as () => void)();
-  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(2));
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
+
+  (button(render(), copy.withdraw).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
+
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.withdrawConfirmTitle,
+    object: `${build.version} · ${copy.revision} ${build.revision}`,
+    consequences: copy.withdrawConfirm,
+    confirmLabel: copy.withdraw,
+    cancelLabel: copy.cancel,
+    closeLabel: copy.cancel,
+    danger: true,
+  });
   expect(harness.fetch).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
+});
+
+it("does not retire a build when confirmation is cancelled", async () => {
+  const copy = getResourceBuildWorkspaceCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
+
+  (button(render(), copy.retire).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
+
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.retireConfirmTitle,
+    object: `${build.version} · ${copy.revision} ${build.revision}`,
+    consequences: copy.retirement,
+    confirmLabel: copy.retire,
+    cancelLabel: copy.cancel,
+    closeLabel: copy.cancel,
+    danger: true,
+  });
+  expect(harness.fetch).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
 });
