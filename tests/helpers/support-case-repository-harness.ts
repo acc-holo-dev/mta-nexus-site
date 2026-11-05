@@ -6,7 +6,7 @@ import {
 } from "@nexus/db";
 import type { SupportCaseCategory } from "@nexus/domain";
 
-export { supportCaseRepository, userRepository };
+export { supportCaseRepository };
 
 /** Unique suffix for disposable support-case repository fixtures. */
 export function fixtureSuffix(label = "support") {
