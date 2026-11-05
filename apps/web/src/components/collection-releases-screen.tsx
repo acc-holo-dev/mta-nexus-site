@@ -150,7 +150,7 @@ export async function CollectionReleasesScreen({
             className="border border-base bg-surface p-2"
           />
         </label>
-        <Button type="submit" variant="outline">
+        <Button type="submit" variant="outline" size="touch">
           {cc.apply}
         </Button>
         {result.q && (

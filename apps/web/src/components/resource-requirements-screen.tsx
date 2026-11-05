@@ -141,7 +141,9 @@ export async function ResourceRequirementsScreen({
         )}
         {query.returnFrom && <input type="hidden" name="returnFrom" value={query.returnFrom} />}
         {query.returnPage && <input type="hidden" name="returnPage" value={query.returnPage} />}
-        <Button type="submit">{copy.check}</Button>
+        <Button type="submit" size="touch">
+          {copy.check}
+        </Button>
       </form>
       <ResourceRequirementsReportBody
         report={report}
