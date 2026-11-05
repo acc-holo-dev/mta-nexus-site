@@ -58,7 +58,7 @@ export default function ErrorPage({
           <p className="font-caption text-muted">{dictionary.errors.referenceHint}</p>
           <Button
             type="button"
-            size="sm"
+            size="touch"
             variant="outline"
             onClick={() => void copyReference()}
             className="rounded-md px-3 font-semibold"
@@ -76,7 +76,7 @@ export default function ErrorPage({
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button
           type="button"
-          size="sm"
+          size="touch"
           onClick={reset}
           className="gap-1.5 rounded-md px-4 font-semibold"
         >
@@ -85,7 +85,7 @@ export default function ErrorPage({
         </Button>
         <Link
           href="/"
-          className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className="flex min-h-11 items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           <Home className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{dictionary.errors.home}</span>
