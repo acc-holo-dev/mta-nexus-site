@@ -6,7 +6,11 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
-- `6cefa74e` — bind order case reviews and recheck observability; tip green after session-binding / recovery wave;
+- `67a12240` / #320 — org team batch remove confirm; split resource acquisition UI suite (tip; CI on [42007107345](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42007107345));
+- `0231ad27` / #319 — locale switcher touch; discussions filter search landmark;
+- `520125fb` / #321 — rebuild F08/F09 nuance and session-actor wave in plans;
+- `bbd9d834` / #318 — CURRENT-STATE tip baseline after session-binding recovery wave;
+- `6cefa74e` — bind order case reviews and recheck observability; last verified-green tip before #318–#320;
 - `e05aa2e2` — recover order cancellation and guard isolated tests;
 - `637f7d3c` — bind storage maintenance and guard local compose;
 - `1e9a9ea2` — bind plan administration and report docker context;
@@ -37,8 +41,8 @@
 
 ## Verified green baseline (bullets)
 
-- **Проверенный tip `origin/main`:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave.
-- **CI на этом SHA:** [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) — success (full selected scope on tip after session-binding fixes).
+- **Текущий tip `origin/main`:** `67a1224043fd9fce77a57bfa7e5919613b108b54` / #320 after #319 locale/discussions landmarks and #318/#321 docs plan rebuild. Tip CI [42007107345](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/42007107345) — in progress; do not treat as verified green until SUCCESS.
+- **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
@@ -70,8 +74,8 @@
 
 ## Старт для следующего агента
 
-1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Зафиксируйте exact SHA и сначала проверьте GitHub CI именно для него. Если новый tip красный, восстановление обязательного gate имеет приоритет над новой UI-работой. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started` по `python3 scripts/_agent_list_open_tasks.py`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
-2. Локальный scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore` и не должен появляться в коммитах. Не ведите параллельные handoff-журналы.
+1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Зафиксируйте exact SHA и сначала проверьте GitHub CI именно для него. Если новый tip красный, восстановление обязательного gate имеет приоритет над новой UI-работой. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started` по `python3 planning/tools/list_open_tasks.py`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
+2. Локальный scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore` и не должен появляться в коммитах; committed tracker helper — `planning/tools/list_open_tasks.py`. Не ведите параллельные handoff-журналы.
 3. Defaults владельца A/B — [DECISIONS.md](DECISIONS.md) (FLOW-05/06/12, UX-06/14/17/23, OPS-19, GROW-01). Ads/commerce/GROW пилоты не активированы.
 4. Schema tip (SQL в repo): **`0089_resource_qa`** (также `0088_follow_mute_and_notify_comments`). Миграции forward-only; не гонять `pnpm db:generate` на живой БД (OPS-06).
 5. HTTP→service для новых write/составных путей; object-mute → `followWorkspaceService` / id prefix `omi`.
@@ -86,7 +90,7 @@
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #316 в проверенном `origin/main`. CI на этом SHA не означает production readiness.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #320 в tip `origin/main`. CI на этом SHA не означает production readiness.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
