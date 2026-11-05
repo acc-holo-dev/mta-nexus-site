@@ -12,6 +12,7 @@ import {
   verificationRequests,
 } from "../schema";
 import { developerExperienceRevision } from "./developer-profile";
+import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import {
   verificationApplicationRevision,
@@ -190,6 +191,7 @@ class VerificationWorkspaceRepository {
     id: string,
     input: { expectedRevision: string; proofUrl: string; notes: string },
     audit: Omit<AuditEvent, "createdAt">,
+    token: string,
   ) {
     return db.transaction(async (tx) => {
       // Same request -> target lock order as moderator decisions. A profile edit
@@ -235,6 +237,13 @@ class VerificationWorkspaceRepository {
         request.targetId,
         true,
       );
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+      await lockInitiatingSession(tx, actorId, token);
       await tx
         .update(verificationRequests)
         .set({ proofUrl: input.proofUrl, notes: input.notes })
@@ -249,6 +258,7 @@ class VerificationWorkspaceRepository {
         details: { ...(profileRevision ? { developerProfileRevision: profileRevision } : {}) },
         createdAt: sql`greatest(clock_timestamp(),coalesce((select max(previous.created_at) from audit_events previous where previous.target_type = 'verification' and previous.target_id = ${id} and previous.actor_id = ${actorId} and previous.actor_type = 'user' and previous.action in ('verification.requested','verification.application_updated')),'-infinity'::timestamptz) + interval '1 microsecond')`,
       });
+      await lockInitiatingSession(tx, actorId, token);
       return {
         id,
         status: "pending" as const,

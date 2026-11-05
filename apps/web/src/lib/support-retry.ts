@@ -31,6 +31,8 @@ type RetryOptions = {
   now?: number;
   newKey?: () => string;
   expectedUpdatedAt?: string;
+  /** Require a readable, writable session storage slot before sending. */
+  requirePersistence?: boolean;
 };
 
 const PREFIX = "nexus:support:retry:v2:";
@@ -50,12 +52,18 @@ const fallbackStore: SupportRetryStorage = {
 };
 
 function getStorage(options: RetryOptions): SupportRetryStorage {
-  if (options.storage !== undefined) return options.storage ?? fallbackStore;
-  try {
-    return typeof sessionStorage !== "undefined" ? sessionStorage : fallbackStore;
-  } catch {
-    return fallbackStore;
+  if (options.storage !== undefined) {
+    if (!options.storage && options.requirePersistence)
+      throw new Error("Support retry storage unavailable");
+    return options.storage ?? fallbackStore;
   }
+  try {
+    if (typeof sessionStorage !== "undefined") return sessionStorage;
+  } catch {
+    if (options.requirePersistence) throw new Error("Support retry storage unavailable");
+  }
+  if (options.requirePersistence) throw new Error("Support retry storage unavailable");
+  return fallbackStore;
 }
 
 function slotFor(actorScope: string, scope: string): string {
@@ -66,7 +74,12 @@ function isStatus(value: unknown): value is SupportRetryStatus {
   return value === "open" || value === "resolved" || value === "closed";
 }
 
-function readAttempt(store: SupportRetryStorage, slot: string, now: number): StoredAttempt | null {
+function readAttempt(
+  store: SupportRetryStorage,
+  slot: string,
+  now: number,
+  strict = false,
+): StoredAttempt | null {
   try {
     const raw = store.getItem(slot);
     if (!raw || raw.length > 512) return null;
@@ -92,16 +105,23 @@ function readAttempt(store: SupportRetryStorage, slot: string, now: number): Sto
       return null;
     return x as StoredAttempt;
   } catch {
+    if (strict) throw new Error("Support retry storage unavailable");
     return null;
   }
 }
 
-function writeAttempt(store: SupportRetryStorage, slot: string, value: StoredAttempt): void {
+function writeAttempt(
+  store: SupportRetryStorage,
+  slot: string,
+  value: StoredAttempt,
+  strict = false,
+): void {
   try {
-    store.setItem(slot, JSON.stringify(value));
+    const raw = JSON.stringify(value);
+    store.setItem(slot, raw);
+    if (strict && store.getItem(slot) !== raw) throw new Error("Storage verification failed");
   } catch {
-    // Browsers may disable sessionStorage; the mutation still works, but
-    // recoverability across reload is unavailable in that environment.
+    if (strict) throw new Error("Support retry storage unavailable");
   }
 }
 
@@ -116,7 +136,9 @@ async function digest(payload: string): Promise<string> {
  * request, but deliberately disables same-tab retry restoration. Never store
  * or expose session tokens, account names, or raw user IDs as storage keys.
  */
-export async function resolveSupportRetryActorScope(): Promise<string | null> {
+export async function resolveSupportRetryActorScope(
+  expectedActorId?: string,
+): Promise<string | null> {
   try {
     const response = await fetch("/api/auth/session", privateApiRequest());
     if (!response.ok) return null;
@@ -124,7 +146,8 @@ export async function resolveSupportRetryActorScope(): Promise<string | null> {
     if (
       data?.authenticated !== true ||
       typeof data.user?.id !== "string" ||
-      !USER_ID.test(data.user.id)
+      !USER_ID.test(data.user.id) ||
+      (expectedActorId !== undefined && data.user.id !== expectedActorId)
     )
       return null;
     return digest(`support-retry:v2:${data.user.id}`);
@@ -141,10 +164,12 @@ async function reserve(
 ): Promise<SupportRetryAttempt> {
   // Missing/invalid identity must not fall back to a cross-account slot.
   const actorScope = options.actorScope;
+  if (options.requirePersistence && (!actorScope || !DIGEST.test(actorScope)))
+    throw new Error("Support retry actor unavailable");
   const store = actorScope && DIGEST.test(actorScope) ? getStorage(options) : null;
   const slot = store && actorScope ? slotFor(actorScope, scope) : null;
   const now = options.now ?? Date.now();
-  const old = store && slot ? readAttempt(store, slot, now) : null;
+  const old = store && slot ? readAttempt(store, slot, now, options.requirePersistence) : null;
   if (old) {
     const oldPayload = payloadAt(old.observedStatus, old.observedUpdatedAt);
     if ((await digest(oldPayload)) === old.digest) {
@@ -155,14 +180,19 @@ async function reserve(
   const key = (options.newKey ?? (() => crypto.randomUUID()))();
   if (!UUID_V4.test(key)) throw new Error("Invalid support retry key generator");
   if (store && slot) {
-    writeAttempt(store, slot, {
-      version: 1,
-      key,
-      digest: await digest(payload),
-      observedStatus,
-      ...(options.expectedUpdatedAt ? { observedUpdatedAt: options.expectedUpdatedAt } : {}),
-      expiresAt: now + TTL_MS,
-    });
+    writeAttempt(
+      store,
+      slot,
+      {
+        version: 1,
+        key,
+        digest: await digest(payload),
+        observedStatus,
+        ...(options.expectedUpdatedAt ? { observedUpdatedAt: options.expectedUpdatedAt } : {}),
+        expiresAt: now + TTL_MS,
+      },
+      options.requirePersistence,
+    );
   }
   return { key, payload, recovered: false };
 }

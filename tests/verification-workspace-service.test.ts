@@ -270,13 +270,13 @@ it("validates own amendment before storage and owns all authority and audit fiel
     notes: "Updated evidence",
   };
   await expect(
-    service.amend(actor, "request", { ...input, requesterId: "victim" }),
+    service.amend(actor, "request", { ...input, requesterId: "victim" }, "unit-token"),
   ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
   expect(mocks.amend).not.toHaveBeenCalled();
-  await expect(service.amend(actor, "../../victim", input)).rejects.toMatchObject({
+  await expect(service.amend(actor, "../../victim", input, "unit-token")).rejects.toMatchObject({
     code: "NOT_FOUND",
   });
-  await service.amend(actor, "request", input);
+  await service.amend(actor, "request", input, "unit-token");
   expect(mocks.amend).toHaveBeenCalledWith(
     "actor",
     "request",
@@ -289,6 +289,7 @@ it("validates own amendment before storage and owns all authority and audit fiel
       targetId: "request",
       targetType: "verification",
     }),
+    "unit-token",
   );
 });
 it("returns only own bounded history summaries and passes filters with actor scope", async () => {

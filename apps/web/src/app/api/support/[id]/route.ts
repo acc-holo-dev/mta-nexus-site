@@ -68,6 +68,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     );
     const messages = access.messages;
     return supportPrivateJson(context, request, {
+      actorId: user.id,
       supportCase: access.supportCase,
       messages: messages.items,
       messagePage: messages.page,
@@ -104,6 +105,21 @@ export const POST = withBrowserMutation(
           { status: 401 },
         );
       }
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        return supportPrivateJson(
+          context,
+          request,
+          { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+          { status: 428 },
+        );
+      if (expectedActor !== access.user.id)
+        return supportPrivateJson(
+          context,
+          request,
+          { error: "Account changed", code: "ACTOR_CHANGED" },
+          { status: 409 },
+        );
       if (!access.supportCase) {
         return supportPrivateJson(
           context,
@@ -311,6 +327,21 @@ export const PATCH = withBrowserMutation(
           { status: 401 },
         );
       }
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        return supportPrivateJson(
+          context,
+          request,
+          { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+          { status: 428 },
+        );
+      if (expectedActor !== access.user.id)
+        return supportPrivateJson(
+          context,
+          request,
+          { error: "Account changed", code: "ACTOR_CHANGED" },
+          { status: 409 },
+        );
       if (!access.supportCase) {
         return supportPrivateJson(
           context,

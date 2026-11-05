@@ -67,6 +67,7 @@ it("renders URL-based escaped search inputs and role-specific create forms", () 
   const html = renderToStaticMarkup(
     <LocaleProvider locale="en">
       <SupportCenter
+        actorId="usr_member"
         initialFilters={{
           page: 2,
           q: '<script>alert("x")</script>',
@@ -88,7 +89,7 @@ it("renders URL-based escaped search inputs and role-specific create forms", () 
   expect(html).toContain("font-label");
   const staff = renderToStaticMarkup(
     <LocaleProvider locale="en">
-      <SupportCenter staffMode />
+      <SupportCenter actorId="usr_member" staffMode />
     </LocaleProvider>,
   );
   expect(staff).toContain(`<search aria-label="${getDictionary("en").support.staffFilters}"`);
@@ -154,4 +155,15 @@ it("rejects duplicate/unknown page filters and localizes no-index support metada
     title: getDictionary("ru").support.staffQueue,
     robots: { index: false, follow: false },
   });
+});
+it("remounts support list and thread when the authenticated actor changes", async () => {
+  const id = `sup_${"a".repeat(24)}`;
+  mocks.session.mockResolvedValue({ id: "actor_a", role: "user" });
+  const listA = await SupportPageSurface({});
+  const threadA = await SupportPageSurface({ id });
+  mocks.session.mockResolvedValue({ id: "actor_b", role: "user" });
+  const listB = await SupportPageSurface({});
+  const threadB = await SupportPageSurface({ id });
+  expect(listA.key).not.toBe(listB.key);
+  expect(threadA.key).not.toBe(threadB.key);
 });

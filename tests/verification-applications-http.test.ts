@@ -101,7 +101,7 @@ it.each([
 });
 it("passes exact own command and rejects cross-site, query injection, wrong media and excessive bytes", async () => {
   expect((await amend(request("PATCH", "", input), context)).status).toBe(200);
-  expect(state.amend).toHaveBeenCalledWith({ id: "actor" }, "request", input);
+  expect(state.amend).toHaveBeenCalledWith({ id: "actor" }, "request", input, "token");
   state.amend.mockClear();
   expect(
     (await amend(request("PATCH", "", input, { "sec-fetch-site": "cross-site" }), context)).status,
@@ -139,4 +139,9 @@ it("distinguishes service failure from an empty history", async () => {
   const body = await response.text();
   expect(body).not.toContain("PRIVATE_DATABASE_DETAILS");
   expect(body).not.toContain("items");
+});
+it("rejects an amendment without its initiating session token", async () => {
+  const response = await amend(request("PATCH", "", input, { cookie: "nexus_locale=ru" }), context);
+  expect(response.status).toBe(401);
+  expect(state.amend).not.toHaveBeenCalled();
 });

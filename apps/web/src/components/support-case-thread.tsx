@@ -29,9 +29,11 @@ import { SupportStatusHistory } from "./support-status-history";
 
 export function SupportCaseThread({
   caseId,
+  actorId,
   staffMode = false,
 }: {
   caseId: string;
+  actorId: string;
   staffMode?: boolean;
 }) {
   const { locale, dictionary } = useNexusLocale();
@@ -87,7 +89,6 @@ export function SupportCaseThread({
         if (!isCurrent()) return false;
         const data = await response.json().catch(() => null);
         if (!isCurrent()) return false;
-        const validated = parseSupportThread(data, caseId);
         if (response.status === 404) {
           setSupportCase(null);
           setRelatedContext(null);
@@ -95,6 +96,8 @@ export function SupportCaseThread({
           setError(workspaceCopy.notFound);
           return false;
         }
+        if (data?.actorId !== actorId) throw new Error(copy.caseLoadError);
+        const validated = parseSupportThread(data, caseId);
         if (!response.ok || !validated) throw new Error(copy.caseLoadError);
 
         setSupportCase(validated.supportCase);
@@ -129,7 +132,7 @@ export function SupportCaseThread({
         if (isCurrent()) setLoading(false);
       }
     },
-    [caseId, copy.caseLoadError, messagePage, workspaceCopy.notFound],
+    [caseId, actorId, copy.caseLoadError, messagePage, workspaceCopy.notFound],
   );
 
   useEffect(() => {
@@ -155,9 +158,11 @@ export function SupportCaseThread({
     setSuccess("");
     setError(null);
     try {
-      const actorScope = await resolveSupportRetryActorScope();
+      const actorScope = await resolveSupportRetryActorScope(actorId);
+      if (!actorScope) throw new SupportClientFailure(workspaceCopy.uncertain);
       const attempt = await reserveSupportReplyRetry(caseId, reply.trim(), expectedStatus, {
         actorScope,
+        requirePersistence: true,
         expectedUpdatedAt: supportCase.updatedAt,
       });
       const { key: requestKey, payload } = attempt;
@@ -169,11 +174,15 @@ export function SupportCaseThread({
         headers: {
           "Content-Type": "application/json",
           "Idempotency-Key": requestKey,
+          "x-nexus-actor-id": actorId,
         },
         body: payload,
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
+      if (response.status === 409 && data?.code === "ACTOR_CHANGED") {
+        throw new SupportClientFailure(workspaceCopy.uncertain);
+      }
       if (response.status === 409) {
         // A definitive conflict means this request was not committed.
         clearSupportRetry(`reply:${caseId}`, requestKey, { actorScope });
@@ -246,7 +255,7 @@ export function SupportCaseThread({
         method: "PATCH",
         cache: "no-store",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },
         body: JSON.stringify({ status, expectedStatus, expectedUpdatedAt }),
         signal: AbortSignal.timeout(15_000),
       });
@@ -480,7 +489,7 @@ export function SupportCaseThread({
         </nav>
       )}
 
-      <SupportStatusHistory caseId={caseId} revision={supportCase.updatedAt} />
+      <SupportStatusHistory caseId={caseId} actorId={actorId} revision={supportCase.updatedAt} />
       {supportCase.status !== "closed" ? (
         <form
           onSubmit={(event) => void sendReply(event)}

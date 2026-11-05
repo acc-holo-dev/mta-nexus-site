@@ -261,8 +261,9 @@ Default: публичное enforcement имеет публичную substantiv
 - `POST /api/support/:id` reply: `expectedStatus`; stale → `SUPPORT_MESSAGE_CONFLICT`; closed → `SUPPORT_CASE_CLOSED`; сознательный reply на resolved может reopen атомарно с message+audit. Browser: refresh thread, preserve unsent text, localized conflict; retry explicit.
 - `SupportCaseRepository.updateStatus` требует `expectedStatus`; нет unconditional fallback. Thread pagination cancels obsolete GETs. Page switch disabled while reply/status pending.
 - JSON mutations ≤ 32 KiB streamed bytes; oversized → `413 SUPPORT_BODY_TOO_LARGE` без write; invalid JSON/UTF-8 rejected; Zod field limits; single-flight client forms.
+- `POST /api/support`, `POST /api/support/:id` и `PATCH /api/support/:id` требуют `X-Nexus-Actor-Id` с ID пользователя исходного экрана; отсутствие даёт 428, смена аккаунта — 409 до записи. Клиенты должны передавать этот заголовок. Список, переписка и история возвращают `actorId`, который интерфейс сверяет перед показом данных.
 - Create/reply: canonical UUIDv4 `Idempotency-Key`; SHA-256 fingerprint нормализованных полей; DB key `(actor_id, request_key)`; mismatch → `SUPPORT_IDEMPOTENCY_CONFLICT`; reservation+mutation+audit в одной транзакции; replay → 201 `replayed: true`. Key не авторизует доступ сам по себе; session + ownership/moderation capability сначала. Migration `0033_support_mutation_idempotency`.
-- Reload-safe retry keys в sessionStorage (UUID, digest, reply status, expiry; без subject/message content); 24h; cross-tab/logout guarantee **не** verified (**живой неизвестно** / PROBLEMS).
+- Reload-safe retry keys в sessionStorage (UUID, digest, reply status, expiry; без subject/message content); 24h. Создание обращения и отправка ответа блокируются, если исходный actor не подтверждён или ключ нельзя сохранить и прочитать в sessionStorage. Cross-tab/logout guarantee **не** verified (**живой неизвестно** / PROBLEMS).
 
 **FLOWS.** Support приватен и idempotent; requester open↔resolved; closed — staff; reply в resolved reopen; лимиты 5 новых/час и 30 replies/час. FLOW-19 — проверенный resource/build/receipt context (**цель** расширения).
 

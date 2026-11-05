@@ -71,7 +71,12 @@ export async function SupportPageSurface({
     );
   if (id !== undefined)
     return /^sup_[a-f0-9]{24}$/u.test(id) ? (
-      <SupportCaseThread caseId={id} staffMode={staff} />
+      <SupportCaseThread
+        key={`${actor.id}:${id}`}
+        caseId={id}
+        staffMode={staff}
+        actorId={actor.id}
+      />
     ) : (
       <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
         <ErrorState
@@ -107,13 +112,14 @@ export async function SupportPageSurface({
   return (
     <SupportCenter
       staffMode={staff}
+      actorId={actor.id}
       initialFilters={filters}
       initialDraft={
         filters.draft === "publication" && filters.subject
           ? { category: "other", subject: filters.subject }
           : null
       }
-      key={params.toString()}
+      key={`${actor.id}:${params.toString()}`}
     />
   );
 }

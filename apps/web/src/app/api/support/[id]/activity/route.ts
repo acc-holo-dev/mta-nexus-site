@@ -25,10 +25,13 @@ export function GET(request: NextRequest, context: { params: Promise<{ id: strin
         before,
         request.cookies.get("nexus_session")?.value ?? "",
       );
-      return supportActivitySchema.parse({
-        ...result,
-        items: result.items.map((item) => ({ ...item, createdAt: item.createdAt.toISOString() })),
-      });
+      return {
+        ...supportActivitySchema.parse({
+          ...result,
+          items: result.items.map((item) => ({ ...item, createdAt: item.createdAt.toISOString() })),
+        }),
+        actorId: user.id,
+      };
     },
     200,
     supportWorkspaceError,

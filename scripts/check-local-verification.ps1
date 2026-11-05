@@ -43,7 +43,6 @@ try {
     throw "Disposable Docker verification failed."
   }
 
-  Write-Output "PASS: disposable Docker verification completed typecheck, CI-aligned Vitest (unit without APP_URL, database with APP_URL) and production Next.js build on a fresh database."
 }
 catch {
   $failure = $_
@@ -51,13 +50,18 @@ catch {
 finally {
   if ($owned) {
     & docker compose -p $project -f compose.verify.yaml down --volumes --remove-orphans --timeout 15
-    if ($LASTEXITCODE -ne 0 -and -not $failure) {
-      $failure = [System.Exception]::new("Disposable verification cleanup failed.")
+    if ($LASTEXITCODE -ne 0) {
+      if (-not $failure) { $failure = [System.Exception]::new("Disposable verification cleanup failed.") }
+      else { Write-Warning "Disposable verification cleanup failed after the original error." }
     }
 
     $remainingVolumes = & docker volume ls -q --filter "label=com.docker.compose.project=$project"
-    if ($remainingVolumes -and -not $failure) {
-      $failure = [System.Exception]::new("Disposable verification volumes remain after cleanup.")
+    if ($LASTEXITCODE -ne 0) {
+      if (-not $failure) { $failure = [System.Exception]::new("Cannot verify disposable verification volume cleanup.") }
+      else { Write-Warning "Cannot verify disposable verification volume cleanup after the original error." }
+    } elseif ($remainingVolumes) {
+      if (-not $failure) { $failure = [System.Exception]::new("Disposable verification volumes remain after cleanup.") }
+      else { Write-Warning "Disposable verification volumes remain after cleanup." }
     }
   }
 
@@ -72,3 +76,4 @@ finally {
 if ($failure) {
   throw $failure
 }
+Write-Output "PASS: disposable Docker verification completed typecheck, CI-aligned Vitest (unit without APP_URL, database with APP_URL) and production Next.js build on a fresh database."

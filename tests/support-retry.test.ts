@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  clearSupportRetry,
   reserveSupportCaseRetry,
   reserveSupportReplyRetry,
-  clearSupportRetry,
   resolveSupportRetryActorScope,
   type SupportRetryStorage,
 } from "../apps/web/src/lib/support-retry";
@@ -276,4 +276,71 @@ it("reuses the original revision and key after an ambiguous reply even when the 
   });
   expect(next.key).toBe(B);
   expect(JSON.parse(next.payload).expectedUpdatedAt).toBe("2026-10-11T00:00:00.001Z");
+});
+it("does not overwrite a different actor retry slot after the session changes", async () => {
+  const actorA = `usr_${"1".repeat(24)}`;
+  const actorB = `usr_${"2".repeat(24)}`;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(
+      async () =>
+        new Response(JSON.stringify({ authenticated: true, user: { id: actorB } }), {
+          status: 200,
+        }),
+    ),
+  );
+  const storage = store();
+  const scopeB = await resolveSupportRetryActorScope(actorB);
+  expect(scopeB).toBeTruthy();
+  await reserveSupportCaseRetry("existing B request", {
+    actorScope: scopeB,
+    storage,
+    now: NOW,
+    newKey: () => B,
+  });
+  const before = storage.dump();
+  const scopeForA = await resolveSupportRetryActorScope(actorA);
+  expect(scopeForA).toBeNull();
+  await reserveSupportCaseRetry("private A request", {
+    actorScope: scopeForA,
+    storage,
+    now: NOW,
+    newKey: () => A,
+  });
+  expect(storage.dump()).toBe(before);
+});
+it("rejects case and reply reservations when durable session storage cannot be read or written", async () => {
+  const denied: SupportRetryStorage = {
+    getItem: () => {
+      throw new Error("denied");
+    },
+    setItem: () => {
+      throw new Error("denied");
+    },
+    removeItem: () => {},
+  };
+  const options = {
+    storage: denied,
+    actorScope: ACTOR_A,
+    requirePersistence: true,
+    now: NOW,
+    newKey: () => A,
+  };
+  await expect(reserveSupportCaseRetry("case", options)).rejects.toThrow(
+    "Support retry storage unavailable",
+  );
+  await expect(reserveSupportReplyRetry(CASE_ID, "reply", "open", options)).rejects.toThrow(
+    "Support retry storage unavailable",
+  );
+  const noWrite: SupportRetryStorage = {
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+  };
+  await expect(reserveSupportCaseRetry("case", { ...options, storage: noWrite })).rejects.toThrow(
+    "Support retry storage unavailable",
+  );
+  await expect(
+    reserveSupportReplyRetry(CASE_ID, "reply", "open", { ...options, storage: noWrite }),
+  ).rejects.toThrow("Support retry storage unavailable");
 });

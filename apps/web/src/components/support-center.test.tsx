@@ -27,7 +27,7 @@ describe("staff support queue UI", () => {
     const copy = getDictionary(locale).support;
     const staff = renderToStaticMarkup(
       <LocaleProvider locale={locale}>
-        <SupportCenter staffMode />
+        <SupportCenter actorId="usr_member" staffMode />
       </LocaleProvider>,
     );
     expect(staff).toContain(`<search aria-label="${copy.staffFilters}"`);
@@ -41,6 +41,7 @@ describe("staff support queue UI", () => {
     const customer = renderToStaticMarkup(
       <LocaleProvider locale={locale}>
         <SupportCenter
+          actorId="usr_member"
           initialContext={{
             productId: `prd_${"a".repeat(24)}`,
             buildId: `bld_${"b".repeat(24)}`,

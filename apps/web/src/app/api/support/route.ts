@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
         token,
       );
       return supportPrivateJson(context, request, {
+        actorId: user.id,
         cases: result.items.map((row) => ({
           ...row.supportCase,
           requesterUsername: row.requesterUsername,
@@ -73,6 +74,7 @@ export async function GET(request: NextRequest) {
       token,
     );
     return supportPrivateJson(context, request, {
+      actorId: user.id,
       cases: result.items,
       page: result.page,
       totalPages: result.totalPages,
@@ -98,6 +100,21 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    const expectedActor = request.headers.get("x-nexus-actor-id");
+    if (!expectedActor)
+      return supportPrivateJson(
+        context,
+        request,
+        { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+        { status: 428 },
+      );
+    if (expectedActor !== user.id)
+      return supportPrivateJson(
+        context,
+        request,
+        { error: "Account changed", code: "ACTOR_CHANGED" },
+        { status: 409 },
+      );
     supportMutationGuard(request);
     const body = await parseBoundedJson(request);
     if (!body.ok && body.reason === "too_large") {

@@ -504,8 +504,9 @@ export async function OrderCaseDetailPage({
         <Pagination page={result.page} totalPages={result.totalPages} locale={locale} />
       </section>
       <SupportCaseThread
-        key={`${caseId}:${result.case.supportUpdatedAt.toISOString()}`}
+        key={`${actor.id}:${caseId}:${result.case.supportUpdatedAt.toISOString()}`}
         caseId={caseId}
+        actorId={actor.id}
         staffMode={staff}
       />
     </div>

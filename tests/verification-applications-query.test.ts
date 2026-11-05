@@ -201,8 +201,11 @@ it("locks ownership and current profile before replacing only evidence, with a m
     [["submission"]],
     [["developer", false]],
     [[["Lua"], "https://example.test", false]],
+    [["actor"]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
   ];
-  expect(await repo.amend("actor", "request", input, audit)).toEqual({
+  expect(await repo.amend("actor", "request", input, audit, "unit-token")).toEqual({
     id: "request",
     status: "pending",
     revision: version("request", "pending", "new-audit"),
@@ -229,12 +232,14 @@ it.each([
   { targetType: "server", code: "VERIFICATION_APPLICATION_READ_ONLY" },
 ])("rejects resolved or MTA-proof mutations %j", async ({ code, ...extra }) => {
   state.rows = [[request(extra)]];
-  await expect(repo.amend("actor", "request", input, audit)).rejects.toMatchObject({ code });
+  await expect(repo.amend("actor", "request", input, audit, "unit-token")).rejects.toMatchObject({
+    code,
+  });
   expect(writes("verification_requests")).toHaveLength(0);
 });
 it("rejects an obsolete author version before target checks or evidence writes", async () => {
   state.rows = [[request()], [["newer-submission"]]];
-  await expect(repo.amend("actor", "request", input, audit)).rejects.toMatchObject({
+  await expect(repo.amend("actor", "request", input, audit, "unit-token")).rejects.toMatchObject({
     code: "VERIFICATION_APPLICATION_CHANGED",
   });
   expect(state.queries).toHaveLength(2);
@@ -249,7 +254,7 @@ it.each(["member", "owner", null])(
       [["other-owner", false]],
       role ? [[role]] : [],
     ];
-    await expect(repo.amend("actor", "request", input, audit)).rejects.toMatchObject({
+    await expect(repo.amend("actor", "request", input, audit, "unit-token")).rejects.toMatchObject({
       code: "VERIFICATION_AUTHORITY_CHANGED",
     });
     expect(writes("verification_requests")).toHaveLength(0);
@@ -261,9 +266,12 @@ it("propagates audit failures instead of reporting a saved version", async () =>
     [["submission"]],
     [["developer", false]],
     [[["Lua"], "https://example.test", false]],
+    [["actor"]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
+    [["session", "2099-01-01T00:00:00.000Z"]],
   ];
   state.failAudit = true;
-  await expect(repo.amend("actor", "request", input, audit)).rejects.toMatchObject({
+  await expect(repo.amend("actor", "request", input, audit, "unit-token")).rejects.toMatchObject({
     cause: { message: "audit failed" },
   });
 });

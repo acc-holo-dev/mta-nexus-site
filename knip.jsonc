@@ -8,8 +8,9 @@
       // Browser checks install Playwright into an isolated prefix in the shell runners.
       // `postgres` is consumed by root operational scripts via the @nexus/db workspace install.
       "ignoreDependencies": ["@playwright/test", "@axe-core/playwright", "postgres"],
-      // OpenSSL is an OS dependency of the closed TLS provider test.
-      "ignoreBinaries": ["openssl"]
+      // OpenSSL is an OS dependency of the closed TLS provider test; pwsh is an
+      // optional system runtime for the PowerShell local-verification mock test.
+      "ignoreBinaries": ["openssl", "pwsh"]
     },
     "apps/web": {
       "entry": ["scripts/**/*.ts"],

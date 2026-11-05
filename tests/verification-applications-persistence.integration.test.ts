@@ -15,6 +15,28 @@ import {
 } from "@nexus/db";
 import { and, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
+import { digestSessionToken } from "../packages/db/src/repositories/sessions";
+import { sessions, users } from "../packages/db/src/schema";
+
+function deferred() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
+async function waitBlocked(pid: number) {
+  const deadline = Date.now() + 3000;
+  while (Date.now() < deadline) {
+    const [row] = await db.execute<{ blocked: boolean }>(
+      sql`select exists(select 1 from pg_stat_activity where datname=current_database() and ${pid}=any(pg_blocking_pids(pid))) as blocked`,
+    );
+    if (row?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  throw new Error("Amendment did not reach the expected lock");
+}
 
 async function user(role: "developer" | "moderator" = "developer") {
   const suffix = randomUUID().replaceAll("-", "").slice(0, 16),
@@ -83,6 +105,7 @@ async function amend(
       targetId: id,
       targetType: "verification",
     },
+    `tok_${actorId}`,
   );
 }
 const resolutionAudits = (id: string) =>
@@ -300,3 +323,105 @@ it("traverses equal-microsecond own history in both directions without a removed
     repo.applications(actorId, { ...filters, status: "all", cursor: anchor }),
   ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
 });
+it("rejects amendment after session revocation while waiting on the application", async () => {
+  const actorId = await user(),
+    application = await request(actorId),
+    previous = await repo.application(actorId, application.id);
+  const ready = deferred(),
+    release = deferred();
+  let pid = 0;
+  const blocker = db.transaction(async (tx) => {
+    const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+    pid = Number(row.pid);
+    await tx
+      .select({ id: verificationRequests.id })
+      .from(verificationRequests)
+      .where(eq(verificationRequests.id, application.id))
+      .for("update");
+    ready.resolve();
+    await release.promise;
+    await tx.delete(sessions).where(eq(sessions.token, digestSessionToken(`tok_${actorId}`)));
+  });
+  try {
+    await Promise.race([ready.promise, blocker]);
+    const pending = amend(actorId, application.id, previous.revision).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    await waitBlocked(pid);
+    release.resolve();
+    await blocker;
+    expect(await pending).toMatchObject({ code: "UNAUTHORIZED" });
+    const [stored] = await db
+      .select()
+      .from(verificationRequests)
+      .where(eq(verificationRequests.id, application.id));
+    expect(stored.proofUrl).toBe("https://example.test/old");
+    expect(
+      (await db.select().from(auditEvents).where(eq(auditEvents.targetId, application.id))).filter(
+        (a) => a.action === "verification.application_updated",
+      ),
+    ).toHaveLength(0);
+  } finally {
+    release.resolve();
+    await blocker.catch(() => {});
+    await db.delete(verificationRequests).where(eq(verificationRequests.id, application.id));
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, actorId));
+    await db.delete(users).where(eq(users.id, actorId));
+  }
+}, 15000);
+it("rolls back amendment if the initiating session expires during an audit wait", async () => {
+  const actorId = await user(),
+    application = await request(actorId),
+    previous = await repo.application(actorId, application.id),
+    auditId = `aud_wait_${randomUUID()}`;
+  const expiresAt = new Date(Date.now() + 4000);
+  await db
+    .update(sessions)
+    .set({ expiresAt })
+    .where(eq(sessions.token, digestSessionToken(`tok_${actorId}`)));
+  const ready = deferred(),
+    release = deferred();
+  let pid = 0;
+  const blocker = db.transaction(async (tx) => {
+    const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+    pid = Number(row.pid);
+    await tx.insert(auditEvents).values({
+      id: auditId,
+      actorId,
+      actorType: "user",
+      action: "fixture",
+      targetType: "verification",
+      targetId: application.id,
+    });
+    ready.resolve();
+    await release.promise;
+    throw new Error("rollback fixture");
+  });
+  try {
+    await Promise.race([ready.promise, blocker]);
+    const pending = amend(actorId, application.id, previous.revision, auditId).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    await waitBlocked(pid);
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.max(0, expiresAt.getTime() - Date.now() + 150)),
+    );
+    release.resolve();
+    await blocker.catch(() => {});
+    expect(await pending).toMatchObject({ code: "UNAUTHORIZED" });
+    const [stored] = await db
+      .select()
+      .from(verificationRequests)
+      .where(eq(verificationRequests.id, application.id));
+    expect(stored.proofUrl).toBe("https://example.test/old");
+    expect(await db.select().from(auditEvents).where(eq(auditEvents.id, auditId))).toHaveLength(0);
+  } finally {
+    release.resolve();
+    await blocker.catch(() => {});
+    await db.delete(verificationRequests).where(eq(verificationRequests.id, application.id));
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, actorId));
+    await db.delete(users).where(eq(users.id, actorId));
+  }
+}, 15000);

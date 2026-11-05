@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
@@ -29,10 +29,13 @@ export const PATCH = withBrowserMutation((request: NextRequest, context: Context
         throw new AppError("Unexpected amendment filters", 400, "VALIDATION_ERROR");
       requireServerJsonContentType(request);
       await verificationRate(actor.id, "verification");
+      const token = request.cookies.get("nexus_session")?.value;
+      if (!token) throw new UnauthorizedError();
       return verificationWorkspaceService.amend(
         actor,
         (await context.params).id,
         await readBoundedJson(request, 16384),
+        token,
       );
     },
     200,

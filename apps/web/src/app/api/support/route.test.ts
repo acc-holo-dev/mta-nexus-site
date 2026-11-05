@@ -78,6 +78,7 @@ const supportHeaders = {
   ...browserMutationHeaders(),
   "content-type": "application/json",
   "Idempotency-Key": "12345678-1234-4234-8234-123456789abc",
+  "x-nexus-actor-id": "usr_member",
 };
 
 function expectPrivate(response: Response) {
@@ -239,7 +240,7 @@ describe("support HTTP authorization and privacy", () => {
     const response = await updateCase(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "PATCH",
-        headers: supportHeaders,
+        headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
         body: JSON.stringify({
           status: "closed",
           expectedStatus: "open",
@@ -555,7 +556,7 @@ describe("support HTTP authorization and privacy", () => {
     const reply = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: supportHeaders,
+        headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
         body: JSON.stringify({ message: "We restored the account.", expectedStatus: "open" }),
       }),
       params,
@@ -583,7 +584,7 @@ describe("support HTTP authorization and privacy", () => {
     const statusResponse = await updateCase(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "PATCH",
-        headers: supportHeaders,
+        headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
         body: JSON.stringify({ status: "resolved", expectedStatus: "open" }),
       }),
       params,
@@ -788,7 +789,7 @@ describe("concurrent support moderation", () => {
     const response = await updateCase(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "PATCH",
-        headers: supportHeaders,
+        headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
         body: JSON.stringify({ status: "closed" }),
       }),
       params,
@@ -815,7 +816,7 @@ describe("concurrent support moderation", () => {
       const response = await updateCase(
         new NextRequest(`https://nexus.test/api/support/${caseId}`, {
           method: "PATCH",
-          headers: supportHeaders,
+          headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
           body: JSON.stringify({ status, expectedStatus: "open" }),
         }),
         params,
@@ -836,7 +837,7 @@ describe("concurrent support moderation", () => {
     const response = await updateCase(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "PATCH",
-        headers: supportHeaders,
+        headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
         body: JSON.stringify({ status: "resolved", expectedStatus: "resolved" }),
       }),
       params,
@@ -861,7 +862,7 @@ describe("concurrent support moderation", () => {
     const response = await updateCase(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "PATCH",
-        headers: supportHeaders,
+        headers: { ...supportHeaders, "x-nexus-actor-id": "usr_staff" },
         body: JSON.stringify({ status: "closed", expectedStatus: "open" }),
       }),
       params,
@@ -1001,6 +1002,7 @@ describe("durable support request replays", () => {
         headers: {
           ...browserMutationHeaders(),
           cookie: supportHeaders.cookie,
+          "x-nexus-actor-id": "usr_member",
           "content-type": "application/json",
         },
         body: JSON.stringify({
@@ -1115,4 +1117,53 @@ describe("support requester workspace lifecycle", () => {
     }
     expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
   });
+});
+it.each([
+  ["create", "POST", createCase],
+  ["reply", "POST", addMessage],
+  ["status", "PATCH", updateCase],
+] as const)(
+  "rejects %s for a different displayed actor before persistence",
+  async (_name, method, handler) => {
+    mocks.session.mockResolvedValue({ id: "usr_other", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "open" });
+    const response = await handler(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method,
+        headers: supportHeaders,
+        body: JSON.stringify({ message: "Must not be sent by a different actor" }),
+      }),
+      params,
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+    expect(mocks.findMutationReplay).not.toHaveBeenCalled();
+    expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
+    expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
+    expect(mocks.updateStatus).not.toHaveBeenCalled();
+  },
+);
+it.each([
+  ["create", "POST", createCase],
+  ["reply", "POST", addMessage],
+  ["status", "PATCH", updateCase],
+] as const)("requires the displayed actor for %s", async (_name, method, handler) => {
+  mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+  mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "open" });
+  const headers = new Headers(supportHeaders);
+  headers.delete("x-nexus-actor-id");
+  const response = await handler(
+    new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+      method,
+      headers,
+      body: JSON.stringify({ message: "A required actor precondition" }),
+    }),
+    params,
+  );
+  expect(response.status).toBe(428);
+  expect(await response.json()).toMatchObject({ code: "ACTOR_ID_REQUIRED" });
+  expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
+  expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
+  expect(mocks.updateStatus).not.toHaveBeenCalled();
 });

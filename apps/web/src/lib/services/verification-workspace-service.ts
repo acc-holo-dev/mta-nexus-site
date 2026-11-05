@@ -76,18 +76,24 @@ class VerificationWorkspaceService {
       hasEarlierEvents: result.hasEarlierEvents,
     };
   }
-  async amend(actor: User, id: string, input: unknown) {
+  async amend(actor: User, id: string, input: unknown, token: string) {
     if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Application");
     const parsed = verificationApplicationAmendSchema.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid evidence", 400, "VALIDATION_ERROR");
-    return verificationWorkspaceRepository.amend(actor.id, id, parsed.data, {
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "user",
-      action: "verification.application_updated",
-      targetId: id,
-      targetType: "verification",
-    });
+    return verificationWorkspaceRepository.amend(
+      actor.id,
+      id,
+      parsed.data,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: "verification.application_updated",
+        targetId: id,
+        targetType: "verification",
+      },
+      token,
+    );
   }
   async overview(actor: User, filters: VerificationQuery) {
     const [profile, history] = await Promise.all([

@@ -86,11 +86,13 @@ export function supportObjectContextHref(context?: SupportFormObjectContext | nu
 }
 
 export function SupportCenter({
+  actorId,
   staffMode = false,
   initialFilters = { page: 1, q: "" },
   initialContext = null,
   initialDraft = null,
 }: {
+  actorId: string;
   staffMode?: boolean;
   initialFilters?: SupportQuery;
   initialContext?: SupportFormObjectContext | null;
@@ -179,6 +181,7 @@ export function SupportCenter({
         }
         const data = await response.json().catch(() => null);
         if (sequence !== loadSequence.current || signal?.aborted) return false;
+        if (data?.actorId !== actorId) throw new Error(copy.loadError);
         const validated = parseSupportCasePage(data);
         if (!response.ok || !validated) throw new Error(copy.loadError);
         setAuthRequired(false);
@@ -196,6 +199,7 @@ export function SupportCenter({
       }
     },
     [
+      actorId,
       copy.loadError,
       page,
       staffMode,
@@ -230,8 +234,12 @@ export function SupportCenter({
     if (objectContext) payloadBody.context = objectContext;
     const payload = JSON.stringify(payloadBody);
     try {
-      const actorScope = await resolveSupportRetryActorScope();
-      const attempt = await reserveSupportCaseRetry(payload, { actorScope });
+      const actorScope = await resolveSupportRetryActorScope(actorId);
+      if (!actorScope) throw new SupportClientFailure(workspaceCopy.uncertain);
+      const attempt = await reserveSupportCaseRetry(payload, {
+        actorScope,
+        requirePersistence: true,
+      });
       const requestKey = attempt.key;
       pendingCreate.current = { payload, key: requestKey };
       const response = await fetch("/api/support", {
@@ -241,6 +249,7 @@ export function SupportCenter({
         headers: {
           "Content-Type": "application/json",
           "Idempotency-Key": requestKey,
+          "x-nexus-actor-id": actorId,
         },
         body: payload,
         signal: AbortSignal.timeout(15_000),

@@ -10,7 +10,15 @@ import { useNexusLocale } from "./locale-context";
 const ghostActionClass =
   "h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
-export function SupportStatusHistory({ caseId, revision }: { caseId: string; revision?: string }) {
+export function SupportStatusHistory({
+  caseId,
+  actorId,
+  revision,
+}: {
+  caseId: string;
+  actorId: string;
+  revision?: string;
+}) {
   const { locale, dictionary } = useNexusLocale(),
     copy = supportWorkspaceCopy(locale);
   const [open, setOpen] = useState(false),
@@ -41,6 +49,7 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
           setError(supportWorkspaceError(locale, body?.code ?? response.status));
           return;
         }
+        if (body?.actorId !== actorId) throw new Error();
         const parsed = supportActivitySchema.safeParse(body);
         if (!parsed.success) throw new Error();
         setData(parsed.data);
@@ -49,7 +58,7 @@ export function SupportStatusHistory({ caseId, revision }: { caseId: string; rev
       }
     })();
     return () => controller.abort();
-  }, [caseId, revision, open, before, retry, locale, copy.historyUnavailable]);
+  }, [caseId, actorId, revision, open, before, retry, locale, copy.historyUnavailable]);
   const label = (status: string) =>
     status === "open"
       ? dictionary.support.open

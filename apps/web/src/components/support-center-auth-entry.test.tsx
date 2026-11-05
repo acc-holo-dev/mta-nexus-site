@@ -70,7 +70,7 @@ afterEach(() => {
 
 it("seeds guest sign-in with the current pathname return target", () => {
   harness.cursor = 0;
-  const gate = SupportCenter({}) as ReactElement<{
+  const gate = SupportCenter({ actorId: "usr_member" }) as ReactElement<{
     locale: "en";
     returnPath?: string | null;
   }>;
