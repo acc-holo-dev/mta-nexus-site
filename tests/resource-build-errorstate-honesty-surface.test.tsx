@@ -19,3 +19,8 @@ it("locks resource build uncertain failures to ErrorState with touch reload", ()
   expect(source).not.toContain('role={uncertain ? "alert" : "status"}');
   expect(source).not.toContain('role="alert"');
 });
+
+it("locks withdrawn product notice to ErrorState without fake retry", () => {
+  expect(source).toContain("{withdrawn ? <ErrorState title={copy.unavailable} /> : null}");
+  expect(source).not.toContain('className="text-warning">{copy.unavailable}</p>');
+});

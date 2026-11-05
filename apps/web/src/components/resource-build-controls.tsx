@@ -112,7 +112,7 @@ export function ResourceBuildControls({
       <p className="text-sm text-muted">
         {copy.revision}: {current.revision} · {copy.statuses[current.status]}
       </p>
-      {withdrawn && <p className="text-warning">{copy.unavailable}</p>}
+      {withdrawn ? <ErrorState title={copy.unavailable} /> : null}
       {current.status === "pending_review" && <p className="text-secondary">{copy.pending}</p>}
       {editable && !withdrawn && (
         <form onSubmit={save} className="space-y-3">
