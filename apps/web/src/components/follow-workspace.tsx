@@ -266,7 +266,7 @@ export function FollowWorkspace({
                       {item.title}
                     </Link>
                   ) : (
-                    <span>{copy.unavailableTarget}</span>
+                    <ErrorState id="follow-unavailable-target" title={copy.unavailableTarget} />
                   )}
                   {item.verified && (
                     <ShieldCheck className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
