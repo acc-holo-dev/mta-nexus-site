@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -61,13 +61,18 @@ export default async function SecurityPage() {
           </h2>
         </div>
         <p className="mt-3 break-all text-sm text-primary">{recoveryEmail?.email ?? user.email}</p>
-        <p className="mt-1 text-xs text-muted">
-          {recoveryEmail
-            ? recoveryEmail.verified
-              ? copy.recoveryVerified
-              : copy.recoveryNeedsVerification
-            : copy.recoveryUnavailable}
-        </p>
+        {recoveryEmail ? (
+          recoveryEmail.verified ? (
+            <p className="mt-1 text-xs text-muted">{copy.recoveryVerified}</p>
+          ) : (
+            <ErrorState
+              id="security-recovery-needs-verification"
+              title={copy.recoveryNeedsVerification}
+            />
+          )
+        ) : (
+          <ErrorState id="security-recovery-unavailable" title={copy.recoveryUnavailable} />
+        )}
       </section>
 
       <section aria-labelledby="security-sessions-heading" className={panelShellClass}>
