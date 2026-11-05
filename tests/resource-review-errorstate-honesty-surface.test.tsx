@@ -31,3 +31,16 @@ it("locks resource review fail/unknown to ErrorState and keeps success as status
   expect(source).not.toContain('role={notice.error ? "alert" : "status"}');
   expect(source).not.toContain('role="alert"');
 });
+
+it("locks resource review eligibility notice to ErrorState and drops soft warning markup", () => {
+  expect(source).toContain(
+    '<ErrorState id="resource-review-eligibility" title={eligibilityNote} />',
+  );
+  expect(source).toMatch(
+    /\{eligibilityNote \? \(\s*<ErrorState id="resource-review-eligibility" title=\{eligibilityNote\} \/>\s*\) : null\}/u,
+  );
+  expect(source).not.toContain('<p role="note" className="text-sm text-warning">');
+  expect(source).not.toMatch(
+    /\{eligibilityNote \? \(\s*<p role="note" className="text-sm text-warning">/u,
+  );
+});
