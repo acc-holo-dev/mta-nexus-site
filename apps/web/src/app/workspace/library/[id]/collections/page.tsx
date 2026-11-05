@@ -174,9 +174,12 @@ export default async function ResourceCollectionsPage({
                 ) : collection.status === "archived" ? (
                   <p className="text-sm text-muted">{c.archivedNote}</p>
                 ) : !mutable ? (
-                  <p className="text-sm text-muted">{c.revisionLocked}</p>
+                  <ErrorState
+                    id="library-resource-collection-revision-locked"
+                    title={c.revisionLocked}
+                  />
                 ) : collection.itemCount >= result.itemLimit ? (
-                  <p className="text-sm text-muted">{c.fullCollection}</p>
+                  <ErrorState id="library-resource-collection-full" title={c.fullCollection} />
                 ) : null}
               </li>
             );
