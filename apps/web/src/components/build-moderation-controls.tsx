@@ -118,6 +118,13 @@ export function BuildModerationControls({
         />
       </label>
 
+      {!hasTrustedCleanScan ? (
+        <ErrorState
+          id="build-moderation-artifact-clean-scan"
+          title={copy.artifactRequiresCleanScan}
+        />
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         {hasTrustedCleanScan ? (
           <a
@@ -127,11 +134,7 @@ export function BuildModerationControls({
             <Download className="h-3.5 w-3.5" aria-hidden="true" />
             {copy.reviewArtifact}
           </a>
-        ) : (
-          <span className="inline-flex min-h-11 items-center rounded-md border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-3 py-2 text-[11px] text-warning">
-            {copy.artifactRequiresCleanScan}
-          </span>
-        )}
+        ) : null}
 
         <Button
           type="button"
