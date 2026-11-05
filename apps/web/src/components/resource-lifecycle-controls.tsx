@@ -17,6 +17,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../lib/private-api-request";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 import { stashSupportObjectContext } from "./support-center";
 
@@ -87,6 +88,19 @@ export function ResourceLifecycleControls({
     });
     if (!parsed.success || !confirmed) {
       setError(copy.errors.RESOURCE_LIFECYCLE_INVALID);
+      return;
+    }
+    if (
+      !(await confirmAction({
+        title: labels[action],
+        object: product.id,
+        consequences: notes[action],
+        confirmLabel: labels[action],
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        ...(action === "archive" ? {} : { danger: false }),
+      }))
+    ) {
       return;
     }
     lock.current = true;
