@@ -395,13 +395,19 @@ export function ServerReviewPanel({
               </p>
             )}
             {mine?.eligibility === "follow_required" && (
-              <p className="text-xs text-warning">{copy.followRequired}</p>
+              <ErrorState
+                id="server-review-eligibility-follow-required"
+                title={copy.followRequired}
+              />
             )}
             {mine?.eligibility === "owner_conflict" && (
-              <p className="text-xs text-warning">{copy.ownerConflict}</p>
+              <ErrorState
+                id="server-review-eligibility-owner-conflict"
+                title={copy.ownerConflict}
+              />
             )}
             {mine?.eligibility === "moderated" && (
-              <p className="text-xs text-warning">{copy.moderated}</p>
+              <ErrorState id="server-review-eligibility-moderated" title={copy.moderated} />
             )}
             {mine?.canReview ? (
               <form className="space-y-4" onSubmit={onSave}>
