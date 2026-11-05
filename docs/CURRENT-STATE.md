@@ -6,6 +6,9 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `724d05ee` / #499 — build-package legacy/no-baseline ErrorState;
+- `013e12a6` / #498 — resource-build withdrawn ErrorState;
+- `10ff59ba` / #502 — build-package-evidence ErrorState truncated references;
 - `00899a76` / #492 — order-case-review actor suite split;
 - `d69eb9ca` / #493 — notification-inbox-history export suite split;
 - `ae73431f` / #488 — library-collections guards suite split;
