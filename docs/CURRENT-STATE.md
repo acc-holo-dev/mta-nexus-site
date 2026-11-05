@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `fe18d545` — tip advanced after tip honesty (#614) on 0a67416f; tip CI not claimed verified-green under rapid merges;
 - `0a67416f` — tip advanced after resource-review-pages suite split (#608); tip CI not claimed verified-green under rapid merges;
 - `dcc97b66` — tip advanced after register-server recovery (#585), order-case recommendationBlocked (#594), and community-report unknown target (#604); tip CI not claimed verified-green under rapid merges;
 - `bd8edb95` — tip advanced after claim-session (#592) and home-directory unavailable (#593); tip CI not claimed verified-green under rapid merges;
