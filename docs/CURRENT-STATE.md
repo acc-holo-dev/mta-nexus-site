@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `4d180af7` — tip advanced after resource QA ask gating (#583) and tip honesty (#612); tip CI not claimed verified-green under rapid merges;
 - `34dde9ee` — tip advanced after library download/unavailableReason (#602/#603) and tip honesty (#611); tip CI not claimed verified-green under rapid merges;
 - `b6378e5e` — tip advanced after tip honesty (#610) on a3f8f7e8; tip CI not claimed verified-green under rapid merges;
 - `a3f8f7e8` — tip advanced after tip honesty (#609) on 113b9ccc; tip CI not claimed verified-green under rapid merges;
