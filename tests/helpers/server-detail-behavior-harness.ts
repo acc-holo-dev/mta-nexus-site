@@ -1,4 +1,4 @@
-import { type Mock, vi } from "vitest";
+import { beforeEach, type Mock, vi } from "vitest";
 
 export type Deferred<T> = {
   promise: Promise<T>;
@@ -47,48 +47,41 @@ export type ServerDetailBehaviorMocks = {
   session: Mock;
 };
 
-/** Hoisted server fixture shared by server-detail behavior suites. */
-export function createServerDetailBehaviorState(): ServerDetailBehaviorState {
-  return {
-    server: {
-      id: "srv_detail",
-      slug: "detail-server",
-      name: "Detail Server",
-      description: "Server description",
-      ipAddress: "203.0.113.50",
-      port: 22003,
-      status: "active",
-      visibility: "public",
-      isVerified: false,
-      ownerId: null,
-      organizationId: null,
-      gameplayTags: [],
-      mediaUrls: [],
-      maxPlayers: 64,
-      createdAt: new Date("2026-10-01T00:00:00.000Z"),
-      updatedAt: new Date("2026-10-01T00:00:00.000Z"),
-    },
-    notFoundCalls: 0,
-  };
-}
+/** Shared server fixture for server-detail behavior suites. */
+export const state: ServerDetailBehaviorState = {
+  server: {
+    id: "srv_detail",
+    slug: "detail-server",
+    name: "Detail Server",
+    description: "Server description",
+    ipAddress: "203.0.113.50",
+    port: 22003,
+    status: "active",
+    visibility: "public",
+    isVerified: false,
+    ownerId: null,
+    organizationId: null,
+    gameplayTags: [],
+    mediaUrls: [],
+    maxPlayers: 64,
+    createdAt: new Date("2026-10-01T00:00:00.000Z"),
+    updatedAt: new Date("2026-10-01T00:00:00.000Z"),
+  },
+  notFoundCalls: 0,
+};
 
-/** Hoisted service mocks shared by server-detail behavior suites. */
-export function createServerDetailBehaviorMocks(): ServerDetailBehaviorMocks {
-  return {
-    getServer: vi.fn(),
-    directory: vi.fn(),
-    history: vi.fn(),
-    updates: vi.fn(),
-    matches: vi.fn(),
-    liveStatus: vi.fn(),
-    session: vi.fn(),
-  };
-}
+/** Shared service mocks for server-detail behavior suites. */
+export const mocks: ServerDetailBehaviorMocks = {
+  getServer: vi.fn(),
+  directory: vi.fn(),
+  history: vi.fn(),
+  updates: vi.fn(),
+  matches: vi.fn(),
+  liveStatus: vi.fn(),
+  session: vi.fn(),
+};
 
-export function resetServerDetailBehavior(
-  state: ServerDetailBehaviorState,
-  mocks: ServerDetailBehaviorMocks,
-) {
+export function resetServerDetailBehavior() {
   vi.clearAllMocks();
   state.notFoundCalls = 0;
   state.server = {
@@ -102,4 +95,8 @@ export function resetServerDetailBehavior(
   mocks.getServer.mockResolvedValue(state.server);
   mocks.matches.mockReturnValue(true);
   mocks.liveStatus.mockReturnValue("online");
+}
+
+export function setupServerDetailBehavior() {
+  beforeEach(resetServerDetailBehavior);
 }

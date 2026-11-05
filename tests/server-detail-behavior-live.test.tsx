@@ -1,27 +1,30 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
-  createServerDetailBehaviorMocks,
-  createServerDetailBehaviorState,
   deferred,
-  resetServerDetailBehavior,
+  mocks,
+  setupServerDetailBehavior,
+  state,
 } from "./helpers/server-detail-behavior-harness";
 
-const state = vi.hoisted(() => createServerDetailBehaviorState());
-const mocks = vi.hoisted(() => createServerDetailBehaviorMocks());
-
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: mocks.session },
-}));
+vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+  const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
+  return {
+    authService: { getSession: harnessMocks.session },
+  };
+});
 
-vi.mock("next/navigation", () => ({
-  notFound: () => {
-    state.notFoundCalls += 1;
-    throw new Error("NEXT_NOT_FOUND");
-  },
-}));
+vi.mock("next/navigation", async () => {
+  const { state: harnessState } = await import("./helpers/server-detail-behavior-harness");
+  return {
+    notFound: () => {
+      harnessState.notFoundCalls += 1;
+      throw new Error("NEXT_NOT_FOUND");
+    },
+  };
+});
 
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -46,31 +49,43 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
-  serverService: {
-    getServerBySlug: mocks.getServer,
-  },
-}));
+vi.mock("../apps/web/src/lib/services/server-service", async () => {
+  const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
+  return {
+    serverService: {
+      getServerBySlug: harnessMocks.getServer,
+    },
+  };
+});
 
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
-  mtaMasterDirectoryService: {
-    getDirectory: mocks.directory,
-  },
-  matchesMtaEndpoint: mocks.matches,
-  mtaLiveStatus: mocks.liveStatus,
-}));
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () => {
+  const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
+  return {
+    mtaMasterDirectoryService: {
+      getDirectory: harnessMocks.directory,
+    },
+    matchesMtaEndpoint: harnessMocks.matches,
+    mtaLiveStatus: harnessMocks.liveStatus,
+  };
+});
 
-vi.mock("../apps/web/src/lib/services/server-history-service", () => ({
-  serverHistoryService: {
-    getHistoryForServer: mocks.history,
-  },
-}));
+vi.mock("../apps/web/src/lib/services/server-history-service", async () => {
+  const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
+  return {
+    serverHistoryService: {
+      getHistoryForServer: harnessMocks.history,
+    },
+  };
+});
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
-  contentService: {
-    listServerUpdates: mocks.updates,
-  },
-}));
+vi.mock("../apps/web/src/lib/services/content-service", async () => {
+  const { mocks: harnessMocks } = await import("./helpers/server-detail-behavior-harness");
+  return {
+    contentService: {
+      listServerUpdates: harnessMocks.updates,
+    },
+  };
+});
 
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
@@ -175,9 +190,7 @@ vi.mock("../apps/web/src/lib/services/server-review-service", () => ({
 
 import ServerDetailPage from "../apps/web/src/app/servers/[slug]/page";
 
-beforeEach(() => {
-  resetServerDetailBehavior(state, mocks);
-});
+setupServerDetailBehavior();
 
 describe("server detail live directory and history", () => {
   it("starts live directory, stored history and server updates together", async () => {
