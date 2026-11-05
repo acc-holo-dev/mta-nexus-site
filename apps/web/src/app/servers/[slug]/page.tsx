@@ -1,4 +1,4 @@
-import { TrustBadge } from "@nexus/ui";
+import { ErrorState, TrustBadge } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { Cpu, Users } from "lucide-react";
 import type { Metadata } from "next";
@@ -345,7 +345,9 @@ export default async function ServerDetailPage({
             />
           </div>
           {!observedServer && <div className="text-[11px] text-faint">{copy.noObservation}</div>}
-          {directoryIsStale && <div className="text-[11px] text-warning">{copy.staleSnapshot}</div>}
+          {directoryIsStale ? (
+            <ErrorState id="server-directory-stale-snapshot" title={copy.staleSnapshot} />
+          ) : null}
         </div>
 
         <div className="nexus-panel space-y-3 p-6">
