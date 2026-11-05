@@ -11,18 +11,20 @@ type ContentReactionRemoveInteractionHarness = {
 };
 
 /** Props match the fixture literals so real ContentReactions stays assignable. */
+type ReactionInitial = {
+  contentId: "content";
+  slug: "guide";
+  authenticated: true;
+  actorId: string;
+  self: false;
+  reaction: "thanks";
+  counts: { helpful: 2; thanks: 3; insight: 0 };
+};
+
 type ContentReactionsComponent = (props: {
   slug: "guide";
   contentId: "content";
-  initial: {
-    contentId: "content";
-    slug: "guide";
-    authenticated: true;
-    actorId: string;
-    self: false;
-    reaction: "thanks";
-    counts: { helpful: 2; thanks: 3; insight: 0 };
-  };
+  initial: ReactionInitial;
   locale: "en";
 }) => ReactNode;
 
@@ -31,14 +33,14 @@ type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
 type Element = ReactElement<Record<string, unknown>>;
 
 const saved = {
-  contentId: "content" as const,
-  slug: "guide" as const,
-  authenticated: true as const,
+  contentId: "content",
+  slug: "guide",
+  authenticated: true,
   actorId: "actor",
-  self: false as const,
-  reaction: "thanks" as const,
+  self: false,
+  reaction: "thanks",
   counts: { helpful: 2, thanks: 3, insight: 0 },
-};
+} as const satisfies Omit<ReactionInitial, "actorId"> & { actorId: "actor" };
 
 export const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -99,7 +101,7 @@ export function createContentReactionRemoveInteractionHelpers(
       ContentReactions({
         slug: "guide",
         contentId: "content",
-        initial: { ...saved, actorId: harness.actorId },
+        initial: { ...saved, actorId: harness.actorId } satisfies ReactionInitial,
         locale: "en",
       }),
     );
