@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import {
   auditEvents,
+  librarySelectionBatchesRepository as batches,
   builds,
   db,
   entitlementRepository,
@@ -8,7 +9,6 @@ import {
   libraryCollectionItems,
   libraryCollections,
   librarySelectionBatchReceipts,
-  librarySelectionBatchesRepository as batches,
   licenses,
   products,
   resourceLibrarySelections,
@@ -19,10 +19,27 @@ import {
 } from "@nexus/db";
 import type { LibrarySelectionBatchCommand } from "@nexus/domain";
 import { asc, eq, sql } from "drizzle-orm";
-import { expect, it } from "vitest";
-import type { ResourceTransaction } from "../packages/db/src/transaction";
+import { expect } from "vitest";
+import type { ResourceTransaction } from "../../packages/db/src/transaction";
 
-async function identity() {
+export type { LibrarySelectionBatchCommand };
+export {
+  batches,
+  builds,
+  createHash,
+  db,
+  entitlements,
+  eq,
+  libraryCollections,
+  licenses,
+  randomUUID,
+  sessionRepository,
+  sessions,
+  sql,
+};
+
+/** Create a disposable user with a live initiating session. */
+export async function identity() {
   const key = randomUUID().replaceAll("-", ""),
     userId = `usr_lsb_session_${key}`,
     token = `lsb-session-token-${key}`,
@@ -42,7 +59,9 @@ async function identity() {
   });
   return { key, userId, token, sessionId };
 }
-async function fixture(access: "entitlement" | "license" = "entitlement") {
+
+/** Seed product, access, collection membership, and a ready selection-batch command. */
+export async function fixture(access: "entitlement" | "license" = "entitlement") {
   const f = await identity(),
     productId = `prd_lsb_${f.key}`,
     collectionId = `lcol_lsb_${f.key}`,
@@ -113,8 +132,11 @@ async function fixture(access: "entitlement" | "license" = "entitlement") {
     },
   };
 }
-type Fixture = Awaited<ReturnType<typeof fixture>>;
-async function state(f: Fixture) {
+
+export type Fixture = Awaited<ReturnType<typeof fixture>>;
+
+/** Read selections, receipts, and audits owned by the fixture actor. */
+export async function state(f: Fixture) {
   const selections = await db
     .select()
     .from(resourceLibrarySelections)
@@ -133,41 +155,6 @@ async function state(f: Fixture) {
   return { selections, receipts, audits };
 }
 
-for (const invalid of ["missing", "unknown", "digest", "foreign", "expired", "revoked"] as const) {
-  it(`rejects new commands and exact replays with a ${invalid} initiating session`, async () => {
-    const f = await fixture();
-    await batches.command(f.input);
-    const before = await state(f);
-    let token = f.token;
-    if (invalid === "missing") token = "";
-    if (invalid === "unknown") token = `unknown-${randomUUID()}`;
-    if (invalid === "digest") token = createHash("sha256").update(token).digest("hex");
-    if (invalid === "foreign") token = (await identity()).token;
-    if (invalid === "expired")
-      await db
-        .update(sessions)
-        .set({ expiresAt: new Date(0) })
-        .where(eq(sessions.id, f.sessionId));
-    if (invalid === "revoked") await sessionRepository.delete(token);
-    for (const command of [f.input.command, { ...f.input.command, requestId: randomUUID() }])
-      await expect(
-        batches.command({ ...f.input, currentToken: token, command }),
-      ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
-    expect(await state(f)).toEqual(before);
-  });
-}
-
-it("applies once and replays the same receipt without leaking its initiating token", async () => {
-  const f = await fixture(),
-    result = await batches.command(f.input);
-  expect(result.replayed).toBe(false);
-  expect(await batches.command(f.input)).toEqual({ ...result, replayed: true });
-  const saved = await state(f);
-  expect([saved.selections.length, saved.receipts.length, saved.audits.length]).toEqual([1, 1, 2]);
-  expect(JSON.stringify(saved)).not.toContain(f.token);
-  expect(JSON.stringify(saved)).not.toContain(createHash("sha256").update(f.token).digest("hex"));
-});
-
 function deferred<T>() {
   let resolve: (value: T) => void = () => undefined;
   const promise = new Promise<T>((done) => {
@@ -175,6 +162,7 @@ function deferred<T>() {
   });
   return { promise, resolve };
 }
+
 async function waitForLock(pid: number) {
   await expect
     .poll(
@@ -189,7 +177,8 @@ async function waitForLock(pid: number) {
     )
     .toBe(true);
 }
-type Target =
+
+export type Target =
   | "account"
   | "selection-advisory"
   | "actor"
@@ -200,6 +189,7 @@ type Target =
   | "selection"
   | "build"
   | "session";
+
 async function lock(tx: ResourceTransaction, f: Fixture, target: Target) {
   if (target === "account" || target === "selection-advisory") {
     const key =
@@ -235,7 +225,12 @@ async function lock(tx: ResourceTransaction, f: Fixture, target: Target) {
     await tx.select().from(builds).where(eq(builds.id, f.buildId)).for("update");
   else await tx.select().from(sessions).where(eq(sessions.id, f.sessionId)).for("update");
 }
-async function duringWait(
+
+/**
+ * Hold a target lock, start a selection-batch command that must wait, run `action`
+ * during the wait, optionally mutate inside the blocker before release.
+ */
+export async function duringWait(
   f: Fixture,
   target: Target,
   action: () => Promise<void>,
@@ -270,136 +265,3 @@ async function duringWait(
   }
   return pending;
 }
-
-for (const target of [
-  "account",
-  "selection-advisory",
-  "actor",
-  "collection",
-  "member",
-  "product",
-  "grant",
-  "selection",
-  "build",
-] as const) {
-  it(`rejects revocation during the ${target} authority lock wait`, async () => {
-    const f = await fixture();
-    if (target === "selection") {
-      await batches.command(f.input);
-      const preview = await batches.preview(f.userId, f.collectionId, {
-        mode: "latest",
-        productIds: [f.productId],
-      });
-      f.input.command = {
-        ...f.input.command,
-        ...preview.choice,
-        requestId: randomUUID(),
-        previewDigest: preview.previewDigest,
-      };
-      f.input.receiptId += "_next";
-      f.input.auditId += "_next";
-    }
-    const before = await state(f);
-    expect(await duringWait(f, target, () => sessionRepository.delete(f.token))).toMatchObject({
-      error: { code: "UNAUTHORIZED" },
-    });
-    expect(await state(f)).toEqual(before);
-  }, 20000);
-}
-
-it("rechecks current collection status after waiting for its owner row", async () => {
-  const f = await fixture(),
-    before = await state(f);
-  expect(
-    await duringWait(
-      f,
-      "collection",
-      async () => {},
-      (tx) =>
-        tx
-          .update(libraryCollections)
-          .set({
-            status: "archived",
-            revision: sql`${libraryCollections.revision} + 1`,
-            updatedAt: sql`clock_timestamp()`,
-          })
-          .where(eq(libraryCollections.id, f.collectionId)),
-    ),
-  ).toMatchObject({ error: { code: "COLLECTION_ARCHIVED" } });
-  expect(await state(f)).toEqual(before);
-}, 20000);
-
-it.each([false, true])(
-  "rechecks session revocation after the session-row wait (replay=%s)",
-  async (replay) => {
-    const f = await fixture();
-    if (replay) await batches.command(f.input);
-    const before = await state(f);
-    expect(
-      await duringWait(
-        f,
-        "session",
-        async () => {},
-        (tx) => tx.delete(sessions).where(eq(sessions.id, f.sessionId)),
-      ),
-    ).toMatchObject({ error: { code: "UNAUTHORIZED" } });
-    expect(await state(f)).toEqual(before);
-  },
-  20000,
-);
-
-for (const expiry of ["session", "entitlement", "license"] as const) {
-  it(`rejects ${expiry} expiry during the session-row wait using fresh time`, async () => {
-    const f = await fixture(expiry === "license" ? "license" : "entitlement"),
-      before = await state(f),
-      expiresAt = new Date(Date.now() + 2000);
-    if (expiry === "session")
-      await db.update(sessions).set({ expiresAt }).where(eq(sessions.id, f.sessionId));
-    else if (expiry === "entitlement")
-      await db.update(entitlements).set({ expiresAt }).where(eq(entitlements.id, f.accessId));
-    else await db.update(licenses).set({ expiresAt }).where(eq(licenses.id, f.accessId));
-    expect(
-      await duringWait(f, "session", async () => {
-        expect(Date.now()).toBeLessThan(expiresAt.getTime());
-        await expect
-          .poll(() => Date.now(), { timeout: 5000, interval: 10 })
-          .toBeGreaterThanOrEqual(expiresAt.getTime());
-      }),
-    ).toMatchObject({
-      error: { code: expiry === "session" ? "UNAUTHORIZED" : "SELECTION_BATCH_UNAVAILABLE" },
-    });
-    expect(await state(f)).toEqual(before);
-  }, 20000);
-}
-
-it("rejects a new safe latest build published during the session wait", async () => {
-  const f = await fixture(),
-    before = await state(f);
-  expect(
-    await duringWait(f, "session", async () => {
-      await db.insert(builds).values({
-        id: `${f.buildId}_new`,
-        productId: f.productId,
-        version: "2.0.0",
-        status: "published",
-        scanStatus: "clean",
-        scanner: "integration-test",
-        scannedAt: new Date(),
-        storageKey: `fixture/${f.key}_new.zip`,
-        sha256Hash: "b".repeat(64),
-        fileSizeBytes: 8,
-      });
-    }),
-  ).toMatchObject({ error: { code: "SELECTION_BATCH_CHANGED" } });
-  expect(await state(f)).toEqual(before);
-}, 20000);
-
-it("rejects a valid foreign caller before reading or changing another owner's batch", async () => {
-  const f = await fixture(),
-    other = await identity(),
-    before = await state(f);
-  await expect(
-    batches.command({ ...f.input, userId: other.userId, currentToken: other.token }),
-  ).rejects.toMatchObject({ statusCode: 404 });
-  expect(await state(f)).toEqual(before);
-});
