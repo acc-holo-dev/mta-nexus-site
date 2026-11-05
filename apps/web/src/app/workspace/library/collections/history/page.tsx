@@ -220,7 +220,10 @@ export default async function Page({
                         {item.currentCollection.revision}
                       </p>
                     ) : (
-                      <p className="text-muted">{h.noCurrent}</p>
+                      <ErrorState
+                        id="library-collection-history-current-unavailable"
+                        title={h.noCurrent}
+                      />
                     )}
                     {command && "sourceCollectionId" in command && (
                       <p className="break-all text-sm">
