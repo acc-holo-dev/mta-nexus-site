@@ -202,7 +202,7 @@ export function OrganizationWorkspacePanel({
       >
         {organizationTeamCopy(locale).title}
       </Link>
-      {!manageable && <p className="nexus-panel p-4 text-sm text-muted">{copy.readOnly}</p>}
+      {!manageable && <ErrorState id="organization-workspace-readonly" title={copy.readOnly} />}
       <OrganizationProfileForm
         key={`${actorId}:${data.organization.id}`}
         locale={locale}
