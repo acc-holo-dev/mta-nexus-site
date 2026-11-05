@@ -82,6 +82,7 @@ export default async function SavedPage({
       <FollowWorkspace
         key={`${type}:${query}`}
         initial={initial}
+        actorId={actor.id}
         type={type}
         query={query}
         locale={locale}

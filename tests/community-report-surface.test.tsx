@@ -170,7 +170,7 @@ it.each(["en", "ru"] as const)(
 it("renders the report entry point with an accessible target-independent label", () => {
   expect(
     renderToStaticMarkup(
-      <CommunityReportForm targetType="comment" targetId="comment" locale="ru" authenticated />,
+      <CommunityReportForm targetType="comment" targetId="comment" locale="ru" actorId="actor" />,
     ),
   ).toContain(communityReportCopy("ru").report);
 });

@@ -73,7 +73,7 @@ function renderGuestForm() {
       targetType: "comment",
       targetId: "comment",
       locale: "en",
-      authenticated: false,
+      actorId: null,
     }),
   );
 }

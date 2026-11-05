@@ -77,7 +77,9 @@ function descendants(node: ReactNode): Element[] {
 }
 function render(locale: "en" | "ru" = "en") {
   harness.cursor = 0;
-  return descendants(FollowWorkspace({ initial: initialPage, query: "", locale }));
+  return descendants(
+    FollowWorkspace({ actorId: "usr_1", initial: initialPage, query: "", locale }),
+  );
 }
 function removeButton(nodes: Element[], locale: "en" | "ru") {
   const label = `${followCopy(locale).remove}: Team`;
@@ -124,7 +126,7 @@ it("deletes a saved follow only after confirmAction approves removal", async () 
   expect(harness.fetch.mock.calls[0][0]).toBe("/api/follow");
   expect(harness.fetch.mock.calls[0][1]).toMatchObject({
     method: "DELETE",
-    body: JSON.stringify({ targetType: "organization", targetId: "org" }),
+    body: JSON.stringify({ targetType: "organization", targetId: "org", expectedActorId: "usr_1" }),
   });
 });
 it.each(["en", "ru"] as const)(
@@ -135,6 +137,7 @@ it.each(["en", "ru"] as const)(
     const copy = followCopy(locale);
     const html = renderToStaticMarkup(
       FollowWorkspace({
+        actorId: "usr_1",
         initial: { items: [], hasMore: false, nextCursor: null },
         query: "",
         locale,
@@ -153,7 +156,9 @@ it.each(["en", "ru"] as const)(
     harness.cursor = 0;
     harness.slots = [];
     const copy = followCopy(locale);
-    const html = renderToStaticMarkup(FollowWorkspace({ initial: null, query: "", locale }));
+    const html = renderToStaticMarkup(
+      FollowWorkspace({ actorId: "usr_1", initial: null, query: "", locale }),
+    );
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageError);
     expect(html).toContain(copy.retry);

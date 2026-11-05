@@ -154,7 +154,7 @@ it.each(["en", "ru"] as const)(
       nextCursor: '{"id":"f","createdAt":"2026-10-10T12:00:00.000000Z"}',
     };
     const html = renderToStaticMarkup(
-      <FollowWorkspace initial={initial} query="" locale={locale} />,
+      <FollowWorkspace actorId="usr_1" initial={initial} query="" locale={locale} />,
     );
     for (const key of ["user", "server", "organization", "product"] as const)
       expect(html).toContain(followCopy(locale)[key]);
@@ -168,11 +168,14 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("keeps failed follow reads separate from true empty states", () => {
-  const failed = renderToStaticMarkup(<FollowWorkspace initial={null} query="" locale="ru" />);
+  const failed = renderToStaticMarkup(
+    <FollowWorkspace actorId="usr_1" initial={null} query="" locale="ru" />,
+  );
   expect(failed).toContain('role="alert"');
   expect(failed).not.toContain(followCopy("ru").empty);
   const empty = renderToStaticMarkup(
     <FollowWorkspace
+      actorId="usr_1"
       initial={{ items: [], hasMore: false, nextCursor: null }}
       query=""
       locale="ru"
@@ -330,6 +333,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const html = renderToStaticMarkup(
       <FollowWorkspace
+        actorId="usr_1"
         locale={locale}
         query=""
         type="content"
@@ -370,7 +374,7 @@ it.each(["en", "ru"] as const)(
         targetType="content"
         targetId="article"
         targetName="Article"
-        initial={{ authenticated: true, following: true }}
+        initial={{ authenticated: true, actorId: "usr_1", following: true }}
       />,
     );
     expect(html).toContain('aria-pressed="true"');
@@ -391,7 +395,7 @@ it.each(["en", "ru"] as const)(
         targetType="product"
         targetId="resource"
         targetName="Pack"
-        initial={{ authenticated: true, following: false }}
+        initial={{ authenticated: true, actorId: "usr_1", following: false }}
       />,
     );
     expect(html).toContain(action.follow);

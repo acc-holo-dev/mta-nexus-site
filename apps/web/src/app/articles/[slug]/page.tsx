@@ -174,7 +174,7 @@ export default async function ArticleDetailPage({
           targetType="content"
           targetId={article.id}
           locale={locale}
-          authenticated={!!viewer}
+          actorId={viewer?.id ?? null}
         />
       )}
 

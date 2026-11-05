@@ -685,6 +685,7 @@ class FollowWorkspaceRepository {
     targetId: string,
     duration: ObjectMuteDuration | null,
     id: string,
+    token: string,
   ) {
     if (!validDiscussionId(targetId))
       throw new AppError("Invalid mute target", 400, "VALIDATION_ERROR");
@@ -694,6 +695,13 @@ class FollowWorkspaceRepository {
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify(["mute", actorId, targetType, targetId])}, 0))`,
       );
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, actorId))
+        .for("share");
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, actorId, token);
       const key = and(
         eq(objectNotificationMutes.userId, actorId),
         eq(objectNotificationMutes.targetType, targetType),
@@ -701,6 +709,7 @@ class FollowWorkspaceRepository {
       );
       if (duration === null) {
         await tx.delete(objectNotificationMutes).where(key);
+        await lockInitiatingSession(tx, actorId, token);
         return { muted: false, mutedUntil: null as string | null };
       }
       // Mute does not require an existing follow — independent of unfollow/watch.
@@ -731,6 +740,7 @@ class FollowWorkspaceRepository {
           mutedUntil: sql<string>`to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
         });
       if (!upserted) throw new AppError("Mute could not be confirmed", 503, "UNCONFIRMED");
+      await lockInitiatingSession(tx, actorId, token);
       return { muted: true, mutedUntil: upserted.mutedUntil };
     });
   }

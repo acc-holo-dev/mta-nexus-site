@@ -113,6 +113,7 @@ describe("social and notification HTTP state contract", () => {
     expectPrivate(anonymous);
     expect(await anonymous.json()).toEqual({
       authenticated: false,
+      actorId: null,
       following: false,
       notifyComments: false,
       muted: false,
@@ -130,6 +131,7 @@ describe("social and notification HTTP state contract", () => {
     expectPrivate(authenticated);
     expect(await authenticated.json()).toEqual({
       authenticated: true,
+      actorId: "usr_1",
       following: true,
       notifyComments: true,
       muted: false,
@@ -149,7 +151,11 @@ describe("social and notification HTTP state contract", () => {
 
   it("confirms a committed follow without Next.js after() notification dispatch", async () => {
     const response = await follow(
-      makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
+      makeRequest(
+        "/api/follow",
+        "POST",
+        '{"targetType":"user","targetId":"usr_2","expectedActorId":"usr_1"}',
+      ),
     );
     expect(response.status).toBe(200);
     expectPrivate(response);
@@ -165,7 +171,11 @@ describe("social and notification HTTP state contract", () => {
     state.follow = null;
     state.following = false;
     const response = await follow(
-      makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'),
+      makeRequest(
+        "/api/follow",
+        "POST",
+        '{"targetType":"user","targetId":"usr_2","expectedActorId":"usr_1"}',
+      ),
     );
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ code: "UNCONFIRMED" });
@@ -173,7 +183,11 @@ describe("social and notification HTTP state contract", () => {
 
   it("returns canonical unfollow state and rejects unbounded IDs", async () => {
     const response = await unfollow(
-      makeRequest("/api/follow", "DELETE", '{"targetType":"user","targetId":"usr_2"}'),
+      makeRequest(
+        "/api/follow",
+        "DELETE",
+        '{"targetType":"user","targetId":"usr_2","expectedActorId":"usr_1"}',
+      ),
     );
     expect(await response.json()).toMatchObject({
       success: true,

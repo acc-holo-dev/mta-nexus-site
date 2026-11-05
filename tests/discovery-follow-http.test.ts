@@ -58,7 +58,15 @@ function request(path: string, method = "GET", body?: unknown, locale = "en", he
       "content-type": "application/json",
       ...headers,
     },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    ...(body === undefined
+      ? {}
+      : {
+          body: JSON.stringify(
+            path === "/api/follow" && body && typeof body === "object" && !Array.isArray(body)
+              ? { expectedActorId: "actor", ...body }
+              : body,
+          ),
+        }),
   });
 }
 beforeEach(() => {
@@ -323,3 +331,19 @@ it("paginates saved discussions within the authenticated reader's own workspace"
     cursor: undefined,
   });
 });
+
+it.each([POST, DELETE])(
+  "rejects a follow command for the previously displayed account after cookie switch",
+  async (handler) => {
+    const response = await handler(
+      request("/api/follow", handler === POST ? "POST" : "DELETE", {
+        targetType: "server",
+        targetId: "target",
+        expectedActorId: "previous_actor",
+      }),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+    expect(mocks.setFollowing).not.toHaveBeenCalled();
+  },
+);

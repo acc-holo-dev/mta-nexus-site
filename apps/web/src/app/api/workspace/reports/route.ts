@@ -26,6 +26,10 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
+      const expectedActor = request.headers.get("x-nexus-actor-id");
+      if (!expectedActor)
+        throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (expectedActor !== actor.id) throw new AppError("Actor changed", 409, "ACTOR_CHANGED");
       requireServerJsonContentType(request);
       const parsed = communityReportCreateSchema.safeParse(await readBoundedJson(request));
       if (!parsed.success) throw new AppError("Invalid report", 400, "VALIDATION_ERROR");

@@ -22,12 +22,14 @@ const actionLinkClass =
 
 export function FollowWorkspace({
   initial,
+  actorId,
   type,
   query,
   locale,
   sectionLabelledBy,
 }: {
   initial: FollowPage | null;
+  actorId: string;
   type?: FollowTargetType;
   query: string;
   locale: Locale;
@@ -88,6 +90,7 @@ export function FollowWorkspace({
         request.signal,
         followError,
       );
+      if (data?.actorId !== actorId) throw new Error(copy.unconfirmed);
       const parsed = followPageSchema.safeParse(data);
       if (!parsed.success) throw new Error(copy.unconfirmed);
       if (!alive.current) return;
@@ -132,7 +135,7 @@ export function FollowWorkspace({
         "/api/follow",
         locale,
         "DELETE",
-        { targetType: item.targetType, targetId: item.targetId },
+        { targetType: item.targetType, targetId: item.targetId, expectedActorId: actorId },
         request.signal,
         followError,
       );

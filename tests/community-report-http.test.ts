@@ -45,6 +45,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
       ...browserMutationHeaders(),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
+      "x-nexus-actor-id": "actor",
       ...headers,
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
@@ -199,4 +200,11 @@ it("rejects a missing initiating cookie before reading a decision body", async (
   expect((await PATCH(req, context)).status).toBe(401);
   expect(read).not.toHaveBeenCalled();
   expect(mocks.decide).not.toHaveBeenCalled();
+});
+it("requires the displayed actor before creating a community report", async () => {
+  const missing = await POST(request("POST", report, "", { "x-nexus-actor-id": "" }));
+  expect(missing.status).toBe(428);
+  const changed = await POST(request("POST", report, "", { "x-nexus-actor-id": "other" }));
+  expect(changed.status).toBe(409);
+  expect(mocks.submit).not.toHaveBeenCalled();
 });

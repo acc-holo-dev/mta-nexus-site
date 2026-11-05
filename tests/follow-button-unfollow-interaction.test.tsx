@@ -50,7 +50,7 @@ import { FollowButton } from "../apps/web/src/components/follow-button";
 import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 
 type Element = ReactElement<Record<string, unknown>>;
-const initial = { authenticated: true, following: true };
+const initial = { authenticated: true, actorId: "usr_1", following: true };
 function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
@@ -122,4 +122,13 @@ it("skips unfollow when confirmation is cancelled", async () => {
   await (toggle(render()).props.onClick as () => Promise<void>)();
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(toggle(render()).props["aria-pressed"]).toBe(true);
+});
+
+it("binds the displayed account to the unfollow request after an account switch", async () => {
+  harness.fetch.mockResolvedValueOnce(response({ code: "ACTOR_CHANGED" }, 409));
+  await (toggle(render()).props.onClick as () => Promise<void>)();
+  expect(JSON.parse(harness.fetch.mock.calls[0][1].body)).toMatchObject({
+    expectedActorId: "usr_1",
+  });
+  expect(render().some((node) => node.props["aria-pressed"] === true)).toBe(false);
 });

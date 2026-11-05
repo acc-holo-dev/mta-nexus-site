@@ -89,6 +89,10 @@ export const POST = withBrowserMutation((request: NextRequest) =>
       requireServerJsonContentType(request);
       const parsed = objectMuteCommandSchema.safeParse(await readBoundedJson(request, 32 * 1024));
       if (!parsed.success) throw new AppError("Invalid mute command", 400, "VALIDATION_ERROR");
+      if (!parsed.data.expectedActorId)
+        throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (parsed.data.expectedActorId !== actor.id)
+        throw new AppError("Account changed", 409, "ACTOR_CHANGED");
       const { targetType, targetId, duration } = parsed.data;
       const result = await followWorkspaceService.setObjectMute(
         actor.id,
@@ -96,6 +100,7 @@ export const POST = withBrowserMutation((request: NextRequest) =>
         targetId,
         duration,
         generateId("omi"),
+        request.cookies.get("nexus_session")?.value ?? "",
       );
       return {
         success: true,

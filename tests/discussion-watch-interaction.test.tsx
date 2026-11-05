@@ -47,7 +47,7 @@ import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
 
 type Element = FlattenedElement;
-const initial = { authenticated: true, following: false };
+const initial = { authenticated: true, actorId: "usr_1", following: false };
 function render(locale: "ru" | "en" = "en") {
   harness.cursor = 0;
   const wrapper = FollowButton({
@@ -93,7 +93,11 @@ it.each(["en", "ru"] as const)(
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
-      body: JSON.stringify({ targetType: "content", targetId: "article" }),
+      body: JSON.stringify({
+        targetType: "content",
+        targetId: "article",
+        expectedActorId: "usr_1",
+      }),
     });
     await (toggle(render(locale)).props.onClick as () => Promise<void>)();
     expect(harness.fetch.mock.calls[1][1].method).toBe("DELETE");
@@ -138,6 +142,7 @@ it("rechecks authoritative state after an uncertain write before allowing anothe
   harness.fetch.mockRejectedValueOnce(Error("network-private")).mockResolvedValueOnce(
     response({
       authenticated: true,
+      actorId: "usr_1",
       following: true,
       targetType: "content",
       targetId: "article",

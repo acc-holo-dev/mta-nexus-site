@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
       context,
       {
         authenticated: !!actor,
+        actorId: actor?.id ?? null,
         following,
         notifyComments,
         muted,
@@ -105,6 +106,10 @@ function mutation(request: NextRequest, following: boolean) {
       requireServerJsonContentType(request);
       const parsed = followCommandSchema.safeParse(await readBoundedJson(request, 32 * 1024));
       if (!parsed.success) throw new AppError("Invalid follow command", 400, "VALIDATION_ERROR");
+      if (!parsed.data.expectedActorId)
+        throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (parsed.data.expectedActorId !== actor.id)
+        throw new AppError("Account changed", 409, "ACTOR_CHANGED");
       const { targetType, targetId, notifyComments } = parsed.data;
       // Follower inbox notice commits in the same follow transaction; no after().
       const result = await followWorkspaceRepository.setFollowingAuthenticated(

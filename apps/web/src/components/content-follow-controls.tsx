@@ -14,6 +14,7 @@ import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 type ContentFollowState = {
   authenticated: boolean;
+  actorId?: string | null;
   following: boolean;
   notifyComments: boolean;
   muted: boolean;
@@ -56,6 +57,7 @@ function ContentFollowControl({
     setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
   const [authenticated, setAuthenticated] = useState(initial?.authenticated ?? false);
+  const [actorId, setActorId] = useState(initial?.actorId ?? null);
   const [following, setFollowing] = useState(initial?.following ?? false);
   const [notifyComments, setNotifyComments] = useState(initial?.notifyComments ?? false);
   const [muted, setMuted] = useState(initial?.muted ?? false);
@@ -78,7 +80,8 @@ function ContentFollowControl({
   }, []);
 
   useEffect(() => {
-    if (initial && attempt === 0 && !initial.error) return;
+    if (initial && attempt === 0 && !initial.error && (!initial.authenticated || initial.actorId))
+      return;
     let active = true;
     const controller = new AbortController();
     setReady(false);
@@ -92,6 +95,7 @@ function ContentFollowControl({
         if (
           !response.ok ||
           typeof data.authenticated !== "boolean" ||
+          (data.authenticated && typeof data.actorId !== "string") ||
           typeof data.following !== "boolean" ||
           typeof data.notifyComments !== "boolean" ||
           typeof data.muted !== "boolean" ||
@@ -101,6 +105,7 @@ function ContentFollowControl({
           throw new Error("Invalid state");
         if (active) {
           setAuthenticated(data.authenticated);
+          setActorId(data.authenticated ? data.actorId : null);
           setFollowing(data.following);
           setNotifyComments(data.notifyComments);
           setMuted(data.muted);
@@ -118,7 +123,7 @@ function ContentFollowControl({
   }, [contentId, attempt, initial]);
 
   async function mutateFollow(desiredFollowing: boolean, desiredNotify: boolean) {
-    if (!alive.current || busy.current || !ready || !authenticated) return;
+    if (!alive.current || busy.current || !ready || !authenticated || !actorId) return;
     busy.current = true;
     setPending(true);
     setMessage("");
@@ -130,8 +135,13 @@ function ContentFollowControl({
         privateApiRequest({
           method: desiredFollowing ? "POST" : "DELETE",
           json: desiredFollowing
-            ? { targetType: "content", targetId: contentId, notifyComments: desiredNotify }
-            : { targetType: "content", targetId: contentId },
+            ? {
+                targetType: "content",
+                targetId: contentId,
+                notifyComments: desiredNotify,
+                expectedActorId: actorId,
+              }
+            : { targetType: "content", targetId: contentId, expectedActorId: actorId },
           signal: controller.signal,
           timeoutMs: 15_000,
         }),
@@ -172,7 +182,7 @@ function ContentFollowControl({
   }
 
   async function mutateMute(duration: ObjectMuteDuration | null) {
-    if (!alive.current || busy.current || !ready || !authenticated) return;
+    if (!alive.current || busy.current || !ready || !authenticated || !actorId) return;
     busy.current = true;
     setPending(true);
     setMessage("");
@@ -183,7 +193,7 @@ function ContentFollowControl({
         "/api/object-mute",
         privateApiRequest({
           method: "POST",
-          json: { targetType: "content", targetId: contentId, duration },
+          json: { targetType: "content", targetId: contentId, duration, expectedActorId: actorId },
           signal: controller.signal,
           timeoutMs: 15_000,
         }),

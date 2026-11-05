@@ -15,6 +15,7 @@ import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 type InitialFollowState = {
   authenticated: boolean;
+  actorId?: string | null;
   following: boolean;
   self?: boolean;
   error?: boolean;
@@ -71,6 +72,7 @@ function FollowControl({
               : "not-following"
       : "checking",
   );
+  const [actorId, setActorId] = useState(initial?.actorId ?? null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -86,7 +88,7 @@ function FollowControl({
     };
   }, []);
   useEffect(() => {
-    if (initial && attempt === 0) return;
+    if (initial && attempt === 0 && (!initial.authenticated || initial.actorId)) return;
     let active = true;
     const controller = new AbortController();
     writeBlocked.current = true;
@@ -101,11 +103,13 @@ function FollowControl({
           !response.ok ||
           typeof data.authenticated !== "boolean" ||
           typeof data.following !== "boolean" ||
+          (data.authenticated && typeof data.actorId !== "string") ||
           data.targetType !== targetType ||
           data.targetId !== targetId
         )
           throw new Error("Invalid state");
         if (active) {
+          setActorId(data.authenticated ? data.actorId : null);
           writeBlocked.current = !data.authenticated || data.self === true;
           setState(
             !data.authenticated
@@ -130,6 +134,7 @@ function FollowControl({
     if (
       !alive.current ||
       busy.current ||
+      !actorId ||
       writeBlocked.current ||
       (state !== "following" && state !== "not-following")
     )
@@ -157,7 +162,7 @@ function FollowControl({
         "/api/follow",
         privateApiRequest({
           method: desired ? "POST" : "DELETE",
-          json: { targetType, targetId },
+          json: { targetType, targetId, expectedActorId: actorId },
           signal: controller.signal,
           timeoutMs: 15_000,
         }),

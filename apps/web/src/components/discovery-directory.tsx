@@ -223,6 +223,7 @@ export async function DirectoryResults({
       targetName={name}
       initial={{
         authenticated: !!actor,
+        actorId: actor?.id ?? null,
         following: saved?.has(id) ?? false,
         self: targetType === "user" && actor?.id === id,
         error: saved === null,

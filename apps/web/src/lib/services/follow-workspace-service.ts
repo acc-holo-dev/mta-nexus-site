@@ -53,8 +53,16 @@ class FollowWorkspaceService {
     targetId: string,
     duration: ObjectMuteDuration | null,
     id: string,
+    token: string,
   ) {
-    return followWorkspaceRepository.setObjectMute(actorId, targetType, targetId, duration, id);
+    return followWorkspaceRepository.setObjectMute(
+      actorId,
+      targetType,
+      targetId,
+      duration,
+      id,
+      token,
+    );
   }
 }
 export const followWorkspaceService = new FollowWorkspaceService();

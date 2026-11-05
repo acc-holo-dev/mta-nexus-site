@@ -45,12 +45,7 @@ beforeEach(() => {
 
 it("shows guest login and create-account links when the report panel is open", () => {
   const html = renderToStaticMarkup(
-    <CommunityReportForm
-      targetType="comment"
-      targetId="comment"
-      locale="en"
-      authenticated={false}
-    />,
+    <CommunityReportForm targetType="comment" targetId="comment" locale="en" actorId={null} />,
   );
   expect(html).toContain(communityReportCopy("en").reportTitle);
   expect(html).toContain('href="/auth/login?next=%2Farticles%2Fguide"');

@@ -553,7 +553,7 @@ export function ContentDiscussion({
                 targetType="comment"
                 targetId={comment.id}
                 locale={locale}
-                authenticated={!!viewer}
+                actorId={viewer?.id ?? null}
               />
             )}
             <Button

@@ -344,6 +344,7 @@ it("links available noncommercial follows to their own feeds while unavailable t
   }));
   const html = renderToStaticMarkup(
     <FollowWorkspace
+      actorId="usr_1"
       initial={{
         items: [...items, { ...items[0], id: "unavailable", targetId: "hidden", href: null }],
         hasMore: false,

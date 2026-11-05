@@ -10,7 +10,7 @@ export function GET(request: NextRequest) {
     async (actor) => {
       const filters = parseFollowQuery(request.nextUrl.searchParams);
       if (!filters) throw new AppError("Invalid follow filters", 400, "VALIDATION_ERROR");
-      return followWorkspaceService.page(actor.id, filters);
+      return { ...(await followWorkspaceService.page(actor.id, filters)), actorId: actor.id };
     },
     200,
     followError,

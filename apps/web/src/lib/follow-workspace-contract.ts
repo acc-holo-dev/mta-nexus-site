@@ -4,6 +4,7 @@ export const FOLLOW_TYPES = ["server", "user", "organization", "product", "conte
 const OBJECT_MUTE_DURATIONS = ["24h", "7d", "30d"] as const;
 export const followCommandSchema = z
   .object({
+    expectedActorId: z.string().min(1).max(128).optional(),
     targetType: z.enum(FOLLOW_TYPES),
     targetId: z.string().trim().min(1).max(128),
     notifyComments: z.boolean().optional(),
@@ -17,6 +18,7 @@ export const followCommandSchema = z
   });
 export const objectMuteCommandSchema = z
   .object({
+    expectedActorId: z.string().min(1).max(128).optional(),
     targetType: z.enum(FOLLOW_TYPES),
     targetId: z.string().trim().min(1).max(128),
     duration: z.enum(OBJECT_MUTE_DURATIONS).nullable(),
