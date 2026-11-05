@@ -85,9 +85,9 @@ export default async function ManageResourcePage({
           {copy.preview}
         </Link>
       </header>
-      {product.metadataReviewRequired && (
-        <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
-      )}
+      {product.metadataReviewRequired ? (
+        <ErrorState id="resource-metadata-review-required" title={publisherCopy.reviewRequired} />
+      ) : null}
       <ResourcePublicationReadinessPanel
         summary={publicationReadiness}
         locale={locale}

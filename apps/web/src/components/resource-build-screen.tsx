@@ -109,9 +109,9 @@ export async function ResourceBuildScreen({
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
-      {product.metadataReviewRequired && (
-        <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
-      )}
+      {product.metadataReviewRequired ? (
+        <ErrorState id="resource-metadata-review-required" title={publisherCopy.reviewRequired} />
+      ) : null}
       {staff && (
         <Link
           href={`/admin/resources/${encodeURIComponent(productId)}/media`}
