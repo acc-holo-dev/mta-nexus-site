@@ -8,8 +8,8 @@ const source = readFileSync(join(root, "apps/web/src/components/community-topic-
 
 it("routes community-topic pending/unknown recovery through ErrorState and keeps busy status", () => {
   expect(source).toContain('import { Button, ErrorState, Field } from "@nexus/ui"');
-  expect(source).toMatch(
-    /pending \? \(\s*<ErrorState title=\{recoveryNotice \|\| copy\.topicPending\} \/>\s*\) : null/u,
+  expect(source).toContain(
+    "{pending ? <ErrorState title={recoveryNotice || copy.topicPending} /> : null}",
   );
   expect(source).toContain('role="status"');
   expect(source).toContain("{copy.publishing}");
