@@ -59,7 +59,7 @@ Release applicability: before_migrating_documentation.
 
 **Исходные пункты:** DOC02. **Решения обсуждения:** NX-001, NX-007, NX-011.
 
-**Сейчас.** docs/AGENT.md отсутствует; AI-007 расходится с root AGENTS; policy test запрещает новые root docs paths.
+**Сейчас.** Agent contract and DOC-02 integration are on tip; handbook register remains the baseline decision index.
 
 **Результат.** Следующий агент начинает с одного контракта и понимает действующие решения, текущее состояние и границы задачи.
 
@@ -163,7 +163,7 @@ Release applicability: when_single_working_tracker_is_selected_and_migrated.
 
 **Исходные пункты:** DOC04. **Решения обсуждения:** NX-001, NX-007, NX-011.
 
-**Сейчас.** Есть пересекающиеся главы, но полный список действительно неиспользуемых файлов не установлен.
+**Сейчас.** Удалены 49 superseded handbook chapters после retarget consumers; сохранены 00-README, 13-DECISION-REGISTER, 15-AI-CONTEXT-INDEX; manifest planning/deletion-manifest.json; полный текст остаётся в Git history.
 
 **Результат.** Уменьшить дублирование без потери правил, импортов, операторских сценариев и истории миграций.
 
@@ -212,7 +212,7 @@ Release applicability: after_semantic_migration_and_consumer_checks.
 
 **Исходные пункты:** DOC05. **Решения обсуждения:** NX-001, NX-007, NX-011.
 
-**Сейчас.** У UX, resources, community, server, staff и commerce есть пересекающиеся target chapters.
+**Сейчас.** Предметные контракты RESOURCES/COMMUNITY/SERVERS-ORGS/TRUST-STAFF/COMMERCIAL-FUTURE созданы и связаны с PRODUCT/ARCHITECTURE/PROJECT-MAP/FLOWS/UX/OPERATIONS. Groups/DM/events и collections≠server packs сохранены; commercial goals без payment activation.
 
 **Результат.** Сохранить уникальные owner-решения и подробные отказы/права в компактной структуре предметных контрактов.
 
@@ -265,7 +265,7 @@ Release applicability: before_retiring_old_subject_chapters.
 
 **Исходные пункты:** ARC01, ARC02. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Монолит и семь packages уже описаны; dependency-cruiser проверяет циклы и часть границ. Есть прямые repository-вызовы в HTTP, но запрета на весь этот путь сейчас нет.
+**Сейчас.** Границы модульного монолита и HTTP→service/repository exceptions зафиксированы; dependency-cruiser и architecture-analysis проверяют контракт. Точечные допустимые repository reads остаются только по списку исключений.
 
 **Результат.** Описать и проверять границу составных service-команд без массового рефакторинга всех handlers.
 
@@ -316,7 +316,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** ARC03, ARC04, ARC05. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Все private manifests: 1.2.0-beta.3; pnpm 12.4.2 согласован. Host/CI Node pin 26.10.0, Docker — node:26-alpine. TS6 у dependency-cruiser намерен; actual patch mismatch текущего CI не установлен.
+**Сейчас.** Версия приложения и toolchain pins согласованы в manifests/engines/.nvmrc/packageManager; focused toolchain-pins и release-version-consistency PASS. Host/CI Node pin и Docker base сверяются отдельно от major-ok engines.
 
 **Результат.** Получать однозначную запись actual Node/pnpm/lockfile и проверять релизный policy без обновления зависимостей ради новизны.
 
@@ -373,7 +373,7 @@ Release applicability: before_accepting_candidate_version_and_toolchain.
 
 **Исходные пункты:** ARC07, ARC12. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Node, PostgreSQL, Caddy и ClamAV используют mutable tags. PostgreSQL 18 mount /var/lib/postgresql уже корректен; Docker updates через Dependabot настроены.
+**Сейчас.** Infra pin schema и linux/amd64 digests зафиксированы в deploy/infra-image-pins.json (productionAuthorized=false). Mutable compose tags сохранены для Dependabot; exact production digest enablement остаётся у OPS-16/17.
 
 **Результат.** Сделать выбранные base/infra bytes повторно доступными по digest и сохранить проверяемый процесс обновления.
 
@@ -488,7 +488,7 @@ Release applicability: before_operating_selected_compose_overlays.
 
 **Исходные пункты:** ARC06, ARC10, ARC11. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Standalone/static и DB runtime копируются в image; startup валидирует env и применяет миграции. Build задаёт NEXT_PUBLIC_APP_URL, prod/CI переопределяют origin. Прямой клиентский env-read не найден; нынешний broken origin не доказан.
+**Сейчас.** Runtime APP_URL отделён от build placeholders; same-digest two-origin contract покрыт focused/entrypoint tests. Full check-production-startup.sh disposable CI остаётся внешним gate.
 
 **Результат.** Зафиксировать build/runtime границу и проверить продвижение одного image без пересборки под каждый домен.
 
@@ -602,7 +602,7 @@ Release applicability: before_next_schema_change_using_authoring_path.
 
 **Исходные пункты:** ARC15, F02. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** evaluateUpgradeArtifact принимает неполный PASS; прежний helper-repro подтверждён. Реальный retained artifact текущего SHA полный и корректный; productionAuthorized в repro оставался false.
+**Сейчас.** evaluateReleaseUpgradeEvidence строгий: schemaVersion=1, неполный PASS отвергается; legacy full fixtures сохраняют PASS. productionAuthorized в локальных repro остаётся false — не live upgrade evidence.
 
 **Результат.** Не допускать technical candidate PASS без обязательных identity, target, verification и cleanup доказательств.
 
@@ -656,7 +656,7 @@ Release applicability: before_next_release_candidate.
 
 **Исходные пункты:** ARC22, OPSNEW-08. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** release-evidence уже хранит SHA/runtime/app version/lockfile/migrations; image evidence и роли находятся отдельно. CI artifacts имеют короткий retention; единого actual digest manifest нет.
+**Сейчас.** Release manifest/retention contract и mismatch tests на tip; ciArtifactDays=14. Durable bundle retention/publish остаются owner_decision (OPS-16) — не объявляется выполненным.
 
 **Результат.** Связать идентичность исходников, образов, схемы и приёмки в один версионированный кандидатный документ с независимым от CI cache хранением.
 
@@ -759,7 +759,7 @@ Release applicability: before_authorized_private_visibility_and_protection_chang
 
 **Исходные пункты:** ARC08, ARC22, OPSNEW-10. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** CI уже строит один runtime image и сохраняет tar по SHA, но GHCR publish отсутствует. Обычный зелёный scoped CI не всегда full acceptance.
+**Сейчас.** Trusted ghcr-publish job подготовлен: без packages:write на PR; gate NEXUS_GHCR_PUBLISH_ENABLED; restore+validate tar без rebuild. Образ не публиковался; enablement — OPS-11.
 
 **Результат.** Добавить проверяемую подготовку/publish кандидата из тех же bytes только после full_acceptance доверенного exact SHA.
 
@@ -863,7 +863,7 @@ Release applicability: before_accepting_private_registry_access_for_delivery.
 
 **Исходные пункты:** ARC13, ARC16, F05. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Runbook prose требует всех writers, но stop-пример не включает штатные license/resource-release workers. App startup применяет forward-only migrations до HTTP; single-instance модель сохраняется.
+**Сейчас.** Maintenance writer inventory согласован с production/mail/recovery overlays; stop/resume включает штатные license/resource-release workers. App startup по-прежнему применяет forward-only migrations до HTTP.
 
 **Результат.** Сделать исполнимый runbook консистентной паузы, одной migration phase и полного resume фактически включённых ролей.
 
@@ -1021,7 +1021,7 @@ Release applicability: before_live_acceptance.
 
 **Исходные пункты:** ARC20, ARC19. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Push/mail имеют read_only/tmpfs/cap_drop/no-new-privileges/pids_limit; license/resource-release — node/init, но не весь тот же профиль. Очереди и курсоры уже durable.
+**Сейчас.** license/resource-release workers выровнены к push-worker профилю read_only/tmpfs/SIGTERM. Structural compose+contract PASS; disposable batch/restart proof остаётся внешним.
 
 **Результат.** Дать каждой worker-роли минимальные проверенные writable-пути и ресурсы, сохранив batch/retry/shutdown.
 
@@ -1223,13 +1223,13 @@ Release applicability: before_capacity_commitments_or_expanded_traffic.
 
 ## OPS-19 — Уточнить контракт human resource versions для сравнения обновлений
 
-**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** SemVer-like resource version helpers; strip optional v for storage/compare; fields stay separate; historical IDs not rewritten. validation + build-version-conflict + mta-version-target PASS.
 
 **Исходные пункты:** ARC17. **Решения обсуждения:** NX-002, NX-003, NX-004, NX-011.
 
-**Сейчас.** Build ID/hash immutable; product/version уникальны. Version regex допускает v1.0/1.0, а package evidence имеет отдельный schemaVersion=1; единый строгий SemVer формат не доказан.
+**Сейчас.** SemVer-like resource version helpers strip optional v for storage/compare; build ID/hash stay immutable; historical IDs are not rewritten.
 
 **Результат.** Выбрать канонический формат и сравнение новых resource releases, сохранив старые immutable идентификаторы и MTA compatibility отдельно.
 
@@ -1336,7 +1336,7 @@ Release applicability: only_after_evidence_based_storage_trigger_and_selected_sc
 
 **Исходные пункты:** F01, INT26. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Claim API правильно требует сессию, но acquire выводит raw 401; AuthForm после успеха всегда открывает /workspace. Проверенные follow/reaction/comment/download entry points не передают исходный путь. Полная смена document после входа уже очищает account router cache.
+**Сейчас.** Safe next return path: guest auth links несут next; acquire сохраняет productId; после входа нет auto-mutation. Open Library destination вынесен в UX-27 и исправлен отдельно.
 
 **Результат.** Один безопасный контракт return target для login/register/expired session: вернуть пользователя к тому же object/query/hash, перечитать права и состояние, дать явно завершить действие. Исправить destination «Открыть библиотеку» без большого redesign.
 
@@ -1397,7 +1397,7 @@ Release applicability: before_core_beta_acceptance.
 
 **Исходные пункты:** INT01, INT08. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Product follow уже сохраняет ресурс через discovery, но не создаёт release watch; общий FollowButton сочетает bookmark-иконку с подписью «Подписаться». User/org/server/content имеют разные эффекты; self-user follow запрещён.
+**Сейчас.** Product follow подписан как Save без обещания release watch; на resource detail FollowButton отделён от watch. User/org/server/content сохраняют разные эффекты; self-follow запрещён.
 
 **Результат.** Назвать текущий product-follow «Сохранить» и вынести на resource detail; для остальных targetType использовать конкретный смысл. Независимое «Следить за ресурсом» допустимо только после определения реальной ленты его событий.
 
@@ -1457,7 +1457,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT02, INT03, INT04. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Watch уже есть в library versions и watches workspace: current access + published safe build, 100 active, batch 20. Category commerce может подавить событие с продвижением sequence; enable/resume пропускает прошлые события. Watch не меняет pinned version.
+**Сейчас.** Public resource detail отдаёт release watch с guest return, suppression/settings и access/acquire paths; лимиты 100/20 честны; watch не меняет pinned version.
 
 **Результат.** Добавить управление с публичного resource detail; показать причину disabled/suppressed и переход к настройкам. Сохранить future-only, expectedRevision, bounded retry и понятные результаты массового управления.
 
@@ -1520,7 +1520,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT05. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Content follow уже уведомляет по follow/followsEnabled; publication owner и parent-comment author могут получать direct content/contentEnabled. Один comment не дублирует notice при совпадении причин; unfollow не глушит direct route.
+**Сейчас.** Discussion follow/unfollow copy явны; unfollow не выдаётся за mute; direct replies сохраняются до object mute (FLOW-05).
 
 **Результат.** Явно обозначить «Следить за обсуждением», причину получения уведомления и точный эффект отписки; сохранить прямые ответы до отдельного решения о mute.
 
@@ -1567,13 +1567,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## FLOW-05 — Спроектировать object mute и временную паузу
 
-**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Object mute/snooze (0088); suppresses follow+direct; no backlog; security exempt. Delivery + /api/object-mute + discussion UI. Focused follow/watch suites PASS.
 
 **Исходные пункты:** INT06. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** В follows нет object-level mute/mutedUntil; global preferences и release watch enabled решают другие задачи. Direct reply может продолжить доставку после unfollow.
+**Сейчас.** Object-level mute/snooze is on tip (0088 / followWorkspaceService, id prefix omi). Suppresses follow and direct delivery without inventing backlog; security-exempt paths documented.
 
 **Результат.** Принять контракт object mute/snooze: target, срок, приоритет относительно direct/follow/category/channel, судьба событий во время паузы, возобновление и ограничения для security events. После решения реализовать отдельную настройку без удаления сохранённой связи.
 
@@ -1620,13 +1620,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## FLOW-06 — Спроектировать тихую закладку публикации
 
-**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** follows.notify_comments DEFAULT true; quiet Save vs discussion watch. Existing rows keep notices. Focused follow suites PASS.
 
 **Исходные пункты:** INT07. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Content-follow уже помещает публикацию в saved и включает comment notices; отдельного quiet mode в проверенной модели нет. Product save уже независим от release watch.
+**Сейчас.** Content follow keeps publication in saved with notify_comments default true; quiet Save versus discussion watch are separate actions on tip.
 
 **Результат.** Добавить сохранение публикации без подписки на комментарии, отдельно от discussion follow. До реализации выбрать модель хранения и миграцию прежних content follows без изменения их намерения.
 
@@ -1680,7 +1680,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT09, INT23. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Saved workspace уже сохраняет удаляемые связи с недоступными target без раскрытия metadata. Private collections имеют create/duplicate/rename/archive/restore, copy/move, import/export, command receipts; лимиты 30 collections/200 items/batch20.
+**Сейчас.** Saved/collections: empty vs filter-empty, Add-to-collection, batch/limit honesty; watch independence. Недоступные target остаются управляемыми заглушками без закрытых metadata.
 
 **Результат.** Улучшить доступность существующих операций: «В коллекцию» на уместных library surfaces, различимые empty/filter-empty/load-error/unavailable, понятный per-item batch result. Сохранить приватное владение и независимость от notifications.
 
@@ -1735,7 +1735,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT10, INT11. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Bell начинает с notifications=[] без отдельного loaded-state; при первом запросе может показывать empty. Последние шесть сообщений, read/unread, batch до25, expectedIsRead, all-read и server-confirmed counts уже есть. Переход по ссылке сам не меняет isRead.
+**Сейчас.** Bell различает loading и empty после успеха; ошибки mark сохраняют confirmed counts; popover≠account-wide all-read; page selection≠account-wide; batch>25 блокируется. Переход по ссылке сам не меняет isRead.
 
 **Результат.** Отделить первую загрузку от empty/error, согласовать правило read-on-open/explicit-read и account-wide all-read. Сохранить ожидание серверного подтверждения, конфликтные ревизии, selection scope и корректные counters.
 
@@ -1792,7 +1792,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT12. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Web Push уже имеет explicit permission request и состояния unsupported/unconfigured/denied/enabled/error. Отключение касается текущего браузера. Пять preferences могут подавлять создание inbox; security category не привязана к их переключателям.
+**Сейчас.** Web Push отделён от inbox/category copy; explicit permission и состояния unsupported/unconfigured/denied/enabled/error сохранены. Security category не подчиняется object mute.
 
 **Результат.** Сделать effective notification contract понятным: какие события получать, создано ли inbox-сообщение, разрешён ли push текущего браузера. Согласовать resourceActivity/commerce naming и причины недоступности без новых каналов.
 
@@ -1845,7 +1845,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT13. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Comment-create отправляет text/parentId с timeout15s без idempotency key и создаёт новый ID; concurrent click guard уже есть. Повтор после server commit + lost response потенциально создаёт дубль; production инцидент и controlled repro не установлены. Guest draft живёт в React state.
+**Сейчас.** Guest claim/auth return preserves safe internal next and acquire/productId; expired/external redirects remain regression-covered.
 
 **Результат.** Сначала воспроизвести управляемый lost-response сценарий вне production и зафиксировать результат. Затем определить и реализовать actor-scoped intent/receipt protocol либо иной доказуемый способ сверки; сохранить draft/content/parent context и явную повторную отправку после входа.
 
@@ -1903,7 +1903,7 @@ Release applicability: controlled_retry_verification; schema_fix_depends_on_chos
 
 **Исходные пункты:** INT14, INT15. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Reply, search, keyset paging, exact-comment links и edit/delete с expectedRevision уже есть. Свой comment редактирует автор; moderator удаляет чужой с причиной, не переписывает. Удаление parent сохраняет ответы.
+**Сейчас.** Edit conflict сохраняет draft+copy; permalink return; delete vs moderation; search сохраняет draft. Reply/search/keyset/exact-comment links и expectedRevision остаются.
 
 **Результат.** Доработать recovery: локальный текст при конфликте, объяснение недоступной permalink-цели, видимый return к общей дискуссии, сохранение draft при поиске и различие удаления/модерации.
 
@@ -1955,13 +1955,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## FLOW-12 — Спроектировать Q&A ресурса и версии отдельно от рейтинговых отзывов
 
-**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Focused 19 PASS. Gaps: follow fanout, abuse/staff removal; migration not applied live.
 
 **Исходные пункты:** INT16. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** На resource detail есть reviews. ContentDiscussion и discussion follow относятся к самостоятельным publications с productId=null; готового resource-wide Q&A из этого не следует.
+**Сейчас.** Publication readiness summary allows FOR SHARE; published build + clean scan identity required for public issue.
 
 **Результат.** Принять target/lifecycle/moderation контракт resource question/thread с необязательным build context, ответом автора и отдельным thread-follow. Затем реализовать без смешивания с rating и private support.
 
@@ -2015,7 +2015,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT17. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Helpful/thanks/insight уже реализованы: одна выбранная реакция, same-click remove, запрет self-reaction, подтверждённые counts. Author notice дедуплицируется для actor/publication.
+**Сейчас.** Reaction unknown/error honesty и guest return на tip; clicks≠points. Helpful/thanks/insight: одна выбранная реакция, self-reaction запрещён, author notice дедуплицируется.
 
 **Результат.** Завершить доступные подписи, guest return и unknown/error recovery вокруг существующего механизма; зафиксировать, что clicks не равны полезной активности и не создают очки.
 
@@ -2066,7 +2066,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT18. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Discovery уже использует GET/URL filters, keyset pages, разные типы и error отдельно от empty. Follow-state может быть unknown. Search API и discovery не следует считать одной несуществующей функцией.
+**Сейчас.** Search/discovery сохраняют URL context; failure возвращает 503 без empty payload; filters/keyset/error≠empty. Follow-state может быть unknown.
 
 **Результат.** Согласовать Back/refresh/filter reset и recovery на переходе из результата в объект; сделать активные фильтры и scope поиска явными, сохраняя unknown состояния связанных действий.
 
@@ -2118,7 +2118,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT19. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** showActivity/showProfessionalContacts уже есть, default=true, expectedUpdatedAt и owner guard. Public contacts исключаются из данных; это не full private account или block user.
+**Сейчас.** Privacy scope copy и guest preview; conflict сохраняет local toggles. showActivity/showProfessionalContacts с expectedUpdatedAt; это не full private account или block user.
 
 **Результат.** Уточнить scope двух настроек и дать безопасный просмотр публичного профиля от лица гостя; сохранять форму при конфликте и не обещать скрытие публичных ресурсов целиком.
 
@@ -2170,7 +2170,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT20. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Server detail использует mtasa:// и выделяемый IP:port; browser не получает подтверждение фактического входа. Unknown/stale observations уже обрабатываются; отдельной copy-кнопки рядом на detail нет.
+**Сейчас.** Connect/Copy honesty на server surfaces: mtasa:// назван как intent, copy IP:port с ручным fallback; browser не получает подтверждение фактического входа. Unknown/stale observations честны.
 
 **Результат.** Назвать действие «Открыть в MTA», добавить copy IP:port с ручным fallback и честным результатом попытки; не превращать launch click в доказательство посещения.
 
@@ -2217,7 +2217,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT21, INT22. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** DownloadButton уже имеет progress/cancel/handoff/receipt. Public detail без buildId просит latest, library versions передаёт selected buildId. Это не сброс pinned selection, но одинаковое «Скачать» скрывает разный результат.
+**Сейчас.** Download различает latest vs selected; confirmed handoff only; integrity отдельно. Session-actor binding wave не меняет handoff labels; F08 barrier probe остаётся открытым.
 
 **Результат.** Различать «скачать последнюю» и «скачать выбранную», сохранять явный выбор при unavailable fixed build; показывать только подтверждённый handoff с переходом к квитанции/инструкции/контекстному support.
 
@@ -2275,7 +2275,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT24, INT25. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Resource review требует published safe resource, access и отсутствие author/manager conflict; removed и withdrawn различны. Server review требует active/public server + follow, исключает owner/managers. Ни access, ни follow не доказывают использование.
+**Сейчас.** Exact review eligibility reason codes; access/follow не выдаются за verified-use; refresh после Follow. Removed и withdrawn различны.
 
 **Результат.** Показывать допустимые reason codes и следующие шаги; после Follow перечитывать review eligibility. Сохранить lifecycle/revision rules и честную подпись основания отзыва.
 
@@ -2332,7 +2332,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT27. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Support cases уже приватны requester/staff, create/reply idempotent, status/revision guarded. Generic form отправляет category/subject/message, repository содержит relatedType/relatedId. Requester open↔resolved; closed — staff; reply в resolved возвращает open.
+**Сейчас.** Support create присоединяет verified product/build/receipt context; closed→related path; idempotency/status/revision guards сохранены. Private requester/staff model без второго тикетного движка.
 
 **Результат.** Дать контекстные входы resource/build/download receipt, показать приложенный контекст перед отправкой и проверить связь сервером. Сохранить intent при unknown response и честный путь для closed кейса.
 
@@ -2389,7 +2389,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** INT28. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Archive/restore/submit и moderation lifecycle уже есть с reasons/confirmations/revisions. Author restore archived и admin release suspended возвращают draft; resource и build — разные состояния.
+**Сейчас.** Lifecycle UI показывает разрешённые переходы; restore archived / release suspended → draft, не auto-publish; unavailable build → support. FLOW-22 fresh-auth остаётся отдельным staff gate.
 
 **Результат.** Свести в workspace ресурс, выбранную сборку и следующий разрешённый шаг; различать archive/suspend/build unavailable и показывать корректный support path, без обещания auto-publication.
 
@@ -2445,7 +2445,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** F08. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Начальная сессия валидируется. После долгой подготовки финальные submit/download gates перепроверяют current actor/authority/access/build, но не получают исходный token. Статический race-gap подтверждён; конкурентный эффект не воспроизведён, общий auth bypass не заявляется.
+**Сейчас.** Final upload/download authorization locks the initiating session token before build/receipt writes. HTTP/code lock is on tip; a controlled multi-connection barrier probe on disposable/live DB remains open (see PROBLEMS F08).
 
 **Результат.** Провести initiating token до final transaction и применить existing lockInitiatingSession с согласованным lock order; добавить контролируемую проверку revoke/expiry между initial auth и final gate.
 
@@ -2502,7 +2502,7 @@ Release applicability: controlled_security_verification_before_beta.
 
 **Исходные пункты:** F09. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** fresh-auth-policy требует current_password для staff_action и отвергает одну session. Admin/actions принимает role/session/token, но не fresh password/proof; unit-test политики не доказывает HTTP enforcement. Компрометация аккаунта не установлена.
+**Сейчас.** Admin/actions HTTP requires fresh current-password proof for critical staff actions per fresh-auth-policy; foreign/revoked session and role loss are rejected. Compromised-session absence is not claimed.
 
 **Результат.** Применить уже действующее правило staff_action→current_password к существующим критичным admin/actions минимальным серверным подтверждением текущего пароля; связать проверку с текущими actor/session и финальной транзакцией. Отдельный TTL/capability-token сервис для этого исправления не обязателен.
 
@@ -2556,7 +2556,7 @@ Release applicability: existing_staff_policy_enforcement_before_beta.
 
 **Исходные пункты:** UI01, UI16. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Tabs меняют локальный filter/ARIA, но данные Inbox зависят от независимого URL state. Общий UI Tabs в app не используется.
+**Сейчас.** Unread/All/Read — URL links, задающие inbox state; смена state сбрасывает cursor; surface tests покрывают выдачу. Общий Tabs primitive не обязателен для этого контракта.
 
 **Результат.** Синхронизировать All/Unread, URL и показанный список, сохранив доступность и корректную семантику route navigation.
 
@@ -2721,7 +2721,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI07, UI08, UI23. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** CommunityTopicForm отправляет снимок, но оставляет поля редактируемыми при busy и показывает payload.error. FollowButton уже различает checking/error/подтверждённый success.
+**Сейчас.** Community/server forms блокируют поля при pending, сохраняют input при error и показывают localized confirmed/error. FollowButton по-прежнему различает checking/error/success.
 
 **Результат.** Не терять поздние правки и показывать локализованный pending/error/confirmed result.
 
@@ -2777,7 +2777,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI11, UI12, UI21. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Light/dark/system и storage fallback работают. В основном CSS нет color-scheme, font-role utilities используют shorthand font; actual browser drift не воспроизводился.
+**Сейчас.** color-scheme, longhand typography и autofill styling на tip; theme-preference + design-token-contrast PASS. Browser autofill probe не записан как evidence.
 
 **Результат.** Проверить native controls и computed typography, исправить подтверждённые расхождения; отдельно оценить понятность theme cycle.
 
@@ -2897,7 +2897,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI14, UI19. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** More содержит 15 ссылок без собственного scroll body/max-height; SectionHeader не задаёт базовые wrap/gap. Обрыв доступа или overlap не воспроизведён.
+**Сейчас.** More menu имеет short-viewport scroll; SectionHeader задаёт wrap/gap. Playwright shell-accessibility этой волной не заявляется.
 
 **Результат.** Проверить достижимость содержимого и исправлять только доказанные responsive ограничения.
 
@@ -2998,7 +2998,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI20, PX04. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Профили и authorId есть; resource card/detail не показывают автора рядом с названием. Trust/Publications links developer profile слипаются на exact-SHA CI fixture.
+**Сейчас.** Публичная attribution автора на resource cards/portfolio; различимые Trust/Publications переходы. developer/org/user page tests PASS.
 
 **Результат.** Показать публичное происхождение ресурса и различимые переходы профиля.
 
@@ -3049,7 +3049,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI22. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** StatusBadge выводит переданную строку; admin callers часто передают raw enum, тогда как Library и managed servers уже локализуют labels.
+**Сейчас.** Admin status/scan labels локализованы RU/EN через status-labels; raw enum values не менялись. Library и managed servers сохраняют свои localized labels.
 
 **Результат.** Согласовать RU/EN status labels без изменения backend enum и смысла badge.
 
@@ -3097,7 +3097,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI04, F06. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** ServerDetailPage при отказе publicPage заменяет результат на reviews=[] и total=0; это выглядит как настоящее отсутствие отзывов. После confirmed записи review форма блокируется до raw reload. Существующие mutation/revision protections сохраняются.
+**Сейчас.** Отказ загрузки server reviews показывает unavailable+retry, а не пустой total=0. Mutation/revision protections и post-save next step сохранены.
 
 **Результат.** Различать недоступную загрузку и успешный пустой результат server reviews, затем показывать актуальный результат сохранения и следующий шаг.
 
@@ -3147,7 +3147,7 @@ Release applicability: before_core_beta_acceptance.
 
 **Исходные пункты:** UI24. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** global-error автономен от shell, обе boundaries не используют error.digest. Retry/Home и RU/EN fallback уже существуют.
+**Сейчас.** global-error автономен от shell; opaque error.digest только когда присутствует; Retry/Home и RU/EN fallback без message/stack/secrets.
 
 **Результат.** Сохранить автономность и показать безопасный public reference, когда он реально доступен.
 
@@ -3194,7 +3194,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** UI25, F10. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Есть browser/axe/component/contrast checks. Часть снимков содержит loading; это не доказательство production hang или проверки ready UI.
+**Сейчас.** Ready capture ждёт settled content (не GlobalLoading); loading/empty/error именованы отдельно. browser-page-ready focused PASS; полный Playwright PNG evidence остаётся disposable CI resource-browser run.
 
 **Результат.** Screenshot evidence подтверждает заданное состояние, а сценарий проверяет полезный результат.
 
@@ -3239,13 +3239,13 @@ Release applicability: before_browser_acceptance.
 
 ## UX-14 — Общая Home и personal changes summary
 
-**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Home personal changes from watches/follows/replies; guest public-only; cookie opt-out. page + preference tests PASS.
 
 **Исходные пункты:** PX01. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Home hero min70vh с двумя CTA; personal data query отсутствует. Общая конечная Home с personal modules уже owner target.
+**Сейчас.** Guest nav hides Workspace cluster/Admin (variant A); member Workspace and Admin follow capabilities on tip.
 
 **Результат.** Согласовать compact first view и personal changes summary реальных ответов/подписок/обновлений.
 
@@ -3294,7 +3294,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** PX02, F06. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Home card — mtasa:// link, players ?? 0 превращает unknown в ноль; directory уже умеет unknown.
+**Сейчас.** Home server card: unknown≠0; partial aggregates подписаны; действия разделены Connect/View/Copy. Unknown не равен offline.
 
 **Результат.** Исправить смысл данных и сделать назначение server actions предсказуемым.
 
@@ -3368,7 +3368,7 @@ Release applicability: before_core_beta_acceptance.
 
 Без обязательных task dependencies.
 
-Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
+ Общие UX primitives можно переиспользовать по готовности; они не блокируют независимое исправление текущего поведения.
 
 Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
@@ -3384,13 +3384,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-17 — Исходники лицензия и DRM показаны как разные свойства
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** licenseModel RU/EN localized for all enum values; no Open/Closed/DRM invented. Source/DRM metadata remains owner choice (DECISIONS recommends B license-only beta). license-model-i18n + detail acquisition PASS.
 
 **Исходные пункты:** PX05. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** License enum описывает scope/term, а не Open/Closed Source; aside печатает его через replace underscores. Free не определяет способ выдачи.
+**Сейчас.** Clear-filter CTAs and honest empty/filtered empty copy are on tip across primary filter surfaces.
 
 **Результат.** Согласовать delivery metadata и честное представление source/license/DRM.
 
@@ -3440,7 +3440,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** PX06. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** ProductCard показывает 0.0 без отзывов и salesCount возле Library icon без смысловой подписи.
+**Сейчас.** Acquire/install/review absence различаются на product surfaces; 0.0 и counters не выдаются за установку или неизмеренные события.
 
 **Результат.** Понятные рейтинги и счётчики без приписывания установки или других неизмеренных событий.
 
@@ -3480,13 +3480,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-19 — Просмотр галереи внутри страницы как расширение
 
-**Фаза:** F2. **Приоритет:** P3. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P3. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Native dialog lightbox on resource gallery; original href preserved; focused tests PASS.
 
 **Исходные пункты:** PX07. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Gallery/order/captions/cover реализованы; оригинал открывается отдельно.
+**Сейчас.** Loading/empty/error/success shells distinguish zero, unknown, and load failure on tip honesty wave surfaces.
 
 **Результат.** При принятии добавить accessible lightbox, сохранив original link.
 
@@ -3528,13 +3528,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-20 — Инструкция и помощь для конкретного ресурса и версии
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Public resource detail Help/Instructions section bound to current published download version; releaseNotes fenced blocks render as copyable plain code; optional compatibility shows unknown without auto-incompatible claims; support/Q&A links use FLOW-19 object context without private license/evidence.
 
 **Исходные пункты:** PX08, PX12. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Description plain text; history/dependencies/compatibility и support существуют. Скачивание не доказывает установку.
+**Сейчас.** Disabled states and retry after error are honest on migrated forms; success confirms from the server.
 
 **Результат.** Структурированная инструкция и контекстная помощь по resource/version без обязательной compatibility metadata.
 
@@ -3629,13 +3629,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-22 — Автор видит причины неготовности публикации
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** proposal. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Publication readiness panel on managed resource overview; domain summary + DB snapshot; focused tests PASS; author-workspace playwright not run.
 
 **Исходные пункты:** PX10. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Author resource overview показывает server-derived readiness checklist с required/recommendation, fix links и disclaimers для preview/scan.
+**Сейчас.** Keyboard and narrow-screen touch targets (min-h-11 / size=touch) are the tip floor for interactive CTAs in honesty waves.
 
 **Результат.** Краткий обзор реального publishing workflow с причиной и переходом к существующему исправлению.
 
@@ -3678,13 +3678,13 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 ## UX-23 — Guest и Workspace навигация следует возможностям человека
 
-**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F2. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Guest: public nav only, Workspace+Admin hidden, Sign in CTA (DECISIONS A). shell/nav suites PASS.
 
 **Исходные пункты:** PX11, F07. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Workspace смешивает виды работы/истории; guest shell показывает Workspace/Admin. Видимая ссылка не доказывает обход прав.
+**Сейчас.** Library destination and guest More ordering match shell-destination policy on tip.
 
 **Результат.** Согласовать guest/capability presentation и сгруппировать задачи без жёсткого выбора роли.
 
@@ -3896,7 +3896,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Исходные пункты:** F07, PX09. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** На product page ссылка с текстом copy.openLibrary имеет href=/workspace, хотя рабочая пользовательская библиотека находится в /workspace/library. Это точечное несовпадение обещания и назначения, независимое от политики общей навигации.
+**Сейчас.** Open Library на market/acquire success ведёт в /workspace/library. Подпись соответствует экрану назначения; guest/owner branching и acquisition receipts не менялись.
 
 **Результат.** Исправить destination существующей ссылки Open Library на /workspace/library без редизайна Workspace и изменения доступа.
 
@@ -3937,13 +3937,13 @@ Release applicability: fix_confirmed_destination_before_beta; navigation_redesig
 
 ## GROW-01 — Определить полезный возврат и минимальные события измерения
 
-**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** needs_decision. **Исполнение:** done. **Область полномочий:** local_development.
+**Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
 **Заметка исполнения.** Docs-only activation dictionary in RETENTION-PLAN (per-role confirmed outcomes; signup≠activated; windows). No pilot/analytics pipeline.
 
 **Исходные пункты:** RET01. **Решения обсуждения:** NX-009, NX-011.
 
-**Сейчас.** Есть аналитические owner-targets; сквозная creator/retention аналитика не подтверждена.
+**Сейчас.** Growth pilots remain deferred without activation; GROW-01 direction accepted, pilots UX-24–26 / GROW-02…09 stay gated.
 
 **Результат.** До пилота отделить интерес, доставку, получение файла и подтверждённую пользу.
 
