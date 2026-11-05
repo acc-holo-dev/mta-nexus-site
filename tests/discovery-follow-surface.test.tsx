@@ -61,6 +61,8 @@ it.each(["en", "ru"] as const)(
     expect(filters).toContain('action="/discover"');
     expect(filters).toContain('name="language"');
     expect(filters).toContain('name="verified"');
+    expect(filters).toContain("flex min-h-11 items-center gap-2");
+    expect(filters).not.toContain("min-h-8");
     expect(filters).toContain(discoveryCopy(locale).filter);
     expect(filters).toContain("rounded-lg");
     expect(filters).toContain("bg-accent");
