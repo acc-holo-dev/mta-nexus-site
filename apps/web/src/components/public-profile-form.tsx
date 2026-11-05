@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, Button, Input } from "@nexus/ui";
+import { Avatar, Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -162,14 +162,12 @@ export function PublicProfileForm() {
           {copy.loading}
         </p>
       )}
-      {notice && (
-        <p
-          role={notice.error ? "alert" : "status"}
-          className={`text-sm ${notice.error ? "text-danger" : "text-success"}`}
-        >
+      {notice?.error ? <ErrorState title={notice.text} /> : null}
+      {notice && !notice.error ? (
+        <p role="status" className="text-sm text-success">
           {notice.text}
         </p>
-      )}
+      ) : null}
       {profile && (
         <form key={profile.id} onSubmit={save} aria-busy={busy || loading} className="space-y-4">
           <div className="flex items-center gap-3">
