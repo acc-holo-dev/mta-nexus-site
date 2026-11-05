@@ -15,14 +15,7 @@ type LibraryCollectionsInteractionHarness = {
 type LibraryCollectionCommandFormComponent = (props: {
   locale: "en" | "ru";
   actorId: string;
-  action?:
-    | "create"
-    | "archive"
-    | "remove"
-    | "duplicate"
-    | "add"
-    | "rename"
-    | "restore";
+  action?: "create" | "archive" | "remove" | "duplicate" | "add" | "rename" | "restore";
   collection?: {
     id: string;
     name: string;
