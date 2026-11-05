@@ -16,7 +16,7 @@ type LibraryMembershipBatchFormComponent = (props: {
   locale: "ru" | "en";
 }) => ReactNode;
 
-export function membershipBatchesFixture(): LibraryResourceCollections {
+function membershipBatchesFixture(): LibraryResourceCollections {
   return {
     schemaVersion: 1,
     generatedAt: "2026-10-12T00:00:00.000Z",
