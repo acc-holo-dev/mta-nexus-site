@@ -3,6 +3,7 @@ import {
   type BuildPackageSummary,
   buildPackageSummary,
 } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getDictionary } from "../lib/i18n";
 import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
@@ -68,7 +69,7 @@ export function BuildPackageSummaryPanel({
               {summary.unresolvedReferences}
             </p>
           )}
-          {summary.referencesTruncated && <p className="text-warning">{copy.truncated}</p>}
+          {summary.referencesTruncated ? <ErrorState title={copy.truncated} /> : null}
         </>
       )}
       <p className="text-xs text-muted">{copy.publicNote}</p>
@@ -154,7 +155,7 @@ export function BuildPackageEvidencePanel({
                   </li>
                 ))}
               </ul>
-              {manifest.referencesTruncated && <p className="text-warning">{copy.truncated}</p>}
+              {manifest.referencesTruncated ? <ErrorState title={copy.truncated} /> : null}
               {manifest.issues.length > 0 && (
                 <>
                   <h3 className="font-semibold">{copy.issues}</h3>
