@@ -26,6 +26,9 @@ const copy = {
     cancel: "Cancel",
     follow: "Follow thread",
     unfollow: "Stop following thread",
+    unfollowConfirmTitle: "Stop following this question?",
+    unfollowConfirm:
+      "You stop receiving updates for this question thread. You can follow it again later. This is not a release watch.",
     followingHelp: "Get updates for this question only. This is not a new-release watch.",
     publicRead: "Questions stay public. Sign in only to ask or follow a thread.",
     signIn: "Sign in to ask a question",
@@ -81,6 +84,9 @@ const copy = {
     cancel: "Отмена",
     follow: "Следить за веткой",
     unfollow: "Не следить за веткой",
+    unfollowConfirmTitle: "Перестать следить за этим вопросом?",
+    unfollowConfirm:
+      "Уведомления по этой ветке вопроса прекратятся. Позже можно снова включить слежение. Это не подписка на релизы.",
     followingHelp: "Уведомления только по этому вопросу. Это не слежение за новыми релизами.",
     publicRead: "Вопросы остаются публичными. Вход нужен, чтобы спросить или следить за веткой.",
     signIn: "Войдите, чтобы задать вопрос",
