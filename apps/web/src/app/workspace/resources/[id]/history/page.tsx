@@ -115,9 +115,9 @@ export default async function Page({
                   ] ?? event.status}
                 </p>
               )}
-              {event.metadataReviewRequired && (
-                <p className="text-sm text-warning">{copy.reviewRequired}</p>
-              )}
+              {event.metadataReviewRequired ? (
+                <ErrorState id="resource-metadata-review-required" title={copy.reviewRequired} />
+              ) : null}
               {event.reason && (
                 <p className="whitespace-pre-wrap break-words text-sm text-secondary">
                   {event.reason}

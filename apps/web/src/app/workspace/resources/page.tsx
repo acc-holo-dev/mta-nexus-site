@@ -136,9 +136,13 @@ export default async function AuthorResourcesPage({
               <p className="mt-2 text-xs text-muted">
                 {product.scope === "personal" ? publisherCopy.personal : publisherCopy.organization}
               </p>
-              {product.metadataReviewRequired && (
-                <p className="mt-2 text-sm text-warning">{publisherCopy.reviewRequired}</p>
-              )}
+              {product.metadataReviewRequired ? (
+                <ErrorState
+                  id="resource-metadata-review-required"
+                  className="mt-2"
+                  title={publisherCopy.reviewRequired}
+                />
+              ) : null}
             </li>
           ))}
         </ul>
