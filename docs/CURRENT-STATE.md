@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `d33f3379` — tip advanced after tip honesty (#750) on f74fd532; tip CI not claimed verified-green under rapid merges;
 - `f74fd532` — tip advanced after order-cancellation unconfirmed (#741) and resource-build quarantined ErrorState (#742); tip CI not claimed verified-green under rapid merges;
 - `45cfab13` — tip advanced after tip honesty (#748) on ac9fd04e; tip CI not claimed verified-green under rapid merges;
 - `ac9fd04e` — tip advanced after membership revisionLocked (#737) and commercial plan unknown operation ErrorState (#738); tip CI not claimed verified-green under rapid merges;
