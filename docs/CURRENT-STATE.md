@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `e0327b4a` — tip advanced after verification workspace write/intent (#803), verification workspace unavailable (#802), and cart unavailable (#799) ErrorState honesty following tip honesty (#810) on 266f8910; tip CI not claimed verified-green under rapid merges;
 - `266f8910` — tip advanced after tip honesty (#809) for 0928452a after #807; tip CI not claimed verified-green under rapid merges;
 - `0928452a` — tip advanced after tip honesty (#807) for 6dd84d63 after #805; tip CI not claimed verified-green under rapid merges;
 - `6dd84d63` — tip advanced after tip honesty (#805) for 0631e737 after #804; tip CI not claimed verified-green under rapid merges;
