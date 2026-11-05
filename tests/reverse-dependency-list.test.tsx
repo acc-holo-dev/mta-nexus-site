@@ -21,18 +21,20 @@ describe("reverse dependency list behavior", () => {
         renderToStaticMarkup(<ReverseDependencyList summary={null} locale={locale} />),
       ).toContain(copy.reverseUnavailable);
 
-      expect(
-        renderToStaticMarkup(
-          <ReverseDependencyList
-            summary={{
-              totalVisible: 0,
-              limitReached: false,
-              products: [],
-            }}
-            locale={locale}
-          />,
-        ),
-      ).toContain(copy.noDependents);
+      const emptyMarkup = renderToStaticMarkup(
+        <ReverseDependencyList
+          summary={{
+            totalVisible: 0,
+            limitReached: false,
+            products: [],
+          }}
+          locale={locale}
+        />,
+      );
+      expect(emptyMarkup).toContain(copy.noDependents);
+      expect(emptyMarkup).toContain(copy.reverseNotice);
+      expect(emptyMarkup).toContain("border-dashed");
+      expect(emptyMarkup).not.toContain('class="text-xs text-faint"');
     },
   );
 

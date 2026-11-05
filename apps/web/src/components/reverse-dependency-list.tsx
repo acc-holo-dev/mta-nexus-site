@@ -1,6 +1,8 @@
+import { EmptyState } from "@nexus/ui";
+import { GitBranch } from "lucide-react";
 import Link from "next/link";
-import type { ReverseDependencySummary } from "../lib/reverse-dependency-summary";
 import { getDictionary, type Locale } from "../lib/i18n";
+import type { ReverseDependencySummary } from "../lib/reverse-dependency-summary";
 
 export function ReverseDependencyList({
   summary,
@@ -16,7 +18,13 @@ export function ReverseDependencyList({
   }
 
   if (summary.products.length === 0) {
-    return <p className="text-xs text-faint">{copy.noDependents}</p>;
+    return (
+      <EmptyState
+        title={copy.noDependents}
+        description={copy.reverseNotice}
+        icon={<GitBranch className="h-6 w-6" aria-hidden="true" />}
+      />
+    );
   }
 
   return (
