@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { flattenReactTestTree } from "./helpers/flatten-react-test-tree";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -38,7 +39,9 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h
 vi.mock("../apps/web/src/components/locale-context", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
+
 import { CommercialPlanForm } from "../apps/web/src/components/commercial-plan-form";
+
 const reply = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status });
 function render() {
   h.cursor = 0;
@@ -109,6 +112,43 @@ it("retains an actor-scoped marker across a lost create and reload until explici
   await vi.waitFor(() => expect(sessionStorage.getItem(key)).toBeNull());
   expect(confirm).toHaveBeenCalledOnce();
   expect(h.fetch.mock.calls.filter(([url]) => url === "/api/admin/commerce/plans")).toHaveLength(1);
+});
+it("keeps the recovery marker when acknowledgement confirmation is cancelled", async () => {
+  await mount();
+  prepare();
+  h.fetch.mockRejectedValueOnce(Error("lost"));
+  await submit();
+  const key = "nexus:commercial-plan-intent:v1:usr_a:new";
+  const saved = sessionStorage.getItem(key);
+  expect(saved).not.toBeNull();
+  h.slots = [];
+  await mount();
+  const clear = render().find(
+    (n) => n.type === "button" && n.props.children === "I checked the result",
+  );
+  if (!clear) throw Error("Missing acknowledgement");
+  const fetchBefore = h.fetch.mock.calls.length;
+  const plansBefore = h.fetch.mock.calls.filter(
+    ([url]) => url === "/api/admin/commerce/plans",
+  ).length;
+  confirm.mockResolvedValueOnce(false);
+  (clear.props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirm).toHaveBeenCalledTimes(1));
+  expect(confirm).toHaveBeenCalledWith({
+    title: "The operation result is unknown",
+    object: "seller-plan",
+    consequences:
+      "Check the list and history first. Clearing this warning does not confirm the result and may allow a duplicate operation.",
+    confirmLabel: "I checked the result",
+    cancelLabel: "Cancel",
+    closeLabel: "Cancel",
+    danger: true,
+  });
+  expect(sessionStorage.getItem(key)).toBe(saved);
+  expect(h.fetch.mock.calls).toHaveLength(fetchBefore);
+  expect(h.fetch.mock.calls.filter(([url]) => url === "/api/admin/commerce/plans")).toHaveLength(
+    plansBefore,
+  );
 });
 it("does not send a create without durable marker storage", async () => {
   await mount();
