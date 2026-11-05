@@ -6,6 +6,8 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `7b293b48` / #404 — resource-review-controls suite split;
+- `5e2c6cab` / #422 — tip honesty through #398;
 - `dceadf11` / #398 — library membership-batches suite split;
 - `e89abcf9` / #419 — tip honesty through #416;
 - `f3023e43` / #416 — tip honesty through #402/#403;
@@ -121,7 +123,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `dceadf11f2f1043a000707f0780fa29abce06400` after #398. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `7b293b48b46a834038ffa949442a0742d8f3fe7c` after #404. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
