@@ -83,6 +83,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.hidden);
     expect(html).toContain(copy.privacy);
     expect(html).toContain(item.text);
+    expect(html).toContain(`<search aria-label="${copy.filters}"`);
     expect(html).toContain('name="q"');
     expect(html).toContain('name="availability"');
     expect(html).toContain('href="/workspace/discussions/comment"');

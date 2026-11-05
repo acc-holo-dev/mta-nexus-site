@@ -75,40 +75,42 @@ export default async function OwnDiscussionsPage({
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.privacy}</p>
       </header>
-      <form
-        action="/workspace/discussions"
-        method="get"
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-      >
-        <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-          {copy.query}
-          <input
-            type="search"
-            name="q"
-            maxLength={120}
-            defaultValue={filters?.query ?? ""}
-            className={`${fieldClass} block min-h-11 w-full`}
-          />
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {copy.availability}
-          <select
-            name="availability"
-            defaultValue={filters?.availability ?? ""}
-            className={`${fieldClass} block min-h-11`}
-          >
-            <option value="">{copy.all}</option>
-            <option value="available">{copy.available}</option>
-            <option value="unavailable">{copy.unavailable}</option>
-          </select>
-        </label>
-        <Button type="submit" className="min-h-11 font-semibold">
-          {copy.search}
-        </Button>
-        <Link href="/workspace/discussions" className={linkClass}>
-          {copy.reset}
-        </Link>
-      </form>
+      <search aria-label={copy.filters}>
+        <form
+          action="/workspace/discussions"
+          method="get"
+          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+        >
+          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+            {copy.query}
+            <input
+              type="search"
+              name="q"
+              maxLength={120}
+              defaultValue={filters?.query ?? ""}
+              className={`${fieldClass} block min-h-11 w-full`}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.availability}
+            <select
+              name="availability"
+              defaultValue={filters?.availability ?? ""}
+              className={`${fieldClass} block min-h-11`}
+            >
+              <option value="">{copy.all}</option>
+              <option value="available">{copy.available}</option>
+              <option value="unavailable">{copy.unavailable}</option>
+            </select>
+          </label>
+          <Button type="submit" className="min-h-11 font-semibold">
+            {copy.search}
+          </Button>
+          <Link href="/workspace/discussions" className={linkClass}>
+            {copy.reset}
+          </Link>
+        </form>
+      </search>
       <a href={latest} className={linkClass}>
         {copy.latest}
       </a>
