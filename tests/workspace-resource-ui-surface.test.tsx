@@ -95,6 +95,31 @@ vi.mock("@nexus/ui", async () => {
         label ? createElement("label", { htmlFor: id }, label) : null,
         createElement("input", { id, ...props }),
       ),
+    ErrorState: ({
+      id,
+      title,
+      description,
+      action,
+    }: {
+      id?: string;
+      title?: ReactNode;
+      description?: ReactNode;
+      action?: ReactNode;
+    }) =>
+      createElement(
+        "div",
+        { "data-ui": "error-state", id },
+        title ? createElement("div", null, title) : null,
+        description ? createElement("div", null, description) : null,
+        action ?? null,
+      ),
+    EmptyState: ({ title, description }: { title?: ReactNode; description?: ReactNode }) =>
+      createElement(
+        "div",
+        { "data-ui": "empty-state" },
+        title ? createElement("div", null, title) : null,
+        description ? createElement("div", null, description) : null,
+      ),
   };
 });
 
