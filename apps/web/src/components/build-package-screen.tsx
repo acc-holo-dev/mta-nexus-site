@@ -111,10 +111,10 @@ export async function BuildPackageScreen({
         </p>
       </header>
       <p className="text-sm text-muted">{copy.comparisonNote}</p>
-      {!detail.build.hasInventory && <p className="text-warning">{copy.legacy}</p>}
-      {detail.build.hasInventory && !detail.comparisonAvailable && (
-        <p className="text-warning">{copy.noBaseline}</p>
-      )}
+      {!detail.build.hasInventory ? <ErrorState title={copy.legacy} /> : null}
+      {detail.build.hasInventory && !detail.comparisonAvailable ? (
+        <ErrorState title={copy.noBaseline} />
+      ) : null}
       <form
         method="get"
         action={pageBase}
