@@ -610,11 +610,13 @@ export function VerificationWorkspace({
               </Button>
               {writeError ? <ErrorState title={writeError} /> : null}
               {intent ? (
-                <p role="status">
-                  {locale === "ru"
-                    ? "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки."
-                    : "The submission result is unconfirmed. Only an exact retry of the original application is available."}
-                </p>
+                <ErrorState
+                  title={
+                    locale === "ru"
+                      ? "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки."
+                      : "The submission result is unconfirmed. Only an exact retry of the original application is available."
+                  }
+                />
               ) : null}
             </form>
           )}
