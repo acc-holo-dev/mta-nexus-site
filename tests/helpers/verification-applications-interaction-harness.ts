@@ -105,6 +105,17 @@ export function createVerificationApplicationsInteractionHelpers(
     (button.props.onClick as () => void)();
   }
 
+  function actionButton(nodes: FlatTestElement[], label: string) {
+    const found = nodes.find((node) => {
+      if (node.type !== "button") return false;
+      const children = node.props.children;
+      if (children === label) return true;
+      return Array.isArray(children) && children.includes(label);
+    });
+    if (!found) throw Error(`Missing ${label}`);
+    return found;
+  }
+
   function reviewNotes() {
     const notes = moderation().find((node) => node.type === "textarea");
     if (!notes) throw Error("Missing moderator notes");
@@ -137,6 +148,7 @@ export function createVerificationApplicationsInteractionHelpers(
     amendErrorState,
     moderation,
     decide,
+    actionButton,
     reviewNotes,
   };
 }
