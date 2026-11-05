@@ -1,4 +1,4 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../lib/i18n";
@@ -14,7 +14,7 @@ export function ReverseDependencyList({
   const copy = getDictionary(locale).dependencyUi;
 
   if (!summary) {
-    return <p className="text-xs text-warning">{copy.reverseUnavailable}</p>;
+    return <ErrorState title={copy.reverseUnavailable} />;
   }
 
   if (summary.products.length === 0) {

@@ -17,9 +17,14 @@ describe("reverse dependency list behavior", () => {
     (locale) => {
       const copy = getDictionary(locale).dependencyUi;
 
-      expect(
-        renderToStaticMarkup(<ReverseDependencyList summary={null} locale={locale} />),
-      ).toContain(copy.reverseUnavailable);
+      const unavailableMarkup = renderToStaticMarkup(
+        <ReverseDependencyList summary={null} locale={locale} />,
+      );
+      expect(unavailableMarkup).toContain(copy.reverseUnavailable);
+      expect(unavailableMarkup).toContain('role="alert"');
+      expect(unavailableMarkup).toContain("bg-danger-soft");
+      expect(unavailableMarkup).not.toContain('class="text-xs text-warning"');
+      expect(unavailableMarkup).not.toContain("border-dashed");
 
       const emptyMarkup = renderToStaticMarkup(
         <ReverseDependencyList
@@ -34,6 +39,7 @@ describe("reverse dependency list behavior", () => {
       expect(emptyMarkup).toContain(copy.noDependents);
       expect(emptyMarkup).toContain(copy.reverseNotice);
       expect(emptyMarkup).toContain("border-dashed");
+      expect(emptyMarkup).not.toContain('role="alert"');
       expect(emptyMarkup).not.toContain('class="text-xs text-faint"');
     },
   );
