@@ -9,6 +9,7 @@ import { followCopy, followError } from "../lib/follow-workspace-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
+import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
 import { LocaleProvider, useNexusLocale } from "./locale-context";
 
@@ -124,6 +125,18 @@ function ContentFollowControl({
 
   async function mutateFollow(desiredFollowing: boolean, desiredNotify: boolean) {
     if (!alive.current || busy.current || !ready || !authenticated || !actorId) return;
+    if (
+      !desiredFollowing &&
+      !(await confirmAction({
+        title: copy.removeConfirmTitle,
+        object: title,
+        consequences: copy.removeConfirm,
+        confirmLabel: copy.removeSave,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+      }))
+    )
+      return;
     busy.current = true;
     setPending(true);
     setMessage("");
