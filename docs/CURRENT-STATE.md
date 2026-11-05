@@ -6,6 +6,8 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `f176e884` / #355 — author content form failures through ErrorState;
+- `6945a24a` / #366 — tip honesty through residual wave;
 - `f15ed794` / #353 — residual requirements/release filter CTAs to touch;
 - `6e955360` / #352 — reaction removal failures through ErrorState;
 - `0047bba1` / #341 — reverse dependency empty through EmptyState;
@@ -74,7 +76,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `f15ed794facc2a92e92130d2da0cbde5e28cea5b` after #353/#352/#341/#365/#349/#335. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `f176e884ee95a20c1a8a77968227dd7babcea0db` after #355/#366. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
