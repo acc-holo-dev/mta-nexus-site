@@ -1,4 +1,5 @@
 import type { ResourceRequirementsReport, ResourceRequirementsScope } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
@@ -24,11 +25,28 @@ export function ResourceRequirementsReportBody({
   const copy = resourceRequirementsCopy(locale);
   return (
     <>
-      {showState && (
-        <p role="status" className="font-semibold">
-          {copy.states[report.state]}
-        </p>
-      )}
+      {showState &&
+        (report.state === "ready" ? (
+          <p role="status" className="font-semibold">
+            {copy.states[report.state]}
+          </p>
+        ) : (
+          <ErrorState
+            id={
+              report.state === "blocked"
+                ? "resource-requirements-report-blocked"
+                : "resource-requirements-report-review"
+            }
+            title={copy.states[report.state]}
+            description={
+              report.issues[0]
+                ? `${report.issues[0].slug} · ${copy.codes[report.issues[0].code]}`
+                : report.cycles[0]
+                  ? report.cycles[0].join(" → ")
+                  : undefined
+            }
+          />
+        ))}
       <p className="text-sm text-muted">
         {copy.snapshot}: {report.generatedAt}
       </p>
@@ -58,9 +76,11 @@ export function ResourceRequirementsReportBody({
             <p>{copy.none}</p>
           )}
           {report.cycles.map((cycle) => (
-            <p key={cycle.join(":")} className="break-words text-danger">
-              {cycle.join(" → ")}
-            </p>
+            <ErrorState
+              key={cycle.join(":")}
+              id={`resource-requirements-cycle-${cycle.join("-")}`}
+              title={cycle.join(" → ")}
+            />
           ))}
         </section>
       )}
