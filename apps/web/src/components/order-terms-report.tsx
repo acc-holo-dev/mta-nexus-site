@@ -6,6 +6,7 @@ import { formatFinancialMinor } from "../lib/financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../lib/order-terms-i18n";
 import { sellerSalesTime } from "../lib/seller-sales-i18n";
 
+// Honesty residual: consistency flags via ErrorState.
 const ORDER_TERMS_FLAG_IDS = {
   amountMismatch: "order-terms-amount-mismatch",
   currencyMismatch: "order-terms-currency-mismatch",
