@@ -25,52 +25,54 @@ export function PrivateChangeHistoryFilters<
 }) {
   const copy = privateChangeHistoryCopy(locale);
   return (
-    <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-4 p-4">
-      <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
-        <span className={labelClass}>{copy.period}</span>
-        <select name="period" className={selectClass} defaultValue={filters.period}>
-          {CHANGE_HISTORY_PERIODS.map((period) => (
-            <option key={period} value={period}>
-              {copy.periods[period]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
-        <span className={labelClass}>{copy.group}</span>
-        <select name="group" className={selectClass} defaultValue={filters.group}>
-          {groups.map((group) => (
-            <option key={group} value={group}>
-              {copy.groups[group]}
-            </option>
-          ))}
-        </select>
-      </label>
-      {search && (
-        <div className="min-w-0 basis-full space-y-1.5">
-          <Input
-            name="q"
-            type="search"
-            label={copy.search}
-            maxLength={80}
-            defaultValue={filters.query}
-            aria-describedby="change-history-search-help"
-          />
-          <span id="change-history-search-help" className="block text-xs text-muted">
-            {copy.searchHelp}
-          </span>
-        </div>
-      )}
-      <Button type="submit" variant="secondary">
-        {copy.apply}
-      </Button>
-      <Link
-        href={path}
-        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
-        {copy.reset}
-      </Link>
-    </form>
+    <search aria-label={search ? copy.search : copy.apply}>
+      <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-4 p-4">
+        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+          <span className={labelClass}>{copy.period}</span>
+          <select name="period" className={selectClass} defaultValue={filters.period}>
+            {CHANGE_HISTORY_PERIODS.map((period) => (
+              <option key={period} value={period}>
+                {copy.periods[period]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+          <span className={labelClass}>{copy.group}</span>
+          <select name="group" className={selectClass} defaultValue={filters.group}>
+            {groups.map((group) => (
+              <option key={group} value={group}>
+                {copy.groups[group]}
+              </option>
+            ))}
+          </select>
+        </label>
+        {search && (
+          <div className="min-w-0 basis-full space-y-1.5">
+            <Input
+              name="q"
+              type="search"
+              label={copy.search}
+              maxLength={80}
+              defaultValue={filters.query}
+              aria-describedby="change-history-search-help"
+            />
+            <span id="change-history-search-help" className="block text-xs text-muted">
+              {copy.searchHelp}
+            </span>
+          </div>
+        )}
+        <Button type="submit" variant="secondary">
+          {copy.apply}
+        </Button>
+        <Link
+          href={path}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        >
+          {copy.reset}
+        </Link>
+      </form>
+    </search>
   );
 }
 export function PrivateChangeHistoryCutoff({ until, locale }: { until: string; locale: Locale }) {

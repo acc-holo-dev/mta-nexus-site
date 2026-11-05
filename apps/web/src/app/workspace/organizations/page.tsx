@@ -54,21 +54,23 @@ export default async function OrganizationsPage({
           {copy.create}
         </Link>
       </header>
-      <form action="/workspace/organizations" className="flex flex-wrap items-end gap-3">
-        <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
-          <span>{copy.search}</span>
-          <input
-            className={`${platformFieldClass} min-h-11`}
-            type="search"
-            name="q"
-            maxLength={120}
-            defaultValue={filters.query}
-          />
-        </label>
-        <Button type="submit" variant="outline" className="min-h-11 text-sm text-secondary">
-          {copy.filter}
-        </Button>
-      </form>
+      <search aria-label={copy.search}>
+        <form action="/workspace/organizations" className="flex flex-wrap items-end gap-3">
+          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+            <span>{copy.search}</span>
+            <input
+              className={`${platformFieldClass} min-h-11`}
+              type="search"
+              name="q"
+              maxLength={120}
+              defaultValue={filters.query}
+            />
+          </label>
+          <Button type="submit" variant="outline" className="min-h-11 text-sm text-secondary">
+            {copy.filter}
+          </Button>
+        </form>
+      </search>
       {!result ? (
         <ErrorState
           title={copy.unavailable}

@@ -233,4 +233,5 @@ it("locks private change-history filter selects to min-h-11 without h-10 chrome"
   const source = read("apps/web/src/components/private-change-history-controls.tsx");
   expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
   expect(source).not.toContain("h-10");
+  expect(source).toContain("<search aria-label={search ? copy.search : copy.apply}>");
 });

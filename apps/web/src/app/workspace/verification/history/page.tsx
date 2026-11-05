@@ -84,59 +84,61 @@ export default async function VerificationHistoryPage({
       <Link href="/workspace/verification" className={navLinkClass}>
         {labels.back}
       </Link>
-      <form
-        method="get"
-        action="/workspace/verification/history"
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-      >
-        <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-          {copy.query}
-          <input
-            type="search"
-            name="q"
-            maxLength={100}
-            defaultValue={filters?.query ?? ""}
-            className={`${platformFieldClass} block min-h-11`}
-          />
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {copy.status}
-          <select
-            name="status"
-            defaultValue={filters?.status ?? "all"}
-            className={`${platformFieldClass} block min-h-11`}
-          >
-            {(["all", "pending", "approved", "rejected"] as const).map((value) => (
-              <option key={value} value={value}>
-                {value === "all" ? copy.all : labels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1 text-xs text-muted">
-          {labels.type}
-          <select
-            name="type"
-            defaultValue={filters?.type ?? "all"}
-            className={`${platformFieldClass} block min-h-11`}
-          >
-            <option value="all">{copy.all}</option>
-            {VERIFICATION_TYPES.map((value) => (
-              <option key={value} value={value}>
-                {labels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Button type="submit" className="min-h-11">
-          {copy.search}
-        </Button>
-        {historyFiltered ? (
-          <Link prefetch={false} href="/workspace/verification/history" className={navLinkClass}>
-            {copy.clear}
-          </Link>
-        ) : null}
-      </form>
+      <search aria-label={copy.query}>
+        <form
+          method="get"
+          action="/workspace/verification/history"
+          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
+        >
+          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+            {copy.query}
+            <input
+              type="search"
+              name="q"
+              maxLength={100}
+              defaultValue={filters?.query ?? ""}
+              className={`${platformFieldClass} block min-h-11`}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.status}
+            <select
+              name="status"
+              defaultValue={filters?.status ?? "all"}
+              className={`${platformFieldClass} block min-h-11`}
+            >
+              {(["all", "pending", "approved", "rejected"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {value === "all" ? copy.all : labels[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1 text-xs text-muted">
+            {labels.type}
+            <select
+              name="type"
+              defaultValue={filters?.type ?? "all"}
+              className={`${platformFieldClass} block min-h-11`}
+            >
+              <option value="all">{copy.all}</option>
+              {VERIFICATION_TYPES.map((value) => (
+                <option key={value} value={value}>
+                  {labels[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button type="submit" className="min-h-11">
+            {copy.search}
+          </Button>
+          {historyFiltered ? (
+            <Link prefetch={false} href="/workspace/verification/history" className={navLinkClass}>
+              {copy.clear}
+            </Link>
+          ) : null}
+        </form>
+      </search>
       <p className="text-xs text-muted">{copy.live}</p>
       <Link
         prefetch={false}

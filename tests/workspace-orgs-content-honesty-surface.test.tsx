@@ -52,6 +52,12 @@ it("locks workspace org activity and content page shells to clipped min-w-0 fram
   }
 });
 
+it("exposes a search landmark on the workspace organizations directory filter", () => {
+  expect(read("apps/web/src/app/workspace/organizations/page.tsx")).toContain(
+    "<search aria-label={copy.search}>",
+  );
+});
+
 it("locks residual workspace subscription page shells to clipped min-w-0 frames", () => {
   for (const page of clippedSubscriptionPages) {
     const source = read(page);

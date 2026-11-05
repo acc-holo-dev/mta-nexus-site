@@ -187,6 +187,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.private);
     expect(html).toContain(copy.ownerNote);
     expect(html).toContain(copy.yes);
+    expect(html).toContain(`<search aria-label="${copy.search}"`);
     expect(html).toContain('name="role"');
     expect(html).toContain('name="access"');
     expect(html).toContain('name="q"');

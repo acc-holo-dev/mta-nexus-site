@@ -81,6 +81,7 @@ it.each(["en", "ru"] as const)(
       expect.objectContaining({ query: "Lua", status: "pending", type: "developer" }),
     );
     expect(html).toContain('action="/workspace/verification/history"');
+    expect(html).toContain(`<search aria-label="${verificationApplicationsCopy(locale).query}"`);
     expect(html).toContain('href="/workspace/verification/request"');
     expect(html).toContain("&lt;script&gt;");
     expect(html).not.toContain("<script>");
