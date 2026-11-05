@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 function evidence(overrides = {}) {
@@ -29,9 +29,13 @@ function evidence(overrides = {}) {
     delivery: {
       acceptedUnique: 20,
       duplicateAccepts: 0,
+      forcedRetries: 1,
+      dispatcher: { retried: 1, unsettled: 0, discarded: 0, stale: 0 },
     },
     queue: {
       finalFixturePending: 0,
+      maxFixturePending: 20,
+      capacity: 100,
     },
     verdict: {
       passed: true,

@@ -100,6 +100,7 @@ const post = (
       ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: "nexus_session=raw-browser-token",
+      "x-nexus-actor-id": "usr_a",
       ...headers,
     },
   });
@@ -866,5 +867,12 @@ it("passes only the raw cookie token to collection mutations and surfaces transa
     (await create(post({ requestId, action: "create", name: "Core", currentToken: "forged" })))
       .status,
   ).toBe(400);
+  expect(state.command).not.toHaveBeenCalled();
+});
+it("requires the displayed actor for collection creation", async () => {
+  const missing = await create(post(undefined, base, { "x-nexus-actor-id": "" }));
+  expect(missing.status).toBe(428);
+  const changed = await create(post(undefined, base, { "x-nexus-actor-id": "usr_b" }));
+  expect(changed.status).toBe(409);
   expect(state.command).not.toHaveBeenCalled();
 });

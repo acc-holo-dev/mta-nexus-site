@@ -18,8 +18,8 @@ import { libraryCollectionsService as service } from "../lib/services/library-co
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import {
-  LibraryCollectionsPagination,
   type LibraryCollectionsActor,
+  LibraryCollectionsPagination,
   type LibraryCollectionsQuery,
   libraryCollectionsLinkClass,
   libraryCollectionsSearchFieldClass,
@@ -108,12 +108,14 @@ export async function LibraryCollectionsDetailView({
           {collection.status === "active" ? (
             <>
               <LibraryCollectionCommandForm
+                actorId={actor.id}
                 key={`rename:${collection.revision}`}
                 locale={locale}
                 collection={snapshot}
                 action="rename"
               />
               <LibraryCollectionCommandForm
+                actorId={actor.id}
                 key={`archive:${collection.revision}`}
                 locale={locale}
                 collection={snapshot}
@@ -122,6 +124,7 @@ export async function LibraryCollectionsDetailView({
             </>
           ) : (
             <LibraryCollectionCommandForm
+              actorId={actor.id}
               key={`restore:${collection.revision}`}
               locale={locale}
               collection={snapshot}
@@ -264,6 +267,7 @@ export async function LibraryCollectionsDetailView({
                 </p>
               ) : (
                 <LibraryCollectionCommandForm
+                  actorId={actor.id}
                   key={`${collection.revision}:${item.productId}`}
                   locale={locale}
                   collection={snapshot}

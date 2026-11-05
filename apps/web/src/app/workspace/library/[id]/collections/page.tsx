@@ -167,7 +167,8 @@ export default async function ResourceCollectionsPage({
                 </p>
                 {permitted ? (
                   <LibraryCollectionCommandForm
-                    key={`${id}:${collection.id}:${collection.revision}:${action}`}
+                    key={`${actor.id}:${id}:${collection.id}:${collection.revision}:${action}`}
+                    actorId={actor.id}
                     locale={locale}
                     collection={collection}
                     productId={id}

@@ -37,7 +37,8 @@ export async function LibraryCollectionsCopyView({
       </p>
       <p className="text-sm text-muted">{c.limit}</p>
       <LibraryCollectionCommandForm
-        key={`copy:${id}:${preview.source.revision}:${preview.sourceDigest}`}
+        key={`copy:${actor.id}:${id}:${preview.source.revision}:${preview.sourceDigest}`}
+        actorId={actor.id}
         locale={locale}
         collection={preview.source}
         copyPreview={preview}

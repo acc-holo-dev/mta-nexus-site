@@ -48,7 +48,11 @@ export function validateWebPushSoakEvidence(evidence) {
   if (!checksumMatches(evidence)) {
     return { ok: false, reason: "evidence checksum mismatch" };
   }
-  if (evidence?.verdict?.passed !== true) {
+  if (
+    evidence?.verdict?.passed !== true ||
+    !Array.isArray(evidence.verdict.failures) ||
+    evidence.verdict.failures.length !== 0
+  ) {
     return {
       ok: false,
       reason: `soak verdict is not passed: ${JSON.stringify(evidence?.verdict?.failures ?? [])}`,
@@ -59,7 +63,19 @@ export function validateWebPushSoakEvidence(evidence) {
     evidence.fixture.jobs < 1 ||
     evidence?.delivery?.acceptedUnique !== evidence.fixture.jobs ||
     evidence?.delivery?.duplicateAccepts !== 0 ||
-    evidence?.queue?.finalFixturePending !== 0
+    evidence?.queue?.finalFixturePending !== 0 ||
+    !Number.isSafeInteger(evidence?.delivery?.forcedRetries) ||
+    evidence.delivery.forcedRetries < 1 ||
+    !Number.isSafeInteger(evidence?.delivery?.dispatcher?.retried) ||
+    evidence.delivery.dispatcher.retried < evidence.delivery.forcedRetries ||
+    evidence.delivery.dispatcher.unsettled !== 0 ||
+    evidence.delivery.dispatcher.discarded !== 0 ||
+    evidence.delivery.dispatcher.stale !== 0 ||
+    !Number.isSafeInteger(evidence?.queue?.capacity) ||
+    evidence.queue.capacity < 1 ||
+    !Number.isSafeInteger(evidence?.queue?.maxFixturePending) ||
+    evidence.queue.maxFixturePending < 0 ||
+    evidence.queue.maxFixturePending > evidence.queue.capacity
   ) {
     return { ok: false, reason: "delivery/queue invariants are incomplete" };
   }
@@ -67,8 +83,12 @@ export function validateWebPushSoakEvidence(evidence) {
     return { ok: false, reason: "fixture cleanup was not proven" };
   }
   if (
+    !Number.isSafeInteger(evidence?.timing?.durationTargetMs) ||
+    evidence.timing.durationTargetMs < 60_000 ||
+    evidence.timing.durationTargetMs > 6 * 60 * 60 * 1_000 ||
+    evidence?.configuration?.durationMs !== evidence.timing.durationTargetMs ||
     !Number.isSafeInteger(evidence?.timing?.durationActualMs) ||
-    evidence.timing.durationActualMs < evidence?.timing?.durationTargetMs
+    evidence.timing.durationActualMs < evidence.timing.durationTargetMs
   ) {
     return { ok: false, reason: "duration evidence is incomplete" };
   }
@@ -92,6 +112,8 @@ export function validateWebPushProviderEvidence(evidence) {
   }
   if (
     evidence?.verdict?.passed !== true ||
+    !Array.isArray(evidence.verdict.failures) ||
+    evidence.verdict.failures.length !== 0 ||
     !Number.isSafeInteger(evidence?.response?.statusCode) ||
     evidence.response.statusCode < 200 ||
     evidence.response.statusCode >= 300 ||
@@ -108,9 +130,12 @@ export function validateWebPushProviderEvidence(evidence) {
     return { ok: false, reason: "target/VAPID identity evidence is invalid" };
   }
   if (
+    !Number.isSafeInteger(evidence?.request?.timeoutMs) ||
+    evidence.request.timeoutMs < 250 ||
+    evidence.request.timeoutMs > 60_000 ||
     !Number.isSafeInteger(evidence?.response?.durationMs) ||
     evidence.response.durationMs < 0 ||
-    evidence.response.durationMs > evidence?.request?.timeoutMs + 5_000
+    evidence.response.durationMs > evidence.request.timeoutMs + 5_000
   ) {
     return { ok: false, reason: "provider timing evidence is invalid" };
   }

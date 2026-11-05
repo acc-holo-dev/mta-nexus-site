@@ -16,8 +16,13 @@ vi.mock("../apps/web/src/components/confirm-action", () => ({
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
   useId: () => "field",
-  useEffect: (effect: () => () => void) => {
-    h.cleanup ??= effect();
+  useEffect: (effect: () => (() => void) | undefined) => {
+    const i = h.cursor++;
+    if (!(i in h.slots)) {
+      h.slots[i] = true;
+      const cleanup = effect();
+      if (!h.cleanup && cleanup) h.cleanup = cleanup;
+    }
   },
   useState: (initial: unknown) => {
     const i = h.cursor++;
@@ -55,6 +60,7 @@ const render = (
   return nodes(
     LibraryCollectionCommandForm({
       locale: "en",
+      actorId: "usr_a",
       action,
       ...(action === "create" ? {} : { collection }),
       productId: "prd_a",
@@ -63,6 +69,21 @@ const render = (
     }),
   );
 };
+async function mountDuplicate(
+  preview = { source: collection, itemCount: 200, sourceDigest: "a".repeat(64) },
+) {
+  h.fetch.mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ authenticated: true, user: { id: "usr_a" } }),
+  });
+  render("duplicate", preview);
+  await vi.waitFor(() =>
+    expect(render("duplicate", preview).find((node) => node.type === "form")?.props.hidden).toBe(
+      false,
+    ),
+  );
+  h.fetch.mockClear();
+}
 const submit = (tree: Element[]) => {
   const form = tree.find((n) => n.type === "form");
   if (!form) throw new Error("Missing command form");
@@ -88,6 +109,12 @@ beforeEach(() => {
   vi.clearAllMocks();
   confirmAction.mockReset().mockResolvedValue(true);
   vi.stubGlobal("fetch", h.fetch);
+  const data = new Map<string, string>();
+  vi.stubGlobal("sessionStorage", {
+    getItem: (key: string) => data.get(key) ?? null,
+    setItem: (key: string, value: string) => data.set(key, value),
+    removeItem: (key: string) => data.delete(key),
+  });
 });
 afterEach(() => vi.unstubAllGlobals());
 it("retries the same UUID and exact command after an ambiguous timeout", async () => {
@@ -149,6 +176,7 @@ it("prevents rapid double submission and never retries a confirmed command", asy
   expect(h.fetch).toHaveBeenCalledOnce();
 });
 it("confirms a full source copy and retries exactly before navigating to its new collection", async () => {
+  await mountDuplicate();
   const copy = libraryCollectionsCopy("en");
   confirmAction.mockResolvedValueOnce(false);
   await submit(render("duplicate"));
@@ -191,11 +219,13 @@ it("rejects a source/preview mismatch before a copy request", async () => {
     itemCount: 2,
     sourceDigest: "a".repeat(64),
   };
+  await mountDuplicate(preview);
   await submit(render("duplicate", preview));
   expect(confirmAction).not.toHaveBeenCalled();
   expect(h.fetch).not.toHaveBeenCalled();
 });
 it("does not navigate on a copy acknowledgement naming the source as its target", async () => {
+  await mountDuplicate();
   h.fetch.mockImplementationOnce(async (_: string, init: RequestInit) =>
     success(JSON.parse(String(init.body)), { ...collection, revision: 1 }),
   );

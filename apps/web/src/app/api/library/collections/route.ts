@@ -12,6 +12,9 @@ export function GET(request: NextRequest) {
 }
 export const POST = withBrowserMutation((request: NextRequest) => {
   return resourceCommerceRequest(request, true, async (actor) => {
+    const expectedActor = request.headers.get("x-nexus-actor-id");
+    if (!expectedActor) throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+    if (expectedActor !== actor.id) throw new AppError("Account changed", 409, "ACTOR_CHANGED");
     if (request.nextUrl.searchParams.size)
       throw new AppError("Unexpected mutation query", 400, "COLLECTION_INVALID");
     return libraryCollectionsService.command(

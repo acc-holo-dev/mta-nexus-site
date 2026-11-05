@@ -163,6 +163,8 @@ Full-page flow (не modal): Basic → Delivery → Files/Source → Dependencie
 
 Приватные: лимиты 30 collections / 200 items / batch 20. Добавление ≠ watch; архив коллекции ≠ отзыв доступа. Public/shared collections не подразумеваются. **Не** versioned server pack.
 
+`POST /api/library/collections` требует `X-Nexus-Actor-Id` с ID исходного аккаунта; отсутствие заголовка даёт 428, смена аккаунта — 409. Create и duplicate сохраняют исходный `requestId` и команду в хранилище текущей вкладки для точного повтора после неопределённого ответа; без доступного хранилища отправка не начинается.
+
 ### 5.4 Read-only historical archive (**текущий runtime**)
 
 Authenticated, `noindex`; без изобретения payment/payout/invoice/DRM provider:

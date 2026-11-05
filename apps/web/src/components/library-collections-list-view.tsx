@@ -79,7 +79,11 @@ export async function LibraryCollectionsListView({
       </p>
       <section className="nexus-panel space-y-3 p-5">
         <h2 className="font-semibold">{c.create}</h2>
-        <LibraryCollectionCommandForm locale={locale} />
+        <LibraryCollectionCommandForm
+          key={`create:${actor.id}`}
+          actorId={actor.id}
+          locale={locale}
+        />
       </section>
       <nav aria-label={c.title} className="flex gap-4">
         {(["active", "archived", "all"] as const).map((status) => (
