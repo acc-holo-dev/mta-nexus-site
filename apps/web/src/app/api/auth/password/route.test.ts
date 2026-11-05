@@ -118,6 +118,19 @@ describe("password change HTTP contract", () => {
     expect(changePassword).not.toHaveBeenCalled();
   });
 
+  it.each([
+    { ...validBody, newPassword: validBody.currentPassword },
+    { ...validBody, newPassword: "short" },
+    { ...validBody, userId: "usr_other" },
+  ])(
+    "rejects invalid password or a spoofed userId with a valid actor precondition",
+    async (body) => {
+      const response = await POST(request(body));
+      expect(response.status).toBe(400);
+      expect(changePassword).not.toHaveBeenCalled();
+    },
+  );
+
   it("returns a generic failure without leaking credentials or tokens", async () => {
     changePassword.mockRejectedValueOnce(new Error("database rejected secret value"));
     const response = await POST(request(validBody));

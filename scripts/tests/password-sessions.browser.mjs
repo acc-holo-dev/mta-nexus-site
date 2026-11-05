@@ -219,6 +219,7 @@ check("P3 unchanged and too-short passwords are rejected; anonymous requests den
         await request(alice, "/api/auth/password", "POST", {
           currentPassword: oldPassword,
           newPassword: value,
+          expectedActorId: aliceId,
         })
       ).status,
       400,
@@ -392,6 +393,27 @@ check(
       (
         await request(bob, "/api/auth/password", "POST", {
           userId: aliceId,
+          expectedActorId: bobId,
+          currentPassword: newPassword,
+          newPassword: secret(),
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await request(bob, "/api/auth/password", "POST", {
+          expectedActorId: aliceId,
+          currentPassword: newPassword,
+          newPassword: secret(),
+        })
+      ).status,
+      409,
+    );
+    assert.equal(
+      (
+        await request(bob, "/api/auth/password", "POST", {
+          expectedActorId: bobId,
           currentPassword: newPassword,
           newPassword: secret(),
         })
