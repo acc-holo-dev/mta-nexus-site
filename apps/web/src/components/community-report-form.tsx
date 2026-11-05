@@ -329,12 +329,12 @@ export function CommunityReportForm({
             </Link>
           </div>
           {intent ? (
-            <p role="status">
-              {message(
+            <ErrorState
+              title={message(
                 "Результат исходной отправки пока не подтверждён. Изменение полей заблокировано; повторите исходную жалобу или проверьте список жалоб.",
                 "The original submission is not confirmed. The fields are locked; retry the original report or check your reports.",
               )}
-            </p>
+            />
           ) : null}
           {error ? (
             <ErrorState
