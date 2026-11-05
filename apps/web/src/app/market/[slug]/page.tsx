@@ -254,12 +254,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className={pageShellClass}>
-      {!isPublic && (
-        <div className="rounded-xl border border-[color:var(--nexus-warning)]/25 bg-warning-soft p-4 text-sm text-warning">
-          <strong>{copy.privatePreview}</strong> · {copy.resourceStatus}:{" "}
-          {formatProductStatus(product.status, copy)}. {copy.notPublic}
-        </div>
-      )}
+      {!isPublic ? (
+        <ErrorState
+          id="market-private-preview"
+          title={copy.privatePreview}
+          description={`${copy.resourceStatus}: ${formatProductStatus(product.status, copy)}. ${copy.notPublic}`}
+        />
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
         <Link href="/market" className="transition-colors hover:text-primary">
@@ -426,9 +427,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                   </section>
                 </div>
               ) : (
-                <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
-                  {isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}
-                </div>
+                <ErrorState
+                  id="market-paid-disabled"
+                  title={isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}
+                />
               )}
             </div>
 
