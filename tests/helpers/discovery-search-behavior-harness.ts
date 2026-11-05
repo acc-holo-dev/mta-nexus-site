@@ -21,7 +21,7 @@ export const sources: DiscoverySearchBehaviorSources = {
   rateLimit: vi.fn(),
 };
 
-export function resetDiscoverySearchBehavior() {
+function resetDiscoverySearchBehavior() {
   for (const source of Object.values(sources)) source.mockReset();
   for (const source of [
     sources.products,
