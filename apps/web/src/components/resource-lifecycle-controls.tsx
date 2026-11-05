@@ -169,38 +169,47 @@ export function ResourceLifecycleControls({
       </dl>
       {nextStepCopy ? <p className="text-sm text-secondary">{nextStepCopy}</p> : null}
       {selectedBuild && buildAvailability !== "available" ? (
-        <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
-          <p>
-            {locale === "ru"
-              ? "Эта сборка недоступна для публичной выдачи. Скачивание и новая подписка на релизы блокируются, пока сборка снова не станет допустимой."
-              : "This build is unavailable for public delivery. Download and new release watches stay blocked until a valid build is available."}
-          </p>
-          <Link
-            href={unavailableBuildSupportHref()}
-            className="mt-2 inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            onClick={() =>
-              stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
-            }
-          >
-            {locale === "ru"
-              ? "Обратиться в поддержку с этим контекстом"
-              : "Contact support with this context"}
-          </Link>
-        </div>
-      ) : null}
-      {actions.length === 0 ? (
-        <div className="space-y-2">
-          <p className="text-sm text-warning">{copy.blocked}</p>
-          {product.status === "suspended" ? (
+        <ErrorState
+          title={
+            locale === "ru"
+              ? "Эта сборка недоступна для публичной выдачи"
+              : "This build is unavailable for public delivery"
+          }
+          description={
+            locale === "ru"
+              ? "Скачивание и новая подписка на релизы блокируются, пока сборка снова не станет допустимой."
+              : "Download and new release watches stay blocked until a valid build is available."
+          }
+          action={
             <Link
               href={unavailableBuildSupportHref()}
               className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              onClick={() => stashSupportObjectContext({ productId: product.id })}
+              onClick={() =>
+                stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
+              }
             >
-              {locale === "ru" ? "Открыть обращение" : "Open a support case"}
+              {locale === "ru"
+                ? "Обратиться в поддержку с этим контекстом"
+                : "Contact support with this context"}
             </Link>
-          ) : null}
-        </div>
+          }
+        />
+      ) : null}
+      {actions.length === 0 ? (
+        <ErrorState
+          title={copy.blocked}
+          action={
+            product.status === "suspended" ? (
+              <Link
+                href={unavailableBuildSupportHref()}
+                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                onClick={() => stashSupportObjectContext({ productId: product.id })}
+              >
+                {locale === "ru" ? "Открыть обращение" : "Open a support case"}
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
         <form onSubmit={submit} aria-busy={busy} className="space-y-4">
           <div className="space-y-1.5">
