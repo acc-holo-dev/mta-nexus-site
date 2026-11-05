@@ -96,84 +96,86 @@ export default async function Page({
         </nav>
         <h1>{v.title}</h1>
         <p className="text-secondary">{v.note}</p>
-        <form
-          method="get"
-          action={collectionInventoryHref()}
-          className="flex flex-wrap items-end gap-3"
-        >
-          <label className="grid gap-1">
-            {v.search}
-            <input
-              name="q"
-              defaultValue={report.q}
-              maxLength={80}
-              className="rounded border border-base bg-surface p-2"
-            />
-          </label>
-          <label className="grid gap-1">
-            {v.status}
-            <select
-              name="status"
-              defaultValue={report.status}
-              className="rounded border border-base bg-surface p-2"
-            >
-              {(["all", "active", "archived"] as const).map((status) => (
-                <option key={status} value={status}>
-                  {c[status]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1">
-            {v.collection}
-            <select
-              name="collectionId"
-              defaultValue={report.collectionId ?? ""}
-              className="rounded border border-base bg-surface p-2"
-            >
-              <option value="">{c.all}</option>
-              {report.collections.map((collection) => (
-                <option key={collection.id} value={collection.id}>
-                  {collection.name} · {c[collection.status]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1">
-            {v.filter}
-            <select
-              name="filter"
-              defaultValue={report.filter}
-              className="rounded border border-base bg-surface p-2"
-            >
-              {LIBRARY_COLLECTION_INVENTORY_FILTERS.map((filter) => (
-                <option key={filter} value={filter}>
-                  {v[filter]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1">
-            {v.releaseFilter}
-            <select
-              name="release"
-              defaultValue={report.release}
-              className="rounded border border-base bg-surface p-2"
-            >
-              {LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS.map((release) => (
-                <option key={release} value={release}>
-                  {v.releaseFilters[release]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <Button type="submit" variant="outline" className="min-h-11 px-3">
-            {v.apply}
-          </Button>
-          <Link href={collectionInventoryHref()} className={navLinkClass}>
-            {v.clear}
-          </Link>
-        </form>
+        <search aria-label={v.search}>
+          <form
+            method="get"
+            action={collectionInventoryHref()}
+            className="flex flex-wrap items-end gap-3"
+          >
+            <label className="grid gap-1">
+              {v.search}
+              <input
+                name="q"
+                defaultValue={report.q}
+                maxLength={80}
+                className="min-h-11 rounded border border-base bg-surface p-2"
+              />
+            </label>
+            <label className="grid gap-1">
+              {v.status}
+              <select
+                name="status"
+                defaultValue={report.status}
+                className="rounded border border-base bg-surface p-2"
+              >
+                {(["all", "active", "archived"] as const).map((status) => (
+                  <option key={status} value={status}>
+                    {c[status]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1">
+              {v.collection}
+              <select
+                name="collectionId"
+                defaultValue={report.collectionId ?? ""}
+                className="rounded border border-base bg-surface p-2"
+              >
+                <option value="">{c.all}</option>
+                {report.collections.map((collection) => (
+                  <option key={collection.id} value={collection.id}>
+                    {collection.name} · {c[collection.status]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1">
+              {v.filter}
+              <select
+                name="filter"
+                defaultValue={report.filter}
+                className="rounded border border-base bg-surface p-2"
+              >
+                {LIBRARY_COLLECTION_INVENTORY_FILTERS.map((filter) => (
+                  <option key={filter} value={filter}>
+                    {v[filter]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1">
+              {v.releaseFilter}
+              <select
+                name="release"
+                defaultValue={report.release}
+                className="rounded border border-base bg-surface p-2"
+              >
+                {LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS.map((release) => (
+                  <option key={release} value={release}>
+                    {v.releaseFilters[release]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button type="submit" variant="outline" className="min-h-11 px-3">
+              {v.apply}
+            </Button>
+            <Link href={collectionInventoryHref()} className={navLinkClass}>
+              {v.clear}
+            </Link>
+          </form>
+        </search>
         <dl className="grid grid-cols-2 gap-3 md:grid-cols-5">
           {(["resources", "references", "available", "unavailable", "shared"] as const).map(
             (key) => (

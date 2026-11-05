@@ -135,33 +135,35 @@ export async function CollectionReleasesScreen({
           {librarySelectionBatchesCopy(locale).title}
         </Link>
       )}
-      <form
-        method="get"
-        action={collectionHref(path.id, "releases")}
-        className="flex flex-wrap items-end gap-3"
-      >
-        <input type="hidden" name="filter" value={result.filter} />
-        <label className="grid gap-1">
-          {cc.search}
-          <input
-            name="q"
-            defaultValue={result.q}
-            maxLength={80}
-            className="border border-base bg-surface p-2"
-          />
-        </label>
-        <Button type="submit" variant="outline" size="touch">
-          {cc.apply}
-        </Button>
-        {result.q && (
-          <Link
-            href={collectionHref(path.id, "releases", { filter: result.filter })}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
-            {cc.clear}
-          </Link>
-        )}
-      </form>
+      <search aria-label={cc.search}>
+        <form
+          method="get"
+          action={collectionHref(path.id, "releases")}
+          className="flex flex-wrap items-end gap-3"
+        >
+          <input type="hidden" name="filter" value={result.filter} />
+          <label className="grid gap-1">
+            {cc.search}
+            <input
+              name="q"
+              defaultValue={result.q}
+              maxLength={80}
+              className="min-h-11 border border-base bg-surface p-2"
+            />
+          </label>
+          <Button type="submit" variant="outline" size="touch">
+            {cc.apply}
+          </Button>
+          {result.q && (
+            <Link
+              href={collectionHref(path.id, "releases", { filter: result.filter })}
+              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              {cc.clear}
+            </Link>
+          )}
+        </form>
+      </search>
       <nav aria-label={c.title} className="flex flex-wrap gap-3">
         {LIBRARY_RELEASE_FILTERS.map((filter) => (
           <Link
