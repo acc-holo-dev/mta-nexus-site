@@ -1,11 +1,16 @@
 # Проверенный срез проекта
 
-**Дата:** 4 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
+**Дата:** 5 ноября 2026. **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site). **Каноническая ветка:** `main`. **Версия приложения:** `1.2.0-beta.3` (не поднималась этой волной).
 
 ## Текущая интеграционная волна — verified green на tip
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `6cefa74e` — bind order case reviews and recheck observability; tip green after session-binding / recovery wave;
+- `e05aa2e2` — recover order cancellation and guard isolated tests;
+- `637f7d3c` — bind storage maintenance and guard local compose;
+- `1e9a9ea2` — bind plan administration and report docker context;
+- `8df4c3d9` — hide stale notification previews and guard capture;
 - `b7e8d9db` / #316 — search landmarks for support, publication desk and directory filters;
 - `484da60a` / #315 — server-review confirmation coverage and split collection copy suite;
 - `d3a5224a` / #317 — notification bell, push and license UI states;
@@ -32,10 +37,10 @@
 
 ## Verified green baseline (bullets)
 
-- **Проверенный tip `origin/main`:** `b7e8d9db40aba99e549db7b4f4a5154ddb29bd82` / #316.
-- **CI на этом SHA:** [CI 41903647006](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41903647006) — success. Выполнены lint/types/unit, database tests, сборка production image и production browser smoke; отдельные browser suites, backup restore и остальные skipped jobs в этот прогон не входили.
+- **Проверенный tip `origin/main`:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave.
+- **CI на этом SHA:** [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) — success (full selected scope on tip after session-binding fixes).
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
-- **Предыдущий green:** `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
+- **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
 - **Prior selected green:** `9c31b96dea…` / [CI 41815429471](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41815429471); prior full browsers `1bb5ab2ddd…` / [CI 41812270647](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41812270647).
 - **Failed tip (not baseline):** `f3525fa5…` / #249 — auth/resource browser honesty/confirm + guest More ordering + login `429` (fixed by #252).
 - **Prior selected green:** `30b3a1b931…` / [CI 41793284793](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41793284793).
