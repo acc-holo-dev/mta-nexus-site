@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `bb3e1d65` — tip advanced after tip honesty (#786) for ac8845be and resource-build-withdrawn ErrorState honesty (#783); tip CI not claimed verified-green under rapid merges;
 - `ac8845be` — tip advanced after author-resource-details-readonly ErrorState honesty (#776) following tip honesty (#785) on 519e1c0d / tip f8d03f6a; tip CI not claimed verified-green under rapid merges;
 - `519e1c0d` — tip advanced after resource-compat-suspended ErrorState honesty (#778) following tip honesty (#782) on 8efb1bd1 / tip 89cdb414; tip CI not claimed verified-green under rapid merges;
 - `8efb1bd1` — tip advanced after tip honesty (#781) on 173ae7fa; tip CI not claimed verified-green under rapid merges;
