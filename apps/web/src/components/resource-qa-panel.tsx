@@ -362,7 +362,7 @@ export function ResourceQaPanel({
           }
         />
       ) : null}
-      {writeError ? <ErrorState title={writeError} /> : null}
+      {writeError ? <ErrorState id="resource-qa-write-failed" title={writeError} /> : null}
 
       {selectedId && detail ? (
         <div className="min-w-0 space-y-4 overflow-x-clip">
