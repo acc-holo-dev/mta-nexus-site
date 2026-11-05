@@ -13,14 +13,17 @@ const h = vi.hoisted(() => ({
   locale: "en",
   cleanup: null as (() => void) | null,
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 
 const { button, ack, reviewed } = createResourceReleaseWatchBatchInteractionHelpers(
   h,
   ResourceReleaseWatchBatchControls,
+  confirmAction,
 );
 
 it("coalesces stale duplicate click handlers while a request is in flight", async () => {
@@ -34,6 +37,7 @@ it("coalesces stale duplicate click handlers while a request is in flight", asyn
   );
   const action = button("Stop selected watches").props.onClick as () => void;
   action();
+  await new Promise((r) => setTimeout(r, 0));
   action();
   expect(h.fetch).toHaveBeenCalledOnce();
   const init = h.fetch.mock.calls[0][1] as RequestInit;
@@ -52,6 +56,7 @@ it("aborts a group command on unmount and ignores the late acknowledgement", asy
       }),
   );
   (button("Stop selected watches").props.onClick as () => void)();
+  await new Promise((r) => setTimeout(r, 0));
   const init = h.fetch.mock.calls[0][1] as RequestInit;
   h.cleanup?.();
   expect(init.signal?.aborted).toBe(true);

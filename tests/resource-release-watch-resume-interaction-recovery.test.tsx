@@ -12,8 +12,10 @@ const h = vi.hoisted(() => ({
   reload: vi.fn(),
   locale: "en",
 }));
+const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
+vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { ResourceReleaseWatchBatchControls } from "../apps/web/src/components/resource-release-watch-batch-controls";
 import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release-watches-i18n";
@@ -21,6 +23,7 @@ import { resourceReleaseWatchesCopy } from "../apps/web/src/lib/resource-release
 const helpers = createResourceReleaseWatchResumeInteractionHelpers(
   h,
   ResourceReleaseWatchBatchControls,
+  confirmAction,
 );
 
 it.each(["en", "ru"])(
@@ -28,7 +31,7 @@ it.each(["en", "ru"])(
   async (locale) => {
     h.locale = locale;
     const copy = resourceReleaseWatchesCopy(locale as "en" | "ru");
-    expect(helpers.checks()).toHaveLength(3);
+    expect(helpers.checks()).toHaveLength(2);
     await helpers.click(copy.applyResume);
     expect(h.fetch).not.toHaveBeenCalled();
     helpers.reviewed();

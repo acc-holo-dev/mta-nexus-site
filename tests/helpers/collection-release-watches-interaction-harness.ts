@@ -11,6 +11,8 @@ type CollectionReleaseWatchesInteractionHarness = {
   locale: string;
 };
 
+type ConfirmActionMock = Mock<(...args: unknown[]) => Promise<boolean>>;
+
 type CollectionReleaseWatchesControlsComponent = (props: {
   items: {
     productId: string;
@@ -58,6 +60,7 @@ export function mockReactHooks(harness: CollectionReleaseWatchesInteractionHarne
 export function createCollectionReleaseWatchesInteractionHelpers(
   harness: CollectionReleaseWatchesInteractionHarness,
   ResourceReleaseWatchBatchControls: CollectionReleaseWatchesControlsComponent,
+  confirmAction?: ConfirmActionMock,
 ) {
   type Element = FlatTestElement;
   let activeWatchCount = 4;
@@ -110,7 +113,6 @@ export function createCollectionReleaseWatchesInteractionHelpers(
   function reviewed() {
     change(checks()[0], true);
     change(checks()[1], true);
-    change(checks().at(-1) as Element, true);
   }
 
   beforeEach(() => {
@@ -120,6 +122,7 @@ export function createCollectionReleaseWatchesInteractionHelpers(
     activeWatchCount = 4;
     collectionId = "lcol_a";
     vi.clearAllMocks();
+    confirmAction?.mockResolvedValue(true);
     vi.stubGlobal("fetch", harness.fetch);
     vi.stubGlobal("window", { location: { reload: harness.reload } });
   });
