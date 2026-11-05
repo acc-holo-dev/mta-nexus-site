@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `5178f3ff` — tip advanced after tip honesty (#754) and support-case-repository suite split (#747); tip CI not claimed verified-green under rapid merges;
 - `5c42a25c` — tip advanced after tip honesty (#753) on 2ff10b8a; tip CI not claimed verified-green under rapid merges;
 - `2ff10b8a` — tip advanced after tip honesty (#752) and admin build quarantine reason ErrorState (#745); tip CI not claimed verified-green under rapid merges;
 - `d33f3379` — tip advanced after tip honesty (#750) on f74fd532; tip CI not claimed verified-green under rapid merges;
