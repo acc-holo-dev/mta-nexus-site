@@ -217,11 +217,14 @@ export default async function ServerDetailPage({
         !server.ownerId &&
         !server.isVerified &&
         (claimViewer === undefined ? (
-          <p role="status">
-            {locale === "ru"
-              ? "Не удалось проверить сессию для подтверждения сервера."
-              : "Could not check the session for server verification."}
-          </p>
+          <ErrorState
+            id="server-claim-session-unavailable"
+            title={
+              locale === "ru"
+                ? "Не удалось проверить сессию для подтверждения сервера."
+                : "Could not check the session for server verification."
+            }
+          />
         ) : (
           <ServerClaimControlPanel
             key={`${server.id}:${claimViewer?.id ?? "guest"}`}
