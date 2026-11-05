@@ -1,7 +1,13 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const readSource = (relative: string) =>
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", relative), "utf8");
 
 const runtime = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 
@@ -59,9 +65,9 @@ vi.mock("next/link", async () => {
   };
 });
 
-import RootLayout from "../apps/web/src/app/layout";
-import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
 import ErrorPage from "../apps/web/src/app/error";
+import GlobalError, { detectGlobalErrorLocale } from "../apps/web/src/app/global-error";
+import RootLayout from "../apps/web/src/app/layout";
 import NotFound from "../apps/web/src/app/not-found";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -168,9 +174,20 @@ describe("Next.js root runtime shell behavior", () => {
       expect(html).toContain(`>${dictionary.errors.retry}</span>`);
       expect(html).toContain(`>${dictionary.errors.home}</span>`);
       expect(html).toContain('href="/"');
+      expect(html).toContain("min-h-11");
+      expect(html).toContain("flex min-h-11 items-center");
       expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(2);
     },
   );
+
+  it("locks root error CTAs to size=touch / min-h-11 without size=sm", () => {
+    const source = readSource("apps/web/src/app/error.tsx");
+    expect(source).toContain('size="touch"');
+    expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);
+    expect(source).toContain("min-h-11 items-center");
+    expect(source).not.toContain('size="sm"');
+    expect(source).not.toContain("min-h-10");
+  });
 
   it.each(["en", "ru"] as const)(
     "renders not-found recovery destinations in %s",
