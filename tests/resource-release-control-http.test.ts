@@ -68,6 +68,7 @@ function post(path: string, body: unknown, headers = {}) {
       cookie: "nexus_session=staff-token",
       ...browserMutationHeaders(),
       "content-type": "application/json",
+      "x-nexus-actor-id": "usr_a",
       ...headers,
     },
     body: JSON.stringify(body),
@@ -240,5 +241,19 @@ it("rejects a missing initiating cookie before reading the selection body", asyn
   const request = post("/api/library/releases/prd_a", fixed, { cookie: "" });
   expect((await select(request, context)).status).toBe(401);
   expect(request.bodyUsed).toBe(false);
+  expect(state.libraryCommand).not.toHaveBeenCalled();
+});
+
+it("requires the original actor before selecting a release", async () => {
+  expect(
+    (await select(post("/api/library/releases/prd_a", fixed, { "x-nexus-actor-id": "" }), context))
+      .status,
+  ).toBe(428);
+  const response = await select(
+    post("/api/library/releases/prd_a", fixed, { "x-nexus-actor-id": "usr_b" }),
+    context,
+  );
+  expect(response.status).toBe(409);
+  expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
   expect(state.libraryCommand).not.toHaveBeenCalled();
 });

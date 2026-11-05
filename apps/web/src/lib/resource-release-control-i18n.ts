@@ -102,7 +102,7 @@ const copy = {
       RATE_LIMIT_EXCEEDED: "Too many requests. Try again shortly.",
       fallback: "The result could not be confirmed. Reload the current state before retrying.",
       actionErrorDescription:
-        "A failed version preference update is not a saved selection. Retry the same request or reload the current state.",
+        "The result may be unknown. Retry the same request or reload the current state.",
     },
   },
   ru: {
@@ -205,7 +205,7 @@ const copy = {
       RATE_LIMIT_EXCEEDED: "Слишком много запросов. Попробуйте немного позже.",
       fallback: "Результат не удалось подтвердить. Обновите состояние перед повтором.",
       actionErrorDescription:
-        "Неудачное обновление выбора версии — это не сохранённая настройка. Повторите тот же запрос или обновите текущее состояние.",
+        "Результат может быть неизвестен. Повторите тот же запрос или обновите текущее состояние.",
     },
   },
 } as const;

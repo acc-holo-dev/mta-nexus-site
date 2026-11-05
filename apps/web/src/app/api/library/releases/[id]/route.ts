@@ -20,6 +20,9 @@ export const POST = withBrowserMutation(
     return resourceCommerceRequest(request, true, async (actor) => {
       const currentToken = request.cookies.get("nexus_session")?.value;
       if (!currentToken) throw new UnauthorizedError();
+      const expected = request.headers.get("x-nexus-actor-id");
+      if (!expected) throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+      if (expected !== actor.id) throw new AppError("Account changed", 409, "ACTOR_CHANGED");
       if (request.nextUrl.searchParams.size !== 0)
         throw new AppError("Invalid library selection query", 400, "RESOURCE_CONTROL_INVALID");
       const command = libraryReleaseCommandSchema.safeParse(await readBoundedJson(request, 2048));

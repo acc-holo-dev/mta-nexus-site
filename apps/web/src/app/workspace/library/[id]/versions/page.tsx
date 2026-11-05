@@ -158,8 +158,9 @@ export default async function LibraryVersionsPage({
         {libraryCollectionsCopy(typedLocale).resourceCollections}
       </Link>
       <LibraryReleaseSelectionControls
-        key={id}
+        key={`${user.id}:${id}`}
         productId={id}
+        actorId={user.id}
         revision={result.selection.revision}
         mode={result.selection.mode}
         selectedBuildId={result.selection.buildId}

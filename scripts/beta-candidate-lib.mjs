@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { evaluateReleaseUpgradeEvidence } from "../packages/db/scripts/release-upgrade-contract.mjs";
+import {
+  evaluateReleaseUpgradeEvidence,
+  sameFullGitSha,
+} from "../packages/db/scripts/release-upgrade-contract.mjs";
 import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "./backup-restore-contract.mjs";
 import { requiredJobs } from "./ci-policy.mjs";
 import { evaluateLegalSurfaces } from "./legal-surfaces-lib.mjs";
@@ -128,15 +131,6 @@ function readJsonIfPresent(path) {
   }
 }
 
-function shaMatches(candidateSha, reportedSha) {
-  return (
-    typeof candidateSha === "string" &&
-    typeof reportedSha === "string" &&
-    candidateSha.length >= 40 &&
-    reportedSha.startsWith(candidateSha.slice(0, 40))
-  );
-}
-
 function jobSuccess(ciEvidence, jobName) {
   if (ciEvidence?.jobResults && typeof ciEvidence.jobResults === "object") {
     return ciEvidence.jobResults[jobName] === "success";
@@ -167,7 +161,7 @@ function evaluateCiJobs(category, ciEvidence, candidateSha) {
       reason: `CI evidence status is ${ciEvidence.status ?? "unknown"}, not PASS.`,
     };
   }
-  if (!shaMatches(candidateSha, ciEvidence.sha)) {
+  if (!sameFullGitSha(candidateSha, ciEvidence.sha)) {
     return {
       status: "blocked",
       reason: "CI evidence SHA does not match the candidate commit.",
@@ -184,6 +178,12 @@ function evaluateCiJobs(category, ciEvidence, candidateSha) {
 }
 
 function evaluateUpgradeArtifact(path, candidateSha) {
+  if (!sameFullGitSha(candidateSha, candidateSha)) {
+    return {
+      status: "blocked",
+      reason: "database upgrade evidence requires the exact candidate SHA.",
+    };
+  }
   const body = readJsonIfPresent(path);
   if (!body) {
     return {
@@ -212,7 +212,13 @@ function evaluateBackupArtifact(path, candidateSha) {
     };
   }
   const sha = body.sha ?? body.repository?.sha ?? body.commit ?? null;
-  if (candidateSha && sha && !shaMatches(candidateSha, sha)) {
+  if (!sha) {
+    return {
+      status: "blocked",
+      reason: "backup-restore evidence is missing the candidate SHA.",
+    };
+  }
+  if (!sameFullGitSha(candidateSha, sha)) {
     return {
       status: "blocked",
       reason: "backup-restore evidence SHA does not match the candidate commit.",
@@ -222,12 +228,6 @@ function evaluateBackupArtifact(path, candidateSha) {
     return {
       status: "blocked",
       reason: `backup-restore status is ${body.status ?? "unknown"}, not PASS.`,
-    };
-  }
-  if (!sha) {
-    return {
-      status: "blocked",
-      reason: "backup-restore evidence is missing the candidate SHA.",
     };
   }
   const incompleteFlags = BACKUP_RESTORE_EVIDENCE_FLAGS.filter((flag) => body[flag] !== true);
@@ -311,7 +311,7 @@ export function evaluateBetaCandidate({
             status: "blocked",
             reason: "Missing artifacts/ci-evidence.json for the candidate SHA.",
           };
-        } else if (!shaMatches(candidateSha, ciEvidence.sha)) {
+        } else if (!sameFullGitSha(candidateSha, ciEvidence.sha)) {
           result = {
             status: "blocked",
             reason: "CI evidence SHA does not match the candidate commit.",

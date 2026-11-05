@@ -118,6 +118,7 @@ it("locks live buyer rights and a cleared build before saving a preference with 
     clockRows,
     [[1, "fixed", "bld_a", stamp]],
     [],
+    liveBuyerSession,
   ];
   expect(await library.command(input)).toMatchObject({
     productId: "prd_a",
@@ -135,7 +136,9 @@ it("locks live buyer rights and a cleared build before saving a preference with 
   expect(buildQuery?.sql).toContain('"builds"."scanned_at" is not null');
   expect(sql).toContain('insert into "resource_library_selections"');
   expect(sql).toContain('insert into "audit_events"');
-  expect(state.queries.at(-1)?.params).toContain("library.release_selected");
+  expect(state.queries.find((q) => q.sql.includes('insert into "audit_events"'))?.params).toContain(
+    "library.release_selected",
+  );
   expect(sql).not.toMatch(
     /(?:insert into|update) "(?:entitlements|licenses|payments|orders|ledger_entries)"/u,
   );
@@ -188,6 +191,7 @@ it("can clear a withdrawn preference while a resource is suspended, without gran
     clockRows,
     [[4, "latest", null, "2026-10-10T12:00:00.001Z"]],
     [],
+    liveBuyerSession,
   ];
   expect(
     await library.command({ ...input, command: { mode: "latest", expectedRevision: 3 } }),
@@ -442,6 +446,7 @@ it("guards an existing revision and advances a future timestamp monotonically", 
     clockRows,
     [[4, "fixed", "bld_a", "2026-10-11T12:00:00.001Z"]],
     [],
+    liveBuyerSession,
   ];
   await library.command({ ...input, command: { ...fixed, expectedRevision: 3 } });
   const query = state.queries.find((q) =>
@@ -473,6 +478,7 @@ it("saves and replays an exact reviewed archive without duplicating audit", asyn
     clockRows,
     [[1, "fixed", "bld_a", stamp]],
     [],
+    liveBuyerSession,
   ];
   const first = await library.command({ ...input, command: { ...fixed, reviewedArtifact } });
   expect(first.selection).toMatchObject({ mode: "fixed", buildId: "bld_a", revision: 1 });
@@ -499,6 +505,7 @@ it("requires the initiating raw session after all authority locks and before wri
     clockRows,
     [[1, "fixed", "bld_a", stamp]],
     [],
+    liveBuyerSession,
   ];
   await library.command(input);
   const sessionIndex = state.queries.findIndex(
@@ -513,11 +520,12 @@ it("requires the initiating raw session after all authority locks and before wri
   expect(state.queries[sessionIndex].params).not.toContain(input.currentToken);
   expect(
     state.queries
-      .slice(sessionIndex + 1)
+      .slice(sessionIndex + 1, -1)
       .map((q) => q.sql)
       .join("\n"),
   ).not.toMatch(/for (?:share|update|no key update)/u);
   expect(state.queries[sessionIndex + 1].sql).toContain("clock_timestamp()");
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
 });
 it("rejects missing sessions before locks and stale database session evidence before exact replay", async () => {
   await expect(library.command({ ...input, currentToken: "" })).rejects.toMatchObject({

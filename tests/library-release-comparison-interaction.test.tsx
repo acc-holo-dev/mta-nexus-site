@@ -68,7 +68,13 @@ let selection = {
 function render() {
   h.cursor = 0;
   return nodes(
-    LibraryReleaseComparisonSelection({ productId: "prd_a", locale: h.locale, selection, target }),
+    LibraryReleaseComparisonSelection({
+      productId: "prd_a",
+      actorId: "usr_a",
+      locale: h.locale,
+      selection,
+      target,
+    }),
   );
 }
 function button(label: string) {

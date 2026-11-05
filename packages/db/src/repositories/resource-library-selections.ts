@@ -254,6 +254,8 @@ export class ResourceLibrarySelectionsRepository {
         targetId: product.id,
         details: { mode: command.mode, buildId, revision },
       });
+      // Roll back both writes if the initiating session expires during a write wait.
+      await lockInitiatingSession(tx, input.userId, input.currentToken);
       return { productId: product.id, selection };
     });
   }

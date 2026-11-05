@@ -8,22 +8,25 @@ import { ActionConfirmCheckbox } from "./action-confirm-checkbox";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseComparisonSelection({
   productId,
+  actorId,
   locale,
   selection,
   target,
 }: {
   productId: string;
+  actorId: string;
   locale: Locale;
   selection: { revision: number; mode: "latest" | "fixed"; buildId: string | null };
   target: { id: string; version: string; sha256Hash: string; fileSizeBytes: number };
 }) {
   const copy = libraryReleaseComparisonCopy(locale);
   const control = getResourceReleaseControlCopy(locale);
-  const state = useLibraryReleaseCommand(productId, locale);
+  const state = useLibraryReleaseCommand(productId, actorId, locale);
   const reviewSelection = { ...selection },
     artifact = { ...target };
   const fingerprint = JSON.stringify([
     productId,
+    actorId,
     reviewSelection.revision,
     reviewSelection.mode,
     reviewSelection.buildId,

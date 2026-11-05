@@ -115,12 +115,15 @@ function resolveEvidenceSha(body) {
   return typeof sha === "string" && sha.length > 0 ? sha : null;
 }
 
-function shaMatches(candidateSha, reportedSha) {
+function isFullGitSha(sha) {
+  return typeof sha === "string" && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/iu.test(sha);
+}
+
+export function sameFullGitSha(candidateSha, reportedSha) {
   return (
-    typeof candidateSha === "string" &&
-    typeof reportedSha === "string" &&
-    candidateSha.length >= 40 &&
-    reportedSha.startsWith(candidateSha.slice(0, 40))
+    isFullGitSha(candidateSha) &&
+    isFullGitSha(reportedSha) &&
+    candidateSha.toLowerCase() === reportedSha.toLowerCase()
   );
 }
 
@@ -184,7 +187,7 @@ export function evaluateReleaseUpgradeEvidence(body, { candidateSha = null } = {
   if (!sha) {
     return { ok: false, reason: "release-upgrade evidence is missing the candidate SHA." };
   }
-  if (candidateSha && !shaMatches(candidateSha, sha)) {
+  if (!isFullGitSha(sha) || (candidateSha !== null && !sameFullGitSha(candidateSha, sha))) {
     return {
       ok: false,
       reason: "release-upgrade evidence SHA does not match the candidate commit.",

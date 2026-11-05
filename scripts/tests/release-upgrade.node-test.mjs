@@ -3,12 +3,12 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  createReleaseUpgradeEvidence,
+  evaluateReleaseUpgradeEvidence,
   RELEASE_UPGRADE_BASELINE_TAG,
   RELEASE_UPGRADE_EVIDENCE_FLAGS,
   RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION,
   RELEASE_UPGRADE_TARGET_TAG,
-  createReleaseUpgradeEvidence,
-  evaluateReleaseUpgradeEvidence,
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
@@ -493,6 +493,25 @@ test("upgrade evidence validator accepts versioned and legacy full-format PASS a
   });
   assert.equal("schemaVersion" in retained, false);
   assert.equal(evaluateReleaseUpgradeEvidence(retained, { candidateSha: evidenceSha }).ok, true);
+});
+
+test("upgrade evidence validates a full SHA even without a supplied candidate", () => {
+  assert.equal(
+    evaluateReleaseUpgradeEvidence(createReleaseUpgradeEvidence({ sha: evidenceSha })).ok,
+    true,
+  );
+  for (const invalid of [`${evidenceSha}not-a-sha`, evidenceSha.slice(0, 39), "x".repeat(40)]) {
+    assert.equal(
+      evaluateReleaseUpgradeEvidence(createReleaseUpgradeEvidence({ sha: invalid })).ok,
+      false,
+    );
+  }
+  assert.equal(
+    evaluateReleaseUpgradeEvidence(createReleaseUpgradeEvidence({ sha: evidenceSha }), {
+      candidateSha: "",
+    }).ok,
+    false,
+  );
 });
 
 test("upgrade evidence validator rejects status-only PASS and identity failures", () => {

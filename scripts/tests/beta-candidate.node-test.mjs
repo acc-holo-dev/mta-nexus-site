@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { createReleaseUpgradeEvidence } from "../../packages/db/scripts/release-upgrade-contract.mjs";
+import { BACKUP_RESTORE_EVIDENCE_FLAGS } from "../backup-restore-contract.mjs";
 import {
   BETA_CANDIDATE_CATEGORIES,
   BETA_CANDIDATE_OUT_OF_SCOPE,
@@ -13,6 +14,62 @@ import {
 } from "../beta-candidate-lib.mjs";
 
 const sha = "a".repeat(40);
+
+test("CI, backup and upgrade evidence require the exact full Git SHA", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-beta-exact-sha-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  mkdirSync(join(root, "artifacts"));
+  for (const [candidateSha, reportedSha, expected] of [
+    [sha, `${sha}not-a-sha`, "blocked"],
+    [`${sha}${"1".repeat(24)}`, `${sha}${"2".repeat(24)}`, "blocked"],
+    [sha, `${sha}${"1".repeat(24)}`, "blocked"],
+    [sha, sha, "passed"],
+    [`${sha}${"1".repeat(24)}`, `${sha}${"1".repeat(24)}`, "passed"],
+  ]) {
+    writeFileSync(
+      join(root, "artifacts", "backup-restore-evidence.json"),
+      JSON.stringify({
+        status: "PASS",
+        sha: reportedSha,
+        ...Object.fromEntries(BACKUP_RESTORE_EVIDENCE_FLAGS.map((name) => [name, true])),
+      }),
+    );
+    writeFileSync(
+      join(root, "artifacts", "release-upgrade.json"),
+      JSON.stringify(createReleaseUpgradeEvidence({ sha: reportedSha })),
+    );
+    const report = evaluateBetaCandidate({
+      candidateSha,
+      dirtyWorkingTree: false,
+      ciEvidence: { ...passingCiEvidence(), sha: reportedSha },
+      artifactRoot: root,
+    });
+    for (const id of ["exact_sha_ci", "backup_restore", "database_upgrade"]) {
+      assert.equal(report.categories.find((item) => item.id === id)?.status, expected, id);
+    }
+  }
+});
+
+test("upgrade category stays blocked without a candidate SHA even when the artifact is valid", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-beta-missing-sha-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  mkdirSync(join(root, "artifacts"));
+  writeFileSync(
+    join(root, "artifacts", "release-upgrade.json"),
+    JSON.stringify(createReleaseUpgradeEvidence({ sha })),
+  );
+  for (const candidateSha of [null, undefined, ""]) {
+    const report = evaluateBetaCandidate({
+      candidateSha,
+      dirtyWorkingTree: false,
+      artifactRoot: root,
+    });
+    assert.equal(
+      report.categories.find((item) => item.id === "database_upgrade")?.status,
+      "blocked",
+    );
+  }
+});
 
 function passingCiEvidence() {
   return {

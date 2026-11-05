@@ -6,12 +6,14 @@ import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library
 import { useNexusLocale } from "./locale-context";
 export function LibraryReleaseSelectionControls({
   productId,
+  actorId,
   revision,
   mode,
   selectedBuildId,
   versions,
 }: {
   productId: string;
+  actorId: string;
   revision: number;
   mode: "latest" | "fixed";
   selectedBuildId: string | null;
@@ -19,7 +21,7 @@ export function LibraryReleaseSelectionControls({
 }) {
   const { locale } = useNexusLocale();
   const copy = getResourceReleaseControlCopy(locale);
-  const state = useLibraryReleaseCommand(productId, locale);
+  const state = useLibraryReleaseCommand(productId, actorId, locale);
   const { pending, busy, saved, send } = state;
   return (
     <section className="nexus-panel space-y-4 p-5">

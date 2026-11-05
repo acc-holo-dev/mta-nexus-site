@@ -11,6 +11,7 @@ const h = vi.hoisted(() => ({
   reload: vi.fn(),
   locale: "en" as Locale,
   productId: "prd_a",
+  actorId: "usr_a",
   revision: 3,
   artifactValid: true,
   uiUpdates: 0,
@@ -67,6 +68,7 @@ function render() {
   return nodes(
     LibraryReleaseSelectionControls({
       productId: h.productId,
+      actorId: h.actorId,
       revision: h.revision,
       mode: "fixed",
       selectedBuildId: "bld_old",
@@ -113,6 +115,7 @@ beforeEach(() => {
   h.cursor = 0;
   h.locale = "en";
   h.productId = "prd_a";
+  h.actorId = "usr_a";
   h.revision = 3;
   h.artifactValid = true;
   h.uiUpdates = 0;
@@ -129,6 +132,7 @@ it.each(["en", "ru"] as const)(
     h.fetch.mockRejectedValueOnce(new Error("lost"));
     await click(`${copy.choose}: 2`);
     const init = h.fetch.mock.calls[0][1] as RequestInit;
+    expect((init.headers as Record<string, string>)["x-nexus-actor-id"]).toBe("usr_a");
     expect(button(`${copy.choose}: 3`).props.disabled).toBe(true);
     await click(`${copy.choose}: 3`); // Even a stale handler cannot replace the frozen command.
     expect(h.fetch).toHaveBeenCalledOnce();
@@ -268,4 +272,23 @@ it("disables malformed archive identities instead of falling back to an unreview
   expect(button("Use this version: 2").props.disabled).toBe(true);
   await click("Use this version: 2");
   expect(h.fetch).not.toHaveBeenCalled();
+});
+
+it("ignores a late response and hides the previous actor's pending command after identity changes", async () => {
+  let complete!: (value: unknown) => void;
+  h.fetch.mockReturnValueOnce(
+    new Promise((resolve) => {
+      complete = resolve;
+    }),
+  );
+  await click("Use this version: 2");
+  const init = h.fetch.mock.calls[0][1] as RequestInit;
+  h.actorId = "usr_b";
+  expect(
+    render().some((n) => n.type === "button" && n.props.children === "Retry the same request"),
+  ).toBe(false);
+  complete({ ok: true, status: 200, json: async () => ack(init) });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  expect(h.refresh).not.toHaveBeenCalled();
+  expect(render().some((n) => n.props.role === "status")).toBe(false);
 });

@@ -16,7 +16,7 @@ import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
 } from "../lib/resource-release-control-i18n";
-export function useLibraryReleaseCommand(productId: string, locale: Locale) {
+export function useLibraryReleaseCommand(productId: string, actorId: string, locale: Locale) {
   const copy = getResourceReleaseControlCopy(locale),
     router = useRouter(),
     lock = useRef(false),
@@ -25,8 +25,15 @@ export function useLibraryReleaseCommand(productId: string, locale: Locale) {
     attempt = useRef(0),
     controller = useRef<AbortController | null>(null),
     terminal = useRef(false),
+    currentScope = useRef(actorId),
+    readyScope = useRef(actorId),
     currentProduct = useRef(productId);
+  const scope = actorId;
   currentProduct.current = productId;
+  if (currentScope.current !== scope) {
+    currentScope.current = scope;
+    attempt.current++;
+  }
   const [pending, setPending] = useState<LibraryReleaseCommand | null>(null),
     [blocked, setBlocked] = useState(false),
     [busy, setBusy] = useState(false),
@@ -34,6 +41,15 @@ export function useLibraryReleaseCommand(productId: string, locale: Locale) {
     [error, setError] = useState("");
   useEffect(() => {
     active.current = true;
+    readyScope.current = scope;
+    frozen.current = null;
+    terminal.current = false;
+    lock.current = false;
+    setPending(null);
+    setBlocked(false);
+    setBusy(false);
+    setSaved(false);
+    setError("");
     return () => {
       active.current = false;
       attempt.current++;
@@ -41,12 +57,19 @@ export function useLibraryReleaseCommand(productId: string, locale: Locale) {
       controller.current = null;
       lock.current = false;
     };
-  }, []);
+  }, [scope]);
   async function send(command: LibraryReleaseCommand) {
-    if (!active.current || lock.current || terminal.current) return;
+    if (
+      !active.current ||
+      lock.current ||
+      terminal.current ||
+      currentScope.current !== scope ||
+      readyScope.current !== scope
+    )
+      return;
     if (!frozen.current) {
       // Ignore a handler retained from a different resource before the first send.
-      if (currentProduct.current !== productId) return;
+      if (currentScope.current !== scope || currentProduct.current !== productId) return;
       frozen.current = freezeLibraryReleaseRequest(productId, command);
       if (!frozen.current) {
         setError(resourceReleaseControlError(locale, "RESOURCE_CONTROL_INVALID"));
@@ -58,7 +81,10 @@ export function useLibraryReleaseCommand(productId: string, locale: Locale) {
       version = ++attempt.current;
     controller.current = abort;
     const current = () =>
-      active.current && attempt.current === version && controller.current === abort;
+      active.current &&
+      currentScope.current === scope &&
+      attempt.current === version &&
+      controller.current === abort;
     lock.current = true;
     setPending(request.command);
     setBusy(true);
@@ -66,7 +92,14 @@ export function useLibraryReleaseCommand(productId: string, locale: Locale) {
     try {
       const response = await fetch(
         `/api/library/releases/${encodeURIComponent(request.productId)}`,
-        privateApiRequest({ method: "POST", json: JSON.parse(request.body), signal: abort.signal }),
+        {
+          ...privateApiRequest({
+            method: "POST",
+            json: JSON.parse(request.body),
+            signal: abort.signal,
+          }),
+          headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },
+        },
       );
       const value = await response.json().catch(() => null);
       if (!current()) return;
@@ -92,13 +125,13 @@ export function useLibraryReleaseCommand(productId: string, locale: Locale) {
     }
   }
   return {
-    pending,
+    pending: readyScope.current === scope ? pending : null,
     pendingProductId: frozen.current?.productId,
     pendingHref: frozen.current?.href,
-    blocked,
-    busy,
-    saved,
-    error,
+    blocked: readyScope.current === scope ? blocked : true,
+    busy: readyScope.current === scope ? busy : false,
+    saved: readyScope.current === scope ? saved : false,
+    error: readyScope.current === scope ? error : "",
     send,
   };
 }
