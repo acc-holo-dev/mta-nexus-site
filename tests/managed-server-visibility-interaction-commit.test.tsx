@@ -25,6 +25,7 @@ vi.mock("../apps/web/src/components/confirm-action", () => ({
 }));
 
 import { ManagedServerVisibilityBatch } from "../apps/web/src/components/managed-server-visibility-batch";
+import { getManagedServerCopy } from "../apps/web/src/lib/managed-server-view";
 import { serverWorkspaceCopy } from "../apps/web/src/lib/server-workspace-copy";
 
 const { render, hasCopy, button, click, acknowledgeBatchCommit, commitBatch, selected, review } =
@@ -64,6 +65,28 @@ it.each(["en", "ru"] as const)(
     expect(button(render(locale), copy.reload).props.disabled).not.toBe(true);
   },
 );
+
+it("does not commit managed-server visibility when confirmAction is cancelled", async () => {
+  const copy = serverWorkspaceCopy("en");
+  const labels = getManagedServerCopy("en");
+  await review();
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  harness.confirm.mockResolvedValueOnce(false);
+  await commitBatch(() => render(), copy.confirm);
+  await vi.waitFor(() => expect(harness.confirm).toHaveBeenCalledTimes(1));
+  expect(harness.confirm).toHaveBeenCalledWith({
+    title: copy.previewTitle,
+    object: "2",
+    scope: labels.private,
+    consequences: copy.confirmWrite,
+    confirmLabel: copy.confirm,
+    cancelLabel: copy.cancel,
+    closeLabel: copy.cancel,
+  });
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(render().some((node) => node.props.children === copy.saved)).toBe(false);
+});
 it.each(["revision", "scope", "network"])(
   "requires refresh after an unconfirmed write and blocks retained handlers (%s)",
   async (kind) => {
