@@ -197,15 +197,47 @@ it("confirms restore before posting the admin action", async () => {
   expect(harness.refresh).toHaveBeenCalledOnce();
 });
 
-it("skips quarantine and restore when confirmation is cancelled", async () => {
+it("does not quarantine a build when confirmation is cancelled", async () => {
   const copy = getDictionary("en").admin;
-  confirmAction.mockResolvedValue(false);
+  const labels = verificationCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
 
   (actionButton(render("published"), copy.quarantineBuild).props.onClick as () => void)();
-  seedControls();
-  (actionButton(render("quarantined"), copy.restoreBuild).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
 
-  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(2));
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.quarantineBuild,
+    object: buildId,
+    consequences: copy.quarantineBuildConfirm,
+    confirmLabel: copy.quarantineBuild,
+    cancelLabel: labels.cancel,
+    closeLabel: labels.cancel,
+  });
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(harness.refresh).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
+});
+
+it("does not restore a build when confirmation is cancelled", async () => {
+  const copy = getDictionary("en").admin;
+  const labels = verificationCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
+
+  (actionButton(render("quarantined"), copy.restoreBuild).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
+
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.restoreBuild,
+    object: buildId,
+    consequences: copy.restoreBuildConfirm,
+    confirmLabel: copy.restoreBuild,
+    cancelLabel: labels.cancel,
+    closeLabel: labels.cancel,
+    danger: false,
+  });
+  expect(harness.fetch).not.toHaveBeenCalled();
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
 });

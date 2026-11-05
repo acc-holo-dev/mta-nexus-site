@@ -164,15 +164,47 @@ it("confirms report dismiss before posting the admin action", async () => {
   expect(harness.refresh).toHaveBeenCalledOnce();
 });
 
-it("skips resolve and dismiss when confirmation is cancelled", async () => {
+it("does not resolve a report when confirmation is cancelled", async () => {
   const copy = getDictionary("en").admin;
-  confirmAction.mockResolvedValue(false);
+  const labels = communityReportCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
 
   (actionButton(render(), copy.resolveReport).props.onClick as () => void)();
-  seedControls();
-  (actionButton(render(), copy.dismissReport).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
 
-  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(2));
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.resolveReport,
+    object: reportId,
+    consequences: copy.resolveReportConfirm,
+    confirmLabel: copy.resolveReport,
+    cancelLabel: labels.cancel,
+    closeLabel: labels.cancel,
+    danger: false,
+  });
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(harness.refresh).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
+});
+
+it("does not dismiss a report when confirmation is cancelled", async () => {
+  const copy = getDictionary("en").admin;
+  const labels = communityReportCopy("en");
+  const slotsBefore = structuredClone(harness.slots);
+  confirmAction.mockResolvedValueOnce(false);
+
+  (actionButton(render(), copy.dismissReport).props.onClick as () => void)();
+  await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
+
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: copy.dismissReport,
+    object: reportId,
+    consequences: copy.dismissReportConfirm,
+    confirmLabel: copy.dismissReport,
+    cancelLabel: labels.cancel,
+    closeLabel: labels.cancel,
+  });
+  expect(harness.fetch).not.toHaveBeenCalled();
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(harness.slots).toEqual(slotsBefore);
 });
