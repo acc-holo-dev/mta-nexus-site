@@ -157,3 +157,73 @@ it("rejects a session revoked while cancellation is waiting on the order row", a
   expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
   expect(await state(f)).toEqual(before);
 }, 20000);
+
+it("rolls back cancellation, receipt and audit when session expires during an audit write", async () => {
+  const f = await fixture(),
+    before = await state(f),
+    expiresAt = new Date(Date.now() + 2000),
+    locked = deferred(),
+    release = deferred();
+  await db.update(sessions).set({ expiresAt }).where(eq(sessions.id, f.sessionId));
+  let blockerPid = 0;
+  const blocker = db
+    .transaction(async (tx) => {
+      await tx.insert(auditEvents).values({
+        id: f.input.auditId,
+        actorId: f.input.buyerId,
+        actorType: "user",
+        targetType: "order",
+        targetId: f.input.orderId,
+        action: "fixture.collision",
+        details: {},
+      });
+      const [row] = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
+      blockerPid = row.pid;
+      locked.resolve();
+      await release.promise;
+      throw new Error("rollback fixture blocker");
+    })
+    .catch((error: unknown) => {
+      if (!(error instanceof Error) || error.message !== "rollback fixture blocker") throw error;
+    });
+  await Promise.race([
+    locked.promise,
+    blocker.then(() => {
+      throw new Error("Blocker exited before locking");
+    }),
+  ]);
+  const pending = orderOperationsRepository.cancel(f.input).then(
+    (value) => ({ value }),
+    (error: unknown) => ({ error }),
+  );
+  try {
+    await expect
+      .poll(
+        async () => {
+          const [row] = await db.execute<{ waiting: boolean }>(sql`select exists(
+        select 1 from pg_stat_activity where datname=current_database()
+        and ${blockerPid}=any(pg_blocking_pids(pid)) and wait_event_type='Lock'
+      ) as waiting`);
+          return row.waiting;
+        },
+        { timeout: 5000, interval: 10 },
+      )
+      .toBe(true);
+    await expect
+      .poll(
+        async () => {
+          const [row] = await db.execute<{ expired: boolean }>(
+            sql`select clock_timestamp()>=${expiresAt}::timestamptz as expired`,
+          );
+          return row.expired;
+        },
+        { timeout: 5000, interval: 10 },
+      )
+      .toBe(true);
+  } finally {
+    release.resolve();
+    await blocker;
+  }
+  expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
+  expect(await state(f)).toEqual(before);
+}, 15000);

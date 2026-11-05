@@ -113,6 +113,7 @@ export class OrderOperationsRepository {
           receipt.expectedUpdatedAt.toISOString() !== command.expectedUpdatedAt
         )
           throw fail("ORDER_REQUEST_CONFLICT");
+        await lockInitiatingSession(tx, input.buyerId, input.currentToken);
         return {
           kind: "unpaid_order_cancelled",
           orderId: receipt.orderId,
@@ -136,6 +137,7 @@ export class OrderOperationsRepository {
         .limit(1)
         .for("share");
       if (payment || ledger) throw fail("ORDER_RECONCILIATION_REQUIRED");
+      await lockInitiatingSession(tx, input.buyerId, input.currentToken);
       const [cancelled] = await tx
         .update(orders)
         .set({
@@ -169,6 +171,7 @@ export class OrderOperationsRepository {
         targetType: "order",
         details: { reason: command.reason, requestId: command.requestId },
       });
+      await lockInitiatingSession(tx, input.buyerId, input.currentToken);
       return {
         kind: "unpaid_order_cancelled",
         orderId: order.id,

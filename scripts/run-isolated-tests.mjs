@@ -17,8 +17,28 @@ const app = [
   "app",
 ];
 const run = (args) => execFileSync("docker", [...compose, ...args], { stdio: "inherit" });
+
+function hasDefaultLocalDockerContext() {
+  if (process.env.DOCKER_HOST || process.env.DOCKER_CONTEXT) {
+    console.error("Refusing isolated tests with Docker host/context overrides.");
+    return false;
+  }
+  try {
+    const context = execFileSync("docker", ["context", "show"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    }).trim();
+    if (context === "default") return true;
+  } catch {
+    // Never treat a failed inspection as proof of a local context.
+  }
+  console.error("Refusing isolated tests without the default local Docker context.");
+  return false;
+}
+
 let created = false;
 try {
+  if (!hasDefaultLocalDockerContext()) throw new Error("Docker context not verified");
   run(["exec", "-T", "postgres", "createdb", "-U", "nexus", database]);
   created = true;
   run([...app, "pnpm", "db:migrate"]);

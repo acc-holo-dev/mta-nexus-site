@@ -315,3 +315,21 @@ it.each(["create", "edit"] as const)(
     expect(state.command).not.toHaveBeenCalled();
   },
 );
+
+it("requires the original buyer before cancelling an order", async () => {
+  expect(
+    (
+      await cancel(
+        request("/api/orders/ord_a/cancel", cancellation, { "x-nexus-actor-id": "" }),
+        ctx,
+      )
+    ).status,
+  ).toBe(428);
+  const response = await cancel(
+    request("/api/orders/ord_a/cancel", cancellation, { "x-nexus-actor-id": "usr_other" }),
+    ctx,
+  );
+  expect(response.status).toBe(409);
+  expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+  expect(state.cancel).not.toHaveBeenCalled();
+});

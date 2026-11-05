@@ -164,10 +164,26 @@ it("requires a durable UUID and canonical millisecond order revision", () => {
     kind: "unpaid_order_cancelled",
     orderId: "ord_a",
     requestId: command.requestId,
-    cancelledAt: command.expectedUpdatedAt,
+    cancelledAt: "2026-10-10T12:00:00.001Z",
   };
-  expect(confirmedOrderCancellation(receipt, "ord_a", command.requestId)).toBe(true);
   expect(
-    confirmedOrderCancellation({ ...receipt, orderId: "other" }, "ord_a", command.requestId),
+    confirmedOrderCancellation(receipt, "ord_a", command.requestId, command.expectedUpdatedAt),
+  ).toBe(true);
+  expect(
+    confirmedOrderCancellation(
+      { ...receipt, orderId: "other" },
+      "ord_a",
+      command.requestId,
+      command.expectedUpdatedAt,
+    ),
   ).toBe(false);
+  for (const cancelledAt of [command.expectedUpdatedAt, "2026-10-10T11:59:59.999Z"])
+    expect(
+      confirmedOrderCancellation(
+        { ...receipt, cancelledAt },
+        "ord_a",
+        command.requestId,
+        command.expectedUpdatedAt,
+      ),
+    ).toBe(false);
 });

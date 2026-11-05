@@ -114,6 +114,7 @@ export function confirmedOrderCancellation(
   value: unknown,
   orderId: string,
   requestId: string,
+  expectedUpdatedAt: string,
 ): boolean {
   return (
     record(value) &&
@@ -122,6 +123,8 @@ export function confirmedOrderCancellation(
     value.requestId === requestId &&
     typeof value.cancelledAt === "string" &&
     Number.isFinite(Date.parse(value.cancelledAt)) &&
+    Number.isFinite(Date.parse(expectedUpdatedAt)) &&
+    Date.parse(value.cancelledAt) > Date.parse(expectedUpdatedAt) &&
     new Date(value.cancelledAt).toISOString() === value.cancelledAt
   );
 }

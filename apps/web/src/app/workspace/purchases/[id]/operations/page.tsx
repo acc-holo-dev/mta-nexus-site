@@ -99,13 +99,14 @@ export default async function OrderOperationsPage({
       >
         {copy.operationsNote}
       </p>
-      {result.canCancel ? (
-        <OrderCancellationForm
-          key={`${id}:${result.order.updatedAt.toISOString()}`}
-          orderId={id}
-          expectedUpdatedAt={result.order.updatedAt.toISOString()}
-        />
-      ) : (
+      <OrderCancellationForm
+        key={`${user.id}:${id}`}
+        actorId={user.id}
+        orderId={id}
+        expectedUpdatedAt={result.order.updatedAt.toISOString()}
+        canCancel={result.canCancel}
+      />
+      {!result.canCancel && (
         <p className="text-sm text-muted">
           {result.order.status === "cancelled" ? copy.cancelledPayment : copy.cannotCancel}
         </p>

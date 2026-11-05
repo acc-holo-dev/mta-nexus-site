@@ -141,7 +141,7 @@ pnpm test:isolated  # requires the running Docker development stack
 pnpm build
 ```
 
-`test:isolated` owns a uniquely named database and removes it after success or failure. It never recreates a shared database. For a host-only setup, create a separate database, apply migrations there and set its `DATABASE_URL` before `pnpm test:database`. Product-specific moderation and verification contracts are indexed in the [domain map](handbook/15-AI-CONTEXT-INDEX.md).
+`test:isolated` owns a uniquely named database and removes it after success or failure. It never recreates a shared database. It requires the default local Docker context and refuses `DOCKER_HOST` or `DOCKER_CONTEXT` overrides before creating the database. For a host-only setup, create a separate database, apply migrations there and set its `DATABASE_URL` before `pnpm test:database`. Product-specific moderation and verification contracts are indexed in the [domain map](handbook/15-AI-CONTEXT-INDEX.md).
 
 ### Test and CI scopes
 

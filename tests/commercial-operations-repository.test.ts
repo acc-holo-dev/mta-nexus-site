@@ -224,9 +224,11 @@ it("cancels once and saves the durable result with atomic audit, without access 
     [],
     [],
     [],
+    [["ses_buyer", "2099-01-01T00:00:00.000Z"]],
     [[cancelled]],
     [],
     [],
+    [["ses_buyer", "2099-01-01T00:00:00.000Z"]],
   ];
   expect(await operations.cancel(input)).toEqual({
     kind: "unpaid_order_cancelled",
@@ -242,9 +244,9 @@ it("cancels once and saves the durable result with atomic audit, without access 
   expect(state.queries[3].sql).toContain("for update");
   expect(state.queries[3].params).toContain(digestSessionToken(input.currentToken));
   expect(state.queries[3].params).not.toContain(input.currentToken);
-  expect(state.queries[7].sql).toContain("date_trunc('milliseconds'");
-  expect(state.queries[8].sql).toContain('insert into "order_cancellation_receipts"');
-  expect(state.queries[9].params).toContain("order.unpaid_cancelled");
+  expect(state.queries[8].sql).toContain("date_trunc('milliseconds'");
+  expect(state.queries[9].sql).toContain('insert into "order_cancellation_receipts"');
+  expect(state.queries[10].params).toContain("order.unpaid_cancelled");
   expect(
     state.queries.some((q) =>
       /insert into "(?:licenses|entitlements|ledger_entries|payments)"/u.test(q.sql),
@@ -257,9 +259,20 @@ it("replays the exact stored cancellation without checking changed status or wri
     [["ord_a", "cancelled", cancelled]],
     ...buyerAuthorization,
     [["ord_a", now, command.reason, cancelled]],
+    [["ses_buyer", "2099-01-01T00:00:00.000Z"]],
   ];
   expect(await operations.cancel(input)).toMatchObject({ cancelledAt: new Date(cancelled) });
-  expect(state.queries).toHaveLength(5);
+  expect(state.queries).toHaveLength(6);
+});
+it("does not expose a stored cancellation when the session expires during receipt lookup", async () => {
+  state.results = [
+    [],
+    [["ord_a", "cancelled", cancelled]],
+    ...buyerAuthorization,
+    [["ord_a", now, command.reason, cancelled]],
+    [],
+  ];
+  await expect(operations.cancel(input)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
 });
 it.each([{ reason: "Different reason" }, { expectedUpdatedAt: cancelled }])(
   "rejects reuse of a receipt key with different intent %j",
@@ -303,7 +316,16 @@ it("requires reconciliation for an order financial entry without a payment attem
   });
 });
 it("does not write a receipt after a failed compare-and-swap", async () => {
-  state.results = [[], [["ord_a", "pending", now]], ...buyerAuthorization, [], [], [], []];
+  state.results = [
+    [],
+    [["ord_a", "pending", now]],
+    ...buyerAuthorization,
+    [],
+    [],
+    [],
+    [["ses_buyer", "2099-01-01T00:00:00.000Z"]],
+    [],
+  ];
   await expect(operations.cancel(input)).rejects.toMatchObject({ code: "ORDER_STATE_CHANGED" });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });

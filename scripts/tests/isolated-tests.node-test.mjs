@@ -6,10 +6,11 @@ import { join, resolve } from "node:path";
 import test from "node:test";
 
 const script = resolve(import.meta.dirname, "../run-isolated-tests.mjs");
-function run(failure = "") {
+function run(failure = "", overrides = {}) {
   const directory = mkdtempSync(join(tmpdir(), "nexus-isolated-runner-"));
   try {
     const log = join(directory, "calls.jsonl");
+    writeFileSync(log, "");
     writeFileSync(
       join(directory, "docker"),
       `#!${process.execPath}
@@ -17,6 +18,9 @@ import { appendFileSync } from "node:fs";
 const args = process.argv.slice(2);
 appendFileSync(process.env.NEXUS_TEST_LOG, JSON.stringify(args) + "\\n");
 if (args.includes(process.env.NEXUS_TEST_FAIL)) process.exit(7);
+if (args[0] === "context" && args[1] === "show") {
+  process.stdout.write(process.env.NEXUS_TEST_CONTEXT || "default");
+}
 `,
       { mode: 0o700 },
     );
@@ -24,20 +28,39 @@ if (args.includes(process.env.NEXUS_TEST_FAIL)) process.exit(7);
       env: {
         ...process.env,
         PATH: `${directory}:${process.env.PATH}`,
+        DOCKER_HOST: "",
+        DOCKER_CONTEXT: "",
         NEXUS_TEST_LOG: log,
         NEXUS_TEST_FAIL: failure,
+        ...overrides,
       },
       encoding: "utf8",
     });
-    const calls = readFileSync(log, "utf8")
+    const allCalls = readFileSync(log, "utf8")
       .trim()
       .split("\n")
+      .filter(Boolean)
       .map((line) => JSON.parse(line));
-    return { result, calls };
+    const calls = allCalls.filter((args) => args[0] !== "context");
+    return { result, calls, allCalls };
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
 }
+
+test("isolated runner refuses remote or unverifiable Docker context before DB creation", () => {
+  for (const [failure, overrides] of [
+    ["", { DOCKER_HOST: "tcp://remote.invalid:2375" }],
+    ["", { DOCKER_CONTEXT: "default" }],
+    ["", { NEXUS_TEST_CONTEXT: "remote" }],
+    ["context", {}],
+  ]) {
+    const { result, calls } = run(failure, overrides);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Refusing isolated tests/u);
+    assert.deepEqual(calls, []);
+  }
+});
 
 test("isolated runs own different databases and remove only their database", () => {
   const first = run(),
