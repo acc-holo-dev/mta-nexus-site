@@ -22,8 +22,7 @@ type LibraryCollectionCommandFormComponent = (props: {
     | "duplicate"
     | "add"
     | "rename"
-    | "restore"
-    | "unarchive";
+    | "restore";
   collection?: {
     id: string;
     name: string;
