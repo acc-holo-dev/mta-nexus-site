@@ -44,7 +44,7 @@ export const organization = {
   updatedAt: time,
 };
 
-export const workspace: OrganizationWorkspace = {
+const workspace: OrganizationWorkspace = {
   organization,
   role: "member",
   owner: { id: "usr_owner", username: "owner", displayName: "Owner", avatarUrl: null },
