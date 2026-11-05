@@ -1,6 +1,6 @@
 "use client";
 import type { ResourceBuildCommand, ResourceBuildView } from "@nexus/domain";
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateRequest } from "../lib/private-request";
@@ -198,9 +198,15 @@ export function ResourceBuildControls({
           </details>
         </div>
       )}
-      {message && <p role={uncertain ? "alert" : "status"}>{message}</p>}
+      {message && uncertain ? <ErrorState title={message} /> : null}
+      {message && !uncertain ? <p role="status">{message}</p> : null}
       {uncertain && (
-        <Button type="button" variant="outline" onClick={() => router.refresh()}>
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11"
+          onClick={() => router.refresh()}
+        >
           {copy.reload}
         </Button>
       )}
