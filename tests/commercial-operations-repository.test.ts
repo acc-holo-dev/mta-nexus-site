@@ -138,6 +138,7 @@ it("editing a published plan appends a draft snapshot and audits within its tran
     [],
     [],
     [["cplan_a", "seller-plan", "user", "draft", 3, now, { ...terms, price: 2000 }]],
+    [["ses_admin", "2099-01-01T00:00:00.000Z"]],
   ];
   expect(
     await plans.command({
@@ -160,6 +161,7 @@ it("editing a published plan appends a draft snapshot and audits within its tran
   expect(state.queries[4].sql).toContain('insert into "commercial_plan_revisions"');
   expect(state.queries[4].params).toContain(JSON.stringify({ ...terms, price: 2000 }));
   expect(state.queries[6].params).toContain("commerce.plan_save");
+  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
   expect(state.queries.some((q) => q.sql.startsWith('update "commercial_plan_revisions"'))).toBe(
     false,
   );

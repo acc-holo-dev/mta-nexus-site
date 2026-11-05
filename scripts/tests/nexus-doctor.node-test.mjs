@@ -63,6 +63,34 @@ test("healthy local prerequisites produce a passing report", async () => {
   }
 });
 
+test("an unreadable Docker context cannot yield an overall pass", async () => {
+  const root = await fixtureRoot();
+  try {
+    const report = await collectDoctor({
+      repositoryRoot: root,
+      nodeVersion: "26.10.0",
+      memoryBytes: 8 * 1024 ** 3,
+      env: {},
+      pathExists: async () => true,
+      probePort: async () => ({ available: true, code: null }),
+      runCommand: commandRunner({
+        "pnpm --version": { ok: true, stdout: "12.4.2" },
+        "docker version --format {{.Server.Version}}": { ok: true, stdout: "29.0.0" },
+        "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
+        "docker compose version --short": { ok: true, stdout: "2.40.0" },
+        "docker context show": { ok: false, stdout: "" },
+        "docker compose -f compose.yaml config --quiet": { ok: true, stdout: "" },
+      }),
+    });
+    assert.equal(report.status, "warn");
+    assert.equal(report.facts.dockerContext, null);
+    assert.equal(report.checks.find((check) => check.id === "docker-context")?.status, "warn");
+    assert.match(formatDoctor(report), /Could not inspect the selected Docker context/u);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("major-ok Node that differs from the exact pin warns in local mode", async () => {
   const root = await fixtureRoot();
   try {

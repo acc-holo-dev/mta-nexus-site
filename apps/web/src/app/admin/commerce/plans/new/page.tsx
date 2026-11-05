@@ -27,7 +27,7 @@ export default async function NewCommercialPlan() {
         {copy.back}
       </Link>
       <h1 className="font-display text-primary">{copy.newPlan}</h1>
-      <CommercialPlanForm />
+      <CommercialPlanForm key={user.id} actorId={user.id} />
     </div>
   );
 }

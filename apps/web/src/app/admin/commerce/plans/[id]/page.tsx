@@ -100,7 +100,11 @@ export default async function CommercialPlanAdmin({
       <p className="text-sm text-secondary">
         {copy[plan.status]} · {copy.revision} {plan.revision} · {plan.slug} · {copy[plan.scope]}
       </p>
-      <CommercialPlanForm key={`${plan.id}:${plan.revision}`} plan={editor} />
+      <CommercialPlanForm
+        key={`${user.id}:${plan.id}:${plan.revision}`}
+        actorId={user.id}
+        plan={editor}
+      />
       <section aria-labelledby="plan-history" className="min-w-0 space-y-4">
         <h2 id="plan-history" className="text-xl font-semibold text-primary">
           {copy.history} ({result.total})

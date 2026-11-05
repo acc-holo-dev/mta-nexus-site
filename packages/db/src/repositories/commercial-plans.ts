@@ -250,6 +250,8 @@ export class CommercialPlanRepository {
           .where(eq(plans.id, input.planId))
           .limit(1);
         if (!row) throw fail("COMMERCIAL_PLAN_STATE_CHANGED");
+        // A session may expire while a plan, revision or audit write is blocked.
+        await lockInitiatingSession(tx, input.actorId, input.currentToken);
         return { plan: projection(row) };
       });
     } catch (error) {

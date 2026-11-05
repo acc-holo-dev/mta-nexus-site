@@ -27,10 +27,16 @@ export const POST = withBrowserMutation(function POST(
   return resourceCommerceRequest(request, true, async (actor) => {
     const token = request.cookies.get("nexus_session")?.value;
     if (!token) throw new UnauthorizedError();
+    const expected = request.headers.get("x-nexus-actor-id");
+    if (!expected) throw new AppError("Actor precondition required", 428, "ACTOR_ID_REQUIRED");
+    if (expected !== actor.id) throw new AppError("Account changed", 409, "ACTOR_CHANGED");
     if (actor.role !== "admin") throw new ForbiddenError();
     const parsed = commercialPlanCommandSchema.safeParse(await readBoundedJson(request, 16384));
     if (!parsed.success || parsed.data.action === "create")
       throw new AppError("Invalid commercial plan", 400, "COMMERCIAL_PLAN_INVALID");
-    return commercialPlanService.command(actor, parsed.data, token, (await params).id);
+    return {
+      ...(await commercialPlanService.command(actor, parsed.data, token, (await params).id)),
+      actorId: actor.id,
+    };
   });
 });

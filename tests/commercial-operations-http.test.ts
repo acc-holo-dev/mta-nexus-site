@@ -73,6 +73,7 @@ const request = (path: string, body?: unknown, headers?: Record<string, string>)
           headers: {
             ...browserMutationHeaders(),
             cookie: "nexus_session=plan-admin-token",
+            "x-nexus-actor-id": "usr_a",
             "content-type": "application/json",
             ...headers,
           },
@@ -292,3 +293,25 @@ it("forwards the initiating cookie for an existing plan command", async () => {
     }),
   );
 });
+
+it.each(["create", "edit"] as const)(
+  "requires the originating administrator for plan %s",
+  async (kind) => {
+    const command =
+      kind === "create"
+        ? { action: "create", slug: "seller-plan", scope: "user", terms, reason: "A valid reason" }
+        : { action: "archive", expectedRevision: 2, reason: "A valid reason" };
+    const run = (actorId: string) =>
+      kind === "create"
+        ? create(request("/api/admin/commerce/plans", command, { "x-nexus-actor-id": actorId }))
+        : edit(
+            request("/api/admin/commerce/plans/cplan_a", command, { "x-nexus-actor-id": actorId }),
+            planCtx,
+          );
+    expect((await run("")).status).toBe(428);
+    const response = await run("usr_b");
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+    expect(state.command).not.toHaveBeenCalled();
+  },
+);

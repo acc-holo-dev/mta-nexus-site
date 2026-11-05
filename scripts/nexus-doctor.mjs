@@ -3,8 +3,8 @@ import { access, readFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { totalmem } from "node:os";
 import { dirname, resolve } from "node:path";
-import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import {
   evaluateToolchainPolicy,
   parseSemver,
@@ -330,6 +330,14 @@ export async function collectDoctor(options = {}) {
       overridden || nonDefault
         ? "Production smoke scripts intentionally refuse remote/non-default daemons; verify the selected local Docker context before destructive disposable tests."
         : undefined,
+    );
+  } else {
+    addCheck(
+      checks,
+      "docker-context",
+      "warn",
+      "Could not inspect the selected Docker context.",
+      "Verify the selected local Docker context before disposable verification or production-rehearsal work.",
     );
   }
 

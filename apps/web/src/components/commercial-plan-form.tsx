@@ -8,18 +8,41 @@ import {
 import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { commercialPlanCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useId, useRef, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { confirmedCommercialPlan, parseCommercialAmount } from "../lib/commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../lib/commercial-i18n";
 import { privateApiRequest } from "../lib/private-api-request";
+import { confirmAction } from "./confirm-action";
 import { useNexusLocale } from "./locale-context";
 
-export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "updatedAt"> }) {
+export function CommercialPlanForm({
+  plan,
+  actorId,
+}: {
+  plan?: Omit<CommercialPlan, "updatedAt">;
+  actorId: string;
+}) {
   const { locale } = useNexusLocale(),
     copy = getCommercialCopy(locale),
     router = useRouter(),
     field = useId(),
-    lock = useRef(false);
+    lock = useRef(false),
+    epoch = useRef(0),
+    controller = useRef<AbortController | null>(null);
+  const identity = `${actorId}:${plan?.id ?? "new"}`;
+  const currentIdentity = useRef(identity);
+  if (currentIdentity.current !== identity) {
+    currentIdentity.current = identity;
+    epoch.current++;
+  }
+  const key = `nexus:commercial-plan-intent:v1:${encodeURIComponent(actorId)}:${encodeURIComponent(plan?.id ?? "new")}`;
+  const [ready, setReady] = useState("");
+  const [marker, setMarker] = useState<{
+    actorId: string;
+    planId: string | null;
+    action: string;
+    slug: string;
+  } | null>(null);
   const initial = {
     titleRu: plan?.titleRu ?? "",
     titleEn: plan?.titleEn ?? "",
@@ -40,9 +63,103 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
   const dirty = Object.keys(initial).some(
     (key) => values[key as keyof typeof values] !== initial[key as keyof typeof initial],
   );
-  const disabled = busy || saved;
+  // The identity key is the restore boundary; other prop changes must not replace an operation in progress.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: identity identifies the actor and form.
+  useEffect(() => {
+    let active = true;
+    epoch.current++;
+    controller.current?.abort();
+    lock.current = false;
+    setReady("");
+    setMarker(null);
+    setError("");
+    setBusy(false);
+    setSaved(false);
+    setValues(initial);
+    setSlug("");
+    setScope("user");
+    setReason("");
+    async function restore() {
+      try {
+        const response = await fetch("/api/auth/session", privateApiRequest());
+        const session = await response.json();
+        if (!response.ok || session?.authenticated !== true || session?.user?.id !== actorId)
+          throw new Error("identity");
+        const raw = sessionStorage.getItem(key);
+        if (raw) {
+          if (raw.length > 2048) throw new Error("storage");
+          const item = JSON.parse(raw);
+          if (
+            item?.actorId !== actorId ||
+            item.planId !== (plan?.id ?? null) ||
+            !["create", "save", "publish", "archive", "restore"].includes(item.action) ||
+            typeof item.slug !== "string" ||
+            item.slug.length > 80
+          )
+            throw new Error("storage");
+          if (active) setMarker(item);
+        }
+        if (active) setReady(identity);
+      } catch {
+        if (active)
+          setError(
+            locale === "ru"
+              ? "Не удалось проверить аккаунт или восстановить запрос. Обновите страницу и войдите в исходный аккаунт."
+              : "Could not verify the account or restore the request. Refresh and sign in to the original account.",
+          );
+      }
+    }
+    void restore();
+    return () => {
+      active = false;
+      epoch.current++;
+      controller.current?.abort();
+    };
+  }, [identity, key]);
+  const disabled = busy || saved || !!marker || ready !== identity;
+  async function clearMarker() {
+    if (!marker || lock.current || ready !== identity || currentIdentity.current !== identity)
+      return;
+    lock.current = true;
+    const version = epoch.current;
+    try {
+      const accepted = await confirmAction({
+        title:
+          locale === "ru" ? "Результат операции неизвестен" : "The operation result is unknown",
+        object: marker.slug,
+        consequences:
+          locale === "ru"
+            ? "Сначала проверьте список и историю. Снятие блокировки не подтверждает результат и может привести к повторной операции."
+            : "Check the list and history first. Clearing this warning does not confirm the result and may allow a duplicate operation.",
+        confirmLabel: locale === "ru" ? "Я проверил результат" : "I checked the result",
+        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
+        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        danger: true,
+      });
+      if (!accepted || version !== epoch.current) return;
+      const response = await fetch("/api/auth/session", privateApiRequest());
+      const session = await response.json();
+      if (version !== epoch.current) return;
+      if (!response.ok || session?.authenticated !== true || session?.user?.id !== actorId)
+        throw new Error("identity");
+      sessionStorage.removeItem(key);
+      if (sessionStorage.getItem(key) !== null) throw new Error("storage");
+      setMarker(null);
+      setError("");
+    } catch {
+      if (version === epoch.current)
+        setError(
+          locale === "ru"
+            ? "Не удалось проверить аккаунт или снять блокировку."
+            : "Could not verify the account or clear the warning.",
+        );
+    } finally {
+      if (version === epoch.current) lock.current = false;
+    }
+  }
   async function send(action: CommercialPlanCommand["action"]) {
-    if (lock.current || disabled) return;
+    if (lock.current || disabled || currentIdentity.current !== identity) return;
+    const version = epoch.current;
     const terms = {
       titleRu: values.titleRu,
       titleEn: values.titleEn,
@@ -64,29 +181,75 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
       setError(copy.errors.COMMERCIAL_PLAN_INVALID);
       return;
     }
+    const intent = {
+      actorId,
+      planId: plan?.id ?? null,
+      action: parsed.data.action,
+      slug: parsed.data.action === "create" ? parsed.data.slug : (plan?.slug ?? ""),
+    };
+    try {
+      if (sessionStorage.getItem(key) !== null) throw new Error("pending");
+      const raw = JSON.stringify(intent);
+      sessionStorage.setItem(key, raw);
+      if (sessionStorage.getItem(key) !== raw) throw new Error("storage");
+    } catch {
+      setError(
+        locale === "ru"
+          ? "Не удалось сохранить состояние восстановления. Запрос не отправлен."
+          : "Could not save recovery state. The request was not sent.",
+      );
+      return;
+    }
+    setMarker(intent);
     lock.current = true;
     setBusy(true);
     setError("");
+    const abort = new AbortController();
+    controller.current = abort;
     try {
       const response = await fetch(
         `/api/admin/commerce/plans${plan ? `/${encodeURIComponent(plan.id)}` : ""}`,
-        privateApiRequest({ method: "POST", json: parsed.data }),
+        {
+          ...privateApiRequest({ method: "POST", json: parsed.data, signal: abort.signal }),
+          headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },
+        },
       );
-      const body = await response.json().catch(() => null),
-        result = confirmedCommercialPlan(body, parsed.data, plan);
+      const body = await response.json().catch(() => null);
+      if (version !== epoch.current || abort.signal.aborted) return;
+      const result =
+        body?.actorId === actorId ? confirmedCommercialPlan(body, parsed.data, plan) : null;
       if (!response.ok || !result) {
+        if ([400, 401, 403, 404, 409, 413, 415, 422, 428, 429].includes(response.status)) {
+          try {
+            sessionStorage.removeItem(key);
+            if (sessionStorage.getItem(key) !== null) throw new Error("storage");
+            setMarker(null);
+          } catch {
+            /* Keep the marker until explicitly reviewed. */
+          }
+        }
+        if (response.status === 401 || body?.code === "ACTOR_CHANGED") setReady("");
         setError(commercialError(locale, body?.code));
         if (response.status === 409) router.refresh();
         return;
+      }
+      try {
+        sessionStorage.removeItem(key);
+        if (sessionStorage.getItem(key) === null) setMarker(null);
+      } catch {
+        /* A retained marker requires manual review. */
       }
       setSaved(true);
       if (!plan) router.push(`/admin/commerce/plans/${result.id}`);
       router.refresh();
     } catch {
-      setError(copy.errors.fallback);
+      if (version === epoch.current && !abort.signal.aborted) setError(copy.errors.fallback);
     } finally {
-      lock.current = false;
-      setBusy(false);
+      if (version === epoch.current) {
+        lock.current = false;
+        setBusy(false);
+      }
+      if (controller.current === abort) controller.current = null;
     }
   }
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -95,6 +258,13 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
   }
   const patch = (key: keyof typeof values, value: string) =>
     setValues((current) => ({ ...current, [key]: value }));
+  if (ready !== identity)
+    return (
+      <section className="nexus-panel p-5">
+        <p role="note">{copy.editNote}</p>
+        {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+      </section>
+    );
   return (
     <form onSubmit={submit} className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5">
       <p role="note" className="text-sm text-secondary">
@@ -229,6 +399,27 @@ export function CommercialPlanForm({ plan }: { plan?: Omit<CommercialPlan, "upda
         <p role="note" className="text-sm text-muted">
           {copy.dirtyNote}
         </p>
+      ) : null}
+      {marker ? (
+        <div className="space-y-2" role="note">
+          <p>
+            {locale === "ru"
+              ? "Результат предыдущей операции неизвестен. Проверьте список и историю перед снятием блокировки."
+              : "The previous operation result is unknown. Check the list and history before clearing this warning."}{" "}
+            <code>{marker.slug}</code>
+          </p>
+          <a href="/admin/commerce/plans" className="underline">
+            {copy.back}
+          </a>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => void clearMarker()}
+          >
+            {locale === "ru" ? "Я проверил результат" : "I checked the result"}
+          </Button>
+        </div>
       ) : null}
       {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {saved ? (
