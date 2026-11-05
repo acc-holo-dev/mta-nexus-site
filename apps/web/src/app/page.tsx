@@ -1,4 +1,4 @@
-import { buttonClassName, SectionHeader } from "@nexus/ui";
+import { buttonClassName, ErrorState, SectionHeader } from "@nexus/ui";
 import { ArrowRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -200,9 +200,10 @@ export default async function HomePage() {
             })}
           </div>
         ) : (
-          <div className="nexus-panel p-8 text-center text-sm text-muted">
-            {dictionary.home.directoryPanelUnavailable}
-          </div>
+          <ErrorState
+            id="home-directory-unavailable"
+            title={dictionary.home.directoryPanelUnavailable}
+          />
         )}
       </section>
 
