@@ -65,6 +65,30 @@ it.each(["ru", "en"] as const)(
   },
 );
 
+it("does not commit a resolved report batch when confirmAction is cancelled", async () => {
+  const copy = reportBatchCopy("en");
+  await review();
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  harness.confirm.mockResolvedValueOnce(false);
+  await commitBatch(() => render(), copy.confirm);
+  await vi.waitFor(() => expect(harness.confirm).toHaveBeenCalledTimes(1));
+  expect(harness.confirm).toHaveBeenCalledWith({
+    title: copy.previewTitle,
+    object: preview.publication.title,
+    scope: `${preview.items.length}`,
+    consequences: `${copy.notes}: ${preview.notes}`,
+    confirmLabel: copy.confirm,
+    cancelLabel: copy.cancel,
+    closeLabel: copy.cancel,
+    danger: false,
+  });
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(
+    render().some((node) => node.props.role === "status" && node.props.children === copy.saved),
+  ).toBe(false);
+});
+
 it("coalesces rapid preview/decision commands and blocks stale handler retries after success", async () => {
   select();
   let finishPreview!: (reply: Response) => void;

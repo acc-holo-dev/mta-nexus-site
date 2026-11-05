@@ -25,10 +25,8 @@ vi.mock("../apps/web/src/components/confirm-action", () => ({
 import { DiscussionReportBatch } from "../apps/web/src/components/discussion-report-batch";
 import { reportBatchCopy } from "../apps/web/src/lib/report-batch-copy";
 
-const { render, click, select, review } = createDiscussionReportBatchInteractionHelpers(
-  harness,
-  DiscussionReportBatch,
-);
+const { render, click, commitBatch, select, review } =
+  createDiscussionReportBatchInteractionHelpers(harness, DiscussionReportBatch);
 
 it("does not submit without selection/reason and allows preview cancellation without a write", async () => {
   click(render(), reportBatchCopy("en").preview);
@@ -36,9 +34,34 @@ it("does not submit without selection/reason and allows preview cancellation wit
   await review();
   click(render(), reportBatchCopy("en").cancel);
   expect(harness.fetch).toHaveBeenCalledTimes(1);
+  expect(harness.confirm).not.toHaveBeenCalled();
   expect(render().some((node) => node.props.children === reportBatchCopy("en").confirm)).toBe(
     false,
   );
+});
+
+it("does not commit a dismissed report batch when confirmAction is cancelled", async () => {
+  const copy = reportBatchCopy("en");
+  await review("en", "dismiss");
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  harness.confirm.mockResolvedValueOnce(false);
+  await commitBatch(() => render(), copy.confirm);
+  await vi.waitFor(() => expect(harness.confirm).toHaveBeenCalledTimes(1));
+  expect(harness.confirm).toHaveBeenCalledWith({
+    title: copy.previewTitle,
+    object: preview.publication.title,
+    scope: `${preview.items.length}`,
+    consequences: `${copy.notes}: ${preview.notes}`,
+    confirmLabel: copy.confirm,
+    cancelLabel: copy.cancel,
+    closeLabel: copy.cancel,
+    danger: true,
+  });
+  expect(harness.fetch).toHaveBeenCalledTimes(1);
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(
+    render().some((node) => node.props.role === "status" && node.props.children === copy.saved),
+  ).toBe(false);
 });
 
 it.each([

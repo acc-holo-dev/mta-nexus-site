@@ -159,8 +159,33 @@ export function createDiscussionReportBatchInteractionHelpers(
     (textarea.props.onChange as (event: unknown) => void)({ target: { value: "Recorded reason" } });
   }
 
-  async function review(locale: "ru" | "en" = "en") {
+  function chooseAction(
+    action: "review" | "resolve" | "dismiss",
+    locale: "ru" | "en" = "en",
+    publication = false,
+  ) {
+    const field = render(locale, true, publication).find((node) => node.type === "select");
+    if (!field) throw Error("Missing decision select");
+    (field.props.onChange as (event: { target: { value: string } }) => void)({
+      target: { value: action },
+    });
+  }
+
+  async function review(locale: "ru" | "en" = "en", action: "resolve" | "dismiss" = "resolve") {
     select(locale);
+    if (action !== "resolve") chooseAction(action, locale);
+    if (action === "dismiss") {
+      const dismissPreview = {
+        ...preview,
+        action: "dismiss" as const,
+        items: preview.items.map((item) => ({ ...item, after: "dismissed" as const })),
+      };
+      harness.fetch
+        .mockReset()
+        .mockImplementation((url: string) =>
+          Promise.resolve(response(url.endsWith("/preview") ? dismissPreview : ack)),
+        );
+    }
     click(render(locale), reportBatchCopy(locale).preview);
     await vi.waitFor(() =>
       expect(
@@ -196,6 +221,7 @@ export function createDiscussionReportBatchInteractionHelpers(
     acknowledgeBatchCommit,
     commitBatch,
     select,
+    chooseAction,
     review,
   };
 }
