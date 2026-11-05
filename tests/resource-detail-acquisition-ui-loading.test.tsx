@@ -28,11 +28,11 @@ import {
   deferred,
   productService,
   renderPage,
+  setupResourceDetailAcquisitionUi,
   state,
-  useResourceDetailAcquisitionUiHarness,
 } from "./helpers/resource-detail-acquisition-ui-state";
 
-useResourceDetailAcquisitionUiHarness();
+setupResourceDetailAcquisitionUi();
 
 describe("resource detail acquisition loading", () => {
   it("labels a published resource without a safe build as a private manager preview", async () => {

@@ -26,11 +26,11 @@ import {
   product,
   productService,
   renderPage,
+  setupResourceDetailAcquisitionUi,
   state,
-  useResourceDetailAcquisitionUiHarness,
 } from "./helpers/resource-detail-acquisition-ui-state";
 
-useResourceDetailAcquisitionUiHarness();
+setupResourceDetailAcquisitionUi();
 
 describe("resource detail acquisition surface", () => {
   it.each(["en", "ru"] as const)(

@@ -1,11 +1,11 @@
-import { createElement, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, vi } from "vitest";
 import { LocaleProvider } from "../../apps/web/src/components/locale-context";
 
-export type AcquisitionLocale = "en" | "ru";
+type AcquisitionLocale = "en" | "ru";
 
-export type AcquisitionUser = {
+type AcquisitionUser = {
   id: string;
   username: string;
   role: "user" | "admin";
@@ -51,7 +51,7 @@ export const productService = {
 };
 
 export function renderPage(element: ReactNode) {
-  return renderToStaticMarkup(createElement(LocaleProvider, { locale: state.locale }, element));
+  return renderToStaticMarkup(<LocaleProvider locale={state.locale}>{element}</LocaleProvider>);
 }
 
 export function deferred<T>() {
@@ -108,7 +108,7 @@ export function build(id: string, version: string) {
   };
 }
 
-export function resetResourceDetailAcquisitionUi() {
+function resetResourceDetailAcquisitionUi() {
   vi.clearAllMocks();
   state.user = null;
   state.entitled = false;
@@ -119,7 +119,7 @@ export function resetResourceDetailAcquisitionUi() {
   state.builds = [build("bld_latest", "2.0.0"), build("bld_old", "1.0.0")];
 }
 
-export function useResourceDetailAcquisitionUiHarness() {
+export function setupResourceDetailAcquisitionUi() {
   beforeEach(() => {
     resetResourceDetailAcquisitionUi();
   });
