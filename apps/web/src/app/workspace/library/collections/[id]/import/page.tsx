@@ -98,7 +98,9 @@ export default async function Page({
           {manifest.productIds.length}
         </p>
         {collection.status === "archived" && <p>{c.archivedNote}</p>}
-        {collection.revision >= 2147483647 && <p>{c.revisionLocked}</p>}
+        {collection.revision >= 2147483647 ? (
+          <ErrorState id="library-collection-import-revision-locked" title={c.revisionLocked} />
+        ) : null}
         <LibraryCollectionImport key={collection.id} collection={collection} locale={typedLocale} />
       </div>
     );
