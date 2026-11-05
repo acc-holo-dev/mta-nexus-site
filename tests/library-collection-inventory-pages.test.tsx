@@ -209,6 +209,8 @@ it("keeps a missing pinned choice inspectable without comparison, preparation or
     ],
   });
   const html = await screen();
+  expect(html).toContain('role="alert"');
+  expect(html).toContain('id="library-collection-resources-selection-missing"');
   expect(html).toContain(libraryCollectionInventoryCopy("en").selectionMissing);
   expect(html).toContain("/prd_a/versions");
   expect(html).not.toContain("data-build=");
