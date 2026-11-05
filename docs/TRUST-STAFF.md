@@ -90,7 +90,7 @@
 
 **OWNER DECISION:** 2FA **не обязательна** только из-за роли Seller / Server Owner / Organization Finance / Staff. Интерфейс настойчиво рекомендует 2FA для high-value/high-risk; PSP/provider или incident могут требовать step-up; sensitive actions могут требовать re-auth **независимо** от 2FA; платформа может пересмотреть mandatory-2FA позже по abuse data. Нельзя блокировать базовую роль только отсутствием 2FA, если иной policy/legal/provider gate этого не требует.
 
-**текущий runtime / живой неизвестно.** Policy `staff_action` → `current_password` существует (`packages/security` fresh-auth); PROBLEMS F09: HTTP→transaction enforcement для admin actions ещё нужно закрыть до public beta. Добровольная 2FA остаётся отдельной возможностью (FLOWS FLOW-22). Финальная действительность initiating session в длинных upload/download — F08 (**живой неизвестно** / issue до beta).
+**текущий runtime.** Policy `staff_action` → `current_password` применяется в HTTP admin/actions на tip (FLOW-22; focused fresh-auth HTTP tests). Session-actor binding wave (`6cefa74e`) дополнительно связывает критичные мутации с initiating/displayed session — см. [PROBLEMS.md](PROBLEMS.md) (Session-actor binding wave). Добровольная 2FA остаётся отдельной возможностью. Controlled multi-connection barrier для initiating-session на длинных upload/download — F08 residual (**живой неизвестно** / disposable probe до beta).
 
 Конфигурация ключей, TLS, outbox и восстановления почты — **только** [OPERATIONS.md](OPERATIONS.md). Состояние очереди ≠ доказанная доставка.
 
@@ -351,22 +351,22 @@ Data minimization: не собирать «на всякий случай» raw 
 
 ## 14. Сводка меток (для быстрой сверки)
 
-| Тема                                                                                                 | Метка                                                                                     |
-| ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `users.role` enum; `/admin` queues; reports/verification/build review concepts                       | текущий runtime                                                                           |
-| Support CAS, filters, body cap, Idempotency-Key, reload-safe keys (с оговорками)                     | текущий runtime                                                                           |
-| Quarantine + downloader incident projection (код/линия SEC)                                          | текущий runtime; production coverage — живой неизвестно                                   |
-| Fresh-auth policy файл существует                                                                    | текущий runtime; полное HTTP enforcement критичных admin actions — живой неизвестно (F09) |
-| Initiating-session на финальных upload/download gates                                                | живой неизвестно (F08)                                                                    |
-| Cumulative staff capabilities; specialized departments; formal SCAM/appeal/trust-label UX            | цель владельца                                                                            |
-| Security Center полный UX; Activity Log; global staff search; impact preview                         | цель владельца                                                                            |
-| 2FA voluntary by role; SCAM one senior Trust/Admin; no universal dual-control finance                | цель владельца (OWNER DECISION)                                                           |
-| Public Trust tab + retained public moderation history states                                         | цель владельца                                                                            |
-| Email/password primary; social ≠ login; email gate; deletion workflow; no Export-my-data requirement | цель владельца                                                                            |
-| Vanity + 7-day grace; verified links; anti-impersonation                                             | цель владельца (монетизация vanity — COMMERCIAL)                                          |
-| Self-service API keys / anonymous public API / public Status Page как launch                         | цель владельца: **не** требуется сейчас                                                   |
-| Revision token против ABA в support; durable cross-tab idempotency UX                                | остаток / предложение усиления                                                            |
-| Exact public SLA minutes                                                                             | не публиковать до capacity; internal targets — цель владельца без контракта               |
+| Тема                                                                                                 | Метка                                                                       |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `users.role` enum; `/admin` queues; reports/verification/build review concepts                       | текущий runtime                                                             |
+| Support CAS, filters, body cap, Idempotency-Key, reload-safe keys (с оговорками)                     | текущий runtime                                                             |
+| Quarantine + downloader incident projection (код/линия SEC)                                          | текущий runtime; production coverage — живой неизвестно                     |
+| Fresh-auth policy + HTTP admin/actions enforcement (FLOW-22)                                         | текущий runtime на tip; расширение списка actions — по мере появления       |
+| Initiating-session lock в final upload/download gates; barrier probe                                 | code lock на tip (FLOW-21); disposable barrier — живой неизвестно (F08)     |
+| Cumulative staff capabilities; specialized departments; formal SCAM/appeal/trust-label UX            | цель владельца                                                              |
+| Security Center полный UX; Activity Log; global staff search; impact preview                         | цель владельца                                                              |
+| 2FA voluntary by role; SCAM one senior Trust/Admin; no universal dual-control finance                | цель владельца (OWNER DECISION)                                             |
+| Public Trust tab + retained public moderation history states                                         | цель владельца                                                              |
+| Email/password primary; social ≠ login; email gate; deletion workflow; no Export-my-data requirement | цель владельца                                                              |
+| Vanity + 7-day grace; verified links; anti-impersonation                                             | цель владельца (монетизация vanity — COMMERCIAL)                            |
+| Self-service API keys / anonymous public API / public Status Page как launch                         | цель владельца: **не** требуется сейчас                                     |
+| Revision token против ABA в support; durable cross-tab idempotency UX                                | остаток / предложение усиления                                              |
+| Exact public SLA minutes                                                                             | не публиковать до capacity; internal targets — цель владельца без контракта |
 
 ---
 
