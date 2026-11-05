@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `d17118d2` — tip advanced after tip honesty (#551) on 5df7c793 residual wave; tip CI not claimed verified-green under rapid merges;
 - `5df7c793` — tip advanced after community-report detail confirm-cancel (#545) and metadata reviewRequired (#544); tip CI not claimed verified-green under rapid merges;
 - `80259a63` — tip advanced after tip honesty (#542) on a74b9d2e residual wave; tip CI not claimed verified-green under rapid merges;
 - `a74b9d2e` — tip advanced after community-topic ErrorState (#527), moderation-blocked ErrorState (#529), resource-review eligibility ErrorState (#533), and tip honesty (#540); tip CI not claimed verified-green under rapid merges;
