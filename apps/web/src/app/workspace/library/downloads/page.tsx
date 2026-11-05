@@ -181,7 +181,7 @@ export default async function ResourceDownloadsPage({
                     version={receipt.version}
                   />
                 ) : (
-                  <p className="text-xs text-muted">{copy.unavailable}</p>
+                  <ErrorState id="library-download-unavailable" title={copy.unavailable} />
                 )}
               </div>
             </li>
