@@ -1,10 +1,9 @@
-import type { Product } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
-import { Library, Star, Tag } from "lucide-react";
 import Link from "next/link";
+import { Library, Star, Tag } from "lucide-react";
+import type { Product } from "@nexus/domain";
 import { getDictionary, type Locale } from "../lib/i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import type { PublicResourceAttribution } from "../lib/public-resource-attribution";
+import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { ResourcePreview } from "./resource-preview";
 
 const cardFocus =
@@ -42,9 +41,7 @@ function AttributionLine({
     );
   }
 
-  return (
-    <ErrorState id="product-card-publisher-unavailable" title={unavailable} className="!p-0" />
-  );
+  return <span className="truncate text-[11px] text-faint">{unavailable}</span>;
 }
 
 export function ProductCard({
