@@ -9,7 +9,7 @@ const source = readFileSync(
   "utf8",
 );
 
-/** Honesty lock for inactive/max-revision move-source notice. */
+/** Honesty lock: inactive/max-revision move-source notice must use ErrorState. */
 it("locks library collection move-source unavailable notice to ErrorState", () => {
   expect(source).toContain('id="library-collection-move-source-unavailable"');
   expect(source).toMatch(
