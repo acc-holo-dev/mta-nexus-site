@@ -163,7 +163,10 @@ export function BuildPackageEvidencePanel({
                 ))}
               </ul>
               {manifest.referencesTruncated ? (
-                <ErrorState id="build-package-evidence-manifest-refs-truncated" title={copy.truncated} />
+                <ErrorState
+                  id="build-package-evidence-manifest-refs-truncated"
+                  title={copy.truncated}
+                />
               ) : null}
               {manifest.issues.length > 0 && (
                 <>
