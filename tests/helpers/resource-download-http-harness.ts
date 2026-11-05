@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { beforeEach, vi } from "vitest";
 
 /** Shared mutable fixtures for resource-download HTTP concern suites. */
+/** Shared fixtures for resource-download-http suite splits. */
 export const resourceDownloadHttpState = {
   user: null as null | {
     id: string;
