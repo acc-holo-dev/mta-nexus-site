@@ -60,6 +60,18 @@ function button(nodes: Element[], label: string) {
 function click(nodes: Element[], label: string) {
   return (button(nodes, label).props.onClick as () => void)();
 }
+function errorState(nodes: Element[]) {
+  return nodes.find(
+    (node) =>
+      typeof node.type !== "string" && (node.type as { name?: string }).name === "ErrorState",
+  );
+}
+function hasErrorAlert(nodes: Element[], title?: string) {
+  const state = errorState(nodes);
+  if (!state || typeof state.props.title !== "string") return false;
+  if (title !== undefined && state.props.title !== title) return false;
+  return nodes.some((node) => node.props.role === "alert");
+}
 const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 beforeEach(() => {
@@ -134,7 +146,8 @@ it.each([
   harness.fetch.mockResolvedValue(response(reply));
   const copy = authorPublicationDeskCopy("en");
   click(render(), copy.restore);
-  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  await vi.waitFor(() => expect(hasErrorAlert(render())).toBe(true));
+  expect(typeof errorState(render())?.props.title).toBe("string");
   expect(harness.refresh).not.toHaveBeenCalled();
   expect(button(render(), copy.restore).props.disabled).toBe(true);
   click(render(), copy.restore);
@@ -150,11 +163,10 @@ it.each(["CONFLICT", "FORBIDDEN", "PUBLICATION_RESTORE_DENIED"])(
     );
     const copy = authorPublicationDeskCopy("ru");
     click(render("ru"), copy.restore);
-    await vi.waitFor(() =>
-      expect(render("ru").some((node) => node.props.role === "alert")).toBe(true),
-    );
-    const alert = render("ru").find((node) => node.props.role === "alert");
-    expect(alert?.props.children).not.toContain("PRIVATE_DATABASE_DETAILS");
+    await vi.waitFor(() => expect(hasErrorAlert(render("ru"))).toBe(true));
+    const alert = errorState(render("ru"));
+    expect(alert?.props.title).toBeTruthy();
+    expect(String(alert?.props.title)).not.toContain("PRIVATE_DATABASE_DETAILS");
     expect(button(render("ru"), copy.restore).props.disabled).toBe(true);
     expect(harness.refresh).not.toHaveBeenCalled();
   },
@@ -213,9 +225,8 @@ it.each(["foreign", undefined])(
     );
     const copy = authorPublicationDeskCopy("en");
     click(render("en", "org"), copy.restore);
-    await vi.waitFor(() =>
-      expect(render("en", "org").some((node) => node.props.role === "alert")).toBe(true),
-    );
+    await vi.waitFor(() => expect(hasErrorAlert(render("en", "org"), copy.uncertain)).toBe(true));
+    expect(errorState(render("en", "org"))?.props.title).toBe(copy.uncertain);
     expect(harness.refresh).not.toHaveBeenCalled();
     expect(button(render("en", "org"), copy.restore).props.disabled).toBe(true);
     click(render("en", "org"), copy.restore);
@@ -259,8 +270,9 @@ it("requires reload on a scope-mismatched server restore acknowledgement", async
   const copy = authorPublicationDeskCopy("en");
   click(render("en", undefined, "srv"), copy.restore);
   await vi.waitFor(() =>
-    expect(render("en", undefined, "srv").some((node) => node.props.role === "alert")).toBe(true),
+    expect(hasErrorAlert(render("en", undefined, "srv"), copy.uncertain)).toBe(true),
   );
+  expect(errorState(render("en", undefined, "srv"))?.props.title).toBe(copy.uncertain);
   expect(harness.refresh).not.toHaveBeenCalled();
   expect(button(render("en", undefined, "srv"), copy.restore).props.disabled).toBe(true);
 });

@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -140,14 +140,12 @@ export function AuthorPublicationRestore({
       >
         {copy.restore}
       </Button>
-      {notice && (
-        <p
-          role={saved ? "status" : "alert"}
-          className={saved ? "text-sm text-success" : "text-sm text-danger"}
-        >
+      {notice && !saved ? <ErrorState title={notice} /> : null}
+      {notice && saved ? (
+        <p role="status" className="text-sm text-success">
           {notice}
         </p>
-      )}
+      ) : null}
       {saved ? (
         <Link
           prefetch={false}
