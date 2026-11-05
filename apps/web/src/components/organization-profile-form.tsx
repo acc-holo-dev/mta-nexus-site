@@ -359,7 +359,7 @@ export function OrganizationProfileForm({
       <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
       <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
       {creationNotice && !initial && (!creationReady || verifiedCreationKey === creationKey) ? (
-        <p role="status">{creationNotice}</p>
+        <ErrorState title={creationNotice} />
       ) : null}
       {creationNonce && !initial && verifiedCreationKey === creationKey ? (
         <Button
