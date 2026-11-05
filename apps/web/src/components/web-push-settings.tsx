@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { notificationInboxCopy } from "../lib/notification-inbox-copy";
@@ -411,9 +411,39 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
           ? copy.webPushDenied
           : shownStatus === "enabled"
             ? copy.webPushEnabled
-            : shownStatus === "error"
-              ? copy.webPushError
-              : copy.webPushDescription;
+            : copy.webPushDescription;
+
+  function retryLoad() {
+    setStatus("loading");
+    setAttempt((value) => value + 1);
+  }
+
+  if (shownStatus === "error") {
+    return (
+      <section
+        aria-labelledby={titleId}
+        aria-describedby={openBetaNoteId}
+        className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4"
+      >
+        <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
+          <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
+          <span>{copy.webPush}</span>
+        </h3>
+        <ErrorState
+          id="web-push-settings-status"
+          title={copy.webPushError}
+          action={
+            <Button type="button" size="touch" variant="outline" onClick={retryLoad}>
+              {copy.retry}
+            </Button>
+          }
+        />
+        <p id={openBetaNoteId} className="text-xs text-muted">
+          {openBetaNote}
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -435,12 +465,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
         {shownStatus === "disabled" && unregisteredLocal && (
           <p className="mt-1 text-xs text-muted">{copy.webPushCleanupHint}</p>
         )}
-        <span
-          role={shownStatus === "error" ? "alert" : "status"}
-          aria-live={shownStatus === "error" ? "assertive" : "polite"}
-          aria-atomic="true"
-          className="sr-only"
-        >
+        <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
           {description}
         </span>
       </div>
@@ -464,19 +489,6 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
           onClick={() => void enable()}
         >
           {copy.webPushEnable}
-        </Button>
-      ) : shownStatus === "error" ? (
-        <Button
-          type="button"
-          size="touch"
-          variant="outline"
-          aria-describedby={describedBy}
-          onClick={() => {
-            setStatus("loading");
-            setAttempt((value) => value + 1);
-          }}
-        >
-          {copy.retry}
         </Button>
       ) : shownStatus === "loading" ? (
         <span aria-hidden="true" className="text-xs text-muted">
