@@ -41,7 +41,9 @@ export function ReverseDependencyList({
           </Link>
         ))}
       </div>
-      {summary.limitReached && <p className="text-[10px] text-warning">{copy.limitReached}</p>}
+      {summary.limitReached ? (
+        <ErrorState id="reverse-deps-limit-reached" title={copy.limitReached} />
+      ) : null}
       <p className="text-[10px] text-faint">{copy.reverseNotice}</p>
     </div>
   );

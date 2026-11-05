@@ -77,6 +77,10 @@ describe("reverse dependency list behavior", () => {
     expect(markup).toContain("Vehicle Core");
     expect(markup).toContain("v2.4.0");
     expect(markup).toContain(copy.limitReached);
+    expect(markup).toContain('id="reverse-deps-limit-reached"');
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain("bg-danger-soft");
+    expect(markup).not.toContain('class="text-[10px] text-warning"');
     expect(markup).toContain(copy.reverseNotice);
     expect(markup).not.toMatch(/compatible with|guaranteed compatible|verified compatible/iu);
   });
