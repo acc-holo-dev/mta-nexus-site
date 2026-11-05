@@ -417,7 +417,7 @@ export function ContentDiscussion({
         {displayCount !== null ? (
           ` (${displayCount})`
         ) : (
-          <span className="ml-2 text-sm text-muted">{copy.countUnavailable}</span>
+          <ErrorState id="discussion-count-unavailable" title={copy.countUnavailable} />
         )}
       </h2>
       <search aria-label={copy.search}>
