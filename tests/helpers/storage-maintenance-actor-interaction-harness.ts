@@ -17,10 +17,7 @@ type StorageCleanupControlsComponent = (props: {
   locale: string;
 }) => ReactNode;
 
-type StorageDiscoveryControlsComponent = (props: {
-  actorId: string;
-  locale: string;
-}) => ReactNode;
+type StorageDiscoveryControlsComponent = (props: { actorId: string; locale: string }) => ReactNode;
 
 export const reply = (value: unknown) => new Response(JSON.stringify(value), { status: 200 });
 
