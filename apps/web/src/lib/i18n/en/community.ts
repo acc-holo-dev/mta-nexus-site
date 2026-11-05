@@ -22,7 +22,25 @@ export const community = {
     publish: "Publish topic",
     createError: "Could not create topic",
     createErrorDescription:
-      "A failed publish is not a created topic. Fix the form if needed, then retry.",
+      "The result may be unconfirmed. Check the saved topic before starting a different submission.",
+    topicIdentity: "Verify the signed-in account",
+    topicSignIn: "Sign in to create a topic",
+    topicGuestDraft: "Copy any text you entered before signing in; it is not saved yet.",
+    topicIdentityError:
+      "The account could not be verified. Sign in to the original account and check again.",
+    topicStorageError:
+      "This browser could not safely access the pending submission. Check session storage; no new topic was sent.",
+    topicPending:
+      "The result is not confirmed. Check the saved topic or retry this exact submission; the same address will be used.",
+    topicCheck: "Check saved topic",
+    topicRetry: "Retry this exact submission",
+    topicNotFound:
+      "No matching topic is visible yet. The original request may still be processing; retrying uses the same address.",
+    topicExisting:
+      "A topic with this address exists in your account. Review the saved version before starting another submission.",
+    topicOpenSaved: "Open saved topic in workspace",
+    topicActorChanged:
+      "The signed-in account changed. The previous account's pending submission is hidden.",
   },
   explore: {
     title: "Explore the MTA ecosystem",

@@ -19,6 +19,7 @@ const router = vi.hoisted(() => ({
 }));
 
 const listCommunityTopics = vi.hoisted(() => vi.fn());
+const getSession = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({
   usePathname: () => state.pathname,
@@ -43,6 +44,8 @@ vi.mock("../apps/web/src/components/locale-context", () => ({
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: { getSession } }));
 
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: {
@@ -60,6 +63,7 @@ describe("community topic submission behavior", () => {
     vi.clearAllMocks();
     state.pathname = "/community";
     listCommunityTopics.mockResolvedValue({ items: state.topics, page: 1, hasMore: false });
+    getSession.mockReset().mockResolvedValue(null);
   });
 
   it("builds only post/question payloads without a client-controlled publication status", () => {
@@ -71,11 +75,12 @@ describe("community topic submission behavior", () => {
         tags: " help, lua, help ",
       },
       123456,
+      "a".repeat(32),
     );
 
     expect(submission).toEqual({
       title: "Vehicle Help: Ä Edition",
-      slug: "vehicle-help-a-edition-2n9c",
+      slug: `vehicle-help-a-edition-2n9c-${"a".repeat(32)}`,
       body: "How should this resource be configured?",
       type: "question",
       tags: ["help", "lua", "help"],
@@ -100,37 +105,50 @@ describe("community topic submission behavior", () => {
         tags: "",
       },
       42,
+      "a".repeat(32),
     );
     expect(submission).not.toBeNull();
     if (!submission) return;
 
     const signal = new AbortController().signal;
-    expect(communityTopicRequest(submission, signal)).toMatchObject({
+    expect(communityTopicRequest(submission, signal, "usr_a")).toMatchObject({
       method: "POST",
       cache: "no-store",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Nexus-Actor-Id": "usr_a" },
       body: JSON.stringify(submission),
       signal,
     });
 
     expect(
-      confirmedCommunityTopicPath(201, {
-        success: true,
-        content: { slug: "topic/with/slash" },
-      }),
-    ).toBe("/articles/topic%2Fwith%2Fslash");
+      confirmedCommunityTopicPath(
+        201,
+        {
+          success: true,
+          content: { slug: submission.slug },
+        },
+        submission.slug,
+      ),
+    ).toBe(`/articles/${submission.slug}`);
     expect(
-      confirmedCommunityTopicPath(200, {
-        success: false,
-        content: { slug: "topic" },
-      }),
+      confirmedCommunityTopicPath(
+        200,
+        {
+          success: false,
+          content: { slug: "topic" },
+        },
+        submission.slug,
+      ),
     ).toBeNull();
     expect(
-      confirmedCommunityTopicPath(500, {
-        success: true,
-        content: { slug: "topic" },
-      }),
+      confirmedCommunityTopicPath(
+        500,
+        {
+          success: true,
+          content: { slug: "topic" },
+        },
+        submission.slug,
+      ),
     ).toBeNull();
   });
 
@@ -197,5 +215,12 @@ describe("community topic submission behavior", () => {
     expect(html).toContain(copy.backToCommunity);
     expect(html).toContain('href="/community"');
     expect(html).toContain("min-h-11");
+  });
+
+  it("reports a session lookup failure instead of treating it as a guest", async () => {
+    getSession.mockRejectedValueOnce(new Error("unavailable"));
+    const html = renderToStaticMarkup(await NewCommunityTopicPage());
+    expect(html).toContain(getDictionary("en").community.topicIdentityError);
+    expect(html).not.toContain('name="body"');
   });
 });

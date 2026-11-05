@@ -31,6 +31,29 @@ import { resourceReviewsRepository } from "./resource-reviews";
 import { containsPattern } from "./search-pattern";
 
 export class ContentRepository {
+  async findOwnCommunityTopicBySlug(slug: string, actorId: string) {
+    if (!/^[a-z0-9-]{3,200}$/u.test(slug) || !actorId) return null;
+    const [row] = await db
+      .select({
+        id: content.id,
+        slug: content.slug,
+        title: content.title,
+        body: content.body,
+        type: content.type,
+        tags: content.tags,
+        status: content.status,
+      })
+      .from(content)
+      .where(
+        and(
+          eq(content.slug, slug),
+          eq(content.authorId, actorId),
+          inArray(content.type, ["post", "question"]),
+        ),
+      )
+      .limit(1);
+    return row ?? null;
+  }
   async countDrafts(): Promise<number> {
     const [row] = await db
       .select({ total: count() })

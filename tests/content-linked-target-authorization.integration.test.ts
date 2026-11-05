@@ -1,16 +1,17 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { productRepository, serverRepository, sessionRepository, userRepository } from "@nexus/db";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "../apps/web/src/app/api/content/route";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
-function contentRequest(token: string, body: Record<string, unknown>) {
+function contentRequest(token: string, actorId: string, body: Record<string, unknown>) {
   return new NextRequest("http://nexus.test/api/content", {
     method: "POST",
     headers: {
       ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: `nexus_session=${token}`,
+      "x-nexus-actor-id": actorId,
     },
     body: JSON.stringify(body),
   });
@@ -98,7 +99,7 @@ describe("linked content target authorization integration", () => {
     });
 
     const foreignServer = await POST(
-      contentRequest(attackerToken, {
+      contentRequest(attackerToken, attackerId, {
         title: "Foreign server association",
         slug: `foreign-server-association-${slugSuffix}`,
         body: "This body is long enough for content validation.",
@@ -112,7 +113,7 @@ describe("linked content target authorization integration", () => {
     });
 
     const foreignProduct = await POST(
-      contentRequest(attackerToken, {
+      contentRequest(attackerToken, attackerId, {
         title: "Foreign resource association",
         slug: `foreign-resource-association-${slugSuffix}`,
         body: "This body is long enough for content validation.",
@@ -126,7 +127,7 @@ describe("linked content target authorization integration", () => {
     });
 
     const owned = await POST(
-      contentRequest(ownerToken, {
+      contentRequest(ownerToken, ownerId, {
         title: "Owned linked publication",
         slug: `owned-linked-publication-${slugSuffix}`,
         body: "This body is long enough for content validation.",

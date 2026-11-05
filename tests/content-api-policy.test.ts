@@ -55,7 +55,11 @@ import { GET, POST } from "../apps/web/src/app/api/content/route";
 function request(body: Record<string, unknown>, token = "session") {
   const req = new NextRequest("http://nexus.test/api/content", {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      "x-nexus-actor-id": "usr_writer",
+    },
     body: JSON.stringify(body),
   });
   if (token) req.cookies.set("nexus_session", token);
@@ -94,6 +98,24 @@ describe("community content API behavior", () => {
     vi.unstubAllEnvs();
   });
 
+  it("rejects a changed actor before creating community content", async () => {
+    const req = request(body({ type: "post" }));
+    req.headers.set("X-Nexus-Actor-Id", "usr_other");
+    const response = await POST(req);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({ code: "ACTOR_CHANGED" });
+    expect(mocks.createWithAudit).not.toHaveBeenCalled();
+  });
+
+  it("requires an actor precondition before creating content", async () => {
+    const req = request(body({ type: "post" }));
+    req.headers.delete("X-Nexus-Actor-Id");
+    const response = await POST(req);
+    expect(response.status).toBe(428);
+    expect(await response.json()).toEqual({ code: "ACTOR_ID_REQUIRED" });
+    expect(mocks.createWithAudit).not.toHaveBeenCalled();
+  });
+
   it("rejects unsupported media and oversized content before persistence", async () => {
     const unsupported = await POST(
       new NextRequest("http://nexus.test/api/content", {
@@ -101,6 +123,7 @@ describe("community content API behavior", () => {
         headers: {
           ...browserMutationHeaders(),
           cookie: "nexus_session=session",
+          "x-nexus-actor-id": "usr_writer",
           "content-type": "text/plain",
         },
         body: "{}",

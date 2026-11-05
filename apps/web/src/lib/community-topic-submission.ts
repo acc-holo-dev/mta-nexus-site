@@ -26,9 +26,11 @@ export function buildCommunityTopicSubmission(
     tags: string;
   },
   now = Date.now(),
+  nonce = globalThis.crypto.randomUUID().replaceAll("-", ""),
 ): CommunityTopicSubmission | null {
   const title = input.title.trim();
   const body = input.body.trim();
+  if (!/^[a-f0-9]{32}$/u.test(nonce) || !Number.isSafeInteger(now) || now < 0) return null;
   if (title.length < 3 || title.length > 200) return null;
   if (body.length < 10 || body.length > 20_000) return null;
   if (input.type !== "question" && input.type !== "post") return null;
@@ -42,7 +44,7 @@ export function buildCommunityTopicSubmission(
   const base = topicSlugBase(title);
   return {
     title,
-    slug: `${base || "topic"}-${now.toString(36)}`,
+    slug: `${base || "topic"}-${now.toString(36)}-${nonce}`,
     body,
     type: input.type,
     tags,
@@ -52,6 +54,7 @@ export function buildCommunityTopicSubmission(
 export function communityTopicRequest(
   submission: CommunityTopicSubmission,
   signal: AbortSignal,
+  actorId: string,
 ): RequestInit {
   return {
     method: "POST",
@@ -59,13 +62,18 @@ export function communityTopicRequest(
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
+      "X-Nexus-Actor-Id": actorId,
     },
     body: JSON.stringify(submission),
     signal,
   };
 }
 
-export function confirmedCommunityTopicPath(status: number, payload: unknown): string | null {
+export function confirmedCommunityTopicPath(
+  status: number,
+  payload: unknown,
+  expectedSlug: string,
+): string | null {
   if (
     status < 200 ||
     status >= 300 ||
@@ -85,7 +93,7 @@ export function confirmedCommunityTopicPath(status: number, payload: unknown): s
     return null;
   }
   const slug = (record.content as Record<string, unknown>).slug;
-  if (typeof slug !== "string" || !slug.trim() || slug.length > 200) {
+  if (typeof slug !== "string" || slug !== expectedSlug || !/^[a-z0-9-]{3,200}$/u.test(slug)) {
     return null;
   }
   return `/articles/${encodeURIComponent(slug)}`;

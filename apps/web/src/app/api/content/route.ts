@@ -76,6 +76,10 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(context, { error: "Authentication required" }, 401);
     }
 
+    const expectedActor = request.headers.get("x-nexus-actor-id");
+    if (!expectedActor) return privateJson(context, { code: "ACTOR_ID_REQUIRED" }, 428);
+    if (expectedActor !== user.id) return privateJson(context, { code: "ACTOR_CHANGED" }, 409);
+
     requireServerJsonContentType(request);
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
