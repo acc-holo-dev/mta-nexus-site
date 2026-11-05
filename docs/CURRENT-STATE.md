@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `fd27bce9` — tip advanced after tip honesty (#800) for e8041e9d after #788; tip CI not claimed verified-green under rapid merges;
 - `e8041e9d` — tip advanced after public-user-trust-hidden ErrorState honesty (#788) following tip honesty (#798) on 878bf100; tip CI not claimed verified-green under rapid merges;
 - `878bf100` — tip advanced after tip honesty (#797) for f4a44484; tip CI not claimed verified-green under rapid merges;
 - `f4a44484` — tip advanced after tip honesty (#796) for 7e0ff7d9; tip CI not claimed verified-green under rapid merges;
