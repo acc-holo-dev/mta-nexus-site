@@ -60,6 +60,25 @@ test("fixture accept: production-recovery-acceptance-accept.json validates", () 
   assert.equal(validateProductionRecoveryAcceptanceEvidence(body, { now: fixtureNow }).ok, true);
 });
 
+test("acceptance requires an explicit, empty failures list for a passing verdict", () => {
+  for (const verdict of [
+    { passed: true },
+    { passed: true, failures: null },
+    { passed: true, failures: "" },
+    { passed: true, failures: ["restore_failed"] },
+  ]) {
+    const result = validateProductionRecoveryAcceptanceEvidence(acceptance({ verdict }), {
+      now: fixtureNow,
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /explicit empty failures array/u);
+  }
+  assert.equal(
+    validateProductionRecoveryAcceptanceEvidence(acceptance(), { now: fixtureNow }).ok,
+    true,
+  );
+});
+
 test("accepts old and clock-skewed restore evidence but rejects a future drill", () => {
   const now = Date.parse("2030-01-01T00:00:00.000Z");
   assert.equal(validateProductionRecoveryAcceptanceEvidence(acceptance(), { now }).ok, true);

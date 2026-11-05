@@ -42,7 +42,12 @@ const post = (
 ) =>
   request(base + query, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), cookie: "nexus_session=plan-review-token", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      cookie: "nexus_session=plan-review-token",
+      "x-nexus-actor-id": "usr_a",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
@@ -148,4 +153,15 @@ it("refuses oversized detail exports without exposing report data", async () => 
 
 afterEach(() => {
   vi.unstubAllEnvs();
+});
+it("requires the displayed actor before saving a plan review", async () => {
+  const missing = await POST(
+    post(command, "", { "content-type": "application/json", "x-nexus-actor-id": "" }),
+  );
+  expect(missing.status).toBe(428);
+  const changed = await POST(
+    post(command, "", { "content-type": "application/json", "x-nexus-actor-id": "usr_b" }),
+  );
+  expect(changed.status).toBe(409);
+  expect(state.save).not.toHaveBeenCalled();
 });

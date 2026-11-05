@@ -6,9 +6,10 @@ import test from "node:test";
 import {
   buildObservabilityReadinessEvidence,
   evaluateObservabilityEvidenceResidual,
-  OBSERVABILITY_RUNBOOK_MENTIONS,
   OBSERVABILITY_REQUIRED_SCRIPTS,
+  OBSERVABILITY_RUNBOOK_MENTIONS,
   validateObservabilityReadinessEvidence,
+  withObservabilityChecksum,
 } from "../observability-evidence-lib.mjs";
 
 const alertEnv = {
@@ -48,6 +49,26 @@ test("buildObservabilityReadinessEvidence passes on this repo with alert env", (
     validateObservabilityReadinessEvidence(evidence, { repoRoot: process.cwd() }).ok,
     true,
   );
+});
+
+test("readiness rejects missing, malformed or contradictory failures", () => {
+  const { evidenceSha256: _checksum, ...core } = buildObservabilityReadinessEvidence({
+    repoRoot: process.cwd(),
+    env: alertEnv,
+  });
+  for (const verdict of [
+    { passed: true },
+    { passed: true, failures: null },
+    { passed: true, failures: "" },
+    { passed: true, failures: ["alert_not_configured"] },
+  ]) {
+    const result = validateObservabilityReadinessEvidence(
+      withObservabilityChecksum({ ...core, verdict }),
+      { repoRoot: process.cwd() },
+    );
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /explicit empty failures array/u);
+  }
 });
 
 test("validateObservabilityReadinessEvidence fails checkout re-check when OPERATIONS lacks a needle", () => {

@@ -81,6 +81,7 @@ it("records a bounded selection and audit atomically, using database-generated t
     [[0]],
     [row],
     [],
+    session,
   ];
   const result = await repo.save("usr_a", command, "review-token");
   expect(result).toMatchObject({
@@ -104,6 +105,8 @@ it("records a bounded selection and audit atomically, using database-generated t
   expect(state.queries[10].sql).toContain('"terms_snapshot"');
   expect(state.queries[10].sql).toContain("default");
   expect(state.queries[11].sql).toContain('insert into "audit_events"');
+  expect(state.queries[12].sql).toContain('from "sessions"');
+  expect(state.queries[12].sql).toContain("for update");
   expect(state.queries.map((q) => q.sql).join("\n")).not.toMatch(
     /insert into "(?:orders|payments|ledger_entries|licenses|entitlements)"/u,
   );

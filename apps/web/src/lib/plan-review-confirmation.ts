@@ -4,11 +4,17 @@ import {
   type PlanReviewCommand,
   readPlanReviewTerms,
 } from "@nexus/domain";
+export async function expectedPlanReviewId(actorId: string, requestId: string): Promise<string> {
+  const input = new TextEncoder().encode(`${actorId}:${requestId.toLowerCase()}`);
+  const digest = await crypto.subtle.digest("SHA-256", input);
+  return `prev_${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+}
 export function confirmedPlanReview(
   body: unknown,
   command: PlanReviewCommand,
   actorId: string,
   expectedTerms: CommercialPlanTerms,
+  expectedId: string,
 ): string | null {
   if (
     !body ||
@@ -23,6 +29,7 @@ export function confirmedPlanReview(
   if (
     typeof r.id !== "string" ||
     !/^prev_[a-f0-9]{64}$/u.test(r.id) ||
+    r.id !== expectedId ||
     r.planId !== command.planId ||
     r.planRevision !== command.expectedRevision ||
     r.scope !== (command.organizationId ? "organization" : "user") ||

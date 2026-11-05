@@ -135,6 +135,8 @@ export class PlanReviewsRepository {
           targetType: "commercial_plan_review",
           details: { planId: plan.id, revision: plan.revision, subjectType, subjectId },
         });
+        // The insert or audit may wait beyond the lifetime of the initiating session.
+        await lockInitiatingSession(tx, actorId, currentToken);
         return { review: projection(record), replayed: false };
       },
       { isolationLevel: "read committed" },

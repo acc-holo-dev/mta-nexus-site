@@ -116,6 +116,7 @@
 - **owner target update:** reviewer может обновить review, в т.ч. после новой версии; сохранить timestamps и material edit history/version context — seller не выдаёт edited review за «всегда про newest build» (REP-004).
 - **owner target moderation reviews:** remove/limit за spam, conflict of interest, abuse, extortion, impersonation, non-product content, policy violations. **Negative but legitimate** не снимается только из-за недовольства seller.
 - **текущий runtime:** resource reviews (доступ + exclude author/managers); server reviews (active/public + follow, exclude owner); plan reviews; denials/flow — [FLOWS.md](FLOWS.md) FLOW-18. Evidence labels Verified Purchase как полный product — частичны/зависят от commerce path.
+- **Обзор тарифа:** `POST /api/subscriptions/reviews` требует `X-Nexus-Actor-Id` исходного пользователя. При неизвестном результате форма сохраняет исходный запрос и условия тарифа в sessionStorage текущей вкладки для точного повтора; при недоступном хранилище отправка блокируется. Это не активирует оплату.
 - **исключение:** follow/access **не** доказывают установку или игровую сессию.
 
 ---

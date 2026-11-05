@@ -57,6 +57,21 @@ test("fixture accept: observability-live-drill-accept.json validates", () => {
   assert.equal(validateObservabilityLiveDrillEvidence(body, { now: fixtureNow }).ok, true);
 });
 
+test("live drill rejects missing, malformed or contradictory failures", () => {
+  for (const verdict of [
+    { passed: true },
+    { passed: true, failures: null },
+    { passed: true, failures: "" },
+    { passed: true, failures: ["delivery_failed"] },
+  ]) {
+    const result = validateObservabilityLiveDrillEvidence(liveDrill({ verdict }), {
+      now: fixtureNow,
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /explicit empty failures array/u);
+  }
+});
+
 test("accepts old and clock-skewed live drills but rejects a future drill", () => {
   const now = Date.parse("2030-01-01T00:00:00.000Z");
   assert.equal(validateObservabilityLiveDrillEvidence(liveDrill(), { now }).ok, true);

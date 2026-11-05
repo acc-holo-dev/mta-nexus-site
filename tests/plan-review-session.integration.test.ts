@@ -321,3 +321,52 @@ it("rejects expiry after the session-row wait even if its SELECT started while v
   expect(await pending).toMatchObject({ error: { code: "UNAUTHORIZED" } });
   expect(await state(f)).toEqual(before);
 }, 20000);
+
+it("rolls back the review and audit if the session expires while the audit insert waits", async () => {
+  const f = await fixture(),
+    before = await state(f),
+    reviewId = `prev_${createHash("sha256").update(`${f.actorId}:${f.command.requestId.toLowerCase()}`).digest("hex")}`,
+    auditId = `aud_${reviewId}`,
+    expiresAt = new Date(Date.now() + 3000),
+    locked = deferred(),
+    release = deferred();
+  await db.update(sessions).set({ expiresAt }).where(eq(sessions.id, f.sessionId));
+  const blocker = db.transaction(async (tx) => {
+    await tx.insert(auditEvents).values({
+      id: auditId,
+      actorId: f.actorId,
+      actorType: "user",
+      action: "fixture",
+      targetType: "commercial_plan_review",
+      targetId: reviewId,
+    });
+    locked.resolve();
+    await release.promise;
+    throw new Error("rollback fixture");
+  });
+  try {
+    await Promise.race([locked.promise, blocker]);
+    const pending = reviews.save(f.actorId, f.command, f.token).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    try {
+      await waitForLock('"audit_events"');
+      await expect
+        .poll(() => Date.now(), { timeout: 5000, interval: 10 })
+        .toBeGreaterThanOrEqual(expiresAt.getTime());
+    } finally {
+      release.resolve();
+    }
+    await blocker.catch(() => {});
+    expect(await pending).toMatchObject({ code: "UNAUTHORIZED" });
+    expect(await state(f)).toEqual(before);
+    expect(
+      await db.select().from(commercialPlanReviews).where(eq(commercialPlanReviews.id, reviewId)),
+    ).toHaveLength(0);
+    expect(await db.select().from(auditEvents).where(eq(auditEvents.id, auditId))).toHaveLength(0);
+  } finally {
+    release.resolve();
+    await blocker.catch(() => {});
+  }
+}, 20_000);

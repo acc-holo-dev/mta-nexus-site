@@ -107,6 +107,12 @@ export function validateProductionRecoveryAcceptanceEvidence(evidence, { now = D
       reason: `acceptance verdict is not passed: ${JSON.stringify(evidence?.verdict?.failures ?? [])}`,
     };
   }
+  if (!Array.isArray(evidence.verdict.failures) || evidence.verdict.failures.length !== 0) {
+    return {
+      ok: false,
+      reason: "passing acceptance verdict requires an explicit empty failures array",
+    };
+  }
   if (!nonEmptyString(evidence?.owner?.name)) {
     return { ok: false, reason: "owner name is required" };
   }

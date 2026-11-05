@@ -1,7 +1,10 @@
 import { commercialFeeEstimate, readPlanReviewTerms } from "@nexus/domain";
 import { planReviewCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedPlanReview } from "../apps/web/src/lib/plan-review-confirmation";
+import {
+  confirmedPlanReview,
+  expectedPlanReviewId,
+} from "../apps/web/src/lib/plan-review-confirmation";
 import { planReviewError, planReviewsCopy } from "../apps/web/src/lib/plan-reviews-i18n";
 import {
   planReviewHref,
@@ -95,8 +98,10 @@ it("strictly parses history, new selections and detail scope, with stable contex
     planReviewNewQuery(new URLSearchParams("planId=cplan_a&revision=2147483647")),
   ).toThrow();
 });
-it("confirms the exact persisted selection before navigating", () => {
-  expect(confirmedPlanReview({ review }, command, "usr_a", terms)).toBe(review.id);
+it("confirms the exact persisted selection before navigating", async () => {
+  const id = await expectedPlanReviewId("usr_a", command.requestId);
+  const ownReview = { ...review, id };
+  expect(confirmedPlanReview({ review: ownReview }, command, "usr_a", terms, id)).toBe(id);
   for (const change of [
     { subjectId: "usr_other" },
     { planRevision: 3 },
@@ -108,7 +113,7 @@ it("confirms the exact persisted selection before navigating", () => {
     { estimate: { ...review.estimate, platformFee: 1 } },
   ])
     expect(
-      confirmedPlanReview({ review: { ...review, ...change } }, command, "usr_a", terms),
+      confirmedPlanReview({ review: { ...ownReview, ...change } }, command, "usr_a", terms, id),
     ).toBeNull();
 });
 
@@ -121,3 +126,22 @@ it("localizes revoked access, expired sessions and rate limits without promising
     expect(planReviewError(locale, "UNKNOWN_INTERNAL_ERROR")).toBe(c.retry);
   }
 });
+it("does not confirm another actor's organization review even with matching terms and subject", async () => {
+  const organizationCommand = { ...command, organizationId: "org_a" };
+  const ownId = await expectedPlanReviewId("usr_a", command.requestId);
+  const otherId = await expectedPlanReviewId("usr_b", command.requestId);
+  const otherReview = { ...review, id: otherId, scope: "organization", subjectId: "org_a" };
+  expect(
+    confirmedPlanReview({ review: otherReview }, organizationCommand, "usr_a", terms, ownId),
+  ).toBeNull();
+});
+it.each(["ru", "en"] as const)(
+  "explains same-tab recovery rather than promising a new request in %s",
+  (locale) => {
+    const copy = planReviewsCopy(locale);
+    expect(copy.frozen).not.toMatch(/starts a new request|начинает новый запрос/u);
+    expect(copy.frozen).toMatch(
+      locale === "ru" ? /исходный выбор сохранён/u : /original selection is saved/u,
+    );
+  },
+);

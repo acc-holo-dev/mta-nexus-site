@@ -171,6 +171,12 @@ export function validateObservabilityReadinessEvidence(evidence, options = {}) {
       reason: `readiness verdict is not passed: ${JSON.stringify(evidence?.verdict?.failures ?? [])}`,
     };
   }
+  if (!Array.isArray(evidence.verdict.failures) || evidence.verdict.failures.length !== 0) {
+    return {
+      ok: false,
+      reason: "passing readiness verdict requires an explicit empty failures array",
+    };
+  }
   for (const relative of OBSERVABILITY_REQUIRED_SCRIPTS) {
     if (evidence?.scripts?.[relative] !== true) {
       return { ok: false, reason: `script proof missing for ${relative}` };
@@ -279,6 +285,12 @@ export function validateObservabilityLiveDrillEvidence(evidence, { now = Date.no
     return {
       ok: false,
       reason: `live drill verdict is not passed: ${JSON.stringify(evidence?.verdict?.failures ?? [])}`,
+    };
+  }
+  if (!Array.isArray(evidence.verdict.failures) || evidence.verdict.failures.length !== 0) {
+    return {
+      ok: false,
+      reason: "passing live drill verdict requires an explicit empty failures array",
     };
   }
   if (!nonEmptyString(evidence?.owner?.name)) {

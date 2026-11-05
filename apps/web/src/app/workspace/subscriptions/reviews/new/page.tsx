@@ -71,7 +71,7 @@ export default async function NewPlanReview({
         </Link>
         <h1 className="font-display">{c.newReview}</h1>
         <PlanReviewForm
-          key={`${plan.id}:${plan.revision}:${scopes.page}`}
+          key={`${actor.id}:${plan.id}:${plan.revision}:${scopes.page}`}
           plan={input}
           actorId={actor.id}
           scopes={scopes.scopes}
