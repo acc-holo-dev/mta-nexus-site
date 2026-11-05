@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `3dab7731` — tip advanced after #734/#735 tip `22c62eb7` and library membership revisionLocked ErrorState (#737); tip CI not claimed verified-green under rapid merges;
 - `6d3d19ff` — tip advanced after #731 tip `cac4aeb1` and release-watch batch maximum ErrorState (#725); tip CI not claimed verified-green under rapid merges;
 - `78b9bb4b` — tip advanced after tip honesty (#733) and author uploadBlocked ErrorState (#728); tip CI not claimed verified-green under rapid merges;
 - `0be621bd` — tip advanced after tip honesty (#732) and build-incident suite split (#723); tip CI not claimed verified-green under rapid merges;
