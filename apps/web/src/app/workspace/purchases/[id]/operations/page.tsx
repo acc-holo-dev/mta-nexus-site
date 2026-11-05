@@ -106,11 +106,12 @@ export default async function OrderOperationsPage({
         expectedUpdatedAt={result.order.updatedAt.toISOString()}
         canCancel={result.canCancel}
       />
-      {!result.canCancel && (
-        <p className="text-sm text-muted">
-          {result.order.status === "cancelled" ? copy.cancelledPayment : copy.cannotCancel}
-        </p>
-      )}
+      {!result.canCancel ? (
+        <ErrorState
+          id="order-operations-cannot-cancel"
+          title={result.order.status === "cancelled" ? copy.cancelledPayment : copy.cannotCancel}
+        />
+      ) : null}
       <section aria-labelledby="payment-attempts" className="space-y-4">
         <h2 id="payment-attempts" className="text-xl font-semibold text-primary">
           {copy.attempts} ({result.total})
