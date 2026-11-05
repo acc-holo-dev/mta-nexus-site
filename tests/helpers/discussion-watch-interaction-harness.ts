@@ -20,7 +20,7 @@ type FollowButtonComponent = (props: {
   targetName: "Article";
   initial: typeof initial;
   locale: "ru" | "en";
-}) => ReactElement;
+}) => ReactElement<{ children?: ReactNode }>;
 
 export const initial = { authenticated: true, actorId: "usr_1", following: false };
 
