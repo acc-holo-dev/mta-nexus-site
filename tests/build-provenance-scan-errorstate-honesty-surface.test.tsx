@@ -16,7 +16,5 @@ it("locks non-clean build provenance scan notices to ErrorState", () => {
   expect(source).toContain("build-provenance-scanner-unavailable");
   expect(source).toContain("build-provenance-scan-not-recorded");
   expect(source).toMatch(/title=\{scanLabel\}/);
-  expect(source).not.toMatch(
-    /toneClass\[provenance\.scanTone\][\s\S]*\{scanLabel\}/,
-  );
+  expect(source).not.toMatch(/toneClass\[provenance\.scanTone\][\s\S]*\{scanLabel\}/);
 });
