@@ -29,6 +29,11 @@ export const latest = {
   compatibility: { mtaMinVersion: "1.6.1", dependencies: ["resource-b"] },
 };
 
+export const suspended = {
+  ...original,
+  suspended: true,
+};
+
 export const actor = {
   id: "usr_a",
   username: "author",
@@ -38,7 +43,7 @@ export const actor = {
   updatedAt: revision,
 };
 
-type ProductSnapshot = typeof original | typeof latest;
+type ProductSnapshot = typeof original | typeof latest | typeof suspended;
 
 type ResourceCompatibilityFormComponent = (props: {
   actorId: "usr_a";
