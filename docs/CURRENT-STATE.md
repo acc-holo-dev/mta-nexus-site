@@ -6,6 +6,8 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `ca1ca21a` / #327 — split resource release control library and staff page suites;
+- `46425287` / #329 — tip honesty through #326 (CI may cancel under rapid merges);
 - `3865b262` / #326 — discover verified filter row min-h-11;
 - `5e51df40` / #325 — staff moderation report filter search landmarks;
 - `e59b3ae8` / #323 — support/feed residual CTAs min-h-11;
@@ -46,7 +48,7 @@
 
 ## Verified green baseline (bullets)
 
-- **Текущий tip `origin/main`:** `3865b262aeb6976ac222803781abcec8df35bf4b` / #326 after #322–#325 landmark/touch wave. Tip CI may be cancelled/restarted by rapid merges; do not claim verified green until SUCCESS on this exact SHA.
+- **Текущий tip `origin/main`:** `ca1ca21ab96379c5b6656de2fd7c00c29423cddd` / #327 after #322–#326 residual landmark/touch wave and #329 tip docs. Tip CI may cancel under rapid merges; do not claim verified green until SUCCESS on this exact SHA.
 - **Последний verified-green tip:** `6cefa74e63e74f08f83a2c16321e223f9e42491a` / session-binding + order/storage/plan recovery wave — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) success.
 - Этот результат не распространяется на локальные коммиты или незакоммиченные изменения после указанного SHA.
 - **Предыдущий green:** `b7e8d9db` / #316; `3883cb61` / [CI 41888242149](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41888242149) after #310–#312 residual honesty wave.
@@ -95,7 +97,7 @@
 
 ## Свидетельства и ограничения
 
-- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #326 в tip `origin/main`. CI на этом SHA не означает production readiness.
+- **Исходники:** DOC + P1/P2 + journey/Admin/OPS-prep + UI honesty sweep и последующие изменения до #327 в tip `origin/main`. CI на этом SHA не означает production readiness.
 - **CI:** см. bullets в **Verified green baseline** выше. Более ранние прогоны — только по exact SHA (пример TS failures: [41285198461](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41285198461)).
 - **Upgrade/restore:** retained disposable artifacts базы = PASS. Не production backup practice. Локально подготовлены схемы/валидаторы F03 (`observability_live_drill`) и F04 (`production_recovery_acceptance`) без закрытия live gates.
 - **GitHub:** public; main protection на проверке базы отсутствовала. Не менять settings без поручения.
