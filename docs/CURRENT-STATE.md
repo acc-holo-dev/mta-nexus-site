@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `c863a6c6` — tip advanced after tip honesty (#765) and library-collection-command-sessions suite split (#751); tip CI not claimed verified-green under rapid merges;
 - `7b1d1626` — tip advanced after tip honesty (#762) and verification-applications (#756) / security-activity (#757) suite splits; tip CI not claimed verified-green under rapid merges;
 - `54116a4b` — tip advanced after org workspace/team readonly ErrorState (#755); tip CI not claimed verified-green under rapid merges;
 - `4ea36e67` — tip advanced after tip honesty (#758) on 5178f3ff; tip CI not claimed verified-green under rapid merges;
