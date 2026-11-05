@@ -75,7 +75,9 @@ it("does not load journal data for moderators or signed-out visitors", async () 
   expect(state.list).not.toHaveBeenCalled();
 });
 it("requires an initially unchecked confirmation before cleanup", () => {
-  const html = renderToStaticMarkup(<StorageCleanupControls id="smo_a" revision={1} locale="en" />);
+  const html = renderToStaticMarkup(
+    <StorageCleanupControls actorId="usr_admin" id="smo_a" revision={1} locale="en" />,
+  );
   expect(html).toContain('type="checkbox"');
   expect(html).not.toContain("checked=");
   expect(html).toContain('disabled=""');

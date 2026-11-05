@@ -86,7 +86,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       </dl>
       {(item.eligible || canRetry) && (
         <StorageCleanupControls
-          key={`${item.id}:${item.revision}`}
+          key={`${actor.id}:${item.id}:${item.revision}`}
+          actorId={actor.id}
           id={item.id}
           revision={item.revision}
           locale={locale}

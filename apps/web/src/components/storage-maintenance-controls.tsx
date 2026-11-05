@@ -1,21 +1,29 @@
 "use client";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../lib/private-api-request";
 import { storageMaintenanceCopy } from "../lib/storage-maintenance-i18n";
 import { ActionConfirmCheckbox, actionConfirmCheckboxFocusClass } from "./action-confirm-checkbox";
 
-async function json(url: string, body?: unknown) {
+async function json(url: string, actorId: string, signal: AbortSignal, body?: unknown) {
   const response = await fetch(url, {
-    method: body === undefined ? "GET" : "POST",
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-    cache: "no-store",
+    ...privateApiRequest({
+      method: body === undefined ? "GET" : "POST",
+      ...(body === undefined ? {} : { json: body }),
+      signal,
+      timeoutMs: 60000,
+    }),
+    headers: {
+      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+      "x-nexus-actor-id": actorId,
+    },
   });
-  if (!response.ok) throw new Error("Storage request failed");
-  return response.json();
+  const value = await response.json().catch(() => null);
+  if (!response.ok || value?.actorId !== actorId) throw new Error("Storage request failed");
+  return value;
 }
-export function StorageDiscoveryControls({ locale }: { locale: string }) {
+export function StorageDiscoveryControls({ locale, actorId }: { locale: string; actorId: string }) {
   const copy = storageMaintenanceCopy(locale),
     router = useRouter();
   const [ownerId, setOwner] = useState(""),
@@ -27,22 +35,75 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
     [pending, setPending] = useState(false),
     [message, setMessage] = useState(""),
     [error, setError] = useState(false);
+  const lock = useRef(false),
+    epoch = useRef(0),
+    current = useRef(actorId),
+    ready = useRef(actorId),
+    controller = useRef<AbortController | null>(null);
+  if (current.current !== actorId) {
+    current.current = actorId;
+    epoch.current++;
+  }
+  useEffect(() => {
+    ready.current = actorId;
+    lock.current = false;
+    controller.current?.abort();
+    setOwner("");
+    setOffset(0);
+    setNamespaceOffset(0);
+    setOwners([]);
+    setNextNamespaces(null);
+    setNextObjects(null);
+    setPending(false);
+    setMessage("");
+    setError(false);
+    return () => {
+      epoch.current++;
+      controller.current?.abort();
+    };
+  }, [actorId]);
   async function run(kind: "namespaces" | "discover", next?: number) {
-    if (pending) return;
+    if (lock.current || pending || ready.current !== actorId || current.current !== actorId) return;
+    const version = epoch.current,
+      abort = new AbortController();
+    controller.current = abort;
+    lock.current = true;
     setPending(true);
     setError(false);
     setMessage("");
     try {
       if (kind === "namespaces") {
         const position = next ?? namespaceOffset;
-        const result = await json(`/api/admin/storage/namespaces?offset=${position}`);
+        const result = await json(
+          `/api/admin/storage/namespaces?offset=${position}`,
+          actorId,
+          abort.signal,
+        );
+        if (version !== epoch.current || abort.signal.aborted) return;
+        if (
+          !Array.isArray(result.owners) ||
+          !result.owners.every((owner: unknown) => typeof owner === "string") ||
+          !(result.nextOffset === null || Number.isSafeInteger(result.nextOffset))
+        )
+          throw new Error("Invalid response");
         setOwners(result.owners);
         setNamespaceOffset(position);
         setNextNamespaces(result.nextOffset);
         if (result.limited) setMessage(copy.limit);
       } else {
         const position = next ?? offset;
-        const result = await json("/api/admin/storage/discovery", { ownerId, offset: position });
+        const result = await json("/api/admin/storage/discovery", actorId, abort.signal, {
+          ownerId,
+          offset: position,
+        });
+        if (version !== epoch.current || abort.signal.aborted) return;
+        if (
+          !Number.isSafeInteger(result.observed) ||
+          !Number.isSafeInteger(result.skipped) ||
+          !(result.nextOffset === null || Number.isSafeInteger(result.nextOffset)) ||
+          typeof result.limited !== "boolean"
+        )
+          throw new Error("Invalid response");
         setOffset(position);
         setNextObjects(result.nextOffset);
         setMessage(
@@ -51,11 +112,16 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
         router.refresh();
       }
     } catch {
-      setError(true);
+      if (version === epoch.current && !abort.signal.aborted) setError(true);
     } finally {
-      setPending(false);
+      if (version === epoch.current) {
+        lock.current = false;
+        setPending(false);
+      }
+      if (controller.current === abort) controller.current = null;
     }
   }
+  if (ready.current !== actorId) return null;
   return (
     <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-4">
       <h2>{copy.discovery}</h2>
@@ -162,10 +228,12 @@ export function StorageDiscoveryControls({ locale }: { locale: string }) {
 }
 export function StorageCleanupControls({
   id,
+  actorId,
   revision,
   locale,
 }: {
   id: string;
+  actorId: string;
   revision: number;
   locale: string;
 }) {
@@ -173,24 +241,77 @@ export function StorageCleanupControls({
     router = useRouter();
   const [confirmed, setConfirmed] = useState(false),
     [pending, setPending] = useState(false),
-    [error, setError] = useState(false);
+    [error, setError] = useState(false),
+    [blocked, setBlocked] = useState(false);
+  const scope = `${actorId}:${id}:${revision}`;
+  const current = useRef(scope),
+    ready = useRef(scope),
+    epoch = useRef(0),
+    lock = useRef(false),
+    controller = useRef<AbortController | null>(null);
+  if (current.current !== scope) {
+    current.current = scope;
+    epoch.current++;
+  }
+  useEffect(() => {
+    ready.current = scope;
+    lock.current = false;
+    controller.current?.abort();
+    setConfirmed(false);
+    setPending(false);
+    setError(false);
+    setBlocked(false);
+    return () => {
+      epoch.current++;
+      controller.current?.abort();
+    };
+  }, [scope]);
   async function cleanup() {
-    if (!confirmed || pending) return;
+    if (
+      !confirmed ||
+      pending ||
+      blocked ||
+      lock.current ||
+      ready.current !== scope ||
+      current.current !== scope
+    )
+      return;
+    const version = epoch.current,
+      abort = new AbortController();
+    controller.current = abort;
+    lock.current = true;
     setPending(true);
     setError(false);
     try {
-      await json(`/api/admin/storage/objects/${encodeURIComponent(id)}/cleanup`, {
-        expectedRevision: revision,
-        confirmation: "delete_unreferenced",
-      });
+      const result = await json(
+        `/api/admin/storage/objects/${encodeURIComponent(id)}/cleanup`,
+        actorId,
+        abort.signal,
+        {
+          expectedRevision: revision,
+          confirmation: "delete_unreferenced",
+        },
+      );
+      if (version !== epoch.current || abort.signal.aborted) return;
+      if (!["deleted", "missing", "changed", "failed"].includes(result.state))
+        throw new Error("Invalid response");
       setConfirmed(false);
+      if (result.state === "failed") setError(true);
       router.refresh();
     } catch {
-      setError(true);
+      if (version === epoch.current && !abort.signal.aborted) {
+        setError(true);
+        setBlocked(true);
+      }
     } finally {
-      setPending(false);
+      if (version === epoch.current) {
+        lock.current = false;
+        setPending(false);
+      }
+      if (controller.current === abort) controller.current = null;
     }
   }
+  if (ready.current !== scope) return null;
   return (
     <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-4">
       <p>{copy.cleanupNote}</p>
@@ -209,7 +330,7 @@ export function StorageCleanupControls({
           type="button"
           variant="danger"
           className="min-h-11"
-          disabled={!confirmed || pending}
+          disabled={!confirmed || pending || blocked}
           isLoading={pending}
           onClick={() => void cleanup()}
         >
@@ -222,7 +343,8 @@ export function StorageCleanupControls({
           disabled={pending}
           onClick={() => {
             setConfirmed(false);
-            router.refresh();
+            if (blocked) window.location.reload();
+            else router.refresh();
           }}
         >
           {copy.refresh}

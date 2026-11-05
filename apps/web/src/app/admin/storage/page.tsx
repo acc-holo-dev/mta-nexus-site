@@ -82,7 +82,7 @@ export default async function Page({
       </Link>
       <h1 className="font-display">{copy.title}</h1>
       <p className="text-secondary">{copy.note}</p>
-      <StorageDiscoveryControls locale={locale} />
+      <StorageDiscoveryControls key={actor.id} actorId={actor.id} locale={locale} />
       <h2>{copy.inventory}</h2>
       <p>
         {copy.deletedBytes}: {result.deletedBytes}

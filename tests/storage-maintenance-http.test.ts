@@ -31,6 +31,7 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
     method: body === undefined ? "GET" : "POST",
     headers: {
       cookie: "nexus_session=storage-token",
+      "x-nexus-actor-id": "usr_admin",
       ...(body === undefined ? {} : browserMutationHeaders()),
       "content-type": "application/json",
       ...headers,
@@ -148,3 +149,31 @@ it("rejects duplicate namespace offsets", async () => {
   expect((await namespaces(request("/namespaces?offset=0&offset=1"))).status).toBe(400);
   expect(state.namespaces).not.toHaveBeenCalled();
 });
+
+it.each(["discover", "cleanup", "namespaces"] as const)(
+  "binds %s to the initiating administrator",
+  async (operation) => {
+    const run = (actorId: string) =>
+      operation === "discover"
+        ? discover(
+            request("/discovery", { ownerId: "usr_a", offset: 0 }, { "x-nexus-actor-id": actorId }),
+          )
+        : operation === "cleanup"
+          ? cleanup(
+              request(
+                "/objects/smo_a/cleanup",
+                { expectedRevision: 1, confirmation: "delete_unreferenced" },
+                { "x-nexus-actor-id": actorId },
+              ),
+              context,
+            )
+          : namespaces(request("/namespaces", undefined, { "x-nexus-actor-id": actorId }));
+    expect((await run("")).status).toBe(428);
+    const result = await run("usr_other");
+    expect(result.status).toBe(409);
+    expect(await result.json()).toMatchObject({ code: "ACTOR_CHANGED" });
+    expect(state.discover).not.toHaveBeenCalled();
+    expect(state.cleanup).not.toHaveBeenCalled();
+    expect(state.namespaces).not.toHaveBeenCalled();
+  },
+);

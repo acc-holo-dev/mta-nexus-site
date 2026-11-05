@@ -9,7 +9,20 @@ if [[ $# -lt 1 ]]; then
   exit 1
 fi
 
-PROJECT="${COMPOSE_PROJECT_NAME:-nexus-local}"
+if [[ -n "${DOCKER_HOST:-}" || -n "${DOCKER_CONTEXT:-}" ]]; then
+  echo "Refusing focused database tests with Docker host/context overrides." >&2
+  exit 1
+fi
+if [[ "${COMPOSE_PROJECT_NAME:-nexus-local}" != "nexus-local" ]]; then
+  echo "Refusing focused database tests outside the nexus-local Compose project." >&2
+  exit 1
+fi
+if ! docker_context=$(docker context show) || [[ "$docker_context" != "default" ]]; then
+  echo "Refusing focused database tests without the default local Docker context." >&2
+  exit 1
+fi
+
+PROJECT="nexus-local"
 COMPOSE=(docker compose -p "$PROJECT" -f compose.yaml)
 DB_NAME="nexus_focus_$(date +%s)_${RANDOM}"
 DATABASE_URL="postgres://nexus:nexus_secret@postgres:5432/${DB_NAME}"
