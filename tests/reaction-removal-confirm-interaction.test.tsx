@@ -50,6 +50,18 @@ import { reactionCopy } from "../apps/web/src/lib/content-reaction-copy";
 
 type Element = ReactElement<Record<string, unknown>>;
 
+function componentName(type: Element["type"]): string | undefined {
+  if (typeof type === "string") return type;
+  if (typeof type === "function") {
+    const fn = type as { displayName?: string; name?: string };
+    return fn.displayName ?? fn.name;
+  }
+  if (typeof type === "object" && type !== null) {
+    return (type as { displayName?: string }).displayName;
+  }
+  return undefined;
+}
+
 function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
@@ -62,6 +74,12 @@ function descendants(node: ReactNode): Element[] {
     ];
   }
   return [element, ...descendants(element.props.children as ReactNode)];
+}
+
+function findNamed(nodes: Element[], name: string) {
+  const found = nodes.find((node) => componentName(node.type) === name);
+  if (!found) throw new Error(`Missing ${name}`);
+  return found;
 }
 
 function render() {
@@ -129,6 +147,18 @@ it("keeps the workspace reaction when confirmation is cancelled", async () => {
   confirmAction.mockResolvedValueOnce(false);
   await (removeButton(render()).props.onClick as () => Promise<void>)();
   expect(harness.fetch).not.toHaveBeenCalled();
+});
+
+it("routes blocked removal failures through ErrorState", async () => {
+  const copy = reactionCopy("en");
+  harness.fetch.mockResolvedValueOnce(response({ code: "FORBIDDEN" }, 403));
+
+  await (removeButton(render()).props.onClick as () => Promise<void>)();
+  await vi.waitFor(() => expect(findNamed(render(), "ErrorState")).toBeDefined());
+
+  expect(findNamed(render(), "ErrorState").props.title).toBeTruthy();
+  expect(render().some((node) => node.props.role === "alert" && node.type === "p")).toBe(false);
+  expect(render().some((node) => node.props.children === copy.removed)).toBe(false);
 });
 
 it("does not apply a delayed removal response to another account", async () => {
