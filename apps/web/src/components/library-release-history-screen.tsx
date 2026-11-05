@@ -109,7 +109,7 @@ export async function LibraryReleaseHistoryScreen({
             pattern="[A-Za-z0-9_-]+"
           />
         </label>
-        <Button type="submit" variant="outline">
+        <Button type="submit" variant="outline" size="touch">
           {c.filter}
         </Button>
       </form>

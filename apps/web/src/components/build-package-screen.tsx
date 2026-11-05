@@ -152,7 +152,7 @@ export async function BuildPackageScreen({
             ))}
           </select>
         </label>
-        <Button type="submit" disabled={options.length === 0} variant="outline">
+        <Button type="submit" disabled={options.length === 0} variant="outline" size="touch">
           {copy.apply}
         </Button>
         <Link href={pageBase} className={navLinkClass}>
