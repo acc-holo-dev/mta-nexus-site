@@ -1,3 +1,4 @@
+import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
 import { getBuildProvenance } from "../lib/build-provenance";
 import { getDictionary, type Locale } from "../lib/i18n";
@@ -69,17 +70,33 @@ export function BuildProvenanceDetails({
       </summary>
 
       <div className="space-y-3 border-t border-base px-3 py-3 text-[11px]">
-        <div className={`rounded-md border px-2.5 py-2 ${toneClass[provenance.scanTone]}`}>
-          <div className="flex items-center gap-1.5 font-semibold">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{scanLabel}</span>
+        {provenance.scanStatus === "clean" ? (
+          <div className={`rounded-md border px-2.5 py-2 ${toneClass.positive}`}>
+            <div className="flex items-center gap-1.5 font-semibold">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{scanLabel}</span>
+            </div>
+            <div className="mt-1 opacity-80">{scanDetail}</div>
+            <div className="mt-2 font-semibold">
+              {copy.trustedCleanGate}:{" "}
+              {provenance.trustedCleanScan ? copy.trustedCleanMet : copy.trustedCleanMissing}
+            </div>
           </div>
-          <div className="mt-1 opacity-80">{scanDetail}</div>
-          <div className="mt-2 font-semibold">
-            {copy.trustedCleanGate}:{" "}
-            {provenance.trustedCleanScan ? copy.trustedCleanMet : copy.trustedCleanMissing}
-          </div>
-        </div>
+        ) : (
+          <ErrorState
+            id={
+              provenance.scanStatus === "malicious"
+                ? "build-provenance-scan-blocked"
+                : provenance.scanStatus === "error"
+                  ? "build-provenance-scanner-unavailable"
+                  : "build-provenance-scan-not-recorded"
+            }
+            title={scanLabel}
+            description={`${scanDetail}. ${copy.trustedCleanGate}: ${
+              provenance.trustedCleanScan ? copy.trustedCleanMet : copy.trustedCleanMissing
+            }`}
+          />
+        )}
 
         <dl className="grid gap-2 sm:grid-cols-[8rem_minmax(0,1fr)]">
           {build.id ? (
