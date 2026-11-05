@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `db581132` — tip advanced after tip honesty (#816) for 8008c436 after #815; tip CI not claimed verified-green under rapid merges;
 - `8008c436` — tip advanced after tip honesty (#815) for 354da9d1 after #808/#812; tip CI not claimed verified-green under rapid merges;
 - `354da9d1` — tip advanced after verification-amend ErrorState honesty (#808) following tip honesty (#812) for c7dfc8b0 after #806; tip CI not claimed verified-green under rapid merges;
 - `c7dfc8b0` — tip advanced after resource-qa-write ErrorState honesty (#806) following prior stack #803/#802/#799/#810 on e0327b4a; tip CI not claimed verified-green under rapid merges;
