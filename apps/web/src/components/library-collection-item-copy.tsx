@@ -163,7 +163,8 @@ export function LibraryCollectionItemCopyForm({
     return (
       <ErrorState id="library-collection-move-source-unavailable" title={c.moveSourceUnavailable} />
     );
-  if (!destinations.length && !pending.current) return <p role="note">{c.noDestination}</p>;
+  if (!destinations.length && !pending.current)
+    return <ErrorState id="library-collection-no-destination" title={c.noDestination} />;
   if (!items.length && !pending.current) return <p>{c.emptyItems}</p>;
   const shownMove = pending.current ? pending.current.command.action === "move-items" : move;
   const shownItems = pending.current
