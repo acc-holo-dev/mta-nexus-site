@@ -71,6 +71,9 @@ const en = {
   itemLimitNext:
     "Remove references from this collection or choose another collection with free capacity.",
   archiveConfirm: "Archive this collection and keep its contents and history.",
+  restoreConfirm: "Restore this collection so its name and contents can be changed again.",
+  removeConfirm:
+    "Remove this resource reference from the collection. Download rights are unchanged.",
   unavailable: "Resource unavailable",
   unavailableNote:
     "Current access or a safe published version is missing. The reference can still be removed.",
@@ -187,6 +190,8 @@ const ru: typeof en = {
   collectionLimitNext: "Перед созданием новой архивируйте или удалите неиспользуемую коллекцию.",
   itemLimitNext: "Уберите записи из этой коллекции или выберите другую с свободным местом.",
   archiveConfirm: "Отправить коллекцию в архив, сохранив состав и историю.",
+  restoreConfirm: "Восстановить коллекцию, чтобы снова менять название и состав.",
+  removeConfirm: "Убрать эту запись ресурса из коллекции. Права на скачивание не изменяются.",
   unavailable: "Ресурс недоступен",
   unavailableNote:
     "Нет действующего доступа или безопасной опубликованной версии. Запись можно убрать из коллекции.",
