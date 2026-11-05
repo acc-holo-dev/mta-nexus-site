@@ -59,6 +59,9 @@ it.each(["en", "ru"] as const)(
       </LocaleProvider>,
     );
     expect(html).toContain(reason);
+    expect(html).toContain('role="alert"');
+    expect(html).toContain("bg-danger-soft");
+    expect(html).not.toContain("text-warning");
     expect(html).not.toContain('type="button"');
     expect(html).not.toContain("data-download-intent");
   },
