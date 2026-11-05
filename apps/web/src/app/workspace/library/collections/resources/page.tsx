@@ -287,7 +287,10 @@ export default async function Page({
                         />
                       </>
                     ) : (
-                      <p role="note">{v.selectionMissing}</p>
+                      <ErrorState
+                        id="library-collection-resources-selection-missing"
+                        title={v.selectionMissing}
+                      />
                     )}
                   </section>
                 )}
