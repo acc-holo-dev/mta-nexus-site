@@ -167,7 +167,7 @@ Do not widen path scopes to “make CI green.” After `pnpm test:unit`, optiona
 [PROBLEMS](PROBLEMS.md#проверки-и-сопровождение); cache contract summary:
 [PROJECT-MAP](PROJECT-MAP.md#ci-install-cache-проверено).
 
-Local commands stay aligned with those scopes:
+Pull requests use the following change-based scopes; the local commands remain aligned with them:
 
 | Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                                                                                          |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -176,7 +176,9 @@ Local commands stay aligned with those scopes:
 | `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
 | `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
 
-Release tags (`v*`) and explicit full workflow dispatch always run `full_acceptance`.
+Every push to `main`, release tags (`v*`) and explicit full workflow dispatch run `full_acceptance`.
+Main pushes can cancel an earlier run, so even a documentation-only successor must
+verify the exact new commit rather than rely on its cancelled predecessor.
 The CI unit job and host development use the same `check:code` command. It uses
 the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
 with an anchored selector for exactly seven scripts. `--sequential` bounds memory;

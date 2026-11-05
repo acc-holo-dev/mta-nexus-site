@@ -102,6 +102,28 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ["packages/db/src/repositories/support.ts"],
     ["packages/db/src/repositories/support-notification-delivery.ts"],
     ...[
+      "organization-workspace",
+      "follow-workspace",
+      "product-mutation-authority",
+      "products",
+      "content-creation-authority",
+      "resource-qa",
+      "resource-reviews",
+      "builds-moderation",
+      "web-push-subscriptions",
+      "support-access",
+      "support-activity",
+      "support-message-discovery",
+    ].map((name) => [`packages/db/src/repositories/${name}.ts`]),
+    ...[
+      "follow/route.ts",
+      "object-mute/route.ts",
+      "products/route.ts",
+      "support/[id]/route.ts",
+      "workspace/organizations/route.ts",
+      "workspace/reports/route.ts",
+    ].map((name) => [`apps/web/src/app/api/${name}`]),
+    ...[
       "web-push-admission-recovery",
       "web-push-outbox",
       "web-push-worker",
@@ -128,7 +150,7 @@ test("migration, database tooling, workflow and explicit release changes run ful
     assert.equal(policy.full, true);
     assert.equal(policy.unitOnly, false);
   }
-  for (const option of [{ explicitFull: true }, { release: true }]) {
+  for (const option of [{ explicitFull: true }, { release: true }, { mainPush: true }]) {
     const policy = classifyChanges([], option);
     assert.equal(policy.code, true);
     assert.equal(policy.full, true);

@@ -25,7 +25,9 @@ const fullAcceptancePaths = [
   /^packages\/db\/src\/repositories\/(?:resource-library-selections|resource-release-watches|resource-release-watch-batches|collection-release-watches)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:web-push-(?:admission-recovery|outbox|worker)|report-notification-delivery|verification-notification-delivery|discussion-notification-delivery|publication-notification-delivery|user-follow-notice|resource-release-worker|support-requester-notice|verification|discussion-moderation-notice|publication-notice|organization-access-notice|license-maintenance|content-reaction-notice|builds)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:support|support-notification-delivery)\.ts$/,
+  /^packages\/db\/src\/repositories\/(?:organization-workspace|follow-workspace|product-mutation-authority|products|content-creation-authority|resource-qa|resource-reviews|builds-moderation|web-push-subscriptions|support-access|support-activity|support-message-discovery)\.ts$/,
   /^apps\/web\/src\/app\/api\/auth\//,
+  /^apps\/web\/src\/app\/api\/(?:follow|object-mute|products|support|workspace\/(?:organizations|reports))(?:\/|$)/,
   /^apps\/web\/src\/lib\/(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
   /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];
@@ -46,17 +48,22 @@ function isUnitOnlyPath(file) {
   return unitOnlyPaths.some((pattern) => pattern.test(file));
 }
 
-export function classifyChanges(files, { explicitFull = false, release = false } = {}) {
+export function classifyChanges(
+  files,
+  { explicitFull = false, release = false, mainPush = false } = {},
+) {
   const code = files.some((file) => !isDocumentation(file));
   const infrastructure = files.some((file) =>
     fullAcceptancePaths.some((pattern) => pattern.test(file)),
   );
-  const full = explicitFull || release || infrastructure;
+  // A newer main push cancels the preceding run, even when it changes only docs.
+  // Its before..HEAD diff cannot prove that an earlier security change completed CI.
+  const full = explicitFull || release || mainPush || infrastructure;
   const codeFiles = files.filter((file) => !isDocumentation(file));
   // Empty or unknown-heavy sets must not claim unit_only; default wider, never narrower.
   const unitOnly = !full && codeFiles.length > 0 && codeFiles.every((file) => isUnitOnlyPath(file));
   return {
-    code: code || explicitFull || release || unitOnly,
+    code: code || explicitFull || release || mainPush || unitOnly,
     unitOnly,
     full,
   };
@@ -148,6 +155,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const policy = classifyChanges(files, {
     explicitFull: event.inputs?.full === true || event.inputs?.full === "true",
     release: (process.env.GITHUB_REF ?? "").startsWith("refs/tags/v"),
+    mainPush:
+      process.env.GITHUB_EVENT_NAME === "push" && process.env.GITHUB_REF === "refs/heads/main",
   });
   if (process.env.GITHUB_EVENT_NAME === "workflow_dispatch") {
     // Manual runs default to fast_ci unless full acceptance is requested.
