@@ -174,6 +174,7 @@ describe("HTTP cache visibility contract", () => {
     expect(anonymous.status).toBe(200);
     expectPrivate(anonymous);
     expect(await anonymous.json()).toEqual({
+      actorId: null,
       notifications: [],
       unreadCount: 0,
     });
@@ -190,6 +191,7 @@ describe("HTTP cache visibility contract", () => {
     );
     expect(authenticated.status).toBe(200);
     expectPrivate(authenticated);
+    expect(await authenticated.json()).toMatchObject({ actorId: "usr_notifications" });
     expect(mocks.notifications).toHaveBeenCalledWith("usr_notifications", 25, true);
   });
 
