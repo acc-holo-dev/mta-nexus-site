@@ -1,4 +1,4 @@
-import { Button } from "@nexus/ui";
+import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
@@ -172,47 +172,52 @@ export async function LibraryCollectionsDetailView({
           {c.history}
         </Link>
       </nav>
-      <form
-        method="get"
-        action={collectionHref(id, adding ? "add" : "")}
-        className="flex flex-wrap items-end gap-3"
-      >
-        <label className="space-y-1">
-          <span className="block text-sm">{c.search}</span>
-          <input
-            name="q"
-            defaultValue={result.q}
-            maxLength={80}
-            className={libraryCollectionsSearchFieldClass}
-          />
-        </label>
-        <Button type="submit" variant="outline">
-          {c.apply}
-        </Button>
-        {result.q && (
-          <Link
-            href={collectionHref(id, adding ? "add" : "")}
-            className={`text-sm ${libraryCollectionsLinkClass}`}
-          >
-            {c.clear}
-          </Link>
-        )}
-      </form>
-      <p className="text-sm">
-        {c.items}: {result.total} · {c.ready}: {result.ready}
-      </p>
-      {!result.items.length && (
-        <div className="space-y-3 text-sm text-muted" role="status" aria-live="polite">
-          <p>{result.q ? c.emptyFilteredItems : c.emptyItems}</p>
+      <search aria-label={c.search}>
+        <form
+          method="get"
+          action={collectionHref(id, adding ? "add" : "")}
+          className="flex flex-wrap items-end gap-3"
+        >
+          <label className="space-y-1">
+            <span className="block text-sm">{c.search}</span>
+            <input
+              name="q"
+              defaultValue={result.q}
+              maxLength={80}
+              className={`min-h-11 ${libraryCollectionsSearchFieldClass}`}
+            />
+          </label>
+          <Button type="submit" variant="outline">
+            {c.apply}
+          </Button>
           {result.q && (
             <Link
               href={collectionHref(id, adding ? "add" : "")}
-              className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
+              className={`text-sm ${libraryCollectionsLinkClass}`}
             >
               {c.clear}
             </Link>
           )}
-        </div>
+        </form>
+      </search>
+      <p className="text-sm">
+        {c.items}: {result.total} · {c.ready}: {result.ready}
+      </p>
+      {!result.items.length && (
+        <EmptyState
+          title={result.q ? c.emptyFilteredItems : c.emptyItems}
+          description={c.emptyItemsHint}
+          action={
+            result.q ? (
+              <Link
+                href={collectionHref(id, adding ? "add" : "")}
+                className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
+              >
+                {c.clear}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {collection.status === "active" && result.items.length > 0 && (
         <LibraryCollectionBatchForm
