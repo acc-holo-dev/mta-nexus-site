@@ -1,5 +1,5 @@
 import { CHANGE_HISTORY_PERIODS, type CommunityReportGroupFilters } from "@nexus/domain";
-import { Button, EmptyState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
 import { REPORT_TYPES } from "../lib/community-report-contract";
@@ -149,7 +149,9 @@ export function CommunityReportGroups({
                   {item.target.text}
                 </p>
               )}
-              {!item.target && <p className="text-xs text-muted">{copy.unknown}</p>}
+              {!item.target ? (
+                <ErrorState id="community-report-unknown-target" title={copy.unknown} />
+              ) : null}
               <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
                 {(["open", "review", "resolved", "dismissed"] as const).map((key) => (
                   <div key={key}>
