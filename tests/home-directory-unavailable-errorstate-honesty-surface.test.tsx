@@ -8,7 +8,9 @@ const source = readFileSync(join(root, "apps/web/src/app/page.tsx"), "utf8");
 
 /** Honesty lock for home directory panel unavailable notice. */
 it("locks home directory panel unavailable to ErrorState", () => {
-  expect(source).toContain('import { buttonClassName, ErrorState, SectionHeader } from "@nexus/ui"');
+  expect(source).toContain(
+    'import { buttonClassName, ErrorState, SectionHeader } from "@nexus/ui"',
+  );
   expect(source).toMatch(
     /directory \? \([\s\S]*?\) : \(\s*<ErrorState\s+id="home-directory-unavailable"\s+title=\{dictionary\.home\.directoryPanelUnavailable\}\s*\/>\s*\)/u,
   );
