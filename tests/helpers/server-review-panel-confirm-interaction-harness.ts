@@ -92,7 +92,7 @@ export function createServerReviewPanelConfirmInteractionHelpers(
 ) {
   function seedPublished() {
     // statusRef, page, unavailable, retrying, mine, signedIn, text, rating,
-    // busy, message, confirmed, loginHref, registerHref
+    // busy, notice, confirmed, loginHref, registerHref
     harness.slots = [
       { current: null },
       emptyPage,
@@ -103,7 +103,7 @@ export function createServerReviewPanelConfirmInteractionHelpers(
       reviewText,
       5,
       false,
-      "",
+      null,
       false,
       "/auth/login?next=%2Fservers%2Fdemo",
       "/auth/register?next=%2Fservers%2Fdemo",
