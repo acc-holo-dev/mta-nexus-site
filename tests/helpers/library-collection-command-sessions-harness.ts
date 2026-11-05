@@ -164,7 +164,6 @@ export async function fixture() {
   };
 }
 
-
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /** Hold a row lock, run an operation that must wait, mutate during the wait, then release. */
