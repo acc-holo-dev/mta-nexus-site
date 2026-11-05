@@ -43,8 +43,8 @@ const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("../apps/web/src/components/confirm-action", () => ({ confirmAction }));
 
 import { FollowButton } from "../apps/web/src/components/follow-button";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
-import { flattenReactTestTree, type FlattenedElement } from "./helpers/flatten-react-test-tree";
+import { followActionCopy, followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+import { type FlattenedElement, flattenReactTestTree } from "./helpers/flatten-react-test-tree";
 
 type Element = FlattenedElement;
 const initial = { authenticated: true, actorId: "usr_1", following: false };
@@ -73,6 +73,7 @@ beforeEach(() => {
   harness.slots = [];
   harness.cursor = 0;
   harness.cleanups = [];
+  initial.following = false;
   confirmAction.mockResolvedValue(true);
   vi.stubGlobal("fetch", harness.fetch);
 });
@@ -105,6 +106,25 @@ it.each(["en", "ru"] as const)(
     expect(render(locale).some((node) => node.props.role === "status")).toBe(true);
   },
 );
+it("does not stop watching when confirmation is cancelled", async () => {
+  const shared = followCopy("en");
+  const copy = followActionCopy("en", "content");
+  initial.following = true;
+  confirmAction.mockResolvedValueOnce(false);
+
+  await (toggle(render()).props.onClick as () => Promise<void>)();
+
+  expect(confirmAction).toHaveBeenCalledWith({
+    title: shared.removeConfirmTitle,
+    object: "Article",
+    consequences: shared.removeConfirm,
+    confirmLabel: copy.unfollow,
+    cancelLabel: shared.cancel,
+    closeLabel: shared.cancel,
+  });
+  expect(harness.fetch).not.toHaveBeenCalled();
+  expect(toggle(render()).props["aria-pressed"]).toBe(true);
+});
 it("blocks repeated clicks while a request is in flight", async () => {
   let resolve!: (value: Response) => void;
   harness.fetch.mockImplementation(
