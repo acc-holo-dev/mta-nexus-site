@@ -6,6 +6,7 @@
 
 Опубликовано на `main`; проверка текущего tip и её охват указаны ниже:
 
+- `cdff3063` — tip advanced after tip honesty (#641) on 2909cd30; tip CI not claimed verified-green under rapid merges;
 - `2909cd30` — tip advanced after #636 library-collection-no-destination and tip honesty (#639) on ce2d63cd; tip CI not claimed verified-green under rapid merges;
 - `ce2d63cd` — tip advanced after tip honesty (#638) on d6c65749; tip CI not claimed verified-green under rapid merges;
 - `d6c65749` — tip advanced after tip honesty (#635) on fd19c3f2; tip CI not claimed verified-green under rapid merges;
