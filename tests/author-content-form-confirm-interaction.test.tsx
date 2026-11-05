@@ -63,6 +63,18 @@ const initial: EditableContent = {
   updatedAt: time,
 };
 
+function componentName(type: Element["type"]): string | undefined {
+  if (typeof type === "string") return type;
+  if (typeof type === "function") {
+    const fn = type as { displayName?: string; name?: string };
+    return fn.displayName ?? fn.name;
+  }
+  if (typeof type === "object" && type !== null) {
+    return (type as { displayName?: string }).displayName;
+  }
+  return undefined;
+}
+
 function descendants(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(descendants);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
@@ -75,6 +87,12 @@ function descendants(node: ReactNode): Element[] {
     ];
   }
   return [element, ...descendants(element.props.children as ReactNode)];
+}
+
+function findNamed(nodes: Element[], name: string) {
+  const found = nodes.find((node) => componentName(node.type) === name);
+  if (!found) throw new Error(`Missing ${name}`);
+  return found;
 }
 
 function seedForm(content: EditableContent = initial) {
@@ -156,6 +174,60 @@ it("does not archive a publication when confirmation is cancelled", async () => 
   await vi.waitFor(() => expect(confirmAction).toHaveBeenCalledTimes(1));
   expect(harness.fetch).not.toHaveBeenCalled();
   expect(harness.refresh).not.toHaveBeenCalled();
+});
+
+it("routes publication mutation failures through ErrorState and keeps success as status", async () => {
+  const copy = getUserPlatformCopy("en");
+  class DraftFormData {
+    get(name: string) {
+      return (
+        (
+          {
+            title: "My draft title",
+            body: "My unsaved publication body.",
+            excerpt: "",
+            coverImageUrl: "",
+            tags: "",
+          } as Record<string, string>
+        )[name] ?? null
+      );
+    }
+  }
+  vi.stubGlobal("FormData", DraftFormData);
+  harness.fetch.mockResolvedValueOnce(response({ code: "CONFLICT" }, 409));
+  const form = render().find((node) => node.type === "form");
+  if (!form) throw new Error("Missing publication form");
+  await (form.props.onSubmit as (event: unknown) => Promise<void>)({
+    preventDefault() {},
+    currentTarget: {},
+  });
+  await vi.waitFor(() => expect(findNamed(render(), "ErrorState")).toBeDefined());
+  expect(findNamed(render(), "ErrorState").props.title).toBeTruthy();
+  expect(render().some((node) => node.props.role === "alert" && node.type === "p")).toBe(false);
+  expect(
+    render().some(
+      (node) => node.type === "button" && node.props.children === copy.checkLatestContent,
+    ),
+  ).toBe(true);
+
+  harness.fetch.mockResolvedValueOnce(
+    response({
+      success: true,
+      content: { ...initial, status: "archived", updatedAt: later },
+    }),
+  );
+  (archiveButton(render()).props.onClick as () => void)();
+  await vi.waitFor(() =>
+    expect(
+      render().some(
+        (node) =>
+          node.type === "p" &&
+          node.props.role === "status" &&
+          node.props.children === copy.archivedNote,
+      ),
+    ).toBe(true),
+  );
+  expect(() => findNamed(render(), "ErrorState")).toThrow(/Missing ErrorState/);
 });
 
 it.each(["en", "ru"] as const)(

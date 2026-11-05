@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@nexus/ui";
+import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -301,15 +301,10 @@ export function AuthorContentForm({
           )}
         </div>
       )}
-      {notice && (
+      {notice?.error ? (
         <div className="space-y-2">
-          <p
-            role={notice.error ? "alert" : "status"}
-            className={`text-sm ${notice.error ? "text-danger" : "text-success"}`}
-          >
-            {notice.text}
-          </p>
-          {notice.error && saved && (
+          <ErrorState title={notice.text} />
+          {saved && (
             <Button
               type="button"
               variant="ghost"
@@ -320,7 +315,7 @@ export function AuthorContentForm({
               {copy.checkLatestContent}
             </Button>
           )}
-          {notice.error && (organization || server) && !saved && (
+          {(organization || server) && !saved && (
             <Link
               href={workspacePath}
               className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -329,7 +324,12 @@ export function AuthorContentForm({
             </Link>
           )}
         </div>
-      )}
+      ) : null}
+      {notice && !notice.error ? (
+        <p role="status" className="text-sm text-success">
+          {notice.text}
+        </p>
+      ) : null}
       {latest && (
         <section className="nexus-panel min-w-0 space-y-3 p-5" aria-label={copy.latestContent}>
           <h2 className="font-semibold">{copy.latestContent}</h2>
