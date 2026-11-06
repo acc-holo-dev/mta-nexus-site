@@ -1,37 +1,20 @@
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  sessionLive: true,
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][],
-  clock: "2026-10-12T00:00:00.000Z",
-}));
+import { expect, it, vi } from "vitest";
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const raw = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    if (sql.includes('from "sessions"'))
-      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
-    if (sql.startsWith("set local")) return { rows: [] };
-    if (sql.includes('AS "observedAt"')) return { rows: [{ observedAt: state.clock }] };
-    return { rows: state.rows.shift() ?? [] };
-  });
-  const db: typeof raw = new Proxy(raw, {
-    get(target, key) {
-      if (key === "transaction")
-        return async (callback: (tx: typeof raw) => unknown) => callback(db);
-      const value = Reflect.get(target, key);
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-  return { db };
+  const { createResourceReleaseWatchesRepositoryDbMock } = await import(
+    "./helpers/resource-release-watches-repository-harness"
+  );
+  return createResourceReleaseWatchesRepositoryDbMock();
 });
+
 import { resourceReleaseWatchesRepository as repo } from "../packages/db/src/repositories/resource-release-watches";
-beforeEach(() => {
-  state.sessionLive = true;
-  state.queries = [];
-  state.rows = [];
-  state.clock = "2026-10-12T00:00:00.000Z";
-});
+import {
+  installResourceReleaseWatchesRepositoryHooks,
+  resourceReleaseWatchesRepositoryState as state,
+} from "./helpers/resource-release-watches-repository-harness";
+
+installResourceReleaseWatchesRepositoryHooks();
+
 it("enrolls at the latest committed release with held live grants, serialized quota and atomic audit", async () => {
   state.rows = [
     [],
@@ -62,6 +45,7 @@ it("enrolls at the latest committed release with held live grants, serialized qu
   expect(insert?.params).toContain(9007199254740993n);
   expect(state.queries.at(-1)?.params).toContain("library.release_watch_changed");
 });
+
 it("allows a user to stop their watch after access is revoked, and handles a replay without writes", async () => {
   state.rows = [
     [],
@@ -91,6 +75,7 @@ it("allows a user to stop their watch after access is revoked, and handles a rep
   expect(await repo.command(input)).toMatchObject({ enabled: false, revision: 2 });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
+
 it("refuses enrollment without access, missing publication and quota overflow", async () => {
   const input = {
     userId: "usr_a",
@@ -114,6 +99,7 @@ it("refuses enrollment without access, missing publication and quota overflow", 
   state.rows = [[], [["prd_a", "draft"]], [["usr_a"]], [["ent_a", null]]];
   await expect(repo.command(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
 });
+
 it("stale revisions cannot overwrite another user's later preference", async () => {
   state.rows = [
     [],
@@ -133,34 +119,6 @@ it("stale revisions cannot overwrite another user's later preference", async () 
     }),
   ).rejects.toMatchObject({ code: "RELEASE_WATCH_CONFLICT" });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
-});
-it("bounds list counts and suppresses unavailable metadata without exposing progress or account IDs", async () => {
-  state.rows = [[[26, 23, 3, 4]], []];
-  expect(await repo.page("usr_a", 2, "enabled")).toMatchObject({
-    counts: { all: 26, enabled: 23 },
-    page: 2,
-    pageSize: 20,
-  });
-  const query = state.queries.at(-1);
-  if (!query) throw new Error("Missing watch list");
-  expect(query.params).toContain("usr_a");
-  expect(query.params.slice(-2)).toEqual([20, 20]);
-  expect(query.sql).toContain("case when");
-  expect(query.sql).toContain("entitlements");
-  expect(query.sql).toContain("scanner");
-  const projection = query.sql.slice(0, query.sql.indexOf(' from "resource_release_watches" left'));
-  expect(projection).not.toContain('"resource_release_watches"."last_sequence"');
-  expect(projection).not.toContain("storage_key");
-});
-
-it("searches literal accessible titles using one database-time snapshot", async () => {
-  state.rows = [[[0, 0, 0, 0]], []];
-  await repo.page("usr_a", 1, "all", String.raw`a%_\z`);
-  for (const query of state.queries) {
-    expect(query.sql).toContain("transaction_timestamp()");
-    expect(query.sql).toContain("ilike");
-    expect(query.params).toContain(String.raw`%a\%\_\\z%`);
-  }
 });
 
 it("rejects malformed direct commands before acquiring any database lock", async () => {
@@ -182,6 +140,7 @@ it("rejects malformed direct commands before acquiring any database lock", async
   }
   expect(state.queries).toHaveLength(0);
 });
+
 it("checks a finite grant at database time after the final locks, including a replay", async () => {
   const input = {
     userId: "usr_a",
@@ -209,6 +168,7 @@ it("checks a finite grant at database time after the final locks, including a re
     expect(state.queries.at(-1)?.sql).toContain("clock_timestamp()");
   }
 });
+
 it("guards an existing upsert and retains monotonic progress and update time", async () => {
   state.rows = [
     [],
@@ -237,6 +197,7 @@ it("guards an existing upsert and retains monotonic progress and update time", a
   expect(update?.sql).toContain('where ("resource_release_watches"."revision" =');
   expect(update?.params).toContain(8n);
 });
+
 it("never audits an unexpected insertion conflict", async () => {
   state.rows = [
     [],
@@ -263,18 +224,6 @@ it("never audits an unexpected insertion conflict", async () => {
   );
   expect(update?.sql).toContain("where false");
   expect(state.queries.some((q) => q.sql.startsWith('insert into "audit_events"'))).toBe(false);
-});
-
-it("reports the account-wide active count independently of searched watch totals", async () => {
-  state.rows = [[[1, 0, 1, 0, 98]], []];
-  const result = await repo.page("usr_a", 1, "disabled", "Core");
-  expect(result).toMatchObject({
-    activeWatchCount: 98,
-    counts: { all: 1, enabled: 0, disabled: 1 },
-  });
-  expect(state.queries).toHaveLength(2);
-  expect(state.queries[0].sql).toContain("active.user_id=");
-  expect(state.queries[0].sql).toContain("active.enabled=true");
 });
 
 it("rejects a revoked initiator after the watch lock, including an idempotent stop", async () => {
