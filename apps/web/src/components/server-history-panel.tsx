@@ -39,6 +39,7 @@ export function ServerHistoryPanel({
           {copy.title}
         </h2>
         <ErrorState
+          id="server-history-unavailable"
           title={copy.unavailable}
           action={
             retryHref ? (
