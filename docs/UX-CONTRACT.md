@@ -1,8 +1,8 @@
 # Рабочий контракт интерфейса MTA NEXUS
 
-**Статус:** living · UI-контракт.
-
-**Интегрировано DOC-02; authoritative UI-контракт после DOC-05.** Срез — `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Предметные правила — в RESOURCES / COMMUNITY / SERVERS-ORGS / TRUST-STAFF / COMMERCIAL-FUTURE; сценарии — [FLOWS](FLOWS.md). Не включает новую функцию, рекламу или оплату без поручения. Сохраняемые требования отделены от предложений `UX-01`–`UX-27`.
+**Статус:** living · UI-контракт.  
+**База:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`.  
+Предметные правила — RESOURCES / COMMUNITY / SERVERS-ORGS / TRUST-STAFF / COMMERCIAL-FUTURE; сценарии — [FLOWS](FLOWS.md). Не включает новую функцию, рекламу или оплату без поручения. Сохраняемые требования отделены от предложений `UX-01`–`UX-27`.
 
 Существующие нормы уже требуют общих UI-компонентов, semantic tokens, RU/EN, keyboard/mobile, понятных состояний и подтверждённого успеха. Ниже они уточнены для экранов. Переходы состояний, права, guest return, mutation confirmation, receipts и delivery описываются в соседнем `docs/FLOWS.md`; второй протокол этих операций здесь не создаётся. [Текущий UX-контракт](UX-CONTRACT.md).
 
