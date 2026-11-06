@@ -64,6 +64,7 @@ export default async function LibraryVersionsPage({
           {copy.updates}
         </Link>
         <ErrorState
+          id="workspace-library-versions-unavailable"
           title={copy.versionsLoadUnavailable}
           description={copy.versionsLoadUnavailableDescription}
           action={
