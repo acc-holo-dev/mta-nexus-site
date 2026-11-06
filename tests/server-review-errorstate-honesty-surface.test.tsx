@@ -29,5 +29,6 @@ it("locks server review write fail/unknown/conflict to ErrorState and keeps succ
     '<p\n          ref={statusRef}\n          id={statusId}\n          role="status"\n          tabIndex={-1}\n          className="text-sm outline-none"\n        >\n          {message}\n        </p>',
   );
   expect(source).not.toContain('role={notice.error ? "alert" : "status"}');
+  expect(source).toContain('id="server-review-load-unavailable"');
   expect(source).toContain("title={loadCopy.unavailable}");
 });

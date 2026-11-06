@@ -333,6 +333,7 @@ export function ServerReviewPanel({
 
       {unavailable || !page ? (
         <ErrorState
+          id="server-review-load-unavailable"
           title={loadCopy.unavailable}
           action={
             <Button
