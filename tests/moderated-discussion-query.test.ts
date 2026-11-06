@@ -170,7 +170,7 @@ it("removes archived discussion with current staff locks and records a reason wi
   );
   expect(state.notice).toHaveBeenCalledWith(
     expect.anything(),
-    expect.objectContaining({ available: false, authorId: "author" }),
+    expect.objectContaining({ authorId: "author", commentId: "comment" }),
   );
 });
 it.each([
