@@ -10,6 +10,6 @@ it("locks support-case-thread-unavailable to ErrorState", () => {
   );
   expect(source).toContain('id="support-case-thread-unavailable"');
   expect(source).toMatch(
-    /<ErrorState\s+id="support-case-thread-unavailable"[\s\S]*?title=\{error\}/u,
+    /<ErrorState\s+id="support-case-thread-unavailable"\s+title=\{error \?\? copy\.caseLoadError\}/u,
   );
 });
