@@ -18,6 +18,14 @@ export type BuildIncidentNotificationDeliveryStats = Readonly<{
   oldestAgeSeconds: number;
 }>;
 
+/** Downloader destination for a quarantined build; falls back to library updates. */
+function buildIncidentDownloaderLink(productId: string) {
+  if (!productId || productId.length > 128 || !/^[A-Za-z0-9_-]+$/u.test(productId)) {
+    return "/workspace/library/updates";
+  }
+  return `/workspace/library/${encodeURIComponent(productId)}/versions`;
+}
+
 export class BuildIncidentNotificationDeliveryRepository {
   async processNext(limit = 20): Promise<BuildIncidentNotificationDeliveryResult> {
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
@@ -83,7 +91,7 @@ export class BuildIncidentNotificationDeliveryRepository {
                 title: "Security notice for a downloaded build",
                 message:
                   "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
-                link: "/security",
+                link: buildIncidentDownloaderLink(job.productId),
                 type: "security",
                 category: "security",
                 data: {
