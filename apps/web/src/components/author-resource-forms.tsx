@@ -373,6 +373,7 @@ export function AuthorResourceForms({
       <div className="space-y-2 lg:col-span-2">
         {conflict ? (
           <ErrorState
+            id="author-resource-draft-conflict"
             title={copy.draftConflict}
             description={copy.draftConflictDescription}
             action={
