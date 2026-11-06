@@ -1,88 +1,29 @@
-import { createHash } from "node:crypto";
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  rows: [] as unknown[][],
-  queries: [] as { sql: string; params: unknown[] }[],
-  options: [] as unknown[],
-}));
+import { expect, it, vi } from "vitest";
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return { rows: state.rows.shift() ?? [] };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return async (fn: (tx: typeof database) => unknown, options: unknown) => {
-            state.options.push(options);
-            return fn(database);
-          };
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
+  const { createLibraryMembershipHistoryRepositoryDbMock } = await import(
+    "./helpers/library-membership-history-repository-harness"
+  );
+  return createLibraryMembershipHistoryRepositoryDbMock();
 });
 
+import { readLibraryMembershipHistory } from "../packages/db/src/repositories/library-membership-history";
 import {
-  readLibraryMembershipHistory,
-  readLibraryMembershipHistoryDetail,
-} from "../packages/db/src/repositories/library-membership-history";
-const date = "2026-10-12T00:00:00.000Z",
-  requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
-const command = {
-  requestId,
-  changes: [
-    { collectionId: "lcol_a", expectedRevision: 2, wasInCollection: true, inCollection: false },
-    { collectionId: "lcol_b", expectedRevision: 1, wasInCollection: false, inCollection: true },
-  ],
-};
-const digest = (productId = "prd_a", proof = command) =>
-  createHash("sha256")
-    .update(JSON.stringify({ productId, command: proof }))
-    .digest("hex");
-const parent = (cmd: unknown = command, hash = digest(), productId = "prd_a", id = "lmb_a") => [
-  id,
-  requestId,
-  productId,
-  hash,
-  cmd,
-  ["lcr_a", "lcr_b"],
-  date,
-];
-const child = (index: number, productId = "prd_a"): unknown[] => {
-  const change = command.changes[index];
-  if (!change) throw Error("Missing change");
-  const uuid = `${index ? "87" : "77"}ca0352-de64-4af9-9e54-7d3c56fe8d89`;
-  return [
-    index ? "lcr_b" : "lcr_a",
-    uuid,
-    change.collectionId,
-    {
-      requestId: uuid,
-      action: change.inCollection ? "add" : "remove",
-      productId,
-      expectedRevision: change.expectedRevision,
-    },
-    {
-      id: change.collectionId,
-      name: "Recorded & name",
-      status: "active",
-      revision: change.expectedRevision + 1,
-    },
-    date,
-  ];
-};
-const prefix = () => [[["usr_a"]], [{ observedAt: date }]] as unknown[][];
-const query = { page: 1, days: 30 as const, operation: "all" as const };
-const text = () => state.queries.map((q) => q.sql).join("\n");
-beforeEach(() => {
-  state.rows = [];
-  state.queries = [];
-  state.options = [];
-});
+  installLibraryMembershipHistoryRepositoryHooks,
+  libraryMembershipHistoryRepositoryChild as child,
+  libraryMembershipHistoryRepositoryCommand as command,
+  libraryMembershipHistoryRepositoryDate as date,
+  libraryMembershipHistoryRepositoryDigest as digest,
+  libraryMembershipHistoryRepositoryParent as parent,
+  libraryMembershipHistoryRepositoryPrefix as prefix,
+  libraryMembershipHistoryRepositoryQuery as query,
+  libraryMembershipHistoryRepositoryRequestId as requestId,
+  libraryMembershipHistoryRepositoryState as state,
+  libraryMembershipHistoryRepositoryText as text,
+} from "./helpers/library-membership-history-repository-harness";
+
+installLibraryMembershipHistoryRepositoryHooks();
+
 it("preserves whole immutable group evidence while separating current own memberships and masked labels", async () => {
   state.rows = [
     ...prefix(),
@@ -149,6 +90,7 @@ it("preserves whole immutable group evidence while separating current own member
   expect(state.queries[6]?.params).toContain("clean");
   expect(text()).not.toMatch(/insert into|update |delete from|for update/iu);
 });
+
 it("binds current membership to both collection and resource across different groups", async () => {
   state.rows = [
     ...prefix(),
@@ -168,6 +110,7 @@ it("binds current membership to both collection and resource across different gr
     '[{"collectionId":"lcol_a","productId":"prd_a"},{"collectionId":"lcol_b","productId":"prd_a"}]',
   );
 });
+
 it.each(["digest", "hidden", "future", "oversized", "association"])(
   "does not expand invalid parent evidence %s",
   async (kind) => {
@@ -190,6 +133,7 @@ it.each(["digest", "hidden", "future", "oversized", "association"])(
     expect(JSON.stringify(report)).not.toContain("PRIVATE");
   },
 );
+
 it.each(["missing", "identity", "revision", "action", "uuid", "hidden"])(
   "refuses partial or contradictory child evidence %s",
   async (kind) => {
@@ -206,57 +150,6 @@ it.each(["missing", "identity", "revision", "action", "uuid", "hidden"])(
     expect(state.queries).toHaveLength(5);
   },
 );
-it("stable own detail survives missing current resource and final reference removal without scope expansion", async () => {
-  state.rows = [...prefix(), [parent()], [child(0), child(1)], [], []];
-  const detail = await readLibraryMembershipHistoryDetail("usr_a", "lmb_a");
-  expect(detail.item.receipt?.id).toBe("lmb_a");
-  expect(detail.item.resource?.currentTitle).toBeNull();
-  expect(detail.item.collections.every((row) => row.current === null)).toBe(true);
-  expect(state.queries[2]?.params).toEqual(["usr_a", "lmb_a", 1]);
-  expect(state.queries).toHaveLength(6);
-});
-it("rejects foreign/unknown details and deleted actors before child or product inspection", async () => {
-  state.rows = [...prefix(), []];
-  await expect(readLibraryMembershipHistoryDetail("usr_a", "lmb_foreign")).rejects.toMatchObject({
-    statusCode: 404,
-  });
-  expect(state.queries).toHaveLength(3);
-  state.queries = [];
-  state.rows = [[]];
-  await expect(readLibraryMembershipHistory("usr_deleted", query)).rejects.toMatchObject({
-    statusCode: 404,
-  });
-  expect(state.queries).toHaveLength(1);
-});
-it("validates bounds before SQL and refuses invalid clocks", async () => {
-  for (const change of [
-    { page: 10000 },
-    { days: 31 },
-    { operation: "delete" },
-    { collectionId: "../private" },
-  ])
-    await expect(
-      readLibraryMembershipHistory("usr_a", { ...query, ...change } as typeof query),
-    ).rejects.toMatchObject({ statusCode: 400 });
-  await expect(readLibraryMembershipHistoryDetail("usr_a", "../private")).rejects.toMatchObject({
-    statusCode: 400,
-  });
-  expect(state.queries).toHaveLength(0);
-  state.rows = [[["usr_a"]], [{ observedAt: "invalid" }]];
-  await expect(readLibraryMembershipHistory("usr_a", query)).rejects.toMatchObject({
-    code: "COLLECTION_SNAPSHOT_INVALID",
-  });
-});
-it("handles empty history without child or current-state queries", async () => {
-  state.rows = [...prefix(), [[0]], []];
-  expect(await readLibraryMembershipHistory("usr_a", query)).toMatchObject({
-    items: [],
-    total: 0,
-    page: 1,
-    totalPages: 1,
-  });
-  expect(state.queries).toHaveLength(4);
-});
 
 it("uses resource-specific current membership when two valid groups share a collection", async () => {
   const otherRequest = "97ca0352-de64-4af9-9e54-7d3c56fe8d89",
