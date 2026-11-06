@@ -57,6 +57,7 @@ function OrderCaseLoadError({
         {backLabel}
       </Link>
       <ErrorState
+        id="order-case-load-unavailable"
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
