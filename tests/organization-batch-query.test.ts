@@ -1,88 +1,37 @@
-import { getTableColumns } from "drizzle-orm";
-import { beforeEach, expect, it, vi } from "vitest";
+import { expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][][],
-  notice: vi.fn(),
-  fail: "",
-}));
 vi.mock("../packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: async () => {},
 }));
-vi.mock("../packages/db/src/repositories/organization-access-notice", () => ({
-  storeOrganizationAccessNotice: state.notice,
-}));
+vi.mock("../packages/db/src/repositories/organization-access-notice", async () => {
+  const { organizationBatchQueryState } = await import("./helpers/organization-batch-query-harness");
+  return { storeOrganizationAccessNotice: organizationBatchQueryState.notice };
+});
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    if (/^select "id" from "users" where "users"\."id" = \$1 for share/u.test(sql))
-      return { rows: [[params[0]]] };
-    state.queries.push({ sql, params });
-    if (state.fail && sql.startsWith(`insert into "${state.fail}"`))
-      throw new Error("Required write unavailable");
-    return {
-      rows:
-        sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
-    };
-  });
-  const proxy = new Proxy(database, {
-    get(target, key) {
-      if (key === "transaction")
-        return (callback: (tx: typeof database) => unknown) => callback(proxy);
-      const value = Reflect.get(target, key);
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-  return { db: proxy };
+  const { createOrganizationBatchQueryDbMock } = await import(
+    "./helpers/organization-batch-query-harness"
+  );
+  return createOrganizationBatchQueryDbMock();
 });
 
 import { organizationWorkspaceRepository as repository } from "../packages/db/src/repositories/organization-workspace";
-import { organizations } from "../packages/db/src/schema";
+import {
+  installOrganizationBatchQueryHooks,
+  organizationBatchQueryInput as input,
+  organizationBatchQueryLater as later,
+  organizationBatchQueryMembers as members,
+  organizationBatchQueryOrg as org,
+  organizationBatchQueryState as state,
+  organizationBatchQueryWrites as writes,
+} from "./helpers/organization-batch-query-harness";
 
-const time = "2026-10-11T00:00:00.000Z",
-  later = "2026-10-11T00:00:00.001Z";
-const org = (extra = {}) =>
-  Object.keys(getTableColumns(organizations)).map(
-    (key) =>
-      ({
-        id: "org",
-        name: "Team",
-        slug: "team",
-        ownerId: "owner",
-        createdAt: time,
-        updatedAt: time,
-        ...extra,
-      })[key as "id"],
-  );
-const members = [
-  ["m-a", "a", "member", ["manage_resources", "manage_servers"], "alice", "Alice"],
-  ["m-b", "b", "developer", ["commercial_custom"], "bob", "Bob"],
-];
-const input = {
-  userIds: ["b", "a"],
-  change: { action: "role", role: "developer" } as const,
-  expectedUpdatedAt: new Date(time),
-};
-const audits = input.userIds.map((id) => ({
-  id: `audit-${id}`,
-  actorId: "owner",
-  actorType: "user" as const,
-  targetType: "organization",
-  targetId: "org",
-  action: "organization.member_updated",
-}));
-const writes = () => state.queries.filter((query) => /^(insert|update|delete)/u.test(query.sql));
+installOrganizationBatchQueryHooks();
+
 async function preview(extra = {}, rows = members) {
   state.rows = [[org(extra)], rows];
   return repository.previewMembers("org", "owner", input, "unit-token");
 }
-beforeEach(() => {
-  state.queries = [];
-  state.rows = [];
-  state.fail = "";
-  state.notice.mockReset().mockResolvedValue(undefined);
-});
+
 it("reviews current scoped identities without leaking permission grants and binds unordered selections", async () => {
   const result = await preview();
   expect(result.changedCount).toBe(1);
@@ -110,70 +59,7 @@ it("reviews current scoped identities without leaking permission grants and bind
   );
   expect(reordered.previewRevision).toBe(result.previewRevision);
 });
-it("writes only changed members once, retains commercial grants, bumps one version and emits existing per-member events", async () => {
-  const reviewed = await preview();
-  state.queries = [];
-  state.rows = [[org()], members, [org({ updatedAt: later })]];
-  const result = await repository.batchMembers(
-    "org",
-    "owner",
-    { ...input, previewRevision: reviewed.previewRevision },
-    audits,
-    "unit-token",
-  );
-  expect(result.changedUserIds).toEqual(["a"]);
-  expect(result.organization.updatedAt.toISOString()).toBe(later);
-  const changes = writes();
-  expect(
-    changes.filter((query) => query.sql.startsWith('update "organization_members"')),
-  ).toHaveLength(1);
-  expect(changes[0].params).toContain(JSON.stringify(["manage_resources", "manage_servers"]));
-  expect(changes.filter((query) => query.sql.startsWith('update "organizations"'))).toHaveLength(1);
-  expect(
-    changes.find((query) => query.sql.startsWith('insert into "audit_events"'))?.params,
-  ).toContain("audit-a");
-  expect(state.notice).toHaveBeenCalledTimes(1);
-  expect(state.notice).toHaveBeenCalledWith(
-    expect.anything(),
-    expect.objectContaining({ id: "org" }),
-    "a",
-    "updated",
-    "audit-a",
-  );
-});
-it("rejects stale review, current permission changes and changed action before all writes", async () => {
-  const reviewed = await preview();
-  for (const changed of [
-    { ...input, previewRevision: "f".repeat(64) },
-    { ...input, previewRevision: reviewed.previewRevision, change: { action: "remove" } as const },
-  ]) {
-    state.queries = [];
-    state.rows = [[org()], members];
-    await expect(
-      repository.batchMembers("org", "owner", changed, audits, "unit-token"),
-    ).rejects.toMatchObject({
-      code: "CONFLICT",
-    });
-    expect(writes()).toEqual([]);
-  }
-  state.queries = [];
-  state.rows = [
-    [org()],
-    members.map((row, i) =>
-      i === 0 ? [row[0], row[1], row[2], ["different_commercial_grant"], row[4], row[5]] : row,
-    ),
-  ];
-  await expect(
-    repository.batchMembers(
-      "org",
-      "owner",
-      { ...input, previewRevision: reviewed.previewRevision },
-      audits,
-      "unit-token",
-    ),
-  ).rejects.toMatchObject({ code: "CONFLICT" });
-  expect(writes()).toEqual([]);
-});
+
 it.each(["owner", "admin"])(
   "rejects protected %s target and missing members atomically",
   async (role) => {
@@ -197,6 +83,7 @@ it.each(["owner", "admin"])(
     expect(writes()).toEqual([]);
   },
 );
+
 it("denies ordinary members, obsolete organization versions, duplicate and oversized selections", async () => {
   state.rows = [[org({ ownerId: "different" })], [["member"]]];
   await expect(
@@ -216,78 +103,4 @@ it("denies ordinary members, obsolete organization versions, duplicate and overs
       repository.previewMembers("org", "owner", { ...input, userIds }, "unit-token"),
     ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
   expect(writes()).toEqual([]);
-});
-it("preserves role when changing only delegated access and deletes a reviewed group in one command", async () => {
-  const change = { action: "server_access", enabled: false } as const;
-  state.rows = [[org()], members];
-  const reviewed = await repository.previewMembers(
-    "org",
-    "owner",
-    { ...input, change },
-    "unit-token",
-  );
-  state.queries = [];
-  state.rows = [[org()], members, [org({ updatedAt: later })]];
-  await repository.batchMembers(
-    "org",
-    "owner",
-    { ...input, change, previewRevision: reviewed.previewRevision },
-    audits,
-    "unit-token",
-  );
-  expect(writes()[0].params).toContain("member");
-  expect(writes()[0].params).toContain(JSON.stringify(["manage_resources"]));
-  const remove = { action: "remove" } as const;
-  state.rows = [[org()], members];
-  const removal = await repository.previewMembers(
-    "org",
-    "owner",
-    { ...input, change: remove },
-    "unit-token",
-  );
-  state.queries = [];
-  state.rows = [[org()], members, [org({ updatedAt: later })]];
-  const result = await repository.batchMembers(
-    "org",
-    "owner",
-    { ...input, change: remove, previewRevision: removal.previewRevision },
-    audits,
-    "unit-token",
-  );
-  expect(result.changedUserIds).toEqual(["a", "b"]);
-  expect(writes().filter((query) => query.sql.startsWith("delete"))).toHaveLength(1);
-  expect(state.notice).toHaveBeenCalledWith(
-    expect.anything(),
-    expect.anything(),
-    "b",
-    "removed",
-    "audit-b",
-  );
-});
-it("propagates mandatory audit and inbox failures to the enclosing transaction", async () => {
-  const reviewed = await preview();
-  state.rows = [[org()], members, [org({ updatedAt: later })]];
-  state.fail = "audit_events";
-  await expect(
-    repository.batchMembers(
-      "org",
-      "owner",
-      { ...input, previewRevision: reviewed.previewRevision },
-      audits,
-      "unit-token",
-    ),
-  ).rejects.toThrow();
-  expect(state.notice).not.toHaveBeenCalled();
-  state.fail = "";
-  state.rows = [[org()], members, [org({ updatedAt: later })]];
-  state.notice.mockRejectedValue(new Error("Inbox unavailable"));
-  await expect(
-    repository.batchMembers(
-      "org",
-      "owner",
-      { ...input, previewRevision: reviewed.previewRevision },
-      audits,
-      "unit-token",
-    ),
-  ).rejects.toThrow("Inbox unavailable");
 });
