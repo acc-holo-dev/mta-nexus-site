@@ -127,6 +127,7 @@ export function ResourceModerationControls({
           {copy.moderationNote}
         </p>
         <ErrorState
+          id="resource-moderation-blocked"
           title={
             locale === "ru"
               ? "Для текущего статуса нет разрешённого moderation-перехода."
