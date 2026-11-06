@@ -180,6 +180,7 @@ export default async function AuthorContentPage({
       </Link>
       {error && (
         <ErrorState
+          id="workspace-content-unavailable"
           title={error}
           action={
             <Link href={retryHref} className={navLinkClass}>
