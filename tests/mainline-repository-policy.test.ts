@@ -57,7 +57,6 @@ describe("mainline repository policy", () => {
       "COMMUNITY.md",
       "CURRENT-STATE.md",
       "DECISIONS.md",
-      "DOCS-MIGRATION.md",
       "DOCS-STYLE.md",
       "FLOWS.md",
       "OPERATIONS.md",
@@ -75,6 +74,9 @@ describe("mainline repository policy", () => {
       "TRUST-STAFF.md",
       "UX-CONTRACT.md",
     ]);
+
+    const archive = readdirSync(resolve(process.cwd(), "docs/archive")).sort();
+    expect(archive).toEqual(["DOCS-MIGRATION.md", "README.md"]);
 
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
     // DOC-04: superseded subject chapters removed; thin nav + decision register remain.

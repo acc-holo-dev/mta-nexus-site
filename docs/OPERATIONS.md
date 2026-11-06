@@ -1,9 +1,12 @@
 # MTA NEXUS Operations / Эксплуатация
 
+**Статус:** living · authoritative runbook (канонический путь `docs/OPERATIONS.md` для scripts/CI).  
+**Split в `docs/ops/*`:** волна D4 без ломки consumers.
+
 This document covers development startup, verification and production boundaries.  
 Документ описывает запуск разработки, проверки и эксплуатационные ограничения.
 
-Компактная карта репозитория: [PROJECT-MAP.md](PROJECT-MAP.md). Предметные контракты DOC-05 (ресурсы/trust/commerce/…) — рядом в `docs/`; **этот файл остаётся authoritative runbook** команд и markers. Storage/scanner цели дополнительно: [ARCHITECTURE](ARCHITECTURE.md), [55…](ARCHITECTURE.md).
+Компактная карта: [PROJECT-MAP.md](PROJECT-MAP.md). Стиль docs: [DOCS-STYLE.md](DOCS-STYLE.md). Предметные контракты — рядом в `docs/`. Storage/scanner: [ARCHITECTURE](ARCHITECTURE.md).
 
 ### Contents / Содержание
 

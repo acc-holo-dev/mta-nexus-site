@@ -1,6 +1,7 @@
 # Community, identity и social — предметный контракт
 
-**Статус:** интегрированный черновик DOC-05 (предметный контракт). База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Handbook-главы остаются действующими источниками до DOC-04. Реестр ID — в [DECISIONS.md](DECISIONS.md) / [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
+**Статус:** living · предметный контракт (сообщество / identity).  
+**База DOC-05:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Реестр ID — [DECISIONS.md](DECISIONS.md) / [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
 
 **Метки смысла.** `текущий runtime` — подтверждено кодом на базе сверки. `owner target` — принятое целевое правило владельца. `proposal` — направление без обязательства внедрения. `live unknown` — live/production факт не установлен этим контрактом.
 

@@ -1,6 +1,21 @@
 # Карта проекта MTA NEXUS
 
-Компактная навигация по репозиторию для людей и агентов. Рабочий вход: [AGENT.md](AGENT.md). Стиль и зоны документации: [DOCS-STYLE.md](DOCS-STYLE.md). Политика слоёв — в [архитектуре](ARCHITECTURE.md); команды — в [эксплуатации](OPERATIONS.md); предметные главы — в [карте областей](handbook/15-AI-CONTEXT-INDEX.md). При расхождении со спецификацией доверяйте коду, миграциям и выполненным проверкам.
+**Статус:** living · навигация и IA.  
+Рабочий вход агента: [AGENT.md](AGENT.md). Стиль и зоны: [DOCS-STYLE.md](DOCS-STYLE.md). Политика слоёв — [ARCHITECTURE.md](ARCHITECTURE.md); команды — [OPERATIONS.md](OPERATIONS.md); предметный указатель — [handbook/15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md). При расхождении со спецификацией доверяйте коду, миграциям и выполненным проверкам.
+
+## Зоны документации (IA)
+
+| Зона | Файлы | Правило |
+| ---- | ----- | ------- |
+| Вход | [README](../README.md), [AGENTS](../AGENTS.md), [AGENT](AGENT.md), этот файл, [DOCS-STYLE](DOCS-STYLE.md) | Коротко; без changelog tip |
+| Факт | [CURRENT-STATE](CURRENT-STATE.md), [PROBLEMS](PROBLEMS.md) | Только актуальный срез и открытые риски |
+| Контракты | [PRODUCT](PRODUCT.md), [ARCHITECTURE](ARCHITECTURE.md), [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [FLOWS](FLOWS.md), [UX-CONTRACT](UX-CONTRACT.md) | Шаблон DOCS-STYLE; не второй backlog |
+| Планы | [ROADMAP](ROADMAP.md) (derived), [RELEASE-PLAN](RELEASE-PLAN.md), [RETENTION-PLAN](RETENTION-PLAN.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md) | План ≠ факт tip |
+| Proposal | [SERVER-PACK-SPEC](SERVER-PACK-SPEC.md), ads/GROW в ROADMAP | Не launch-blocker free beta |
+| Эксплуатация | [OPERATIONS](OPERATIONS.md) | Канонический путь для scripts/CI; split — волна D4 |
+| Решения | [DECISIONS](DECISIONS.md), [13-DECISION-REGISTER](handbook/13-DECISION-REGISTER.md) | 309 ID не дублировать текстом |
+| Tracker | `planning/tasks.json`, [TRACKER](../planning/TRACKER.md); [TASKS](TASKS.md) derived | Один backlog |
+| Архив | [archive/](archive/README.md) | История DOC; не читать первым |
 
 ## Стек (факт кода)
 
@@ -87,23 +102,24 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 
 ## Документы по роли
 
-| Нужно                                  | Открыть                                                                                                            |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Как начать и выбрать задачу            | [AGENT.md](AGENT.md), [AGENTS.md](../AGENTS.md)                                                                    |
-| Что подтверждено сейчас                | [CURRENT-STATE.md](CURRENT-STATE.md)                                                                               |
-| Что строим / ближайший выпуск          | [PRODUCT.md](PRODUCT.md)                                                                                           |
-| Ресурсы / библиотека / публикация      | [RESOURCES.md](RESOURCES.md)                                                                                       |
-| Сообщество / identity                  | [COMMUNITY.md](COMMUNITY.md)                                                                                       |
-| Серверы / организации                  | [SERVERS-ORGS.md](SERVERS-ORGS.md)                                                                                 |
-| Доверие / staff / аккаунт              | [TRUST-STAFF.md](TRUST-STAFF.md)                                                                                   |
-| Коммерция / DRM (будущее)              | [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md)                                                                       |
-| Решения (NX + указатель baseline)      | [DECISIONS.md](DECISIONS.md)                                                                                       |
-| Полный реестр decision ID              | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md), `planning/decision-baseline.json`                     |
-| Очередь и карточки                     | [ROADMAP.md](ROADMAP.md), [TASKS.md](TASKS.md), `planning/tasks.json`, [TRACKER.md](../planning/TRACKER.md)        |
-| Проблемы и ограничения                 | [PROBLEMS.md](PROBLEMS.md)                                                                                         |
-| UI / сценарии                          | [UX-CONTRACT.md](UX-CONTRACT.md), [FLOWS.md](FLOWS.md)                                                             |
-| Выпуск / удержание / миграция docs     | [RELEASE-PLAN.md](RELEASE-PLAN.md), [RETENTION-PLAN.md](RETENTION-PLAN.md), [DOCS-MIGRATION.md](DOCS-MIGRATION.md) |
-| Слои и безопасность                    | [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                 |
-| Команды и ops                          | [OPERATIONS.md](OPERATIONS.md)                                                                                     |
-| Предметная глава (handbook, до DOC-04) | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)                                                          |
-| Историческая очередь handbook          | [10-ROADMAP.md](ROADMAP.md)                                                                                        |
+| Нужно                             | Открыть                                                                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Как начать и выбрать задачу       | [AGENT.md](AGENT.md), [AGENTS.md](../AGENTS.md), [DOCS-STYLE.md](DOCS-STYLE.md)                             |
+| Что подтверждено сейчас           | [CURRENT-STATE.md](CURRENT-STATE.md)                                                                        |
+| Что строим / ближайший выпуск     | [PRODUCT.md](PRODUCT.md)                                                                                    |
+| Ресурсы / библиотека / публикация | [RESOURCES.md](RESOURCES.md)                                                                                |
+| Сообщество / identity             | [COMMUNITY.md](COMMUNITY.md)                                                                                |
+| Серверы / организации             | [SERVERS-ORGS.md](SERVERS-ORGS.md)                                                                          |
+| Доверие / staff / аккаунт         | [TRUST-STAFF.md](TRUST-STAFF.md)                                                                            |
+| Коммерция / DRM (будущее)         | [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md)                                                                |
+| Решения (NX + указатель)          | [DECISIONS.md](DECISIONS.md)                                                                                |
+| Полный реестр decision ID         | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md), `planning/decision-baseline.json`              |
+| Очередь и карточки                | [ROADMAP.md](ROADMAP.md), [TASKS.md](TASKS.md), `planning/tasks.json`, [TRACKER.md](../planning/TRACKER.md) |
+| Проблемы и ограничения            | [PROBLEMS.md](PROBLEMS.md)                                                                                  |
+| UI / сценарии                     | [UX-CONTRACT.md](UX-CONTRACT.md), [FLOWS.md](FLOWS.md)                                                      |
+| Выпуск / удержание                | [RELEASE-PLAN.md](RELEASE-PLAN.md), [RETENTION-PLAN.md](RETENTION-PLAN.md)                                  |
+| Слои и безопасность               | [ARCHITECTURE.md](ARCHITECTURE.md)                                                                          |
+| Команды и ops                     | [OPERATIONS.md](OPERATIONS.md)                                                                              |
+| Предметная глава (указатель)      | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)                                                   |
+| Архив миграции docs               | [archive/DOCS-MIGRATION.md](archive/DOCS-MIGRATION.md)                                                      |
+| Derived прослеживаемость          | [TRACEABILITY.md](TRACEABILITY.md) (render; путь пока в корне `docs/`)                                      |

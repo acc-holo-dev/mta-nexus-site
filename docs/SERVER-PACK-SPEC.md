@@ -1,6 +1,7 @@
 # Versioned server resource pack (GROW-08 proposal)
 
-**Status:** local specification draft only. Not a pilot, install agent, or auto-update.
+**Статус:** proposal · не launch-blocker free beta.  
+Local specification draft only. Not a pilot, install agent, or auto-update.
 Depends on a chosen GROW-02 starter-collection pilot before claiming usefulness.
 Schema/runtime changes are out of scope until OPS-06 authoring is accepted for this shape.
 

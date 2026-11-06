@@ -1,7 +1,7 @@
 # Стиль документации MTA NEXUS
 
 **Статус:** living · канон для новых и переписываемых `.md`.  
-**Связано:** [PROJECT-MAP.md](PROJECT-MAP.md) · [AGENT.md](AGENT.md) · [DOCS-MIGRATION.md](DOCS-MIGRATION.md) (история DOC-01…05).
+**Связано:** [PROJECT-MAP.md](PROJECT-MAP.md) · [AGENT.md](AGENT.md) · [archive/DOCS-MIGRATION.md](archive/DOCS-MIGRATION.md) (история DOC-01…05).
 
 ## Назначение файлов
 
@@ -36,10 +36,10 @@
 | Файл                         | Источник                         | Команда                                      |
 | ---------------------------- | -------------------------------- | -------------------------------------------- |
 | `docs/ROADMAP.md`            | `planning/tasks.json`            | `python planning/tools/render_backlog.py`    |
-| `docs/TASKS.md`              | `planning/tasks.json`            | то же                                        |
-| `docs/TRACEABILITY.md`       | import / render pipeline         | то же / см. TRACKER                          |
+| `docs/TASKS.md`              | `planning/tasks.json`            | то же; не править вручную                    |
+| `docs/TRACEABILITY.md`       | import / render pipeline         | то же; путь в корне `docs/` до D5            |
 
-Живой статус исполнения — только [`planning/tasks.json`](../planning/TRACKER.md).
+Живой статус исполнения — только [`planning/tasks.json`](../planning/TRACKER.md). Архив DOC: [`archive/`](archive/README.md).
 
 ## Проверки после правок docs
 
@@ -50,4 +50,4 @@
 
 ## Порядок переработки (волны)
 
-См. план владельца: D0 style → D1 IA → D2 CURRENT-STATE → D3 контракты → D4 OPERATIONS → D5 решения/планы → D6 приёмка. Не смешивать tip-honesty PR с волнами документации.
+Волны: **D0+D2** (style + CURRENT-STATE) и **D1** (IA/`archive/`) — в работе на `cursor/docs-rewrite-foundation-c97a`. Далее: D3 контракты → D4 OPERATIONS → D5 решения/планы → D6 приёмка. Не смешивать tip-honesty PR с волнами документации.

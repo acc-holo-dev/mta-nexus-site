@@ -1,8 +1,10 @@
 # Продуктовый контракт и границы ближайшего выпуска
 
-**Статус:** обогащено DOC-05. Опирается на P-001…P-008, [01-PROJECT-CONCEPT](PRODUCT.md), [32-LAUNCH…](PRODUCT.md), [37-HOME…](PRODUCT.md). База: `385e577e7443cf7d7b817419ce5c3b8afe87b690`.
+**Статус:** living · контракт ближайшего выпуска (free beta).  
+**База смысла DOC-05:** `385e577e7443cf7d7b817419ce5c3b8afe87b690` (P-001…P-008 и бывшие главы concept/launch/home — в Git).  
+**Не является:** production readiness, активацией платежей или DRM.
 
-Предметные контракты: [RESOURCES](RESOURCES.md) · [COMMUNITY](COMMUNITY.md) · [SERVERS-ORGS](SERVERS-ORGS.md) · [TRUST-STAFF](TRUST-STAFF.md) · [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Сценарии — [FLOWS](FLOWS.md); UI — [UX-CONTRACT](UX-CONTRACT.md).
+Предметные контракты: [RESOURCES](RESOURCES.md) · [COMMUNITY](COMMUNITY.md) · [SERVERS-ORGS](SERVERS-ORGS.md) · [TRUST-STAFF](TRUST-STAFF.md) · [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Сценарии — [FLOWS](FLOWS.md); UI — [UX-CONTRACT](UX-CONTRACT.md). Стиль — [DOCS-STYLE](DOCS-STYLE.md).
 
 ## Для кого и какую задачу решаем
 

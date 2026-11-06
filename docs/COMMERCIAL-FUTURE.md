@@ -1,6 +1,7 @@
 # Коммерческое будущее: marketplace, DRM, планы и реклама
 
-**Статус:** предметный контракт DOC-05 (1 ноября 2026). База сверки: `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Документ сохраняет утверждённые цели владельца и исключения; **он не активирует платежи, выплаты, live DRM или платный marketplace** в бесплатной beta.
+**Статус:** living · план/цель (не runtime free beta).  
+**База DOC-05:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`. Сохраняет утверждённые цели владельца; **не** активирует платежи, выплаты, live DRM или платный marketplace в бесплатной beta.
 
 Связанные рамки: [PRODUCT.md](PRODUCT.md), [DECISIONS.md](DECISIONS.md), [handbook/13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md), [ROADMAP.md](ROADMAP.md) (F5/F6). Сценарии — [FLOWS.md](FLOWS.md); UI — [UX-CONTRACT.md](UX-CONTRACT.md); каталог/библиотека без активации платежей — [RESOURCES.md](RESOURCES.md); споры/staff — [TRUST-STAFF.md](TRUST-STAFF.md).
 

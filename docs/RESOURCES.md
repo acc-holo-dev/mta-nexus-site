@@ -1,6 +1,6 @@
 # Ресурсы, библиотека и публикация
 
-**Статус:** integrated DOC-05 draft subject contract.
+**Статус:** living · предметный контракт (ресурсы / библиотека / публикация).
 
 Предметный контракт DOC-05 для каталога ресурсов, версий/сборок, выдачи файла, приватной библиотеки, коллекций и seller-публикации. Не активирует коммерцию и не заменяет [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md). Платежи, settlement, commission, DRM-модели, payout и dispute timing — [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md) (план) и исходные handbook-главы до DOC-04.
 

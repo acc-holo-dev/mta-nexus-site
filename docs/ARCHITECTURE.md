@@ -1,8 +1,9 @@
 # Архитектура MTA NEXUS
 
-Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
+**Статус:** living · слои и границы пакетов.  
+Навигация: [PROJECT-MAP](PROJECT-MAP.md). Предметные контракты: [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды: [OPERATIONS](OPERATIONS.md).
 
-**DOC-05:** смысловые правила доменной модели и storage/scanner сохранены здесь и в указанных контрактах; полный текст [08-DOMAIN…](ARCHITECTURE.md) и [55-PRODUCTION-STORAGE…](ARCHITECTURE.md) не удалён (DOC-04).
+Смысловые правила доменной модели и storage/scanner — здесь и в контрактах (DOC-05). Исторический полный текст бывших глав `08-DOMAIN…` / `55-PRODUCTION-STORAGE…` — в Git (DOC-04).
 
 ## Форма системы
 

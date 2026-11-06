@@ -1,5 +1,7 @@
 # FLOWS — пользовательские сценарии и контракты результатов
 
+**Статус:** living · сценарный контракт.
+
 **Интегрировано DOC-02; authoritative сценарии после DOC-05.** Основание — код `385e577e7443cf7d7b817419ce5c3b8afe87b690`, 1.2.0-beta.3. Предметные правила — в [RESOURCES](RESOURCES.md) / [COMMUNITY](COMMUNITY.md) / [SERVERS-ORGS](SERVERS-ORGS.md) / [TRUST-STAFF](TRUST-STAFF.md) / [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md); UI — [UX-CONTRACT](UX-CONTRACT.md); ops — [OPERATIONS](OPERATIONS.md). Этот файл не означает внедрение, новый PASS или разрешение внешних действий. Задачи: [tasks.json](../planning/tasks.json).
 
 ## 1. Общий контракт действия
