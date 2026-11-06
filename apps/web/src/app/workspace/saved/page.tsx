@@ -61,6 +61,7 @@ export default async function SavedPage({
           <p className="mt-2 text-sm text-muted">{copy.description}</p>
         </header>
         <ErrorState
+          id="workspace-saved-unavailable"
           title={copy.pageError}
           action={
             <Link href={returnPath} className={retryLinkClass}>
