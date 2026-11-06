@@ -130,7 +130,13 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
           {busy ? copy.calculating : copy.calculate}
         </Button>
       </form>
-      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="commercial-fee-calculator-unavailable"
+          title={error}
+          description={copy.formErrorHint}
+        />
+      ) : null}
       {result ? (
         <div role="status">
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
