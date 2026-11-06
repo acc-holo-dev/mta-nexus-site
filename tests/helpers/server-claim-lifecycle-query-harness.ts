@@ -66,7 +66,7 @@ export function createServerClaimLifecycleQueryWebPushMock() {
   };
 }
 
-export function resetServerClaimLifecycleQueryState() {
+function resetServerClaimLifecycleQueryState() {
   serverClaimLifecycleQueryState.queries = [];
   serverClaimLifecycleQueryState.rows = [];
 }
@@ -77,7 +77,7 @@ export function installServerClaimLifecycleQueryHooks() {
   });
 }
 
-export function serverClaimLifecycleQueryRow(table: PgTable, values: Record<string, unknown>) {
+function serverClaimLifecycleQueryRow(table: PgTable, values: Record<string, unknown>) {
   return Object.keys(getTableColumns(table)).map((key) => values[key] ?? null);
 }
 
