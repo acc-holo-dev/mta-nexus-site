@@ -1,68 +1,23 @@
-import { createHash } from "node:crypto";
-import { getTableColumns } from "drizzle-orm";
-import { beforeEach, expect, it, vi } from "vitest";
-import { organizations } from "../packages/db/src/schema";
+import { expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][][],
-  config: undefined as unknown,
-}));
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return { rows: state.rows.shift() ?? [] };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return (callback: (tx: typeof database) => unknown, config: unknown) => {
-            state.config = config;
-            return callback(database);
-          };
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
-});
-
-import { organizationGovernanceRepository as team } from "../packages/db/src/repositories/organization-governance";
-import { profileChangeHistoryRepository as profile } from "../packages/db/src/repositories/profile-change-history";
-
-const stamp = "2026-10-12T00:00:00.123456Z",
-  base = { period: "all" as const, group: "all" as const, query: "" };
-const fingerprint = (
-  scope: string,
-  actor: string,
-  target: string,
-  period: string,
-  group: string,
-  query = "",
-) =>
-  createHash("sha256")
-    .update(JSON.stringify([1, scope, actor, target, period, group, query]))
-    .digest("hex");
-const org = () => {
-  const value = {
-    id: "org",
-    ownerId: "owner",
-    name: "Team",
-    slug: "team",
-    createdAt: stamp,
-    updatedAt: stamp,
-  };
-  return Object.keys(getTableColumns(organizations)).map(
-    (key) => value[key as keyof typeof value] ?? null,
+  const { createPrivateChangeHistoryQueryDbMock } = await import(
+    "./helpers/private-change-history-query-harness"
   );
-};
-beforeEach(() => {
-  state.queries = [];
-  state.rows = [];
-  state.config = undefined;
+  return createPrivateChangeHistoryQueryDbMock();
 });
+
+import { profileChangeHistoryRepository as profile } from "../packages/db/src/repositories/profile-change-history";
+import {
+  installPrivateChangeHistoryQueryHooks,
+  privateChangeHistoryQueryBase as base,
+  privateChangeHistoryQueryFingerprint as fingerprint,
+  privateChangeHistoryQueryStamp as stamp,
+  privateChangeHistoryQueryState as state,
+} from "./helpers/private-change-history-query-harness";
+
+installPrivateChangeHistoryQueryHooks();
+
 it("scopes profile history to the actual target account with bounded field-name projections", async () => {
   state.rows = [[["owner"]], [[stamp]], []];
   const result = await profile.page("owner", base);
@@ -209,59 +164,4 @@ it("fails closed when the database clock is absent or malformed", async () => {
   state.rows = [[["owner"]], [["bad"]]];
   await expect(profile.page("owner", base)).rejects.toMatchObject({ code: "INTERNAL_ERROR" });
   expect(state.queries).toHaveLength(2);
-});
-it("filters organization membership by current public accounts using escaped search before the page limit", async () => {
-  state.rows = [[org()], [[stamp]], []];
-  const filters = { ...base, group: "team" as const, period: "30" as const, query: "%_" };
-  await team.history("org", "owner", undefined, filters);
-  const query = state.queries[2];
-  expect(query.params).toEqual(
-    expect.arrayContaining([
-      "organization",
-      "org",
-      "organization.member_updated",
-      30,
-      "%\\%\\_%",
-      21,
-    ]),
-  );
-  expect(query.params).not.toContain("organization.ownership_transferred");
-  expect(query.sql).toContain('"organization_activity_subject"."username" ilike');
-  expect(query.sql).not.toMatch(/email|password|ip_address|user_agent/u);
-});
-it("binds organization pages to manager, target, group, search and exact window", async () => {
-  const filters = {
-    ...base,
-    group: "ownership" as const,
-    query: "Owner",
-    cursor: {
-      version: 1 as const,
-      context: fingerprint(
-        "organization-change-history",
-        "owner",
-        "org",
-        "all",
-        "ownership",
-        "Owner",
-      ),
-      until: stamp,
-      id: "anchor",
-    },
-  };
-  state.rows = [[org()], [[stamp]], [["anchor", stamp]], []];
-  expect((await team.history("org", "owner", undefined, filters)).until).toBe(stamp);
-  expect(state.queries[2].params).toContain("organization.ownership_transferred");
-  expect(state.queries[2].params).toContain("%Owner%");
-  expect(state.queries[3].params).toEqual(expect.arrayContaining([stamp, "anchor", 21]));
-  await expect(team.history("other", "owner", undefined, filters)).rejects.toMatchObject({
-    code: "INVALID_CURSOR",
-  });
-});
-it("rechecks live membership before reading the clock or audit rows", async () => {
-  state.rows = [[org()], [["member"]]];
-  await expect(team.history("org", "foreign", undefined, base)).rejects.toMatchObject({
-    code: "FORBIDDEN",
-  });
-  expect(state.queries).toHaveLength(2);
-  expect(state.queries.some((query) => query.sql.includes('from "audit_events"'))).toBe(false);
 });
