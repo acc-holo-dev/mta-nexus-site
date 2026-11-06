@@ -29,7 +29,7 @@ export async function createOrderCaseRepositoryDbMock() {
   };
 }
 
-export function resetOrderCaseRepositoryState() {
+function resetOrderCaseRepositoryState() {
   const state = orderCaseRepositoryState;
   state.rows = [];
   state.queries = [];
@@ -55,7 +55,7 @@ export const orderCaseRepositoryOrder = [
   orderCaseRepositoryDate,
 ];
 
-export const orderCaseRepositorySnapshotHash = createHash("sha256")
+const orderCaseRepositorySnapshotHash = createHash("sha256")
   .update(
     JSON.stringify([
       "ord_a",
