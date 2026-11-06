@@ -27,9 +27,15 @@ vi.mock("../../../lib/services/content-service", () => ({
     pageDiscussion: async () => ({ items: [], hasMore: false, nextCursor: null }),
   },
 }));
+type ContentFollowRow = {
+  targetId: string;
+  notifyComments: boolean;
+  mutedUntil: string | null;
+};
+type MuteState = { muted: boolean; mutedUntil: string | null };
 const follow = vi.hoisted(() => ({
-  contentStates: vi.fn(async () => []),
-  muteState: vi.fn(async () => ({ muted: false, mutedUntil: null })),
+  contentStates: vi.fn(async (): Promise<ContentFollowRow[]> => []),
+  muteState: vi.fn(async (): Promise<MuteState> => ({ muted: false, mutedUntil: null })),
   session: null as null | { id: string; role: string },
 }));
 vi.mock("@nexus/db", () => ({
