@@ -6,7 +6,7 @@ import {
 import type { Report, User } from "@nexus/domain";
 import { UnauthorizedError } from "@nexus/domain";
 
-export type PlatformReportListItem = Report & {
+type PlatformReportListItem = Report & {
   targetPreview: AdminReportTargetPreview | null;
 };
 
