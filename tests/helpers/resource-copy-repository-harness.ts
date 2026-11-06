@@ -135,7 +135,6 @@ export function resourceCopyRepositoryInserts() {
 }
 
 export {
-  date as resourceCopyRepositoryDate,
   metadata as resourceCopyRepositoryMetadata,
   receiptId as resourceCopyRepositoryReceiptId,
   sourceId as resourceCopyRepositorySourceId,
