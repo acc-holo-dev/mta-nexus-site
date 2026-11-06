@@ -543,7 +543,13 @@ export function ServerDetailsForm({
               </span>
             )}
           </div>
-          {notice?.error ? <ErrorState title={notice.text} className="sm:col-span-2" /> : null}
+          {notice?.error ? (
+            <ErrorState
+              id="server-details-form-notice-unavailable"
+              title={notice.text}
+              className="sm:col-span-2"
+            />
+          ) : null}
         </form>
       )}
       {!identityVerified && notice?.error && <ErrorState title={notice.text} />}
