@@ -125,8 +125,22 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+function readQaThreadId(value: string | string[] | undefined): string | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw || typeof raw !== "string") return null;
+  const id = raw.trim();
+  return /^[A-Za-z0-9_-]{8,128}$/.test(id) ? id : null;
+}
+
+export default async function ProductDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ qa?: string | string[] }>;
+}) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const initialQaThreadId = readQaThreadId(query.qa);
   const [locale, user] = await Promise.all([
     getRequestLocale(),
     cookies().then((cookieStore) =>
@@ -674,6 +688,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 authenticated={Boolean(user)}
                 canManage={canManageProduct || isAdmin}
                 initial={qaPage}
+                initialThreadId={initialQaThreadId}
                 builds={builds
                   .filter((build) => build.status === "published" && build.scanStatus === "clean")
                   .map((build) => ({ id: build.id, version: build.version }))}

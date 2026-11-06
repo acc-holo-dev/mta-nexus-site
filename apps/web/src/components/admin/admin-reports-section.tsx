@@ -24,6 +24,11 @@ type AdminReport = {
   moderatorNotes?: string | null;
   resolvedAt?: Date | string | null;
   status: string;
+  targetPreview?: {
+    title: string | null;
+    href: string | null;
+    detail: string | null;
+  } | null;
 };
 
 export function AdminReportsSection({
@@ -98,14 +103,24 @@ export function AdminReportsSection({
               className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
             >
               <div className="min-w-0 space-y-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                     {report.type}
                   </span>
-                  <span className="font-code text-xs font-heading text-primary">
+                  {report.targetPreview?.title ? (
+                    <span className="min-w-0 break-words text-sm font-semibold text-primary">
+                      {report.targetPreview.title}
+                    </span>
+                  ) : null}
+                  <span className="font-code text-xs font-heading text-muted">
                     {report.targetId}
                   </span>
                 </div>
+                {report.targetPreview?.detail ? (
+                  <p className="line-clamp-3 font-caption text-secondary">
+                    {report.targetPreview.detail}
+                  </p>
+                ) : null}
                 <p className="font-caption text-secondary">{report.reason}</p>
                 <p className="font-caption text-faint">
                   {copy.reporter}: {report.reporterId} · {report.targetType} ·{" "}
@@ -128,6 +143,14 @@ export function AdminReportsSection({
                   status={adminStatusLabel(locale, report.status)}
                   tone={adminStatusTone(report.status)}
                 />
+                {report.targetPreview?.href ? (
+                  <Link
+                    href={report.targetPreview.href}
+                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.openReportedTarget}
+                  </Link>
+                ) : null}
                 {(report.status === "open" || report.status === "under_review") &&
                   (report.targetType === "review" ? (
                     <Link

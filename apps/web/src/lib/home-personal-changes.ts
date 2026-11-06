@@ -78,7 +78,7 @@ export async function loadPersonalChangesSummary(
       });
     }
   } else {
-    failedSources.push("releaseWatch", "discussionFollow", "replyToMe");
+    failedSources.push("releaseWatch", "discussionFollow", "replyToMe", "resourceQa");
   }
 
   // Effective enabled watches: source health only (unread release notices already listed).

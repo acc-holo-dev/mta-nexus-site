@@ -76,6 +76,7 @@ export const admin = {
     previous: "Назад",
     next: "Далее",
     reporter: "Автор жалобы",
+    openReportedTarget: "Открыть объект жалобы",
     reportEvidence: "Ссылок на доказательства",
     noReportHistory: "Решений пока нет.",
     reportDecidedAt: "Решение принято",

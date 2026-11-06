@@ -85,7 +85,7 @@ async function deliver(
       recipientId: input.recipientId,
       title: text.title,
       message: text.message,
-      link: `/market/${encodeURIComponent(input.product.slug)}#resource-qa`,
+      link: `/market/${encodeURIComponent(input.product.slug)}?qa=${encodeURIComponent(input.threadId)}#resource-qa`,
       type: "content",
       category: "content",
       isRead: false,

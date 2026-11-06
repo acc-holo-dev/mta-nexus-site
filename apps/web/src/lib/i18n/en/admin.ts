@@ -74,6 +74,7 @@ export const admin = {
     previous: "Previous",
     next: "Next",
     reporter: "Reported by",
+    openReportedTarget: "Open reported target",
     reportEvidence: "Evidence links",
     noReportHistory: "No decisions yet.",
     reportDecidedAt: "Decided",

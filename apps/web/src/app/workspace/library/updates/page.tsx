@@ -3,6 +3,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { LibraryReleaseFollowLatest } from "../../../../components/library-release-follow-latest";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
 import { parseHistoryPage } from "../../../../lib/commerce-history-format";
@@ -85,6 +86,11 @@ export default async function LibraryUpdatesPage({
           {result.items.map((item) => {
             const version = item.mode === "fixed" ? item.selectedVersion : item.latestVersion;
             const buildId = item.mode === "fixed" ? item.selectedBuildId : item.latestBuildId;
+            const canCompare =
+              item.state === "update_available" &&
+              Boolean(item.selectedBuildId) &&
+              Boolean(item.latestBuildId) &&
+              item.selectedBuildId !== item.latestBuildId;
             return (
               <li key={item.productId} className="nexus-panel space-y-3 p-5">
                 <h2 className="break-words font-semibold text-primary">
@@ -113,12 +119,43 @@ export default async function LibraryUpdatesPage({
                     buildId={buildId}
                   />
                 ) : null}
-                <Link
-                  href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className={navLinkClass}
-                >
-                  {copy.manage}
-                </Link>
+                {item.state === "update_available" ? (
+                  <LibraryReleaseFollowLatest
+                    productId={item.productId}
+                    actorId={user.id}
+                    revision={item.revision}
+                    mode={item.mode}
+                  />
+                ) : null}
+                <div className="flex flex-wrap gap-4">
+                  {item.slug && item.state !== "unavailable" ? (
+                    <Link
+                      href={`/market/${encodeURIComponent(item.slug)}`}
+                      className={navLinkClass}
+                    >
+                      {copy.open}
+                    </Link>
+                  ) : null}
+                  {canCompare && item.selectedBuildId && item.latestBuildId ? (
+                    <Link
+                      href={`/workspace/library/${encodeURIComponent(item.productId)}/versions/compare?${new URLSearchParams(
+                        {
+                          from: item.selectedBuildId,
+                          to: item.latestBuildId,
+                        },
+                      )}`}
+                      className={navLinkClass}
+                    >
+                      {copy.compare}
+                    </Link>
+                  ) : null}
+                  <Link
+                    href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
+                    className={navLinkClass}
+                  >
+                    {copy.manage}
+                  </Link>
+                </div>
               </li>
             );
           })}

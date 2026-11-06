@@ -108,6 +108,11 @@ export default async function LibraryVersionsPage({
       <h2 className="min-w-0 break-words text-xl text-primary">
         {result.latest ? (result.product.title ?? copy.privateResource) : copy.privateResource}
       </h2>
+      {result.latest && result.product.slug ? (
+        <Link href={`/market/${encodeURIComponent(result.product.slug)}`} className={navLinkClass}>
+          {copy.open}
+        </Link>
+      ) : null}
       <p role="note" className="text-sm text-secondary">
         {copy.selectNote}
       </p>

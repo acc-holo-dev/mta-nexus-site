@@ -51,6 +51,7 @@ export function ResourceQaPanel({
   canManage,
   initial,
   builds,
+  initialThreadId = null,
 }: {
   productId: string;
   locale: Locale;
@@ -58,6 +59,8 @@ export function ResourceQaPanel({
   canManage: boolean;
   initial: PagePayload | null;
   builds: BuildOption[];
+  /** Optional staff/public deep-link thread id from `?qa=` on the market page. */
+  initialThreadId?: string | null;
 }) {
   const copy = resourceQaCopy(locale);
   const [page, setPage] = useState<PagePayload | null>(initial);
@@ -77,6 +80,7 @@ export function ResourceQaPanel({
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const writeGuard = useRef(false);
+  const deepLinkDone = useRef(false);
   const base = `/api/products/${encodeURIComponent(productId)}/qa`;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
@@ -137,6 +141,13 @@ export function ResourceQaPanel({
       setLoadingDetail(false);
     }
   }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies(loadThread): One-shot market `?qa=` deep link.
+  useEffect(() => {
+    if (deepLinkDone.current || !initialThreadId) return;
+    deepLinkDone.current = true;
+    void loadThread(initialThreadId);
+  }, [initialThreadId]);
 
   async function mutate(path: string, body: unknown, expected: (payload: unknown) => boolean) {
     if (writeGuard.current) return false;

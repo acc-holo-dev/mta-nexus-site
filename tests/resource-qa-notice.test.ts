@@ -64,7 +64,7 @@ it("notifies the publisher about a new question with a content-category inbox ro
       "usr_publisher",
       "New resource question",
       "Someone asked about Physics Pack.",
-      "/market/physics-pack#resource-qa",
+      "/market/physics-pack?qa=rqt_a#resource-qa",
       "content",
       "content",
     ]),
