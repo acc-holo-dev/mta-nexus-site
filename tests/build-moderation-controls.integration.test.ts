@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { assignIntegrationStaffPassword } from "./integration-staff-password";
 import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 import {
   auditEvents,
   buildRepository,
