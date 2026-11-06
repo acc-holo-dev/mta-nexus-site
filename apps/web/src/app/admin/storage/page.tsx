@@ -65,6 +65,7 @@ export default async function Page({
           {copy.back}
         </Link>
         <ErrorState
+          id="admin-storage-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
