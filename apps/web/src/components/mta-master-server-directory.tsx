@@ -301,6 +301,7 @@ export function MtaMasterServerDirectory({
 
       {error && (
         <ErrorState
+          id="mta-master-directory-error-unavailable"
           title={error}
           action={
             <Button
