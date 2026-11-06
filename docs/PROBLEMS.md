@@ -1,97 +1,68 @@
 # Открытые проблемы
 
 **Статус:** living · только открытые риски и сохраняемые ограничения.  
-Здесь нет changelog tip/PR. Статус пункта подтверждается запуском на конкретном коммите и среде.
+Нет changelog tip/PR. Закрытие — только проверка на exact SHA / среде. Tracker: `planning/tasks.json`.
 
-Интеграция DOC-02 (1 ноября 2026) **дополнила** реестр аудитом F01–F10 / UI01 / INT13 / ARC14. Ни один пункт не закрыт подготовкой документа, созданием task card или наличием файлов в репозитории. Машиночитаемые задачи: [`planning/tasks.json`](../planning/tasks.json); сценарные контракты — [FLOWS.md](FLOWS.md).
+**Типы:** issue (разрыв кода/контракта) · operational gate (среда) · decision/proposal.
 
-**Issue** — подтверждённый разрыв кода/контракта либо ограниченный технический риск; **operational gate** — неизвестная готовность целевого окружения; **decision/proposal** — выбор политики или продукта. Static code path не доказывает частоту инцидента.
+## Открытые gates (приоритет)
 
-## Зависимости
+| ID | Тип | Остаток | Закрытие |
+| -- | --- | ------- | -------- |
+| **F03** | Operational gate | Alert routing человеку на целевой среде | Drill: отказ → alert → owner → recovery; evidence `check-observability-live-drill-evidence.mjs` |
+| **F04** | Operational gate | Production backup/recovery practice | Независимые копии + restore rehearsal; CI restore ≠ F04 |
+| **F08** | Issue residual | Session lock в коде есть; barrier probe на disposable/live не гонялся | Controlled multi-connection barrier → нет новых build/receipt |
+| **ARC14 / OPS-06** | Workflow | Authoring path есть; tip journal → `0089`; generate rehearsal для новых DDL | Disposable `db:generate` перед schema change |
+| OPS-09/11 | External | `github_settings` | Только по допуску владельца |
+| Ads UX-24–26 / GROW-02…09 | Deferred | Не активированы | Отдельное поручение |
 
-Регулярно проверять `pnpm audit` и обновлять зависимости небольшими группами с тестами и сборкой. Обоснованные ограничения (проверяются `scripts/tests/toolchain-pins.node-test.mjs`):
+**Не закрывать** F03/F04/settings/deploy/ads/GROW без live evidence и допуска.
 
-- `@esbuild-kit/*` ещё тянет `drizzle-kit@0.31.11`; безопасной замены нет, пока upstream не уберёт loader. Nested `esbuild` уже зафиксирован override на `0.28.2`.
-- Vite закреплён на `8.3.5` (Vitest 5 peer: `^6.4 || ^7 || ^8`); дальнейшие минорные обновления — небольшими группами с `pnpm test:unit` / tooling pins.
-- `dependency-cruiser@18.7.2` для `tsPreCompilationDeps` использует вложенный TypeScript `6.0.3` через `packageExtensions`. **Не снимать pin на beta:** на 2026-10-31 npm даёт только `18.8.0-beta-1` (TS ≥7.1 native API); стабильного 18.8 ещё нет. Корневой `typescript` сейчас резолвится в `7.0.2` (`^7.0.2`) — для снятия расширения нужны **оба**: stable dependency-cruiser ≥18.8 **и** typescript ≥7.1, затем `pnpm analyze:architecture` + `pnpm test:tooling`.
+## Локально закрытые кодовые разрывы (не production ready)
 
-## Приёмка релиза
+F01, F02, F05, F06, F07, F09, F10 (усиление), UI01, INT13, FLOW-09/14/16 и смежные UX/OPS — закрыты кодом на tip волнах; требуют regression на текущем SHA. Session-actor binding (`6cefa74e`) усиливает honesty HTTP→service; **не** закрывает F08 barrier и **не** F03/F04.
 
-Локальная сборка и тесты не подтверждают готовность целевой инфраструктуры. Для кандидата: после `full_acceptance` на exact SHA выполните `pnpm beta:fetch` (скачивает retained CI artifacts через `gh`, без изобретения PASS), затем `pnpm beta:candidate` на чистом checkout. Отчёт требует `artifacts/ci-evidence.json` (с `jobResults`), `release-upgrade.json` и `backup-restore-evidence.json` со `status: "PASS"`, matching SHA и всеми флагами disposable rehearsal. Отчёт никогда не ставит open beta live и не разрешает production deploy. Полный backup/restore rehearsal (`scripts/check-backup-restore.mjs`) по-прежнему только на disposable GitHub-hosted runner (ROADMAP 19); локально подтверждается контракт топологии `compose.production.yaml`. In-repo residuals: `legal_surfaces` clears via `pnpm legal:check` (product pages only—not counsel); `observability` clears via `NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready` + `pnpm observability:verify` when alert thresholds are configured (not production vendor routing). Optional Web Push still needs both soak + live provider evidence (`pnpm push:soak` / `pnpm push:provider:probe` + verify; file presence alone never invents PASS). Human gates remain: deploy authorization, counsel review of legal wording, production alert routing, live push-provider subscription.
+| Source | Кратко | Приёмка |
+| ------ | ------ | ------- |
+| F01 | Guest return path / acquire | Browser: resource→auth→тот же acquire |
+| F02 | Beta evidence validator строгий | Missing flags блокируют; PASS ≠ deploy |
+| F05 | Overlay/writers runbook | Live maintenance rehearsal ещё open |
+| F06 | Unknown ≠ 0; review failure ≠ empty | UI regression |
+| F08 code | `lockInitiatingSession` | Barrier probe open |
+| F09 | Fresh-password staff actions | HTTP focused tests |
+| INT13 | Comment idempotency + draft no auto-publish | Discussion compose |
+| ARC14 | Forward-only authoring guards | Disposable generate before DDL |
 
-## Доставка уведомлений
-
-Исторически потерянные уведомления автоматически не восстанавливаются. Verification, reports, support, discussion, server-publication fanout, user-follow notices и SEC-002 build-incident notices (served download receipts after explicit quarantine opt-in) коммитят транзакционный источник (job или inbox) без Next.js `after()`; worker перепроверяет eligibility. Миграции 0083/0084/0085 не заполняют доставку для старых комментариев/публикаций/карантинов. Исчерпание повторов fanout/admission (attempts = 5) требует устранения причины и адресного reset одного id: `pnpm notifications:delivery list|reset` (`NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES`, без bulk; канал `build_incident`) — см. [эксплуатацию](OPERATIONS.md#recovering-report-inbox-delivery); внешняя push-доставка по-прежнему не exactly-once.
+Подробные evidence paths — в Git history этого файла до docs rewrite; карточки — `planning/tasks.json`.
 
 ## Проверки и сопровождение
 
-Тесты PostgreSQL внутри одного запуска используют общую БД и выполняются последовательно (`fileParallelism: false`, `maxWorkers: 1`). Файлы database-проекта изолируются (`isolate: true`), потому что temp-table suites подменяют `packages/db/src/client` per-file Proxy. Полный набор не запускать одновременно с тяжёлой сборкой на ограниченном хосте. Для локальных изменений выбирать связанные проверки; дальнейшие ускорения — только по новым замерам без ослабления конкуренции и отката. **Не** ставить `isolate: false` и **не** поднимать database `maxWorkers` без нового измеримого плана и зелёного прогона.
+Database Vitest: `fileParallelism: false`, `maxWorkers: 1`, `isolate: true`. Не поднимать parallelism без нового замера. Host/CI pin Node `26.10.0` / pnpm `12.4.2`. Unit timing helper: `node scripts/summarize-unit-timings.mjs` после `pnpm test:unit`.
 
-Замер unit (host Node 26.11.1 при exact pin `.nvmrc` / `.node-version` **26.10.0** / pnpm 12.4.2, 2026-10-31, tip with Phase-0 docs): `pnpm test:unit` wall **≈62.5s**, 634 files / 6815 tests (1 failure was the temporary PROJECT-MAP allowlist gap, now fixed). Sum of per-file durations ≈29.3s under `maxWorkers: 4`. Top slow files then (from `artifacts/unit-tests.json` via `node scripts/summarize-unit-timings.mjs`): interaction/UI suites `discussion-report-batch-interaction` (~2.0s), `managed-server-visibility-interaction` (~1.3s), `notification-inbox-history-interaction` (~1.2s), then `storage-atomic-upload` (~1.2s) and `request-ip-properties` (~1.0s). Since that baseline, those three interaction suites were split into focused files without claiming a new wall-time win yet: inbox (#270), managed-server-visibility (#279), discussion-report-batch (#280). Remeasure before treating wall time as improved; дальнейшая оптимизация unit — только по новым замерам; database policy unchanged (`fileParallelism: false`, `maxWorkers: 1`, no `isolate: false`). Exact host/CI pin остаётся `26.10.0` (major-ok `engines.node`: `>=26.0.0 <27`); см. OPERATIONS.
+## Сохраняемые инженерные ограничения
 
-Dependency-cruiser 18.7 ещё не использует API TypeScript 7 для pre-compilation deps: см. ограничение в разделе «Зависимости». После стабильного 18.8+/TS 7.1 снять `packageExtensions` и перепроверить `analyze:architecture`.
+### Зависимости
 
-## Production-сборка
+- `@esbuild-kit/*` → `drizzle-kit@0.31.11`; nested `esbuild` override `0.28.2`.
+- Vite pin `8.3.5` (Vitest 5 peer).
+- `dependency-cruiser@18.7.2` + nested TS `6.0.3` via `packageExtensions`; не снимать до stable cruiser ≥18.8 **и** typescript ≥7.1.
 
-Динамические пути local storage и absolute mail-secret files остаются runtime mounts: Turbopack может предупреждать о broad tracing. NFT-выход standalone ограничен `outputFileTracingExcludes` (tests/docs/scripts/migrations/deploy/git/env/uploads), runtime-образ стартует как `USER node` и пишет только в `/data/uploads`; migrations/workers уходят отдельным `/runtime/db`. Не ослаблять исключения и non-root runtime ради «тихого» build log.
+### Production build
 
-## Размер модулей
+Standalone tracing excludes + non-root `/data/uploads`. Не ослаблять ради тихого build log.
 
-Операции `builds` и `community-reports` разделены по сценариям (query/moderation/lifecycle и query/submit/decision) с тонкими facade. Новые связанные изменения держать в тех же границах; сам по себе размер файла не доказывает ошибку.
+### Уведомления
 
-## Аудит F01–F10 и связанные пункты
+Потерянные fanout не восстанавливаются автоматически. Reset одного id: `pnpm notifications:delivery list|reset` + `NEXUS_NOTIFICATION_DELIVERY_RESET_ACK=YES` ([OPERATIONS](OPERATIONS.md#recovering-report-inbox-delivery)). Push — не exactly-once.
 
-### Статус реализации (локальная волна 2026-11-01)
+### Приёмка кандидата
 
-Локально закрыты кодовые разрывы: **F02/OPS-07**, **F01/FLOW-01** (+ UX-27 library href), **UI01/UX-01**, **F06/UX-15+UX-11**, **F09/FLOW-22** (HTTP enforcement на tip), **F08/FLOW-21** (session lock в коде; barrier probe ещё открыт), **INT13/FLOW-10**, **F05/OPS-12** (+ OPS-04 overlay inventory), **ARC14/OPS-06** (authoring path/guards; tip journal → 0089 без нового generator DDL в основном checkout). Дополнительно локально: FLOW-09/14/16, UX-09/02/18, OPS-01/02; session-actor binding wave на tip `6cefa74e`. Это не заменяет full_acceptance на новом SHA и не закрывает operational gates F03/F04.
+`pnpm beta:fetch` → `pnpm beta:candidate` на exact tip после `full_acceptance`. Нужны retained artifacts со `status: "PASS"` и matching SHA. Отчёт **не** ставит beta live и **не** разрешает production deploy.
 
+## GitHub / docs
 
-Идентификаторы первого столбца — **source_ids** для карты задач в `planning/tasks.json`. Они служат точками crosslink; здесь не заводится второй рабочий tracker.
+Visibility, branch protection, Releases — отдельные permissions; snapshot ≠ обещание. AI-007 согласован с AGENTS (explicit owner push). ROADMAP PASS на старом SHA не переносится на новый tip.
 
-| Source ID | Тип / доказанность                                                   | Эффект и границы утверждения                                                                                                                                                                                                                                                                                                                                  | Когда закрыть                                               | Проверяемая приёмка                                                                                                                                                 | Evidence (baseline SHA)                                                                                                 |
-| --------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| F01       | Issue; **локально закрыто** FLOW-01 2026-11-01                       | Было: guest claim 401 без return path; auth всегда `/workspace`; productId терялся. Сейчас: безопасный internal return + acquire/productId сохраняются в auth path.                                                                                                                                                                                           | Browser/CI на tip SHA; expired/external redirect регрессии. | Guest RU/EN: resource→login/register→тот же acquire/productId→явный claim→library/download.                                                                         | `auth-return-path`; acquire/auth-form; focused auth-return tests                                                        |
-| F02       | Issue; **локально закрыто** OPS-07 2026-11-01                        | Validator больше не принимает PASS без SHA/обязательных flags. Retained CI artifact базы `385e577e…` по-прежнему валиден.                                                                                                                                                                                                                                     | До следующего релиза: прогон validator на tip artifacts.    | Missing/mismatch/wrong-type/false обязательных identity/target/flags блокируют; настоящий artifact проходит. Technical PASS ≠ deploy.                               | `scripts/beta-candidate-lib.mjs`; OPERATIONS acceptance                                                                 |
-| F03       | Operational gate; требует live evidence                              | Readiness проверяет комплект scripts/env/runbook; сам report не доказывает alert routing человеку. Live-drill validator (`check-observability-live-drill-evidence.mjs`) проверяет форму evidence, но не закрывает gate без согласованного drill. Нельзя утверждать отсутствие внешнего мониторинга только по Git.                                             | До public beta/пользовательского трафика.                   | На согласованном окружении: сигнал отказа→alert→получение ответственным→recovery; известны owners/пороги и проверенные зависимости.                                 | `scripts/observability-evidence-lib.mjs`; `scripts/check-observability-live-drill-evidence.mjs` (gate open)             |
-| F04       | Operational gate; CI restore успешен, production практика неизвестна | Сохранённый exact-SHA restore artifact подтверждает synthetic DB/ledger/uploads restore после потери source. Production-recovery-acceptance validator (`check-production-recovery-acceptance-evidence.mjs`) принимает только заполненный drill report; CI restore PASS ≠ F04. Не подтверждены расписание, независимое хранение, retention и реальные RPO/RTO. | До public beta; до появления ценных данных — если раньше.   | Недоступность основного хоста не лишает копии; парный restore на репрезентативном наборе проверяет права/файлы/ledger и измеряет потери/время против принятой цели. | `scripts/check-backup-restore.mjs`; `scripts/check-production-recovery-acceptance-evidence.mjs` (gate open); OPERATIONS |
-| F05       | Issue runbook; локально закрыто OPS-12/OPS-04 2026-11-01             | Prose и overlay matrix согласованы с inventory writers (app/push/license/resource-release ± mail-worker). Live disposable rehearsal writers stop/resume ещё не доказан этим checkout.                                                                                                                                                                         | Live maintenance rehearsal на целевой среде.                | Во время backup нет active application writers; PostgreSQL доступен dump. Полный набор worker возобновлён той же версией до ingress.                                | OPERATIONS; `compose-overlay-matrix.node-test.mjs` PASS                                                                 |
-| F06       | Issue; **локально закрыто** UX-15/UX-11 2026-11-01                   | Unknown players и server-review failure больше не маскируются под 0/empty.                                                                                                                                                                                                                                                                                    | Tip SHA UI/regression.                                      | Unknown ≠ 0; отказ review → unavailable/retry; пустой результат → empty.                                                                                            | `apps/web/src/app/page.tsx`; servers detail                                                                             |
-| F07       | Decision/proposal; destination **локально** UX-27/UX-23 2026-11-01   | Guest nav скрывает Workspace cluster/Admin (вариант A); library destination исправлен. Глубина меню/journeys map как proposal может уточняться.                                                                                                                                                                                                               | Оставшиеся UX nav polish карточки; staff capability map.    | Guest: только public nav + Sign in; member Workspace по capabilities; Admin только staff. Connect/Copy явны на server profile.                                      | `sidebar` / `shell-destination-policy`; market library href                                                             |
-| F08       | Issue; code path FLOW-21 локально на tip; **barrier probe открыт**   | Final upload/download authorization locks initiating session token before build/receipt writes. HTTP/code lock ≠ закрытие F08: controlled multi-connection barrier на disposable/live DB в этом checkout ещё не гонялся.                                                                                                                                      | Disposable DB barrier probe при необходимости CI/beta.      | Controlled barrier→revoke/expiry initiating session→resume: нет нового build/receipt/download_started.                                                              | builds/download routes; `lockInitiatingSession`; focused auth tests PASS                                                |
-| F09       | Issue enforcement; **локально закрыто** FLOW-22; HTTP на tip         | HTTP admin/actions на tip принимает fresh current-password proof по policy (`admin-actions-fresh-auth-http` + session-actor binding). Компрометация сессии не утверждается.                                                                                                                                                                                   | Расширение списка критичных actions по мере появления.      | Absent/wrong password, foreign/revoked session и утрата роли отвергаются в HTTP→transaction.                                                                        | `fresh-auth-policy`; admin actions route; focused fresh-auth HTTP tests                                                 |
-| F10       | Issue качества visual evidence; локально усилено UX-13 2026-11-01    | Ready-capture ждёт settled content (без GlobalLoading); loading/empty/error именуются отдельно. Exact-SHA PNG из disposable CI ещё не пересняты этим checkout.                                                                                                                                                                                                | Следующий resource-browser CI run на новом SHA.             | Правильные URL/heading/data и отсутствие skeleton перед capture; RU/EN mobile/desktop PNG + metadata.                                                               | `browser-page-ready.mjs`; `public-portfolio.playwright.mjs`                                                             |
-| UI01      | Issue; **локально закрыто** UX-01 2026-11-01                         | Unread/All/Read фильтруют rows через URL state; ARIA согласована.                                                                                                                                                                                                                                                                                             | Tip SHA inbox interaction.                                  | Смешанный набор реально фильтруется; Back/refresh/cursor reset согласованы.                                                                                         | notification-center-tabs; notifications page; inbox tests                                                               |
-| INT13     | Controlled repro; FLOW-10 + draft UX локально 2026-11-02             | UUIDv4 Idempotency-Key → `comments.id`; replay без второго fanout; mismatch→409. Session draft stores validated `intentKey`; restore after sign-in shows explicit publish-restored control (**без** auto-publish).                                                                                                                                            | Tip SHA discussion compose surface.                         | Один intent→один comment/fanout; restored draft never auto-publishes.                                                                                               | content-comment-client; discussion-compose-draft; content-discussion; focused draft tests PASS                          |
-| ARC14     | Decision + workflow risk; локальный authoring path OPS-06 2026-11-01 | Выбран guarded forward-only path; `pnpm db:generate` не гонялся в основном checkout. Journal/snapshot lag остаётся фактом до следующего реального DDL в disposable copy.                                                                                                                                                                                      | До следующего schema-change: disposable generate rehearsal. | Disposable copy: manual/custom+guard или supported baseline; applied SQL/journal не переписываются.                                                                 | OPERATIONS; release-upgrade node tests PASS                                                                             |
+## Правило закрытия
 
-### Session-actor binding wave
-
-Tip `6cefa74e` и предшествующая серия bind/session commits связывают state-changing HTTP→service пути с initiating/displayed actor+session (orgs, community, library, licenses, subscriptions, storage maintenance, order-case reviews и смежные). Волна усиливает session/actor honesty на tip; она **не** закрывает F08 disposable barrier probe и **не** подменяет FLOW-22 fresh-password HTTP enforcement. **F03/F04** остаются открытыми operational gates до live evidence.
-
-### Оговорки об evidence
-
-Настоящий retained `release-upgrade.json` текущего baseline SHA повторно прочитан при triage: `status=PASS`, `phase=complete`, matching SHA, `target=0087_server_reviews`, boolean verification/cleanup flags true. Настоящий retained restore report тоже имеет matching SHA/PASS и true flags. **F02 не опровергает эти результаты:** прежний эксперимент использовал отдельно созданные синтетические JSON и показывал слабый validator, сохраняя `productionAuthorized=false`.
-
-**0087 vs 0089:** retained upgrade evidence по-прежнему на `target=0087_server_reviews`. Tip journal сейчас заканчивается на `0089_resource_qa` (90 SQL, включая `0088_follow_mute_and_notify_comments`). PASS retained артефакта на 0087 не доказывает disposable upgrade rehearsal для 0088/0089 — для tip target нужен новый прогон.
-
-F08 не обозначает unauthenticated access: начальная сессия валидна, actor/access/build проверяются повторно; открытый остаток — controlled barrier probe, не отсутствие session lock в коде. У F09 на tip уже есть HTTP fresh-password/proof enforcement для выбранных критичных действий, а не обязательная MFA для всех. INT13 начинается с controlled repro/design; наблюдавшийся production duplicate не заявляется. F10 относится к пригодности сохранённых PNG, не к установленному зависанию сайта. ARC14 требует безопасной проверки генератора, а не переписывания истории текущей БД.
-
-## Сопутствующие GitHub и docs вопросы
-
-### GitHub workflow — наблюдение, не runtime defect
-
-В снимке на baseline SHA репозиторий **public**, owner type **User**, main `protected=false`, protection `enabled=false`, rulesets пусты, список **GitHub Releases** пуст. Это состояние проверки, а не обещание его неизменности. Отсутствие GitHub Releases не означает отсутствия версии приложения, tags или CI artifacts. Смена visibility, policies и публикация release относятся к отдельным GitHub task permissions.
-
-### Источник правил отправки кода — согласован в DOC-02
-
-Ранее корневой AGENTS требовал прямого указания владельца для отправки в GitHub, а AI-007 формулировал широкое разрешение commit/push directly to main. **DOC-02 согласовал AI-007 с AGENTS:** ID сохранён, действующая норма обновлена в [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md) и пояснена в [DECISIONS.md](DECISIONS.md). Старая формулировка остаётся в Git и не расширяет текущее поручение, не разрешает push без указания владельца, deploy или изменение настроек.
-
-### Точность текущей сводки
-
-[Baseline ROADMAP](ROADMAP.md) хранит прежний PASS для `acc1ef93`; он остаётся исторически привязанным к этому SHA и не является PASS нового кандидата. Перечень исключений UI Button также неполон: `server-review-panel` содержит raw reload button помимо упомянутого global-error. Это ограниченная неточность сводки, а не основание объявить весь завершённый roadmap этап сломанным. Актуальная очередь разработки — [ROADMAP.md](ROADMAP.md) / `planning/tasks.json`.
-
-## Правило закрытия и отсрочки
-
-Закрытие требует task/PR, фактической проверки acceptance и SHA результата; продуктовые метрики не придумываются. Live gates требуют evidence целевого окружения, а не только файлов в repo. Отсрочка записывает причину и точку пересмотра: public beta, следующий релиз, schema change или принятое продуктовое решение. Приоритет не превращает все строки в одинаковый P1 release blocker.
-
-Новые mute/bookmark/Q&A/ads/commerce proposals не дописываются сюда как «отсутствующие ошибки»: их место — решения и roadmap. Действующая функциональность сохраняет свой статус, пока конкретный новый evidence не показывает обратного.
+Нужны task/PR, acceptance check и SHA. Live gates — evidence целевой среды. Proposals (mute/ads/commerce) не записывать сюда как «отсутствующие баги».

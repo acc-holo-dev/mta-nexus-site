@@ -21,7 +21,7 @@
 | `backup-recovery` | Backup/restore, maintenance | [§4 Backup and recovery](../OPERATIONS.md#4-backup-and-recovery) |
 | `resource-safety` | Scanner / integrity / quarantine ops | [§5 Resource safety](../OPERATIONS.md#5-resource-safety-operations) |
 | `release` | Branch/release, GHCR, beta evidence | [§6 Branch and release](../OPERATIONS.md#6-branch-and-release-operations) |
-| `workers` | Push/mail workers, limits | [Worker liveness…](../OPERATIONS.md#worker-liveness-vs-progress) |
+| `workers` | Push/mail workers, limits | [workers.md](workers.md) · stub [Worker liveness…](../OPERATIONS.md#worker-liveness-vs-progress) |
 
 ## Правила переноса
 

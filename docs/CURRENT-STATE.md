@@ -61,7 +61,7 @@ Tracker: **64** `done` / **19** `not_started` (`python3 planning/tools/list_open
 
 ## Версии и инфраструктура
 
-Node `26.10.0`, pnpm `12.4.2`, Docker `node:26-alpine`, PostgreSQL 18. Команды — [OPERATIONS.md](OPERATIONS.md); доставка — [RELEASE-PLAN.md](RELEASE-PLAN.md).
+Node `26.10.0`, pnpm `12.4.2`, Docker `node:26-alpine`, PostgreSQL 18. Команды — [OPERATIONS.md](OPERATIONS.md) ([ops/](ops/README.md)); доставка — [RELEASE-PLAN.md](RELEASE-PLAN.md).
 
 ## Как обновлять этот файл
 
