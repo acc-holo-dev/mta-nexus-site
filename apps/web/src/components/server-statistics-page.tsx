@@ -59,6 +59,7 @@ export async function ServerStatisticsPage({
       <div className={pageShellClass}>
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <ErrorState
+          id="server-statistics-unavailable"
           title={copy.unavailable}
           action={
             <a href={path} className={navLinkClass}>
