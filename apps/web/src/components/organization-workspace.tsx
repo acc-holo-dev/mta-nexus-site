@@ -443,6 +443,7 @@ export function OrganizationWorkspacePanel({
         </nav>
         {error && (
           <ErrorState
+            id="organization-workspace-unavailable"
             title={error}
             action={
               <Button
