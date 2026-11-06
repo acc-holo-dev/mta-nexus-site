@@ -60,6 +60,7 @@ export async function ServerObservationBrowserPage({
     <div className={pageShellClass}>
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
       <ErrorState
+        id="server-observation-browser-page-unavailable"
         title={text}
         action={
           <a href={href} className={navLinkClass}>
