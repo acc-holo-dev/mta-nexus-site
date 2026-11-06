@@ -1,75 +1,27 @@
-import { createHash } from "node:crypto";
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][][],
-  config: null as unknown,
-}));
+import { expect, it, vi } from "vitest";
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return { rows: state.rows.shift() ?? [] };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return async (callback: (tx: typeof database) => unknown, config: unknown) => {
-            state.config = config;
-            return callback(database);
-          };
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
+  const { createServerObservationBrowserQueryDbMock } = await import(
+    "./helpers/server-observation-browser-query-harness"
+  );
+  return createServerObservationBrowserQueryDbMock();
 });
+
 import { ServerObservationRepository } from "../packages/db/src/repositories/server-observations";
-const repository = new ServerObservationRepository(),
-  end = new Date("2026-10-11T00:00:00.000Z"),
-  exact = "2026-10-10T23:59:00.123456Z";
-const filters = {
-  end,
-  query: "",
-  players: "all" as const,
-  password: "all" as const,
-  responding: "all" as const,
-};
-const server = ["server", "Server", "server", "public", "active", 0];
-const row = (id: string) => [id, exact, 0, 64, "mode", "map", "1.6", false, null];
-function context(
-  access: "public" | "managed" = "public",
-  actor = "",
-  extra: Partial<typeof filters> = {},
-) {
-  const input = { ...filters, ...extra };
-  return createHash("sha256")
-    .update(
-      JSON.stringify([
-        1,
-        "server-observation-browser",
-        "server",
-        access,
-        actor,
-        24,
-        end.toISOString(),
-        input.query,
-        input.players,
-        input.password,
-        input.responding,
-      ]),
-    )
-    .digest("hex");
-}
-beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(end);
-  state.queries = [];
-  state.config = null;
-  state.rows = [[server], [row("obs")]];
-});
-afterEach(() => vi.useRealTimers());
+import {
+  installServerObservationBrowserQueryHooks,
+  serverObservationBrowserQueryContext as context,
+  serverObservationBrowserQueryExact as exact,
+  serverObservationBrowserQueryFilters as filters,
+  serverObservationBrowserQueryRow as row,
+  serverObservationBrowserQueryServer as server,
+  serverObservationBrowserQueryState as state,
+} from "./helpers/server-observation-browser-query-harness";
+
+installServerObservationBrowserQueryHooks();
+
+const repository = new ServerObservationRepository();
+
 it("reuses public visibility authority and selects only a bounded observation page without aggregates", async () => {
   const result = await repository.pageObservations(
     { slug: "server" },
@@ -82,7 +34,7 @@ it("reuses public visibility authority and selects only a bounded observation pa
   expect(state.queries[0].params).toEqual(["server", "public", "unlisted", 1]);
   const query = state.queries[1];
   expect(query.params).toContain("mta_master");
-  expect(query.params).toContain(end.toISOString());
+  expect(query.params).toContain(filters.end.toISOString());
   expect(query.params.at(-1)).toBe(26);
   expect(query.sql).not.toMatch(/offset|count\(|avg\(|created_at|source_sequence|"name"/iu);
   expect(query.sql).toContain('left("game_mode",240)');
@@ -157,59 +109,3 @@ it("retains exact tie keys in a 25-row sentinel page and continues without readi
     '("server_observations"."observed_at","server_observations"."id") <',
   );
 });
-it("selects nearest newer neighbors ascending and returns the page newest first", async () => {
-  state.rows[1] = [row("a"), row("b"), row("c")];
-  const page = await repository.pageObservations({ id: "server" }, { kind: "public" }, 24, {
-    ...filters,
-    cursor: { createdAt: exact, id: "old", context: context(), direction: "newer" },
-  });
-  expect(page?.observations.map((item) => item.id)).toEqual(["c", "b", "a"]);
-  expect(state.queries[1].sql).toContain('"server_observations"."observed_at" asc');
-  expect(page?.previousCursor).toBeNull();
-  expect(page?.nextCursor?.id).toBe("a");
-});
-it.each([
-  { query: "other" },
-  { players: "zero" as const },
-  { password: "yes" as const },
-  { end: new Date("2026-10-10T00:00:00.000Z") },
-])("rejects cross-filter/period continuations before observation reads", async (extra) => {
-  await expect(
-    repository.pageObservations({ id: "server" }, { kind: "public" }, 24, {
-      ...filters,
-      ...extra,
-      cursor: { createdAt: exact, id: "obs", context: context(), direction: "older" },
-    }),
-  ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
-  expect(state.queries).toHaveLength(1);
-});
-it("binds managed continuations to the current account and keeps empty continuations recoverable", async () => {
-  await expect(
-    repository.pageObservations({ id: "server" }, { kind: "managed", actorId: "other" }, 24, {
-      ...filters,
-      cursor: {
-        createdAt: exact,
-        id: "obs",
-        context: context("managed", "owner"),
-        direction: "older",
-      },
-    }),
-  ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
-  state.rows = [[server], []];
-  const page = await repository.pageObservations({ id: "server" }, { kind: "public" }, 24, {
-    ...filters,
-    cursor: { createdAt: exact, id: "obs", context: context(), direction: "older" },
-  });
-  expect(page?.observations).toEqual([]);
-  expect(page?.nextCursor).toBeNull();
-  expect(page?.previousCursor).toBeNull();
-});
-it.each([new Date(NaN), new Date(end.getTime() + 1), new Date(end.getTime() - 91 * 86400000)])(
-  "bounds period ends before database reads",
-  async (end) => {
-    await expect(
-      repository.pageObservations({ id: "server" }, { kind: "public" }, 24, { ...filters, end }),
-    ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
-    expect(state.queries).toHaveLength(0);
-  },
-);
