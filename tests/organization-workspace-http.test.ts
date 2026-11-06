@@ -1,104 +1,35 @@
-import { AppError } from "@nexus/domain";
-import { NextRequest } from "next/server";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import { expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  actor: { id: "owner", role: "user" } as Record<string, unknown> | null,
-}));
-const mocks = vi.hoisted(() => ({
-  pageMine: vi.fn(),
-  leave: vi.fn(),
-  getWorkspace: vi.fn(),
-  create: vi.fn(),
-  updateProfile: vi.fn(),
-  addMember: vi.fn(),
-  changeMember: vi.fn(),
-  rate: vi.fn(),
-}));
-vi.mock("@nexus/db", () => ({ organizationWorkspaceRepository: mocks }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: async () => state.actor },
-}));
-vi.mock("@nexus/security", () => ({
-  consumeRateLimit: mocks.rate,
-  generateId: (p: string) => `${p}_new`,
-}));
+vi.mock("@nexus/db", async () => {
+  const { createOrganizationWorkspaceHttpDbMock } = await import(
+    "./helpers/organization-workspace-http-harness"
+  );
+  return createOrganizationWorkspaceHttpDbMock();
+});
+vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+  const { createOrganizationWorkspaceHttpAuthMock } = await import(
+    "./helpers/organization-workspace-http-harness"
+  );
+  return createOrganizationWorkspaceHttpAuthMock();
+});
+vi.mock("@nexus/security", async () => {
+  const { createOrganizationWorkspaceHttpSecurityMock } = await import(
+    "./helpers/organization-workspace-http-harness"
+  );
+  return createOrganizationWorkspaceHttpSecurityMock();
+});
 
-import { POST as leave } from "../apps/web/src/app/api/workspace/organizations/[id]/leave/route";
-import {
-  PATCH as change,
-  DELETE as remove,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/members/[userId]/route";
-import { POST as add } from "../apps/web/src/app/api/workspace/organizations/[id]/members/route";
-import {
-  PATCH as profile,
-  GET as workspace,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/route";
 import { POST as create, GET as list } from "../apps/web/src/app/api/workspace/organizations/route";
+import {
+  installOrganizationWorkspaceHttpHooks,
+  organizationWorkspaceHttpFields as fields,
+  organizationWorkspaceHttpMocks as mocks,
+  organizationWorkspaceHttpRequest as request,
+  organizationWorkspaceHttpState as state,
+} from "./helpers/organization-workspace-http-harness";
 
-const version = "2026-10-10T12:00:00.000Z";
-const fields = { name: "Team", description: "Description", logoUrl: "", websiteUrl: "" };
-const stored = {
-  ...fields,
-  id: "org",
-  slug: "team",
-  ownerId: "owner",
-  isVerified: false,
-  createdAt: new Date(version),
-  updatedAt: new Date(version),
-};
-const context = { params: Promise.resolve({ id: "org", userId: "member" }) };
-function request(method: string, body?: unknown, locale = "en", headers = {}) {
-  return new NextRequest("http://nexus.test/api/workspace/organizations?page=2&q=team", {
-    method,
-    headers: {
-      ...browserMutationHeaders(),
-      cookie: `nexus_session=test;nexus_locale=${locale}`,
-      "content-type": "application/json",
-      "x-nexus-actor-id": "owner",
-      "x-nexus-creation-nonce": "a".repeat(32),
-      ...headers,
-    },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
-}
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
-beforeEach(() => {
-  stubBrowserMutationOrigin();
-  vi.clearAllMocks();
-  state.actor = { id: "owner", role: "user" };
-  mocks.rate.mockResolvedValue({ success: true });
-  mocks.pageMine.mockResolvedValue({
-    items: [{ ...stored, role: "owner" }],
-    page: 2,
-    hasMore: false,
-  });
-  mocks.getWorkspace.mockResolvedValue({
-    organization: stored,
-    role: "owner",
-    owner: null,
-    members: [],
-    page: 2,
-    hasMore: false,
-  });
-  mocks.create.mockResolvedValue(stored);
-  mocks.updateProfile.mockResolvedValue(stored);
-  mocks.addMember.mockResolvedValue({
-    organization: stored,
-    member: {
-      id: "member",
-      username: "member",
-      displayName: "Member",
-      avatarUrl: null,
-      role: "developer",
-      managesServers: true,
-    },
-  });
-  mocks.changeMember.mockResolvedValue({ organization: stored, userId: "member", removed: true });
-});
+installOrganizationWorkspaceHttpHooks();
+
 it("returns private bounded member-scoped organization lists", async () => {
   const response = await list(request("GET"));
   expect(response.status).toBe(200);
@@ -106,10 +37,6 @@ it("returns private bounded member-scoped organization lists", async () => {
   expect(response.headers.get("vary")).toBe("Cookie");
   expect(mocks.pageMine).toHaveBeenCalledWith("owner", 2, "team");
   expect((await response.json()).items[0]).not.toHaveProperty("createdAt");
-});
-it("scopes a workspace read to the authenticated account", async () => {
-  expect((await workspace(request("GET"), context)).status).toBe(200);
-  expect(mocks.getWorkspace).toHaveBeenCalledWith("org", "owner", 2, "team");
 });
 it.each([list, create])("denies anonymous callers before repository access", async (handler) => {
   state.actor = null;
@@ -154,111 +81,6 @@ it.each([{ ownerId: "victim" }, { isVerified: true }, { permissions: ["manage_pr
     expect(mocks.create).not.toHaveBeenCalled();
   },
 );
-it("passes immutable profile identity and an optimistic revision to the write path", async () => {
-  expect(
-    (await profile(request("PATCH", { ...fields, expectedUpdatedAt: version }), context)).status,
-  ).toBe(200);
-  expect(mocks.updateProfile).toHaveBeenCalledWith(
-    "org",
-    "owner",
-    new Date(version),
-    fields,
-    expect.objectContaining({ action: "organization.profile_updated" }),
-    "test",
-  );
-  expect(
-    (
-      await profile(
-        request("PATCH", { ...fields, slug: "changed", expectedUpdatedAt: version }),
-        context,
-      )
-    ).status,
-  ).toBe(400);
-});
-it("rejects a changed actor before team mutations and private workspace refresh", async () => {
-  const other = { "x-nexus-actor-id": "other" };
-  expect(
-    (
-      await add(
-        request(
-          "POST",
-          { username: "member", role: "member", managesServers: false, expectedUpdatedAt: version },
-          "en",
-          other,
-        ),
-        context,
-      )
-    ).status,
-  ).toBe(409);
-  expect(
-    (await remove(request("DELETE", { expectedUpdatedAt: version }, "en", other), context)).status,
-  ).toBe(409);
-  expect(
-    (await leave(request("POST", { expectedUpdatedAt: version }, "en", other), context)).status,
-  ).toBe(409);
-  expect((await workspace(request("GET", undefined, "en", other), context)).status).toBe(409);
-  expect(mocks.addMember).not.toHaveBeenCalled();
-  expect(mocks.changeMember).not.toHaveBeenCalled();
-  expect(mocks.leave).not.toHaveBeenCalled();
-});
-it("adds a bounded exact username and delegated server permission", async () => {
-  expect(
-    (
-      await add(
-        request("POST", {
-          username: "member",
-          role: "developer",
-          managesServers: true,
-          expectedUpdatedAt: version,
-        }),
-        context,
-      )
-    ).status,
-  ).toBe(201);
-  expect(mocks.addMember).toHaveBeenCalledWith(
-    "org",
-    "owner",
-    new Date(version),
-    "member",
-    "developer",
-    true,
-    "mem_new",
-    expect.objectContaining({ action: "organization.member_added" }),
-    "test",
-  );
-});
-it("requires a revision for member changes and deletion", async () => {
-  expect(
-    (
-      await change(
-        request("PATCH", { role: "member", managesServers: false, expectedUpdatedAt: version }),
-        context,
-      )
-    ).status,
-  ).toBe(200);
-  expect((await remove(request("DELETE", { expectedUpdatedAt: version }), context)).status).toBe(
-    200,
-  );
-  expect(mocks.changeMember).toHaveBeenLastCalledWith(
-    "org",
-    "owner",
-    new Date(version),
-    "member",
-    null,
-    expect.objectContaining({ action: "organization.member_removed" }),
-    "test",
-  );
-  expect((await remove(request("DELETE", {}), context)).status).toBe(400);
-});
-it.each(["MEMBER_PROTECTED", "MEMBER_EXISTS", "CONFLICT"])(
-  "preserves transaction errors and localizes %s",
-  async (code) => {
-    mocks.changeMember.mockRejectedValue(new AppError("Private database message", 409, code));
-    const response = await remove(request("DELETE", { expectedUpdatedAt: version }, "ru"), context);
-    expect(response.status).toBe(409);
-    expect(await response.json()).toMatchObject({ code });
-  },
-);
 it("rejects cross-site, wrong content type, oversize bodies and denied rate limits", async () => {
   expect(
     (
@@ -287,30 +109,4 @@ it("maps slug collisions and hides unknown repository failures", async () => {
   const unavailable = await list(request("GET"));
   expect(unavailable.status).toBe(503);
   expect(JSON.stringify(await unavailable.json())).not.toContain("secret");
-});
-
-it("scopes voluntary exit to the session user and a required revision", async () => {
-  mocks.leave.mockResolvedValue({ organization: stored, userId: "owner", removed: true });
-  expect((await leave(request("POST", { expectedUpdatedAt: version }), context)).status).toBe(200);
-  expect(mocks.leave).toHaveBeenCalledWith(
-    "org",
-    "owner",
-    new Date(version),
-    expect.objectContaining({ action: "organization.member_left" }),
-    "test",
-  );
-  expect(
-    (await leave(request("POST", { expectedUpdatedAt: version, userId: "victim" }), context))
-      .status,
-  ).toBe(400);
-});
-it("rejects a profile edit from a different displayed account", async () => {
-  const response = await profile(
-    request("PATCH", { ...fields, expectedUpdatedAt: version }, "en", {
-      "x-nexus-actor-id": "other",
-    }),
-    context,
-  );
-  expect(response.status).toBe(409);
-  expect(mocks.updateProfile).not.toHaveBeenCalled();
 });
