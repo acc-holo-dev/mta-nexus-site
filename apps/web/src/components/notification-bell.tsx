@@ -293,6 +293,7 @@ export function NotificationBell() {
 
           {error ? (
             <ErrorState
+              id="notification-bell-unavailable"
               title={error}
               description={copy.errorHint}
               className="rounded-none border-x-0 border-t-0 py-4"
