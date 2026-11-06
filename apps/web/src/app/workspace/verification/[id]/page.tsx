@@ -56,6 +56,7 @@ export default async function VerificationApplicationPage({
           {copy.title}
         </Link>
         <ErrorState
+          id="workspace-verification-detail-unavailable"
           title={labels.unavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
