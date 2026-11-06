@@ -292,6 +292,7 @@ export function DiscussionReportBatch({
       )}
       {error ? (
         <ErrorState
+          id="discussion-report-batch-unavailable"
           title={error}
           description={copy.formErrorHint}
           action={
