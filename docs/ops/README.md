@@ -3,7 +3,7 @@
 **Статус:** living · навигация.  
 **Канонический путь runbook для scripts/CI:** [`docs/OPERATIONS.md`](../OPERATIONS.md) — **не удалять и не переименовывать** без согласованного переноса consumers.
 
-Этот каталог — карта разреза монолита. Пока текст живёт в `OPERATIONS.md`; будущие `docs/ops/*.md` подключаются только вместе с обновлением:
+Модули уже вынесены; `OPERATIONS.md` держит stubs + consumer markers. Дальнейшие переносы (например `dev-startup`) — только вместе с обновлением:
 
 - `scripts/observability-evidence-lib.mjs`
 - `scripts/tests/*operator*` / release-evidence suites
@@ -14,14 +14,14 @@
 
 | Модуль (план) | Тема | Якорь / раздел сейчас |
 | ------------- | ---- | --------------------- |
-| `dev-startup` | DEV Compose, overlays, mail | [§1 Supported DEV startup](../OPERATIONS.md#1-supported-dev-startup) |
-| `verification` | Test/CI scopes, browser/axe | [§2 Verification](../OPERATIONS.md#2-verification) |
-| `production-boundary` | Overlay matrix, digests, migrations | [§3 Production boundary](../OPERATIONS.md#3-production-boundary) |
-| `inbox-recovery` | Report/support/verification/push/discussion/build-incident | [inbox-recovery.md](inbox-recovery.md) · stubs [Recovering report…](../OPERATIONS.md#recovering-report-inbox-delivery) |
-| `backup-recovery` | Backup/restore, maintenance | [backup-recovery.md](backup-recovery.md) · stubs [§4](../OPERATIONS.md#4-backup-and-recovery) |
-| `resource-safety` | Build safety migration / admin storage | [resource-safety.md](resource-safety.md) · stub [§5](../OPERATIONS.md#5-resource-safety-operations) |
-| `release` | Branch/release, GHCR, beta evidence | [§6 Branch and release](../OPERATIONS.md#6-branch-and-release-operations) |
-| `workers` | Push/mail workers, limits | [workers.md](workers.md) · stub [Worker liveness…](../OPERATIONS.md#worker-liveness-vs-progress) |
+| `dev-startup` | DEV Compose, mail | still in [OPERATIONS §1](../OPERATIONS.md#1-supported-dev-startup) |
+| `verification` | Test/CI scopes, browser/axe | [verification.md](verification.md) |
+| `production-boundary` | Overlay matrix, migrations | [production-boundary.md](production-boundary.md) |
+| `inbox-recovery` | Notification delivery recovery | [inbox-recovery.md](inbox-recovery.md) |
+| `backup-recovery` | Backup/restore, maintenance | [backup-recovery.md](backup-recovery.md) |
+| `resource-safety` | Build safety / admin storage | [resource-safety.md](resource-safety.md) |
+| `release` | Branch/release, GHCR, beta evidence | [release.md](release.md) |
+| `workers` | Push/mail workers, limits | [workers.md](workers.md) |
 
 ## Правила переноса
 

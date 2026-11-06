@@ -1,32 +1,23 @@
 # MTA NEXUS Operations / Эксплуатация
 
 **Статус:** living · authoritative runbook (канонический путь `docs/OPERATIONS.md` для scripts/CI).  
-**Split:** карта модулей — [ops/README.md](ops/README.md); полный текст пока здесь (consumers pinned).
+**Split:** подробный текст — [ops/](ops/README.md); здесь stubs + обязательные markers для scripts/CI.
 
-This document covers development startup, verification and production boundaries.  
-Документ описывает запуск разработки, проверки и эксплуатационные ограничения.
+This document is the pinned operator entrypoint.  
+Документ — канонический вход оператора; детали в модулях `docs/ops/*`.
 
-Компактная карта: [PROJECT-MAP.md](PROJECT-MAP.md). Стиль docs: [DOCS-STYLE.md](DOCS-STYLE.md). Предметные контракты — рядом в `docs/`. Storage/scanner: [ARCHITECTURE](ARCHITECTURE.md).
+Компактная карта: [PROJECT-MAP.md](PROJECT-MAP.md). Стиль: [DOCS-STYLE.md](DOCS-STYLE.md). Storage/scanner: [ARCHITECTURE](ARCHITECTURE.md).
 
 ### Contents / Содержание
 
-1. [Supported DEV startup](#1-supported-dev-startup)
-2. [Verification](#2-verification)
-3. [Production boundary](#3-production-boundary)
-4. [Backup and recovery](#4-backup-and-recovery)
-5. [Resource safety operations](#5-resource-safety-operations)
-6. [Branch and release operations](#6-branch-and-release-operations)
-
-- [Compose overlay matrix](#compose-overlay-matrix)
-- [Same-digest promotion across runtime origins](#same-digest-promotion-across-runtime-origins)
-- [Forward-only migration authoring](#forward-only-migration-authoring)
-- [Base and infra image digests](#base-and-infra-image-digests)
-- [Release manifest and retention](#release-manifest-and-retention)
-- [Trusted GHCR publish prep](#trusted-ghcr-publish-prep)
-- [Resource integrity rollout and seed recovery](#resource-integrity-rollout-and-seed-recovery)
-- [Production compilation in restricted build environments](#production-compilation-in-restricted-build-environments)
-- [Existing-installation release and recovery](#existing-installation-release-and-recovery)
-- [Worker container limits](#worker-container-limits)
+1. [Supported DEV startup](#1-supported-dev-startup) *(полный текст пока здесь)*
+2. [Verification](#2-verification) → [ops/verification.md](ops/verification.md)
+3. [Production boundary](#3-production-boundary) → [ops/production-boundary.md](ops/production-boundary.md)
+4. Inbox recovery stubs → [ops/inbox-recovery.md](ops/inbox-recovery.md)
+5. [Backup and recovery](#4-backup-and-recovery) → [ops/backup-recovery.md](ops/backup-recovery.md)
+6. [Resource safety](#5-resource-safety-operations) → [ops/resource-safety.md](ops/resource-safety.md)
+7. [Branch and release](#6-branch-and-release-operations) → [ops/release.md](ops/release.md)
+8. Workers → [ops/workers.md](ops/workers.md)
 
 ## 1. Supported DEV startup
 
@@ -134,268 +125,51 @@ and [SMTP TLS documentation](https://mailpit.axllent.org/docs/configuration/smtp
 
 ## 2. Verification
 
-Run the appropriate scope against a prepared environment. PostgreSQL tests need a disposable database; do not run the full suite against the development database.
+Full: [ops/verification.md](ops/verification.md)
+([Test and CI scopes](ops/verification.md#test-and-ci-scopes),
+[browser accessibility](ops/verification.md#automated-browser-accessibility),
+[property-based](ops/verification.md#property-based-checks),
+[code analysis](ops/verification.md#code-analysis-and-focused-checks)).
 
-```bash
-pnpm install --frozen-lockfile
-pnpm check:code
-pnpm docs:check
-pnpm test:isolated  # requires the running Docker development stack
-pnpm build
-```
-
-`test:isolated` owns a uniquely named database and removes it after success or failure. It never recreates a shared database. It requires the default local Docker context and refuses `DOCKER_HOST` or `DOCKER_CONTEXT` overrides before creating the database. For a host-only setup, create a separate database, apply migrations there and set its `DATABASE_URL` before `pnpm test:database`. Product-specific moderation and verification contracts are indexed in the [domain map](handbook/15-AI-CONTEXT-INDEX.md).
+Use `pnpm check:code`, focused `pnpm test:focus`, database disposable suites, and
+path-scoped CI (`documentation` → `unit_ci` → `fast_ci` → `full_acceptance`). Local
+PASS ≠ production deploy.
 
 ### Test and CI scopes
 
-- `pnpm check:code`: formatting, lint, types, package boundaries, unused code, unit and tooling checks; no Docker or PostgreSQL required.
-- `pnpm test:unit`: isolated unit/mock suites, at most four parallel workers; no database required. Prints the normal reporter and writes timings/results to ignored `artifacts/unit-tests.json`. Run **without** `NEXT_PUBLIC_APP_URL` (same as the CI `unit` job); unit CSRF fixtures use `Origin: http://nexus.test` and correctly fail closed when APP_URL is `http://localhost:3000`.
-- `pnpm test:database`: real DB/integration suites, sequential files against a disposable PostgreSQL database. Run **with** `NEXT_PUBLIC_APP_URL` (same as the CI `verify` job).
-- `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
-- `pnpm test`: both Vitest projects in one process/env. Prefer CI-aligned runners for acceptance: `node scripts/run-ci-aligned-vitest.mjs` (used by `pnpm release:verify` and `compose.verify.yaml` / `NEXUS_LOCAL_VERIFY=true` local disposable verify) runs unit without APP_URL then database with APP_URL. `pnpm test:isolated` runs the same split directly in its owned database. Do not weaken CSRF checks to make a combined `pnpm test` + APP_URL green.
-- CI-aligned and release verification require `NEXUS_DISPOSABLE_DATABASE=1` and an explicit PostgreSQL `DATABASE_URL` without query/fragment: host must be loopback or Compose `postgres`, and database name must end in `_test`/`_verify`, or be an owned `nexus_test_<uuid>` / `nexus_focus_<timestamp>_<random>` name. Release verification blocks both migration and test gates if preflight fails. The acknowledgement, host and name do not prove that a database contains no valuable data: the operator must ensure the target is disposable before setting them.
-- Disposable local Docker verify: `NEXUS_LOCAL_VERIFY=true bash scripts/check-local-verification.sh` (or the `.ps1` twin) builds `compose.verify.yaml`, migrates a fresh DB, typechecks, runs CI-aligned Vitest, then a production-shaped `pnpm build`. It is a developer fallback, not a GitHub Actions workflow; CI still runs `check:code` and `test:database` as separate jobs and does **not** invoke `release:verify`.
-
-CI chooses a scope from the changed-file set (`scripts/ci-policy.mjs`). Unknown or
-mixed paths never narrow the gate; they stay on `fast_ci` or escalate to
-`full_acceptance`. Local commands stay aligned with those scopes.
-
-Workspace install jobs (`unit`, `verify`, `mail-worker`) must keep
-`pnpm/action-setup` **before** `actions/setup-node` with `cache: pnpm`, then
-`pnpm install --frozen-lockfile`. Jobs without a workspace install must not set
-`cache: pnpm`. This order is asserted by `scripts/tests/ci-hardening.node-test.mjs`.
-Do not widen path scopes to “make CI green.” After `pnpm test:unit`, optional
-`node scripts/summarize-unit-timings.mjs` ranks slow files from
-`artifacts/unit-tests.json` (gitignored). Measured host timings live in
-[PROBLEMS](PROBLEMS.md#проверки-и-сопровождение); cache contract summary:
-[PROJECT-MAP](PROJECT-MAP.md#ci-install-cache-проверено).
-
-Pull requests use the following change-based scopes; the local commands remain aligned with them:
-
-| Scope             | When                                                                                                                                                          | CI jobs                                               | Local analogue                                                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `documentation`   | Markdown-only (`README.md`, `docs/**/*.md`)                                                                                                                   | `plan` (doc links)                                    | `node scripts/check-doc-links.mjs`                                                                                      |
-| `unit_ci`         | Only `packages/ui/**` and/or `apps/web/src/components/**` (plus markdown)                                                                                     | `plan`, `unit`                                        | `pnpm check:code`                                                                                                       |
-| `fast_ci`         | Other application code that is not infrastructure                                                                                                             | `plan`, `unit`, `verify`, `image`, `smoke`            | `pnpm check:code` then disposable `pnpm test:database` (or `node scripts/run-ci-aligned-vitest.mjs` / `compose.verify`) |
-| `full_acceptance` | Migrations, Compose/Docker, workflows, lockfiles, security/storage/config, selected trust-boundary repositories, release tags, or workflow_dispatch with full | All CI jobs including browser and production rehearse | `pnpm release:verify` (CI-aligned Vitest) / `test:isolated` / full acceptance                                           |
-
-Every push to `main`, release tags (`v*`) and explicit full workflow dispatch run `full_acceptance`.
-Main pushes can cancel an earlier run, so even a documentation-only successor must
-verify the exact new commit rather than rely on its cancelled predecessor.
-The CI unit job and host development use the same `check:code` command. It uses
-the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
-with an anchored selector for exactly seven scripts. `--sequential` bounds memory;
-`--no-bail` lets independent checks finish after an earlier failure and returns a
-nonzero result if any check failed. The selected checks are independent of order. Unit
-test files still run with four Vitest workers. CI preserves the unit JSON even
-when a different check fails; database/build/browser acceptance keep their own jobs.
-No additional task runner is installed.
-
-`scripts/test-projects.mjs` uses the existing pinned SWC parser to inspect source
-syntax without executing modules. It follows executable imports/re-exports,
-CommonJS and TypeScript import-equals edges, plus calls inside template expressions.
-Explicit type-only declarations and TypeScript import queries are erased; inline
-type specifiers remain conservative because their module can retain side effects.
-Zero-argument arrow factories in hoisted `vi.mock` calls cut a mocked import edge,
-including Vitest's typed `vi.mock(import("..."), factory)` syntax. Partial/automatic
-and runtime mocks, `importActual` and unmock calls retain live edges. Unknown
-dynamic targets and unresolved local/workspace imports remain in the DB project;
-syntax errors stop classification with the source path. This is a conservative
-repository policy, not a whole-program evaluator of arbitrary aliases or control flow.
-See [SWC parsing APIs](https://swc.rs/docs/usage/core#parse)
-and [Vitest mock semantics](https://vitest.dev/api/vi#vi-mock).
+See [ops/verification.md#test-and-ci-scopes](ops/verification.md#test-and-ci-scopes).
 
 ### Automated browser accessibility
 
-All five browser-tool installations in the workflows use
-`scripts/browser-toolchain.mjs`. This is the single place to update their
-pinned package versions:
-
-| Profile | Tools                                               | Used by                               |
-| ------- | --------------------------------------------------- | ------------------------------------- |
-| `basic` | Playwright                                          | DEV origin/hydration verification     |
-| `a11y`  | Playwright, axe Playwright integration and axe-core | Production smoke and Resource browser |
-| `agent` | Playwright and agent-browser                        | Account and Directory browser         |
-
-The installer receives an absolute tool directory, invokes npm directly, and
-preserves a failed installation's exit status. Each job still uses its own
-temporary tool directory and Chromium installation. The application dependency
-graph is unchanged by these profiles. Direct package versions are pinned;
-browser-tool transitive dependencies retain npm's normal resolution behavior.
-
-The Chromium acceptance uses `@axe-core/playwright` 4.13.0 and
-`axe-core` 4.13.0. Both are pinned in the isolated browser-tools installations for
-the smoke and resource-browser jobs; they are not application dependencies.
-
-| Contour                  | Scanned states                                                                                                                                                                             |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Production browser smoke | Login, registration and password recovery in RU/EN, light desktop and dark mobile themes; authenticated workspace after registration.                                                      |
-| Resource browser         | Open notification and mobile More dialogs in RU/EN; login error, recovery success and authenticated Settings, Security, Support, resource publishing and server claim at 320px and 1280px. |
-
-`scripts/axe-accessibility.mjs` scans the full rendered state after each test's
-readiness assertions. It selects WCAG 2 A/AA, 2.1 A/AA and 2.2 AA rule tags and
-fails on every returned violation, including contrast. There are no rule disables
-or excluded page regions. Existing keyboard, focus, reflow and ARIA-reference
-checks remain in the same scenarios.
-
-Every completed scan writes a JSON diagnostic under the job report's `axe/`
-directory and attaches it to Playwright. Reports retain rule IDs, impacts, help
-links and element selectors, without raw HTML or form values. Incomplete checks
-are recorded for review separately from confirmed violations. Passing scans are
-retained even though general Playwright output is preserved only for failures.
-These checks cover automatically detectable issues in the tested states; keyboard
-and assistive-technology assessments remain necessary.
-
-The standalone gate tests verify that a violation blocks acceptance after its
-report is saved, incomplete findings stay visible, and engine errors propagate.
-They use a browser-adapter fixture and do not claim a real DOM scan. Current
-browser execution/hosted-runner limitations are tracked in [PROBLEMS](PROBLEMS.md).
-Integration follows the [official Playwright accessibility guide](https://playwright.dev/docs/accessibility-testing)
-and [axe Playwright API](https://github.com/dequelabs/axe-core-npm/tree/v4.13.0/packages/playwright).
+See [ops/verification.md#automated-browser-accessibility](ops/verification.md#automated-browser-accessibility).
 
 ### Property-based checks
 
-`fast-check` 4.10.2 is a root development dependency and runs through the existing
-Vitest unit project. `pnpm test:properties` executes four trusted-proxy/IP
-properties, each with 1000 generated cases: mismatched Unicode markers must not
-throw, missing/untrusted markers must ignore forwarded IPs, a trusted real IPv4/IPv6
-address takes precedence, and an invalid first forwarded hop must not be skipped.
-
-The default seed is `20261009`, keeping CI repeatable. Use another signed 32-bit
-seed to explore additional inputs:
-
-```bash
-FC_SEED=12345 pnpm test:properties
-```
-
-Fast-check reports its seed and shrinks a failure to a smaller counterexample.
-The first adoption caught a UTF-8 length error in proxy-marker comparison;
-the exact Latin-1 regression is also covered using real Fetch Headers. Invalid
-markers return `unknown` before `timingSafeEqual` can throw, while correct
-markers still use timing-safe byte comparison. This is a bounded property suite,
-not an exhaustive proof of all request handling.
-See the [official fast-check building blocks](https://fast-check.dev/docs/core-blocks/)
-and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotimingsafeequala-b).
+See [ops/verification.md#property-based-checks](ops/verification.md#property-based-checks).
 
 ### Code analysis and focused checks
 
-Use `pnpm analyze:architecture` and `pnpm analyze:unused` for dependency boundaries and unused code. Dependency-cruiser currently warns about TypeScript 7 compatibility; do not treat its result as complete without resolving that limitation.
-
-`pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. Database tests require applied migrations and the same disposable database preflight (acknowledgement, URL host and name) as CI-aligned verification above. Unit-only tests do not require a database. When Compose Postgres is unpublished on the host (`compose.yaml`), use `pnpm test:focus:compose <tests/...integration.test.ts>` to create a disposable database on the Compose network, migrate it, run the focused files, and drop the database. This helper requires the default local Docker context without `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and uses only the documented `nexus-local` project; it refuses another `COMPOSE_PROJECT_NAME`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
-
-`pnpm ci:diagnose --run-id <id>` reads one GitHub Actions run and its annotations. It may require an appropriate read-only GitHub credential. A workflow with zero executed steps is not a successful test.
+See [ops/verification.md#code-analysis-and-focused-checks](ops/verification.md#code-analysis-and-focused-checks).
 
 ## 3. Production boundary
 
-Production must use explicit production Compose/configuration, not the local development stack.
+Full: [ops/production-boundary.md](ops/production-boundary.md).
 
-Required properties include:
-
-- HTTPS public URL;
-- unique strong authentication and proxy secrets;
-- persistent private storage;
-- TLS-edge security headers: HSTS, frame denial, MIME sniffing protection, strict-origin referrer policy and disabled camera/microphone/geolocation/payment browser capabilities;
-- container health that verifies HTTP/database readiness and real read/write access to the mounted private storage before the public proxy depends on the app;
-- PostgreSQL backup and restore procedure;
-- ClamAV enabled and reachable;
-- no development placeholder secrets;
-- no public database/ClamAV ports;
-- explicit recovery/email configuration before claiming email delivery is operational.
-
-Paid commerce remains disabled.
+Production Compose overlays, same-digest promotion, and forward-only migration
+authoring live in the module. Do not merge `compose.yaml` with
+`compose.production.yaml`.
 
 ### Compose overlay matrix
 
-Compose merge order is significant. Do not combine the development base with the
-production base. Supported scenarios (OPS-04 / ARC09):
-
-| Scenario                                  | Files (left → right merge order)                                                                | Expected roles                                                                                                                      |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Dev                                       | `compose.yaml`                                                                                  | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker` (host source mounts + loopback app port)    |
-| Dev + local mail capture                  | `compose.yaml` + `compose.mailpit.yaml`                                                         | Dev roles + Mailpit + durable account-mail worker (capture only)                                                                    |
-| Isolated verify                           | `compose.verify.yaml`                                                                           | Disposable `postgres` + `verify` (no production ports; not a deploy)                                                                |
-| Production                                | `compose.production.yaml`                                                                       | `postgres`, `clamav`, `app`, `push-worker`, `license-worker`, `resource-release-worker`, `caddy`                                    |
-| Production + recovery mail                | `compose.production.yaml` + `compose.recovery.yaml` + `compose.mail-worker.yaml`                | Production roles + optional `mail-worker`; recovery env on `app`                                                                    |
-| Production + recovery mail + file secrets | …previous… + `compose.recovery-file-secrets.yaml` (and optional auth/CA/rotation file overlays) | Same roles; secrets via `/run/secrets` — do not mix conflicting env+file values for the same key                                    |
-| Production CI                             | `compose.production.yaml` + `compose.production-ci.yaml`                                        | Same production service set; Compose ≥ 2.24.4 for `!override`; Caddy published only on loopback `127.0.0.1:8080` / `127.0.0.1:8443` |
-
-**Inventory (production base writers and edge):**
-
-| Role                     | Service                   | Notes                                                           |
-| ------------------------ | ------------------------- | --------------------------------------------------------------- |
-| HTTP + migration phase   | `app`                     | Entrypoint migrates before HTTP (`scripts/start-production.sh`) |
-| Web Push                 | `push-worker`             | Always in production base                                       |
-| License maintenance      | `license-worker`          | Always in production base                                       |
-| Resource release notices | `resource-release-worker` | Always in production base                                       |
-| Optional account mail    | `mail-worker`             | Only when mail overlays are enabled                             |
-| Ingress                  | `caddy`                   | Stop during maintenance; not a DB writer                        |
-| Database                 | `postgres`                | Keep running for `pg_dump`                                      |
-| Scanner                  | `clamav`                  | Keep available; not an application writer                       |
-
-Production rendered config must not carry development source bind-mounts
-(`./apps/...`, `./packages/...`). CI must not publish non-loopback host ports.
-Static `docker compose config` with synthetic values confirms shape; it does not
-prove live readiness. Contract tests: `scripts/tests/compose-overlay-matrix.node-test.mjs`
-plus recovery/mail fixtures under `scripts/tests/*compose*`.
+See [ops/production-boundary.md#compose-overlay-matrix](ops/production-boundary.md#compose-overlay-matrix).
 
 ### Same-digest promotion across runtime origins
 
-OPS-05 / ARC10: one prebuilt `runtime` app image is promoted under different
-allowed HTTPS origins **without rebuild**. Build-stage `NEXT_PUBLIC_APP_URL`,
-`AUTH_SECRET` and `DATABASE_URL` in the Dockerfile are compile placeholders only;
-`@nexus/config` rejects those build-placeholder secrets if they reach a production
-process. Prefer canonical runtime `APP_URL`; Compose may still set the historical
-server name `NEXT_PUBLIC_APP_URL` (entrypoint keeps them aligned). Client bundles
-must not read `NEXT_PUBLIC_APP_URL` for links or CSRF. Caddy uses runtime
-`{$DOMAIN}`; production Compose templates
-`NEXT_PUBLIC_APP_URL=https://${DOMAIN}` while the disposable CI overlay uses
-`https://nexus-ci.test:8443` against `${NEXUS_CI_IMAGE}` (prebuilt).
-
-**Local contract (does not claim production PASS):**
-
-```bash
-node --test scripts/tests/production-entrypoint.node-test.mjs
-pnpm test:focus tests/config.test.ts tests/production-runtime-readiness.test.ts \
-  tests/production-tracing-bounds.test.ts tests/production-edge-security.test.ts
-```
-
-Full disposable image rehearse remains `scripts/check-production-startup.sh` on a
-GitHub-hosted runner with its existing guards (`NEXUS_CI_PREBUILT_IMAGE` when
-reusing one digest). That check is external to local development and is not
-asserted PASS here.
+See [ops/production-boundary.md#same-digest-promotion-across-runtime-origins](ops/production-boundary.md#same-digest-promotion-across-runtime-origins).
 
 ### Forward-only migration authoring
 
-Schema history is forward-only ([ARCHITECTURE](ARCHITECTURE.md)): new changes are
-new SQL migrations; rolling back an image does not roll back the database. Applied
-SQL files and `packages/db/migrations/meta/_journal.json` are not rewritten.
-
-**Current generator risk (OPS-06 / ARC14):** the journal contains migrations through
-the latest `0087_*` tag, while Drizzle meta snapshots still stop at `0000` /
-`0001`. Plain `pnpm db:generate` / `drizzle-kit generate` against that lag is
-unsafe in the main checkout and is refused by
-`packages/db/scripts/guard-db-generate.mjs`.
-
-**Supported authoring path (manual/custom + guards):**
-
-1. Work only in a disposable checkout or temporary branch. Do not run generate
-   against the live main working tree as a “fix”.
-2. Create an empty custom migration:
-   `NEXUS_ALLOW_DB_GENERATE=1 pnpm --filter @nexus/db generate:custom -- --name <descriptive_tag>`
-3. Hand-author only the expected forward-only delta in the new SQL file. Keep
-   retries/idempotency compatible with existing upgrade rehearsal.
-4. Update the release-upgrade contract target when the journal advances
-   (`packages/db/scripts/release-upgrade-contract.mjs` and
-   `scripts/tests/release-upgrade.node-test.mjs`).
-5. On hosted CI, run the existing disposable upgrade path
-   (`packages/db/scripts/check-release-upgrade.mjs`). Do not point tooling at a
-   working production database.
-
-Plain generate remains unsupported while snapshots lag. A disposable experiment
-requires the explicit double opt-in `NEXUS_ALLOW_UNSAFE_DB_GENERATE=1` and must
-never be used to “align” applied history by rewriting journal/SQL. Domain/data
-model context for schema work lives in [ARCHITECTURE](ARCHITECTURE.md) (handbook
-`08-DOMAIN…` was removed; do not revive that path).
+See [ops/production-boundary.md#forward-only-migration-authoring](ops/production-boundary.md#forward-only-migration-authoring).
 
 ### Recovering report inbox delivery
 
@@ -522,400 +296,59 @@ isolated restored backup before production apply.
 
 ## 6. Branch and release operations
 
-The maintained branch is `main`.
+Full: [ops/release.md](ops/release.md)
+(digests, **Release manifest and retention**, GHCR prep, integrity rollout,
+beta candidate evidence, acceptance evidence).
 
-A release is not accepted merely because code exists on `main`. Acceptance requires:
+The maintained branch is `main`. Acceptance needs exact-SHA checks, migration
+review, appropriate browser/runtime checks, backup/restore confidence for
+data-changing releases, and an explicit deployment decision.
 
-- exact-SHA checks executed successfully;
-- migration review;
-- browser/runtime checks appropriate to the change;
-- backup/restore confidence for data-changing releases;
-- explicit deployment decision.
-
-Current package version: `1.2.0-beta.3`. Confirm the candidate version in `package.json`; a version string alone does not demonstrate production acceptance.
+Current package version: `1.2.0-beta.3`. Confirm the candidate version in
+`package.json`; a version string alone does not demonstrate production acceptance.
 
 ### Base and infra image digests
 
-OPS-03 keeps Dockerfile/Compose on mutable tags (`node:26-alpine`,
-`postgres:18-alpine`, `caddy:2-alpine`, `clamav/clamav:1.5`) so Dependabot docker
-updates remain reviewable security PRs. The three Node stages
-(`development` / `build` / `runtime`) all follow that major-branch Node policy;
-the exact host/CI pin stays in `.nvmrc` / `.node-version`.
-
-PostgreSQL stays on major **18** with volume mount `/var/lib/postgresql`. An
-engine major upgrade is a separate operator procedure from application schema
-migrations.
-
-Release candidates record exact digests and platform in
-[`deploy/infra-image-pins.json`](../deploy/infra-image-pins.json). Resolve them
-when preparing a candidate (does not publish images or authorize production):
-
-```bash
-node scripts/resolve-infra-image-digests.mjs --platform linux/amd64
-# dry-run only:
-node scripts/resolve-infra-image-digests.mjs --dry-run
-```
-
-Updating digests is a reviewable file change. Unresolved pins are honest
-`status: "unresolved"` entries — do not invent production locks from tag strings
-alone. Mutable tags are never production deploy inputs; the approved digest from
-the release manifest is.
+See [ops/release.md#base-and-infra-image-digests](ops/release.md#base-and-infra-image-digests).
 
 ### Release manifest and retention
 
-OPS-08 extends core release evidence with a versioned `releaseManifest`
-(`scripts/release-evidence-lib.mjs`). Required fields include:
-
-- `appVersion`, exact repository SHA, lockfile hash, toolchain evaluation;
-- app image digest/platform (may stay `unresolved` until trusted GHCR publish);
-- selected infra image pins, PostgreSQL major 18, schema baseline/target, migration hashes;
-- redacted role/overlay inventory and links to CI / upgrade / restore evidence;
-- `productionAuthorized: false` and `openBetaLive: false` always from the builder.
-
-Missing or mismatched digest/SHA/schema, or an unknown `schemaVersion`, blocks
-technical acceptance. CI artifact retention remains **14 days** and is not the
-durable release archive. Durable release-bundle/image retention stays
-`owner_decision_required` until the owner approves duration and store (OPS-16).
-Do not place secrets or working backups in release assets.
+See [ops/release.md#release-manifest-and-retention](ops/release.md#release-manifest-and-retention).
+Retention contract uses `owner_decision_required` where human gates apply.
+CI artifact retention remains **14 days** unless an owner decision changes it.
 
 ### Trusted GHCR publish prep
 
-OPS-10 prepares a `ghcr-publish` job in `.github/workflows/ci.yml` that:
-
-- never runs on `pull_request`;
-- accepts only `push` or `workflow_dispatch` on `refs/heads/main` or a `refs/tags/v*` release ref;
-- requires `plan.outputs.full == true` and a successful summary for the exact SHA;
-- restores the already-built `production.tar` (`fail-on-cache-miss: true`) and
-  validates `org.opencontainers.image.revision` — no rebuild under the same identity;
-- elevates `packages: write` only on that job (workflow default stays `contents: read`).
-
-Actual push stays gated on repository variable `NEXUS_GHCR_PUBLISH_ENABLED=true`
-after OPS-11 visibility/access acceptance. Until then the job is skipped and no
-GHCR package is published. Mutable tags such as `:latest` are not production
-inputs; consumers use the recorded digest.
+See [ops/release.md#trusted-ghcr-publish-prep](ops/release.md#trusted-ghcr-publish-prep).
 
 ## Resource integrity rollout and seed recovery
 
-Before applying migration `0024_product_type_invariant`, inspect the type inventory
-on the target database and follow the backup/restore procedure above:
-
-```sql
-SELECT type, count(*) FROM products GROUP BY type ORDER BY type;
-```
-
-The migration normalizes only `tool` to `plugin`. Unknown values must be reviewed
-and explicitly corrected by an operator; the constraint intentionally blocks an
-unreviewed migration. Run `pnpm db:migrate` before the updated application.
-
-Development baseline commands (shared absolute local storage required):
-
-```bash
-docker compose -p nexus-local -f compose.yaml exec \
-  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
-docker compose -p nexus-local -f compose.yaml exec \
-  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed
-# Only after inspecting a reported legacy demo metadata mismatch:
-docker compose -p nexus-local -f compose.yaml exec \
-  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:repair
-# Optional cleanup for exact old Unsplash/DiceBear values written by the seed:
-docker compose -p nexus-local -f compose.yaml exec \
-  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:repair-media
-# Optional additive one-year history for local UI testing:
-docker compose -p nexus-local -f compose.yaml exec \
-  -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:historical
-```
-
-Every seed command fails before storage or database mutation when `NODE_ENV=production` or
-when the exact development-only acknowledgement is absent. Do not persist this acknowledgement
-in production configuration.
-
-The second normal run should report zero insertions and zero repairs. Changed
-passwords, roles, product descriptions and build moderation states stay intact.
-Build repair touches only known demo size/hash fields. Media repair clears only
-exact legacy demo CDN values; a custom avatar/banner/thumbnail/cover survives.
-A conflicting on-disk file is never overwritten; inspect it separately.
-Do not use these commands for production data provisioning.
-
-Run the fast regression group with `pnpm test:resource-integrity`. Against an
-isolated, migrated PostgreSQL development database, run
-`pnpm test:resource-integrity:integration` with its `DATABASE_URL`. The new database
-tests use temporary tables; the seed test copies checks/indexes, not foreign keys,
-and is not a substitute for the full `pnpm test:isolated` acceptance run.
-
-Finally verify both demo resource claim/download flows through the browser,
-compare response length/hash to disk, rerun seed, and confirm account edits remain.
-A 409 `BUILD_ARTIFACT_MISMATCH` means storage metadata disagrees with the build;
-inspect storage and the build record before retrying. Current acceptance gaps
-remain in [PROBLEMS.md](PROBLEMS.md).
-
-### Local archive integrity and immutable keys
-
-Local downloads hash the opened file before responding. Same-size corruption now
-returns the same private 409 `BUILD_ARTIFACT_MISMATCH` as a size mismatch, for both
-public and reviewer downloads. Hashing uses a 64 KiB buffer but adds a full disk
-read per download; include this cost in latency/load acceptance tests.
-
-Uploads atomically publish complete files and refuse an existing storage key.
-Do not retry with a reused key or edit published files in place. Publish a new
-build/key through the normal upload workflow. Filesystem administrators can still
-change an inode after verification; keep application storage private and treat
-manual file changes as maintenance requiring verification.
-
-A process crash may leave a UUID-suffixed `.tmp` file. Automatic cleanup covers
-handled failures, not process termination. Inspect orphan files before cleanup;
-never remove files belonging to an active upload. Filesystems must support hard
-links within the storage directory; unsupported publication fails without a
-partially published destination.
-
-Cancelled downloads propagate the request signal to storage. Preparation stops
-between disk reads; streams and abort listeners are released. A cancellation
-before response delivery maps to private 499 `DOWNLOAD_CANCELLED`, without a
-server-error log. The disconnected client may never receive this response.
-If cancellation races with an audit write, the started event can remain; it must
-not be interpreted as a completed download. Include a real network disconnect
-during hashing and during response streaming in deployment acceptance checks.
+See [ops/release.md#resource-integrity-rollout-and-seed-recovery](ops/release.md#resource-integrity-rollout-and-seed-recovery)
+and [Local archive integrity](ops/release.md#local-archive-integrity-and-immutable-keys).
 
 ## Production compilation in restricted build environments
 
-The default `pnpm build` uses Next.js Turbopack. Some sandbox environments deny
-its internal local port binding while processing CSS (`Operation not permitted`).
-When that environment limitation is confirmed, run `pnpm build:webpack` explicitly
-with the same production build environment variables. This selects Next.js's
-Webpack compiler and produces the configured standalone output. It does not start
-a web server or disable application configuration validation.
-
-There is no automatic fallback: a failed default build remains a failed gate.
-CI/release verification continues to execute the default build. Record which
-compiler was used; a successful Webpack build does not establish Turbopack parity,
-service connectivity or runtime/browser acceptance.
-
-Release evidence explicitly records its required gate names. The summary requires
-repository identity, evidence harness, database migrations, lint, typecheck, tests
-the default Next.js build and final repository stability exactly once each. Missing or duplicate gate records
-block release-candidate status even if every recorded command passed. Additional
-checks may extend the report; failed or incomplete checks still prevent success.
-Repository cleanliness must be explicitly confirmed as false for `dirty`.
-
-After the commands finish, release verification reads HEAD and working-tree status
-again. A changed commit, dirty final tree or failed Git read blocks the candidate;
-both initial and final identity are recorded without serializing changed paths.
-This detects final-state drift, not transient edits that were reverted during the
-run. Use an isolated checkout in CI and avoid editing it during verification.
-
-Local container readiness probes the mounted storage directory using the same
-hard-link publication primitive as local archive uploads. It verifies that a new
-published name is readable, replacement fails with EEXIST, and removing the
-staging name preserves the published bytes. Success includes
-`publication: "atomic-no-replace"`. Filesystems without hard-link support fail
-readiness instead of reporting that uploads are ready based on read/write alone.
-Each probe uses and removes only its own unique temporary directory. This does
-not prove scanner availability, crash durability or end-to-end HTTP uploads.
-
-Release verification bounds each external gate command to 30 minutes and identity
-lookups to 15 seconds. A gate timeout is recorded as failed with `timedOut`,
-`timeoutMs` and `ETIMEDOUT`; it cannot produce a release candidate. Verification
-continues to collect remaining gate results. The timeout forcibly terminates the
-direct child process; it is not a process-tree cleanup guarantee, so CI should
-retain its job-level timeout and isolated runner cleanup.
-
-Evidence JSON is serialized before writing, flushed to a private temporary file
-on the same filesystem, then published by rename. A serialization or pre-rename
-write failure preserves the previous report; normal failures clean only the
-current run's temporary directory. Readers see a complete old or new report.
-Always verify the report SHA and command exit status: a failed run can leave the
-older report in place. Abrupt termination may leave a temporary directory, and
-this does not guarantee directory-entry durability after power loss.
-
-The Verify CI job uploads only `artifacts/release-evidence.json` immediately after
-release verification, including failed verification runs. Artifact names include
-the workflow SHA and attempt; retention is 14 days. If verification ran but no
-report exists, upload fails explicitly. Earlier setup failures that skip
-verification do not attempt an upload. Runner termination or job cancellation can
-still prevent artifact preservation; a downloadable report does not imply passed
-gates. Check its repository SHA and summary before using it as release evidence.
-
-The production proxy rejects declared Content-Length above 65 MiB before
-upstream handling, including routes that never read request bodies. The existing
-request_body limit remains in place for streaming/chunked reads. Production smoke
-reports safe phase names and line numbers on failure without shell xtrace or
-command text; all browser rehearsals share this production prerequisite.
-
+See [ops/release.md#production-compilation-in-restricted-build-environments](ops/release.md#production-compilation-in-restricted-build-environments).
 
 ## Existing-installation release and recovery
 
-This runbook prepares an operator-reviewed Docker deployment. It does not deploy
-production, select a target host, or authorize deletion/restoration of its data.
-Use the existing production Compose project name and its protected environment
-file throughout. Changing the project name during a normal update creates different
-volumes and can make an intact installation appear empty.
+See [ops/release.md#existing-installation-release-and-recovery](ops/release.md#existing-installation-release-and-recovery).
 
 ### Open free beta candidate evidence
 
-ROADMAP 20 prepares a **checkable** free open-beta candidate. It does not open
-beta, authorize production deployment, or activate paid marketplace/DRM.
-
-1. Select one exact `main` SHA and wait for `full_acceptance` CI to succeed
-   (backup-restore and release-upgrade artifacts are published only when
-   `plan.outputs.full=true`; retention is 14 days).
-2. On a clean checkout of that SHA run `pnpm beta:fetch` (or
-   `pnpm beta:fetch <sha>`). A 7–64 character hexadecimal prefix must resolve
-   to one local commit; missing or ambiguous commits are refused before contacting
-   GitHub. The resolved full SHA is used to find the CI run. It uses `gh` to download retained
-   `ci-evidence-<sha>`, `release-upgrade-<sha>-<attempt>`, and
-   `backup-restore-<sha>-<attempt>` into local `artifacts/ci-evidence.json`,
-   `artifacts/release-upgrade.json`, and `artifacts/backup-restore-evidence.json`.
-   The fetch never invents PASS JSON; missing/expired artifacts fail honestly.
-3. Run `pnpm beta:candidate`. ROADMAP 19 backup-restore evidence must report
-   `status: "PASS"`, matching SHA, and every disposable-rehearsal flag true
-   (`sourceDestroyedBeforeRestore`, checksum/row/schema/ledger/upload restores,
-   `cleanupComplete`). Incomplete flags block the candidate—they do not pass.
-
-The report writes `artifacts/beta-candidate-evidence.json`. Interpret it as:
-
-| Field                                    | Meaning                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `checkableCandidate: true`               | Required technical proofs for that SHA passed; only owner deploy authorization remains                                                                                                                                                                                                                                                                                                                      |
-| `status: awaiting_owner_deploy_decision` | Same as checkable; still not live and not authorized                                                                                                                                                                                                                                                                                                                                                        |
-| `openBetaLive` / `productionAuthorized`  | Always `false` in this harness                                                                                                                                                                                                                                                                                                                                                                              |
-| `technicalBlockers`                      | Named gaps (often missing backup-restore CI evidence for ROADMAP 19)                                                                                                                                                                                                                                                                                                                                        |
-| `residuals`                              | Optional proofs only: `legal_surfaces` passes from in-repo Terms/Privacy/Community rules (counsel review stays human); `observability` clears only when `artifacts/observability-readiness-evidence.json` validates via `pnpm observability:verify` after `NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready`; `web_push` still needs both soak + live provider JSON (presence alone never clears) |
-
-`ci-evidence.json` from the CI summary job now includes `requiredJobs` and
-`jobResults` so browser/mail/runtime categories can be checked per job.
-
-Legal product surfaces: `pnpm legal:check` (Terms `/terms`, Privacy `/privacy`,
-Community rules `/community-rules`, footer links, RU/EN substance). This is not
-counsel approval.
-
-Operator observability readiness (alert thresholds + in-repo probes/runbooks):
-
-Configure queue alert thresholds before `observability:ready` (values must be positive
-numbers; `.env` is read for missing keys only):
-
-| Env key                                   | Role                                |
-| ----------------------------------------- | ----------------------------------- |
-| `WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT`    | Pending jobs as % of queue capacity |
-| `WEB_PUSH_QUEUE_ALERT_DUE_JOBS`           | Due (ready) job count               |
-| `WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS` | Oldest pending job age              |
-
-```bash
-NEXUS_OBSERVABILITY_READY_ACK=YES pnpm observability:ready
-pnpm observability:verify
-```
-
-`observability:ready` and `observability:verify` prove in-repo probe scripts, threshold
-env keys, and OPERATIONS runbook needles—including delivery-failure alert names such as
-`publication_delivery_failed` and `build_incident_delivery_failed`. They do **not** prove
-production host alert routing to humans or any third-party monitoring vendor contract.
-**Operator readiness ≠ live routing proof (F03 / OPS-14):** validated
-`artifacts/observability-readiness-evidence.json` never closes the operational gate; only
-owner-filled `observability_live_drill` evidence with real owner/channel/thresholds and
-`signalAt → alertAt → humanReceivedAt → recoveryAt` timestamps on the target environment
-does. Validate with
-[`validateObservabilityLiveDrillEvidence`](../scripts/observability-evidence-lib.mjs) /
-`pnpm observability:live-drill:verify` (or
-`node scripts/check-observability-live-drill-evidence.mjs`); fixture shape in
-[`scripts/fixtures/observability-live-drill-accept.json`](../scripts/fixtures/observability-live-drill-accept.json).
-Mis-submitting readiness JSON to the live-drill validator is rejected.
-The validator allows up to five minutes of clock skew for `recoveryAt`; it rejects a
-later future timestamp and does not impose an expiration on older evidence.
-
-Offline queue-probe drill (disposable fixture; exit code 2 means alert, same pattern as
-[`scripts/tests/web-push-worker-queue.node-test.mjs`](../scripts/tests/web-push-worker-queue.node-test.mjs)):
-
-```bash
-DRILL_DIR="$(mktemp -d)"
-trap 'rm -rf "$DRILL_DIR"' EXIT
-HEALTH_FILE="$DRILL_DIR/web-push-health.json"
-DRILL_NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-cat >"$HEALTH_FILE" <<EOF
-{"status":"ready","configured":true,"pid":1,"batch":8,"heartbeatAt":"${DRILL_NOW}","staleAfterMs":60000,"progressAt":"${DRILL_NOW}","progressStaleAfterMs":180000,"queuePending":0,"queueDue":0,"queueLeased":0,"queueCapacity":10000,"queueOldestAgeSeconds":0,"reportPending":0,"reportFailed":0,"reportOldestAgeSeconds":0,"supportPending":0,"supportFailed":0,"supportOldestAgeSeconds":0,"verificationPending":0,"verificationFailed":0,"verificationOldestAgeSeconds":0,"discussionPending":0,"discussionFailed":0,"discussionOldestAgeSeconds":0,"publicationPending":1,"publicationFailed":1,"publicationOldestAgeSeconds":0,"buildIncidentPending":0,"buildIncidentFailed":0,"buildIncidentOldestAgeSeconds":0,"admissionPending":0,"admissionFailed":0,"admissionOldestAgeSeconds":0,"queueAlert":"alert","queueAlertReasons":["publication_delivery_failed"],"queueAlertThresholds":{"pendingPercent":80,"dueJobs":100,"oldestAgeSeconds":900}}
-EOF
-NEXUS_WEB_PUSH_HEALTH_FILE="$HEALTH_FILE" node scripts/check-web-push-worker-queue.mjs
-echo "expect exit code 2 (alert); got $?"
-```
-
-Optional Web Push residual (both artifacts required; never invent PASS). Soak uses
-a fixture sender against a migrated database. Local Compose does **not** publish
-Postgres to the host, so prefer the compose-network soak entrypoint (stops
-`push-worker` for the run so it cannot race the soak dispatcher):
-
-```bash
-# Dev VAPID into the protected env file only (never commit private keys):
-node scripts/generate-web-push-vapid.mjs 'mailto:push-dev@example.invalid'
-
-# Soak via Compose network → artifacts/web-push-soak-evidence.json
-NEXUS_WEB_PUSH_SOAK_ACK=YES NEXUS_WEB_PUSH_SOAK_DURATION_MS=60000 pnpm push:soak:compose
-# equivalent host-only path when DATABASE_URL already reaches a migrated DB:
-# NEXUS_WEB_PUSH_SOAK_ACK=YES NEXUS_WEB_PUSH_SOAK_DURATION_MS=60000 pnpm push:soak && pnpm push:soak:verify
-
-# Provider probe needs a real browser Push subscription (HTTPS FCM/Mozilla/… endpoint).
-# Enable Web Push while signed in on the local app, then copy endpoint/p256dh/auth
-# from that session — do not invent endpoints. Automation browsers without
-# Notification/PushManager permission cannot clear this half of the residual.
-NEXUS_WEB_PUSH_PROVIDER_PROBE_ACK=YES \
-  NEXUS_WEB_PUSH_PROBE_ENDPOINT='https://…' \
-  NEXUS_WEB_PUSH_PROBE_P256DH='…' \
-  NEXUS_WEB_PUSH_PROBE_AUTH='…' \
-  pnpm push:provider:probe
-pnpm push:provider:verify
-```
+See [ops/release.md#open-free-beta-candidate-evidence](ops/release.md#open-free-beta-candidate-evidence).
+Use `pnpm observability:live-drill:verify` (or
+`node scripts/check-observability-live-drill-evidence.mjs`) — validators do
+**not** close F03 without a live drill. Mentions
+`publication_delivery_failed` and `build_incident_delivery_failed` as probe
+reasons only.
 
 ### Acceptance evidence
 
-Select one exact `main` commit and wait for **CI**, **Resource browser**,
-**Account browser**, and **Directory browser** to succeed on that commit.
-Keep these CI artifacts outside the runner before their 14-day retention expires:
-
-| Evidence                                | What it proves                                                                                                                                                         |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build                                                                                          |
-| `release-upgrade-<sha>-<attempt>`       | Drizzle upgrade from the configured baseline to the current migration target; failed DDL and ledger rollback; retry, idempotency and preservation checks               |
-| `backup-restore-<sha>-<attempt>`        | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
-
-**F04 / OPS-13 production recovery acceptance (not CI disposable rehearsal):** retained
-`backup-restore-<sha>` JSON with `status: "PASS"` proves ROADMAP 19 synthetic restore on a
-GitHub-hosted disposable runner only. It is **not** operational backup/recovery acceptance.
-Owner acceptance uses `production_recovery_acceptance` evidence
-([`production-recovery-acceptance-evidence.mjs`](../scripts/production-recovery-acceptance-evidence.mjs))
-with agreed RPO/RTO (minutes), retention + verified off-host location, restore access/break-glass,
-and measured restore timestamps/data loss checked against those targets. Validate with
-`pnpm recovery:acceptance:verify` (or
-`node scripts/check-production-recovery-acceptance-evidence.mjs`). The validator allows up to
-five minutes of clock skew for `completedAt`; it rejects a later future timestamp and does not
-impose an expiration on older evidence. Checklist before recording acceptance:
-
-1. Owner documents RPO/RTO, retention, off-host independence from the primary host, and who may restore.
-2. Confirm fresh backup copies exist off-host; do not store dump secrets in GitHub artifacts.
-3. On a separately authorized protected copy (not production volumes), measure restore duration and data loss vs targets.
-4. Write `artifacts/production-recovery-acceptance-evidence.json` with `verdict.passed: true` only after the drill.
-5. Keep [`check-backup-restore.mjs`](../scripts/check-backup-restore.mjs) on disposable hosted runners only; do not retarget it at live volumes.
-
-Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
-to be true in the upgrade and restore reports. A downloaded report alone is not
-success. These reports extend the core release evidence; they are separate required
-workflow steps, not additional gates silently inferred by the core JSON summary.
-
-Upgrade evidence is versioned (`schemaVersion: 1` on newly written artifacts). The
-strict validator in [`release-upgrade-contract.mjs`](../packages/db/scripts/release-upgrade-contract.mjs)
-rejects missing/mismatched SHA, wrong `baseline`/`target`, incomplete `phase`
-(must be `complete`), and missing/false/wrong-type required boolean flags.
-Retained full-format CI artifacts that omit `schemaVersion` remain accepted when
-identity, phase, baseline/target and flags are otherwise complete; status-only
-`PASS` JSON is not enough. Technical upgrade PASS never sets
-`productionAuthorized` — deploy authorization stays a separate owner decision.
-Beta-candidate evaluation uses the same upgrade validator.
-
-The upgrade fixture pins its baseline and latest target in that contract and fails when another migration
-is added without updating it. It verifies the Support tables, Web Push subscriptions, durable outbox
-tables/indexes, queue-gate seed, legacy-row preservation, rollback/retry and
-idempotent rerun. Review and extend it with the next release's old-schema fixtures
-and data-changing effects. Its injected failure is synthetic and is appended to
-migration 0027 after that migration's real SQL, within Drizzle's transaction.
-It proves database rollback/retry,
-not recovery from host failure or compatibility of an older application image.
-Backup acceptance uses synthetic data and the production PostgreSQL/storage
-topology; rehearse separately against a protected copy of the target dataset.
+See [ops/release.md#acceptance-evidence](ops/release.md#acceptance-evidence).
+Use `pnpm recovery:acceptance:verify` (or
+`node scripts/check-production-recovery-acceptance-evidence.mjs`) — CI restore
+PASS is not F04.
 
 ### Worker liveness vs progress
 

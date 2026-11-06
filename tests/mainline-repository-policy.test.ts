@@ -83,7 +83,10 @@ describe("mainline repository policy", () => {
       "README.md",
       "backup-recovery.md",
       "inbox-recovery.md",
+      "production-boundary.md",
+      "release.md",
       "resource-safety.md",
+      "verification.md",
       "workers.md",
     ]);
 

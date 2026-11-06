@@ -50,4 +50,4 @@
 
 ## Порядок переработки (волны)
 
-Волны на `cursor/docs-rewrite-foundation-c97a` / PR #820: **D0–D2** done · **D1** done · **D3** subject contracts reshaped · **D4** карта `docs/ops/` (path `OPERATIONS.md` pinned). Далее: вынос модулей ops с stub-якорями → D5 решения/планы → D6 приёмка. Не смешивать tip-honesty PR с волнами документации.
+Волны на PR #820: **D0–D5** landed · **D4** ops modules extracted (`verification`, `production-boundary`, `inbox-recovery`, `backup-recovery`, `resource-safety`, `release`, `workers`; §1 DEV startup still inline). Path `docs/OPERATIONS.md` pinned for consumers. Остаётся: optional DEV-startup extract + D6 acceptance after merge. Не смешивать tip-honesty PR с волнами docs.
