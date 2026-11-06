@@ -27,6 +27,7 @@ const capabilities = {
   canAsk: false,
   canAnswer: false,
   canResolve: false,
+  canModerate: false,
   askReason: "resource_unavailable" as const,
 };
 

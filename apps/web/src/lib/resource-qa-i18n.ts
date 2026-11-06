@@ -30,6 +30,14 @@ const copy = {
     unfollowConfirm:
       "You stop receiving updates for this question thread. You can follow it again later. This is not a release watch.",
     followingHelp: "Get updates for this question only. This is not a new-release watch.",
+    removeThread: "Remove question",
+    removeThreadConfirmTitle: "Remove this question?",
+    removeThreadConfirm:
+      "The question leaves the public list. Followers are notified. This does not delete private support cases or reviews.",
+    removeAnswer: "Remove answer",
+    removeAnswerConfirmTitle: "Remove this answer?",
+    removeAnswerConfirm:
+      "The answer leaves the public thread. If it was the useful answer, the question returns to open.",
     publicRead: "Questions stay public. Sign in only to ask or follow a thread.",
     signIn: "Sign in to ask a question",
     accessRequired: "Add this resource to your library before asking.",
@@ -88,6 +96,14 @@ const copy = {
     unfollowConfirm:
       "Уведомления по этой ветке вопроса прекратятся. Позже можно снова включить слежение. Это не подписка на релизы.",
     followingHelp: "Уведомления только по этому вопросу. Это не слежение за новыми релизами.",
+    removeThread: "Удалить вопрос",
+    removeThreadConfirmTitle: "Удалить этот вопрос?",
+    removeThreadConfirm:
+      "Вопрос исчезнет из публичного списка. Подписчики получат уведомление. Приватные обращения в поддержку и отзывы не затрагиваются.",
+    removeAnswer: "Удалить ответ",
+    removeAnswerConfirmTitle: "Удалить этот ответ?",
+    removeAnswerConfirm:
+      "Ответ исчезнет из публичной ветки. Если он был отмечен полезным, вопрос снова станет открытым.",
     publicRead: "Вопросы остаются публичными. Вход нужен, чтобы спросить или следить за веткой.",
     signIn: "Войдите, чтобы задать вопрос",
     accessRequired: "Сначала добавьте ресурс в библиотеку.",

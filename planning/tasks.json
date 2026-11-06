@@ -2594,7 +2594,7 @@
       "queue_state": "specified",
       "priority": "P2",
       "source_ids": ["INT16"],
-      "current": "Publication readiness summary allows FOR SHARE; published build + clean scan identity required for public issue.",
+      "current": "Public Q&A with thread follow, transactional fanout notices, and manager/staff removal on tip. Live DB upgrade for 0089 still an operational remainder.",
       "goal": "Принять target/lifecycle/moderation контракт resource question/thread с необязательным build context, ответом автора и отдельным thread-follow. Затем реализовать без смешивания с rating и private support.",
       "scope_files": [
         "apps/web/src/app/market/[slug]/page.tsx",
@@ -2656,7 +2656,7 @@
         }
       ],
       "execution_updated_on": "2026-11-05",
-      "execution_notes": "Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Focused 19 PASS. Gaps: follow fanout, abuse/staff removal; migration not applied live."
+      "execution_notes": "Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Ask auto-follows asker; transactional content notices for ask/answer/resolve/remove; staff/publisher remove thread+answer routes/UI. Focused QA suites PASS. Migration still not applied live."
     },
     {
       "id": "FLOW-13",

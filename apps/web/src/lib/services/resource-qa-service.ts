@@ -3,6 +3,8 @@ import type {
   ResourceQaAnswerCommand,
   ResourceQaAskCommand,
   ResourceQaFollowCommand,
+  ResourceQaRemoveAnswerCommand,
+  ResourceQaRemoveThreadCommand,
   ResourceQaResolveCommand,
   User,
 } from "@nexus/domain";
@@ -43,6 +45,34 @@ export const resourceQaService = {
       actorId: actor.id,
       productId,
       threadId,
+      auditId: generateId("aud"),
+      command,
+    }),
+  removeThread: (
+    actor: User,
+    productId: string,
+    threadId: string,
+    command: ResourceQaRemoveThreadCommand,
+  ) =>
+    resourceQaRepository.removeThread({
+      actorId: actor.id,
+      productId,
+      threadId,
+      auditId: generateId("aud"),
+      command,
+    }),
+  removeAnswer: (
+    actor: User,
+    productId: string,
+    threadId: string,
+    answerId: string,
+    command: ResourceQaRemoveAnswerCommand,
+  ) =>
+    resourceQaRepository.removeAnswer({
+      actorId: actor.id,
+      productId,
+      threadId,
+      answerId,
       auditId: generateId("aud"),
       command,
     }),

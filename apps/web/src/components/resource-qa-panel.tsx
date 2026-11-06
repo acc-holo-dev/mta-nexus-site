@@ -89,6 +89,7 @@ export function ResourceQaPanel({
   const canAsk = Boolean(capabilities?.canAsk);
   const canAnswer = Boolean(capabilities?.canAnswer || canManage);
   const canResolve = Boolean(capabilities?.canResolve || canManage);
+  const canModerate = Boolean(capabilities?.canModerate || canManage);
 
   async function loadPage() {
     setLoadingPage(true);
@@ -326,6 +327,66 @@ export function ResourceQaPanel({
     if (ok) await loadThread(detail.thread.id);
   }
 
+  async function onRemoveThread() {
+    if (!detail) return;
+    if (
+      !(await confirmAction({
+        title: copy.removeThreadConfirmTitle,
+        object: detail.thread.body,
+        consequences: copy.removeThreadConfirm,
+        confirmLabel: copy.removeThread,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    const ok = await mutate(
+      `${base}/${encodeURIComponent(detail.thread.id)}/remove`,
+      { action: "remove", expectedRevision: detail.thread.revision },
+      (payload) =>
+        Boolean(
+          payload &&
+            typeof payload === "object" &&
+            (payload as { success?: boolean; status?: string }).success &&
+            (payload as { status?: string }).status === "removed",
+        ),
+    );
+    if (!ok) return;
+    setSelectedId(null);
+    setDetail(null);
+    setPendingThreadId(null);
+    await loadPage();
+  }
+
+  async function onRemoveAnswer(answerId: string, answerBody: string) {
+    if (!detail) return;
+    if (
+      !(await confirmAction({
+        title: copy.removeAnswerConfirmTitle,
+        object: answerBody,
+        consequences: copy.removeAnswerConfirm,
+        confirmLabel: copy.removeAnswer,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    const ok = await mutate(
+      `${base}/${encodeURIComponent(detail.thread.id)}/answers/${encodeURIComponent(answerId)}/remove`,
+      { action: "remove", expectedRevision: detail.thread.revision },
+      (payload) =>
+        Boolean(
+          payload &&
+            typeof payload === "object" &&
+            (payload as { success?: boolean; answerId?: string }).success &&
+            (payload as { answerId?: string }).answerId === answerId,
+        ),
+    );
+    if (ok) await loadThread(detail.thread.id);
+  }
+
   function retryRead() {
     if (pendingThreadId) {
       void loadThread(pendingThreadId);
@@ -396,16 +457,30 @@ export function ResourceQaPanel({
 
           {authenticated ? (
             <div className="space-y-1">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="min-h-11"
-                disabled={busy}
-                onClick={() => void onFollow(!detail.thread.following)}
-              >
-                {detail.thread.following ? copy.unfollow : copy.follow}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="min-h-11"
+                  disabled={busy}
+                  onClick={() => void onFollow(!detail.thread.following)}
+                >
+                  {detail.thread.following ? copy.unfollow : copy.follow}
+                </Button>
+                {canModerate ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="min-h-11"
+                    disabled={busy}
+                    onClick={() => void onRemoveThread()}
+                  >
+                    {copy.removeThread}
+                  </Button>
+                ) : null}
+              </div>
               <p className="text-[11px] text-faint">{copy.followingHelp}</p>
             </div>
           ) : null}
@@ -439,6 +514,16 @@ export function ResourceQaPanel({
                         onClick={() => void onResolve(item.id)}
                       >
                         {copy.resolve}
+                      </button>
+                    ) : null}
+                    {canModerate ? (
+                      <button
+                        type="button"
+                        className={textActionClass}
+                        disabled={busy}
+                        onClick={() => void onRemoveAnswer(item.id, item.body)}
+                      >
+                        {copy.removeAnswer}
                       </button>
                     ) : null}
                   </div>
