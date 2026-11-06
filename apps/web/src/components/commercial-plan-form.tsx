@@ -262,7 +262,13 @@ export function CommercialPlanForm({
     return (
       <section className="nexus-panel p-5">
         <p role="note">{copy.editNote}</p>
-        {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+        {error ? (
+          <ErrorState
+            id="commercial-plan-form-error-unavailable"
+            title={error}
+            description={copy.formErrorHint}
+          />
+        ) : null}
       </section>
     );
   return (
