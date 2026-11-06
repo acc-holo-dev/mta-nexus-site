@@ -73,6 +73,7 @@ export default async function OrganizationsPage({
       </search>
       {!result ? (
         <ErrorState
+          id="workspace-organizations-unavailable"
           title={copy.unavailable}
           action={
             <Link href={href(filters.page)} className={navLinkClass}>
