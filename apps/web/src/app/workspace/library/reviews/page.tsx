@@ -58,6 +58,7 @@ export default async function Page({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-library-reviews-unavailable"
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
           action={
