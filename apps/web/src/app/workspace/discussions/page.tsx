@@ -116,6 +116,7 @@ export default async function OwnDiscussionsPage({
       </a>
       {error ? (
         <ErrorState
+          id="workspace-discussions-unavailable"
           title={error}
           action={
             <a href={latest} className={linkClass}>
