@@ -48,7 +48,7 @@ export function createSupportWorkspaceQueryWebPushMock() {
   return { enqueueWebPushWithRecoveryWithin: supportWorkspaceQueryState.push };
 }
 
-export function resetSupportWorkspaceQueryState() {
+function resetSupportWorkspaceQueryState() {
   supportWorkspaceQueryState.queries = [];
   supportWorkspaceQueryState.rows = [];
   supportWorkspaceQueryState.config = null;
