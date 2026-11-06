@@ -284,7 +284,13 @@ export function ResourceVariantsForm({
     return (
       <section className="space-y-6">
         {busy && <p role="status">{copy.working}</p>}
-        {error && <ErrorState title={error} description={copy.actionFailedDescription} />}
+        {error && (
+          <ErrorState
+            id="resource-variants-form-unavailable"
+            title={error}
+            description={copy.actionFailedDescription}
+          />
+        )}
         {(needsCheck || saved) && !foreignActor && (
           <Button type="button" variant="outline" disabled={busy} onClick={() => void checkSaved()}>
             {copy.variantsCheck}
