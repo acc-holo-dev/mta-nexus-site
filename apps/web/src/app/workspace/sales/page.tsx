@@ -56,6 +56,7 @@ export default async function SalesHistoryPage({
       <div className={pageShellClass}>
         <HistoryShell copy={copy} area="sales">
           <ErrorState
+            id="workspace-sales-unavailable"
             title={copy.salesLoadUnavailable}
             description={copy.salesLoadUnavailableHint}
             action={
