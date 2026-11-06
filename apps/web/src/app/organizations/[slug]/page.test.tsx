@@ -1,5 +1,9 @@
 vi.mock("../../../components/follow-button", () => ({
-  FollowButton: () => <button type="button">Follow</button>,
+  FollowButton: (props: { initial?: unknown }) => (
+    <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
+      Follow
+    </button>
+  ),
 }));
 
 import type { ReactNode } from "react";
@@ -14,6 +18,9 @@ const state = vi.hoisted(() => ({
   slug: "team",
   products: vi.fn(),
   content: vi.fn(),
+  session: vi.fn(async (): Promise<{ id: string; role: string } | null> => null),
+  followStates: vi.fn(async (): Promise<string[]> => []),
+  muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
 vi.mock("@nexus/db", () => ({
   organizationRepository: {
@@ -30,10 +37,22 @@ vi.mock("@nexus/db", () => ({
   },
   productRepository: { pagePublishedFreeByOrganization: state.products },
   contentRepository: { pagePublishedEditorialByOrganization: state.content },
+  followWorkspaceRepository: {
+    states: state.followStates,
+    muteState: state.muteState,
+  },
 }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+  getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
+}));
 vi.mock("../../../lib/services/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
+}));
+vi.mock("../../../lib/services/auth-service", () => ({
+  authService: {
+    getSession: () => state.session(),
+  },
 }));
 vi.mock("../../../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
@@ -86,6 +105,12 @@ beforeEach(() => {
   state.slug = "team";
   state.products.mockReset();
   state.content.mockReset();
+  state.session.mockReset();
+  state.followStates.mockReset();
+  state.muteState.mockReset();
+  state.session.mockResolvedValue(null);
+  state.followStates.mockResolvedValue([]);
+  state.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
   state.products.mockResolvedValue({
     products: [{ id: "release", title: "Later release" }],
     total: 120,
@@ -98,6 +123,31 @@ beforeEach(() => {
     page: 3,
     totalPages: 12,
   });
+});
+
+it("SSR-hydrates guest organization follow controls without querying mute state", async () => {
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(state.followStates).not.toHaveBeenCalled();
+  expect(state.muteState).not.toHaveBeenCalled();
+  expect(html).toContain(
+    'data-follow-initial="{&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;muted&quot;:false,&quot;mutedUntil&quot;:null}"',
+  );
+});
+
+it("SSR-hydrates authenticated organization follow and mute", async () => {
+  state.session.mockResolvedValue({ id: "viewer", role: "user" });
+  state.followStates.mockResolvedValue(["org"]);
+  state.muteState.mockResolvedValue({
+    muted: true,
+    mutedUntil: "2026-12-01T00:00:00.000Z",
+  });
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(state.followStates).toHaveBeenCalledWith("viewer", "organization", ["org"]);
+  expect(state.muteState).toHaveBeenCalledWith("viewer", "organization", "org");
+  expect(html).toContain("&quot;authenticated&quot;:true");
+  expect(html).toContain("&quot;following&quot;:true");
+  expect(html).toContain("&quot;muted&quot;:true");
+  expect(html).toContain("2026-12-01T00:00:00.000Z");
 });
 it.each(["en", "ru"] as const)("renders a paginated portfolio and total in %s", async (locale) => {
   state.locale = locale;

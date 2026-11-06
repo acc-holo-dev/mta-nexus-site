@@ -24,6 +24,7 @@
 - Community discussion honesty: author removal notices → `/workspace/discussions/:commentId`; staff comment report targets expose `moderationHref` → `/admin/community/:contentId/discussion/:commentId`.
 - Article discussion follow/mute: public article SSR hydrates content follow + mute into ContentFollowControls (same honesty as discovery/product Save).
 - Verification requester resolution (non-server) → `/workspace/verification/:requestId` (history list remains unsafe-id fallback); server resolve stays on the managed server.
+- Public entity follow/mute: server / user / developer / organization profiles SSR-hydrate FollowButton initial (same honesty as discovery/product Save).
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.

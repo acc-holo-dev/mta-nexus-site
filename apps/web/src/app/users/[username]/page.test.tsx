@@ -1,5 +1,9 @@
 vi.mock("../../../components/follow-button", () => ({
-  FollowButton: () => <button type="button">Follow</button>,
+  FollowButton: (props: { initial?: unknown }) => (
+    <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
+      Follow
+    </button>
+  ),
 }));
 vi.mock("../../../components/object-report-form", () => ({
   ObjectReportForm: () => null,
@@ -16,6 +20,14 @@ const state = vi.hoisted(() => ({
   products: vi.fn(),
   servers: vi.fn(),
   directory: vi.fn(),
+  session: vi.fn(
+    async (): Promise<{ id: string; role: string } | null> => ({
+      id: "viewer",
+      role: "user",
+    }),
+  ),
+  followStates: vi.fn(async (): Promise<string[]> => []),
+  muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
 vi.mock("@nexus/db", () => ({
   userRepository: {
@@ -32,6 +44,10 @@ vi.mock("@nexus/db", () => ({
   },
   productRepository: { pagePublishedFreeByAuthor: state.products },
   serverRepository: { pageActivePublicByOwner: state.servers },
+  followWorkspaceRepository: {
+    states: state.followStates,
+    muteState: state.muteState,
+  },
 }));
 vi.mock("../../../lib/i18n-server", () => ({
   getRequestLocale: async () => state.locale,
@@ -87,7 +103,7 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("../../../lib/services/auth-service", () => ({
   authService: {
-    getSession: async () => ({ id: "user", role: "user" }),
+    getSession: () => state.session(),
   },
 }));
 
@@ -107,6 +123,12 @@ beforeEach(() => {
   state.products.mockReset();
   state.servers.mockReset();
   state.directory.mockReset();
+  state.session.mockReset();
+  state.followStates.mockReset();
+  state.muteState.mockReset();
+  state.session.mockResolvedValue({ id: "viewer", role: "user" });
+  state.followStates.mockResolvedValue([]);
+  state.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
   state.products.mockResolvedValue({
     products: [{ id: "resource", slug: "second-page-resource", title: "Second-page resource" }],
     total: 49,
@@ -115,6 +137,31 @@ beforeEach(() => {
     totalPages: 3,
   });
   state.servers.mockResolvedValue({ servers: [], total: 0, page: 1, pageSize: 12, totalPages: 1 });
+});
+
+it("SSR-hydrates guest follow controls without querying mute state", async () => {
+  state.session.mockResolvedValue(null);
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(state.followStates).not.toHaveBeenCalled();
+  expect(state.muteState).not.toHaveBeenCalled();
+  expect(html).toContain(
+    'data-follow-initial="{&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;muted&quot;:false,&quot;mutedUntil&quot;:null}"',
+  );
+});
+
+it("SSR-hydrates authenticated user follow and mute", async () => {
+  state.followStates.mockResolvedValue(["user"]);
+  state.muteState.mockResolvedValue({
+    muted: true,
+    mutedUntil: "2026-12-01T00:00:00.000Z",
+  });
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(state.followStates).toHaveBeenCalledWith("viewer", "user", ["user"]);
+  expect(state.muteState).toHaveBeenCalledWith("viewer", "user", "user");
+  expect(html).toContain("&quot;authenticated&quot;:true");
+  expect(html).toContain("&quot;following&quot;:true");
+  expect(html).toContain("&quot;muted&quot;:true");
+  expect(html).toContain("2026-12-01T00:00:00.000Z");
 });
 
 it.each(["en", "ru"] as const)(
@@ -238,6 +285,7 @@ it("hides the direct activity link while keeping public resources available", as
   expect(renderToStaticMarkup(await Page(input()))).toContain('href="/users/member/activity"');
 });
 it("renders owner guest preview without follow chrome while keeping resources and attribution path", async () => {
+  state.session.mockResolvedValue({ id: "user", role: "user" });
   const html = renderToStaticMarkup(
     await Page({
       params: Promise.resolve({ username: "member" }),

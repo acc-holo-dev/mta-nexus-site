@@ -1,4 +1,4 @@
-import { productRepository } from "@nexus/db";
+import { followWorkspaceRepository, productRepository } from "@nexus/db";
 import { Avatar, EmptyState, ErrorState, StatCard } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -9,8 +9,9 @@ import { DeveloperExperience } from "../../../components/developer-experience";
 import { FollowButton } from "../../../components/follow-button";
 import { ProductCard } from "../../../components/product-card";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { trustCopy } from "../../../lib/public-user-trust-copy";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
@@ -64,11 +65,13 @@ export default async function DeveloperProfilePage({
   const query = await searchParams;
   const requestedPage = parseProfilePage(query?.page);
   const profilePath = `/developers/${encodeURIComponent(user.username)}`;
+  const sessionToken = (await getRequestCookieStore()).get("nexus_session")?.value;
   let loadError = false;
   const loaded = await Promise.all([
     productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24),
     verificationWorkspaceService.publicProfile(user.id).catch(() => null),
     profilePrivacyService.visibility(user.id),
+    authService.getSession(sessionToken).catch(() => null),
   ]).catch(() => {
     loadError = true;
     return null;
@@ -89,7 +92,22 @@ export default async function DeveloperProfilePage({
     );
   }
 
-  const [result, professional, visibility] = loaded;
+  const [result, professional, visibility, actor] = loaded;
+  const [savedFollowIds, userMute] = await Promise.all([
+    actor
+      ? followWorkspaceRepository.states(actor.id, "user", [user.id]).catch(() => null)
+      : Promise.resolve([] as string[]),
+    actor
+      ? followWorkspaceRepository.muteState(actor.id, "user", user.id).catch(() => null)
+      : Promise.resolve(null),
+  ]);
+  const followInitial = buildFollowInitialState({
+    actor,
+    targetId: user.id,
+    followedIds: savedFollowIds,
+    mute: userMute,
+    self: actor?.id === user.id,
+  });
   const authorProducts = result.products;
   const attributions = await productService
     .getPublicAttributions(authorProducts)
@@ -119,7 +137,12 @@ export default async function DeveloperProfilePage({
             <p className="max-w-xl text-sm leading-relaxed text-muted">
               {user.bio || copy.bioFallback}
             </p>
-            <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+            <FollowButton
+              targetType="user"
+              targetId={user.id}
+              targetName={user.displayName}
+              initial={followInitial}
+            />
             <nav
               aria-label={copy.creatorProfile}
               className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2"
