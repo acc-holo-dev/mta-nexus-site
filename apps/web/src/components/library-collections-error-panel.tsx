@@ -19,6 +19,7 @@ export function LibraryCollectionsErrorPanel({
   return (
     <section className="mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16">
       <ErrorState
+        id="library-collections-error-panel-unavailable"
         title={libraryCollectionError(locale, code)}
         description={
           code === "COLLECTION_ITEM_LIMIT" || code === "COLLECTION_LIMIT"
