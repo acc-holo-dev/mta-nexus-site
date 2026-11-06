@@ -162,7 +162,9 @@ export function PublicProfileForm() {
           {copy.loading}
         </p>
       )}
-      {notice?.error ? <ErrorState title={notice.text} /> : null}
+      {notice?.error ? (
+        <ErrorState id="public-profile-form-notice-unavailable" title={notice.text} />
+      ) : null}
       {notice && !notice.error ? (
         <p role="status" className="text-sm text-success">
           {notice.text}

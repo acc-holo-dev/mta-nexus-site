@@ -8,7 +8,10 @@ const source = readFileSync(join(root, "apps/web/src/components/public-profile-f
 
 it("locks public profile form failures to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Avatar, Button, ErrorState, Input } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={notice.text} />");
+  expect(source).toContain('id="public-profile-form-notice-unavailable"');
+  expect(source).toMatch(
+    /<ErrorState\s+id="public-profile-form-notice-unavailable"[\s\S]*?title=\{notice\.text\}/u,
+  );
   expect(source).toContain('role="status"');
   expect(source).toContain("text-success");
   expect(source).not.toContain('role={notice.error ? "alert" : "status"}');
