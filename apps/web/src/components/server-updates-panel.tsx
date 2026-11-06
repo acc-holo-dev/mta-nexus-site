@@ -45,6 +45,7 @@ export function ServerUpdatesPanel({
 
       {updates === null ? (
         <ErrorState
+          id="server-updates-unavailable"
           title={copy.unavailable}
           action={
             retryHref ? (
