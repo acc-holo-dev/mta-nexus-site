@@ -58,6 +58,7 @@ export default async function ResourceCartReceiptsPage({
     return (
       <section className={pageShellClass}>
         <ErrorState
+          id="acquisitions-receipts-invalid"
           title={copy.invalid}
           action={
             <Link href="/workspace/acquisitions/receipts" className={linkClass}>
