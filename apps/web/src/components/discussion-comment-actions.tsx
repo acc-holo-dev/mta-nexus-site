@@ -247,6 +247,7 @@ export function DiscussionCommentActions({
       )}
       {error || stale ? (
         <ErrorState
+          id="discussion-comment-actions-unavailable"
           title={stale ? copy.changed : error}
           description={copy.formErrorHint}
           action={
