@@ -58,6 +58,7 @@ export default async function SellerSalesPage({
             {c.back}
           </Link>
           <ErrorState
+            id="workspace-sales-report-unavailable"
             title={c.loadUnavailable}
             description={c.loadUnavailableHint}
             action={
