@@ -45,7 +45,7 @@ export async function createSubscriptionsRepositoryDbMock() {
   };
 }
 
-export function resetSubscriptionsRepositoryState() {
+function resetSubscriptionsRepositoryState() {
   subscriptionsRepositoryState.rows = [];
   subscriptionsRepositoryState.queries = [];
   subscriptionsRepositoryState.options = [];
@@ -61,7 +61,7 @@ export const subscriptionsRepositoryCurrentToken = "subscription-current-token";
 export const subscriptionsRepositorySessionRow = () => [
   ["ses_subscription", new Date(Date.now() + 3600000).toISOString()],
 ];
-export const subscriptionsRepositoryHash = (v: unknown) =>
+const subscriptionsRepositoryHash = (v: unknown) =>
   createHash("sha256").update(JSON.stringify(v)).digest("hex");
 
 export const subscriptionsRepositoryGrant = {
@@ -87,20 +87,18 @@ export const subscriptionsRepositoryStored = {
   createdAt: date,
 } as typeof subscriptionReceipts.$inferSelect;
 
-export function subscriptionsRepositoryValues(columns: object, row: object) {
+function subscriptionsRepositoryValues(columns: object, row: object) {
   return Object.keys(columns).map((key) => {
     const v = (row as Record<string, unknown>)[key];
     return v instanceof Date ? v.toISOString() : (v ?? null);
   });
 }
 
-export const subscriptionsRepositoryGrantValues = (
-  row = subscriptionsRepositoryGrant,
-) => subscriptionsRepositoryValues(getTableColumns(accountSubscriptions), row);
+export const subscriptionsRepositoryGrantValues = (row = subscriptionsRepositoryGrant) =>
+  subscriptionsRepositoryValues(getTableColumns(accountSubscriptions), row);
 
-export const subscriptionsRepositoryReceiptValues = (
-  row = subscriptionsRepositoryStored,
-) => subscriptionsRepositoryValues(getTableColumns(subscriptionReceipts), row);
+export const subscriptionsRepositoryReceiptValues = (row = subscriptionsRepositoryStored) =>
+  subscriptionsRepositoryValues(getTableColumns(subscriptionReceipts), row);
 
 export const subscriptionsRepositoryPlanValues = (row = plan) =>
   subscriptionsRepositoryValues(getTableColumns(commercialPlans), row);
