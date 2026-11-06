@@ -183,6 +183,7 @@ export default async function WorkspacePage() {
 
         {!library ? (
           <ErrorState
+            id="workspace-library-unavailable"
             title={dictionary.workspace.libraryUnavailable}
             action={
               <Link href="/workspace" className={retryLinkClass}>
