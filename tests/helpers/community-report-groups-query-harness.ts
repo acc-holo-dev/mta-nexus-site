@@ -14,10 +14,7 @@ export async function createCommunityReportGroupsQueryDbMock() {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     communityReportGroupsQueryState.queries.push({ sql, params });
-    if (
-      communityReportGroupsQueryState.failAudit &&
-      sql.startsWith('insert into "audit_events"')
-    )
+    if (communityReportGroupsQueryState.failAudit && sql.startsWith('insert into "audit_events"'))
       throw Error("audit failure");
     return {
       rows:
@@ -55,7 +52,7 @@ export function createCommunityReportGroupsQueryInitiatingSessionMock() {
   return { lockInitiatingSession: vi.fn() };
 }
 
-export function resetCommunityReportGroupsQueryState() {
+function resetCommunityReportGroupsQueryState() {
   communityReportGroupsQueryState.queries = [];
   communityReportGroupsQueryState.rows = [];
   communityReportGroupsQueryState.config = undefined;
@@ -80,7 +77,7 @@ export const communityReportGroupsQueryInput = {
   action: "resolve" as const,
   notes: "Reviewed reason",
 };
-export const communityReportGroupsQueryDigest = "a".repeat(64);
+const communityReportGroupsQueryDigest = "a".repeat(64);
 
 export function communityReportGroupsQueryContext(
   actor = "staff",
