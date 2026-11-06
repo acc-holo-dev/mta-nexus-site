@@ -347,6 +347,7 @@ export function ResourceQaPanel({
 
       {readError ? (
         <ErrorState
+          id="resource-qa-read-unavailable"
           title={readError}
           description={copy.unavailableDescription}
           action={
