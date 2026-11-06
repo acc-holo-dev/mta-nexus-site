@@ -48,7 +48,7 @@ export function createVerificationProfessionalQueryPushMock() {
   };
 }
 
-export function resetVerificationProfessionalQueryState() {
+function resetVerificationProfessionalQueryState() {
   verificationProfessionalQueryState.queries = [];
   verificationProfessionalQueryState.rows = [];
   verificationProfessionalQueryState.failAudit = false;
@@ -63,7 +63,7 @@ export function installVerificationProfessionalQueryHooks() {
 export const verificationProfessionalQueryTime = "2026-10-10T00:00:00.000Z";
 export const verificationProfessionalQueryLater = "2026-10-10T00:00:01.000Z";
 
-export function verificationProfessionalQueryRow(table: PgTable, values: Record<string, unknown>) {
+function verificationProfessionalQueryRow(table: PgTable, values: Record<string, unknown>) {
   return Object.keys(getTableColumns(table)).map((key) => values[key] ?? null);
 }
 
