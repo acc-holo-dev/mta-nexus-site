@@ -34,6 +34,7 @@ export default async function ResourceCartPage() {
           <p className="text-sm text-secondary">{copy.subtitle}</p>
         </header>
         <ErrorState
+          id="workspace-cart-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href="/workspace/cart" className={retryLinkClass}>
