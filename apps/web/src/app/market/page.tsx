@@ -172,6 +172,7 @@ export default async function MarketPage({
 
       {!catalog ? (
         <ErrorState
+          id="market-catalog-unavailable"
           title={dictionary.market.loadUnavailable}
           action={
             <Link href={catalogHref} className={actionLinkClass}>
