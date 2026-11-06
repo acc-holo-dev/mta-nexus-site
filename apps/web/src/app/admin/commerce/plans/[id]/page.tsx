@@ -70,6 +70,7 @@ export default async function CommercialPlanAdmin({
           {copy.back}
         </Link>
         <ErrorState
+          id="admin-commerce-plan-detail-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
