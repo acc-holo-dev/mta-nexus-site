@@ -52,7 +52,7 @@ export function createVerificationApplicationsQueryWebPushMock() {
   };
 }
 
-export function resetVerificationApplicationsQueryState() {
+function resetVerificationApplicationsQueryState() {
   verificationApplicationsQueryState.queries = [];
   verificationApplicationsQueryState.rows = [];
   verificationApplicationsQueryState.options = [];
