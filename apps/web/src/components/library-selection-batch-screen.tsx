@@ -51,6 +51,7 @@ export async function LibrarySelectionBatchScreen({
   const loadFailure = (retryHref: string) => (
     <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
       <ErrorState
+        id="library-selection-batch-unavailable"
         title={c.loadUnavailable}
         action={
           <Link
