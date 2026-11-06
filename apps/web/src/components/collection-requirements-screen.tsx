@@ -72,6 +72,7 @@ export async function CollectionRequirementsScreen({
           {c.back}
         </Link>
         <ErrorState
+          id="collection-requirements-unavailable"
           title={c.loadUnavailable}
           action={
             <Link href={`${requirementsBase}${retrySuffix}`} className={navLinkClass}>
