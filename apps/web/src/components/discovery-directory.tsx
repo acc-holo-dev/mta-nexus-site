@@ -163,6 +163,7 @@ export async function DirectoryResults({
   if (!result)
     return (
       <ErrorState
+        id="discovery-directory-unavailable"
         title={loadError}
         action={
           <Link
