@@ -88,6 +88,7 @@ export default async function OrganizationProfilePage({
     return (
       <div className="min-w-0 space-y-6 overflow-x-clip">
         <ErrorState
+          id="organization-public-profile-load-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={profileHref} className={actionLinkClass}>
