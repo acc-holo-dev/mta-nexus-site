@@ -104,6 +104,7 @@ export async function ContextPublicationHistoryScreen({
       </header>
       {!data ? (
         <ErrorState
+          id="context-publication-history-unavailable"
           title={failure || copy.unavailable}
           action={
             <a href={path} className={navLinkClass}>
