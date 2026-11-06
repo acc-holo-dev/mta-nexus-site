@@ -63,6 +63,7 @@ export default async function ResourceCopyDetailPage({
             {c.history}
           </Link>
           <ErrorState
+            id="workspace-resource-copy-receipt-unavailable"
             title={c.loadUnavailable}
             action={
               <Link href={returnPath} className={navLinkClass}>
