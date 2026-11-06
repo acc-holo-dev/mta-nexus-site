@@ -65,6 +65,7 @@ export default async function PublisherModerationHistory({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-resource-moderation-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
