@@ -34,6 +34,7 @@ const initialPage: FollowPage = {
       image: null,
       verified: true,
       href: "/organizations/team",
+      mutedUntil: null,
     },
   ],
   hasMore: false,

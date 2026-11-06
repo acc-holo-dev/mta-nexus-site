@@ -38,4 +38,5 @@ export const followWorkspaceItemBase: FollowPage["items"][number] = {
   image: null,
   verified: true,
   href: "/organizations/team",
+  mutedUntil: null,
 };

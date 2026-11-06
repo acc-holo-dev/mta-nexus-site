@@ -68,6 +68,7 @@ const item = z.object({
     .string()
     .regex(/^\/(users|organizations|servers|market|articles)\//u)
     .nullable(),
+  mutedUntil: z.iso.datetime().nullable(),
 });
 export const followPageSchema = z
   .object({

@@ -34,6 +34,7 @@ class FollowWorkspaceService {
         description: row.description,
         image: safeExternalWebUrl(row.image) ?? null,
         verified: row.verified,
+        mutedUntil: row.mutedUntil ?? null,
         ...(row.targetType === "content" ? { discussion: row.discussion } : {}),
         href:
           row.handle && row.title

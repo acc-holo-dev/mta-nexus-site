@@ -6,13 +6,24 @@ import type { FollowTargetType, ObjectMuteDuration } from "../lib/follow-workspa
 import { followCopy, followError } from "../lib/follow-workspace-copy";
 import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "./locale-context";
+import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 /**
  * Temporary notice mute for a followable object. Independent of follow/unfollow
  * and release-watch; security notices are never muted this way.
  */
-export function ObjectMuteControls({
+export function ObjectMuteControls(props: {
+  targetType: FollowTargetType;
+  targetId: string;
+  actorId: string;
+  locale?: Locale;
+  initial?: { muted: boolean; mutedUntil: string | null };
+}) {
+  const control = <ObjectMuteControl key={`${props.targetType}:${props.targetId}`} {...props} />;
+  return props.locale ? <LocaleProvider locale={props.locale}>{control}</LocaleProvider> : control;
+}
+
+function ObjectMuteControl({
   targetType,
   targetId,
   actorId,
