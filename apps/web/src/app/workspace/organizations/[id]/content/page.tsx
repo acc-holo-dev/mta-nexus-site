@@ -77,6 +77,7 @@ export default async function OrganizationPublications({
       </header>
       {!result ? (
         <ErrorState
+          id="workspace-organization-content-unavailable"
           title={failure}
           action={
             <Link href={path} className={navLinkClass}>
