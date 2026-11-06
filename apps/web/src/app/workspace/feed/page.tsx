@@ -49,6 +49,7 @@ export default async function FollowingFeedPage({
           <p className="mt-2 text-sm text-muted">{copy.description}</p>
         </header>
         <ErrorState
+          id="workspace-feed-unavailable"
           title={copy.error}
           action={
             <Link href={returnPath} className={retryLinkClass}>
