@@ -21,6 +21,7 @@ describe("reverse dependency list behavior", () => {
         <ReverseDependencyList summary={null} locale={locale} />,
       );
       expect(unavailableMarkup).toContain(copy.reverseUnavailable);
+      expect(unavailableMarkup).toContain('id="reverse-deps-unavailable"');
       expect(unavailableMarkup).toContain('role="alert"');
       expect(unavailableMarkup).toContain("bg-danger-soft");
       expect(unavailableMarkup).not.toContain('class="text-xs text-warning"');

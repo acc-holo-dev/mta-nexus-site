@@ -14,7 +14,7 @@ export function ReverseDependencyList({
   const copy = getDictionary(locale).dependencyUi;
 
   if (!summary) {
-    return <ErrorState title={copy.reverseUnavailable} />;
+    return <ErrorState id="reverse-deps-unavailable" title={copy.reverseUnavailable} />;
   }
 
   if (summary.products.length === 0) {

@@ -22,7 +22,9 @@ const source = readFileSync(
 
 it("locks reverse-dependency limitReached to ErrorState without soft warning", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={copy.reverseUnavailable} />");
+  expect(source).toContain(
+    '<ErrorState id="reverse-deps-unavailable" title={copy.reverseUnavailable} />',
+  );
   expect(source).toContain(
     '<ErrorState id="reverse-deps-limit-reached" title={copy.limitReached} />',
   );
