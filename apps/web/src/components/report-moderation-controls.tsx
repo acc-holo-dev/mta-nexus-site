@@ -109,7 +109,11 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
       </div>
       {!ready && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
       {error ? (
-        <ErrorState title={error} description={copy.reportDecisionFailedDescription} />
+        <ErrorState
+          id="report-moderation-controls-unavailable"
+          title={error}
+          description={copy.reportDecisionFailedDescription}
+        />
       ) : null}
     </div>
   );
