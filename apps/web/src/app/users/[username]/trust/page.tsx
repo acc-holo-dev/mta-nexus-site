@@ -43,6 +43,7 @@ export default async function TrustPage({ params }: { params: Promise<{ username
           <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         </header>
         <ErrorState
+          id="user-trust-unavailable"
           title={copy.unavailable}
           action={
             <a href={href} className={actionLinkClass}>
