@@ -31,7 +31,7 @@ export async function createResourceReleaseWatchesRepositoryDbMock() {
   return { db };
 }
 
-export function resetResourceReleaseWatchesRepositoryState() {
+function resetResourceReleaseWatchesRepositoryState() {
   resourceReleaseWatchesRepositoryState.sessionLive = true;
   resourceReleaseWatchesRepositoryState.queries = [];
   resourceReleaseWatchesRepositoryState.rows = [];
