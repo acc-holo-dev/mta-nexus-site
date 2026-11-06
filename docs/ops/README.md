@@ -18,8 +18,8 @@
 | `verification` | Test/CI scopes, browser/axe | [§2 Verification](../OPERATIONS.md#2-verification) |
 | `production-boundary` | Overlay matrix, digests, migrations | [§3 Production boundary](../OPERATIONS.md#3-production-boundary) |
 | `inbox-recovery` | Report/support/verification/push/discussion/build-incident | [inbox-recovery.md](inbox-recovery.md) · stubs [Recovering report…](../OPERATIONS.md#recovering-report-inbox-delivery) |
-| `backup-recovery` | Backup/restore, maintenance | [§4 Backup and recovery](../OPERATIONS.md#4-backup-and-recovery) |
-| `resource-safety` | Scanner / integrity / quarantine ops | [§5 Resource safety](../OPERATIONS.md#5-resource-safety-operations) |
+| `backup-recovery` | Backup/restore, maintenance | [backup-recovery.md](backup-recovery.md) · stubs [§4](../OPERATIONS.md#4-backup-and-recovery) |
+| `resource-safety` | Build safety migration / admin storage | [resource-safety.md](resource-safety.md) · stub [§5](../OPERATIONS.md#5-resource-safety-operations) |
 | `release` | Branch/release, GHCR, beta evidence | [§6 Branch and release](../OPERATIONS.md#6-branch-and-release-operations) |
 | `workers` | Push/mail workers, limits | [workers.md](workers.md) · stub [Worker liveness…](../OPERATIONS.md#worker-liveness-vs-progress) |
 
