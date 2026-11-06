@@ -30,7 +30,7 @@ export async function createLibraryMembershipHistoryRepositoryDbMock() {
   };
 }
 
-export function resetLibraryMembershipHistoryRepositoryState() {
+function resetLibraryMembershipHistoryRepositoryState() {
   libraryMembershipHistoryRepositoryState.rows = [];
   libraryMembershipHistoryRepositoryState.queries = [];
   libraryMembershipHistoryRepositoryState.options = [];
@@ -43,8 +43,7 @@ export function installLibraryMembershipHistoryRepositoryHooks() {
 }
 
 export const libraryMembershipHistoryRepositoryDate = "2026-10-12T00:00:00.000Z";
-export const libraryMembershipHistoryRepositoryRequestId =
-  "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
+export const libraryMembershipHistoryRepositoryRequestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
 
 export const libraryMembershipHistoryRepositoryCommand = {
   requestId: libraryMembershipHistoryRepositoryRequestId,
@@ -108,10 +107,7 @@ export function libraryMembershipHistoryRepositoryChild(
 }
 
 export function libraryMembershipHistoryRepositoryPrefix() {
-  return [
-    [["usr_a"]],
-    [{ observedAt: libraryMembershipHistoryRepositoryDate }],
-  ] as unknown[][];
+  return [[["usr_a"]], [{ observedAt: libraryMembershipHistoryRepositoryDate }]] as unknown[][];
 }
 
 export const libraryMembershipHistoryRepositoryQuery = {
