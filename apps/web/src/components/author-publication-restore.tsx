@@ -140,7 +140,9 @@ export function AuthorPublicationRestore({
       >
         {copy.restore}
       </Button>
-      {notice && !saved ? <ErrorState title={notice} /> : null}
+      {notice && !saved ? (
+        <ErrorState id="author-publication-restore-notice-unavailable" title={notice} />
+      ) : null}
       {notice && saved ? (
         <p role="status" className="text-sm text-success">
           {notice}
