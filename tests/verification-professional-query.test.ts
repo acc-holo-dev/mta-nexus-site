@@ -251,7 +251,7 @@ it("sets the genuine professional flag, audits and delivers one inbox result aft
   expect(state.queries[4].sql).toContain('order by "users"."id" asc');
   expect(state.queries[4].sql).toContain("for update");
   expect(writes("notifications")).toHaveLength(1);
-  expect(writes("notifications")[0].params).toContain("/workspace/verification?view=history");
+  expect(writes("notifications")[0].params).toContain("/workspace/verification/ver_request");
   expect(writes("audit_events")).toHaveLength(1);
 });
 it("refuses changed or legacy missing profile revisions before setting verified experience", async () => {
