@@ -37,6 +37,7 @@ function BuildPackageLoadError({
         {copy.back}
       </Link>
       <ErrorState
+        id="build-package-load-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
