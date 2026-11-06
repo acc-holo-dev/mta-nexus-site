@@ -46,6 +46,7 @@ export default async function LibraryUpdatesPage({
           {copy.library}
         </Link>
         <ErrorState
+          id="workspace-library-updates-unavailable"
           title={copy.updatesLoadUnavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
