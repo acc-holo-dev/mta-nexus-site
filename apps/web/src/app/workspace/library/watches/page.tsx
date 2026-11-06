@@ -90,6 +90,7 @@ export default async function ReleaseWatchesPage({
           {copy.library}
         </Link>
         <ErrorState
+          id="workspace-library-watches-unavailable"
           title={copy.loadUnavailable}
           description={copy.loadUnavailableDescription}
           action={
