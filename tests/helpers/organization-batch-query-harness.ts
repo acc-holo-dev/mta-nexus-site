@@ -36,7 +36,7 @@ export async function createOrganizationBatchQueryDbMock() {
   return { db: proxy };
 }
 
-export function resetOrganizationBatchQueryState() {
+function resetOrganizationBatchQueryState() {
   const state = organizationBatchQueryState;
   state.queries = [];
   state.rows = [];

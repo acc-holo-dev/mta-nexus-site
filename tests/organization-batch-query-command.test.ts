@@ -4,7 +4,9 @@ vi.mock("../packages/db/src/repositories/initiating-session", () => ({
   lockInitiatingSession: async () => {},
 }));
 vi.mock("../packages/db/src/repositories/organization-access-notice", async () => {
-  const { organizationBatchQueryState } = await import("./helpers/organization-batch-query-harness");
+  const { organizationBatchQueryState } = await import(
+    "./helpers/organization-batch-query-harness"
+  );
   return { storeOrganizationAccessNotice: organizationBatchQueryState.notice };
 });
 vi.mock("../packages/db/src/client", async () => {
