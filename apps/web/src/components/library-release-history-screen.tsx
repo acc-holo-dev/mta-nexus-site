@@ -59,6 +59,7 @@ export async function LibraryReleaseHistoryScreen({
           {c.back}
         </Link>
         <ErrorState
+          id="library-release-history-unavailable"
           title={c.loadUnavailable}
           action={
             <Link
