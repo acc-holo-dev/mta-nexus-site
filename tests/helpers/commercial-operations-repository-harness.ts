@@ -31,7 +31,7 @@ export async function createCommercialOperationsRepositoryDbMock() {
   };
 }
 
-export function resetCommercialOperationsRepositoryState() {
+function resetCommercialOperationsRepositoryState() {
   commercialOperationsRepositoryState.queries = [];
   commercialOperationsRepositoryState.results = [];
   commercialOperationsRepositoryState.options = [];
