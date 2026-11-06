@@ -144,6 +144,7 @@ export default async function TeamPage({
       )}
       {error && (
         <ErrorState
+          id="workspace-organization-team-unavailable"
           title={error}
           action={
             <a href={organizationTeamHref(id, filters ?? { query: "" })} className={navLinkClass}>
