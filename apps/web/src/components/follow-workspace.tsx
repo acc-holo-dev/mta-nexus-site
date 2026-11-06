@@ -209,6 +209,7 @@ export function FollowWorkspace({
       </search>
       {error && (
         <ErrorState
+          id="follow-workspace-unavailable"
           title={error}
           action={
             <Button
