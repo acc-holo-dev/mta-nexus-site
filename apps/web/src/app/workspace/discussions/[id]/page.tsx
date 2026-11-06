@@ -53,6 +53,7 @@ export default async function OwnCommentPage({ params }: { params: Promise<{ id:
         />
       ) : (
         <ErrorState
+          id="workspace-discussion-detail-failed"
           title={copy.failed}
           action={
             <a href={returnPath} className={linkClass}>
