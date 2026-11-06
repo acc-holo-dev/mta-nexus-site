@@ -137,9 +137,12 @@ export default async function ProductDetailPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ qa?: string | string[] }>;
+  searchParams?: Promise<{ qa?: string | string[] }>;
 }) {
-  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const [{ slug }, query] = await Promise.all([
+    params,
+    searchParams ?? Promise.resolve({} as { qa?: string | string[] }),
+  ]);
   const initialQaThreadId = readQaThreadId(query.qa);
   const [locale, user] = await Promise.all([
     getRequestLocale(),
