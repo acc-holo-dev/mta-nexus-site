@@ -78,6 +78,9 @@ describe("mainline repository policy", () => {
     const archive = readdirSync(resolve(process.cwd(), "docs/archive")).sort();
     expect(archive).toEqual(["DOCS-MIGRATION.md", "README.md"]);
 
+    const opsIndex = readdirSync(resolve(process.cwd(), "docs/ops")).sort();
+    expect(opsIndex).toEqual(["README.md"]);
+
     const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
     // DOC-04: superseded subject chapters removed; thin nav + decision register remain.
     expect(handbook.length).toBe(3);

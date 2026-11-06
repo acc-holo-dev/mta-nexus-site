@@ -61,7 +61,7 @@
 
 Ключевые сущности и связи (детали и исключения — [08-DOMAIN…](ARCHITECTURE.md)): Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `packages/db`; факты runtime — код.
 
-Storage/scanner/observability цели и границы production mounts — [55…](ARCHITECTURE.md) + [OPERATIONS](OPERATIONS.md); Security Center / quarantine admin — также [TRUST-STAFF](TRUST-STAFF.md) и [35…](TRUST-STAFF.md).
+Storage/scanner/observability цели и границы production mounts — этот файл + [OPERATIONS](OPERATIONS.md) (+ указатель [ops/](ops/README.md)); Security Center / quarantine admin — [TRUST-STAFF](TRUST-STAFF.md).
 
 ## Граница продукта
 

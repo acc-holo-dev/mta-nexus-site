@@ -12,7 +12,7 @@
 | Контракты | [PRODUCT](PRODUCT.md), [ARCHITECTURE](ARCHITECTURE.md), [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [FLOWS](FLOWS.md), [UX-CONTRACT](UX-CONTRACT.md) | Шаблон DOCS-STYLE; не второй backlog |
 | Планы | [ROADMAP](ROADMAP.md) (derived), [RELEASE-PLAN](RELEASE-PLAN.md), [RETENTION-PLAN](RETENTION-PLAN.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md) | План ≠ факт tip |
 | Proposal | [SERVER-PACK-SPEC](SERVER-PACK-SPEC.md), ads/GROW в ROADMAP | Не launch-blocker free beta |
-| Эксплуатация | [OPERATIONS](OPERATIONS.md) | Канонический путь для scripts/CI; split — волна D4 |
+| Эксплуатация | [OPERATIONS](OPERATIONS.md), указатель [ops/](ops/README.md) | Канонический путь pinned; D4 — карта модулей без ломки consumers |
 | Решения | [DECISIONS](DECISIONS.md), [13-DECISION-REGISTER](handbook/13-DECISION-REGISTER.md) | 309 ID не дублировать текстом |
 | Tracker | `planning/tasks.json`, [TRACKER](../planning/TRACKER.md); [TASKS](TASKS.md) derived | Один backlog |
 | Архив | [archive/](archive/README.md) | История DOC; не читать первым |

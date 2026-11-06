@@ -50,4 +50,4 @@
 
 ## Порядок переработки (волны)
 
-Волны: **D0+D2** (style + CURRENT-STATE) и **D1** (IA/`archive/`) — в работе на `cursor/docs-rewrite-foundation-c97a`. Далее: D3 контракты → D4 OPERATIONS → D5 решения/планы → D6 приёмка. Не смешивать tip-honesty PR с волнами документации.
+Волны на `cursor/docs-rewrite-foundation-c97a` / PR #820: **D0–D2** done · **D1** done · **D3** subject contracts reshaped · **D4** карта `docs/ops/` (path `OPERATIONS.md` pinned). Далее: вынос модулей ops с stub-якорями → D5 решения/планы → D6 приёмка. Не смешивать tip-honesty PR с волнами документации.

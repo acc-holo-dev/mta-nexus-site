@@ -1,7 +1,7 @@
 # MTA NEXUS Operations / Эксплуатация
 
 **Статус:** living · authoritative runbook (канонический путь `docs/OPERATIONS.md` для scripts/CI).  
-**Split в `docs/ops/*`:** волна D4 без ломки consumers.
+**Split:** карта модулей — [ops/README.md](ops/README.md); полный текст пока здесь (consumers pinned).
 
 This document covers development startup, verification and production boundaries.  
 Документ описывает запуск разработки, проверки и эксплуатационные ограничения.
