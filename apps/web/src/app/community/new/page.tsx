@@ -15,6 +15,7 @@ export default async function NewCommunityTopicPage() {
   } catch {
     return (
       <ErrorState
+        id="community-new-topic-identity-unavailable"
         title={copy.topicIdentityError}
         action={<Link href="/community/new">{copy.topicIdentity}</Link>}
       />
