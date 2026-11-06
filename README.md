@@ -4,7 +4,7 @@
 
 **Active development branch:** `main` only. Production-развёртывание требует отдельного решения.
 
-Быстрая ориентация: [контракт агента](docs/AGENT.md) · [карта проекта](docs/PROJECT-MAP.md) · [текущее состояние](docs/CURRENT-STATE.md).
+Быстрая ориентация: [контракт агента](docs/AGENT.md) · [карта проекта](docs/PROJECT-MAP.md) · [текущее состояние](docs/CURRENT-STATE.md) · [стиль документации](docs/DOCS-STYLE.md).
 
 ## Запуск
 

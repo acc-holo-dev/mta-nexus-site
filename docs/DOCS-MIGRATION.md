@@ -1,5 +1,7 @@
 # Миграция документации без потери решений
 
+**Статус:** archive · история DOC-01…05; рабочий стиль и новые волны — [DOCS-STYLE.md](DOCS-STYLE.md).
+
 Карта для SHA `385e577e7443cf7d7b817419ce5c3b8afe87b690`. **DOC-01:** инвентаризированы 56 docs Markdown + README/AGENTS (58 в `planning/documents-map.json`); 309 decision ID совпадают с `planning/decision-baseline.json`; потребители путей зафиксированы ниже. **DOC-02:** ядро интегрировано. **DOC-03:** JSON-in-repo tracker. **DOC-05:** предметные контракты созданы. **DOC-04:** удалены 49 superseded глав; kept `00-README`, `13-DECISION-REGISTER`, `15-AI-CONTEXT-INDEX`; manifest `planning/deletion-manifest.json`. Список — план ответственности, а не разрешение удалить всё, что оказалось в нескольких главах.
 
 ## Порядок

@@ -58,6 +58,7 @@ describe("mainline repository policy", () => {
       "CURRENT-STATE.md",
       "DECISIONS.md",
       "DOCS-MIGRATION.md",
+      "DOCS-STYLE.md",
       "FLOWS.md",
       "OPERATIONS.md",
       "PROBLEMS.md",
