@@ -262,6 +262,7 @@ export function OrganizationTeamDirectory({
       )}
       {(error || blocked) && (
         <ErrorState
+          id="organization-team-directory-unavailable"
           title={error || copy.uncertain}
           action={
             <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
