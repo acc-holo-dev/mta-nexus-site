@@ -41,6 +41,7 @@ function ModeratedDiscussionLoadError({
     <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
       <ErrorState
+        id="moderated-discussion-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
