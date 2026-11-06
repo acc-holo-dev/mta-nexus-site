@@ -32,7 +32,7 @@ export async function createResourceActivityRepositoryDbMock() {
   };
 }
 
-export function resetResourceActivityRepositoryState() {
+function resetResourceActivityRepositoryState() {
   resourceActivityRepositoryState.queries = [];
   resourceActivityRepositoryState.results = [];
   resourceActivityRepositoryState.options = [];
