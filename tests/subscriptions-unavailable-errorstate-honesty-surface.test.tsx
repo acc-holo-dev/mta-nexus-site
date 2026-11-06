@@ -4,7 +4,10 @@ import { expect, it } from "vitest";
 
 /** Honesty lock for subscriptions catalog load-unavailable notice. */
 it("locks subscriptions unavailable to ErrorState", () => {
-  const source = readFileSync(join(process.cwd(), "apps/web/src/app/subscriptions/page.tsx"), "utf8");
+  const source = readFileSync(
+    join(process.cwd(), "apps/web/src/app/subscriptions/page.tsx"),
+    "utf8",
+  );
   expect(source).toContain('id="subscriptions-unavailable"');
   expect(source).toMatch(
     /<ErrorState\s+id="subscriptions-unavailable"\s+title=\{copy\.loadUnavailable\}/u,
