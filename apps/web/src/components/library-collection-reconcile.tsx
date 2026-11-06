@@ -248,6 +248,7 @@ export function LibraryCollectionReconcileForm({
       {frozen && !saved && <p role="note">{c.frozen}</p>}
       {error ? (
         <ErrorState
+          id="library-collection-reconcile-unavailable"
           title={error}
           description={c.actionErrorDescription}
           action={
