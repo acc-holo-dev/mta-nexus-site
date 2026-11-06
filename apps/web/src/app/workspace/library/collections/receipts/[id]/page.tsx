@@ -67,6 +67,7 @@ export default async function Page({
       return (
         <div className={pageShellClass}>
           <ErrorState
+            id="library-collection-receipt-load-unavailable"
             title={r.loadUnavailable}
             description={r.loadUnavailableDescription}
             action={
