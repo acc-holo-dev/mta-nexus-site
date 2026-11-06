@@ -97,6 +97,7 @@ export default async function SubscriptionActivationPage({
       return (
         <section className={pageShellClass}>
           <ErrorState
+            id="subscription-activate-code-unavailable"
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
             action={
