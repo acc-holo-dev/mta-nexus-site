@@ -82,6 +82,7 @@ export function OrganizationHistoryView({
       )}
       {!data && (
         <ErrorState
+          id="organization-history-unavailable"
           title={error ?? copy.unavailable}
           action={
             <Link href={path} className={navLinkClass}>
