@@ -34,6 +34,7 @@ function DiscussionReportsLoadError({ locale, retryHref }: { locale: Locale; ret
     <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
       <ErrorState
+        id="discussion-reports-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
