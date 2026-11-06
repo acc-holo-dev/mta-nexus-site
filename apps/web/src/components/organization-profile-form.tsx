@@ -511,7 +511,7 @@ export function OrganizationProfileForm({
           {copy.publicView}
         </Link>
       )}
-      {error && <ErrorState title={error} />}
+      {error && <ErrorState id="organization-profile-form-unavailable" title={error} />}
       {saved && (
         <p
           role="status"
