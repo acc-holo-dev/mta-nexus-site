@@ -50,4 +50,4 @@
 
 ## Порядок переработки (волны)
 
-Волны на PR #820: **D0–D5** landed · **D4** ops modules extracted (`verification`, `production-boundary`, `inbox-recovery`, `backup-recovery`, `resource-safety`, `release`, `workers`; §1 DEV startup still inline). Path `docs/OPERATIONS.md` pinned for consumers. Остаётся: optional DEV-startup extract + D6 acceptance after merge. Не смешивать tip-honesty PR с волнами docs.
+Волны на PR #820: **D0–D5** landed · **D4** полный разрез `docs/ops/*` (`dev-startup`, `verification`, `production-boundary`, `inbox-recovery`, `backup-recovery`, `resource-safety`, `release`, `workers`). Path `docs/OPERATIONS.md` pinned (stubs + markers). Остаётся: D6 acceptance / nav polish after merge. Не смешивать tip-honesty PR с волнами docs.

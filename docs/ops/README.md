@@ -14,7 +14,7 @@
 
 | Модуль (план) | Тема | Якорь / раздел сейчас |
 | ------------- | ---- | --------------------- |
-| `dev-startup` | DEV Compose, mail | still in [OPERATIONS §1](../OPERATIONS.md#1-supported-dev-startup) |
+| `dev-startup` | DEV Compose, mail | [dev-startup.md](dev-startup.md) |
 | `verification` | Test/CI scopes, browser/axe | [verification.md](verification.md) |
 | `production-boundary` | Overlay matrix, migrations | [production-boundary.md](production-boundary.md) |
 | `inbox-recovery` | Notification delivery recovery | [inbox-recovery.md](inbox-recovery.md) |

@@ -82,6 +82,7 @@ describe("mainline repository policy", () => {
     expect(opsIndex).toEqual([
       "README.md",
       "backup-recovery.md",
+      "dev-startup.md",
       "inbox-recovery.md",
       "production-boundary.md",
       "release.md",
