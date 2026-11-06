@@ -224,6 +224,7 @@ function AcquireContent() {
           />
         ) : (
           <ErrorState
+            id="acquire-product-unavailable"
             title={productError}
             description={dictionary.errors.message}
             action={
