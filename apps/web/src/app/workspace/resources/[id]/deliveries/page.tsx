@@ -84,6 +84,7 @@ export default async function PublisherDeliveriesPage({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-resource-deliveries-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
