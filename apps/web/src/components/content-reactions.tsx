@@ -213,7 +213,9 @@ export function ContentReactions({
           {copy.my}
         </Link>
       )}
-      {message && blocked ? <ErrorState title={message} /> : null}
+      {message && blocked ? (
+        <ErrorState id="content-reactions-unavailable" title={message} />
+      ) : null}
       {message && !blocked ? (
         <p role="status" className="text-xs text-success">
           {message}
