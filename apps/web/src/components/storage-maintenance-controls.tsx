@@ -222,7 +222,13 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
         )}
       </form>
       <p role="status">{message}</p>
-      {error ? <ErrorState title={copy.error} description={copy.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="storage-maintenance-controls-unavailable"
+          title={copy.error}
+          description={copy.formErrorHint}
+        />
+      ) : null}
     </section>
   );
 }
