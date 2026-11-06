@@ -58,6 +58,7 @@ export default async function DownloadReceiptPage({ params }: { params: Promise<
           {copy.title}
         </Link>
         <ErrorState
+          id="library-download-detail-load-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link
