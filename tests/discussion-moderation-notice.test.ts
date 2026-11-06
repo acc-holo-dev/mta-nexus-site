@@ -38,7 +38,7 @@ import { db } from "../packages/db/src/client";
 import { discussionModerationNotice } from "../packages/db/src/repositories/discussion-moderation-notice";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
-const item = { auditId: "audit", authorId: "author", commentId: "comment", slug: "guide" },
+const item = { auditId: "audit", authorId: "author", commentId: "comment" },
   insert = () => state.queries.find((q) => q.sql.startsWith("insert"));
 beforeEach(() => {
   vi.clearAllMocks();
