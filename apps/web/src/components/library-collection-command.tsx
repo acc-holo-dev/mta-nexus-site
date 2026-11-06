@@ -349,7 +349,7 @@ export function LibraryCollectionCommandForm({
   return (
     <>
       {requiresStoredIntent && (!createReady || readyActor !== actorId) && error ? (
-        <ErrorState title={error} />
+        <ErrorState id="library-collection-command-unavailable" title={error} />
       ) : null}
       <form
         onSubmit={submit}
