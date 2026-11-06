@@ -1,70 +1,32 @@
-import { getTableColumns } from "drizzle-orm";
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  rows: [] as unknown[][][],
-  queries: [] as { sql: string; params: unknown[] }[],
-  notice: vi.fn(),
-}));
-vi.mock("../packages/db/src/repositories/publication-notice", () => ({
-  publicationNotice: state.notice,
-}));
-vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return {
-      rows:
-        sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
-    };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return (work: (tx: typeof database) => unknown) => work(database);
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
-});
-import { contentRepository } from "../packages/db/src/repositories/content";
-import { content } from "../packages/db/src/schema";
-const time = "2026-10-11T00:00:00.000Z";
-const row = (extra: Record<string, unknown> = {}) =>
-  Object.keys(getTableColumns(content)).map(
-    (key) =>
-      (
-        ({
-          id: "item",
-          authorId: "author",
-          title: "Draft",
-          body: "Reviewed body",
-          tags: [],
-          slug: "draft",
-          type: "article",
-          status: "draft",
-          createdAt: time,
-          updatedAt: time,
-          ...extra,
-        }) as Record<string, unknown>
-      )[key] ?? null,
+import { expect, it, vi } from "vitest";
+
+vi.mock("../packages/db/src/repositories/publication-notice", async () => {
+  const { publicationModerationQueryState } = await import(
+    "./helpers/publication-moderation-query-harness"
   );
-const token = "staff-session";
-const liveSession = [["ses_staff", "2099-01-01T00:00:00.000Z"]];
-const audit = {
-  id: "audit",
-  actorId: "mod",
-  actorType: "admin" as const,
-  action: "content.published",
-  targetId: "item",
-  targetType: "content",
-};
-beforeEach(() => {
-  vi.clearAllMocks();
-  state.rows = [];
-  state.queries = [];
+  return { publicationNotice: publicationModerationQueryState.notice };
 });
+
+vi.mock("../packages/db/src/client", async () => {
+  const { createPublicationModerationQueryDbMock } = await import(
+    "./helpers/publication-moderation-query-harness"
+  );
+  return createPublicationModerationQueryDbMock();
+});
+
+import { contentRepository } from "../packages/db/src/repositories/content";
+import {
+  installPublicationModerationQueryHooks,
+  publicationModerationQueryAudit as audit,
+  publicationModerationQueryLiveSession as liveSession,
+  publicationModerationQueryRow as row,
+  publicationModerationQueryState as state,
+  publicationModerationQueryTime as time,
+  publicationModerationQueryToken as token,
+} from "./helpers/publication-moderation-query-harness";
+
+installPublicationModerationQueryHooks();
+
 it("locks content then current moderator authority, versions the update and stores the notice after audit", async () => {
   state.rows = [
     [row()],
@@ -132,51 +94,3 @@ it.each([{ status: "archived" }, { updatedAt: "2026-10-11T00:00:00.001Z" }])(
     expect(state.notice).not.toHaveBeenCalled();
   },
 );
-it("rechecks the noncommercial publication scope under the authoritative content lock", async () => {
-  state.rows = [[row({ type: "resource" })], [["moderator"]], liveSession];
-  await expect(
-    contentRepository.moderateStatusWithAudit(
-      "item",
-      "published",
-      "draft",
-      audit,
-      token,
-      new Date(time),
-      true,
-    ),
-  ).rejects.toMatchObject({ code: "NOT_FOUND" });
-  expect(state.queries.some((query) => /^(update|insert)/u.test(query.sql))).toBe(false);
-  expect(state.notice).not.toHaveBeenCalled();
-});
-it("rejects incomplete legacy publishing under lock, while permitting complete Unicode text at the preview boundary", async () => {
-  state.rows = [[row({ body: "x".repeat(100001) })], [["moderator"]], liveSession];
-  await expect(
-    contentRepository.moderateStatusWithAudit(
-      "item",
-      "published",
-      "draft",
-      audit,
-      token,
-      new Date(time),
-      true,
-    ),
-  ).rejects.toMatchObject({ code: "CONTENT_REVIEW_TOO_LARGE" });
-  expect(state.notice).not.toHaveBeenCalled();
-  state.rows = [
-    [row({ body: "😀".repeat(60000) })],
-    [["moderator"]],
-    liveSession,
-    [row({ status: "published" })],
-  ];
-  expect(
-    await contentRepository.moderateStatusWithAudit(
-      "item",
-      "published",
-      "draft",
-      audit,
-      token,
-      new Date(time),
-      true,
-    ),
-  ).toMatchObject({ status: "published" });
-});
