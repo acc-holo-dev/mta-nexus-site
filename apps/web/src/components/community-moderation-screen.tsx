@@ -50,6 +50,7 @@ export async function CommunityModerationScreen({
       <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
         <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
         <ErrorState
+          id="community-moderation-unavailable"
           title={copy.unavailable}
           action={
             <a href={returnPath} className={focusLink}>
