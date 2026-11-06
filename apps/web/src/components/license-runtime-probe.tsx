@@ -218,7 +218,13 @@ export function LicenseRuntimeProbe({
           </time>
         </p>
       )}
-      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="license-runtime-probe-unavailable"
+          title={error}
+          description={copy.formErrorHint}
+        />
+      ) : null}
     </section>
   );
 }
