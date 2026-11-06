@@ -241,7 +241,7 @@ export function ManagedServerVisibilityBatch({
           {copy.busy}
         </p>
       )}
-      {error ? <ErrorState title={error} /> : null}
+      {error ? <ErrorState id="managed-server-visibility-batch-unavailable" title={error} /> : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}
