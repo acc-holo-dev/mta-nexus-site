@@ -29,7 +29,7 @@ export async function createLibraryCollectionInventoryDbMock() {
   };
 }
 
-export function resetLibraryCollectionInventoryState() {
+function resetLibraryCollectionInventoryState() {
   libraryCollectionInventoryState.rows = [];
   libraryCollectionInventoryState.queries = [];
   libraryCollectionInventoryState.options = [];
