@@ -69,6 +69,7 @@ export default async function ArticlesPage({
 
       {!result ? (
         <ErrorState
+          id="articles-unavailable"
           title={platformCopy.unavailable}
           action={
             <Link
