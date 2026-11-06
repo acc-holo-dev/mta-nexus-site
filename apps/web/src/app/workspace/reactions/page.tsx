@@ -112,6 +112,7 @@ export default async function ReactionsPage({
       </a>
       {error ? (
         <ErrorState
+          id="workspace-reactions-unavailable"
           title={error}
           action={
             <a href={latest} className={linkClass}>
