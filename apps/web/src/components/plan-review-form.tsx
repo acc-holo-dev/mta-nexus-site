@@ -218,7 +218,9 @@ export function PlanReviewForm({
   }
   return (
     <>
-      {readyScope !== renderScope && error ? <ErrorState title={error} /> : null}
+      {readyScope !== renderScope && error ? (
+        <ErrorState id="plan-review-form-unavailable" title={error} />
+      ) : null}
       <form
         onSubmit={submit}
         hidden={readyScope !== renderScope}
