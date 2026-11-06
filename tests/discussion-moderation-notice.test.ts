@@ -47,7 +47,7 @@ beforeEach(() => {
   state.failInbox = false;
   state.push.mockResolvedValue({ queued: 1, reason: "queued" });
 });
-it("locks content preferences and stores a status-only notice with a safe target link", async () => {
+it("locks content preferences and stores a status-only notice with the author discussion permalink", async () => {
   await discussionModerationNotice(db as unknown as Tx, item);
   expect(state.lock).toHaveBeenCalledWith(db, ["author"]);
   expect(insert()?.params).toEqual(
@@ -55,7 +55,7 @@ it("locks content preferences and stores a status-only notice with a safe target
       "author",
       "Discussion moderation",
       "Comment comment: removed.",
-      "/articles/guide#discussion",
+      "/workspace/discussions/comment",
     ]),
   );
   expect(insert()?.sql).toContain("on conflict do nothing");
@@ -103,15 +103,17 @@ it.each(["en", "ru"] as const)(
     );
     expect(result.message).toBe(
       locale === "ru"
-        ? "Модератор удалил ваш комментарий. Ответы сохранены."
-        : "A moderator removed your comment. Replies remain.",
+        ? "Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены."
+        : "A moderator removed your comment. Open the discussion in your workspace. Replies remain.",
     );
     expect(result.message).not.toContain("comment:");
   },
 );
 
-it("links unavailable publications to the author's private discussion workspace", async () => {
-  await discussionModerationNotice(db as unknown as Tx, { ...item, available: false });
-  expect(insert()?.params).toContain("/workspace/discussions");
-  expect(insert()?.params).not.toContain("/articles/guide#discussion");
+it("never falls back to the discussion list or a public article hash", async () => {
+  await discussionModerationNotice(db as unknown as Tx, item);
+  const links = (insert()?.params ?? []).filter(
+    (value): value is string => typeof value === "string" && value.startsWith("/"),
+  );
+  expect(links).toEqual(["/workspace/discussions/comment"]);
 });

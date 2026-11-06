@@ -129,7 +129,12 @@ it("builds market Q&A deep links and article/server/user previews", async () => 
     moderationHref: "/admin/community/cnt_a",
     detail: null,
   });
-  expect(map.get("comment:cmt_a")?.href).toBe("/admin/community/cnt_a/discussion/cmt_a");
+  expect(map.get("comment:cmt_a")).toEqual({
+    title: "Guide",
+    href: "/articles/guide",
+    moderationHref: "/admin/community/cnt_a/discussion/cmt_a",
+    detail: "spam body",
+  });
   expect(map.get("user:usr_a")).toEqual({
     title: "Alice",
     href: "/users/alice",

@@ -21,6 +21,7 @@
 - Support staff notices deep-link to `/admin/support/:caseId` (queue list remains fallback for unsafe ids).
 - Build-incident downloader notices open library versions/updates (not Security Center), with RU/EN localization via `data.kind = build_incident`.
 - Publisher build honesty: review/quarantine/restore notices deep-link to `/workspace/resources/:productId/builds/:buildId` with RU/EN `build_lifecycle` copy (no malware invention).
+- Community discussion honesty: author removal notices → `/workspace/discussions/:commentId`; staff comment report targets expose `moderationHref` → `/admin/community/:contentId/discussion/:commentId`.
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.

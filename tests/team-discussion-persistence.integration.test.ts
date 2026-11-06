@@ -272,7 +272,7 @@ it("binds a Unicode legacy comment's full text digest, removes archived discussi
     .select({ link: notifications.link, message: notifications.message })
     .from(notifications)
     .where(eq(notifications.recipientId, author.id));
-  expect(notice.link).toBe("/workspace/discussions");
+  expect(notice.link).toBe(`/workspace/discussions/${message.id}`);
   expect(notice.message).not.toContain("Recorded moderation reason");
 });
 it("rejects changed text, revoked staff and wrong publication without mutation or moderation notices", async () => {

@@ -121,14 +121,12 @@ export async function resolveAdminReportTargets(
     });
   }
   for (const row of commentRows) {
-    const href = row.contentId
-      ? `/admin/community/${encodeURIComponent(row.contentId)}/discussion/${encodeURIComponent(row.id)}`
-      : row.slug
-        ? `/articles/${encodeURIComponent(row.slug)}`
-        : null;
     result.set(`comment:${row.id}`, {
       title: row.title,
-      href,
+      href: row.slug ? `/articles/${encodeURIComponent(row.slug)}` : null,
+      moderationHref: row.contentId
+        ? `/admin/community/${encodeURIComponent(row.contentId)}/discussion/${encodeURIComponent(row.id)}`
+        : null,
       detail: row.text.slice(0, 160),
     });
   }
