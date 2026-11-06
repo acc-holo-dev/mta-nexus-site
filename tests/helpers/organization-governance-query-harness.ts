@@ -62,7 +62,7 @@ export function createOrganizationGovernanceQueryPushMock() {
   return { enqueueWebPushWithRecoveryWithin: organizationGovernanceQueryState.push };
 }
 
-export function resetOrganizationGovernanceQueryState() {
+function resetOrganizationGovernanceQueryState() {
   organizationGovernanceQueryState.queries = [];
   organizationGovernanceQueryState.rows = [];
   organizationGovernanceQueryState.config = null;
