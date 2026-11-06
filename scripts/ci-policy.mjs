@@ -56,14 +56,14 @@ export function classifyChanges(
   const infrastructure = files.some((file) =>
     fullAcceptancePaths.some((pattern) => pattern.test(file)),
   );
-  // A newer main push cancels the preceding run, even when it changes only docs.
-  // Its before..HEAD diff cannot prove that an earlier security change completed CI.
-  const full = explicitFull || release || mainPush || infrastructure;
+  // Main concurrency no longer cancels in-flight runs. Docs-only tip updates can
+  // stay documentation-scoped; code on main still takes full_acceptance.
+  const full = explicitFull || release || infrastructure || (mainPush && code);
   const codeFiles = files.filter((file) => !isDocumentation(file));
   // Empty or unknown-heavy sets must not claim unit_only; default wider, never narrower.
   const unitOnly = !full && codeFiles.length > 0 && codeFiles.every((file) => isUnitOnlyPath(file));
   return {
-    code: code || explicitFull || release || mainPush || unitOnly,
+    code: code || explicitFull || release || unitOnly || (mainPush && code),
     unitOnly,
     full,
   };

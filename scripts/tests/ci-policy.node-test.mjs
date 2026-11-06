@@ -150,13 +150,36 @@ test("migration, database tooling, workflow and explicit release changes run ful
     assert.equal(policy.full, true);
     assert.equal(policy.unitOnly, false);
   }
-  for (const option of [{ explicitFull: true }, { release: true }, { mainPush: true }]) {
+  for (const option of [{ explicitFull: true }, { release: true }]) {
     const policy = classifyChanges([], option);
     assert.equal(policy.code, true);
     assert.equal(policy.full, true);
     assert.equal(policy.unitOnly, false);
     assert(requiredJobs(policy).includes("resource-browser"));
   }
+  assert.deepEqual(classifyChanges([], { mainPush: true }), {
+    code: false,
+    unitOnly: false,
+    full: false,
+  });
+  assert.deepEqual(classifyChanges(["docs/CURRENT-STATE.md"], { mainPush: true }), {
+    code: false,
+    unitOnly: false,
+    full: false,
+  });
+  assert.deepEqual(classifyChanges(["apps/web/src/app/page.tsx"], { mainPush: true }), {
+    code: true,
+    unitOnly: false,
+    full: true,
+  });
+});
+
+test("main CI keeps in-flight runs and does not cancel tip documentation merges", () => {
+  const workflow = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
+  assert.match(
+    workflow,
+    /cancel-in-progress:\s*\$\{\{\s*github\.ref\s*!=\s*'refs\/heads\/main'\s*\}\}/,
+  );
 });
 
 test("skipped or missing required gates never report successful acceptance", () => {
