@@ -181,6 +181,18 @@ export function CommercialPlanForm({
       setError(copy.errors.COMMERCIAL_PLAN_INVALID);
       return;
     }
+    if (action === "publish" || action === "archive" || action === "restore") {
+      const accepted = await confirmAction({
+        title: copy[action],
+        object: plan?.slug ?? slug,
+        consequences: copy[`${action}Confirm`],
+        confirmLabel: copy[action],
+        cancelLabel: locale === "ru" ? "Отмена" : "Cancel",
+        closeLabel: locale === "ru" ? "Отмена" : "Cancel",
+        ...(action === "archive" ? { danger: true } : { danger: false }),
+      });
+      if (!accepted || version !== epoch.current) return;
+    }
     const intent = {
       actorId,
       planId: plan?.id ?? null,

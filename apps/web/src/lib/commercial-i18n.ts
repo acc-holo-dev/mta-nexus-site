@@ -28,6 +28,12 @@ const copy = {
     publish: "Publish",
     archive: "Archive",
     restore: "Restore draft",
+    publishConfirm:
+      "Publishing makes these terms visible as an announcement. Subscription purchase stays unavailable until a payment provider is integrated.",
+    archiveConfirm:
+      "Archiving withdraws this plan from new selection. Existing recorded history stays.",
+    restoreConfirm:
+      "Restoring returns this plan to draft so terms can be edited and published again.",
     saving: "Saving…",
     saved: "Changes confirmed.",
     revision: "Version",
@@ -135,6 +141,11 @@ const copy = {
     publish: "Опубликовать",
     archive: "В архив",
     restore: "Восстановить черновик",
+    publishConfirm:
+      "Публикация делает эти условия видимыми как анонс. Покупка подписки остаётся недоступной до подключения платёжного провайдера.",
+    archiveConfirm: "Архивация снимает тариф с нового выбора. Уже записанная история сохраняется.",
+    restoreConfirm:
+      "Восстановление возвращает тариф в черновик, чтобы условия можно было править и снова опубликовать.",
     saving: "Сохранение…",
     saved: "Изменения подтверждены.",
     revision: "Версия",

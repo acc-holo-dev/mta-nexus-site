@@ -1,3 +1,4 @@
+import type { CommercialPlan } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
 import { flattenReactTestTree } from "./flatten-react-test-tree";
@@ -13,7 +14,10 @@ type CommercialPlanFormConfirmHarness = {
   confirm: Mock;
 };
 
-type CommercialPlanFormComponent = (props: { actorId: string }) => ReactNode;
+type CommercialPlanFormComponent = (props: {
+  actorId: string;
+  plan?: Omit<CommercialPlan, "updatedAt">;
+}) => ReactNode;
 
 export const reply = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), { status });
@@ -49,13 +53,18 @@ export function createCommercialPlanFormConfirmInteractionHelpers(
   harness: CommercialPlanFormConfirmHarness,
   CommercialPlanForm: CommercialPlanFormComponent,
 ) {
+  let activePlan: Omit<CommercialPlan, "updatedAt"> | undefined;
+
   function render() {
     harness.cursor = 0;
     harness.effects = [];
-    return flattenReactTestTree(CommercialPlanForm({ actorId: harness.actor }) as ReactNode);
+    return flattenReactTestTree(
+      CommercialPlanForm({ actorId: harness.actor, plan: activePlan }) as ReactNode,
+    );
   }
 
-  async function mount(actor = harness.actor) {
+  async function mount(actor = harness.actor, plan?: Omit<CommercialPlan, "updatedAt">) {
+    activePlan = plan;
     harness.fetch.mockResolvedValueOnce(reply({ authenticated: true, user: { id: actor } }));
     render();
     for (const effect of harness.effects) effect();
@@ -84,7 +93,19 @@ export function createCommercialPlanFormConfirmInteractionHelpers(
   }
 
   function planPosts() {
-    return harness.fetch.mock.calls.filter(([url]) => url === "/api/admin/commerce/plans");
+    return harness.fetch.mock.calls.filter(([url]) =>
+      String(url).startsWith("/api/admin/commerce/plans"),
+    );
+  }
+
+  function lifecycleButton(label: string) {
+    return render().find((n) => n.type === "button" && n.props.children === label);
+  }
+
+  async function clickLifecycle(label: string) {
+    const button = lifecycleButton(label);
+    if (!button) throw Error(`Missing lifecycle button ${label}`);
+    await (button.props.onClick as () => Promise<void>)();
   }
 
   function acknowledgementButton() {
@@ -94,6 +115,7 @@ export function createCommercialPlanFormConfirmInteractionHelpers(
   beforeEach(() => {
     harness.slots = [];
     harness.actor = "usr_a";
+    activePlan = undefined;
     harness.fetch.mockReset();
     harness.push.mockReset();
     harness.refresh.mockReset();
@@ -112,9 +134,12 @@ export function createCommercialPlanFormConfirmInteractionHelpers(
   return {
     render,
     mount,
+    fill,
     prepare,
     submit,
     planPosts,
+    lifecycleButton,
+    clickLifecycle,
     acknowledgementButton,
   };
 }
