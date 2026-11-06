@@ -129,7 +129,11 @@ export function BuildQuarantineControls({
         {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
       </Button>
       {error ? (
-        <ErrorState title={error} description={copy.quarantineBuildFailedDescription} />
+        <ErrorState
+          id="build-quarantine-controls-unavailable"
+          title={error}
+          description={copy.quarantineBuildFailedDescription}
+        />
       ) : null}
     </div>
   );
