@@ -284,6 +284,25 @@ it("reads only the authenticated reader's discussion subscription state", async 
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
 });
+it("hydrates product mute state on follow GET without requiring a save", async () => {
+  mocks.isFollowing.mockResolvedValue(false);
+  mocks.muteState.mockResolvedValue({
+    muted: true,
+    mutedUntil: "2026-11-07T12:00:00.000000Z",
+  });
+  const response = await followState(request("/api/follow?targetType=product&targetId=prd_hud"));
+  expect(await response.json()).toMatchObject({
+    authenticated: true,
+    following: false,
+    muted: true,
+    mutedUntil: "2026-11-07T12:00:00.000000Z",
+    targetType: "product",
+    targetId: "prd_hud",
+  });
+  expect(mocks.isFollowing).toHaveBeenCalledExactlyOnceWith("actor", "product", "prd_hud");
+  expect(mocks.muteState).toHaveBeenCalledExactlyOnceWith("actor", "product", "prd_hud");
+  expect(mocks.contentStates).not.toHaveBeenCalled();
+});
 it.each([POST, DELETE])(
   "persists a desired discussion subscription without creating a profile-follower notice",
   async (handler) => {

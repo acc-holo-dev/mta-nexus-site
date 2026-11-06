@@ -208,3 +208,16 @@ it("reads follow state for a whole bounded grid in one scoped query", async () =
   expect(state.queries[0].params).not.toContain("target-50");
   expect(state.queries[0].params.at(-1)).toBe(50);
 });
+it("reads active mute states for a bounded discovery grid without requiring follows", async () => {
+  state.rows = [[["target-1", "2026-11-07T12:00:00.000000Z"]]];
+  const ids = Array.from({ length: 60 }, (_, index) => `target-${index}`);
+  expect(await follows.muteStates("actor", "server", ids)).toEqual([
+    { targetId: "target-1", mutedUntil: "2026-11-07T12:00:00.000000Z" },
+  ]);
+  expect(state.queries).toHaveLength(1);
+  expect(state.queries[0].params).toContain("actor");
+  expect(state.queries[0].params).toContain("server");
+  expect(state.queries[0].params).toContain("target-49");
+  expect(state.queries[0].params).not.toContain("target-50");
+  expect(state.queries[0].sql).toContain("object_notification_mutes");
+});

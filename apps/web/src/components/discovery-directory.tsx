@@ -195,41 +195,52 @@ export async function DirectoryResults({
             .catch(() => ({ user: null, failed: true }))
         : { user: null, failed: false };
     const actor = viewer.user;
-    // One bounded read for the whole grid; cards never issue per-item state reads.
-    const followed = viewer.failed
-      ? null
-      : actor
-        ? await followWorkspaceRepository
-            .states(
-              actor.id,
-              targetType,
-              result.items.map((item) => item.id),
-            )
-            .catch(() => null)
-        : [];
-    return { actor, saved: followed ? new Set(followed) : null };
+    // One bounded follow+mute read for the whole grid; cards never issue per-item state reads.
+    if (viewer.failed) return { actor, saved: null, mutes: null };
+    if (!actor) return { actor, saved: new Set<string>(), mutes: new Map<string, string>() };
+    const ids = result.items.map((item) => item.id);
+    const [followed, muteRows] = await Promise.all([
+      followWorkspaceRepository.states(actor.id, targetType, ids).catch(() => null),
+      followWorkspaceRepository.muteStates(actor.id, targetType, ids).catch(() => null),
+    ]);
+    return {
+      actor,
+      saved: followed ? new Set(followed) : null,
+      mutes: muteRows
+        ? new Map(muteRows.map((row) => [row.targetId, row.mutedUntil] as const))
+        : null,
+    };
   };
-  const [directory, { actor, saved }] = await Promise.all([
+  const [directory, { actor, saved, mutes }] = await Promise.all([
     result.type === "servers" && result.items.length
       ? mtaMasterDirectoryService.getDirectory().catch(() => null)
       : null,
     readFollows(),
   ]);
   const observationFor = observationLookupForSnapshot(directory?.servers ?? []);
-  const followControl = (id: string, name: string) => (
-    <FollowButton
-      targetType={targetType}
-      targetId={id}
-      targetName={name}
-      initial={{
-        authenticated: !!actor,
-        actorId: actor?.id ?? null,
-        following: saved?.has(id) ?? false,
-        self: targetType === "user" && actor?.id === id,
-        error: saved === null,
-      }}
-    />
-  );
+  const followControl = (id: string, name: string) => {
+    const mutedUntil = mutes?.get(id) ?? null;
+    return (
+      <FollowButton
+        targetType={targetType}
+        targetId={id}
+        targetName={name}
+        initial={{
+          authenticated: !!actor,
+          actorId: actor?.id ?? null,
+          following: saved?.has(id) ?? false,
+          self: targetType === "user" && actor?.id === id,
+          error: saved === null,
+          ...(mutes
+            ? {
+                muted: Boolean(mutedUntil),
+                mutedUntil,
+              }
+            : {}),
+        }}
+      />
+    );
+  };
   return (
     <div className="space-y-5">
       {state.type === "servers" && (
