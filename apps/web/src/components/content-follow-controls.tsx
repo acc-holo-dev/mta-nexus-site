@@ -247,6 +247,7 @@ function ContentFollowControl({
   if (failed) {
     return (
       <ErrorState
+        id="content-follow-controls-unavailable"
         title={message || copy.error}
         description={copy.errorHint}
         className="items-stretch py-4"
