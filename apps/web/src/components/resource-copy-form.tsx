@@ -106,7 +106,13 @@ export function ResourceCopyForm({
           {c.frozen}
         </p>
       )}
-      {error ? <ErrorState title={error} description={c.errorDescription} /> : null}
+      {error ? (
+        <ErrorState
+          id="resource-copy-form-unavailable"
+          title={error}
+          description={c.errorDescription}
+        />
+      ) : null}
       <div className="flex flex-wrap gap-4">
         <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? c.busy : c.create}
