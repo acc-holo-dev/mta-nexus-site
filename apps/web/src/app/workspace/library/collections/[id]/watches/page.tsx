@@ -75,6 +75,7 @@ export default async function Page({
           {copy.library}
         </Link>
         <ErrorState
+          id="library-collection-watches-load-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={href(query.page)} className={navLinkClass}>
