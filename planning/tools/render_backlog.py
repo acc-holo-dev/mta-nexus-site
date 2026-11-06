@@ -15,7 +15,9 @@ def read(name: str):
 
 
 def write(name: str, text: str) -> None:
-    (DOCS / name).write_text(text.rstrip() + "\n", encoding="utf8")
+    path = DOCS / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text.rstrip() + "\n", encoding="utf8")
 
 
 def cell(s) -> str:
@@ -107,7 +109,7 @@ F6 намеренно не содержит детального execution backl
 
 ## Полный индекс
 
-Приёмка, реальные paths, проверки и источники — в [TASKS.md](TASKS.md). Связи исходного анализа — в [TRACEABILITY.md](TRACEABILITY.md).
+Приёмка, реальные paths, проверки и источники — в [TASKS.md](TASKS.md). Связи исходного анализа — в [archive/TRACEABILITY.md](archive/TRACEABILITY.md).
 
 """
     for phase in phases:
@@ -174,8 +176,8 @@ F6 намеренно не содержит детального execution backl
 
     trace = """# Прослеживаемость исходных рекомендаций
 
-**Статус:** derived · не править вручную (`python planning/tools/render_backlog.py`).  
-Путь пока `docs/TRACEABILITY.md` (перенос в `archive/` — волна D5 вместе с renderer).
+**Статус:** derived · archive · не править вручную (`python planning/tools/render_backlog.py`).  
+**Путь:** `docs/archive/TRACEABILITY.md` (историческая матрица source→task; не рабочий вход агента).
 
 Сгенерировано из `planning/source-register.json` и `planning/tasks.json`. Каждый из 96 пунктов имеет хотя бы одну task-связь. Пункт может затрагивать несколько задач, а задача — объединять связанные наблюдения; эти числа не равны числу багов. Покрытие означает наличие места в плане, а не выполненную реализацию.
 
@@ -197,11 +199,11 @@ F6 намеренно не содержит детального execution backl
         "18 направлений старого MTA Market и дополнительные будущие идеи учтены отдельно в "
         "`planning/retention-directions.json`.\n"
     )
-    write("TRACEABILITY.md", trace)
+    write("archive/TRACEABILITY.md", trace)
     print(
         json.dumps(
             {
-                "rendered": ["ROADMAP.md", "TASKS.md", "TRACEABILITY.md"],
+                "rendered": ["ROADMAP.md", "TASKS.md", "archive/TRACEABILITY.md"],
                 "tasks": len(tasks),
                 "source_rows": len(sources),
                 "execution_counts": dict(exec_counts),

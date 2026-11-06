@@ -122,4 +122,4 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 | Команды и ops                     | [OPERATIONS.md](OPERATIONS.md)                                                                              |
 | Предметная глава (указатель)      | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)                                                   |
 | Архив миграции docs               | [archive/DOCS-MIGRATION.md](archive/DOCS-MIGRATION.md)                                                      |
-| Derived прослеживаемость          | [TRACEABILITY.md](TRACEABILITY.md) (render; путь пока в корне `docs/`)                                      |
+| Derived прослеживаемость          | [archive/TRACEABILITY.md](archive/TRACEABILITY.md) (render)                                                |

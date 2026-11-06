@@ -1,10 +1,8 @@
 # MTA NEXUS — Decision Register
 
-> Утверждённые решения и открытые вопросы. Текущее поведение проверяйте в коде и миграциях.
-> Этот файл нужен людям и AI-агентам: он отделяет решения от current implementation, legacy и ещё открытых деталей.
->
-> NX-дополнения, открытые выборы и пояснение согласования AI-007: [docs/DECISIONS.md](../DECISIONS.md).
-> Рабочий вход агента: [docs/AGENT.md](../AGENT.md). Индекс baseline ID: `planning/decision-baseline.json`.
+**Статус:** living · полный baseline ID (не дублировать текстом в других файлах).  
+**Для кого:** люди и агенты — отделяет решения от current implementation / legacy / OPEN.  
+NX-дополнения: [DECISIONS.md](../DECISIONS.md). Вход агента: [AGENT.md](../AGENT.md). Индекс: `planning/decision-baseline.json`. Текущее поведение проверяйте в коде и миграциях.
 
 ## Статусы
 

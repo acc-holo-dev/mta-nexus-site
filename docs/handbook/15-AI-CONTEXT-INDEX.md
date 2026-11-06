@@ -1,6 +1,7 @@
 # Карта предметных областей
 
-Сначала структура репозитория и команды: [PROJECT-MAP](../PROJECT-MAP.md). После DOC-04 handbook-главы по сценариям удалены; читайте сводные контракты. Полный реестр решений: [13-DECISION-REGISTER.md](13-DECISION-REGISTER.md).
+**Статус:** living · тонкий указатель (после DOC-04).  
+Сначала структура и команды: [PROJECT-MAP](../PROJECT-MAP.md). Handbook-главы по сценариям удалены — читайте сводные контракты. Реестр: [13-DECISION-REGISTER.md](13-DECISION-REGISTER.md).
 
 | Область                    | Код                                           | Контракт                                                                   |
 | -------------------------- | --------------------------------------------- | -------------------------------------------------------------------------- |
@@ -11,7 +12,7 @@
 | Сообщество и уведомления   | content/discussion/follow, workers            | [COMMUNITY](../COMMUNITY.md), [FLOWS](../FLOWS.md)                         |
 | Модерация и доверие        | report/admin/verification; community-reports* | [TRUST-STAFF](../TRUST-STAFF.md)                                           |
 | Интерфейс                  | `packages/ui`, `globals.css`, i18n            | [UX-CONTRACT](../UX-CONTRACT.md), [PRODUCT](../PRODUCT.md)                 |
-| База и эксплуатация        | `packages/db`, migrations, `scripts`, CI      | [ARCHITECTURE](../ARCHITECTURE.md), [OPERATIONS](../OPERATIONS.md)         |
+| База и эксплуатация        | `packages/db`, migrations, `scripts`, CI      | [ARCHITECTURE](../ARCHITECTURE.md), [OPERATIONS](../OPERATIONS.md) / [ops/](../ops/README.md) |
 | Будущая коммерция          | commerce/license services                     | [COMMERCIAL-FUTURE](../COMMERCIAL-FUTURE.md)                               |
 
 Открывайте только относящиеся к задаче разделы. Проверяйте код и тесты: спецификация может описывать целевое состояние. Исторические главы — в Git.

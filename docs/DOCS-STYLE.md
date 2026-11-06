@@ -37,7 +37,7 @@
 | ---------------------------- | -------------------------------- | -------------------------------------------- |
 | `docs/ROADMAP.md`            | `planning/tasks.json`            | `python planning/tools/render_backlog.py`    |
 | `docs/TASKS.md`              | `planning/tasks.json`            | то же; не править вручную                    |
-| `docs/TRACEABILITY.md`       | import / render pipeline         | то же; путь в корне `docs/` до D5            |
+| `docs/archive/TRACEABILITY.md` | import / render pipeline       | то же; archive, не рабочий вход              |
 
 Живой статус исполнения — только [`planning/tasks.json`](../planning/TRACKER.md). Архив DOC: [`archive/`](archive/README.md).
 
@@ -50,4 +50,4 @@
 
 ## Порядок переработки (волны)
 
-Волны на PR #820: **D0–D5** landed · **D4** полный разрез `docs/ops/*` (`dev-startup`, `verification`, `production-boundary`, `inbox-recovery`, `backup-recovery`, `resource-safety`, `release`, `workers`). Path `docs/OPERATIONS.md` pinned (stubs + markers). Остаётся: D6 acceptance / nav polish after merge. Не смешивать tip-honesty PR с волнами docs.
+Волны на PR #820: **D0–D5** landed · **D4** `docs/ops/*` complete · **D6** TRACEABILITY → `docs/archive/`, nav/AGENT/handbook polish. Path `docs/OPERATIONS.md` pinned. Tip-honesty PR не смешивать с docs.

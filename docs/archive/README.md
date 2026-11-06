@@ -7,5 +7,4 @@
 | Файл | Содержание |
 | ---- | ---------- |
 | [DOCS-MIGRATION.md](DOCS-MIGRATION.md) | История DOC-01…05, карта ответственности путей |
-
-`docs/TRACEABILITY.md` пока остаётся в корне `docs/` как **derived** выход `render_backlog.py` (перенос пути — волна D5).
+| [TRACEABILITY.md](TRACEABILITY.md) | Derived source→task матрица (`render_backlog.py`) |

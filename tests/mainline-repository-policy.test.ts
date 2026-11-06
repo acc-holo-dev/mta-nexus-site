@@ -70,13 +70,12 @@ describe("mainline repository policy", () => {
       "SERVER-PACK-SPEC.md",
       "SERVERS-ORGS.md",
       "TASKS.md",
-      "TRACEABILITY.md",
       "TRUST-STAFF.md",
       "UX-CONTRACT.md",
     ]);
 
     const archive = readdirSync(resolve(process.cwd(), "docs/archive")).sort();
-    expect(archive).toEqual(["DOCS-MIGRATION.md", "README.md"]);
+    expect(archive).toEqual(["DOCS-MIGRATION.md", "README.md", "TRACEABILITY.md"]);
 
     const opsIndex = readdirSync(resolve(process.cwd(), "docs/ops")).sort();
     expect(opsIndex).toEqual([
