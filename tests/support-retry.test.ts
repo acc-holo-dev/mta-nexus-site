@@ -2,38 +2,28 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
-  reserveSupportReplyRetry,
   resolveSupportRetryActorScope,
-  type SupportRetryStorage,
 } from "../apps/web/src/lib/support-retry";
+import {
+  SUPPORT_RETRY_ACTOR_A,
+  SUPPORT_RETRY_ACTOR_B,
+  SUPPORT_RETRY_KEY_A,
+  SUPPORT_RETRY_KEY_B,
+  SUPPORT_RETRY_NOW,
+  createSupportRetryStore,
+} from "./helpers/support-retry-harness";
 
-const NOW = 1_797_000_000_000;
-const CASE_ID = `sup_${"a".repeat(24)}`;
-const A = "12345678-1234-4234-8234-123456789abc";
-const B = "12345678-1234-4234-8234-123456789abd";
-const ACTOR_A = "a".repeat(64);
-const ACTOR_B = "b".repeat(64);
-
-function store(): SupportRetryStorage & { dump(): string; size(): number } {
-  const values = new Map<string, string>();
-  return {
-    getItem: (key) => values.get(key) ?? null,
-    setItem: (key, value) => {
-      values.set(key, value);
-    },
-    removeItem: (key) => {
-      values.delete(key);
-    },
-    dump: () => Array.from(values.values()).join("\n"),
-    size: () => values.size,
-  };
-}
+const NOW = SUPPORT_RETRY_NOW;
+const A = SUPPORT_RETRY_KEY_A;
+const B = SUPPORT_RETRY_KEY_B;
+const ACTOR_A = SUPPORT_RETRY_ACTOR_A;
+const ACTOR_B = SUPPORT_RETRY_ACTOR_B;
 
 afterEach(() => vi.unstubAllGlobals());
 
-describe("support retry recovery across same-tab reload", () => {
+describe("support retry case recovery and actor isolation", () => {
   it("recovers original case request key without storing plaintext", async () => {
-    const storage = store();
+    const storage = createSupportRetryStore();
     const payload = JSON.stringify({
       category: "payment",
       subject: "Sensitive order",
@@ -60,7 +50,7 @@ describe("support retry recovery across same-tab reload", () => {
   });
 
   it("does not let an obsolete request clear a newer changed-payload retry", async () => {
-    const storage = store();
+    const storage = createSupportRetryStore();
     await reserveSupportCaseRetry("old", {
       storage,
       actorScope: ACTOR_A,
@@ -80,53 +70,8 @@ describe("support retry recovery across same-tab reload", () => {
     expect(storage.size()).toBe(0);
   });
 
-  it("preserves the original expected status when staff resolves the thread", async () => {
-    const storage = store();
-    await reserveSupportReplyRetry(CASE_ID, "Please help", "open", {
-      storage,
-      actorScope: ACTOR_A,
-      now: NOW,
-      newKey: () => A,
-    });
-    const retry = await reserveSupportReplyRetry(CASE_ID, "Please help", "resolved", {
-      storage,
-      actorScope: ACTOR_A,
-      now: NOW + 250,
-      newKey: () => B,
-    });
-    expect(retry.key).toBe(A);
-    expect(retry.recovered).toBe(true);
-    expect(JSON.parse(retry.payload).expectedStatus).toBe("open");
-    expect(storage.dump()).not.toContain("Please help");
-  });
-
-  it("expires old keys and isolates changed reply content", async () => {
-    const storage = store();
-    await reserveSupportReplyRetry(CASE_ID, "old", "open", {
-      storage,
-      actorScope: ACTOR_A,
-      now: NOW,
-      newKey: () => A,
-    });
-    const changed = await reserveSupportReplyRetry(CASE_ID, "new", "resolved", {
-      storage,
-      actorScope: ACTOR_A,
-      now: NOW + 1,
-      newKey: () => B,
-    });
-    expect(changed).toMatchObject({ key: B, recovered: false });
-    expect(JSON.parse(changed.payload).expectedStatus).toBe("resolved");
-    const expired = await reserveSupportReplyRetry(CASE_ID, "new", "resolved", {
-      storage,
-      actorScope: ACTOR_A,
-      now: NOW + 86_400_002,
-      newKey: () => A,
-    });
-    expect(expired).toMatchObject({ key: A, recovered: false });
-  });
-
   it("handles unavailable storage and rejects invalid case IDs and keys", async () => {
-    const denied: SupportRetryStorage = {
+    const denied = {
       getItem: () => {
         throw new Error("denied");
       },
@@ -146,13 +91,6 @@ describe("support retry recovery across same-tab reload", () => {
         })
       ).key,
     ).toBe(A);
-    expect(() =>
-      reserveSupportReplyRetry("invalid", "test", "open", {
-        storage: denied,
-        now: NOW,
-        newKey: () => A,
-      }),
-    ).toThrow("Invalid support case id");
     await expect(
       reserveSupportCaseRetry("test", {
         storage: denied,
@@ -161,8 +99,9 @@ describe("support retry recovery across same-tab reload", () => {
       }),
     ).rejects.toThrow("Invalid support retry key generator");
   });
+
   it("separates the same payload across accounts in one tab", async () => {
-    const storage = store();
+    const storage = createSupportRetryStore();
     const a = await reserveSupportCaseRetry("same payload", {
       storage,
       actorScope: ACTOR_A,
@@ -195,7 +134,7 @@ describe("support retry recovery across same-tab reload", () => {
   });
 
   it("never persists or reuses a key without a verified actor", async () => {
-    const storage = store();
+    const storage = createSupportRetryStore();
     for (const actorScope of [null, undefined, "", "not-a-digest"]) {
       const attempt = await reserveSupportCaseRetry("same payload", {
         storage,
@@ -243,40 +182,6 @@ describe("support retry recovery across same-tab reload", () => {
   });
 });
 
-it("reuses the original revision and key after an ambiguous reply even when the live case revision changes", async () => {
-  const storage = store(),
-    firstVersion = "2026-10-11T00:00:00.000Z";
-  const first = await reserveSupportReplyRetry(CASE_ID, "Sensitive retry message", "open", {
-    storage,
-    actorScope: ACTOR_A,
-    now: NOW,
-    newKey: () => A,
-    expectedUpdatedAt: firstVersion,
-  });
-  const retry = await reserveSupportReplyRetry(CASE_ID, "Sensitive retry message", "resolved", {
-    storage,
-    actorScope: ACTOR_A,
-    now: NOW + 250,
-    newKey: () => B,
-    expectedUpdatedAt: "2026-10-11T00:00:00.001Z",
-  });
-  expect(retry).toEqual({ ...first, recovered: true });
-  expect(JSON.parse(retry.payload)).toMatchObject({
-    expectedStatus: "open",
-    expectedUpdatedAt: firstVersion,
-  });
-  expect(storage.dump()).not.toContain("Sensitive retry message");
-  clearSupportRetry(`reply:${CASE_ID}`, A, { storage, actorScope: ACTOR_A, now: NOW + 500 });
-  const next = await reserveSupportReplyRetry(CASE_ID, "Sensitive retry message", "resolved", {
-    storage,
-    actorScope: ACTOR_A,
-    now: NOW + 500,
-    newKey: () => B,
-    expectedUpdatedAt: "2026-10-11T00:00:00.001Z",
-  });
-  expect(next.key).toBe(B);
-  expect(JSON.parse(next.payload).expectedUpdatedAt).toBe("2026-10-11T00:00:00.001Z");
-});
 it("does not overwrite a different actor retry slot after the session changes", async () => {
   const actorA = `usr_${"1".repeat(24)}`;
   const actorB = `usr_${"2".repeat(24)}`;
@@ -289,7 +194,7 @@ it("does not overwrite a different actor retry slot after the session changes", 
         }),
     ),
   );
-  const storage = store();
+  const storage = createSupportRetryStore();
   const scopeB = await resolveSupportRetryActorScope(actorB);
   expect(scopeB).toBeTruthy();
   await reserveSupportCaseRetry("existing B request", {
@@ -308,39 +213,4 @@ it("does not overwrite a different actor retry slot after the session changes", 
     newKey: () => A,
   });
   expect(storage.dump()).toBe(before);
-});
-it("rejects case and reply reservations when durable session storage cannot be read or written", async () => {
-  const denied: SupportRetryStorage = {
-    getItem: () => {
-      throw new Error("denied");
-    },
-    setItem: () => {
-      throw new Error("denied");
-    },
-    removeItem: () => {},
-  };
-  const options = {
-    storage: denied,
-    actorScope: ACTOR_A,
-    requirePersistence: true,
-    now: NOW,
-    newKey: () => A,
-  };
-  await expect(reserveSupportCaseRetry("case", options)).rejects.toThrow(
-    "Support retry storage unavailable",
-  );
-  await expect(reserveSupportReplyRetry(CASE_ID, "reply", "open", options)).rejects.toThrow(
-    "Support retry storage unavailable",
-  );
-  const noWrite: SupportRetryStorage = {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {},
-  };
-  await expect(reserveSupportCaseRetry("case", { ...options, storage: noWrite })).rejects.toThrow(
-    "Support retry storage unavailable",
-  );
-  await expect(
-    reserveSupportReplyRetry(CASE_ID, "reply", "open", { ...options, storage: noWrite }),
-  ).rejects.toThrow("Support retry storage unavailable");
 });
