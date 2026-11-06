@@ -286,6 +286,7 @@ export function LibraryCollectionBatchForm({
       )}
       {error ? (
         <ErrorState
+          id="library-collection-batch-unavailable"
           title={error}
           description={
             error.includes(c.fullCollection) ? c.capacityErrorDescription : c.actionErrorDescription
