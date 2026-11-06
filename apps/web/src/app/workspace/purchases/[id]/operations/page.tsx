@@ -61,6 +61,7 @@ export default async function OrderOperationsPage({
           {copy.back}
         </Link>
         <ErrorState
+          id="purchase-operations-load-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
