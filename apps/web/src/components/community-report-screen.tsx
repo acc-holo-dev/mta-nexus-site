@@ -51,6 +51,7 @@ export async function CommunityReportScreen({
     return (
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
         <ErrorState
+          id="community-report-forbidden"
           title={copy.forbidden}
           action={
             <Link
