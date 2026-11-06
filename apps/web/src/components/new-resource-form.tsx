@@ -435,6 +435,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
 
       {error ? (
         <ErrorState
+          id="new-resource-form-unavailable"
           title={error}
           description={message(
             "Отправка могла завершиться. Повтор использует исходные данные и тот же файл.",
