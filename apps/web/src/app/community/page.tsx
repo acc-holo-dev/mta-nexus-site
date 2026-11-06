@@ -79,6 +79,7 @@ export default async function CommunityPage({
 
       {!result ? (
         <ErrorState
+          id="community-unavailable"
           title={platformCopy.unavailable}
           action={
             <Link
