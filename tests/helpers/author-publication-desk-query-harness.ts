@@ -38,7 +38,7 @@ export async function createAuthorPublicationDeskQueryDbMock() {
   };
 }
 
-export function resetAuthorPublicationDeskQueryState() {
+function resetAuthorPublicationDeskQueryState() {
   const state = authorPublicationDeskQueryState;
   state.queries = [];
   state.rows = [];
@@ -69,7 +69,7 @@ export const authorPublicationDeskQueryContext = createHash("sha256")
   .update(JSON.stringify([1, "author-publication-desk", "actor", "", "", "all", "all", "all"]))
   .digest("hex");
 
-export const authorPublicationDeskQueryFixture: Record<string, unknown> = {
+const authorPublicationDeskQueryFixture: Record<string, unknown> = {
   id: "article",
   slug: "article",
   title: "Title",
@@ -91,8 +91,7 @@ export function authorPublicationDeskQueryFull(
 ) {
   return [
     ...Object.keys(getTableColumns(content)).map(
-      (key) =>
-        ({ ...authorPublicationDeskQueryFixture, ...overrides })[key] ?? null,
+      (key) => ({ ...authorPublicationDeskQueryFixture, ...overrides })[key] ?? null,
     ),
     exact,
   ];
