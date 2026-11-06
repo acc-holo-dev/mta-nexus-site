@@ -78,6 +78,7 @@ export default async function DeveloperProfilePage({
     return (
       <div className="min-w-0 space-y-6 overflow-x-clip">
         <ErrorState
+          id="developer-profile-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={profilePath} className={actionLinkClass}>
