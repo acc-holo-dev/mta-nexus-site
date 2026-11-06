@@ -169,6 +169,7 @@ export function BuildModerationControls({
 
       {error ? (
         <ErrorState
+          id="build-moderation-controls-unavailable"
           title={error}
           description={versionCopy.failedDescription}
           action={
