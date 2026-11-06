@@ -76,6 +76,7 @@ export default async function Page({
       return (
         <div className={pageShellClass}>
           <ErrorState
+            id="library-collection-compare-load-unavailable"
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}
             action={
