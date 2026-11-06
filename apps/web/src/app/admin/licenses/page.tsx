@@ -81,6 +81,7 @@ export default async function LicensesModerationPage({
           {copy.adminBack}
         </Link>
         <ErrorState
+          id="admin-licenses-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link
