@@ -10,8 +10,12 @@ it("routes organization lookup outages through ErrorState with touch retry", () 
   expect(source).toContain(
     'import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui"',
   );
+  expect(source).toContain('id="register-server-organizations-unavailable"');
   expect(source).toMatch(
-    /organizationsFailed \? \(\s*<ErrorState[\s\S]*?title=\{copy\.organizationsUnavailable\}[\s\S]*?size="touch"[\s\S]*?setOrganizationsLoadAttempt[\s\S]*?\{dictionary\.errors\.retry\}/u,
+    /organizationsFailed \? \(\s*<ErrorState[\s\S]*?id="register-server-organizations-unavailable"[\s\S]*?title=\{copy\.organizationsUnavailable\}[\s\S]*?size="touch"[\s\S]*?setOrganizationsLoadAttempt[\s\S]*?\{dictionary\.errors\.retry\}/u,
+  );
+  expect(source).not.toMatch(
+    /organizationsFailed \? \(\s*<ErrorState\s+title=\{copy\.organizationsUnavailable\}/u,
   );
   expect(source).not.toContain('role="status" className="block text-xs text-muted"');
   expect(source).not.toMatch(
