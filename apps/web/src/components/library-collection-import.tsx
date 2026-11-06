@@ -181,6 +181,7 @@ export function LibraryCollectionImport({
         </Button>
         {error ? (
           <ErrorState
+            id="library-collection-import-unavailable"
             title={error}
             description={m.previewErrorDescription}
             action={
