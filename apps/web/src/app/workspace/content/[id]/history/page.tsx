@@ -103,6 +103,7 @@ export default async function PublicationHistoryPage({
       </header>
       {error && (
         <ErrorState
+          id="workspace-content-history-unavailable"
           title={error}
           action={
             <Link href={retryHref} className={navLinkClass}>
