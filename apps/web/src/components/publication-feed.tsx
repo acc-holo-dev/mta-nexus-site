@@ -153,6 +153,7 @@ export function PublicationFeed({
       </FilterBar>
       {error && (
         <ErrorState
+          id="publication-feed-unavailable"
           title={error}
           action={
             <a
