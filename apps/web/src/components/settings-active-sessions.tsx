@@ -103,6 +103,7 @@ export function SettingsActiveSessions({
 
         {sessions === null ? (
           <ErrorState
+            id="settings-session-unavailable"
             title={copy.sessionUnavailable}
             action={
               <Button
