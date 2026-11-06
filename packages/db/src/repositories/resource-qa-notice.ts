@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, gt, ne, sql } from "drizzle-orm";
 import type { db } from "../client";
 import {
   notificationPreferences,
   notifications,
+  objectNotificationMutes,
   organizations,
   resourceQaThreadFollows,
   resourceQaThreads,
@@ -69,6 +70,21 @@ async function deliver(
     .where(eq(notificationPreferences.userId, input.recipientId))
     .limit(1);
   if (preference?.enabled === false) return;
+
+  // Active product mute suppresses Q&A content notices (same rule as content mutes).
+  const [muted] = await tx
+    .select({ id: objectNotificationMutes.id })
+    .from(objectNotificationMutes)
+    .where(
+      and(
+        eq(objectNotificationMutes.userId, input.recipientId),
+        eq(objectNotificationMutes.targetType, "product"),
+        eq(objectNotificationMutes.targetId, input.product.id),
+        gt(objectNotificationMutes.mutedUntil, sql`clock_timestamp()`),
+      ),
+    )
+    .limit(1);
+  if (muted) return;
 
   const id = noticeId([
     input.kind,

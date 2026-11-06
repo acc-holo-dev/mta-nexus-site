@@ -50,7 +50,8 @@ beforeEach(() => {
 });
 
 it("notifies the publisher about a new question with a content-category inbox row", async () => {
-  state.rows = [[], [["notice"]]];
+  // preference → active product mute check → insert
+  state.rows = [[], [], [["notice"]]];
   await notifyResourceQaEvent(db as unknown as Tx, {
     kind: "asked",
     product,
@@ -88,8 +89,24 @@ it("notifies the publisher about a new question with a content-category inbox ro
   expect(state.push).toHaveBeenCalled();
 });
 
+it("skips Q&A notices while an active product mute is in force", async () => {
+  state.rows = [[], [["mute_a"]]];
+  await notifyResourceQaEvent(db as unknown as Tx, {
+    kind: "asked",
+    product,
+    threadId: "rqt_a",
+    actorId: "usr_asker",
+  });
+  expect(state.lock).toHaveBeenCalledWith(db, ["usr_publisher"]);
+  expect(state.queries.some((query) => query.sql.startsWith('insert into "notifications"'))).toBe(
+    false,
+  );
+  expect(state.push).not.toHaveBeenCalled();
+});
+
 it("fans out answer notices to the asker and other followers, never the answering actor", async () => {
-  state.rows = [[["usr_asker"]], [["usr_follower"]], [], [["notice"]], [], [["notice"]]];
+  // author + followers, then per recipient: preference → mute → insert
+  state.rows = [[["usr_asker"]], [["usr_follower"]], [], [], [["notice"]], [], [], [["notice"]]];
   await notifyResourceQaEvent(db as unknown as Tx, {
     kind: "answered",
     product,

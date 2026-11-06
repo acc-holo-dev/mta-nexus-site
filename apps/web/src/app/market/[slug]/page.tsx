@@ -13,6 +13,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
 import { FollowButton } from "../../../components/follow-button";
+import { ObjectMuteControls } from "../../../components/object-mute-controls";
 import { ProductDependencyList } from "../../../components/product-dependency-list";
 import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
@@ -335,7 +336,7 @@ export default async function ProductDetailPage({
 
             <div className="space-y-3 border-t border-base pt-4">
               {isPublic ? (
-                <div className="space-y-1">
+                <div className="space-y-3">
                   <FollowButton
                     targetType="product"
                     targetId={product.id}
@@ -343,6 +344,14 @@ export default async function ProductDetailPage({
                     initial={saveInitial}
                     locale={locale}
                   />
+                  {user && user.id !== product.authorId ? (
+                    <ObjectMuteControls
+                      targetType="product"
+                      targetId={product.id}
+                      actorId={user.id}
+                      locale={locale}
+                    />
+                  ) : null}
                 </div>
               ) : null}
               {hasAccess ? (
