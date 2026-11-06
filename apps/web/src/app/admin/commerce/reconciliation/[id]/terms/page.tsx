@@ -81,6 +81,7 @@ export default async function TermsPage({
           {c.back}
         </Link>
         <ErrorState
+          id="admin-reconciliation-terms-unavailable"
           title={c.loadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
