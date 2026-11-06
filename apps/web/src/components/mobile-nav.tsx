@@ -150,7 +150,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-base bg-surface/95 px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-1 backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-base bg-surface px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-1 lg:hidden"
       aria-label={dictionary.nav.ecosystem}
     >
       {items.map((item) => {
@@ -162,8 +162,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
-              active ? "bg-accent-soft text-accent" : "text-muted hover:bg-hover hover:text-primary"
+            className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
+              active ? "bg-accent-soft text-accent" : "text-primary hover:bg-hover"
             }`}
           >
             <Icon className="h-4 w-4" aria-hidden="true" />
@@ -180,8 +180,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
         aria-expanded={isMoreOpen}
         aria-haspopup="dialog"
         aria-controls={isMoreOpen ? "mobile-more-menu" : undefined}
-        className={`h-auto min-h-12 min-w-0 flex-col gap-1 rounded-md px-1 py-2 text-[10px] font-semibold focus-visible:ring-offset-0 ${
-          moreActive ? "bg-accent-soft text-accent" : "text-muted hover:text-primary"
+        className={`h-auto min-h-12 min-w-0 flex-col gap-1 rounded-md px-1 py-2 text-xs font-semibold focus-visible:ring-offset-0 ${
+          moreActive ? "bg-accent-soft text-accent" : "text-primary hover:bg-hover"
         }`}
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
