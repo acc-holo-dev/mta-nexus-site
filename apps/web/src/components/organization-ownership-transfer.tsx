@@ -189,6 +189,7 @@ export function OrganizationOwnershipTransfer({
       )}
       {error ? (
         <ErrorState
+          id="organization-ownership-transfer-unavailable"
           title={error}
           description={copy.formErrorHint}
           action={
