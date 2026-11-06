@@ -77,6 +77,7 @@ export function SupportStatusHistory({
         <div className="min-w-0 space-y-3 overflow-x-clip" aria-live="polite">
           {error ? (
             <ErrorState
+              id="support-status-history-unavailable"
               title={error}
               description={copy.historyUnavailableDescription}
               action={
