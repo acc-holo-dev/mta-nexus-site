@@ -2206,7 +2206,11 @@
       ],
       "verification": [
         "tests/saved-follows-page.test.tsx",
-        "tests/library-collections-persistence.integration.test.ts",
+        "tests/library-collections-persistence-create-guards.integration.test.ts",
+        "tests/library-collections-persistence-batch.integration.test.ts",
+        "tests/library-collections-persistence-copy-move.integration.test.ts",
+        "tests/library-collections-persistence-membership.integration.test.ts",
+        "tests/library-collections-persistence-reconcile.integration.test.ts",
         "behavior probe: missing target, collection full, partial batch, retry same receipt, import validation."
       ],
       "dependencies": ["FLOW-02"],

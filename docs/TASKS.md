@@ -1702,7 +1702,11 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 ### Проверки при реализации
 
 - tests/saved-follows-page.test.tsx
-- tests/library-collections-persistence.integration.test.ts
+- tests/library-collections-persistence-create-guards.integration.test.ts
+- tests/library-collections-persistence-batch.integration.test.ts
+- tests/library-collections-persistence-copy-move.integration.test.ts
+- tests/library-collections-persistence-membership.integration.test.ts
+- tests/library-collections-persistence-reconcile.integration.test.ts
 - behavior probe: missing target, collection full, partial batch, retry same receipt, import validation.
 
 ### Зависимости и условия
