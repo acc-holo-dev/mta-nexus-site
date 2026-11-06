@@ -183,8 +183,17 @@ export function formatNotification(
       title: locale === "ru" ? "Новая жалоба сообщества" : notification.title,
       message: locale === "ru" ? "Жалоба сообщества ожидает рассмотрения." : notification.message,
     };
+  if (
+    notification.title === "New report" &&
+    notification.message === "A report is awaiting review."
+  )
+    return {
+      title: locale === "ru" ? "Новая жалоба" : notification.title,
+      message: locale === "ru" ? "Жалоба ожидает рассмотрения." : notification.message,
+    };
   const reportStatus =
-    notification.title === "Community report status" &&
+    (notification.title === "Community report status" ||
+      notification.title === "Platform report status") &&
     /^Report status: (under_review|resolved|dismissed)\.$/u.exec(notification.message);
   if (reportStatus) {
     const statuses: Record<string, string> = {
@@ -193,7 +202,12 @@ export function formatNotification(
       dismissed: "отклонена",
     };
     return {
-      title: locale === "ru" ? "Статус жалобы" : notification.title,
+      title:
+        locale === "ru"
+          ? notification.title === "Platform report status"
+            ? "Статус жалобы платформы"
+            : "Статус жалобы"
+          : notification.title,
       message: locale === "ru" ? `Жалоба ${statuses[reportStatus[1]]}.` : notification.message,
     };
   }

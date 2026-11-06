@@ -36,6 +36,7 @@ export default async function AdminPage({
   searchParams: Promise<{
     reportView?: string;
     reportPage?: string;
+    reportId?: string;
     verificationView?: string;
     verificationPage?: string;
     buildPage?: string;
@@ -52,6 +53,10 @@ export default async function AdminPage({
     typeof value === "string" && /^[1-9]\d{0,4}$/.test(value) ? Number(value) : 1;
   const reportView = query.reportView === "history" ? "history" : "pending";
   const reportPage = parsePage(query.reportPage);
+  const focusedReportId =
+    typeof query.reportId === "string" && /^[A-Za-z0-9_-]{1,128}$/u.test(query.reportId)
+      ? query.reportId
+      : null;
   const verificationView = query.verificationView === "history" ? "history" : "pending";
   const verificationPage = parsePage(query.verificationPage);
   const buildPage = parsePage(query.buildPage);
@@ -107,6 +112,9 @@ export default async function AdminPage({
   const loaded = await Promise.all([
     adminService.getSystemHealthMetrics(adminUser),
     adminService.listReports(adminUser, reportView, reportPage),
+    focusedReportId
+      ? adminService.getReport(adminUser, focusedReportId).catch(() => null)
+      : Promise.resolve(null),
     verificationRepository.listPage(verificationView, verificationPage),
     verificationRepository.countPending(),
     buildRepository.listPendingReviewPage(buildPage),
@@ -139,6 +147,7 @@ export default async function AdminPage({
   const [
     health,
     reportPageResult,
+    focusedReport,
     verificationPageResult,
     pendingVerificationCount,
     buildPageResult,
@@ -151,7 +160,11 @@ export default async function AdminPage({
   ] = loaded;
 
   const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
-  const { reports, hasMore: moreReports } = reportPageResult;
+  const { hasMore: moreReports } = reportPageResult;
+  const reports =
+    focusedReport && !reportPageResult.reports.some((report) => report.id === focusedReport.id)
+      ? [focusedReport, ...reportPageResult.reports]
+      : reportPageResult.reports;
   const { builds: pendingBuilds, hasMore: moreBuilds } = buildPageResult;
   const { builds: riskBuilds, hasMore: moreRiskBuilds } = riskBuildPageResult;
   const { items: pendingContent, hasMore: moreContent } = contentPageResult;
@@ -314,6 +327,7 @@ export default async function AdminPage({
         reports={reports}
         moreReports={moreReports}
         reportHref={reportHref}
+        focusedReportId={focusedReport?.id ?? focusedReportId}
       />
 
       {canViewAudit && (

@@ -77,6 +77,7 @@ export const admin = {
     next: "Далее",
     reporter: "Автор жалобы",
     openReportedTarget: "Открыть объект жалобы",
+    openStaffModeration: "Открыть модерацию для сотрудников",
     removeReportedQaThread: "Удалить вопрос и закрыть жалобу",
     removeReportedQaThreadNotes: "Сотрудники удалили указанный вопрос по ресурсу.",
     targetTypes: {

@@ -73,6 +73,20 @@ class AdminService {
     };
   }
 
+  async getReport(actor: User, reportId: string): Promise<AdminReportListItem | null> {
+    if (!can(actor, "admin.moderation")) {
+      throw new ForbiddenError("Moderator access required");
+    }
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(reportId)) return null;
+    const report = await reportRepository.findById(reportId);
+    if (!report) return null;
+    const targets = await resolveAdminReportTargets([report]);
+    return {
+      ...report,
+      targetPreview: targets.get(`${report.targetType}:${report.targetId}`) ?? null,
+    };
+  }
+
   async resolveReport(
     reportId: string,
     input: {

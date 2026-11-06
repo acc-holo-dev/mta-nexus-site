@@ -29,6 +29,7 @@ type AdminReport = {
     title: string | null;
     href: string | null;
     detail: string | null;
+    moderationHref?: string | null;
     productId?: string | null;
     revision?: number | null;
     removable?: boolean;
@@ -50,6 +51,7 @@ export function AdminReportsSection({
   reports,
   moreReports,
   reportHref,
+  focusedReportId = null,
 }: {
   locale: Locale;
   copy: AdminCopy;
@@ -60,6 +62,7 @@ export function AdminReportsSection({
   reports: AdminReport[];
   moreReports: boolean;
   reportHref: (view: "pending" | "history", page: number) => string;
+  focusedReportId?: string | null;
 }) {
   return (
     <section>
@@ -109,7 +112,13 @@ export function AdminReportsSection({
           reports.map((report) => (
             <div
               key={report.id}
-              className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
+              id={`report-${report.id}`}
+              data-report-focus={focusedReportId === report.id ? "true" : undefined}
+              className={`nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center${
+                focusedReportId === report.id
+                  ? " ring-2 ring-[color:var(--nexus-accent)] ring-offset-2 ring-offset-[var(--nexus-page)]"
+                  : ""
+              }`}
             >
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -158,6 +167,14 @@ export function AdminReportsSection({
                     className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
                     {copy.openReportedTarget}
+                  </Link>
+                ) : null}
+                {report.targetPreview?.moderationHref ? (
+                  <Link
+                    href={report.targetPreview.moderationHref}
+                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.openStaffModeration}
                   </Link>
                 ) : null}
                 {(report.status === "open" || report.status === "under_review") &&

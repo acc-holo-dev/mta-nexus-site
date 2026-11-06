@@ -1,8 +1,10 @@
+import { createHash } from "node:crypto";
 import { type AuditEvent, ForbiddenError, type Report, UnauthorizedError } from "@nexus/domain";
 import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, reportNotificationDeliveries, reports, users } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
+import { notificationRepository } from "./notifications";
 import { lockPublicReportTarget } from "./report-target";
 
 export class ReportRepository {
@@ -59,6 +61,49 @@ export class ReportRepository {
       .where(and(eq(reports.id, id), sql`${reports.targetType} <> 'review'`))
       .limit(1);
     return (rows[0] as unknown as Report) || null;
+  }
+
+  async findOwnedByReporter(id: string, reporterId: string): Promise<Report | null> {
+    const rows = await db
+      .select()
+      .from(reports)
+      .where(
+        and(
+          eq(reports.id, id),
+          eq(reports.reporterId, reporterId),
+          sql`${reports.targetType} <> 'review'`,
+        ),
+      )
+      .limit(1);
+    return (rows[0] as unknown as Report) || null;
+  }
+
+  async listForReporter(
+    reporterId: string,
+    page: number,
+    pageSize = 30,
+  ): Promise<{ reports: Report[]; hasMore: boolean }> {
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      page > 99_999 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      throw new RangeError("Invalid report page");
+    }
+    const rows = await db
+      .select()
+      .from(reports)
+      .where(and(eq(reports.reporterId, reporterId), sql`${reports.targetType} <> 'review'`))
+      .orderBy(desc(reports.createdAt), desc(reports.id))
+      .limit(pageSize + 1)
+      .offset((page - 1) * pageSize);
+    return {
+      reports: rows.slice(0, pageSize) as unknown as Report[],
+      hasMore: rows.length > pageSize,
+    };
   }
 
   async findOpenByReporterAndTarget(
@@ -186,6 +231,34 @@ export class ReportRepository {
         ...audit,
         createdAt: now,
       });
+
+      const notice = await notificationRepository.createWithPushOutboxWithin(
+        tx,
+        {
+          id: `ntf_report_${createHash("sha256")
+            .update(JSON.stringify([audit.id, resolved.reporterId]))
+            .digest("hex")}`,
+          recipientId: resolved.reporterId,
+          title: "Platform report status",
+          message: `Report status: ${status}.`,
+          link: `/workspace/platform-reports/${encodeURIComponent(resolved.id)}`,
+          type: "security",
+          category: "security",
+        },
+        true,
+      );
+      if (
+        notice.notification &&
+        (notice.pushQueueState === "saturated" || notice.pushQueueState === "error")
+      ) {
+        console.warn(
+          JSON.stringify({
+            event: "notification.push_outbox_degraded",
+            producer: "platform_report",
+            reason: notice.pushQueueState,
+          }),
+        );
+      }
 
       return resolved as unknown as Report;
     });

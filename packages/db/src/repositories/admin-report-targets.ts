@@ -7,6 +7,8 @@ export type AdminReportTargetPreview = {
   title: string | null;
   href: string | null;
   detail: string | null;
+  /** Staff moderation surface when the public href alone is weak for operators. */
+  moderationHref?: string | null;
   /** Present for resource Q&A so staff can remove without a separate lookup. */
   productId?: string | null;
   revision?: number | null;
@@ -113,6 +115,7 @@ export async function resolveAdminReportTargets(
     result.set(`content:${row.id}`, {
       title: row.title,
       href: `/articles/${encodeURIComponent(row.slug)}`,
+      moderationHref: `/admin/community/${encodeURIComponent(row.id)}`,
       detail: null,
     });
   }

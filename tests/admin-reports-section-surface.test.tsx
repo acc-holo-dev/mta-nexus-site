@@ -84,4 +84,47 @@ it("links resource Q&A reports to the market deep link with thread preview", () 
   expect(html).toContain("rqa_thread_1");
   expect(html).toContain('data-qa-remove="rpt_qa:prd_hud:rqa_thread_1"');
   expect(html).toContain('data-report="rpt_qa"');
+  expect(html).toContain('id="report-rpt_qa"');
+});
+
+it("exposes staff moderation deep links for content report targets", () => {
+  const copy = getDictionary("en").admin;
+  const html = renderToStaticMarkup(
+    <AdminReportsSection
+      locale="en"
+      copy={copy}
+      dateLocale="en-US"
+      reportView="pending"
+      reportPage={1}
+      reportsOpenCount={1}
+      moreReports={false}
+      focusedReportId="rpt_content"
+      reportHref={(view, page) => `/admin?reportView=${view}&reportPage=${page}`}
+      reports={[
+        {
+          id: "rpt_content",
+          type: "abuse",
+          targetId: "cnt_guide",
+          reason: "Stolen article",
+          reporterId: "usr_r",
+          targetType: "content",
+          createdAt: "2026-11-05T12:00:00.000Z",
+          evidenceUrls: [],
+          status: "open",
+          targetPreview: {
+            title: "Guide",
+            href: "/articles/guide",
+            moderationHref: "/admin/community/cnt_guide",
+            detail: null,
+          },
+        },
+      ]}
+    />,
+  );
+
+  expect(html).toContain('href="/articles/guide"');
+  expect(html).toContain('href="/admin/community/cnt_guide"');
+  expect(html).toContain(copy.openStaffModeration);
+  expect(html).toContain('id="report-rpt_content"');
+  expect(html).toContain('data-report-focus="true"');
 });

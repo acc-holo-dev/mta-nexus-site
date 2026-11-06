@@ -125,6 +125,7 @@ it("builds market Q&A deep links and article/server/user previews", async () => 
   expect(map.get("content:cnt_a")).toEqual({
     title: "Guide",
     href: "/articles/guide",
+    moderationHref: "/admin/community/cnt_a",
     detail: null,
   });
   expect(map.get("comment:cmt_a")?.href).toBe("/admin/community/cnt_a/discussion/cmt_a");

@@ -140,7 +140,11 @@ it("uses current staff roles and the fixed account horizon, with safe generic li
   });
   await drain(f.reportId);
   expect(await notices(f.reportId)).toMatchObject([
-    { recipientId: promoted, link: "/admin", category: "security" },
+    {
+      recipientId: promoted,
+      link: `/admin?reportView=pending&reportId=${encodeURIComponent(f.reportId)}#report-${encodeURIComponent(f.reportId)}`,
+      category: "security",
+    },
   ]);
   expect(await notices(f.reportId)).toHaveLength(1);
 });

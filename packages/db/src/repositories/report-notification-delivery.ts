@@ -88,7 +88,7 @@ export class ReportNotificationDeliveryRepository {
                 message: "A report is awaiting review.",
                 link: job.community
                   ? `/admin/reports/${encodeURIComponent(job.reportId)}`
-                  : "/admin",
+                  : `/admin?reportView=pending&reportId=${encodeURIComponent(job.reportId)}#report-${encodeURIComponent(job.reportId)}`,
                 type: "security",
                 category: "security",
               },
