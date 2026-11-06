@@ -44,6 +44,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           {copy.inventory}
         </Link>
         <ErrorState
+          id="admin-storage-object-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
