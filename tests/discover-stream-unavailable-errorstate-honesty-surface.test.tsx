@@ -1,0 +1,13 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { expect, it } from "vitest";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const source = readFileSync(join(root, "apps/web/src/app/discover/stream/page.tsx"), "utf8");
+
+/** Honesty lock for discover stream load failure. */
+it("locks discover-stream-unavailable notice to ErrorState", () => {
+  expect(source).toContain('id="discover-stream-unavailable"');
+  expect(source).toMatch(/<ErrorState\s+id="discover-stream-unavailable"\s+title=\{error\}/u);
+});

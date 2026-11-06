@@ -73,6 +73,7 @@ export default async function StreamPage({
       {state && <DirectoryFilters state={state} locale={locale} path="/discover/stream" stream />}
       {error ? (
         <ErrorState
+          id="discover-stream-unavailable"
           title={error}
           action={
             <Link href={discoveryStreamHref(state ?? fallback)} className={actionLinkClass}>
