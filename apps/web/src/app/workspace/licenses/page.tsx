@@ -87,6 +87,7 @@ export default async function LicensesHistoryPage({
       <div className={pageShellClass}>
         <HistoryShell copy={copy} area="licenses">
           <ErrorState
+            id="workspace-licenses-unavailable"
             title={copy.loadUnavailable}
             action={
               <Link href={retryHref} className={navLinkClass}>
