@@ -27,6 +27,7 @@ export function DiscussionComposeWriteFeedback({
   const copy = getDiscussionCopy(locale);
   return (
     <ErrorState
+      id="content-discussion-compose-unavailable"
       title={error}
       description={copy.formErrorHint}
       className="items-stretch py-4"
