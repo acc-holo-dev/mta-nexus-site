@@ -90,7 +90,7 @@ export function createWorkspaceLiveSourceDirectoryMock() {
   };
 }
 
-export function resetWorkspaceLiveSourceState() {
+function resetWorkspaceLiveSourceState() {
   vi.clearAllMocks();
   workspaceLiveSourceState.user = {
     id: "usr_workspace",
