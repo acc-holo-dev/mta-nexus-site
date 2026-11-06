@@ -280,7 +280,7 @@ it("removes an archived comment with full Unicode version, keeps other reports p
       .where(
         and(
           eq(notifications.recipientId, f.original.id),
-          eq(notifications.link, "/workspace/discussions"),
+          eq(notifications.link, `/workspace/discussions/${c.id}`),
         ),
       ),
   ).toHaveLength(1);

@@ -6,14 +6,18 @@ import { lockNotificationPreferencesForUsers } from "./notification-preference-l
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/** Author permalink for a moderated discussion row (survives public unavailability). */
+function authorDiscussionHref(commentId: string) {
+  return `/workspace/discussions/${encodeURIComponent(commentId)}`;
+}
+
 export async function discussionModerationNotice(
   tx: Transaction,
   input: {
     auditId: string;
     authorId: string;
     commentId: string;
-    slug: string;
-    available?: boolean;
   },
 ) {
   await lockNotificationPreferencesForUsers(tx, [input.authorId]);
@@ -33,10 +37,7 @@ export async function discussionModerationNotice(
       recipientId: input.authorId,
       title: "Discussion moderation",
       message: `Comment ${input.commentId}: removed.`,
-      link:
-        input.available === false
-          ? "/workspace/discussions"
-          : `/articles/${encodeURIComponent(input.slug)}#discussion`,
+      link: authorDiscussionHref(input.commentId),
       type: "content",
       category: "content",
       isRead: false,

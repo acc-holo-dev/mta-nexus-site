@@ -284,8 +284,6 @@ it("allows a live moderator to remove another comment with a reason and a guarde
     auditId: "audit",
     authorId: "other",
     commentId: "comment",
-    slug: "article",
-    available: true,
   });
 });
 it("denies moderator edits and removal without reason", async () => {

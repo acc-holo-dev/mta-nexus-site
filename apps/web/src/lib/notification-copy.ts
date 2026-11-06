@@ -21,8 +21,8 @@ export function formatNotification(
       title: locale === "ru" ? "Модерация обсуждения" : "Discussion moderation",
       message:
         locale === "ru"
-          ? "Модератор удалил ваш комментарий. Ответы сохранены."
-          : "A moderator removed your comment. Replies remain.",
+          ? "Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены."
+          : "A moderator removed your comment. Open the discussion in your workspace. Replies remain.",
     };
   if (
     notification.title === "Publication reaction" &&

@@ -157,7 +157,7 @@ it("commits status-only moderator notices with deletion/audit and respects recip
       .digest("hex")}`,
     title: "Discussion moderation",
     message: `Comment ${message.id}: removed.`,
-    link: `/articles/${item.slug}#discussion`,
+    link: `/workspace/discussions/${message.id}`,
     category: "content",
   });
   expect(JSON.stringify(rows)).not.toMatch(

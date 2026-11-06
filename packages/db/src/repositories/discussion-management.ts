@@ -180,8 +180,6 @@ class DiscussionManagementRepository {
         auditId: input.auditId,
         authorId: current.authorId,
         commentId: current.id,
-        slug: publication.slug ?? (input.slug as string),
-        available: publication.status === "published",
       });
     return {
       contentId: publication.id,

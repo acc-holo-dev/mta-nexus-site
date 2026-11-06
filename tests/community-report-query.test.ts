@@ -295,8 +295,6 @@ it("uses the shared archived-discussion removal and transactional author notice,
     auditId: "removal-audit",
     authorId: "author",
     commentId: "comment",
-    slug: "article",
-    available: false,
   });
   const reports = state.queries.filter((query) => query.sql.startsWith('update "reports"'));
   expect(reports).toHaveLength(1);
