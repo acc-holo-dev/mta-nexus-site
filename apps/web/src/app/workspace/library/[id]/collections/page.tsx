@@ -68,6 +68,7 @@ export default async function ResourceCollectionsPage({
             {c.title}
           </Link>
           <ErrorState
+            id="library-resource-collections-load-unavailable"
             title={c.loadUnavailable}
             action={
               <Link
