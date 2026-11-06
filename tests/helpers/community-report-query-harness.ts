@@ -50,7 +50,7 @@ export function createCommunityReportQueryInitiatingSessionMock() {
   return { lockInitiatingSession: vi.fn() };
 }
 
-export function resetCommunityReportQueryState() {
+function resetCommunityReportQueryState() {
   communityReportQueryState.queries = [];
   communityReportQueryState.rows = [];
   communityReportQueryState.failAudit = false;
@@ -64,7 +64,7 @@ export function installCommunityReportQueryHooks() {
   });
 }
 
-export const communityReportQueryTime = "2026-10-10T00:00:00Z";
+const communityReportQueryTime = "2026-10-10T00:00:00Z";
 export const communityReportQueryReportRow = [
   "report",
   "comment",
