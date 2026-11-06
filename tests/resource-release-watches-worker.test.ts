@@ -1,71 +1,29 @@
-import { getTableColumns } from "drizzle-orm";
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][],
-  enqueue: vi.fn(),
-  clock: "2026-10-12T00:00:00.000Z",
-}));
-vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
-  enqueueWebPushWithRecoveryWithin: state.enqueue,
-}));
+import { expect, it, vi } from "vitest";
+
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", async () => {
+  const { resourceReleaseWatchesWorkerState } = await import(
+    "./helpers/resource-release-watches-worker-harness"
+  );
+  return { enqueueWebPushWithRecoveryWithin: resourceReleaseWatchesWorkerState.enqueue };
+});
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const raw = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    if (sql.includes('AS "observedAt"')) return { rows: [{ observedAt: state.clock }] };
-    return { rows: state.rows.shift() ?? [] };
-  });
-  const db: typeof raw = new Proxy(raw, {
-    get(target, key) {
-      if (key === "transaction")
-        return async (callback: (tx: typeof raw) => unknown) => callback(db);
-      const value = Reflect.get(target, key);
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-  return { db };
+  const { createResourceReleaseWatchesWorkerDbMock } = await import(
+    "./helpers/resource-release-watches-worker-harness"
+  );
+  return createResourceReleaseWatchesWorkerDbMock();
 });
-import { builds, resourceReleaseEvents } from "../packages/db/src/schema";
-import { buildRepository } from "../packages/db/src/repositories/builds";
+
 import { resourceReleaseWorkerRepository as worker } from "../packages/db/src/repositories/resource-release-worker";
-function event() {
-  const values: Record<string, unknown> = {
-    sequence: "9007199254740993",
-    productId: "prd_a",
-    buildId: "bld_a",
-    version: "2.0.0",
-    sha256Hash: "a".repeat(64),
-    fileSizeBytes: 7,
-    createdAt: "2026-10-11T00:00:00Z",
-  };
-  return Object.keys(getTableColumns(resourceReleaseEvents)).map((key) => values[key]);
-}
-function rows(enabled = true, safe = true) {
-  return [
-    [],
-    [],
-    [["usr_a", "prd_a"]],
-    [["prd_a", "Public resource", "published"]],
-    [["usr_a"]],
-    [["ent_a", null]],
-    [[1, "9007199254740992"]],
-    [event()],
-    safe ? [["bld_a"]] : [],
-    [],
-    [[enabled]],
-    ...(enabled && safe ? [[]] : []),
-    [["prd_a"]],
-    [],
-  ];
-}
-beforeEach(() => {
-  vi.clearAllMocks();
-  state.queries = [];
-  state.rows = [];
-  state.clock = "2026-10-12T00:00:00.000Z";
-  state.enqueue.mockResolvedValue({ queued: 2, reason: "queued" });
-});
+import {
+  installResourceReleaseWatchesWorkerHooks,
+  resourceReleaseWatchesWorkerEvent as event,
+  resourceReleaseWatchesWorkerRows as rows,
+  resourceReleaseWatchesWorkerState as state,
+} from "./helpers/resource-release-watches-worker-harness";
+
+installResourceReleaseWatchesWorkerHooks();
+
 it("atomically processes one exact release with current rights, preference lock, inbox, progress and audit", async () => {
   state.rows = rows();
   const result = await worker.runBatch(1);
@@ -154,90 +112,6 @@ it("checks bounds and stops before any transaction when shutdown is requested", 
   });
   expect(state.queries).toHaveLength(0);
 });
-
-it.each(["approve", "reject"] as const)(
-  "moderation persists release work only for a successful approval (%s)",
-  async (decision) => {
-    const artifact: Record<string, unknown> = {
-      id: "bld_a",
-      productId: "prd_a",
-      version: "2.0.0",
-      status: decision === "approve" ? "published" : "rejected",
-      revision: 4,
-      sha256Hash: "a".repeat(64),
-      fileSizeBytes: 7,
-      createdAt: "2026-10-11T00:00:00Z",
-      scannedAt: "2026-10-11T00:00:00Z",
-    };
-    state.rows = [
-      [["prd_a"]],
-      [["prd_a", "published", "usr_a", null, false]],
-      [["moderator"]],
-      [["ses_staff", "2099-01-01T00:00:00.000Z"]],
-      [Object.keys(getTableColumns(builds)).map((key) => artifact[key] ?? null)],
-      [["prd_a", "Resource", "usr_a", null]],
-      decision === "approve" ? [["bld_a", "2.0.0"]] : [],
-      [],
-      [],
-      [],
-      [],
-      [],
-    ];
-    const audit = {
-      id: "aud_a",
-      actorId: "usr_staff",
-      actorType: "user" as const,
-      action: "build.reviewed",
-      targetType: "build",
-      targetId: "bld_a",
-    };
-    expect(
-      await buildRepository.moderatePending("bld_a", decision, audit, 3, "staff-session"),
-    ).toMatchObject({
-      id: "bld_a",
-    });
-    const event = state.queries.find((query) =>
-      query.sql.startsWith('insert into "resource_release_events"'),
-    );
-    if (decision === "approve") {
-      expect(event?.params).toEqual(["prd_a", "bld_a", "2.0.0", "a".repeat(64), 7]);
-      expect(event?.sql).toContain('on conflict ("build_id") do nothing');
-      expect(state.queries.at(-1)).toBe(event);
-    } else expect(event).toBeUndefined();
-    expect(state.queries.some((query) => query.sql.startsWith('insert into "audit_events"'))).toBe(
-      true,
-    );
-  },
-);
-
-it("a stale moderation decision creates no release work, inbox or audit", async () => {
-  state.rows = [
-    [["prd_a"]],
-    [["prd_a", "published", "usr_a", null, false]],
-    [["moderator"]],
-    [["ses_staff", "2099-01-01T00:00:00.000Z"]],
-    [],
-  ];
-  expect(
-    await buildRepository.moderatePending(
-      "bld_a",
-      "approve",
-      {
-        id: "aud_a",
-        actorId: "usr_staff",
-        actorType: "user",
-        action: "build.approved",
-        targetType: "build",
-        targetId: "bld_a",
-      },
-      3,
-      "staff-session",
-    ),
-  ).toBeNull();
-  expect(state.queries).toHaveLength(5);
-  expect(state.queries.some((query) => query.sql.startsWith("insert"))).toBe(false);
-});
-
 it("uses the database clock after preference locking when a grant expires while waiting", async () => {
   state.rows = rows();
   state.rows[5] = [["ent_a", "2026-10-12T00:00:00Z"]];
