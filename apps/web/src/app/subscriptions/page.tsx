@@ -45,6 +45,7 @@ export default async function SubscriptionCatalog({
       <div className={shellClass}>
         <h1 className="font-display text-primary">{copy.catalog}</h1>
         <ErrorState
+          id="subscriptions-unavailable"
           title={copy.loadUnavailable}
           description={subscriptions.notice}
           action={
