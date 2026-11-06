@@ -1,5 +1,9 @@
 vi.mock("../../../components/follow-button", () => ({
-  FollowButton: () => <button type="button">Follow</button>,
+  FollowButton: (props: { initial?: unknown }) => (
+    <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
+      Follow
+    </button>
+  ),
 }));
 
 import type { ReactNode } from "react";
@@ -25,17 +29,32 @@ const state = vi.hoisted(() => ({
     isVerified: boolean;
   },
   products: vi.fn(),
+  session: vi.fn(async (): Promise<{ id: string; role: string } | null> => null),
+  followStates: vi.fn(async (): Promise<string[]> => []),
+  muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
 vi.mock("../../../lib/services/auth-service", () => ({
-  authService: { getUserByUsername: async () => state.user },
+  authService: {
+    getUserByUsername: async () => state.user,
+    getSession: () => state.session(),
+  },
 }));
-vi.mock("@nexus/db", () => ({ productRepository: { pagePublishedFreeByAuthor: state.products } }));
+vi.mock("@nexus/db", () => ({
+  productRepository: { pagePublishedFreeByAuthor: state.products },
+  followWorkspaceRepository: {
+    states: state.followStates,
+    muteState: state.muteState,
+  },
+}));
 vi.mock("../../../lib/services/product-service", () => ({
   productService: {
     getPublicAttributions: async () => new Map(),
   },
 }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+  getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
+}));
 vi.mock("../../../lib/services/profile-privacy-service", () => ({
   profilePrivacyService: {
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
@@ -96,6 +115,12 @@ beforeEach(() => {
     isVerified: false,
   };
   state.products.mockReset();
+  state.session.mockReset();
+  state.followStates.mockReset();
+  state.muteState.mockReset();
+  state.session.mockResolvedValue(null);
+  state.followStates.mockResolvedValue([]);
+  state.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
   state.products.mockResolvedValue({
     products: [{ id: "outside-global-top-100", title: "Author's published resource" }],
     total: 49,
@@ -103,6 +128,31 @@ beforeEach(() => {
     pageSize: 24,
     totalPages: 3,
   });
+});
+
+it("SSR-hydrates guest developer follow controls without querying mute state", async () => {
+  const html = renderToStaticMarkup(await Page(params()));
+  expect(state.followStates).not.toHaveBeenCalled();
+  expect(state.muteState).not.toHaveBeenCalled();
+  expect(html).toContain(
+    'data-follow-initial="{&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;muted&quot;:false,&quot;mutedUntil&quot;:null}"',
+  );
+});
+
+it("SSR-hydrates authenticated developer follow and mute", async () => {
+  state.session.mockResolvedValue({ id: "viewer", role: "user" });
+  state.followStates.mockResolvedValue(["author"]);
+  state.muteState.mockResolvedValue({
+    muted: true,
+    mutedUntil: "2026-12-01T00:00:00.000Z",
+  });
+  const html = renderToStaticMarkup(await Page(params()));
+  expect(state.followStates).toHaveBeenCalledWith("viewer", "user", ["author"]);
+  expect(state.muteState).toHaveBeenCalledWith("viewer", "user", "author");
+  expect(html).toContain("&quot;authenticated&quot;:true");
+  expect(html).toContain("&quot;following&quot;:true");
+  expect(html).toContain("&quot;muted&quot;:true");
+  expect(html).toContain("2026-12-01T00:00:00.000Z");
 });
 
 it.each(["en", "ru"] as const)(

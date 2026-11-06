@@ -33,6 +33,8 @@ const mocks = vi.hoisted(() => ({
   liveStatus: vi.fn(),
   reviewProps: [] as Array<Record<string, unknown>>,
   session: vi.fn(),
+  followStates: vi.fn(async (): Promise<string[]> => []),
+  muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
@@ -66,6 +68,22 @@ vi.mock("@nexus/ui", async () => {
   return {
     TrustBadge: ({ label }: { label: string }) =>
       React.createElement("span", { "data-testid": "trust-badge" }, label),
+    Button: ({
+      children,
+      ...props
+    }: {
+      children?: ReactNode;
+      [key: string]: unknown;
+    }) => React.createElement("button", props, children),
+    ErrorState: ({ title }: { title: string }) =>
+      React.createElement("div", { role: "alert" }, title),
+  };
+});
+
+vi.mock("../../../components/object-report-form", async () => {
+  const React = await import("react");
+  return {
+    ObjectReportForm: () => React.createElement("div", { "data-testid": "object-report" }),
   };
 });
 
@@ -96,10 +114,21 @@ vi.mock("../../../lib/i18n-server", () => ({
   getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));
 
+vi.mock("@nexus/db", () => ({
+  followWorkspaceRepository: {
+    states: mocks.followStates,
+    muteState: mocks.muteState,
+  },
+}));
+
 vi.mock("../../../components/server-follow-button", async () => {
   const React = await import("react");
   return {
-    ServerFollowButton: () => React.createElement("div", { "data-testid": "server-follow" }),
+    ServerFollowButton: ({ initial }: { initial?: unknown }) =>
+      React.createElement("div", {
+        "data-testid": "server-follow",
+        "data-follow-initial": JSON.stringify(initial ?? null),
+      }),
   };
 });
 
@@ -170,12 +199,50 @@ describe("server detail review load honesty", () => {
     vi.clearAllMocks();
     mocks.reviewProps.length = 0;
     mocks.session.mockResolvedValue(null);
+    mocks.followStates.mockResolvedValue([]);
+    mocks.muteState.mockResolvedValue({ muted: false, mutedUntil: null });
     mocks.getServer.mockResolvedValue(state.server);
     mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
     mocks.history.mockResolvedValue(null);
     mocks.updates.mockResolvedValue([]);
     mocks.matches.mockReturnValue(false);
     mocks.liveStatus.mockReturnValue("unknown");
+    mocks.publicPage.mockResolvedValue({
+      reviews: [],
+      total: 0,
+      page: 1,
+      pageSize: 20,
+      totalPages: 1,
+    });
+  });
+
+  it("SSR-hydrates guest follow controls without querying mute state", async () => {
+    const html = renderToStaticMarkup(
+      await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
+    );
+    expect(mocks.followStates).not.toHaveBeenCalled();
+    expect(mocks.muteState).not.toHaveBeenCalled();
+    expect(html).toContain(
+      'data-follow-initial="{&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;muted&quot;:false,&quot;mutedUntil&quot;:null}"',
+    );
+  });
+
+  it("SSR-hydrates authenticated server follow and mute", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_a", role: "user" });
+    mocks.followStates.mockResolvedValue(["srv_detail"]);
+    mocks.muteState.mockResolvedValue({
+      muted: true,
+      mutedUntil: "2026-12-01T00:00:00.000Z",
+    });
+    const html = renderToStaticMarkup(
+      await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
+    );
+    expect(mocks.followStates).toHaveBeenCalledWith("usr_a", "server", ["srv_detail"]);
+    expect(mocks.muteState).toHaveBeenCalledWith("usr_a", "server", "srv_detail");
+    expect(html).toContain("&quot;authenticated&quot;:true");
+    expect(html).toContain("&quot;following&quot;:true");
+    expect(html).toContain("&quot;muted&quot;:true");
+    expect(html).toContain("2026-12-01T00:00:00.000Z");
   });
 
   it("passes unavailable instead of fabricating total=0 when publicPage rejects", async () => {

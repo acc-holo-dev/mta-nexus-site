@@ -1,4 +1,9 @@
-import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
+import {
+  contentRepository,
+  followWorkspaceRepository,
+  organizationRepository,
+  productRepository,
+} from "@nexus/db";
 import { EmptyState, ErrorState, StatCard } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { Building2, ExternalLink, Globe, ShieldCheck } from "lucide-react";
@@ -10,11 +15,13 @@ import { ArticleCard } from "../../../components/article-card";
 import { FollowButton } from "../../../components/follow-button";
 import { ProductCard } from "../../../components/product-card";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +74,7 @@ export default async function OrganizationProfilePage({
   const websiteUrl = safeExternalWebUrl(organization.websiteUrl);
   const query = await searchParams;
   const profileHref = `/organizations/${encodeURIComponent(organization.slug)}`;
+  const sessionToken = (await getRequestCookieStore()).get("nexus_session")?.value;
   let loadError = false;
   const loaded = await Promise.all([
     productRepository.pagePublishedFreeByOrganization(
@@ -79,6 +87,7 @@ export default async function OrganizationProfilePage({
       parseProfilePage(query?.articlePage),
       12,
     ),
+    authService.getSession(sessionToken).catch(() => null),
   ]).catch(() => {
     loadError = true;
     return null;
@@ -99,7 +108,25 @@ export default async function OrganizationProfilePage({
     );
   }
 
-  const [resourcePage, articlePage] = loaded;
+  const [resourcePage, articlePage, actor] = loaded;
+  const [savedFollowIds, orgMute] = await Promise.all([
+    actor
+      ? followWorkspaceRepository
+          .states(actor.id, "organization", [organization.id])
+          .catch(() => null)
+      : Promise.resolve([] as string[]),
+    actor
+      ? followWorkspaceRepository
+          .muteState(actor.id, "organization", organization.id)
+          .catch(() => null)
+      : Promise.resolve(null),
+  ]);
+  const followInitial = buildFollowInitialState({
+    actor,
+    targetId: organization.id,
+    followedIds: savedFollowIds,
+    mute: orgMute,
+  });
   const products = resourcePage.products;
   const attributions = await productService.getPublicAttributions(products).catch(() => new Map());
   const articles = articlePage.items;
@@ -150,6 +177,7 @@ export default async function OrganizationProfilePage({
               targetType="organization"
               targetId={organization.id}
               targetName={organization.name}
+              initial={followInitial}
             />
             <Link href={`${profileHref}/activity`} className={actionLinkClass}>
               {publicationCopy(locale).activity}

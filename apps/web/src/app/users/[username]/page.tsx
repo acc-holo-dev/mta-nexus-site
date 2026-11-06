@@ -1,4 +1,9 @@
-import { productRepository, serverRepository, userRepository } from "@nexus/db";
+import {
+  followWorkspaceRepository,
+  productRepository,
+  serverRepository,
+  userRepository,
+} from "@nexus/db";
 import { Avatar, ErrorState, StatCard } from "@nexus/ui";
 import { Calendar, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -12,6 +17,7 @@ import { ObjectReportForm } from "../../../components/object-report-form";
 import { ProductCard } from "../../../components/product-card";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { ServerCard } from "../../../components/server-card";
+import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { parseProfilePage } from "../../../lib/profile-pagination";
@@ -113,6 +119,21 @@ export default async function UserProfilePage({
 
   const [resourcePage, serverPage, professional, visibility, actor] = loaded;
   const guestPreview = wantsGuestPreview && actor?.id === user.id;
+  const [savedFollowIds, userMute] = await Promise.all([
+    actor
+      ? followWorkspaceRepository.states(actor.id, "user", [user.id]).catch(() => null)
+      : Promise.resolve([] as string[]),
+    actor
+      ? followWorkspaceRepository.muteState(actor.id, "user", user.id).catch(() => null)
+      : Promise.resolve(null),
+  ]);
+  const followInitial = buildFollowInitialState({
+    actor,
+    targetId: user.id,
+    followedIds: savedFollowIds,
+    mute: userMute,
+    self: actor?.id === user.id,
+  });
   const userProducts = resourcePage.products;
   const attributions = await productService
     .getPublicAttributions(userProducts)
@@ -165,7 +186,12 @@ export default async function UserProfilePage({
             </p>
             {!guestPreview && (
               <div className="space-y-1">
-                <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+                <FollowButton
+                  targetType="user"
+                  targetId={user.id}
+                  targetName={user.displayName}
+                  initial={followInitial}
+                />
                 {actor?.id !== user.id ? (
                   <ObjectReportForm
                     targetType="user"

@@ -1,3 +1,4 @@
+import { followWorkspaceRepository } from "@nexus/db";
 import { ErrorState, TrustBadge } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { Cpu, Users } from "lucide-react";
@@ -13,6 +14,7 @@ import { ServerFollowButton } from "../../../components/server-follow-button";
 import { ServerHistoryPanel } from "../../../components/server-history-panel";
 import { ServerReviewPanel } from "../../../components/server-review-panel";
 import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
+import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
 import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
@@ -104,17 +106,30 @@ export default async function ServerDetailPage({
     .map(safeExternalWebUrl)
     .filter((url): url is string => url !== undefined);
 
-  const [directory, history, serverUpdates, reviewPage] = await Promise.all([
-    mtaMasterDirectoryService.getDirectory().catch(() => null),
-    serverHistoryService.getHistoryForServer(server, historyWindow).catch(() => null),
-    contentService.listServerUpdates(server.id, 6).catch(() => null),
-    server.visibility === "public" && server.status === "active"
-      ? serverReviewService
-          .publicPage(server.id)
-          .then((page) => ({ state: "ready" as const, page }))
-          .catch(() => ({ state: "unavailable" as const }))
-      : Promise.resolve(null),
-  ]);
+  const [directory, history, serverUpdates, reviewPage, savedFollowIds, serverMute] =
+    await Promise.all([
+      mtaMasterDirectoryService.getDirectory().catch(() => null),
+      serverHistoryService.getHistoryForServer(server, historyWindow).catch(() => null),
+      contentService.listServerUpdates(server.id, 6).catch(() => null),
+      server.visibility === "public" && server.status === "active"
+        ? serverReviewService
+            .publicPage(server.id)
+            .then((page) => ({ state: "ready" as const, page }))
+            .catch(() => ({ state: "unavailable" as const }))
+        : Promise.resolve(null),
+      reportViewer
+        ? followWorkspaceRepository.states(reportViewer.id, "server", [server.id]).catch(() => null)
+        : Promise.resolve([] as string[]),
+      reportViewer
+        ? followWorkspaceRepository.muteState(reportViewer.id, "server", server.id).catch(() => null)
+        : Promise.resolve(null),
+    ]);
+  const followInitial = buildFollowInitialState({
+    actor: reportViewer,
+    targetId: server.id,
+    followedIds: savedFollowIds,
+    mute: serverMute,
+  });
 
   const observedServer = directory?.servers.find((item) => matchesMtaEndpoint(server, item));
   const directoryIsStale = directory?.isStale ?? false;
@@ -205,7 +220,11 @@ export default async function ServerDetailPage({
                 {contextTrustCopy(locale).title}
               </Link>
             )}
-            <ServerFollowButton serverId={server.id} serverName={server.name} />
+            <ServerFollowButton
+              serverId={server.id}
+              serverName={server.name}
+              initial={followInitial}
+            />
             <ObjectReportForm
               targetType="server"
               targetId={server.id}
