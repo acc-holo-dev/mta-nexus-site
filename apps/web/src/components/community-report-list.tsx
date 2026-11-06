@@ -142,6 +142,7 @@ export function CommunityReportList({
       </search>
       {error ? (
         <ErrorState
+          id="community-report-list-unavailable"
           title={error}
           action={
             <Button
