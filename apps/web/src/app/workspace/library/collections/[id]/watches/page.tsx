@@ -5,9 +5,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
+import { ResourceReleaseWatchControl } from "../../../../../../components/resource-release-watch-control";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { collectionPageParams } from "../../../../../../lib/library-collections-query";
+import { collectionReleasesCopy } from "../../../../../../lib/collection-releases-i18n";
+import { collectionHref, collectionPageParams } from "../../../../../../lib/library-collections-query";
+import { getResourceReleaseControlCopy } from "../../../../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
 import { resourceReleaseWatchesQuery } from "../../../../../../lib/resource-release-watches-query";
@@ -104,6 +107,9 @@ export default async function Page({
       <Link href="/workspace/library/watches" className={navLinkClass}>
         {copy.watchCenter}
       </Link>
+      <Link href={collectionHref(path.id, "releases")} className={navLinkClass}>
+        {collectionReleasesCopy(locale).title}
+      </Link>
       <Link href="/workspace/library/watches/history?source=collection" className={navLinkClass}>
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
@@ -175,14 +181,34 @@ export default async function Page({
                 {item.enabled ? copy.enabled : copy.disabled}
                 {!item.available ? ` · ${copy.unavailable}` : ""}
               </p>
-              {item.available && (
-                <Link
-                  href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className={navLinkClass}
-                >
-                  {copy.versions}
-                </Link>
-              )}
+              <ResourceReleaseWatchControl
+                key={`${item.productId}:${item.revision}:${item.enabled}`}
+                watch={{
+                  productId: item.productId,
+                  enabled: item.enabled,
+                  revision: item.revision,
+                  updatedAt: item.updatedAt,
+                }}
+                available={item.available}
+              />
+              <div className="flex flex-wrap gap-4">
+                {item.slug ? (
+                  <Link
+                    href={`/market/${encodeURIComponent(item.slug)}`}
+                    className={navLinkClass}
+                  >
+                    {getResourceReleaseControlCopy(locale).open}
+                  </Link>
+                ) : null}
+                {item.available && (
+                  <Link
+                    href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
+                    className={navLinkClass}
+                  >
+                    {copy.versions}
+                  </Link>
+                )}
+              </div>
             </li>
           ))}
         </ul>

@@ -44,6 +44,24 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
     </button>
   ),
 }));
+vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
+  LibraryReleaseFollowLatest: ({ productId }: { productId: string }) => (
+    <button type="button" data-follow-latest={productId}>
+      Use latest
+    </button>
+  ),
+}));
+vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+  ResourceReleaseWatchControl: ({
+    watch,
+  }: {
+    watch: { productId: string; enabled: boolean; revision: number };
+  }) => (
+    <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
+      Watch
+    </button>
+  ),
+}));
 
 import Page, {
   dynamic,
@@ -73,7 +91,9 @@ const report = () => ({
     {
       productId: "prd_a",
       title: "Accessible & title",
+      slug: "accessible-title",
       available: true,
+      watch: { enabled: false, revision: 0, updatedAt: null },
       release: {
         state: "update_available",
         mode: "fixed",
@@ -90,7 +110,9 @@ const report = () => ({
     {
       productId: "prd_orphan",
       title: "PRIVATE-TITLE",
+      slug: null,
       available: false,
+      watch: { enabled: false, revision: 0, updatedAt: null },
       memberships: [{ ...a, addedAt: date }],
     },
   ],
@@ -136,6 +158,13 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("/prd_a/requirements?previewBuildId=bld_pin");
     expect(html).toContain("/prd_a/versions/compare?from=bld_pin&amp;to=bld_new");
     expect(html).toContain(v.releaseStates.update_available);
+    expect(html).toContain(v.watchNote);
+    expect(html).toContain(v.collectionReleases);
+    expect(html).toContain("/workspace/library/collections/lcol_a/releases");
+    expect(html).toContain("/workspace/library/collections/lcol_a/watches");
+    expect(html).toContain('data-follow-latest="prd_a"');
+    expect(html).toContain('data-watch="prd_a"');
+    expect(html).toContain('href="/market/accessible-title"');
     expect(html).toContain(v.snapshotNote);
     expect(html).not.toContain("/workspace/library/prd_orphan/versions");
     expect(html).not.toContain("/download");

@@ -75,6 +75,17 @@ vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
     </button>
   ),
 }));
+vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+  ResourceReleaseWatchControl: ({
+    watch,
+  }: {
+    watch: { productId: string; enabled: boolean; revision: number };
+  }) => (
+    <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
+      Watch
+    </button>
+  ),
+}));
 
 import Versions from "../apps/web/src/app/workspace/library/[id]/versions/page";
 import Updates, { metadata } from "../apps/web/src/app/workspace/library/updates/page";
@@ -102,6 +113,10 @@ beforeEach(() => {
         latestVersion: "2.0.0",
         latestBuildId: "bld_latest",
         storageKey: "PRIVATE-FILE",
+        watchEnabled: false,
+        watchRevision: 0,
+        watchUpdatedAt: null,
+        hasAccess: true,
       },
     ],
     counts: { all: 41, updates: 1, pinned: 1, unavailable: 1 },
@@ -301,6 +316,10 @@ it("offers open, compare, and follow-latest actions when an update is available"
         selectedBuildId: "bld_old",
         latestVersion: "2.0.0",
         latestBuildId: "bld_latest",
+        watchEnabled: true,
+        watchRevision: 2,
+        watchUpdatedAt: now,
+        hasAccess: true,
       },
     ],
     counts: { all: 1, updates: 1, pinned: 1, unavailable: 0 },
@@ -321,6 +340,7 @@ it("offers open, compare, and follow-latest actions when an update is available"
   expect(html).toContain('data-follow-latest="prd_a"');
   expect(html).toContain('data-revision="4"');
   expect(html).toContain('data-download="bld_old"');
+  expect(html).toContain('data-watch="prd_a" data-enabled="true"');
 });
 it("masks unavailable resource metadata even if an upstream DTO includes it", async () => {
   const list = await state.updates();

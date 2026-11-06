@@ -46,6 +46,9 @@ const en = {
   compareVersions: "Compare chosen and latest releases",
   preparation: "Review this exact release",
   preferenceRevision: "Version choice revision",
+  collectionReleases: "Collection version overview",
+  collectionWatches: "Collection release watches",
+  watchNote: "Membership does not enable release watches. Toggle watches explicitly.",
   snapshotNote:
     "This JSON page records the observed choices and memberships. It does not grant access, install resources or change version preferences.",
 };
@@ -96,6 +99,9 @@ const ru: typeof en = {
   compareVersions: "Сравнить выбранную и последнюю публикации",
   preparation: "Проверить эту точную публикацию",
   preferenceRevision: "Ревизия выбора версии",
+  collectionReleases: "Обзор версий коллекции",
+  collectionWatches: "Подписки на релизы коллекции",
+  watchNote: "Вхождение в коллекцию не включает подписку на релизы. Подписку нужно включать отдельно.",
   snapshotNote:
     "Эта страница JSON сохраняет наблюдаемые версии и вхождения. Она не даёт прав доступа, не устанавливает ресурсы и не меняет выбор версий.",
 };

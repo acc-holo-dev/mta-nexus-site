@@ -21,6 +21,17 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { collectionPage: h.page },
 }));
+vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+  ResourceReleaseWatchControl: ({
+    watch,
+  }: {
+    watch: { productId: string; enabled: boolean };
+  }) => (
+    <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
+      Watch
+    </button>
+  ),
+}));
 
 import Page, {
   metadata,
@@ -42,8 +53,24 @@ beforeEach(() => {
     collection: { id: "lcol_a", name: "<Core>", status: "active", revision: 3 },
     activeWatchCount: 4,
     items: [
-      { productId: "prd_a", enabled: false, revision: 0, available: true, title: "Root" },
-      { productId: "prd_b", enabled: false, revision: 2, available: false, title: "PRIVATE-TITLE" },
+      {
+        productId: "prd_a",
+        enabled: false,
+        revision: 0,
+        available: true,
+        title: "Root",
+        slug: "root-core",
+        updatedAt: null,
+      },
+      {
+        productId: "prd_b",
+        enabled: false,
+        revision: 2,
+        available: false,
+        title: "PRIVATE-TITLE",
+        slug: null,
+        updatedAt: null,
+      },
     ],
     counts: { all: 22, enabled: 0, disabled: 22, unavailable: 1 },
     page: 2,
@@ -63,6 +90,11 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("4/100");
     expect(html).toContain("query=Core");
     expect(html).toContain("/workspace/library/watches");
+    expect(html).toContain("/workspace/library/collections/lcol_a/releases");
+    expect(html).toContain('data-watch="prd_a"');
+    expect(html).toContain('data-watch="prd_b"');
+    expect(html).toContain('href="/market/root-core"');
+    expect(html).not.toContain("/market/PRIVATE");
     expect(metadata.robots).toEqual({ index: false, follow: false });
   },
 );

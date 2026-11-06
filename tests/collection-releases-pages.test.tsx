@@ -36,6 +36,17 @@ vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
     </button>
   ),
 }));
+vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+  ResourceReleaseWatchControl: ({
+    watch,
+  }: {
+    watch: { productId: string; enabled: boolean };
+  }) => (
+    <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
+      Watch
+    </button>
+  ),
+}));
 
 import { CollectionReleasesScreen } from "../apps/web/src/components/collection-releases-screen";
 import { collectionReleasesCopy } from "../apps/web/src/lib/collection-releases-i18n";
@@ -54,6 +65,9 @@ const item = {
   selectedBuildId: "bld_pin",
   selectedVersion: "1.0.0",
   addedAt: new Date(),
+  watchEnabled: false,
+  watchRevision: 0,
+  watchUpdatedAt: null,
 };
 const report = () => ({
   collection: { id: "lcol_a", name: "Core & maps", status: "active", revision: 7 },
@@ -124,6 +138,9 @@ it.each(["en", "ru"])(
       'href="/workspace/library/prd_a/versions/compare?from=bld_pin&amp;to=bld_new"',
     );
     expect(html).toContain('data-follow-latest="prd_a"');
+    expect(html).toContain('data-watch="prd_a"');
+    expect(html).toContain('data-watch="prd_withdrawn"');
+    expect(html).not.toContain('data-watch="prd_lost"');
   },
 );
 it("shows filtered empty releases with a clear link that keeps the collection path", async () => {

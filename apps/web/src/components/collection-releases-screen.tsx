@@ -19,6 +19,7 @@ import { libraryCollectionsService } from "../lib/services/library-collections-s
 import { LibraryReleaseFollowLatest } from "./library-release-follow-latest";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceDownloadButton } from "./resource-download-button";
+import { ResourceReleaseWatchControl } from "./resource-release-watch-control";
 export async function CollectionReleasesScreen({
   params,
   searchParams,
@@ -232,6 +233,19 @@ export async function CollectionReleasesScreen({
                   actorId={actor.id}
                   revision={item.revision}
                   mode={item.mode}
+                />
+              ) : null}
+              {item.hasAccess ? (
+                <ResourceReleaseWatchControl
+                  key={`${item.productId}:${item.watchRevision}:${item.watchEnabled}`}
+                  watch={{
+                    productId: item.productId,
+                    enabled: item.watchEnabled,
+                    revision: item.watchRevision,
+                    updatedAt: item.watchUpdatedAt,
+                  }}
+                  available={item.state !== "unavailable"}
+                  hasAccess={item.hasAccess}
                 />
               ) : null}
               <div className="flex flex-wrap gap-4">

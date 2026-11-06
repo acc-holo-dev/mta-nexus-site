@@ -81,7 +81,8 @@ export async function readCollectionReleaseWatches(
       const available = sql`owned.resource_id IS NOT NULL AND product.status='published' AND EXISTS(SELECT 1 FROM ${builds} WHERE ${safePublishedBuildCondition(sql`product.id`)})`;
       const sources = sql`${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, watch_rows AS (
       SELECT member.product_id AS "productId",member.added_at,coalesce(watch.enabled,false) AS enabled,coalesce(watch.revision,0) AS revision,watch.updated_at AS "updatedAt",
-        coalesce(${available},false) AS available,CASE WHEN ${available} THEN left(product.title,200) END AS title
+        coalesce(${available},false) AS available,CASE WHEN ${available} THEN left(product.title,200) END AS title,
+        CASE WHEN ${available} THEN product.slug END AS slug
       FROM ${members} member LEFT JOIN owned ON owned.resource_id=member.product_id LEFT JOIN ${products} product ON product.id=member.product_id
       LEFT JOIN ${watches} watch ON watch.user_id=${userId} AND watch.product_id=member.product_id
       WHERE member.collection_id=${collectionId}
@@ -118,8 +119,9 @@ export async function readCollectionReleaseWatches(
         updatedAt: Date | string | null;
         available: boolean;
         title: string | null;
+        slug: string | null;
       }>(sql`${sources}
-      SELECT "productId",enabled,revision,"updatedAt",available,title FROM ${table} WHERE ${condition} ORDER BY added_at DESC,"productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
+      SELECT "productId",enabled,revision,"updatedAt",available,title,slug FROM ${table} WHERE ${condition} ORDER BY added_at DESC,"productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
       return {
         collection,
         items: rows.map((row) => ({
@@ -129,6 +131,7 @@ export async function readCollectionReleaseWatches(
           updatedAt: row.updatedAt ? new Date(row.updatedAt) : null,
           available: row.available,
           title: row.available ? row.title : null,
+          slug: row.available && typeof row.slug === "string" && row.slug.length > 0 ? row.slug : null,
         })),
         counts,
         activeWatchCount: summary?.activeWatchCount ?? 0,

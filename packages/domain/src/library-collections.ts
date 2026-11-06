@@ -367,8 +367,12 @@ export type LibraryCollectionInventory = Omit<LibraryCollectionInventoryQuery, "
   items: {
     productId: string;
     title: string | null;
+    /** Public market slug when the resource is currently available; otherwise withheld. */
+    slug: string | null;
     available: boolean;
     release: LibraryCollectionInventoryRelease | null;
+    /** Account release-watch posture; revision 0 means no saved watch row yet. */
+    watch: { enabled: boolean; revision: number; updatedAt: string | null };
     memberships: (LibraryCollectionSnapshot & { addedAt: string })[];
   }[];
 };
