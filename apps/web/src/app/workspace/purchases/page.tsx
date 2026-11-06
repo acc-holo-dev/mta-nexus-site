@@ -59,6 +59,7 @@ export default async function PurchasesHistoryPage({
       <div className={pageShellClass}>
         <HistoryShell copy={copy} area="purchases">
           <ErrorState
+            id="workspace-purchases-unavailable"
             title={copy.purchasesLoadUnavailable}
             description={copy.purchasesLoadUnavailableHint}
             action={
