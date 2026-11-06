@@ -66,6 +66,7 @@ export function ServerStatisticsExportButton({
       </Button>
       {error ? (
         <ErrorState
+          id="server-statistics-export-unavailable"
           title={error}
           description={copy.exportErrorHint}
           className="items-stretch py-4"
