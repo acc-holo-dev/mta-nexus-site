@@ -168,6 +168,7 @@ export function CommunityReportDetailView({
       </div>
       {error ? (
         <ErrorState
+          id="community-report-detail-unavailable"
           title={error}
           action={
             <Button
