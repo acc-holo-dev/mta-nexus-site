@@ -149,6 +149,7 @@ export function VerificationModerationControls({
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
       {error ? (
         <ErrorState
+          id="verification-moderation-controls-unavailable"
           title={error}
           description={verificationCopy(locale).decisionFailedDescription}
           action={
