@@ -56,6 +56,7 @@ export default async function ResourceCartReceiptPage({
           {copy.title}
         </Link>
         <ErrorState
+          id="acquisition-receipt-detail-load-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnPath} className={linkClass}>
