@@ -129,6 +129,7 @@ export async function ServerWorkspaceHistoryScreen({
       </form>
       {!data ? (
         <ErrorState
+          id="server-workspace-history-unavailable"
           title={failure || copy.historyUnavailable}
           action={
             <Link href={serverWorkspaceHistoryHref(id, query)} className={navLinkClass}>
