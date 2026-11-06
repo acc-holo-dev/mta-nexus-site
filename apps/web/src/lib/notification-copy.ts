@@ -131,6 +131,29 @@ export function formatNotification(
       message: messages[organizationAccess[2]],
     };
   }
+  const serverOwnership = /^Server ownership verification was (approved|rejected)\.$/u.exec(
+    notification.message,
+  );
+  if (
+    serverOwnership &&
+    (notification.title === "Verification approved" ||
+      notification.title === "Verification rejected")
+  ) {
+    return {
+      title:
+        locale === "ru"
+          ? serverOwnership[1] === "approved"
+            ? "Верификация одобрена"
+            : "Верификация отклонена"
+          : notification.title,
+      message:
+        locale === "ru"
+          ? serverOwnership[1] === "approved"
+            ? "Подтверждение контроля сервера одобрено."
+            : "Подтверждение контроля сервера отклонено."
+          : notification.message,
+    };
+  }
   const verification =
     /^([a-z]+) verification for ([a-zA-Z0-9_-]{1,128}) was (approved|rejected)\.$/u.exec(
       notification.message,
@@ -156,6 +179,19 @@ export function formatNotification(
       message:
         locale === "ru"
           ? `${labels[verification[1]]} ${verification[3] === "approved" ? "одобрено" : "отклонено"}.`
+          : notification.message,
+    };
+  }
+  if (
+    notification.title === "Server ownership proof requires review" &&
+    notification.message === "A verified server control proof is awaiting review."
+  ) {
+    return {
+      title:
+        locale === "ru" ? "Доказательство контроля сервера требует проверки" : notification.title,
+      message:
+        locale === "ru"
+          ? "Проверенное доказательство контроля сервера ожидает рассмотрения."
           : notification.message,
     };
   }

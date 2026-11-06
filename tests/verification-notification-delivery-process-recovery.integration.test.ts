@@ -14,7 +14,7 @@ import {
   noticeId,
   notices,
   notifications,
-  PENDING_LINK,
+  pendingLink,
   ready,
   setupVerificationNotificationDelivery,
   source,
@@ -38,7 +38,7 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
     category: "security",
     title: "New verification request",
     message: "A verification request is awaiting review.",
-    link: PENDING_LINK,
+    link: pendingLink(request.id),
     isRead: true,
     createdAt: originalTime,
   });
@@ -55,12 +55,11 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
     expect(row).toMatchObject({
       title: "New verification request",
       message: "A verification request is awaiting review.",
-      link: PENDING_LINK,
+      link: pendingLink(request.id),
       category: "security",
     });
     expect(JSON.stringify(row)).not.toContain("PRIVATE_");
     expect(JSON.stringify(row)).not.toContain(requesterId);
-    expect(JSON.stringify(row)).not.toContain(request.id);
   }
   expect((await source(request.id)).completedAt).not.toBeNull();
 });

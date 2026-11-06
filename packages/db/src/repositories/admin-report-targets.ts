@@ -108,6 +108,7 @@ export async function resolveAdminReportTargets(
     result.set(`server:${row.id}`, {
       title: row.name,
       href: `/servers/${encodeURIComponent(row.slug)}`,
+      moderationHref: `/workspace/servers/${encodeURIComponent(row.id)}`,
       detail: null,
     });
   }

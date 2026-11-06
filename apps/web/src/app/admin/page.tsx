@@ -39,6 +39,7 @@ export default async function AdminPage({
     reportId?: string;
     verificationView?: string;
     verificationPage?: string;
+    verificationId?: string;
     buildPage?: string;
     riskBuildPage?: string;
     contentPage?: string;
@@ -59,6 +60,10 @@ export default async function AdminPage({
       : null;
   const verificationView = query.verificationView === "history" ? "history" : "pending";
   const verificationPage = parsePage(query.verificationPage);
+  const focusedVerificationId =
+    typeof query.verificationId === "string" && /^[A-Za-z0-9_-]{1,128}$/u.test(query.verificationId)
+      ? query.verificationId
+      : null;
   const buildPage = parsePage(query.buildPage);
   const riskBuildPage = parsePage(query.riskBuildPage);
   const contentPage = parsePage(query.contentPage);
@@ -116,6 +121,9 @@ export default async function AdminPage({
       ? adminService.getReport(adminUser, focusedReportId).catch(() => null)
       : Promise.resolve(null),
     verificationRepository.listPage(verificationView, verificationPage),
+    focusedVerificationId
+      ? verificationRepository.getQueueItem(focusedVerificationId).catch(() => null)
+      : Promise.resolve(null),
     verificationRepository.countPending(),
     buildRepository.listPendingReviewPage(buildPage),
     buildRepository.countPendingReview(),
@@ -149,6 +157,7 @@ export default async function AdminPage({
     reportPageResult,
     focusedReport,
     verificationPageResult,
+    focusedVerification,
     pendingVerificationCount,
     buildPageResult,
     pendingBuildCount,
@@ -159,7 +168,12 @@ export default async function AdminPage({
     auditLogs,
   ] = loaded;
 
-  const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
+  const { hasMore: moreVerifications } = verificationPageResult;
+  const verificationRequests =
+    focusedVerification &&
+    !verificationPageResult.requests.some((request) => request.id === focusedVerification.id)
+      ? [focusedVerification, ...verificationPageResult.requests]
+      : verificationPageResult.requests;
   const { hasMore: moreReports } = reportPageResult;
   const reports =
     focusedReport && !reportPageResult.reports.some((report) => report.id === focusedReport.id)
@@ -219,6 +233,7 @@ export default async function AdminPage({
         verificationRequests={verificationRequests}
         moreVerifications={moreVerifications}
         verificationHref={verificationHref}
+        focusedVerificationId={focusedVerificationId}
       />
 
       <AdminBuildsQuarantineSection

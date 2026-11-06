@@ -39,7 +39,9 @@ export const noticeId = (requestId: string, recipientId: string) =>
     .update(JSON.stringify([requestId, recipientId]))
     .digest("hex")}`;
 
-export const PENDING_LINK = "/admin?verificationView=pending&verificationPage=1";
+export function pendingLink(verificationRequestId: string) {
+  return `/admin?verificationView=pending&verificationId=${encodeURIComponent(verificationRequestId)}#verification-${encodeURIComponent(verificationRequestId)}`;
+}
 
 /** Register shared afterEach cleanup for verification notification delivery suites. */
 export function setupVerificationNotificationDelivery() {

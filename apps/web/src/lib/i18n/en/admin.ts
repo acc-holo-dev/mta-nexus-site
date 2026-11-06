@@ -20,6 +20,14 @@ export const admin = {
     verificationHistory: "Decision history",
     verificationPages: "Verification pages",
     verificationProof: "Open submitted proof",
+    verificationOpenServer: "Open public server page",
+    verificationManagedServer: "Open managed server claim status",
+    verificationClaimPersonal: "Personal ownership claim",
+    verificationClaimOrganization: "Organization ownership claim",
+    verificationProofCurrent:
+      "Control proof matches the current server endpoint and ownership scope.",
+    verificationProofStale:
+      "Control proof no longer matches the current server endpoint or ownership scope.",
     noVerificationHistory: "No verification decisions yet.",
     pendingRequests: "pending requests",
     requester: "Requester",

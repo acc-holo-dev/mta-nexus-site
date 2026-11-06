@@ -201,36 +201,90 @@ export class VerificationRepository {
     return row?.total ?? 0;
   }
 
-  async listPage(view: "pending" | "history", page: number, pageSize = 30) {
-    if (
-      !Number.isSafeInteger(page) ||
-      page < 1 ||
-      page > 99_999 ||
-      !Number.isSafeInteger(pageSize) ||
-      pageSize < 1 ||
-      pageSize > 100
-    ) {
-      throw new RangeError("Invalid verification page");
-    }
-    const filter =
-      view === "pending"
-        ? eq(verificationRequests.status, "pending")
-        : inArray(verificationRequests.status, ["approved", "rejected"]);
-    const ordering =
-      view === "pending"
-        ? [asc(verificationRequests.createdAt), asc(verificationRequests.id)]
-        : [desc(verificationRequests.resolvedAt), desc(verificationRequests.id)];
-    const submission = verificationEvidenceSubmission(db);
-    const rows = await db
-      .select({
-        ...getTableColumns(verificationRequests),
-        targetUsername: users.username,
-        organizationSlug: organizations.slug,
-        currentSpecialties: developerProfiles.specialties,
-        currentGithubUrl: developerProfiles.githubUrl,
-        evidenceEventId: submission.id,
-        evidenceAction: submission.action,
-      })
+  private mapQueueRow<
+    T extends {
+      id: string;
+      status: string;
+      targetType: string;
+      evidenceEventId: string | null;
+      evidenceAction: string | null;
+      serverName: string | null;
+      serverSlug: string | null;
+      serverOrganizationId: string | null;
+      serverEndpointRevision: number | null;
+      claimEndpointRevision: number | null;
+      claimScopeRecorded: boolean | null;
+      claimOrganizationId: string | null;
+    },
+  >({
+    evidenceEventId,
+    evidenceAction,
+    serverName,
+    serverSlug,
+    serverOrganizationId,
+    serverEndpointRevision,
+    claimEndpointRevision,
+    claimScopeRecorded,
+    claimOrganizationId,
+    ...row
+  }: T) {
+    const isServer = row.targetType === "server";
+    const proofMatchesServer = isServer
+      ? claimEndpointRevision !== null &&
+        serverEndpointRevision !== null &&
+        claimEndpointRevision === serverEndpointRevision &&
+        serverClaimMatchesOwnershipScope(
+          {
+            claimScopeRecorded: claimScopeRecorded === true,
+            claimOrganizationId,
+          },
+          { organizationId: serverOrganizationId },
+        )
+      : null;
+    const claimScope =
+      isServer && claimScopeRecorded === true
+        ? claimOrganizationId
+          ? ("organization" as const)
+          : ("personal" as const)
+        : null;
+    return {
+      ...row,
+      serverName: isServer && typeof serverName === "string" ? serverName : null,
+      serverSlug:
+        isServer && typeof serverSlug === "string" && serverSlug.length > 0 ? serverSlug : null,
+      claimScope,
+      proofMatchesServer,
+      applicationRevision: verificationApplicationRevision(
+        row.id,
+        row.status,
+        evidenceEventId ?? null,
+      ),
+      evidenceUpdated: evidenceAction === "verification.application_updated",
+    };
+  }
+
+  private queueSelect(submission: ReturnType<typeof verificationEvidenceSubmission>) {
+    return {
+      ...getTableColumns(verificationRequests),
+      targetUsername: users.username,
+      organizationSlug: organizations.slug,
+      currentSpecialties: developerProfiles.specialties,
+      currentGithubUrl: developerProfiles.githubUrl,
+      serverName: servers.name,
+      serverSlug: servers.slug,
+      serverOrganizationId: servers.organizationId,
+      serverEndpointRevision: servers.endpointRevision,
+      claimEndpointRevision: serverClaimChallenges.endpointRevision,
+      claimScopeRecorded: serverClaimChallenges.claimScopeRecorded,
+      claimOrganizationId: serverClaimChallenges.claimOrganizationId,
+      evidenceEventId: submission.id,
+      evidenceAction: submission.action,
+    };
+  }
+
+  private queueJoins(submission: ReturnType<typeof verificationEvidenceSubmission>) {
+    return db
+      .select(this.queueSelect(submission))
       .from(verificationRequests)
       .leftJoinLateral(submission, sql`true`)
       .leftJoin(
@@ -254,22 +308,58 @@ export class VerificationRepository {
           eq(verificationRequests.targetType, "developer"),
         ),
       )
+      .leftJoin(
+        servers,
+        and(
+          eq(servers.id, verificationRequests.targetId),
+          eq(verificationRequests.targetType, "server"),
+        ),
+      )
+      .leftJoin(
+        serverClaimChallenges,
+        and(
+          eq(serverClaimChallenges.verificationRequestId, verificationRequests.id),
+          eq(serverClaimChallenges.serverId, verificationRequests.targetId),
+        ),
+      );
+  }
+
+  async listPage(view: "pending" | "history", page: number, pageSize = 30) {
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      page > 99_999 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      throw new RangeError("Invalid verification page");
+    }
+    const filter =
+      view === "pending"
+        ? eq(verificationRequests.status, "pending")
+        : inArray(verificationRequests.status, ["approved", "rejected"]);
+    const ordering =
+      view === "pending"
+        ? [asc(verificationRequests.createdAt), asc(verificationRequests.id)]
+        : [desc(verificationRequests.resolvedAt), desc(verificationRequests.id)];
+    const submission = verificationEvidenceSubmission(db);
+    const rows = await this.queueJoins(submission)
       .where(filter)
       .orderBy(...ordering)
       .limit(pageSize + 1)
       .offset((page - 1) * pageSize);
     return {
-      requests: rows.slice(0, pageSize).map(({ evidenceEventId, evidenceAction, ...row }) => ({
-        ...row,
-        applicationRevision: verificationApplicationRevision(
-          row.id,
-          row.status,
-          evidenceEventId ?? null,
-        ),
-        evidenceUpdated: evidenceAction === "verification.application_updated",
-      })),
+      requests: rows.slice(0, pageSize).map((row) => this.mapQueueRow(row)),
       hasMore: rows.length > pageSize,
     };
+  }
+
+  async getQueueItem(id: string) {
+    if (!id || id.length > 128) return null;
+    const submission = verificationEvidenceSubmission(db);
+    const [row] = await this.queueJoins(submission).where(eq(verificationRequests.id, id)).limit(1);
+    return row ? this.mapQueueRow(row) : null;
   }
 
   async listByRequester(requesterId: string) {
@@ -532,14 +622,19 @@ export class VerificationRepository {
       });
 
       const decisionLabel = input.decision === "approved" ? "approved" : "rejected";
+      const serverResolution = request.targetType === "server";
       const [resolutionNotification] = await tx
         .insert(notifications)
         .values({
           id: `ntf_verification_resolution_${request.id}`,
           recipientId: request.requesterId,
           title: input.decision === "approved" ? "Verification approved" : "Verification rejected",
-          message: `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
-          link: `/workspace/verification?view=history`,
+          message: serverResolution
+            ? `Server ownership verification was ${decisionLabel}.`
+            : `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
+          link: serverResolution
+            ? `/workspace/servers/${encodeURIComponent(request.targetId)}`
+            : `/workspace/verification?view=history`,
           type: "security",
           category: "security",
           isRead: false,

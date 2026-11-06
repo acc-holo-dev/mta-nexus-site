@@ -120,6 +120,7 @@ it("builds market Q&A deep links and article/server/user previews", async () => 
   expect(map.get("server:srv_a")).toEqual({
     title: "RP City",
     href: "/servers/rp-city",
+    moderationHref: "/workspace/servers/srv_a",
     detail: null,
   });
   expect(map.get("content:cnt_a")).toEqual({
