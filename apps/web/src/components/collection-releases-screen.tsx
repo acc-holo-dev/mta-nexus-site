@@ -78,6 +78,7 @@ export async function CollectionReleasesScreen({
           {cc.back}
         </Link>
         <ErrorState
+          id="collection-releases-unavailable"
           title={c.loadUnavailable}
           action={
             <Link
