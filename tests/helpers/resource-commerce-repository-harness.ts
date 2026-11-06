@@ -32,7 +32,7 @@ export async function createResourceCommerceRepositoryDbMock() {
   };
 }
 
-export function resetResourceCommerceRepositoryState() {
+function resetResourceCommerceRepositoryState() {
   resourceCommerceRepositoryState.queries = [];
   resourceCommerceRepositoryState.results = [];
   resourceCommerceRepositoryState.options = [];
@@ -46,7 +46,7 @@ export function installResourceCommerceRepositoryHooks() {
 
 export const resourceCommerceRepositoryRevision = new Date("2026-10-10T00:00:00Z");
 
-export const resourceCommerceRepositoryProduct = {
+const resourceCommerceRepositoryProduct = {
   id: "prd_a",
   title: "Resource",
   slug: "resource",
