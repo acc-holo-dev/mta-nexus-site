@@ -184,7 +184,13 @@ export function OrderCaseCreateForm({
           {busy ? copy.busy : copy.send}
         </Button>
       </fieldset>
-      {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="order-case-forms-unavailable"
+          title={error}
+          description={copy.formErrorHint}
+        />
+      ) : null}
       {savedId && (
         <p role="status">
           {copy.saved}{" "}
