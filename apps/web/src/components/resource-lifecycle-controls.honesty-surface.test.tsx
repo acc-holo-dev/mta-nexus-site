@@ -14,8 +14,9 @@ it("locks lifecycle blocked and unavailable-build notices to ErrorState with sup
   expect(source).toContain("title={copy.blocked}");
   expect(source).toContain("unavailableBuildSupportHref()");
   expect(source).toContain("stashSupportObjectContext");
+  expect(source).toContain('id="resource-lifecycle-blocked"');
   expect(source).toMatch(
-    /actions\.length === 0 \? \(\s*<ErrorState[\s\S]*?title=\{copy\.blocked\}/u,
+    /actions\.length === 0 \? \(\s*<ErrorState[\s\S]*?id="resource-lifecycle-blocked"[\s\S]*?title=\{copy\.blocked\}/u,
   );
   expect(source).toMatch(
     /buildAvailability !== "available" \? \(\s*<ErrorState[\s\S]*?unavailableBuildSupportHref\(\)/u,

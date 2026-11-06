@@ -211,6 +211,7 @@ export function ResourceLifecycleControls({
       ) : null}
       {actions.length === 0 ? (
         <ErrorState
+          id="resource-lifecycle-blocked"
           title={copy.blocked}
           action={
             product.status === "suspended" ? (
