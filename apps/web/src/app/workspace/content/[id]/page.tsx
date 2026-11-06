@@ -48,6 +48,7 @@ export default async function EditPublicationPage({ params }: { params: Promise<
         <AuthorContentForm locale={locale} initial={initial} />
       ) : (
         <ErrorState
+          id="workspace-content-detail-unavailable"
           title={copy.unavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
