@@ -15,7 +15,7 @@ import {
   noticeId,
   notices,
   notifications,
-  PENDING_LINK,
+  pendingLink,
   setupVerificationNotificationDelivery,
   source,
   sql,
@@ -45,14 +45,13 @@ it("delivers verification inbox through the shared worker repository without lea
       recipientId: moderator,
       title: "New verification request",
       message: "A verification request is awaiting review.",
-      link: PENDING_LINK,
+      link: pendingLink(request.id),
       type: "security",
       category: "security",
     }),
   ]);
   expect(JSON.stringify(stored)).not.toContain("PRIVATE_");
   expect(JSON.stringify(stored)).not.toContain(requesterId);
-  expect(JSON.stringify(stored)).not.toContain(request.id);
   const dispatcher = await readFile(
     path.resolve(import.meta.dirname, "../packages/db/scripts/run-web-push-dispatcher.ts"),
     "utf8",
@@ -123,7 +122,7 @@ it("uses current roles and the fixed account horizon", async () => {
       recipientId: promoted,
       title: "New verification request",
       message: "A verification request is awaiting review.",
-      link: PENDING_LINK,
+      link: pendingLink(request.id),
     },
   ]);
   expect(await notices(request.id)).toHaveLength(1);
