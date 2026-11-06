@@ -192,6 +192,7 @@ export default async function SubscriptionAccountPage({
           {c.catalog}
         </Link>
         <ErrorState
+          id="workspace-subscriptions-page-unavailable"
           title={c.loadUnavailable}
           description={c.loadUnavailableHint}
           action={
