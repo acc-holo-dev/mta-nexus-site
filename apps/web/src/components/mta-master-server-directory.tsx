@@ -258,7 +258,7 @@ export function MtaMasterServerDirectory({
                 copy.updateUnknown
               )}
             </p>
-          ) : (
+          ) : error ? null : (
             <ErrorState id="mta-master-directory-unavailable" title={copy.unavailable} />
           )}
         </div>
