@@ -5,17 +5,17 @@
 
 ## Зоны документации (IA)
 
-| Зона | Файлы | Правило |
-| ---- | ----- | ------- |
-| Вход | [README](../README.md), [AGENTS](../AGENTS.md), [AGENT](AGENT.md), этот файл, [DOCS-STYLE](DOCS-STYLE.md) | Коротко; без changelog tip |
-| Факт | [CURRENT-STATE](CURRENT-STATE.md), [PROBLEMS](PROBLEMS.md) | Только актуальный срез и открытые риски |
-| Контракты | [PRODUCT](PRODUCT.md), [ARCHITECTURE](ARCHITECTURE.md), [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [FLOWS](FLOWS.md), [UX-CONTRACT](UX-CONTRACT.md) | Шаблон DOCS-STYLE; не второй backlog |
-| Планы | [ROADMAP](ROADMAP.md) (derived), [RELEASE-PLAN](RELEASE-PLAN.md), [RETENTION-PLAN](RETENTION-PLAN.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md) | План ≠ факт tip |
-| Proposal | [SERVER-PACK-SPEC](SERVER-PACK-SPEC.md), ads/GROW в ROADMAP | Не launch-blocker free beta |
-| Эксплуатация | [OPERATIONS](OPERATIONS.md), модули [ops/](ops/README.md) | Путь pinned (stubs+markers); полный текст в `docs/ops/*` |
-| Решения | [DECISIONS](DECISIONS.md), [13-DECISION-REGISTER](handbook/13-DECISION-REGISTER.md) | 309 ID не дублировать текстом |
-| Tracker | `planning/tasks.json`, [TRACKER](../planning/TRACKER.md); [TASKS](TASKS.md) derived | Один backlog |
-| Архив | [archive/](archive/README.md) | История DOC; не читать первым |
+| Зона         | Файлы                                                                                                                                                                                                                          | Правило                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| Вход         | [README](../README.md), [AGENTS](../AGENTS.md), [AGENT](AGENT.md), этот файл, [DOCS-STYLE](DOCS-STYLE.md)                                                                                                                      | Коротко; без changelog tip                               |
+| Факт         | [CURRENT-STATE](CURRENT-STATE.md), [PROBLEMS](PROBLEMS.md)                                                                                                                                                                     | Только актуальный срез и открытые риски                  |
+| Контракты    | [PRODUCT](PRODUCT.md), [ARCHITECTURE](ARCHITECTURE.md), [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [FLOWS](FLOWS.md), [UX-CONTRACT](UX-CONTRACT.md) | Шаблон DOCS-STYLE; не второй backlog                     |
+| Планы        | [ROADMAP](ROADMAP.md) (derived), [RELEASE-PLAN](RELEASE-PLAN.md), [RETENTION-PLAN](RETENTION-PLAN.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md)                                                                               | План ≠ факт tip                                          |
+| Proposal     | [SERVER-PACK-SPEC](SERVER-PACK-SPEC.md), ads/GROW в ROADMAP                                                                                                                                                                    | Не launch-blocker free beta                              |
+| Эксплуатация | [OPERATIONS](OPERATIONS.md), модули [ops/](ops/README.md)                                                                                                                                                                      | Путь pinned (stubs+markers); полный текст в `docs/ops/*` |
+| Решения      | [DECISIONS](DECISIONS.md), [13-DECISION-REGISTER](handbook/13-DECISION-REGISTER.md)                                                                                                                                            | 309 ID не дублировать текстом                            |
+| Tracker      | `planning/tasks.json`, [TRACKER](../planning/TRACKER.md); [TASKS](TASKS.md) derived                                                                                                                                            | Один backlog                                             |
+| Архив        | [archive/](archive/README.md)                                                                                                                                                                                                  | История DOC; не читать первым                            |
 
 ## Стек (факт кода)
 
@@ -122,4 +122,4 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 | Команды и ops                     | [OPERATIONS.md](OPERATIONS.md)                                                                              |
 | Предметная глава (указатель)      | [15-AI-CONTEXT-INDEX.md](handbook/15-AI-CONTEXT-INDEX.md)                                                   |
 | Архив миграции docs               | [archive/DOCS-MIGRATION.md](archive/DOCS-MIGRATION.md)                                                      |
-| Derived прослеживаемость          | [archive/TRACEABILITY.md](archive/TRACEABILITY.md) (render)                                                |
+| Derived прослеживаемость          | [archive/TRACEABILITY.md](archive/TRACEABILITY.md) (render)                                                 |

@@ -427,4 +427,3 @@ from successful local mock tests.
 Local runtimes mapped only to UID 0 may be unable to start native PostgreSQL. Do not
 disable PostgreSQL's root refusal or use production data to work around that condition;
 use this disposable CI service or a normal non-root local PostgreSQL installation.
-

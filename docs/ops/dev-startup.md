@@ -107,4 +107,3 @@ capture. Standalone tooling tests exercise key persistence and a real verified
 TLS connection without Docker. These tests do not replace the Compose acceptance.
 Mailpit configuration follows the [official Docker](https://mailpit.axllent.org/docs/install/docker/)
 and [SMTP TLS documentation](https://mailpit.axllent.org/docs/configuration/smtp/).
-

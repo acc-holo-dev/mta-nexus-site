@@ -5,12 +5,12 @@
 Полный текст решений — [13-DECISION-REGISTER](handbook/13-DECISION-REGISTER.md); NX — [DECISIONS](DECISIONS.md).  
 Ops mail/ClamAV/recovery — только [OPERATIONS](OPERATIONS.md). DM/groups product — [COMMUNITY](COMMUNITY.md).
 
-| Метка | Значение |
-| ----- | -------- |
-| **Runtime** | Код/схема на SHA ≠ production deploy |
-| **Цель** | Owner target |
-| **Предложение** | Без отдельной команды |
-| **Live unknown** | Нужны свидетельства среды |
+| Метка            | Значение                             |
+| ---------------- | ------------------------------------ |
+| **Runtime**      | Код/схема на SHA ≠ production deploy |
+| **Цель**         | Owner target                         |
+| **Предложение**  | Без отдельной команды                |
+| **Live unknown** | Нужны свидетельства среды            |
 
 ## Жёсткие инварианты
 
@@ -30,12 +30,12 @@ Ops mail/ClamAV/recovery — только [OPERATIONS](OPERATIONS.md). DM/groups
 
 **Runtime roles** в `users.role`: `user`, `developer`, `server_owner`, `moderator`, `admin`.
 
-| Контекст | Граница |
-| -------- | ------- |
-| Гость | Public surfaces; без private library/evidence/manage |
-| Пользователь | Свой аккаунт/сессии/разрешённые взаимодействия |
+| Контекст                   | Граница                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------- |
+| Гость                      | Public surfaces; без private library/evidence/manage                            |
+| Пользователь               | Свой аккаунт/сессии/разрешённые взаимодействия                                  |
 | Автор / server owner / org | Только текущие права; историческое авторство не сохраняет доступ после transfer |
-| Staff | Capability над областью; reason/evidence/audit по операции |
+| Staff                      | Capability над областью; reason/evidence/audit по операции                      |
 
 **Цель:** staff-полномочия накапливаются (capability grants), не один взаимоисключающий enum: Support, Community, Resource/Server, Verification, Finance/Disputes, Security/Trust, Admin. Seller/Buyer — сценарии, не отдельные аккаунты.
 
@@ -43,27 +43,27 @@ Ops mail/ClamAV/recovery — только [OPERATIONS](OPERATIONS.md). DM/groups
 
 ## Семантика доверия
 
-| Факт | Значение |
-| ---- | -------- |
-| Control proof | Управление endpoint; ≠ качество / universal approval |
-| Verification | Evidence-backed claim; пересматриваемо; **нельзя купить** |
-| Review | Eligible interaction; negative legitimate не снимается seller complaint |
-| Reputation | Multi-signal; не один платный opaque score |
-| Report | Вход в расследование ≠ публичный вердикт |
-| Malware clean | Конкретная проверка; ≠ абсолютная безопасность |
+| Факт          | Значение                                                                |
+| ------------- | ----------------------------------------------------------------------- |
+| Control proof | Управление endpoint; ≠ качество / universal approval                    |
+| Verification  | Evidence-backed claim; пересматриваемо; **нельзя купить**               |
+| Review        | Eligible interaction; negative legitimate не снимается seller complaint |
+| Reputation    | Multi-signal; не один платный opaque score                              |
+| Report        | Вход в расследование ≠ публичный вердикт                                |
+| Malware clean | Конкретная проверка; ≠ абсолютная безопасность                          |
 
 Публичный build: published + clean scan (scanner id + time). Timeout/absent scanner ≠ clean. Файлы приватны; size/SHA при передаче; integrity fail блокирует выдачу.
 
 ## Аккаунт и auth
 
-| Тема | Runtime | Цель |
-| ---- | ------- | ---- |
-| Login | Email + password | Social ≠ login providers |
-| Email verification gate | Частично | Почти все state-changing public actions |
-| Security Center / sessions / recovery | Частично | Full center + Activity log |
-| 2FA | Optional | Recommend for high-risk; не блок базовой роли |
-| `staff_action` → `current_password` | Да (FLOW-22) | Step-up независимо от 2FA |
-| Account delete | — | Archive personal-owned entities; не обязан обходить всё вручную |
+| Тема                                  | Runtime          | Цель                                                            |
+| ------------------------------------- | ---------------- | --------------------------------------------------------------- |
+| Login                                 | Email + password | Social ≠ login providers                                        |
+| Email verification gate               | Частично         | Почти все state-changing public actions                         |
+| Security Center / sessions / recovery | Частично         | Full center + Activity log                                      |
+| 2FA                                   | Optional         | Recommend for high-risk; не блок базовой роли                   |
+| `staff_action` → `current_password`   | Да (FLOW-22)     | Step-up независимо от 2FA                                       |
+| Account delete                        | —                | Archive personal-owned entities; не обязан обходить всё вручную |
 
 Session-actor binding на tip — [PROBLEMS](PROBLEMS.md). Controlled multi-connection barrier upload/download — F08 residual (**live unknown**).
 
@@ -73,13 +73,13 @@ Session-actor binding на tip — [PROBLEMS](PROBLEMS.md). Controlled multi-con
 
 **Runtime:** quarantine + report-decision + build-incident delivery с opt-in существуют; полный production coverage кэшей — **live unknown**.
 
-| Policy | Решение владельца |
-| ------ | ----------------- |
-| Admin search | Permission-aware; finance/security без capability не раскрывать |
-| Raw provider payloads | Restricted debug; audit open; secrets не в UI |
-| Self-service API keys | Не обязательны для first commercial |
-| Public anonymous API | Не открывать на первом этапе |
-| Public Status Page | Не требуется сейчас; internal observability обязательна для production |
+| Policy                | Решение владельца                                                      |
+| --------------------- | ---------------------------------------------------------------------- |
+| Admin search          | Permission-aware; finance/security без capability не раскрывать        |
+| Raw provider payloads | Restricted debug; audit open; secrets не в UI                          |
+| Self-service API keys | Не обязательны для first commercial                                    |
+| Public anonymous API  | Не открывать на первом этапе                                           |
+| Public Status Page    | Не требуется сейчас; internal observability обязательна для production |
 
 ## Модерация, санкции, SCAM, апелляции
 
@@ -87,13 +87,13 @@ Session-actor binding на tip — [PROBLEMS](PROBLEMS.md). Controlled multi-con
 
 **Цель:** специализированные departments, не один undifferentiated super-user. Case timeline append-oriented. Note audiences: `INTERNAL` | `VISIBLE_TO_AFFECTED_USER` | `PUBLIC_REASON` — conversion только explicit.
 
-| Тема | Правило владельца |
-| ---- | ----------------- |
-| Sanctions ladder | warning → remove → restrict → temp ban → permanent → high-severity public trust label |
-| SCAM/BLACKLIST | Controlled platform verdict; один authorized senior Trust/Admin + evidence + public reason + appeal; не crowd vote |
-| Appeals | Обязательны для bans/content/verification/eligible disputes: upheld / modified / overturned |
-| Financial correction | Finance capability + provider auth + re-auth + audit + idempotency; dual-control не universal invariant |
-| Anti-abuse | Нет silent staff impersonation; нет blind bulk destroy; subscription не shields |
+| Тема                 | Правило владельца                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Sanctions ladder     | warning → remove → restrict → temp ban → permanent → high-severity public trust label                              |
+| SCAM/BLACKLIST       | Controlled platform verdict; один authorized senior Trust/Admin + evidence + public reason + appeal; не crowd vote |
+| Appeals              | Обязательны для bans/content/verification/eligible disputes: upheld / modified / overturned                        |
+| Financial correction | Finance capability + provider auth + re-auth + audit + idempotency; dual-control не universal invariant            |
+| Anti-abuse           | Нет silent staff impersonation; нет blind bulk destroy; subscription не shields                                    |
 
 ## Support concurrency (**runtime**)
 

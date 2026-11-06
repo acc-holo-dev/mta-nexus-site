@@ -7,14 +7,14 @@
 
 ## Открытые gates (приоритет)
 
-| ID | Тип | Остаток | Закрытие |
-| -- | --- | ------- | -------- |
-| **F03** | Operational gate | Alert routing человеку на целевой среде | Drill: отказ → alert → owner → recovery; evidence `check-observability-live-drill-evidence.mjs` |
-| **F04** | Operational gate | Production backup/recovery practice | Независимые копии + restore rehearsal; CI restore ≠ F04 |
-| **F08** | Issue residual | Session lock в коде есть; barrier probe на disposable/live не гонялся | Controlled multi-connection barrier → нет новых build/receipt |
-| **ARC14 / OPS-06** | Workflow | Authoring path есть; tip journal → `0089`; generate rehearsal для новых DDL | Disposable `db:generate` перед schema change |
-| OPS-09/11 | External | `github_settings` | Только по допуску владельца |
-| Ads UX-24–26 / GROW-02…09 | Deferred | Не активированы | Отдельное поручение |
+| ID                        | Тип              | Остаток                                                                     | Закрытие                                                                                        |
+| ------------------------- | ---------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **F03**                   | Operational gate | Alert routing человеку на целевой среде                                     | Drill: отказ → alert → owner → recovery; evidence `check-observability-live-drill-evidence.mjs` |
+| **F04**                   | Operational gate | Production backup/recovery practice                                         | Независимые копии + restore rehearsal; CI restore ≠ F04                                         |
+| **F08**                   | Issue residual   | Session lock в коде есть; barrier probe на disposable/live не гонялся       | Controlled multi-connection barrier → нет новых build/receipt                                   |
+| **ARC14 / OPS-06**        | Workflow         | Authoring path есть; tip journal → `0089`; generate rehearsal для новых DDL | Disposable `db:generate` перед schema change                                                    |
+| OPS-09/11                 | External         | `github_settings`                                                           | Только по допуску владельца                                                                     |
+| Ads UX-24–26 / GROW-02…09 | Deferred         | Не активированы                                                             | Отдельное поручение                                                                             |
 
 **Не закрывать** F03/F04/settings/deploy/ads/GROW без live evidence и допуска.
 
@@ -22,16 +22,16 @@
 
 F01, F02, F05, F06, F07, F09, F10 (усиление), UI01, INT13, FLOW-09/14/16 и смежные UX/OPS — закрыты кодом на tip волнах; требуют regression на текущем SHA. Session-actor binding (`6cefa74e`) усиливает honesty HTTP→service; **не** закрывает F08 barrier и **не** F03/F04.
 
-| Source | Кратко | Приёмка |
-| ------ | ------ | ------- |
-| F01 | Guest return path / acquire | Browser: resource→auth→тот же acquire |
-| F02 | Beta evidence validator строгий | Missing flags блокируют; PASS ≠ deploy |
-| F05 | Overlay/writers runbook | Live maintenance rehearsal ещё open |
-| F06 | Unknown ≠ 0; review failure ≠ empty | UI regression |
-| F08 code | `lockInitiatingSession` | Barrier probe open |
-| F09 | Fresh-password staff actions | HTTP focused tests |
-| INT13 | Comment idempotency + draft no auto-publish | Discussion compose |
-| ARC14 | Forward-only authoring guards | Disposable generate before DDL |
+| Source   | Кратко                                      | Приёмка                                |
+| -------- | ------------------------------------------- | -------------------------------------- |
+| F01      | Guest return path / acquire                 | Browser: resource→auth→тот же acquire  |
+| F02      | Beta evidence validator строгий             | Missing flags блокируют; PASS ≠ deploy |
+| F05      | Overlay/writers runbook                     | Live maintenance rehearsal ещё open    |
+| F06      | Unknown ≠ 0; review failure ≠ empty         | UI regression                          |
+| F08 code | `lockInitiatingSession`                     | Barrier probe open                     |
+| F09      | Fresh-password staff actions                | HTTP focused tests                     |
+| INT13    | Comment idempotency + draft no auto-publish | Discussion compose                     |
+| ARC14    | Forward-only authoring guards               | Disposable generate before DDL         |
 
 Подробные evidence paths — в Git history этого файла до docs rewrite; карточки — `planning/tasks.json`.
 

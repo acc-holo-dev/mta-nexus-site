@@ -12,16 +12,16 @@
 
 ## Карта разделов → якоря в OPERATIONS
 
-| Модуль (план) | Тема | Якорь / раздел сейчас |
-| ------------- | ---- | --------------------- |
-| `dev-startup` | DEV Compose, mail | [dev-startup.md](dev-startup.md) |
-| `verification` | Test/CI scopes, browser/axe | [verification.md](verification.md) |
-| `production-boundary` | Overlay matrix, migrations | [production-boundary.md](production-boundary.md) |
-| `inbox-recovery` | Notification delivery recovery | [inbox-recovery.md](inbox-recovery.md) |
-| `backup-recovery` | Backup/restore, maintenance | [backup-recovery.md](backup-recovery.md) |
-| `resource-safety` | Build safety / admin storage | [resource-safety.md](resource-safety.md) |
-| `release` | Branch/release, GHCR, beta evidence | [release.md](release.md) |
-| `workers` | Push/mail workers, limits | [workers.md](workers.md) |
+| Модуль (план)         | Тема                                | Якорь / раздел сейчас                            |
+| --------------------- | ----------------------------------- | ------------------------------------------------ |
+| `dev-startup`         | DEV Compose, mail                   | [dev-startup.md](dev-startup.md)                 |
+| `verification`        | Test/CI scopes, browser/axe         | [verification.md](verification.md)               |
+| `production-boundary` | Overlay matrix, migrations          | [production-boundary.md](production-boundary.md) |
+| `inbox-recovery`      | Notification delivery recovery      | [inbox-recovery.md](inbox-recovery.md)           |
+| `backup-recovery`     | Backup/restore, maintenance         | [backup-recovery.md](backup-recovery.md)         |
+| `resource-safety`     | Build safety / admin storage        | [resource-safety.md](resource-safety.md)         |
+| `release`             | Branch/release, GHCR, beta evidence | [release.md](release.md)                         |
+| `workers`             | Push/mail workers, limits           | [workers.md](workers.md)                         |
 
 ## Правила переноса
 

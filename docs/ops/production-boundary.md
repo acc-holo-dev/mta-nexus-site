@@ -114,4 +114,3 @@ requires the explicit double opt-in `NEXUS_ALLOW_UNSAFE_DB_GENERATE=1` and must
 never be used to “align” applied history by rewriting journal/SQL. Domain/data
 model context for schema work lives in [ARCHITECTURE](../ARCHITECTURE.md) (handbook
 `08-DOMAIN…` was removed; do not revive that path).
-

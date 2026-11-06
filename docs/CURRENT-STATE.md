@@ -7,11 +7,11 @@
 
 ## Tip и CI (факт)
 
-| Поле | Значение |
-| ---- | -------- |
-| Tip `origin/main` (на дату среза) | `3acacfdb` |
+| Поле                                         | Значение                                                                                                                                        |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tip `origin/main` (на дату среза)            | `3acacfdb`                                                                                                                                      |
 | Последний зафиксированный verified-green tip | `6cefa74e` — session-binding / recovery wave; [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) SUCCESS |
-| Правило | PASS только на exact SHA. Зелёный CI ≠ production deploy. Не объявлять tip verified-green без SUCCESS на текущем SHA. |
+| Правило                                      | PASS только на exact SHA. Зелёный CI ≠ production deploy. Не объявлять tip verified-green без SUCCESS на текущем SHA.                           |
 
 История промежуточных tip/PR — в Git, не в этом файле.
 
@@ -34,12 +34,12 @@
 
 ## Открытые gates и приоритет
 
-| Тип | Остаток |
-| --- | ------- |
-| Operational | **F03** alert routing, **F04** backup/recovery — нужны drills на целевой среде + evidence (#191 schemas). OPS-09/11 `github_settings` — только по допуску. |
-| Product deferred | GROW-02…09, ads UX-24–26 — без активации. |
-| Перед DDL | Disposable generate rehearsal (OPS-06). |
-| После human gates | `pnpm beta:fetch` / `pnpm beta:candidate` на exact tip SHA. |
+| Тип               | Остаток                                                                                                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Operational       | **F03** alert routing, **F04** backup/recovery — нужны drills на целевой среде + evidence (#191 schemas). OPS-09/11 `github_settings` — только по допуску. |
+| Product deferred  | GROW-02…09, ads UX-24–26 — без активации.                                                                                                                  |
+| Перед DDL         | Disposable generate rehearsal (OPS-06).                                                                                                                    |
+| После human gates | `pnpm beta:fetch` / `pnpm beta:candidate` на exact tip SHA.                                                                                                |
 
 Tracker: **64** `done` / **19** `not_started` (`python3 planning/tools/list_open_tasks.py`). Статус только в `planning/tasks.json` — см. [TRACKER.md](../planning/TRACKER.md).
 

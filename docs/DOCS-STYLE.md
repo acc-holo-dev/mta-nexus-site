@@ -33,11 +33,11 @@
 
 ## Derived документы
 
-| Файл                         | Источник                         | Команда                                      |
-| ---------------------------- | -------------------------------- | -------------------------------------------- |
-| `docs/ROADMAP.md`            | `planning/tasks.json`            | `python planning/tools/render_backlog.py`    |
-| `docs/TASKS.md`              | `planning/tasks.json`            | то же; не править вручную                    |
-| `docs/archive/TRACEABILITY.md` | import / render pipeline       | то же; archive, не рабочий вход              |
+| Файл                           | Источник                 | Команда                                   |
+| ------------------------------ | ------------------------ | ----------------------------------------- |
+| `docs/ROADMAP.md`              | `planning/tasks.json`    | `python planning/tools/render_backlog.py` |
+| `docs/TASKS.md`                | `planning/tasks.json`    | то же; не править вручную                 |
+| `docs/archive/TRACEABILITY.md` | import / render pipeline | то же; archive, не рабочий вход           |
 
 Живой статус исполнения — только [`planning/tasks.json`](../planning/TRACKER.md). Архив DOC: [`archive/`](archive/README.md).
 

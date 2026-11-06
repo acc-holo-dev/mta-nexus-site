@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import collections
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -202,6 +204,27 @@ F6 намеренно не содержит детального execution backl
         "`planning/retention-directions.json`.\n"
     )
     write("archive/TRACEABILITY.md", trace)
+    # Keep Biome markdown format green after regenerate.
+    fmt = subprocess.run(
+        [
+            "pnpm",
+            "exec",
+            "biome",
+            "format",
+            "--write",
+            "docs/ROADMAP.md",
+            "docs/TASKS.md",
+            "docs/archive/TRACEABILITY.md",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if fmt.returncode != 0:
+        sys.stderr.write(fmt.stdout + fmt.stderr)
+        raise SystemExit(fmt.returncode)
+
     print(
         json.dumps(
             {

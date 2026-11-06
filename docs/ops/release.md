@@ -399,4 +399,3 @@ It proves database rollback/retry,
 not recovery from host failure or compatibility of an older application image.
 Backup acceptance uses synthetic data and the production PostgreSQL/storage
 topology; rehearse separately against a protected copy of the target dataset.
-

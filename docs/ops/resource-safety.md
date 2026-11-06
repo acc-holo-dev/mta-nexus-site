@@ -15,4 +15,3 @@ The build safety rule is enforced in repository queries and at the database laye
 - `currentVersion` is realigned to the newest safe published build where one exists.
 
 Review these data-changing effects on an isolated restored backup before applying the migration to any existing production dataset.
-

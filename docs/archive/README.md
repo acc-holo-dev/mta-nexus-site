@@ -4,7 +4,7 @@
 
 Сюда переносятся завершённые миграции и исторические пакеты. Актуальный стиль и волны: [../DOCS-STYLE.md](../DOCS-STYLE.md). Вход агента: [../AGENT.md](../AGENT.md).
 
-| Файл | Содержание |
-| ---- | ---------- |
-| [DOCS-MIGRATION.md](DOCS-MIGRATION.md) | История DOC-01…05, карта ответственности путей |
-| [TRACEABILITY.md](TRACEABILITY.md) | Derived source→task матрица (`render_backlog.py`) |
+| Файл                                   | Содержание                                        |
+| -------------------------------------- | ------------------------------------------------- |
+| [DOCS-MIGRATION.md](DOCS-MIGRATION.md) | История DOC-01…05, карта ответственности путей    |
+| [TRACEABILITY.md](TRACEABILITY.md)     | Derived source→task матрица (`render_backlog.py`) |

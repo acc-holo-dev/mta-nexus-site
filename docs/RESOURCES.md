@@ -4,12 +4,12 @@
 **База DOC-05:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`.  
 **Не активирует** платежи, payout, production DRM. Commerce-цели — [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). UI/сценарии — [UX-CONTRACT](UX-CONTRACT.md), [FLOWS](FLOWS.md).
 
-| Метка | Значение |
-| ----- | -------- |
-| **Текущий runtime** | Код / free beta сейчас |
-| **Цель** | Утверждено владельцем; free beta не включает реальные платежи |
-| **Предложение** | Не строить без поручения |
-| **Live unknown** | Нужно свидетельство среды/CI |
+| Метка               | Значение                                                      |
+| ------------------- | ------------------------------------------------------------- |
+| **Текущий runtime** | Код / free beta сейчас                                        |
+| **Цель**            | Утверждено владельцем; free beta не включает реальные платежи |
+| **Предложение**     | Не строить без поручения                                      |
+| **Live unknown**    | Нужно свидетельство среды/CI                                  |
 
 ## Цель
 
@@ -17,25 +17,25 @@
 
 ## Акторы и права
 
-| Актор | Права / ожидание |
-| ----- | ---------------- |
-| Гость / покупатель | Каталог, карточка, после входа — claim/library/download по правам |
-| Автор / seller | Публикация free path сейчас; paid listing — **цель** после commerce gates |
-| Org с `manage_products` | Metadata/builds/releases/support (**цель**); finance/payout — Owner/Finance + re-auth |
-| Staff | Модерация, quarantine, revoke с reason/audit/appeal |
+| Актор                    | Права / ожидание                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Гость / покупатель       | Каталог, карточка, после входа — claim/library/download по правам                                           |
+| Автор / seller           | Публикация free path сейчас; paid listing — **цель** после commerce gates                                   |
+| Org с `manage_products`  | Metadata/builds/releases/support (**цель**); finance/payout — Owner/Finance + re-auth                       |
+| Staff                    | Модерация, quarantine, revoke с reason/audit/appeal                                                         |
 | Любой зарегистрированный | Может стать seller фактом публикации + Seller Agreement (**цель**); verification — отдельный evidence layer |
 
 Workspace — единый `/workspace`, без auto-redirect в dashboard после login (**цель**).
 
 ## Happy path (runtime free)
 
-| Путь | Завершение |
-| ---- | ---------- |
-| Каталог → карточка | Автор, описание, доступность; ошибка ≠ пусто ≠ unknown online |
+| Путь                                    | Завершение                                                                       |
+| --------------------------------------- | -------------------------------------------------------------------------------- |
+| Каталог → карточка                      | Автор, описание, доступность; ошибка ≠ пусто ≠ unknown online                    |
 | `/acquire?productId=` → claim → library | Сессия + entitlement; Save / release watch / discussion follow — разные действия |
-| Download latest / pinned | Published + clean scan; клиент сверяет `X-Resource-Build-Id` |
-| Коллекции | Private only; add ≠ watch; архив ≠ отзыв доступа |
-| Historical archive | Purchases/licenses/sales — read-only facts без provider secrets |
+| Download latest / pinned                | Published + clean scan; клиент сверяет `X-Resource-Build-Id`                     |
+| Коллекции                               | Private only; add ≠ watch; архив ≠ отзыв доступа                                 |
+| Historical archive                      | Purchases/licenses/sales — read-only facts без provider secrets                  |
 
 Сценарии latest vs pinned, receipt, FLOW-01/07/17/18/20 — [FLOWS](FLOWS.md).
 
@@ -43,7 +43,7 @@ Workspace — единый `/workspace`, без auto-redirect в dashboard по�
 
 Публичная выдача файла требует:
 
-1. допустимую **опубликованную** сборку, и  
+1. допустимую **опубликованную** сборку, и
 2. чистый результат сканирования с **идентификатором сканера** и **временем**.
 
 Иначе сборка не `ready` и не downloadable public build.
@@ -69,15 +69,15 @@ Workspace — единый `/workspace`, без auto-redirect в dashboard по�
 
 ## Библиотека и коллекции (**текущий runtime**)
 
-| Правило | Содержание |
-| ------- | ---------- |
-| `/workspace/library` | Счётчик `all/ready/unavailable`, страница ≤12; preview ≤4; порядок `MAX(grant.created_at) DESC, resource_id` |
-| Право `product.download` | User entitlements **или** активные неистёкшие licenses; дубли → одна строка |
-| Не карточка | Revoked/suspended/expired licenses; expired entitlements; `product.update` |
-| `ready` | Published product **и** ≥1 published build с clean-сканом (scanner id + time) |
-| Недоступный acquired | Остаётся без утечки title/slug/version/download |
-| Коллекции | ≤30 collections / ≤200 items / batch ≤20; private only; не server pack |
-| Archive routes | `/workspace/purchases|licenses|sales` — ownership + 20-row page; без payment tokens / secret keys / buyer PII на sales |
+| Правило                  | Содержание                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `/workspace/library`     | Счётчик `all/ready/unavailable`, страница ≤12; preview ≤4; порядок `MAX(grant.created_at) DESC, resource_id` |
+| Право `product.download` | User entitlements **или** активные неистёкшие licenses; дубли → одна строка                                  |
+| Не карточка              | Revoked/suspended/expired licenses; expired entitlements; `product.update`                                   |
+| `ready`                  | Published product **и** ≥1 published build с clean-сканом (scanner id + time)                                |
+| Недоступный acquired     | Остаётся без утечки title/slug/version/download                                                              |
+| Коллекции                | ≤30 collections / ≤200 items / batch ≤20; private only; не server pack                                       |
+| Archive routes           | `/workspace/purchases                                                                                        | licenses | sales` — ownership + 20-row page; без payment tokens / secret keys / buyer PII на sales |
 
 `ready` label — подсказка, не авторизация. Paid checkout этим контуром **не** реализуется.
 
@@ -100,16 +100,16 @@ KYC (**цель**): draft до KYC ок; KYC обязателен до перв�
 
 ## Editions, license, cart (**цель**; не runtime paid)
 
-| Тема | Правило владельца |
-| ---- | ----------------- |
-| Editions | Free/Premium; closed/open delivery; несколько scopes/SKU |
-| DRM | Seller opt-in на closed; open source — без DRM; цена ≠ trust |
-| Dependencies | Graph до оплаты; нельзя авто-класть платную dep в cart |
-| License scope | **1 лицензия = 1 MTA server**; unbound paid: 30-day activation window |
-| Delist / seller-ban | Новые покупки stop; good-faith buyers — 30-day redownload window (malware/legal may cut sooner) |
-| Free retention | Safe free не обязан удаляться через 30 дней только из-за paid policy |
-| Reviews | Paid → confirmed purchase; free → claim; seller не обнуляет feedback релизом |
-| Cart | Multi-item; guest cart ≠ reservation; checkout = login + verified email; webhook без idempotent domain transition не создаёт доступ |
+| Тема                | Правило владельца                                                                                                                   |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Editions            | Free/Premium; closed/open delivery; несколько scopes/SKU                                                                            |
+| DRM                 | Seller opt-in на closed; open source — без DRM; цена ≠ trust                                                                        |
+| Dependencies        | Graph до оплаты; нельзя авто-класть платную dep в cart                                                                              |
+| License scope       | **1 лицензия = 1 MTA server**; unbound paid: 30-day activation window                                                               |
+| Delist / seller-ban | Новые покупки stop; good-faith buyers — 30-day redownload window (malware/legal may cut sooner)                                     |
+| Free retention      | Safe free не обязан удаляться через 30 дней только из-за paid policy                                                                |
+| Reviews             | Paid → confirmed purchase; free → claim; seller не обнуляет feedback релизом                                                        |
+| Cart                | Multi-item; guest cart ≠ reservation; checkout = login + verified email; webhook без idempotent domain transition не создаёт доступ |
 
 Trial / wishlist / support term / update entitlement — **цель**; детали commerce → [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md).
 
@@ -132,14 +132,14 @@ Trial / wishlist / support term / update entitlement — **цель**; дета�
 
 ## Сводка runtime vs цель
 
-| Тема | Runtime | Цель |
-| ---- | ------- | ---- |
-| Free claim, library, download gates | Да | UX FLOW-01/17 |
-| Historical + pinned download | Да | Сохранить gates |
-| Private collections | Да | FLOW-07 UX |
-| Paid cart/checkout/DRM/payout | Выкл. | Lifecycle + 1 license=1 server |
-| Publish wizard / KYC | Частичный free path | Полный wizard + states |
-| Trial / Wishlist / multi-SKU | Нет | С commerce phase |
+| Тема                                | Runtime             | Цель                           |
+| ----------------------------------- | ------------------- | ------------------------------ |
+| Free claim, library, download gates | Да                  | UX FLOW-01/17                  |
+| Historical + pinned download        | Да                  | Сохранить gates                |
+| Private collections                 | Да                  | FLOW-07 UX                     |
+| Paid cart/checkout/DRM/payout       | Выкл.               | Lifecycle + 1 license=1 server |
+| Publish wizard / KYC                | Частичный free path | Полный wizard + states         |
+| Trial / Wishlist / multi-SKU        | Нет                 | С commerce phase               |
 
 ## Связь с кодом и источниками
 

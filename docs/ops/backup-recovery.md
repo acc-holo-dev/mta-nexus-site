@@ -177,5 +177,3 @@ Keep the failed installation stopped and retain its volumes for investigation.
 
 Do not copy a raw PostgreSQL volume between major versions. Preserve both the
 failed volumes and the backup until the recovered installation is confirmed stable.
-
-
