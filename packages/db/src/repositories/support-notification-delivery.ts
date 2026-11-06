@@ -19,7 +19,7 @@ export type SupportNotificationDeliveryStats = Readonly<{
 }>;
 
 /** Staff inbox deep link for a support case; falls back to the queue list if id is unsafe. */
-export function supportStaffCaseLink(caseId: string) {
+function supportStaffCaseLink(caseId: string) {
   if (!caseId || caseId.length > 128 || !/^[A-Za-z0-9_-]+$/u.test(caseId)) {
     return "/admin/support";
   }
