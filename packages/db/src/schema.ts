@@ -8,6 +8,7 @@ import type {
 } from "@nexus/domain";
 import {
   type BuildIncidentNotificationData,
+  type BuildLifecycleNotificationData,
   type BuildPackageEvidence,
   type BuildReviewNotificationData,
   type CommercialPlanStatus,
@@ -1412,6 +1413,7 @@ export const notifications = pgTable(
     data: jsonb("data").$type<
       | BuildReviewNotificationData
       | BuildIncidentNotificationData
+      | BuildLifecycleNotificationData
       | LicenseTermNotificationData
       | ResourceReleaseNoticeData
       | import("@nexus/domain").DiscussionPushNotificationData

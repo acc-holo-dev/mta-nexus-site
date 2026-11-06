@@ -711,10 +711,13 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   );
   assert.equal(approvalNotices.filter((notice) => notice.data?.kind === "build_review").length, 1);
   await approvalCard.getByRole("link", { name: "View", exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/workspace/resources/${product.id}$`, "u"));
+  await expect(page).toHaveURL(
+    new RegExp(`/workspace/resources/${product.id}/builds/${pendingFirst.id}$`, "u"),
+  );
+  await page.goto(`/workspace/resources/${product.id}`);
   await restorePendingDraft();
   evidence.push(
-    "Approval delivered one localized author notification with notes and a working resource link; replay returned 409.",
+    "Approval delivered one localized author notification with notes and a working build link; replay returned 409.",
   );
   await expect(
     page.getByText("Approved author acceptance version one.", { exact: true }),
@@ -893,7 +896,10 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await page.setViewportSize({ width: 390, height: 844 });
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   await rejectionCard.getByRole("link", { name: "Открыть", exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/workspace/resources/${product.id}$`, "u"));
+  await expect(page).toHaveURL(
+    new RegExp(`/workspace/resources/${product.id}/builds/${second.id}$`, "u"),
+  );
+  await page.goto(`/workspace/resources/${product.id}`);
   evidence.push(
     "Approval/rejection notifications localized to RU, fit mobile width and marked as read without losing history.",
   );

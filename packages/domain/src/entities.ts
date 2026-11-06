@@ -462,10 +462,20 @@ export interface BuildIncidentNotificationData {
   version: string;
 }
 
+export interface BuildLifecycleNotificationData {
+  kind: "build_lifecycle";
+  event: "quarantined" | "restored";
+  resourceTitle: string;
+  version: string;
+  productId: string;
+  buildId: string;
+}
+
 export interface Notification {
   data?:
     | BuildReviewNotificationData
     | BuildIncidentNotificationData
+    | BuildLifecycleNotificationData
     | import("./license-maintenance").LicenseTermNotificationData
     | import("./resource-release-watches").ResourceReleaseNoticeData
     | DiscussionPushNotificationData

@@ -3,6 +3,11 @@ import { classifyBuildAvailability, unavailableBuildSupportHref } from "@nexus/d
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, buildIncidentNotificationDeliveries, builds, products } from "../schema";
+import {
+  buildLifecycleNoticeSeed,
+  notifyProductManagersWithin,
+  publisherBuildHref,
+} from "./build-publisher-notices";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { lockInitiatingSession } from "./initiating-session";
 import {
@@ -124,6 +129,7 @@ export async function quarantinePublishedAndRefreshProduct(
     const [parent] = await tx
       .select({
         id: products.id,
+        title: products.title,
         status: products.status,
         authorId: products.authorId,
         organizationId: products.organizationId,
@@ -197,6 +203,24 @@ export async function quarantinePublishedAndRefreshProduct(
         notifyAffectedDownloaders: options.notifyAffectedDownloaders === true,
       },
     });
+    await notifyProductManagersWithin(tx, {
+      authorId: parent.authorId,
+      organizationId: parent.organizationId,
+      title: "Resource build quarantined",
+      message:
+        "A published build was quarantined after a security review. Open the build in your workspace for the current delivery state.",
+      link: publisherBuildHref(quarantined.productId, quarantined.id),
+      data: {
+        kind: "build_lifecycle",
+        event: "quarantined",
+        resourceTitle: parent.title,
+        version: quarantined.version,
+        productId: quarantined.productId,
+        buildId: quarantined.id,
+      },
+      noticeSeed: buildLifecycleNoticeSeed("quarantined", quarantined.id, audit.id),
+      producer: "build_quarantine",
+    });
     if (options.notifyAffectedDownloaders === true) {
       // SEC-002: enqueue durable fanout only when moderators explicitly request it.
       await tx.insert(buildIncidentNotificationDeliveries).values({
@@ -225,6 +249,7 @@ export async function restoreQuarantinedAndRefreshProduct(
     const [parent] = await tx
       .select({
         id: products.id,
+        title: products.title,
         status: products.status,
         authorId: products.authorId,
         organizationId: products.organizationId,
@@ -298,6 +323,24 @@ export async function restoreQuarantinedAndRefreshProduct(
       .where(eq(products.id, restored.productId));
 
     await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+    await notifyProductManagersWithin(tx, {
+      authorId: parent.authorId,
+      organizationId: parent.organizationId,
+      title: "Resource build restored",
+      message:
+        "A quarantined build was restored to publication. Open the build in your workspace for the current delivery state.",
+      link: publisherBuildHref(restored.productId, restored.id),
+      data: {
+        kind: "build_lifecycle",
+        event: "restored",
+        resourceTitle: parent.title,
+        version: restored.version,
+        productId: restored.productId,
+        buildId: restored.id,
+      },
+      noticeSeed: buildLifecycleNoticeSeed("restored", restored.id, audit.id),
+      producer: "build_quarantine_restore",
+    });
     return restored as unknown as Build;
   });
 }

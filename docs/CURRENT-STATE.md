@@ -20,6 +20,7 @@
 - Servers/orgs trust-staff: verification queue deep link `verificationId` + focused card; server claim/proof enrichment; ownership resolve notice → managed server; server report `moderationHref` → workspace claim status.
 - Support staff notices deep-link to `/admin/support/:caseId` (queue list remains fallback for unsafe ids).
 - Build-incident downloader notices open library versions/updates (not Security Center), with RU/EN localization via `data.kind = build_incident`.
+- Publisher build honesty: review/quarantine/restore notices deep-link to `/workspace/resources/:productId/builds/:buildId` with RU/EN `build_lifecycle` copy (no malware invention).
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.
