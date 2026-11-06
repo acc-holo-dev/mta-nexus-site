@@ -188,7 +188,13 @@ export function OrderCancellationForm({
     }
   }
   if (ready !== scope && !canCancel)
-    return error ? <ErrorState title={error} description={copy.formErrorHint} /> : null;
+    return error ? (
+      <ErrorState
+        id="order-cancellation-form-unavailable"
+        title={error}
+        description={copy.formErrorHint}
+      />
+    ) : null;
   if (ready === scope && !canCancel && !pending.current && !saved) return null;
   return (
     <form onSubmit={submit} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
