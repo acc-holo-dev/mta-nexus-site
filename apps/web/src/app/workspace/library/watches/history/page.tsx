@@ -75,6 +75,7 @@ export default async function Page({
           {c.back}
         </Link>
         <ErrorState
+          id="library-watches-history-load-unavailable"
           title={c.loadUnavailable}
           description={c.loadUnavailableDescription}
           action={
