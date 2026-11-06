@@ -209,6 +209,7 @@ function FollowControl({
         <p className="text-sm text-muted">{copy.self}</p>
       ) : state === "error" ? (
         <ErrorState
+          id="follow-button-unavailable"
           title={message || shared.error}
           description={shared.errorHint}
           className="items-stretch py-4"
