@@ -54,6 +54,7 @@ export default async function Page({
       <section className={pageShellClass}>
         <h1 className="font-display">{copy.title}</h1>
         <ErrorState
+          id="market-reviews-unavailable"
           title={copy.pageUnavailable}
           action={
             <Link
