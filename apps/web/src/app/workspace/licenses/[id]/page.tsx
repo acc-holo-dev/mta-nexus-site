@@ -48,6 +48,7 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-license-detail-load-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={retryHref} className={navLinkClass}>
