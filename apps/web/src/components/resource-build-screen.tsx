@@ -47,6 +47,7 @@ function ResourceBuildLoadError({
         {backLabel}
       </Link>
       <ErrorState
+        id="resource-build-load-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
