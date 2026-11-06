@@ -219,6 +219,7 @@ export function LibrarySelectionBatchControls({
       {frozen && !saved && <p role="note">{c.frozen}</p>}
       {error ? (
         <ErrorState
+          id="library-selection-batch-controls-unavailable"
           title={error}
           description={c.actionErrorDescription}
           action={
