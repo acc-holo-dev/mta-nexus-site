@@ -84,6 +84,7 @@ export function HomePersonalChangesPanel({
 
       {summary.status === "error" ? (
         <ErrorState
+          id="home-personal-changes-unavailable"
           title={copy.error}
           action={
             <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
