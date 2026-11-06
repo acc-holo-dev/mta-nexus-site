@@ -242,7 +242,11 @@ export function LibraryCollectionItemCopyForm({
           </p>
         )}
         {overCapacity ? (
-          <ErrorState title={c.quota} description={c.capacityErrorDescription} />
+          <ErrorState
+            id="library-collection-item-copy-quota"
+            title={c.quota}
+            description={c.capacityErrorDescription}
+          />
         ) : null}
         <ActionConfirmCheckbox
           id={`${source.id}-${action}-confirm`}
