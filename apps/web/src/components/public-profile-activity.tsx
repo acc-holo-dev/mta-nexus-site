@@ -37,6 +37,7 @@ export async function PublicProfileActivity({
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
         <ErrorState
+          id="public-profile-activity-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={activityPath} className={linkClass}>
