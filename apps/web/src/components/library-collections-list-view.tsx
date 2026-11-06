@@ -45,6 +45,7 @@ export async function LibraryCollectionsListView({
           {c.library}
         </Link>
         <ErrorState
+          id="library-collections-list-unavailable"
           title={c.loadUnavailable}
           action={
             <Link
