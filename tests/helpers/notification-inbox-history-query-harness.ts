@@ -25,7 +25,7 @@ export async function createNotificationInboxHistoryQueryDbMock() {
   };
 }
 
-export function resetNotificationInboxHistoryQueryState() {
+function resetNotificationInboxHistoryQueryState() {
   notificationInboxHistoryQueryState.queries = [];
   notificationInboxHistoryQueryState.rows = [];
   notificationInboxHistoryQueryState.options = [];
@@ -54,10 +54,7 @@ export function notificationInboxHistoryQueryHash(
     .digest("hex");
 }
 
-export function notificationInboxHistoryQueryRow(
-  id: string,
-  time = "2026-10-11T00:00:00.123456Z",
-) {
+export function notificationInboxHistoryQueryRow(id: string, time = "2026-10-11T00:00:00.123456Z") {
   return [id, "Title", "Message", null, null, false, "system", false, time];
 }
 
@@ -70,8 +67,6 @@ export function notificationInboxHistoryQueryPeriodHash(
   actor = "actor",
 ) {
   return createHash("sha256")
-    .update(
-      JSON.stringify([2, "notification-inbox", actor, "", "all", "all", period, anchor]),
-    )
+    .update(JSON.stringify([2, "notification-inbox", actor, "", "all", "all", period, anchor]))
     .digest("hex");
 }
