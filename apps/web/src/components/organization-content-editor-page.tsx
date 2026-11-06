@@ -69,6 +69,7 @@ export async function OrganizationContentEditorPage({
         />
       ) : (
         <ErrorState
+          id="organization-content-editor-page-unavailable"
           title={failure}
           action={
             <Link
