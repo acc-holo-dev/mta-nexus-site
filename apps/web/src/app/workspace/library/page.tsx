@@ -128,6 +128,7 @@ export default async function ResourceLibraryPage({
       </div>
       {!result ? (
         <ErrorState
+          id="workspace-library-page-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link
