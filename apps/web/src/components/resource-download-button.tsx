@@ -128,7 +128,7 @@ export function ResourceDownloadButton({
   if (unavailableReason) {
     return (
       <div className="space-y-2">
-        <ErrorState title={unavailableReason} />
+        <ErrorState id="resource-download-button-unavailable" title={unavailableReason} />
         <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
       </div>
     );
