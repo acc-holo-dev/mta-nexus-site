@@ -70,6 +70,7 @@ export async function LibraryReleaseComparisonScreen({
           {c.back}
         </Link>
         <ErrorState
+          id="library-release-comparison-unavailable"
           title={c.loadUnavailable}
           action={
             <Link
