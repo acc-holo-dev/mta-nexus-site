@@ -13,10 +13,7 @@ export async function createPublicationManagementQueryDbMock() {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     publicationManagementQueryState.queries.push({ sql, params });
-    if (
-      publicationManagementQueryState.failAudit &&
-      sql.startsWith('insert into "audit_events"')
-    )
+    if (publicationManagementQueryState.failAudit && sql.startsWith('insert into "audit_events"'))
       throw new Error("audit failure");
     return { rows: publicationManagementQueryState.rows.shift() ?? [] };
   });
@@ -37,7 +34,7 @@ export function createPublicationManagementQueryNoticeMock() {
   return { discussionModerationNotice: publicationManagementQueryState.notice };
 }
 
-export function resetPublicationManagementQueryState() {
+function resetPublicationManagementQueryState() {
   publicationManagementQueryState.queries = [];
   publicationManagementQueryState.rows = [];
   publicationManagementQueryState.failAudit = false;
