@@ -200,7 +200,9 @@ export function ResourceBuildControls({
           </details>
         </div>
       )}
-      {message && uncertain ? <ErrorState title={message} /> : null}
+      {message && uncertain ? (
+        <ErrorState id="resource-build-controls-unavailable" title={message} />
+      ) : null}
       {message && !uncertain ? <p role="status">{message}</p> : null}
       {uncertain && (
         <Button
