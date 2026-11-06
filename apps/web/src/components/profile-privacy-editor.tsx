@@ -235,6 +235,7 @@ export function ProfilePrivacyEditor({
       )}
       {notice?.error ? (
         <ErrorState
+          id="profile-privacy-notice-unavailable"
           title={notice.text}
           action={
             <Button
