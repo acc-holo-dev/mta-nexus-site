@@ -423,6 +423,7 @@ export function LicenseControlPanel({
       )}
       {error ? (
         <ErrorState
+          id="license-control-panel-unavailable"
           title={error}
           description={copy.formErrorHint}
           action={
