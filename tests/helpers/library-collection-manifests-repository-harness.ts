@@ -29,7 +29,7 @@ export async function createLibraryCollectionManifestsRepositoryDbMock() {
   };
 }
 
-export function resetLibraryCollectionManifestsRepositoryState() {
+function resetLibraryCollectionManifestsRepositoryState() {
   libraryCollectionManifestsRepositoryState.rows = [];
   libraryCollectionManifestsRepositoryState.queries = [];
   libraryCollectionManifestsRepositoryState.options = [];
