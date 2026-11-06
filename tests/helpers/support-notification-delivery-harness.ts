@@ -23,22 +23,22 @@ import {
 } from "../../packages/db/src/schema";
 
 export {
+  auditEvents,
   db,
   delivery,
-  SupportNotificationDeliveryRepository,
-  sessionRepository,
-  supportCaseRepository,
-  webPushSubscriptionRepository,
-  auditEvents,
+  eq,
+  inArray,
   jobs,
   notifications,
+  SupportNotificationDeliveryRepository,
+  sessionRepository,
   supportCaseMessages,
+  supportCaseRepository,
   supportCases,
   supportMutationRequests,
   users,
   webPushOutbox,
-  eq,
-  inArray,
+  webPushSubscriptionRepository,
 };
 
 const actors: string[] = [];
@@ -52,6 +52,10 @@ export const noticeId = (messageId: string, recipientId: string) =>
   `ntf_support_moderator_${createHash("sha256")
     .update(JSON.stringify([messageId, recipientId]))
     .digest("hex")}`;
+
+export function staffCaseLink(caseId: string) {
+  return `/admin/support/${encodeURIComponent(caseId)}`;
+}
 
 /** Register shared afterEach cleanup for support notification delivery suites. */
 export function setupSupportNotificationDelivery() {

@@ -16,9 +16,10 @@ import {
   notifications,
   ready,
   reply,
+  SupportNotificationDeliveryRepository,
   setupSupportNotificationDelivery,
   source,
-  SupportNotificationDeliveryRepository,
+  staffCaseLink,
   users,
 } from "./helpers/support-notification-delivery-harness";
 
@@ -57,13 +58,12 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
     expect(row).toMatchObject({
       title: "New support case",
       message: "A support case is awaiting review.",
-      link: "/admin/support",
+      link: staffCaseLink(f.caseId),
       category: "system",
     });
     expect(JSON.stringify(row)).not.toContain("PRIVATE_");
     expect(JSON.stringify(row)).not.toContain(f.requesterId);
     expect(JSON.stringify(row)).not.toContain(f.messageId);
-    expect(JSON.stringify(row)).not.toContain(f.caseId);
   }
   expect((await source(f.messageId)).completedAt).not.toBeNull();
 });
@@ -150,12 +150,11 @@ it("uses current roles and the fixed horizon, excluding the requester on replies
       recipientId: promoted,
       title: "Support case updated",
       message: "A support case has a new requester message.",
-      link: "/admin/support",
+      link: staffCaseLink(f.caseId),
     },
   ]);
   expect(await notices(r.messageId)).toHaveLength(1);
   expect(JSON.stringify(await notices(r.messageId))).not.toContain("PRIVATE_");
-  expect(JSON.stringify(await notices(r.messageId))).not.toContain(f.caseId);
 });
 
 it("retries a locked recipient without advancing, then rechecks a committed demotion", async () => {

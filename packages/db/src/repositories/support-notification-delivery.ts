@@ -18,6 +18,14 @@ export type SupportNotificationDeliveryStats = Readonly<{
   oldestAgeSeconds: number;
 }>;
 
+/** Staff inbox deep link for a support case; falls back to the queue list if id is unsafe. */
+export function supportStaffCaseLink(caseId: string) {
+  if (!caseId || caseId.length > 128 || !/^[A-Za-z0-9_-]+$/u.test(caseId)) {
+    return "/admin/support";
+  }
+  return `/admin/support/${encodeURIComponent(caseId)}`;
+}
+
 export class SupportNotificationDeliveryRepository {
   async processNext(limit = 20): Promise<SupportNotificationDeliveryResult> {
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
@@ -28,6 +36,7 @@ export class SupportNotificationDeliveryRepository {
       const [job] = await tx
         .select({
           messageId: supportNotificationDeliveries.messageId,
+          caseId: supportNotificationDeliveries.caseId,
           // Preserve the database's microseconds in the account horizon.
           createdAt: sql<string>`${supportNotificationDeliveries.createdAt}::text`,
           event: supportNotificationDeliveries.event,
@@ -93,7 +102,7 @@ export class SupportNotificationDeliveryRepository {
                   job.event === "case_created"
                     ? "A support case is awaiting review."
                     : "A support case has a new requester message.",
-                link: "/admin/support",
+                link: supportStaffCaseLink(job.caseId),
                 type: "system",
                 category: "system",
               },
