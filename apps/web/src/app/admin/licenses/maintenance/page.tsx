@@ -67,6 +67,7 @@ export default async function Page({
           {copy.back}
         </Link>
         <ErrorState
+          id="admin-license-maintenance-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link
