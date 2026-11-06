@@ -326,6 +326,7 @@ export function SupportCaseThread({
           {copy.back}
         </Link>
         <ErrorState
+          id="support-case-thread-unavailable"
           title={error ?? copy.caseLoadError}
           action={
             <Button
