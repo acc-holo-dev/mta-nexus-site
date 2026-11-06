@@ -106,4 +106,4 @@ export async function initiatingToken(userId: string) {
   return token;
 }
 
-export { cases, db, randomUUID };
+export { cases, randomUUID };
