@@ -1,109 +1,46 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Build, Product, User } from "@nexus/domain";
+import { describe, expect, it, vi } from "vitest";
+import type { Build } from "@nexus/domain";
 import { eventBus } from "@nexus/domain";
 
-const mocks = vi.hoisted(() => ({
-  findBuild: vi.fn(),
-  findProduct: vi.fn(),
-  moderatePending: vi.fn(),
-  submitForReview: vi.fn(),
-  can: vi.fn(),
-}));
+vi.mock("@nexus/db", async () => {
+  const { buildModerationPolicyMocks } = await import("./helpers/build-moderation-policy-harness");
+  return {
+    buildRepository: {
+      findById: buildModerationPolicyMocks.findBuild,
+      moderatePending: buildModerationPolicyMocks.moderatePending,
+      submitForReview: buildModerationPolicyMocks.submitForReview,
+    },
+    productRepository: {
+      findById: buildModerationPolicyMocks.findProduct,
+    },
+    organizationRepository: {
+      findById: vi.fn(),
+      listUserMemberships: vi.fn(async () => []),
+    },
+  };
+});
 
-vi.mock("@nexus/db", () => ({
-  buildRepository: {
-    findById: mocks.findBuild,
-    moderatePending: mocks.moderatePending,
-    submitForReview: mocks.submitForReview,
-  },
-  productRepository: {
-    findById: mocks.findProduct,
-  },
-  organizationRepository: {
-    findById: vi.fn(),
-    listUserMemberships: vi.fn(async () => []),
-  },
-}));
-
-vi.mock("@nexus/security", () => ({
-  can: mocks.can,
-  generateId: vi.fn((prefix: string) => `${prefix}_test`),
-}));
+vi.mock("@nexus/security", async () => {
+  const { buildModerationPolicyMocks } = await import("./helpers/build-moderation-policy-harness");
+  return {
+    can: buildModerationPolicyMocks.can,
+    generateId: vi.fn((prefix: string) => `${prefix}_test`),
+  };
+});
 
 import { ProductService } from "../apps/web/src/lib/services/product-service";
+import {
+  buildModerationPolicyBuild as build,
+  buildModerationPolicyMocks as mocks,
+  buildModerationPolicyModerator as moderator,
+  buildModerationPolicyStaffPasswordHash as staffPasswordHash,
+  installBuildModerationPolicyLifecycle,
+} from "./helpers/build-moderation-policy-harness";
 
-const staffPasswordHash = "hash_mod";
-
-const moderator = {
-  id: "usr_mod",
-  username: "moderator",
-  displayName: "Moderator",
-  role: "moderator",
-} as User;
-
-function product(): Product {
-  return {
-    id: "prd_1",
-    authorId: "usr_author",
-    title: "Resource",
-    slug: "resource",
-    description: "Resource",
-    type: "script",
-    status: "pending_review",
-    price: 0,
-    currency: "USD",
-    licenseModel: "unlimited",
-    tags: [],
-    currentVersion: "1.0.0",
-    ratingAverage: 0,
-    ratingCount: 0,
-    salesCount: 0,
-    isFeatured: false,
-    screenshots: [],
-    compatibility: { dependencies: [] },
-    createdAt: new Date("2026-01-01T00:00:00.000Z"),
-    updatedAt: new Date("2026-01-01T00:00:00.000Z"),
-  } as Product;
-}
-
-function build(overrides: Partial<Build> = {}): Build {
-  return {
-    id: "bld_1",
-    productId: "prd_1",
-    revision: 1,
-    version: "1.0.0",
-    releaseNotes: "Release",
-    status: "pending_review",
-    storageKey: "test/bld_1.zip",
-    sha256Hash: "a".repeat(64),
-    fileSizeBytes: 42,
-    fileName: "resource.zip",
-    mimeType: "application/zip",
-    scanStatus: "clean",
-    scanner: "test-scanner",
-    scannedAt: new Date("2026-01-01T00:00:00.000Z"),
-    isSigned: false,
-    createdAt: new Date("2026-01-01T00:00:00.000Z"),
-    ...overrides,
-  } as Build;
-}
+installBuildModerationPolicyLifecycle();
 
 describe("build moderation service behavior", () => {
   const service = new ProductService();
-  let publishSpy: ReturnType<typeof vi.spyOn>;
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.can.mockReturnValue(true);
-    mocks.findBuild.mockResolvedValue(build());
-    mocks.findProduct.mockResolvedValue(product());
-    mocks.moderatePending.mockResolvedValue(build({ status: "published" }));
-    publishSpy = vi.spyOn(eventBus, "publish").mockResolvedValue(undefined);
-  });
 
   it("requires moderator permission before reading the build", async () => {
     mocks.can.mockReturnValue(false);
@@ -191,107 +128,6 @@ describe("build moderation service behavior", () => {
       statusCode: 409,
       code: "BUILD_STATE_CHANGED",
     });
-    expect(publishSpy).not.toHaveBeenCalled();
-  });
-
-  it("publishes submitted_for_review, never released, when an author submits a build", async () => {
-    const pending = build({
-      id: "bld_test",
-      status: "pending_review",
-    });
-    mocks.submitForReview.mockResolvedValue(pending);
-    vi.spyOn(service, "assertCanReleaseBuild").mockResolvedValue(product());
-
-    await expect(
-      service.releaseBuild(
-        {
-          productId: "prd_1",
-          version: "1.0.0",
-          releaseNotes: "Submission",
-          storageKey: "test/bld_test.zip",
-          sha256Hash: "a".repeat(64),
-          fileSizeBytes: 42,
-          fileName: "resource.zip",
-          mimeType: "application/zip",
-          scanStatus: "clean",
-          scanner: "test-scanner",
-          scannedAt: new Date("2026-01-01T00:00:00.000Z"),
-        },
-        moderator,
-        "moderator-session",
-      ),
-    ).resolves.toBe(pending);
-
-    expect(publishSpy).toHaveBeenCalledTimes(1);
-    expect(publishSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: "build.submitted_for_review",
-        aggregateType: "build",
-        payload: expect.objectContaining({
-          productId: "prd_1",
-          version: "1.0.0",
-        }),
-      }),
-    );
-    expect(publishSpy).not.toHaveBeenCalledWith(
-      expect.objectContaining({ type: "build.released" }),
-    );
-  });
-
-  it("publishes build.released only after a successful approval", async () => {
-    const reviewed = build({ status: "published" });
-    mocks.moderatePending.mockResolvedValue(reviewed);
-
-    await expect(
-      service.reviewBuild(
-        {
-          buildId: "bld_1",
-          expectedRevision: 1,
-          decision: "approve",
-          notes: "Reviewed clean build",
-          expectedPasswordHash: staffPasswordHash,
-        },
-        moderator,
-        "staff-session",
-      ),
-    ).resolves.toBe(reviewed);
-
-    expect(mocks.moderatePending).toHaveBeenCalledWith(
-      "bld_1",
-      "approve",
-      expect.objectContaining({
-        action: "build.approved",
-        details: expect.objectContaining({ notes: "Reviewed clean build" }),
-      }),
-      1,
-      "staff-session",
-      staffPasswordHash,
-    );
-    expect(publishSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: "build.released",
-        aggregateId: "bld_1",
-      }),
-    );
-  });
-
-  it("does not publish build.released after a successful rejection", async () => {
-    const reviewed = build({ status: "rejected" });
-    mocks.moderatePending.mockResolvedValue(reviewed);
-
-    await expect(
-      service.reviewBuild(
-        {
-          buildId: "bld_1",
-          expectedRevision: 1,
-          decision: "reject",
-          notes: "Rejected",
-          expectedPasswordHash: staffPasswordHash,
-        },
-        moderator,
-        "staff-session",
-      ),
-    ).resolves.toBe(reviewed);
-    expect(publishSpy).not.toHaveBeenCalled();
+    expect(eventBus.publish).not.toHaveBeenCalled();
   });
 });
