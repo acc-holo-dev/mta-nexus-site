@@ -60,7 +60,10 @@ it("the real worker delivers support inbox without VAPID or a request callback",
     expect(result.stdout + result.stderr).not.toContain("PRIVATE_");
     expect((await source(f.messageId)).completedAt).toBeInstanceOf(Date);
     expect(await notices(f.messageId)).toEqual([
-      expect.objectContaining({ recipientId: moderator, link: "/admin/support" }),
+      expect.objectContaining({
+        recipientId: moderator,
+        link: `/admin/support/${encodeURIComponent(f.caseId)}`,
+      }),
     ]);
   } finally {
     await rm(root, { recursive: true, force: true });
