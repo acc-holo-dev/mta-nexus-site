@@ -19,7 +19,12 @@ export function ProductDependencyList({
   }
 
   if (!resolution) {
-    return <ErrorState title={copy.resolutionUnavailable} />;
+    return (
+      <ErrorState
+        id="product-dependency-resolution-unavailable"
+        title={copy.resolutionUnavailable}
+      />
+    );
   }
 
   return (
@@ -39,7 +44,11 @@ export function ProductDependencyList({
           </div>
         ) : dependencyItem.status === "self_reference" ? (
           <div key={dependencyItem.slug}>
-            <ErrorState title={copy.selfReference} description={dependencyItem.slug} />
+            <ErrorState
+              id="product-dependency-self-reference"
+              title={copy.selfReference}
+              description={dependencyItem.slug}
+            />
           </div>
         ) : (
           <div key={dependencyItem.slug}>

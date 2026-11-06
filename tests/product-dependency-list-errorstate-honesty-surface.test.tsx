@@ -22,18 +22,19 @@ const source = readFileSync(
 
 it("locks null catalogue resolution to ErrorState without inventing retry", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={copy.resolutionUnavailable} />");
+  expect(source).toContain('id="product-dependency-resolution-unavailable"');
+  expect(source).toContain("title={copy.resolutionUnavailable}");
   expect(source).not.toMatch(/text-\[10px\] text-warning>\{\s*copy\.resolutionUnavailable\s*\}/u);
-  expect(source).not.toMatch(/ErrorState[\s\S]*action=/u);
+  expect(source).not.toMatch(/id="product-dependency-resolution-unavailable"[\s\S]*action=/u);
 });
 
 it("locks self_reference soft warning to ErrorState without inventing retry", () => {
-  expect(source).toContain(
-    "<ErrorState title={copy.selfReference} description={dependencyItem.slug} />",
-  );
+  expect(source).toContain('id="product-dependency-self-reference"');
+  expect(source).toContain("title={copy.selfReference}");
+  expect(source).toContain("description={dependencyItem.slug}");
   expect(source).not.toContain('font-mono text-warning">{dependencyItem.slug}');
   expect(source).not.toContain('text-[10px] text-warning">{copy.selfReference}');
-  expect(source).not.toMatch(/ErrorState[\s\S]*action=/u);
+  expect(source).not.toMatch(/id="product-dependency-self-reference"[\s\S]*action=/u);
 });
 
 it("locks unresolved catalogue miss to ErrorState without inventing retry", () => {
@@ -58,6 +59,7 @@ it.each(["en", "ru"] as const)(
     );
 
     expect(markup).toContain(copy.resolutionUnavailable);
+    expect(markup).toContain('id="product-dependency-resolution-unavailable"');
     expect(markup).toContain('role="alert"');
     expect(markup).toContain("bg-danger-soft");
     expect(markup).not.toContain("core-ui, missing-pack");
@@ -93,6 +95,7 @@ it.each(["en", "ru"] as const)(
 
     expect(markup).toContain(copy.selfReference);
     expect(markup).toContain("vehicle-pack");
+    expect(markup).toContain('id="product-dependency-self-reference"');
     expect(markup).toContain('role="alert"');
     expect(markup).toContain("bg-danger-soft");
     expect(markup).not.toContain('class="font-mono text-warning"');
