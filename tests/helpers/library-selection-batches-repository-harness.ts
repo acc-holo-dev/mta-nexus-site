@@ -36,7 +36,7 @@ export async function createLibrarySelectionBatchesRepositoryDbMock() {
   };
 }
 
-export function resetLibrarySelectionBatchesRepositoryState() {
+function resetLibrarySelectionBatchesRepositoryState() {
   const state = librarySelectionBatchesRepositoryState;
   state.queries = [];
   state.rows = [];
@@ -55,7 +55,7 @@ export function installLibrarySelectionBatchesRepositoryHooks() {
   });
 }
 
-export const librarySelectionBatchesRepositoryDate = "2026-10-12T00:00:00.000Z";
+const librarySelectionBatchesRepositoryDate = "2026-10-12T00:00:00.000Z";
 
 export const librarySelectionBatchesRepositoryChoice = {
   mode: "fixed" as const,
