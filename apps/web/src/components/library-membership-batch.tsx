@@ -282,6 +282,7 @@ export function LibraryMembershipBatchForm({
       )}
       {error ? (
         <ErrorState
+          id="library-membership-batch-unavailable"
           title={error}
           description={h.actionErrorDescription}
           action={
