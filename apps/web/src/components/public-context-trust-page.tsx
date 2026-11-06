@@ -145,6 +145,7 @@ export async function PublicContextTrustPage({
         </a>
         {error && (
           <ErrorState
+            id="public-context-trust-unavailable"
             title={error}
             action={
               <a href={latest} className={actionLinkClass}>
