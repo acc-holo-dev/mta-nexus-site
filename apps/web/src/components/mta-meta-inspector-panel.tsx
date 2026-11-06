@@ -183,6 +183,7 @@ export function MtaMetaInspectorPanel({
 
       {result?.error ? (
         <ErrorState
+          id="mta-meta-inspector-error-unavailable"
           title={result.error}
           description={copy.formErrorHint}
           className="items-stretch py-4"
