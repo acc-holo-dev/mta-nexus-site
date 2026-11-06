@@ -1,54 +1,24 @@
-import { createHash } from "node:crypto";
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  rows: [] as unknown[][],
-  queries: [] as { sql: string; params: unknown[] }[],
-  options: [] as unknown[],
-}));
+import { expect, it, vi } from "vitest";
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return { rows: state.rows.shift() ?? [] };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return async (fn: (tx: typeof database) => unknown, options: unknown) => {
-            state.options.push(options);
-            return fn(database);
-          };
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
+  const { createLibraryCollectionReceiptDetailRepositoryDbMock } = await import(
+    "./helpers/library-collection-receipt-detail-repository-harness"
+  );
+  return createLibraryCollectionReceiptDetailRepositoryDbMock();
 });
 
 import { readLibraryCollectionReceiptDetail } from "../packages/db/src/repositories/library-collection-receipt-detail";
-import { libraryCollectionCommandSchema } from "../packages/validation/src/library-collections";
-const date = "2026-10-13T00:00:00.000Z",
-  requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
-const command = libraryCollectionCommandSchema.parse({
-  requestId,
-  action: "reconcile-items",
-  expectedRevision: 2,
-  addProductIds: ["prd_added"],
-  removeProductIds: ["prd_removed"],
-});
-const snapshot = { id: "lcol_a", name: "Recorded & name", status: "active", revision: 3 };
-const row = (
-  proof: unknown = command,
-  digest = createHash("sha256").update(JSON.stringify(command)).digest("hex"),
-) => ["lcr_a", requestId, "lcol_a", digest, proof, snapshot, date];
-const prefix = () => [[["usr_a"]], [{ observedAt: date }]] as unknown[][];
-const text = () => state.queries.map((q) => q.sql).join("\n");
-beforeEach(() => {
-  state.rows = [];
-  state.queries = [];
-  state.options = [];
-});
+import {
+  installLibraryCollectionReceiptDetailRepositoryHooks,
+  libraryCollectionReceiptDetailRepositoryPrefix as prefix,
+  libraryCollectionReceiptDetailRepositoryRow as row,
+  libraryCollectionReceiptDetailRepositorySnapshot as snapshot,
+  libraryCollectionReceiptDetailRepositoryState as state,
+  libraryCollectionReceiptDetailRepositoryText as text,
+} from "./helpers/library-collection-receipt-detail-repository-harness";
+
+installLibraryCollectionReceiptDetailRepositoryHooks();
+
 it("offers only exact inverse differences while retaining all unrelated current references", async () => {
   state.rows = [
     ...prefix(),
@@ -172,77 +142,3 @@ it.each([
     expect(report.restoration?.items.every((item) => !item.canAdd && !item.canRemove)).toBe(true);
   },
 );
-it.each(["digest", "hidden", "identity", "request", "future"])(
-  "neutralizes malformed immutable proof before current metadata lookups: %s",
-  async (kind) => {
-    const proof = row();
-    if (kind === "digest") proof[3] = "0".repeat(64);
-    if (kind === "hidden") proof[4] = { ...command, storageKey: "PRIVATE" };
-    if (kind === "identity") proof[5] = { ...snapshot, id: "lcol_foreign" };
-    if (kind === "request") proof[1] = "77ca0352-de64-4af9-9e54-7d3c56fe8d89";
-    if (kind === "future") proof[4] = { requestId, action: "future-action" };
-    state.rows = [...prefix(), [proof]];
-    const report = await readLibraryCollectionReceiptDetail("usr_a", "lcr_a");
-    expect(report).toMatchObject({
-      receipt: null,
-      currentCollection: null,
-      restoration: null,
-      resources: [],
-    });
-    expect(state.queries).toHaveLength(3);
-    expect(JSON.stringify(report)).not.toContain("PRIVATE");
-  },
-);
-it("does not invent reversible state for ordinary add/remove receipts with unknown prior membership", async () => {
-  const proof = libraryCollectionCommandSchema.parse({
-    requestId,
-    action: "add",
-    productId: "prd_a",
-    expectedRevision: 2,
-  });
-  state.rows = [
-    ...prefix(),
-    [row(proof, createHash("sha256").update(JSON.stringify(proof)).digest("hex"))],
-    [["lcol_a", "Current", "active", 9]],
-  ];
-  const report = await readLibraryCollectionReceiptDetail("usr_a", "lcr_a");
-  expect(report.receipt?.command).toEqual(proof);
-  expect(report.restoration).toBeNull();
-  expect(state.queries).toHaveLength(4);
-});
-it("rejects foreign/unknown receipt IDs and deleted actors before resource inspection", async () => {
-  await expect(readLibraryCollectionReceiptDetail("usr_a", "../private")).rejects.toMatchObject({
-    statusCode: 400,
-  });
-  expect(state.queries).toHaveLength(0);
-  state.rows = [...prefix(), []];
-  await expect(readLibraryCollectionReceiptDetail("usr_a", "lcr_foreign")).rejects.toMatchObject({
-    statusCode: 404,
-  });
-  expect(state.queries).toHaveLength(3);
-  state.queries = [];
-  state.rows = [[]];
-  await expect(readLibraryCollectionReceiptDetail("usr_deleted", "lcr_a")).rejects.toMatchObject({
-    statusCode: 404,
-  });
-  expect(state.queries).toHaveLength(1);
-});
-it("preserves proof with a missing current collection and rejects invalid snapshot time/count", async () => {
-  state.rows = [...prefix(), [row()], []];
-  expect((await readLibraryCollectionReceiptDetail("usr_a", "lcr_a")).receipt?.collection).toEqual(
-    snapshot,
-  );
-  state.rows = [[["usr_a"]], [{ observedAt: "invalid" }]];
-  await expect(readLibraryCollectionReceiptDetail("usr_a", "lcr_a")).rejects.toMatchObject({
-    code: "COLLECTION_SNAPSHOT_INVALID",
-  });
-  state.rows = [
-    ...prefix(),
-    [row()],
-    [["lcol_a", "Current", "active", 9]],
-    Array.from({ length: 201 }, (_, i) => [`prd_${i}`]),
-  ];
-  await expect(readLibraryCollectionReceiptDetail("usr_a", "lcr_a")).rejects.toMatchObject({
-    code: "COLLECTION_SNAPSHOT_INVALID",
-  });
-});
