@@ -77,6 +77,7 @@ export default async function ServerPublications({
       </header>
       {!result ? (
         <ErrorState
+          id="workspace-server-content-unavailable"
           title={failure}
           action={
             <Link href={path} className={navLinkClass}>
