@@ -13,6 +13,6 @@ const source = readFileSync(
 it("locks storage-maintenance-controls-unavailable notice to ErrorState", () => {
   expect(source).toContain('id="storage-maintenance-controls-unavailable"');
   expect(source).toMatch(
-    /<ErrorState\s+id="storage-maintenance-controls-unavailable"\s+title=\{copy\\.error\}/u,
+    /<ErrorState\s+id="storage-maintenance-controls-unavailable"\s+title=\{copy\.error\}/u,
   );
 });
