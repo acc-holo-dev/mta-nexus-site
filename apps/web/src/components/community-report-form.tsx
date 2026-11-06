@@ -246,7 +246,7 @@ export function CommunityReportForm({
         />
       ) : !verified || verifiedKey !== storageKey || !storageReady ? (
         error ? (
-          <ErrorState title={error} />
+          <ErrorState id="community-report-form-unavailable" title={error} />
         ) : (
           <p role="status">
             {message("Проверяем сессию и черновик…", "Checking the session and saved report…")}
