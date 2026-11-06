@@ -73,7 +73,13 @@ export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: s
         </Button>
         <span className="font-numeric text-[11px] text-faint">{text.length}/5000</span>
       </div>
-      {error ? <ErrorState title={error} description={copy.commentErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="content-comment-form-unavailable"
+          title={error}
+          description={copy.commentErrorHint}
+        />
+      ) : null}
     </form>
   );
 }
