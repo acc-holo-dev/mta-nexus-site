@@ -14,9 +14,7 @@ it("deep-links non-server verification resolutions to the requester application 
   expect(source).toContain('return "/workspace/verification/history"');
   expect(source).toContain("verificationRequesterHref(request.id)");
   expect(source).not.toContain("`/workspace/verification?view=history`");
-  expect(source).toMatch(
-    /`\/workspace\/servers\/\$\{encodeURIComponent\(request\.targetId\)\}`/u,
-  );
+  expect(source).toMatch(/`\/workspace\/servers\/\$\{encodeURIComponent\(request\.targetId\)\}`/u);
 });
 
 it.each(["en", "ru"] as const)(
