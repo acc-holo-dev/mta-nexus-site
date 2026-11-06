@@ -108,6 +108,7 @@ export default function ResetPasswordPage() {
 
         {state.kind === "invalid" && (
           <ErrorState
+            id="reset-password-invalid"
             title={copy.invalidReset}
             action={
               <Link href="/auth/forgot-password" className={navLinkClass}>
