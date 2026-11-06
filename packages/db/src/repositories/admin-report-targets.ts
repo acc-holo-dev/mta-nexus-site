@@ -7,6 +7,10 @@ export type AdminReportTargetPreview = {
   title: string | null;
   href: string | null;
   detail: string | null;
+  /** Present for resource Q&A so staff can remove without a separate lookup. */
+  productId?: string | null;
+  revision?: number | null;
+  removable?: boolean;
 };
 
 function idsFor(type: Report["targetType"], reports: readonly Report[]) {
@@ -79,6 +83,9 @@ export async function resolveAdminReportTargets(
           .select({
             id: resourceQaThreads.id,
             body: resourceQaThreads.body,
+            status: resourceQaThreads.status,
+            revision: resourceQaThreads.revision,
+            productId: resourceQaThreads.productId,
             title: products.title,
             slug: products.slug,
           })
@@ -135,6 +142,9 @@ export async function resolveAdminReportTargets(
         ? `/market/${encodeURIComponent(row.slug)}?qa=${encodeURIComponent(row.id)}#resource-qa`
         : null,
       detail: row.body.slice(0, 160),
+      productId: row.productId,
+      revision: row.revision,
+      removable: row.status === "open" || row.status === "resolved",
     });
   }
 

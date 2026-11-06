@@ -92,6 +92,8 @@ export type ResourceQaNotificationData = {
   kind: "resource_qa";
   event: "asked" | "answered" | "resolved" | "removed";
   productId: string;
+  /** Public catalogue title at delivery time; used for inbox localization. */
+  productTitle: string;
   threadId: string;
   answerId?: string | null;
 };

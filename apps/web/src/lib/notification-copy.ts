@@ -215,6 +215,8 @@ export function formatNotification(
     };
   const resourceQa = notification.data;
   if (resourceQa?.kind === "resource_qa") {
+    const title = typeof resourceQa.productTitle === "string" ? resourceQa.productTitle.trim() : "";
+    const named = title.length > 0 && title.length <= 200 ? title : null;
     const titles =
       locale === "ru"
         ? {
@@ -232,16 +234,32 @@ export function formatNotification(
     const messages =
       locale === "ru"
         ? {
-            asked: "По ресурсу задали новый публичный вопрос.",
-            answered: "В ветке вопроса появился новый ответ.",
-            resolved: "Ответ отмечен полезным для этого вопроса.",
-            removed: "Вопрос удалён издателем или сотрудниками.",
+            asked: named
+              ? `По ресурсу «${named}» задали новый публичный вопрос.`
+              : "По ресурсу задали новый публичный вопрос.",
+            answered: named
+              ? `В ветке вопроса по «${named}» появился новый ответ.`
+              : "В ветке вопроса появился новый ответ.",
+            resolved: named
+              ? `Ответ отмечен полезным для вопроса по «${named}».`
+              : "Ответ отмечен полезным для этого вопроса.",
+            removed: named
+              ? `Вопрос по «${named}» удалён издателем или сотрудниками.`
+              : "Вопрос удалён издателем или сотрудниками.",
           }
         : {
-            asked: "Someone asked a public question about a resource.",
-            answered: "There is a new answer on a resource question thread.",
-            resolved: "A useful answer was marked for a resource question.",
-            removed: "A resource question was removed by staff or the publisher.",
+            asked: named
+              ? `Someone asked a public question about ${named}.`
+              : "Someone asked a public question about a resource.",
+            answered: named
+              ? `There is a new answer on a question about ${named}.`
+              : "There is a new answer on a resource question thread.",
+            resolved: named
+              ? `A useful answer was marked for a question about ${named}.`
+              : "A useful answer was marked for a resource question.",
+            removed: named
+              ? `A question about ${named} was removed by staff or the publisher.`
+              : "A resource question was removed by staff or the publisher.",
           };
     return { title: titles[resourceQa.event], message: messages[resourceQa.event] };
   }

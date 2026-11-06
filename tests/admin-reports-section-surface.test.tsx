@@ -19,6 +19,22 @@ vi.mock("../apps/web/src/components/report-moderation-controls", () => ({
   ),
 }));
 
+vi.mock("../apps/web/src/components/admin/admin-resource-qa-report-actions", () => ({
+  AdminResourceQaReportActions: ({
+    reportId,
+    productId,
+    threadId,
+  }: {
+    reportId: string;
+    productId: string;
+    threadId: string;
+  }) => (
+    <button type="button" data-qa-remove={`${reportId}:${productId}:${threadId}`}>
+      Remove question and resolve
+    </button>
+  ),
+}));
+
 vi.mock("../apps/web/src/components/report-evidence-links", () => ({
   ReportEvidenceLinks: () => null,
 }));
@@ -50,6 +66,9 @@ it("links resource Q&A reports to the market deep link with thread preview", () 
             title: "Racing HUD",
             href: "/market/racing-hud?qa=rqa_thread_1#resource-qa",
             detail: "How do I bypass the license check?",
+            productId: "prd_hud",
+            revision: 2,
+            removable: true,
           },
         },
       ]}
@@ -60,6 +79,9 @@ it("links resource Q&A reports to the market deep link with thread preview", () 
   expect(html).toContain("How do I bypass the license check?");
   expect(html).toContain('href="/market/racing-hud?qa=rqa_thread_1#resource-qa"');
   expect(html).toContain(copy.openReportedTarget);
+  expect(html).toContain("Resource Q&amp;A");
+  expect(html).not.toContain("· resource_qa_thread ·");
   expect(html).toContain("rqa_thread_1");
+  expect(html).toContain('data-qa-remove="rpt_qa:prd_hud:rqa_thread_1"');
   expect(html).toContain('data-report="rpt_qa"');
 });

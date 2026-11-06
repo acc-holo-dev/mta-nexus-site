@@ -68,6 +68,9 @@ it("builds market Q&A deep links and article/server/user previews", async () => 
         {
           id: "rqa_1",
           body: "How do I install this?",
+          status: "open",
+          revision: 3,
+          productId: "prd_a",
           title: "HUD",
           slug: "hud",
         },
@@ -134,5 +137,8 @@ it("builds market Q&A deep links and article/server/user previews", async () => 
     title: "HUD",
     href: "/market/hud?qa=rqa_1#resource-qa",
     detail: "How do I install this?",
+    productId: "prd_a",
+    revision: 3,
+    removable: true,
   });
 });

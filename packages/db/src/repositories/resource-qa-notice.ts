@@ -109,6 +109,7 @@ async function deliver(
         kind: "resource_qa",
         event: input.kind,
         productId: input.product.id,
+        productTitle: input.product.title,
         threadId: input.threadId,
         answerId: input.answerId ?? null,
       },

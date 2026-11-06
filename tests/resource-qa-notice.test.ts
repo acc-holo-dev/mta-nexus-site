@@ -72,18 +72,22 @@ it("notifies the publisher about a new question with a content-category inbox ro
   );
   expect(
     insert?.params.some((value) => {
-      if (typeof value === "string") {
-        try {
-          return (JSON.parse(value) as { kind?: string }).kind === "resource_qa";
-        } catch {
-          return false;
-        }
-      }
-      return (
-        typeof value === "object" &&
-        value !== null &&
-        (value as { kind?: string }).kind === "resource_qa"
-      );
+      const data =
+        typeof value === "string"
+          ? (() => {
+              try {
+                return JSON.parse(value) as {
+                  kind?: string;
+                  productTitle?: string;
+                };
+              } catch {
+                return null;
+              }
+            })()
+          : typeof value === "object" && value !== null
+            ? (value as { kind?: string; productTitle?: string })
+            : null;
+      return data?.kind === "resource_qa" && data.productTitle === "Physics Pack";
     }),
   ).toBe(true);
   expect(state.push).toHaveBeenCalled();

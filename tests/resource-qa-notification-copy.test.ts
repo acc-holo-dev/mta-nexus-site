@@ -4,7 +4,7 @@ import { formatNotification } from "../apps/web/src/lib/notification-copy";
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it.each(["asked", "answered", "resolved", "removed"] as const)(
-  "localizes resource Q&A %s notices in RU without changing stored English templates",
+  "localizes resource Q&A %s notices with the product title in RU and EN",
   (event) => {
     const en = formatNotification(
       {
@@ -14,6 +14,7 @@ it.each(["asked", "answered", "resolved", "removed"] as const)(
           kind: "resource_qa",
           event,
           productId: "prd_a",
+          productTitle: "Physics Pack",
           threadId: "rqt_a",
           answerId: null,
         },
@@ -29,6 +30,7 @@ it.each(["asked", "answered", "resolved", "removed"] as const)(
           kind: "resource_qa",
           event,
           productId: "prd_a",
+          productTitle: "Physics Pack",
           threadId: "rqt_a",
           answerId: null,
         },
@@ -37,7 +39,9 @@ it.each(["asked", "answered", "resolved", "removed"] as const)(
       "ru",
     );
     expect(en.title.length).toBeGreaterThan(0);
+    expect(en.message).toContain("Physics Pack");
     expect(ru.title).not.toEqual(en.title);
+    expect(ru.message).toContain("Physics Pack");
     expect(ru.message).not.toEqual(en.message);
   },
 );

@@ -9,6 +9,7 @@ import { resourceReviewCopy } from "../../lib/resource-review-i18n";
 import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
 import { ReportEvidenceLinks } from "../report-evidence-links";
 import { ReportModerationControls } from "../report-moderation-controls";
+import { AdminResourceQaReportActions } from "./admin-resource-qa-report-actions";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
@@ -28,8 +29,16 @@ type AdminReport = {
     title: string | null;
     href: string | null;
     detail: string | null;
+    productId?: string | null;
+    revision?: number | null;
+    removable?: boolean;
   } | null;
 };
+
+function targetTypeLabel(copy: AdminCopy, targetType: string) {
+  const labels = copy.targetTypes as Record<string, string>;
+  return labels[targetType] ?? targetType;
+}
 
 export function AdminReportsSection({
   locale,
@@ -123,8 +132,8 @@ export function AdminReportsSection({
                 ) : null}
                 <p className="font-caption text-secondary">{report.reason}</p>
                 <p className="font-caption text-faint">
-                  {copy.reporter}: {report.reporterId} · {report.targetType} ·{" "}
-                  {new Date(report.createdAt).toLocaleDateString(dateLocale)}
+                  {copy.reporter}: {report.reporterId} · {targetTypeLabel(copy, report.targetType)}{" "}
+                  · {new Date(report.createdAt).toLocaleDateString(dateLocale)}
                 </p>
                 <ReportEvidenceLinks urls={report.evidenceUrls} label={copy.reportEvidence} />
                 {report.moderatorNotes && (
@@ -160,7 +169,20 @@ export function AdminReportsSection({
                       {resourceReviewCopy(locale).detail}
                     </Link>
                   ) : (
-                    <ReportModerationControls reportId={report.id} />
+                    <>
+                      {report.targetType === "resource_qa_thread" &&
+                      report.targetPreview?.removable &&
+                      report.targetPreview.productId &&
+                      typeof report.targetPreview.revision === "number" ? (
+                        <AdminResourceQaReportActions
+                          reportId={report.id}
+                          productId={report.targetPreview.productId}
+                          threadId={report.targetId}
+                          revision={report.targetPreview.revision}
+                        />
+                      ) : null}
+                      <ReportModerationControls reportId={report.id} />
+                    </>
                   ))}
               </div>
             </div>
