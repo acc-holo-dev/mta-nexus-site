@@ -149,6 +149,7 @@ export default async function VerificationHistoryPage({
       </Link>
       {error ? (
         <ErrorState
+          id="verification-history-unavailable"
           title={error}
           action={
             <Link href={retryHref} className={navLinkClass}>
