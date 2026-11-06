@@ -6,8 +6,10 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { DeveloperExperience } from "../../../components/developer-experience";
 import { FollowButton } from "../../../components/follow-button";
+import { ObjectReportForm } from "../../../components/object-report-form";
 import { ProductCard } from "../../../components/product-card";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { ServerCard } from "../../../components/server-card";
@@ -74,9 +76,7 @@ export default async function UserProfilePage({
   const query = await searchParams;
   const previewRaw = query?.preview;
   const wantsGuestPreview = (Array.isArray(previewRaw) ? previewRaw[0] : previewRaw) === "guest";
-  const sessionToken = wantsGuestPreview
-    ? (await cookies()).get("nexus_session")?.value
-    : undefined;
+  const sessionToken = (await cookies()).get("nexus_session")?.value;
   const resourcePageNumber = parseProfilePage(query?.page);
   const serverPageNumber = parseProfilePage(query?.serverPage);
   const profileHref = `/users/${encodeURIComponent(user.username)}`;
@@ -88,7 +88,7 @@ export default async function UserProfilePage({
       ? verificationWorkspaceService.publicProfile(user.id).catch(() => null)
       : Promise.resolve(null),
     profilePrivacyService.visibility(user.id),
-    wantsGuestPreview ? authService.getSession(sessionToken) : Promise.resolve(null),
+    authService.getSession(sessionToken).catch(() => null),
   ]).catch(() => {
     loadError = true;
     return null;
@@ -165,7 +165,19 @@ export default async function UserProfilePage({
               {user.bio || copy.memberFallback}
             </p>
             {!guestPreview && (
-              <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+              <div className="space-y-1">
+                <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+                {actor?.id !== user.id ? (
+                  <ObjectReportForm
+                    targetType="user"
+                    targetId={user.id}
+                    locale={locale}
+                    authenticated={Boolean(actor)}
+                    loginHref={authEntryHref("login", profileHref)}
+                    registerHref={authEntryHref("register", profileHref)}
+                  />
+                ) : null}
+              </div>
             )}
             {visibility.showActivity && (
               <Link

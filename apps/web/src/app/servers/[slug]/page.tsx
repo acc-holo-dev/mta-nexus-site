@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { authEntryHref } from "../../../components/auth-return-path";
+import { ObjectReportForm } from "../../../components/object-report-form";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 import { ServerConnectControls } from "../../../components/server-connect-controls";
 import { ServerFollowButton } from "../../../components/server-follow-button";
@@ -81,15 +83,18 @@ export default async function ServerDetailPage({
 
   if (!server || server.visibility === "private") notFound();
 
+  let reportViewer: { id: string } | null = null;
   let claimViewer: { id: string } | null | undefined;
-  if (!server.organizationId && !server.ownerId && !server.isVerified) {
-    try {
-      const store = await getRequestCookieStore();
-      claimViewer = await authService.getSession(store.get("nexus_session")?.value);
-    } catch {
-      claimViewer = undefined;
-    }
+  try {
+    const store = await getRequestCookieStore();
+    reportViewer = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    reportViewer = null;
   }
+  if (!server.organizationId && !server.ownerId && !server.isVerified) {
+    claimViewer = reportViewer;
+  }
+  const serverReturnPath = `/servers/${encodeURIComponent(server.slug)}`;
 
   const websiteUrl = safeExternalWebUrl(server.websiteUrl);
   const discordUrl = safeExternalWebUrl(server.discordUrl);
@@ -201,6 +206,14 @@ export default async function ServerDetailPage({
               </Link>
             )}
             <ServerFollowButton serverId={server.id} serverName={server.name} />
+            <ObjectReportForm
+              targetType="server"
+              targetId={server.id}
+              locale={locale}
+              authenticated={Boolean(reportViewer)}
+              loginHref={authEntryHref("login", serverReturnPath)}
+              registerHref={authEntryHref("register", serverReturnPath)}
+            />
             <ServerConnectControls
               address={connectAddress}
               connectUri={connectUri}
