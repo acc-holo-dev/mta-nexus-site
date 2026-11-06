@@ -30,6 +30,10 @@ test("SEC-002 build-incident delivery lands with explicit quarantine opt-in", ()
     /notifyAffectedDownloaders/u,
   );
   assert.match(read("packages/db/scripts/run-web-push-dispatcher.ts"), /build-incident-delivery/u);
+  const delivery = read("packages/db/src/repositories/build-incident-notification-delivery.ts");
+  assert.match(delivery, /\/workspace\/library\/\$\{encodeURIComponent\(productId\)\}\/versions/u);
+  assert.match(delivery, /\/workspace\/library\/updates/u);
+  assert.doesNotMatch(delivery, /link:\s*"\/security"/u);
   const lifecycle = read("packages/db/src/repositories/builds-lifecycle.ts");
   assert.doesNotMatch(
     lifecycle,

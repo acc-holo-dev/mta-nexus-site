@@ -591,7 +591,9 @@ The durable source is `build_incident_notification_deliveries` (migration 0085);
 historical quarantines are not backfilled. The queue probe reports
 `buildIncidentPending`, `buildIncidentFailed`, `buildIncidentOldestAgeSeconds`, and
 alerts `build_incident_delivery_failed` or `build_incident_delivery_backlog`. Notices
-are generic security inbox items linking to `/security` and never invent malware details.
+are generic security inbox items linking to the library versions surface for that
+resource (`/workspace/library/:productId/versions`, with `/workspace/library/updates`
+as fallback) and never invent malware details.
 
 ```sh
 pnpm notifications:delivery list --channel build_incident

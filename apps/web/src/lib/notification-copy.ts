@@ -263,6 +263,19 @@ export function formatNotification(
             : "В обсуждении, в котором вы участвуете, появился новый ответ."
           : notification.message,
     };
+  const buildIncident = notification.data;
+  if (buildIncident?.kind === "build_incident") {
+    return {
+      title:
+        locale === "ru"
+          ? "Уведомление безопасности о загруженной сборке"
+          : "Security notice for a downloaded build",
+      message:
+        locale === "ru"
+          ? "Сборка, которую вы загрузили, помещена в карантин после проверки безопасности. Прекратите использовать эту версию и проверьте наличие обновления в библиотеке."
+          : "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
+    };
+  }
   const resourceQa = notification.data;
   if (resourceQa?.kind === "resource_qa") {
     const title = typeof resourceQa.productTitle === "string" ? resourceQa.productTitle.trim() : "";
