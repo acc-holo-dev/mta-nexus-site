@@ -74,6 +74,7 @@ export async function ServerContentEditorPage({
         </>
       ) : (
         <ErrorState
+          id="server-content-editor-page-unavailable"
           title={failure}
           action={
             <Link
