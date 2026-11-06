@@ -145,6 +145,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     return (
       <div className={pageShellClass}>
         <ErrorState
+          id="market-detail-unavailable"
           title={copy.detailUnavailable}
           description={copy.detailUnavailableDescription}
           action={
