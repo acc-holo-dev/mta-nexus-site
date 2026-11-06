@@ -69,6 +69,7 @@ export default async function AuthorResourcesPage({
           <p className="text-sm text-secondary">{copy.subtitle}</p>
         </header>
         <ErrorState
+          id="workspace-resources-unavailable"
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
