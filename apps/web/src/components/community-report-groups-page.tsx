@@ -45,6 +45,7 @@ export async function CommunityReportGroupsPage({
     return (
       <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
         <ErrorState
+          id="community-report-groups-unavailable"
           title={reportGroupsError(
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
