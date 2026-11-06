@@ -131,6 +131,7 @@ export default async function SubscriptionHistoryPage({
       return (
         <section className={pageShellClass}>
           <ErrorState
+            id="subscription-history-code-unavailable"
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
             action={
