@@ -40,7 +40,7 @@ export async function createResourceCopyRepositoryDbMock() {
   };
 }
 
-export function resetResourceCopyRepositoryState() {
+function resetResourceCopyRepositoryState() {
   resourceCopyRepositoryState.queries = [];
   resourceCopyRepositoryState.rows = [];
   resourceCopyRepositoryState.options = [];
@@ -64,9 +64,9 @@ export const resourceCopyRepositorySource = {
   updatedAt: date,
 } as typeof products.$inferSelect;
 
-export const resourceCopyRepositoryInitialCommand = initialCommand;
+const resourceCopyRepositoryInitialCommand = initialCommand;
 
-export function resourceCopyRepositoryHash(value: unknown) {
+function resourceCopyRepositoryHash(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
@@ -116,9 +116,7 @@ export function resourceCopyRepositoryProduct(
   });
 }
 
-export function resourceCopyRepositoryRecord(
-  values: ReturnType<typeof resourceCopyRepositoryRow>,
-) {
+export function resourceCopyRepositoryRecord(values: ReturnType<typeof resourceCopyRepositoryRow>) {
   return Object.keys(getTableColumns(resourceDraftCopies)).map((key) => {
     const v = (values as Record<string, unknown>)[key];
     return v instanceof Date ? v.toISOString() : v;
