@@ -1,82 +1,26 @@
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  sessionLive: true,
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][],
-  failAudit: false,
-}));
+import { expect, it, vi } from "vitest";
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const raw = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    if (sql.includes('from "sessions"'))
-      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
-    if (state.failAudit && sql.startsWith('insert into "audit_events"'))
-      throw new Error("audit failed");
-    return { rows: state.rows.shift() ?? [] };
-  });
-  const db: typeof raw = new Proxy(raw, {
-    get(target, key) {
-      if (key === "transaction")
-        return async (callback: (tx: typeof raw) => unknown) => callback(db);
-      const value = Reflect.get(target, key);
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-  return { db };
+  const { createCollectionReleaseWatchesRepositoryDbMock } = await import(
+    "./helpers/collection-release-watches-repository-harness"
+  );
+  return createCollectionReleaseWatchesRepositoryDbMock();
 });
+
+import { enableCollectionReleaseWatches as enable } from "../packages/db/src/repositories/collection-release-watches";
 import {
-  enableCollectionReleaseWatches as enable,
-  readCollectionReleaseWatches as page,
-} from "../packages/db/src/repositories/collection-release-watches";
-const stamp = "2026-10-12T00:00:00.000Z";
-const input = {
-  userId: "usr_a",
-  currentToken: "tok_a",
-  collectionId: "lcol_a",
-  auditId: "aud_a",
-  command: {
-    expectedCollectionRevision: 3,
-    items: [
-      { productId: "prd_a", expectedRevision: 0 },
-      { productId: "prd_b", expectedRevision: 2 },
-    ],
-  },
-};
-const owned = (status = "active", revision = 3) => [
-  [],
-  [],
-  [],
-  [],
-  [["usr_a"]],
-  [["lcol_a", "Core", status, revision]],
-];
-const ready = (previous: unknown[][] = [["prd_b", false, 2, stamp]]) => [
-  ...owned(),
-  [["prd_a"], ["prd_b"]],
-  [
-    ["prd_a", "published"],
-    ["prd_b", "published"],
-  ],
-  [["ent_a", null]],
-  [["bld_a"]],
-  [["ent_b", null]],
-  [["bld_b"]],
-  previous,
-];
-const output = [
-  { productId: "prd_b", enabled: true, revision: 3, updatedAt: stamp },
-  { productId: "prd_a", enabled: true, revision: 1, updatedAt: stamp },
-];
-function success() {
-  state.rows = [...ready(), [[5]], [{ observedAt: stamp }], output, []];
-}
-beforeEach(() => {
-  state.sessionLive = true;
-  state.rows = [];
-  state.queries = [];
-  state.failAudit = false;
-});
+  collectionReleaseWatchesRepositoryInput as input,
+  collectionReleaseWatchesRepositoryOwned as owned,
+  collectionReleaseWatchesRepositoryOutput as output,
+  collectionReleaseWatchesRepositoryReady as ready,
+  collectionReleaseWatchesRepositoryStamp as stamp,
+  collectionReleaseWatchesRepositoryState as state,
+  collectionReleaseWatchesRepositorySuccess as success,
+  installCollectionReleaseWatchesRepositoryHooks,
+} from "./helpers/collection-release-watches-repository-harness";
+
+installCollectionReleaseWatchesRepositoryHooks();
+
 it("holds collection membership, rights, safe builds and current watch revisions before one baseline upsert and audit", async () => {
   success();
   const result = await enable(input);
@@ -154,46 +98,6 @@ it("propagates a mandatory audit failure and rejects a partial guarded upsert", 
   state.rows = [...ready(), [[5]], [{ observedAt: stamp }], [output[0]]];
   await expect(enable(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_BATCH_CONFLICT" });
 });
-it("reads only an owner's collection in a masked, bounded database-time snapshot", async () => {
-  state.rows = [
-    [["usr_a"]],
-    [["lcol_a", "Core", "archived", 3]],
-    [{ all: 1, enabled: 0, disabled: 1, unavailable: 1, activeWatchCount: 4 }],
-    [
-      {
-        productId: "prd_a",
-        enabled: false,
-        revision: 0,
-        updatedAt: null,
-        available: false,
-        title: "PRIVATE-TITLE",
-        lastSequence: "PRIVATE-CURSOR",
-      },
-    ],
-  ];
-  const result = await page("usr_a", "lcol_a", 1, "all", "Core");
-  expect(result).toMatchObject({
-    collection: { status: "archived" },
-    activeWatchCount: 4,
-    items: [{ title: null, updatedAt: null }],
-  });
-  expect(JSON.stringify(result)).not.toContain("PRIVATE");
-  const text = state.queries.map((q) => q.sql).join("\n");
-  expect(text).toContain("transaction_timestamp()");
-  expect(text).toContain("WHERE available AND title ILIKE");
-  expect(text).toContain("watch.user_id=");
-  expect(text).not.toMatch(/for share|last_sequence|storage_key/u);
-});
-it("rejects foreign collections and malformed direct commands before granting any watch", async () => {
-  state.rows = [[["usr_a"]], []];
-  await expect(page("usr_a", "lcol_other")).rejects.toMatchObject({ statusCode: 404 });
-  state.queries = [];
-  await expect(
-    enable({ ...input, command: { ...input.command, expectedCollectionRevision: 0 } }),
-  ).rejects.toMatchObject({ statusCode: 400 });
-  expect(state.queries).toHaveLength(0);
-});
-
 it("checks the initiating session after every authority lock before reading the enrollment clock", async () => {
   success();
   await enable(input);
