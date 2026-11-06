@@ -48,6 +48,7 @@ export default async function ResourceVariantsPage({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-resource-variants-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
