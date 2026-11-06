@@ -17,7 +17,7 @@
 | `dev-startup` | DEV Compose, overlays, mail | [§1 Supported DEV startup](../OPERATIONS.md#1-supported-dev-startup) |
 | `verification` | Test/CI scopes, browser/axe | [§2 Verification](../OPERATIONS.md#2-verification) |
 | `production-boundary` | Overlay matrix, digests, migrations | [§3 Production boundary](../OPERATIONS.md#3-production-boundary) |
-| `inbox-recovery` | Report/support/verification/push/discussion/build-incident | [Recovering report inbox…](../OPERATIONS.md#recovering-report-inbox-delivery) и соседние |
+| `inbox-recovery` | Report/support/verification/push/discussion/build-incident | [inbox-recovery.md](inbox-recovery.md) · stubs [Recovering report…](../OPERATIONS.md#recovering-report-inbox-delivery) |
 | `backup-recovery` | Backup/restore, maintenance | [§4 Backup and recovery](../OPERATIONS.md#4-backup-and-recovery) |
 | `resource-safety` | Scanner / integrity / quarantine ops | [§5 Resource safety](../OPERATIONS.md#5-resource-safety-operations) |
 | `release` | Branch/release, GHCR, beta evidence | [§6 Branch and release](../OPERATIONS.md#6-branch-and-release-operations) |

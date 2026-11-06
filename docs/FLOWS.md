@@ -2,7 +2,7 @@
 
 **Статус:** living · сценарный контракт.  
 **База:** код `385e577e7443cf7d7b817419ce5c3b8afe87b690`, app `1.2.0-beta.3`.  
-Предметные правила — [RESOURCES](RESOURCES.md) / [COMMUNITY](COMMUNITY.md) / [SERVERS-ORGS](SERVERS-ORGS.md) / [TRUST-STAFF](TRUST-STAFF.md) / [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md); UI — [UX-CONTRACT](UX-CONTRACT.md); ops — [OPERATIONS](OPERATIONS.md). Файл не означает внедрение, новый PASS или внешнее разрешение. Задачи: `planning/tasks.json`.
+Предметные правила — [RESOURCES](RESOURCES.md) / [COMMUNITY](COMMUNITY.md) / [SERVERS-ORGS](SERVERS-ORGS.md) / [TRUST-STAFF](TRUST-STAFF.md) / [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md); UI — [UX-CONTRACT](UX-CONTRACT.md); ops — [OPERATIONS](OPERATIONS.md) ([ops/](ops/README.md)). Файл не означает внедрение, новый PASS или внешнее разрешение. Задачи: `planning/tasks.json`.
 
 ## 1. Общий контракт действия
 
@@ -24,9 +24,7 @@
 
 ## 2. Гость → ресурс → вход → получение
 
-**Сейчас:** бесплатный ресурс ведёт в `/acquire?productId=…`; claim корректно требует сессию, но ошибка не предлагает контекстного восстановления. AuthForm после успеха всегда открывает `/workspace`. Это подтверждённый разрыв F01.
-
-**Цель FLOW-01:** единый внутренний return target, включая разрешённые query/hash; login и registration возвращают к тому же намерению. Внешние redirect targets не принимаются. Полная смена document после auth сохраняется, чтобы не переиспользовать cache предыдущего аккаунта. После входа повторно читаются права, существование объекта и уже выполненное состояние. Запись, реакция или скачивание не запускаются автоматически.
+**Runtime (FLOW-01 закрыт в коде):** `/acquire?productId=…` → auth с безопасным internal return → claim → library/download. Внешние redirect targets не принимаются. После входа повторно читаются права и состояние объекта; запись/скачивание не автостартуют. Regression — на exact tip SHA ([PROBLEMS](PROBLEMS.md)).
 
 «Открыть библиотеку» должно вести в библиотеку. Потерянный комментарий требует отдельного draft/intent-контракта FLOW-10. Основание: [AuthForm](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/auth-form.tsx#L44-L60), [acquire](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/app/acquire/page.tsx#L83-L114).
 
