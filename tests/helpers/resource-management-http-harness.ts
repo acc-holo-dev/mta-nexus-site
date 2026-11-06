@@ -107,7 +107,7 @@ export function resourceManagementHttpRequest(
   );
 }
 
-export function resetResourceManagementHttpState() {
+function resetResourceManagementHttpState() {
   resourceManagementHttpState.user = { id: "usr_a", role: "developer" };
   resourceManagementHttpState.allowed = true;
   for (const mock of [
