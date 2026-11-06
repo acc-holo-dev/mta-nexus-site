@@ -121,6 +121,7 @@ export function ModeratedDiscussionRemoval({
       </Button>
       {error ? (
         <ErrorState
+          id="moderated-discussion-removal-unavailable"
           title={error}
           description={copy.formErrorHint}
           action={
