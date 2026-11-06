@@ -11,7 +11,7 @@ const source = readFileSync(
 
 it("locks resource build uncertain failures to ErrorState with touch reload", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={message} />");
+  expect(source).toContain('<ErrorState id="resource-build-controls-unavailable" title={message} />');
   expect(source).toContain('role="status"');
   expect(source).toMatch(
     /uncertain && \(\s*<Button[\s\S]*?className="min-h-11"[\s\S]*?\{copy\.reload\}/u,
