@@ -27,7 +27,7 @@ export async function createResourceReviewRepositoryDbMock() {
   };
 }
 
-export function resetResourceReviewRepositoryState() {
+function resetResourceReviewRepositoryState() {
   resourceReviewRepositoryState.queries = [];
   resourceReviewRepositoryState.rows = [];
   resourceReviewRepositoryState.clock = null;
