@@ -207,6 +207,7 @@ export function LibraryReleaseCommandStatus({
       ) : null}
       {error ? (
         <ErrorState
+          id="library-release-command-unavailable"
           title={error}
           description={copy.errors.actionErrorDescription}
           action={
