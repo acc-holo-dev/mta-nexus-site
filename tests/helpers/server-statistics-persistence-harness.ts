@@ -4,9 +4,7 @@ import { vi } from "vitest";
 const active = vi.hoisted(() => ({ db: null as unknown }));
 
 /** Factory for `vi.mock("../packages/db/src/client", …)` from suite files under `tests/`. */
-export async function createServerStatisticsPersistenceDbMock(
-  importOriginal: <T>() => Promise<T>,
-) {
+export async function createServerStatisticsPersistenceDbMock(importOriginal: <T>() => Promise<T>) {
   const original = await importOriginal<typeof import("../../packages/db/src/client")>();
   return {
     ...original,
