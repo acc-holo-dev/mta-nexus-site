@@ -349,6 +349,42 @@ export function formatNotification(
           : notification.message,
     };
   const data = notification.data;
+  if (data?.kind === "build_lifecycle") {
+    const title =
+      typeof data.resourceTitle === "string" && data.resourceTitle.trim().length > 0
+        ? data.resourceTitle.trim().slice(0, 200)
+        : null;
+    const version =
+      typeof data.version === "string" && data.version.trim().length > 0
+        ? data.version.trim().slice(0, 64)
+        : null;
+    if (data.event === "quarantined") {
+      return {
+        title: locale === "ru" ? "Сборка ресурса в карантине" : "Resource build quarantined",
+        message:
+          locale === "ru"
+            ? title && version
+              ? `«${title}» · версия ${version} помещена в карантин после проверки безопасности. Откройте сборку в рабочей области.`
+              : "Опубликованная сборка помещена в карантин после проверки безопасности. Откройте сборку в рабочей области."
+            : title && version
+              ? `${title} · version ${version} was quarantined after a security review. Open the build in your workspace.`
+              : "A published build was quarantined after a security review. Open the build in your workspace for the current delivery state.",
+      };
+    }
+    if (data.event === "restored") {
+      return {
+        title: locale === "ru" ? "Сборка ресурса восстановлена" : "Resource build restored",
+        message:
+          locale === "ru"
+            ? title && version
+              ? `«${title}» · версия ${version} возвращена к публикации. Откройте сборку в рабочей области.`
+              : "Сборка из карантина возвращена к публикации. Откройте сборку в рабочей области."
+            : title && version
+              ? `${title} · version ${version} was restored to publication. Open the build in your workspace.`
+              : "A quarantined build was restored to publication. Open the build in your workspace for the current delivery state.",
+      };
+    }
+  }
   if (
     data?.kind !== "build_review" ||
     (data.decision !== "approve" && data.decision !== "reject") ||

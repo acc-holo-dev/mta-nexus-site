@@ -263,7 +263,7 @@ export async function moderatePending(
       insert into ${notifications} (id, recipient_id, title, message, link, type, category, is_read, data, created_at)
       select 'ntf_build_review_' || ${reviewed.id} || '_r' || ${reviewed.revision ?? expectedRevision + 1}::text || '_' || ${users.id}, ${users.id},
         ${title}, ${`${product.title} · ${reviewed.version}${notes ? `\n${notes}` : ""}`},
-        ${`/workspace/resources/${product.id}`}, 'system', 'system', false, ${JSON.stringify(data)}::jsonb, now()
+        ${`/workspace/resources/${product.id}/builds/${reviewed.id}`}, 'system', 'system', false, ${JSON.stringify(data)}::jsonb, now()
       from ${users}
       where (
         (${product.organizationId}::text is null and ${users.id} = ${product.authorId})

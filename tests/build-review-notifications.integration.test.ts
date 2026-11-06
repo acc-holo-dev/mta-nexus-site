@@ -129,7 +129,7 @@ it("commits approval and one author notification atomically, even with simultane
     }),
   ]);
   expect(notices[0]).toMatchObject({
-    link: `/workspace/resources/${f.productId}`,
+    link: `/workspace/resources/${f.productId}/builds/${f.buildId}`,
     category: "system",
     isRead: false,
     data: {
