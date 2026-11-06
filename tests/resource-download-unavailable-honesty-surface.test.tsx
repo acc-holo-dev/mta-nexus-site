@@ -12,7 +12,7 @@ const source = readFileSync(
 it("locks fixed-selection unavailableReason to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toMatch(
-    /if \(unavailableReason\) \{\s*return \(\s*<div className="space-y-2">\s*<ErrorState title=\{unavailableReason\} \/>/u,
+    /if \(unavailableReason\) \{\s*return \(\s*<div className="space-y-2">\s*<ErrorState id="resource-download-button-unavailable" title=\{unavailableReason\} \/>/u,
   );
   expect(source).toContain("<ErrorState\n          title={copy.downloadErrors[failure]}");
   expect(source).toContain('role="status"');
