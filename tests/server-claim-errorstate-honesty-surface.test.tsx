@@ -20,7 +20,9 @@ it("locks server-claim unknown_issue/unknown_verify notices to ErrorState", () =
   expect(source).toContain("The challenge result is unknown.");
   expect(source).toContain("The verification result is unknown.");
   expect(source).toContain('href="/workspace/verification"');
-  expect(source).toContain('{error ? <ErrorState id="server-claim-control-panel-unavailable" title={error} /> : null}');
+  expect(source).toContain(
+    '{error ? <ErrorState id="server-claim-control-panel-unavailable" title={error} /> : null}',
+  );
   expect(source).not.toContain('className="space-y-2 text-sm text-secondary" role="status"');
   expect(source).not.toMatch(
     /unknown_issue[\s\S]{0,120}role="status"|role="status"[\s\S]{0,120}unknown_issue/u,
