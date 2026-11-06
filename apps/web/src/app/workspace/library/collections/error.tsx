@@ -11,6 +11,7 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
     <section className="mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16">
       <ErrorState
+        id="library-collections-error-retry-unavailable"
         title={c.retry}
         description={c.loadUnavailableDescription}
         action={
