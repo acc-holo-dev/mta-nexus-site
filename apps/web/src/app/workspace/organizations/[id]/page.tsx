@@ -77,6 +77,7 @@ export default async function OrganizationPage({
         </>
       ) : (
         <ErrorState
+          id="workspace-organization-detail-unavailable"
           title={failure}
           action={
             <Link
