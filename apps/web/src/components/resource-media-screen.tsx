@@ -44,6 +44,7 @@ function ResourceMediaLoadError({
         {copy.back}
       </Link>
       <ErrorState
+        id="resource-media-load-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
