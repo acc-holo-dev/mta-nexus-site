@@ -71,6 +71,7 @@ export default async function ReconciliationDetail({
           {copy.back}
         </Link>
         <ErrorState
+          id="admin-commerce-reconciliation-detail-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
