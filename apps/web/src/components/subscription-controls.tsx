@@ -306,7 +306,13 @@ export function SubscriptionControls(props: Props) {
           {c.frozen}
         </p>
       )}
-      {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="subscription-controls-unavailable"
+          title={error}
+          description={c.formErrorHint}
+        />
+      ) : null}
       <Button
         type="submit"
         disabled={busy || ready !== scope}
