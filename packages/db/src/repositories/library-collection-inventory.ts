@@ -18,6 +18,7 @@ import {
   libraryCollections as collections,
   libraryCollectionItems as members,
   products,
+  resourceReleaseWatches as watches,
 } from "../schema";
 import { effectiveUserDownloadSources } from "./user-library";
 import { libraryReleaseProjection } from "./library-release-projection";
@@ -123,8 +124,11 @@ export async function readLibraryCollectionInventory(
     ), resource_rows AS (
       SELECT refs.id AS "productId",refs."membershipCount",refs."inSelected",
         CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN left(product.title,200) END AS title,
+        CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN product.slug END AS slug,
+        coalesce(watch.enabled,false) AS "watchEnabled",coalesce(watch.revision,0) AS "watchRevision",watch.updated_at AS "watchUpdatedAt",
         ${projection.available} AS available,${projection.columns}
       FROM refs LEFT JOIN owned ON owned.resource_id=refs.id LEFT JOIN ${products} product ON product.id=refs.id
+      LEFT JOIN ${watches} watch ON watch.user_id=${userId} AND watch.product_id=refs.id
       ${projection.joins}
       WHERE refs."inSelected"
     )`;
@@ -204,11 +208,15 @@ export async function readLibraryCollectionInventory(
         InventoryReleaseRow & {
           productId: string;
           title: string | null;
+          slug: string | null;
           available: boolean;
           membershipCount: number;
+          watchEnabled: boolean;
+          watchRevision: number;
+          watchUpdatedAt: Date | string | null;
         }
       >(sql`${resources}
-      SELECT "productId",title,available,"membershipCount",mode,revision,state,"canReviewRequirements","latestBuildId","latestVersion","selectedBuildId","selectedVersion"
+      SELECT "productId",title,slug,available,"membershipCount","watchEnabled","watchRevision","watchUpdatedAt",mode,revision,state,"canReviewRequirements","latestBuildId","latestVersion","selectedBuildId","selectedVersion"
       FROM resource_rows WHERE ${where} ORDER BY "productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
       if (
         rows.length > bounds.pageSize ||
@@ -265,11 +273,30 @@ export async function readLibraryCollectionInventory(
           new Set(memberships.map((item) => item.id)).size !== memberships.length
         )
           throw invalidSnapshot();
+        if (
+          typeof row.watchEnabled !== "boolean" ||
+          !Number.isSafeInteger(row.watchRevision) ||
+          row.watchRevision < 0 ||
+          row.watchRevision > 2147483647 ||
+          (row.watchEnabled && row.watchRevision < 1)
+        )
+          throw invalidSnapshot();
+        const watchUpdatedAt = row.watchUpdatedAt ? new Date(row.watchUpdatedAt) : null;
+        if (watchUpdatedAt && !Number.isFinite(watchUpdatedAt.getTime())) throw invalidSnapshot();
         return {
           productId: row.productId,
           title: row.available === true && typeof row.title === "string" ? row.title : null,
+          slug:
+            row.available === true && typeof row.slug === "string" && row.slug.length > 0
+              ? row.slug
+              : null,
           available: row.available === true,
           release: inventoryReleaseSnapshot(row),
+          watch: {
+            enabled: row.watchEnabled,
+            revision: row.watchRevision,
+            updatedAt: watchUpdatedAt ? watchUpdatedAt.toISOString() : null,
+          },
           memberships,
         };
       });

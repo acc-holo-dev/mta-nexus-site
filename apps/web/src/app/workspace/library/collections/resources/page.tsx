@@ -8,8 +8,10 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { LibraryReleaseFollowLatest } from "../../../../../components/library-release-follow-latest";
 import { PlatformSignIn } from "../../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
 import { getDictionary } from "../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { libraryCollectionInventoryCopy } from "../../../../../lib/library-collection-inventory-i18n";
@@ -23,6 +25,7 @@ import {
   libraryCollectionsCopy,
 } from "../../../../../lib/library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../../../../../lib/library-collections-query";
+import { getResourceReleaseControlCopy } from "../../../../../lib/resource-release-control-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
 
@@ -96,6 +99,17 @@ export default async function Page({
         </nav>
         <h1>{v.title}</h1>
         <p className="text-secondary">{v.note}</p>
+        <p className="text-sm text-secondary">{v.watchNote}</p>
+        {report.collectionId ? (
+          <nav className="flex flex-wrap gap-4" aria-label={v.collection}>
+            <Link href={collectionHref(report.collectionId, "releases")} className={navLinkClass}>
+              {v.collectionReleases}
+            </Link>
+            <Link href={collectionHref(report.collectionId, "watches")} className={navLinkClass}>
+              {v.collectionWatches}
+            </Link>
+          </nav>
+        ) : null}
         <search aria-label={v.search}>
           <form
             method="get"
@@ -285,6 +299,14 @@ export default async function Page({
                           version={release.effective.version}
                           buildId={release.effective.buildId}
                         />
+                        {release.state === "update_available" ? (
+                          <LibraryReleaseFollowLatest
+                            productId={item.productId}
+                            actorId={actor.id}
+                            revision={release.revision}
+                            mode={release.mode}
+                          />
+                        ) : null}
                       </>
                     ) : (
                       <ErrorState
@@ -294,7 +316,27 @@ export default async function Page({
                     )}
                   </section>
                 )}
+                {item.available ? (
+                  <ResourceReleaseWatchControl
+                    key={`${item.productId}:${item.watch.revision}:${item.watch.enabled}`}
+                    watch={{
+                      productId: item.productId,
+                      enabled: item.watch.enabled,
+                      revision: item.watch.revision,
+                      updatedAt: item.watch.updatedAt ? new Date(item.watch.updatedAt) : null,
+                    }}
+                    available={item.available}
+                  />
+                ) : null}
                 <div className="flex flex-wrap gap-4">
+                  {item.slug ? (
+                    <Link
+                      href={`/market/${encodeURIComponent(item.slug)}`}
+                      className={navLinkClass}
+                    >
+                      {getResourceReleaseControlCopy(locale).open}
+                    </Link>
+                  ) : null}
                   <Link href={`${resourceHref}/collections`} className={navLinkClass}>
                     {v.manage}
                   </Link>

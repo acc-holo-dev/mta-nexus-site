@@ -6,6 +6,7 @@ import Link from "next/link";
 import { LibraryReleaseFollowLatest } from "../../../../components/library-release-follow-latest";
 import { PlatformSignIn } from "../../../../components/platform-sign-in";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
+import { ResourceReleaseWatchControl } from "../../../../components/resource-release-watch-control";
 import { parseHistoryPage } from "../../../../lib/commerce-history-format";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -127,6 +128,17 @@ export default async function LibraryUpdatesPage({
                     mode={item.mode}
                   />
                 ) : null}
+                <ResourceReleaseWatchControl
+                  key={`${item.productId}:${item.watchRevision}:${item.watchEnabled}`}
+                  watch={{
+                    productId: item.productId,
+                    enabled: item.watchEnabled,
+                    revision: item.watchRevision,
+                    updatedAt: item.watchUpdatedAt,
+                  }}
+                  available={item.state !== "unavailable"}
+                  hasAccess={item.hasAccess !== false}
+                />
                 <div className="flex flex-wrap gap-4">
                   {item.slug && item.state !== "unavailable" ? (
                     <Link

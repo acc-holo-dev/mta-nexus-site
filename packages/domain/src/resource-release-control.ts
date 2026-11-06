@@ -87,4 +87,8 @@ export type LibraryReleaseItem = {
   selectedBuildId: string | null;
   selectedVersion: string | null;
   state: LibraryReleaseState;
+  /** Account release-watch posture; revision 0 means no saved watch row yet. */
+  watchEnabled: boolean;
+  watchRevision: number;
+  watchUpdatedAt: Date | null;
 };

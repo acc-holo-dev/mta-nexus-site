@@ -82,6 +82,10 @@ it("reads collection releases and full count in one private database-clock snaps
         mode: "fixed",
         latestBuildId: "bld_latest",
         selectedBuildId: "bld_fixed",
+        addedAt: date,
+        watchEnabled: true,
+        watchRevision: 2,
+        watchUpdatedAt: date,
       },
     ],
   ];
@@ -96,7 +100,14 @@ it("reads collection releases and full count in one private database-clock snaps
     q: "100%_\\",
     total: 21,
     counts: { all: 41 },
-    items: [{ state: "update_available" }],
+    items: [
+      {
+        state: "update_available",
+        watchEnabled: true,
+        watchRevision: 2,
+        watchUpdatedAt: new Date(date),
+      },
+    ],
   });
   expect(state.options).toEqual([{ isolationLevel: "repeatable read", accessMode: "read only" }]);
   expect(state.queries).toHaveLength(5);
@@ -104,6 +115,7 @@ it("reads collection releases and full count in one private database-clock snaps
   expect(sqlText()).toContain("member.collection_id=");
   expect(sqlText()).toContain("owned.resource_id IS NOT NULL");
   expect(sqlText()).toContain("selected.id <> latest.id");
+  expect(sqlText()).toContain("resource_release_watches");
   expect(state.queries.at(-1)?.params).toContain("%100\\%\\_\\\\%");
   expect(state.queries.at(-1)?.params.slice(-2)).toEqual([20, 20]);
   expect(sqlText()).not.toMatch(/storage_key|license_key|insert into|update /u);
@@ -123,12 +135,16 @@ it("preserves masked lost-access references and inspects archived collections wi
         selectedBuildId: null,
         state: "unavailable",
         mode: "fixed",
+        addedAt: date,
+        watchEnabled: false,
+        watchRevision: 0,
+        watchUpdatedAt: null,
       },
     ],
   ];
   expect(await repo.releases("usr_a", "lcol_a", 1, "unavailable")).toMatchObject({
     collection: { status: "archived" },
-    items: [{ title: null, hasAccess: false }],
+    items: [{ title: null, hasAccess: false, watchEnabled: false, watchRevision: 0 }],
   });
   expect(sqlText()).toContain("LEFT JOIN owned ON owned.resource_id=refs.resource_id");
   expect(sqlText()).toContain("owned.resource_id IS NULL");

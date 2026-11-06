@@ -167,6 +167,7 @@ it("reads only an owner's collection in a masked, bounded database-time snapshot
         updatedAt: null,
         available: false,
         title: "PRIVATE-TITLE",
+        slug: "PRIVATE-SLUG",
         lastSequence: "PRIVATE-CURSOR",
       },
     ],
@@ -175,13 +176,14 @@ it("reads only an owner's collection in a masked, bounded database-time snapshot
   expect(result).toMatchObject({
     collection: { status: "archived" },
     activeWatchCount: 4,
-    items: [{ title: null, updatedAt: null }],
+    items: [{ title: null, slug: null, updatedAt: null }],
   });
   expect(JSON.stringify(result)).not.toContain("PRIVATE");
   const text = state.queries.map((q) => q.sql).join("\n");
   expect(text).toContain("transaction_timestamp()");
   expect(text).toContain("WHERE available AND title ILIKE");
   expect(text).toContain("watch.user_id=");
+  expect(text).toContain("product.slug");
   expect(text).not.toMatch(/for share|last_sequence|storage_key/u);
 });
 it("rejects foreign collections and malformed direct commands before granting any watch", async () => {

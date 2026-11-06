@@ -1,6 +1,10 @@
 import { sql } from "drizzle-orm";
 import type { LibraryReleaseFilter, LibraryReleaseItem } from "@nexus/domain";
-import { products, libraryCollectionItems as members } from "../schema";
+import {
+  products,
+  libraryCollectionItems as members,
+  resourceReleaseWatches as watches,
+} from "../schema";
 import { effectiveUserDownloadSources } from "./user-library";
 import { libraryReleaseProjection } from "./library-release-projection";
 import type { ResourceTransaction } from "./entitlements";
@@ -25,8 +29,12 @@ export async function readLibraryReleasePage(
           ${projection.columns},
           CASE WHEN ${available} THEN product.title END AS title,
           CASE WHEN ${available} THEN product.slug END AS slug,
+          coalesce(watch.enabled,false) AS "watchEnabled",
+          coalesce(watch.revision,0) AS "watchRevision",
+          watch.updated_at AS "watchUpdatedAt",
           CASE WHEN ${available} THEN latest.created_at ELSE refs.added_at END AS sort_time
         FROM refs LEFT JOIN owned ON owned.resource_id=refs.resource_id LEFT JOIN ${products} product ON product.id = refs.resource_id
+        LEFT JOIN ${watches} watch ON watch.user_id=${userId} AND watch.product_id=refs.resource_id
         ${projection.joins}
       )${q ? sql`, searched AS (SELECT * FROM release_rows WHERE title ILIKE ${containsPattern(q)})` : sql``}`;
   const rowsTable = q ? sql`searched` : sql`release_rows`;
@@ -55,8 +63,25 @@ export async function readLibraryReleasePage(
         : filter === "unavailable"
           ? sql`state IN ('unavailable', 'selection_unavailable')`
           : sql`true`;
-  const rows = await tx.execute<LibraryReleaseItem>(sql`${sources}
-        SELECT "productId", "addedAt", "hasAccess", revision, mode, title, slug, "latestBuildId", "latestVersion", "selectedBuildId", "selectedVersion", state
+  const rows = await tx.execute<
+    Omit<LibraryReleaseItem, "watchUpdatedAt" | "addedAt"> & {
+      addedAt: Date | string;
+      watchUpdatedAt: Date | string | null;
+    }
+  >(sql`${sources}
+        SELECT "productId", "addedAt", "hasAccess", revision, mode, title, slug, "latestBuildId", "latestVersion", "selectedBuildId", "selectedVersion", state, "watchEnabled", "watchRevision", "watchUpdatedAt"
         FROM ${rowsTable} WHERE ${condition} ORDER BY sort_time DESC NULLS LAST, "productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
-  return { items: rows, counts, filter, q, ...bounds };
+  return {
+    items: rows.map((item) => ({
+      ...item,
+      addedAt: new Date(item.addedAt),
+      watchEnabled: item.watchEnabled === true,
+      watchRevision: Number(item.watchRevision) || 0,
+      watchUpdatedAt: item.watchUpdatedAt ? new Date(item.watchUpdatedAt) : null,
+    })),
+    counts,
+    filter,
+    q,
+    ...bounds,
+  };
 }

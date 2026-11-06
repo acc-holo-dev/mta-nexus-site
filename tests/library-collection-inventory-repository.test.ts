@@ -50,8 +50,12 @@ const rows = () => [
   {
     productId: "prd_a",
     title: "Accessible",
+    slug: "accessible-core",
     available: true,
     membershipCount: 2,
+    watchEnabled: true,
+    watchRevision: 3,
+    watchUpdatedAt: date,
     mode: "latest",
     revision: 0,
     canReviewRequirements: true,
@@ -62,7 +66,16 @@ const rows = () => [
     selectedVersion: null,
     storageKey: "PRIVATE",
   },
-  { productId: "prd_orphan", title: "PRIVATE", available: false, membershipCount: 1 },
+  {
+    productId: "prd_orphan",
+    title: "PRIVATE",
+    slug: "PRIVATE-SLUG",
+    available: false,
+    membershipCount: 1,
+    watchEnabled: false,
+    watchRevision: 0,
+    watchUpdatedAt: null,
+  },
 ];
 const memberships = () => [
   ["prd_a", "lcol_a", date],
@@ -88,13 +101,21 @@ it("deduplicates own references while retaining every current membership and mas
   expect(report.items[0]).toMatchObject({
     productId: "prd_a",
     title: "Accessible",
+    slug: "accessible-core",
     available: true,
+    watch: { enabled: true, revision: 3, updatedAt: date },
     memberships: [
       { id: "lcol_a", status: "active", revision: 4 },
       { id: "lcol_b", status: "archived", revision: 7 },
     ],
   });
-  expect(report.items[1]).toMatchObject({ productId: "prd_orphan", title: null, available: false });
+  expect(report.items[1]).toMatchObject({
+    productId: "prd_orphan",
+    title: null,
+    slug: null,
+    available: false,
+    watch: { enabled: false, revision: 0, updatedAt: null },
+  });
   expect(JSON.stringify(report)).not.toContain("PRIVATE");
   expect(state.options).toEqual([{ isolationLevel: "repeatable read", accessMode: "read only" }]);
   expect(state.queries).toHaveLength(6);
@@ -105,6 +126,7 @@ it("deduplicates own references while retaining every current membership and mas
   expect(text()).toContain("transaction_timestamp()");
   expect(text()).toContain("'product.download'");
   expect(text()).toContain("'published'");
+  expect(text()).toContain("resource_release_watches");
   expect(state.queries[3]?.params).toContain("clean");
   expect(text()).not.toMatch(/insert into|update |delete from|for update/iu);
 });
