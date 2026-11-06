@@ -40,6 +40,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/organizations/team"');
     expect(html).toContain(followCopy(locale).unavailableTarget);
     expect(html).toContain(`${followCopy(locale).remove}: Team`);
+    expect(html).toContain(followCopy(locale).muteHelp);
+    expect(html).toContain(followCopy(locale).mute24h);
     expect(html).toContain(followCopy(locale).older);
     expect(html).not.toContain("private-target-marker");
     expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
@@ -174,6 +176,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(action.following);
     expect(html).toContain(`${action.unfollow}: Article`);
     expect(html).toContain(action.hint);
+    expect(html).toContain(followCopy(locale).muteHelp);
+    expect(html).toContain(followCopy(locale).mute24h);
     expect(html).toContain("rounded-lg");
     expect(html).toContain("text-accent");
   },
@@ -193,6 +197,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain(action.follow);
     expect(html).toContain(action.hint);
+    expect(html).toContain(followCopy(locale).muteHelp);
     expect(html).not.toContain(followCopy(locale).follow);
   },
 );

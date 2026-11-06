@@ -62,6 +62,19 @@ vi.mock("../apps/web/src/components/library-release-selection-controls", () => (
     </span>
   ),
 }));
+vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
+  LibraryReleaseFollowLatest: ({
+    productId,
+    revision,
+  }: {
+    productId: string;
+    revision: number;
+  }) => (
+    <button type="button" data-follow-latest={productId} data-revision={revision}>
+      Use latest
+    </button>
+  ),
+}));
 
 import Versions from "../apps/web/src/app/workspace/library/[id]/versions/page";
 import Updates, { metadata } from "../apps/web/src/app/workspace/library/updates/page";
@@ -272,6 +285,42 @@ it("downloads only the explicitly selected cleared release", async () => {
   expect(html).toContain('data-testid="build-provenance"');
   expect(html).toContain('data-build-id="bld_fixed"');
   expect(html).not.toContain("PRIVATE-FILE");
+});
+it("offers open, compare, and follow-latest actions when an update is available", async () => {
+  const copy = getResourceReleaseControlCopy("en");
+  state.updates.mockResolvedValueOnce({
+    items: [
+      {
+        productId: "prd_a",
+        title: "Racing HUD",
+        slug: "racing-hud",
+        state: "update_available",
+        mode: "fixed",
+        revision: 4,
+        selectedVersion: "1.0.0",
+        selectedBuildId: "bld_old",
+        latestVersion: "2.0.0",
+        latestBuildId: "bld_latest",
+      },
+    ],
+    counts: { all: 1, updates: 1, pinned: 1, unavailable: 0 },
+    page: 1,
+    totalPages: 1,
+    pageSize: 20,
+    total: 1,
+  });
+  const html = renderToStaticMarkup(
+    await Updates({ searchParams: Promise.resolve({ filter: "updates", page: "1" }) }),
+  );
+  expect(html).toContain('href="/market/racing-hud"');
+  expect(html).toContain(copy.open);
+  expect(html).toContain(
+    'href="/workspace/library/prd_a/versions/compare?from=bld_old&amp;to=bld_latest"',
+  );
+  expect(html).toContain(copy.compare);
+  expect(html).toContain('data-follow-latest="prd_a"');
+  expect(html).toContain('data-revision="4"');
+  expect(html).toContain('data-download="bld_old"');
 });
 it("masks unavailable resource metadata even if an upstream DTO includes it", async () => {
   const list = await state.updates();

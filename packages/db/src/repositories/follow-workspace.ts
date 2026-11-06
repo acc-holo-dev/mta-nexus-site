@@ -15,9 +15,9 @@ import {
   users,
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
+import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import { userFollowNotice } from "./user-follow-notice";
-import { lockInitiatingSession } from "./initiating-session";
 
 type TargetType = Follow["targetType"];
 type Cursor = { createdAt: string; id: string };
@@ -154,6 +154,9 @@ class FollowWorkspaceRepository {
           latestId: string | null;
           latestAt: string | null;
         } | null>`case when ${content.id} is not null then jsonb_build_object('replyCount',${content.commentCount},'latestId',(select id from comments where content_id=${content.id} and product_id is null order by created_at desc,id desc limit 1),'latestAt',(select to_char(created_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') from comments where content_id=${content.id} and product_id is null order by created_at desc,id desc limit 1)) else null end`,
+        mutedUntil: sql<
+          string | null
+        >`case when ${objectNotificationMutes.mutedUntil} > clock_timestamp() then to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') else null end`,
       })
       .from(follows)
       .leftJoin(users, and(eq(follows.targetType, "user"), eq(users.id, follows.targetId)))
@@ -186,6 +189,14 @@ class FollowWorkspaceRepository {
           eq(follows.targetType, "content"),
           eq(content.id, follows.targetId),
           availableDiscussion,
+        ),
+      )
+      .leftJoin(
+        objectNotificationMutes,
+        and(
+          eq(objectNotificationMutes.userId, actorId),
+          eq(objectNotificationMutes.targetType, follows.targetType),
+          eq(objectNotificationMutes.targetId, follows.targetId),
         ),
       )
       .where(

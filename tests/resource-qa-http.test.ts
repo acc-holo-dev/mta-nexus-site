@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
@@ -13,6 +13,8 @@ const state = vi.hoisted(() => ({
   answer: vi.fn(),
   resolve: vi.fn(),
   follow: vi.fn(),
+  removeThread: vi.fn(),
+  removeAnswer: vi.fn(),
   rate: vi.fn(),
 }));
 
@@ -35,17 +37,24 @@ vi.mock("@nexus/db", () => ({
     answer: state.answer,
     resolve: state.resolve,
     follow: state.follow,
+    removeThread: state.removeThread,
+    removeAnswer: state.removeAnswer,
   },
 }));
 
-import { GET as list, POST as ask } from "../apps/web/src/app/api/products/[id]/qa/route";
-import { GET as detail } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/route";
+import { POST as removeAnswer } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/answers/[answerId]/remove/route";
 import { POST as answer } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/answers/route";
-import { POST as resolve } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/resolve/route";
 import { POST as follow } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/follow/route";
+import { POST as removeThread } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/remove/route";
+import { POST as resolve } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/resolve/route";
+import { GET as detail } from "../apps/web/src/app/api/products/[id]/qa/[threadId]/route";
+import { POST as ask, GET as list } from "../apps/web/src/app/api/products/[id]/qa/route";
 
 const productContext = { params: Promise.resolve({ id: "prd_a" }) };
 const threadContext = { params: Promise.resolve({ id: "prd_a", threadId: "rqt_a" }) };
+const answerContext = {
+  params: Promise.resolve({ id: "prd_a", threadId: "rqt_a", answerId: "rqa_a" }),
+};
 
 const request = (url: string, body?: unknown, headers: Record<string, string> = {}) =>
   new NextRequest(`https://nexus.test${url}`, {
@@ -71,6 +80,8 @@ beforeEach(() => {
     state.answer,
     state.resolve,
     state.follow,
+    state.removeThread,
+    state.removeAnswer,
   ])
     fn.mockReset().mockResolvedValue({});
 });
@@ -169,7 +180,13 @@ it("loads a thread detail and answers without inventing download access", async 
       following: false,
       followRevision: 0,
     },
-    capabilities: { canAsk: true, canAnswer: false, canResolve: false, askReason: "ok" },
+    capabilities: {
+      canAsk: true,
+      canAnswer: false,
+      canResolve: false,
+      canModerate: false,
+      askReason: "ok",
+    },
   });
   const response = await detail(request("/api/products/prd_a/qa/rqt_a"), threadContext);
   expect(response.status).toBe(200);
@@ -244,6 +261,53 @@ it("follows a thread without enabling release watches", async () => {
   const payload = await response.json();
   expect(payload.following).toBe(true);
   expect(payload).not.toHaveProperty("releaseWatch");
+});
+
+it("removes threads and answers through authenticated moderation routes", async () => {
+  state.removeThread.mockResolvedValue({ threadId: "rqt_a", status: "removed", revision: 3 });
+  state.removeAnswer.mockResolvedValue({
+    threadId: "rqt_a",
+    answerId: "rqa_a",
+    threadRevision: 4,
+    answerRevision: 2,
+    status: "open",
+  });
+  expect(
+    (
+      await removeThread(
+        request("/api/products/prd_a/qa/rqt_a/remove", {
+          action: "remove",
+          expectedRevision: 2,
+        }),
+        threadContext,
+      )
+    ).status,
+  ).toBe(200);
+  expect(state.removeThread).toHaveBeenCalledWith(
+    expect.objectContaining({
+      actorId: "usr_a",
+      threadId: "rqt_a",
+      command: { action: "remove", expectedRevision: 2 },
+    }),
+  );
+  expect(
+    (
+      await removeAnswer(
+        request("/api/products/prd_a/qa/rqt_a/answers/rqa_a/remove", {
+          action: "remove",
+          expectedRevision: 3,
+        }),
+        answerContext,
+      )
+    ).status,
+  ).toBe(200);
+  expect(state.removeAnswer).toHaveBeenCalledWith(
+    expect.objectContaining({
+      actorId: "usr_a",
+      answerId: "rqa_a",
+      command: { action: "remove", expectedRevision: 3 },
+    }),
+  );
 });
 
 it("maps repository AppError codes for Q&A reads", async () => {

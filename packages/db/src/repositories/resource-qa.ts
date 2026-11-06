@@ -7,6 +7,8 @@ import {
   type ResourceQaBuildContext,
   type ResourceQaCapabilities,
   type ResourceQaFollowCommand,
+  type ResourceQaRemoveAnswerCommand,
+  type ResourceQaRemoveThreadCommand,
   type ResourceQaResolveCommand,
   type ResourceQaThreadDetail,
   type ResourceQaThreadSummary,
@@ -27,6 +29,7 @@ import {
 import { safePublishedBuildCondition } from "./build-safety";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { historyPageBounds } from "./history-pagination";
+import { notifyResourceQaEvent } from "./resource-qa-notice";
 
 const invalid = (message = "Invalid Q&A command") =>
   new AppError(message, 400, "RESOURCE_QA_INVALID");
@@ -271,6 +274,7 @@ class ResourceQaRepository {
           canAsk: askReason === "ok",
           canAnswer: canManage,
           canResolve: canManage,
+          canModerate: canManage,
           askReason,
         };
         return { threads, capabilities, ...bounds };
@@ -381,6 +385,7 @@ class ResourceQaRepository {
             canAsk: askReason === "ok",
             canAnswer: canManage,
             canResolve: canManage,
+            canModerate: canManage,
             askReason,
           } satisfies ResourceQaCapabilities,
         };
@@ -429,11 +434,25 @@ class ResourceQaRepository {
         buildId,
         buildVersionLabel,
       });
+      // Asker follows their own thread so answer/resolve fanout reaches them.
+      await tx.insert(resourceQaThreadFollows).values({
+        userId: input.actorId,
+        threadId: input.threadId,
+        enabled: true,
+        revision: 1,
+        updatedAt: new Date(),
+      });
       await audit(tx, input.actorId, input.auditId, "resource.qa_asked", input.threadId, {
         productId: product.id,
         buildId,
         // Never audit private support text or download artifacts through Q&A.
         bodyLength: body.length,
+      });
+      await notifyResourceQaEvent(tx, {
+        kind: "asked",
+        product,
+        threadId: input.threadId,
+        actorId: input.actorId,
       });
       return {
         id: input.threadId,
@@ -513,6 +532,13 @@ class ResourceQaRepository {
         { answerId: input.answerId, bodyLength: body.length },
         actor?.role === "admin" || actor?.role === "moderator",
       );
+      await notifyResourceQaEvent(tx, {
+        kind: "answered",
+        product,
+        threadId: thread.id,
+        actorId: input.actorId,
+        answerId: input.answerId,
+      });
       return {
         threadId: thread.id,
         answerId: input.answerId,
@@ -618,11 +644,200 @@ class ResourceQaRepository {
         { answerId: answer.id },
         staff,
       );
+      await notifyResourceQaEvent(tx, {
+        kind: "resolved",
+        product,
+        threadId: thread.id,
+        actorId: input.actorId,
+        answerId: answer.id,
+      });
       return {
         threadId: thread.id,
         status: "resolved" as const,
         revision: nextRevision,
         resolvedAnswerId: answer.id,
+      };
+    });
+  }
+
+  async removeThread(input: {
+    actorId: string;
+    productId: string;
+    threadId: string;
+    auditId: string;
+    command: ResourceQaRemoveThreadCommand;
+  }) {
+    if (
+      !Number.isSafeInteger(input.command.expectedRevision) ||
+      input.command.expectedRevision < 1
+    ) {
+      throw invalid();
+    }
+    return db.transaction(async (tx) => {
+      const product = await currentProduct(tx, input.productId, true);
+      if (!(await publiclyAvailable(tx, product))) throw new NotFoundError("Resource", product.id);
+      if (!(await isManagerOrStaff(tx, product, input.actorId))) throw new ForbiddenError();
+
+      const [thread] = await tx
+        .select({
+          id: resourceQaThreads.id,
+          status: resourceQaThreads.status,
+          revision: resourceQaThreads.revision,
+        })
+        .from(resourceQaThreads)
+        .where(
+          and(
+            eq(resourceQaThreads.id, input.threadId),
+            eq(resourceQaThreads.productId, product.id),
+          ),
+        )
+        .limit(1)
+        .for("update");
+      if (!thread || thread.status === "removed")
+        throw new NotFoundError("ResourceQaThread", input.threadId);
+      if (thread.revision !== input.command.expectedRevision) throw changed();
+
+      const nextRevision = thread.revision + 1;
+      await tx
+        .update(resourceQaThreads)
+        .set({
+          status: "removed",
+          resolvedAnswerId: null,
+          resolvedAt: null,
+          resolvedBy: null,
+          revision: nextRevision,
+          updatedAt: new Date(),
+        })
+        .where(eq(resourceQaThreads.id, thread.id));
+
+      const [actor] = await tx
+        .select({ role: users.role })
+        .from(users)
+        .where(eq(users.id, input.actorId))
+        .limit(1);
+      const staff = actor?.role === "admin" || actor?.role === "moderator";
+      await audit(
+        tx,
+        input.actorId,
+        input.auditId,
+        "resource.qa_thread_removed",
+        thread.id,
+        { previousStatus: thread.status },
+        staff,
+      );
+      await notifyResourceQaEvent(tx, {
+        kind: "removed",
+        product,
+        threadId: thread.id,
+        actorId: input.actorId,
+      });
+      return { threadId: thread.id, status: "removed" as const, revision: nextRevision };
+    });
+  }
+
+  async removeAnswer(input: {
+    actorId: string;
+    productId: string;
+    threadId: string;
+    answerId: string;
+    auditId: string;
+    command: ResourceQaRemoveAnswerCommand;
+  }) {
+    if (
+      !Number.isSafeInteger(input.command.expectedRevision) ||
+      input.command.expectedRevision < 1
+    ) {
+      throw invalid();
+    }
+    return db.transaction(async (tx) => {
+      const product = await currentProduct(tx, input.productId, true);
+      if (!(await publiclyAvailable(tx, product))) throw new NotFoundError("Resource", product.id);
+      if (!(await isManagerOrStaff(tx, product, input.actorId))) throw new ForbiddenError();
+
+      const [thread] = await tx
+        .select({
+          id: resourceQaThreads.id,
+          status: resourceQaThreads.status,
+          revision: resourceQaThreads.revision,
+          resolvedAnswerId: resourceQaThreads.resolvedAnswerId,
+        })
+        .from(resourceQaThreads)
+        .where(
+          and(
+            eq(resourceQaThreads.id, input.threadId),
+            eq(resourceQaThreads.productId, product.id),
+          ),
+        )
+        .limit(1)
+        .for("update");
+      if (!thread || thread.status === "removed")
+        throw new NotFoundError("ResourceQaThread", input.threadId);
+      if (thread.revision !== input.command.expectedRevision) throw changed();
+
+      const [answer] = await tx
+        .select({
+          id: resourceQaAnswers.id,
+          status: resourceQaAnswers.status,
+          revision: resourceQaAnswers.revision,
+        })
+        .from(resourceQaAnswers)
+        .where(
+          and(eq(resourceQaAnswers.id, input.answerId), eq(resourceQaAnswers.threadId, thread.id)),
+        )
+        .limit(1)
+        .for("update");
+      if (!answer || answer.status === "removed")
+        throw new NotFoundError("ResourceQaAnswer", input.answerId);
+
+      const nextThreadRevision = thread.revision + 1;
+      const nextAnswerRevision = answer.revision + 1;
+      await tx
+        .update(resourceQaAnswers)
+        .set({
+          status: "removed",
+          revision: nextAnswerRevision,
+          updatedAt: new Date(),
+        })
+        .where(eq(resourceQaAnswers.id, answer.id));
+
+      const clearResolved = thread.resolvedAnswerId === answer.id;
+      await tx
+        .update(resourceQaThreads)
+        .set({
+          ...(clearResolved
+            ? {
+                status: "open" as const,
+                resolvedAnswerId: null,
+                resolvedAt: null,
+                resolvedBy: null,
+              }
+            : {}),
+          revision: nextThreadRevision,
+          updatedAt: new Date(),
+        })
+        .where(eq(resourceQaThreads.id, thread.id));
+
+      const [actor] = await tx
+        .select({ role: users.role })
+        .from(users)
+        .where(eq(users.id, input.actorId))
+        .limit(1);
+      const staff = actor?.role === "admin" || actor?.role === "moderator";
+      await audit(
+        tx,
+        input.actorId,
+        input.auditId,
+        "resource.qa_answer_removed",
+        thread.id,
+        { answerId: answer.id, clearedResolved: clearResolved },
+        staff,
+      );
+      return {
+        threadId: thread.id,
+        answerId: answer.id,
+        threadRevision: nextThreadRevision,
+        answerRevision: nextAnswerRevision,
+        status: clearResolved ? ("open" as const) : (thread.status as "open" | "resolved"),
       };
     });
   }

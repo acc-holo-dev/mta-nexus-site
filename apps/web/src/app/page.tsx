@@ -157,6 +157,7 @@ export default async function HomePage() {
             reasonReleaseWatch: dictionary.home.personalReasonReleaseWatch,
             reasonDiscussionFollow: dictionary.home.personalReasonDiscussionFollow,
             reasonReplyToMe: dictionary.home.personalReasonReplyToMe,
+            reasonResourceQa: dictionary.home.personalReasonResourceQa,
             openInbox: dictionary.home.personalOpenInbox,
           }}
         />

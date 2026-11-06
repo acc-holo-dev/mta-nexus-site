@@ -15,8 +15,10 @@ name: CI
         type: boolean
         default: true
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # Keep in-flight main verification. Docs/tip-honesty merges used to cancel
+  # unfinished full_acceptance and forced every main push through full scope.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 permissions:
   contents: read
 jobs:

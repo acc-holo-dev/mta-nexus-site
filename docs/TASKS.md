@@ -1957,11 +1957,11 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Focused 19 PASS. Gaps: follow fanout, abuse/staff removal; migration not applied live.
+**Заметка исполнения.** Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Ask auto-follows asker; transactional content notices with RU/EN formatting and Home resourceQa reason; staff/publisher remove; abuse report target resource_qa_thread + panel form. Focused QA suites PASS. Migration still not applied live.
 
 **Исходные пункты:** INT16. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 
-**Сейчас.** Publication readiness summary allows FOR SHARE; published build + clean scan identity required for public issue.
+**Сейчас.** Public Q&A with thread follow, transactional fanout notices, and manager/staff removal on tip. Live DB upgrade for 0089 still an operational remainder.
 
 **Результат.** Принять target/lifecycle/moderation контракт resource question/thread с необязательным build context, ответом автора и отдельным thread-follow. Затем реализовать без смешивания с rating и private support.
 

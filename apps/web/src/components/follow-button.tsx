@@ -12,6 +12,7 @@ import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
 import { LocaleProvider, useNexusLocale } from "./locale-context";
+import { ObjectMuteControls } from "./object-mute-controls";
 
 type InitialFollowState = {
   authenticated: boolean;
@@ -19,6 +20,8 @@ type InitialFollowState = {
   following: boolean;
   self?: boolean;
   error?: boolean;
+  muted?: boolean;
+  mutedUntil?: string | null;
 };
 export function FollowButton(props: {
   targetType: FollowTargetType;
@@ -73,6 +76,7 @@ function FollowControl({
       : "checking",
   );
   const [actorId, setActorId] = useState(initial?.actorId ?? null);
+  const [mutedUntil, setMutedUntil] = useState<string | null>(initial?.mutedUntil ?? null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -110,6 +114,7 @@ function FollowControl({
           throw new Error("Invalid state");
         if (active) {
           setActorId(data.authenticated ? data.actorId : null);
+          setMutedUntil(typeof data.mutedUntil === "string" ? data.mutedUntil : null);
           writeBlocked.current = !data.authenticated || data.self === true;
           setState(
             !data.authenticated
@@ -253,6 +258,15 @@ function FollowControl({
         </Button>
       )}
       {showHint && <p className="max-w-sm text-xs text-muted">{copy.hint}</p>}
+      {actorId && (state === "following" || state === "not-following") ? (
+        <ObjectMuteControls
+          targetType={targetType}
+          targetId={targetId}
+          actorId={actorId}
+          locale={locale}
+          initial={{ muted: Boolean(mutedUntil), mutedUntil }}
+        />
+      ) : null}
       {message && state !== "error" ? (
         <p role="status" className="max-w-sm text-xs text-success">
           {message}

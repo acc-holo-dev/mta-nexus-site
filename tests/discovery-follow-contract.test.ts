@@ -119,6 +119,7 @@ it("checks paired latest-comment selectors in paged saved discussions", () => {
     image: null,
     verified: false,
     href: "/articles/article",
+    mutedUntil: null,
   };
   const valid = { replyCount: 4, latestId: "reply", latestAt: "2026-10-12T00:00:00.123456Z" };
   const page = (discussion: unknown) =>

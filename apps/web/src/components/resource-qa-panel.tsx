@@ -16,6 +16,7 @@ import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
+import { ResourceQaReportForm } from "./resource-qa-report-form";
 
 type BuildOption = { id: string; version: string };
 
@@ -50,6 +51,7 @@ export function ResourceQaPanel({
   canManage,
   initial,
   builds,
+  initialThreadId = null,
 }: {
   productId: string;
   locale: Locale;
@@ -57,6 +59,8 @@ export function ResourceQaPanel({
   canManage: boolean;
   initial: PagePayload | null;
   builds: BuildOption[];
+  /** Optional staff/public deep-link thread id from `?qa=` on the market page. */
+  initialThreadId?: string | null;
 }) {
   const copy = resourceQaCopy(locale);
   const [page, setPage] = useState<PagePayload | null>(initial);
@@ -76,6 +80,7 @@ export function ResourceQaPanel({
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
   const [registerHref, setRegisterHref] = useState(() => authEntryHref("register", pathname));
   const writeGuard = useRef(false);
+  const deepLinkDone = useRef(false);
   const base = `/api/products/${encodeURIComponent(productId)}/qa`;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Refresh login return path after client navigation.
@@ -89,6 +94,7 @@ export function ResourceQaPanel({
   const canAsk = Boolean(capabilities?.canAsk);
   const canAnswer = Boolean(capabilities?.canAnswer || canManage);
   const canResolve = Boolean(capabilities?.canResolve || canManage);
+  const canModerate = Boolean(capabilities?.canModerate || canManage);
 
   async function loadPage() {
     setLoadingPage(true);
@@ -135,6 +141,13 @@ export function ResourceQaPanel({
       setLoadingDetail(false);
     }
   }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies(loadThread): One-shot market `?qa=` deep link.
+  useEffect(() => {
+    if (deepLinkDone.current || !initialThreadId) return;
+    deepLinkDone.current = true;
+    void loadThread(initialThreadId);
+  }, [initialThreadId]);
 
   async function mutate(path: string, body: unknown, expected: (payload: unknown) => boolean) {
     if (writeGuard.current) return false;
@@ -326,6 +339,66 @@ export function ResourceQaPanel({
     if (ok) await loadThread(detail.thread.id);
   }
 
+  async function onRemoveThread() {
+    if (!detail) return;
+    if (
+      !(await confirmAction({
+        title: copy.removeThreadConfirmTitle,
+        object: detail.thread.body,
+        consequences: copy.removeThreadConfirm,
+        confirmLabel: copy.removeThread,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    const ok = await mutate(
+      `${base}/${encodeURIComponent(detail.thread.id)}/remove`,
+      { action: "remove", expectedRevision: detail.thread.revision },
+      (payload) =>
+        Boolean(
+          payload &&
+            typeof payload === "object" &&
+            (payload as { success?: boolean; status?: string }).success &&
+            (payload as { status?: string }).status === "removed",
+        ),
+    );
+    if (!ok) return;
+    setSelectedId(null);
+    setDetail(null);
+    setPendingThreadId(null);
+    await loadPage();
+  }
+
+  async function onRemoveAnswer(answerId: string, answerBody: string) {
+    if (!detail) return;
+    if (
+      !(await confirmAction({
+        title: copy.removeAnswerConfirmTitle,
+        object: answerBody,
+        consequences: copy.removeAnswerConfirm,
+        confirmLabel: copy.removeAnswer,
+        cancelLabel: copy.cancel,
+        closeLabel: copy.cancel,
+        danger: true,
+      }))
+    )
+      return;
+    const ok = await mutate(
+      `${base}/${encodeURIComponent(detail.thread.id)}/answers/${encodeURIComponent(answerId)}/remove`,
+      { action: "remove", expectedRevision: detail.thread.revision },
+      (payload) =>
+        Boolean(
+          payload &&
+            typeof payload === "object" &&
+            (payload as { success?: boolean; answerId?: string }).success &&
+            (payload as { answerId?: string }).answerId === answerId,
+        ),
+    );
+    if (ok) await loadThread(detail.thread.id);
+  }
+
   function retryRead() {
     if (pendingThreadId) {
       void loadThread(pendingThreadId);
@@ -396,19 +469,48 @@ export function ResourceQaPanel({
 
           {authenticated ? (
             <div className="space-y-1">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="min-h-11"
-                disabled={busy}
-                onClick={() => void onFollow(!detail.thread.following)}
-              >
-                {detail.thread.following ? copy.unfollow : copy.follow}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="min-h-11"
+                  disabled={busy}
+                  onClick={() => void onFollow(!detail.thread.following)}
+                >
+                  {detail.thread.following ? copy.unfollow : copy.follow}
+                </Button>
+                {canModerate ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="min-h-11"
+                    disabled={busy}
+                    onClick={() => void onRemoveThread()}
+                  >
+                    {copy.removeThread}
+                  </Button>
+                ) : null}
+              </div>
               <p className="text-[11px] text-faint">{copy.followingHelp}</p>
+              <ResourceQaReportForm
+                threadId={detail.thread.id}
+                locale={locale}
+                authenticated={authenticated}
+                loginHref={loginHref}
+                registerHref={registerHref}
+              />
             </div>
-          ) : null}
+          ) : (
+            <ResourceQaReportForm
+              threadId={detail.thread.id}
+              locale={locale}
+              authenticated={authenticated}
+              loginHref={loginHref}
+              registerHref={registerHref}
+            />
+          )}
 
           <div className="min-w-0 space-y-3 overflow-x-clip">
             {detail.thread.answers.length === 0 ? (
@@ -439,6 +541,16 @@ export function ResourceQaPanel({
                         onClick={() => void onResolve(item.id)}
                       >
                         {copy.resolve}
+                      </button>
+                    ) : null}
+                    {canModerate ? (
+                      <button
+                        type="button"
+                        className={textActionClass}
+                        disabled={busy}
+                        onClick={() => void onRemoveAnswer(item.id, item.body)}
+                      >
+                        {copy.removeAnswer}
                       </button>
                     ) : null}
                   </div>

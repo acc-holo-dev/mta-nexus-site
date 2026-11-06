@@ -80,6 +80,7 @@ const copy = {
     actionFailedDescription:
       "A failed moderation action is not a changed resource state. Reload before retrying.",
     open: "Open resource",
+    compare: "Compare selected and latest",
     manage: "Manage versions",
     revision: "Preference revision",
     releaseNotes: "Release notes",
@@ -183,6 +184,7 @@ const copy = {
     actionFailedDescription:
       "Неуспешное действие модерации не меняет состояние ресурса. Обновите страницу перед повтором.",
     open: "Открыть ресурс",
+    compare: "Сравнить выбранную и последнюю",
     manage: "Управлять версиями",
     revision: "Версия настройки",
     releaseNotes: "Описание выпуска",

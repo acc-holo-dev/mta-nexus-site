@@ -1,14 +1,20 @@
 import {
+  type AdminReportTargetPreview,
   auditRepository,
   contentRepository,
   productRepository,
   reportRepository,
+  resolveAdminReportTargets,
   serverRepository,
   userRepository,
 } from "@nexus/db";
-import { can, generateId } from "@nexus/security";
-import { ForbiddenError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Report, User } from "@nexus/domain";
+import { ForbiddenError, NotFoundError } from "@nexus/domain";
+import { can, generateId } from "@nexus/security";
+
+export type AdminReportListItem = Report & {
+  targetPreview: AdminReportTargetPreview | null;
+};
 
 class AdminService {
   async getSystemHealthMetrics(actor: User) {
@@ -51,12 +57,20 @@ class AdminService {
     actor: User,
     view: "pending" | "history" = "pending",
     page = 1,
-  ): Promise<{ reports: Report[]; hasMore: boolean }> {
+  ): Promise<{ reports: AdminReportListItem[]; hasMore: boolean }> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator access required");
     }
 
-    return reportRepository.listPage(view, page);
+    const pageResult = await reportRepository.listPage(view, page);
+    const targets = await resolveAdminReportTargets(pageResult.reports);
+    return {
+      hasMore: pageResult.hasMore,
+      reports: pageResult.reports.map((report) => ({
+        ...report,
+        targetPreview: targets.get(`${report.targetType}:${report.targetId}`) ?? null,
+      })),
+    };
   }
 
   async resolveReport(

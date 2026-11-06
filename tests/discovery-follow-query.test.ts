@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -20,8 +21,10 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-import { publicDirectoryRepository as directory } from "../packages/db/src/repositories/public-directory";
+
 import { followWorkspaceRepository as follows } from "../packages/db/src/repositories/follow-workspace";
+import { publicDirectoryRepository as directory } from "../packages/db/src/repositories/public-directory";
+
 beforeEach(() => {
   state.queries = [];
   state.rows = [];
@@ -76,7 +79,7 @@ it("uses a sentinel rather than a count or unbounded creator read", async () => 
   expect(state.queries).toHaveLength(1);
 });
 const stamp = "2026-10-10T12:00:00.123456Z";
-const followRow = (id: string, title: string | null = "Team") => [
+const followRow = (id: string, title: string | null = "Team", mutedUntil: string | null = null) => [
   id,
   "organization",
   "org",
@@ -88,6 +91,8 @@ const followRow = (id: string, title: string | null = "Team") => [
   null,
   null,
   false,
+  null,
+  mutedUntil,
 ];
 it("scopes follows to the session owner and pages with exact PostgreSQL microseconds", async () => {
   state.rows = [Array.from({ length: 21 }, (_, index) => followRow(`f${index}`))];
@@ -105,6 +110,7 @@ it("scopes follows to the session owner and pages with exact PostgreSQL microsec
   expect(query.params).toContain(stamp);
   expect(query.params).toContain("%\\%\\_%");
   expect(query.params.at(-1)).toBe(21);
+  expect(query.sql).toContain('left join "object_notification_mutes"');
   expect(query.sql.split(" from ")[0]).not.toMatch(/email|password|permission|storage_key/u);
 });
 it("hides inaccessible target metadata inside joins while preserving removable follow keys", async () => {
@@ -115,6 +121,7 @@ it("hides inaccessible target metadata inside joins while preserving removable f
     targetId: "org",
     title: null,
     handle: null,
+    mutedUntil: null,
   });
   const query = state.queries[0];
   expect(query.sql).toContain('left join "servers"');
@@ -131,6 +138,12 @@ it("hides inaccessible target metadata inside joins while preserving removable f
     ]),
   );
   expect(query.sql).not.toContain('"servers"."visibility" <>');
+});
+it("projects an active object mute timestamp onto saved follow rows", async () => {
+  const muted = "2026-11-07T12:00:00.000000Z";
+  state.rows = [[followRow("muted", "Team", muted)]];
+  const result = await follows.page("actor");
+  expect(result.items[0]).toMatchObject({ id: "muted", mutedUntil: muted });
 });
 it.each(["server", "organization", "user", "product"] as const)(
   "locks the fresh %s target and confirms the stored follow",

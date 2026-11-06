@@ -16,6 +16,7 @@ import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
+import { LibraryReleaseFollowLatest } from "./library-release-follow-latest";
 import { PlatformSignIn } from "./platform-sign-in";
 import { ResourceDownloadButton } from "./resource-download-button";
 export async function CollectionReleasesScreen({
@@ -225,14 +226,48 @@ export async function CollectionReleasesScreen({
                   buildId={buildId}
                 />
               )}
-              {item.hasAccess && item.title !== null && (
-                <Link
-                  href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
-                  {copy.manage}
-                </Link>
-              )}
+              {item.state === "update_available" && item.hasAccess ? (
+                <LibraryReleaseFollowLatest
+                  productId={item.productId}
+                  actorId={actor.id}
+                  revision={item.revision}
+                  mode={item.mode}
+                />
+              ) : null}
+              <div className="flex flex-wrap gap-4">
+                {item.slug && item.state !== "unavailable" ? (
+                  <Link
+                    href={`/market/${encodeURIComponent(item.slug)}`}
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.open}
+                  </Link>
+                ) : null}
+                {item.state === "update_available" &&
+                item.selectedBuildId &&
+                item.latestBuildId &&
+                item.selectedBuildId !== item.latestBuildId ? (
+                  <Link
+                    href={`/workspace/library/${encodeURIComponent(item.productId)}/versions/compare?${new URLSearchParams(
+                      {
+                        from: item.selectedBuildId,
+                        to: item.latestBuildId,
+                      },
+                    )}`}
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.compare}
+                  </Link>
+                ) : null}
+                {item.hasAccess && item.title !== null ? (
+                  <Link
+                    href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
+                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.manage}
+                  </Link>
+                ) : null}
+              </div>
             </li>
           );
         })}

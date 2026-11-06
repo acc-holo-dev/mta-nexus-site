@@ -243,7 +243,7 @@ export default async function ResourceLibraryPage({
                     href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`}
                     className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                   >
-                    {libraryCollectionsCopy(locale).resourceCollections}
+                    {libraryCollectionsCopy(locale).toCollection}
                   </Link>
                   <Link
                     href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`}

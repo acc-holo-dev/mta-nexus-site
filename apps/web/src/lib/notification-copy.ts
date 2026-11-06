@@ -213,6 +213,56 @@ export function formatNotification(
             : "В обсуждении, в котором вы участвуете, появился новый ответ."
           : notification.message,
     };
+  const resourceQa = notification.data;
+  if (resourceQa?.kind === "resource_qa") {
+    const title = typeof resourceQa.productTitle === "string" ? resourceQa.productTitle.trim() : "";
+    const named = title.length > 0 && title.length <= 200 ? title : null;
+    const titles =
+      locale === "ru"
+        ? {
+            asked: "Новый вопрос по ресурсу",
+            answered: "Ответ на вопрос по ресурсу",
+            resolved: "Вопрос по ресурсу решён",
+            removed: "Вопрос по ресурсу удалён",
+          }
+        : {
+            asked: "New resource question",
+            answered: "Resource question answered",
+            resolved: "Resource question resolved",
+            removed: "Resource question removed",
+          };
+    const messages =
+      locale === "ru"
+        ? {
+            asked: named
+              ? `По ресурсу «${named}» задали новый публичный вопрос.`
+              : "По ресурсу задали новый публичный вопрос.",
+            answered: named
+              ? `В ветке вопроса по «${named}» появился новый ответ.`
+              : "В ветке вопроса появился новый ответ.",
+            resolved: named
+              ? `Ответ отмечен полезным для вопроса по «${named}».`
+              : "Ответ отмечен полезным для этого вопроса.",
+            removed: named
+              ? `Вопрос по «${named}» удалён издателем или сотрудниками.`
+              : "Вопрос удалён издателем или сотрудниками.",
+          }
+        : {
+            asked: named
+              ? `Someone asked a public question about ${named}.`
+              : "Someone asked a public question about a resource.",
+            answered: named
+              ? `There is a new answer on a question about ${named}.`
+              : "There is a new answer on a resource question thread.",
+            resolved: named
+              ? `A useful answer was marked for a question about ${named}.`
+              : "A useful answer was marked for a resource question.",
+            removed: named
+              ? `A question about ${named} was removed by staff or the publisher.`
+              : "A resource question was removed by staff or the publisher.",
+          };
+    return { title: titles[resourceQa.event], message: messages[resourceQa.event] };
+  }
   const follower =
     notification.title === "New Follower" &&
     /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);

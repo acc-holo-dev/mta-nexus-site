@@ -1,6 +1,6 @@
 import { AppError, NotFoundError, type Report } from "@nexus/domain";
-import { and, eq, isNull, ne } from "drizzle-orm";
-import { builds, comments, content, products, servers, users } from "../schema";
+import { and, eq, inArray, isNull, ne } from "drizzle-orm";
+import { builds, comments, content, products, resourceQaThreads, servers, users } from "../schema";
 import type { ResourceTransaction } from "../transaction";
 import { safePublishedBuildCondition } from "./build-safety";
 
@@ -34,6 +34,24 @@ export async function lockPublicReportTarget(
     }
   }
   if (type === "product") return product(id);
+  if (type === "resource_qa_thread") {
+    const [thread] = await tx
+      .select({
+        id: resourceQaThreads.id,
+        authorId: resourceQaThreads.authorId,
+        productId: resourceQaThreads.productId,
+      })
+      .from(resourceQaThreads)
+      .where(
+        and(eq(resourceQaThreads.id, id), inArray(resourceQaThreads.status, ["open", "resolved"])),
+      )
+      .limit(1)
+      .for("share");
+    if (!thread) return missing();
+    if (thread.authorId === actorId) throw new AppError("Own target", 422, "REPORT_OWN_TARGET");
+    await product(thread.productId);
+    return;
+  }
   if (type === "server") {
     const [row] = await tx
       .select({ id: servers.id })

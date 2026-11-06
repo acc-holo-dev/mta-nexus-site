@@ -63,6 +63,7 @@ export async function loadPersonalChangesSummary(
 
       let reason: PersonalChangeReason | null = null;
       if (kind === "resource_release" || item.category === "commerce") reason = "releaseWatch";
+      else if (kind === "resource_qa") reason = "resourceQa";
       else if (item.category === "follow") reason = "discussionFollow";
       else if (item.category === "content") reason = "replyToMe";
       if (!reason) continue;
@@ -77,7 +78,7 @@ export async function loadPersonalChangesSummary(
       });
     }
   } else {
-    failedSources.push("releaseWatch", "discussionFollow", "replyToMe");
+    failedSources.push("releaseWatch", "discussionFollow", "replyToMe", "resourceQa");
   }
 
   // Effective enabled watches: source health only (unread release notices already listed).

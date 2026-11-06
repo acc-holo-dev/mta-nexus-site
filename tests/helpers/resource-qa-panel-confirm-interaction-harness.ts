@@ -28,6 +28,7 @@ const capabilities = {
   canAsk: false,
   canAnswer: true,
   canResolve: true,
+  canModerate: true,
   askReason: "ok" as const,
 };
 

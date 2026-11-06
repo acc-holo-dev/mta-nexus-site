@@ -469,6 +469,7 @@ export interface Notification {
     | import("./license-maintenance").LicenseTermNotificationData
     | import("./resource-release-watches").ResourceReleaseNoticeData
     | DiscussionPushNotificationData
+    | import("./resource-qa").ResourceQaNotificationData
     | null;
   id: string;
   recipientId: string;
@@ -497,7 +498,14 @@ export interface AuditEvent {
 export interface Report {
   id: string;
   reporterId: string;
-  targetType: "product" | "server" | "content" | "comment" | "user" | "review";
+  targetType:
+    | "product"
+    | "server"
+    | "content"
+    | "comment"
+    | "user"
+    | "review"
+    | "resource_qa_thread";
   targetId: string;
   type: ReportType;
   reason: string;

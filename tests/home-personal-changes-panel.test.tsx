@@ -57,6 +57,7 @@ function panelCopy(locale: "en" | "ru"): HomePersonalCopy {
     reasonReleaseWatch: home.personalReasonReleaseWatch,
     reasonDiscussionFollow: home.personalReasonDiscussionFollow,
     reasonReplyToMe: home.personalReasonReplyToMe,
+    reasonResourceQa: home.personalReasonResourceQa,
     openInbox: home.personalOpenInbox,
   };
 }

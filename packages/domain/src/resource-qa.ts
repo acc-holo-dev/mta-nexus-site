@@ -46,6 +46,7 @@ export type ResourceQaCapabilities = {
   canAsk: boolean;
   canAnswer: boolean;
   canResolve: boolean;
+  canModerate: boolean;
   askReason: "ok" | "sign_in" | "resource_unavailable" | "access_required";
 };
 
@@ -75,4 +76,24 @@ export type ResourceQaResolveCommand =
 export type ResourceQaFollowCommand = {
   action: "follow" | "unfollow";
   expectedRevision: number;
+};
+
+export type ResourceQaRemoveThreadCommand = {
+  action: "remove";
+  expectedRevision: number;
+};
+
+export type ResourceQaRemoveAnswerCommand = {
+  action: "remove";
+  expectedRevision: number;
+};
+
+export type ResourceQaNotificationData = {
+  kind: "resource_qa";
+  event: "asked" | "answered" | "resolved" | "removed";
+  productId: string;
+  /** Public catalogue title at delivery time; used for inbox localization. */
+  productTitle: string;
+  threadId: string;
+  answerId?: string | null;
 };

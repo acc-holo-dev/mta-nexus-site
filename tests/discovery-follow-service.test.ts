@@ -108,6 +108,7 @@ it("projects saved identity and exact cursor without exposing repository-only fi
   expect(JSON.parse(result.nextCursor ?? "")).toEqual(cursor);
   expect(result.items[0].href).toBe("/organizations/team%20%26%20friends");
   expect(result.items[0].image).toBeNull();
+  expect(result.items[0].mutedUntil).toBeNull();
   expect(result.items[0]).not.toHaveProperty("email");
   expect(result.items[0]).not.toHaveProperty("cursorTime");
 });
@@ -124,6 +125,7 @@ it("projects bounded saved discussion counts and focused reply metadata without 
         description: "Excerpt",
         image: null,
         verified: false,
+        mutedUntil: "2026-11-07T12:00:00.000000Z",
         discussion: { replyCount: 7, latestId: "latest", latestAt: "2026-10-12T00:00:00.000123Z" },
         body: "private-body",
         authorId: "private-author",
@@ -140,6 +142,7 @@ it("projects bounded saved discussion counts and focused reply metadata without 
   });
   expect(result.items[0]).toMatchObject({
     href: "/articles/current-slug",
+    mutedUntil: "2026-11-07T12:00:00.000000Z",
     discussion: { replyCount: 7, latestId: "latest", latestAt: "2026-10-12T00:00:00.000123Z" },
   });
   expect(JSON.stringify(result)).not.toContain("private-");

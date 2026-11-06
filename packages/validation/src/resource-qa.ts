@@ -40,3 +40,17 @@ export const resourceQaFollowSchema = z
     expectedRevision: revision,
   })
   .strict();
+
+export const resourceQaRemoveThreadSchema = z
+  .object({
+    action: z.literal("remove"),
+    expectedRevision: revision.min(1),
+  })
+  .strict();
+
+export const resourceQaRemoveAnswerSchema = z
+  .object({
+    action: z.literal("remove"),
+    expectedRevision: revision.min(1),
+  })
+  .strict();

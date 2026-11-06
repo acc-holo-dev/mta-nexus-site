@@ -29,6 +29,13 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
     </button>
   ),
 }));
+vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
+  LibraryReleaseFollowLatest: ({ productId }: { productId: string }) => (
+    <button type="button" data-follow-latest={productId}>
+      Use latest
+    </button>
+  ),
+}));
 
 import { CollectionReleasesScreen } from "../apps/web/src/components/collection-releases-screen";
 import { collectionReleasesCopy } from "../apps/web/src/lib/collection-releases-i18n";
@@ -38,6 +45,7 @@ const item = {
   productId: "prd_a",
   hasAccess: true,
   title: "Safe & core",
+  slug: "safe-core",
   state: "update_available",
   mode: "fixed",
   revision: 2,
@@ -111,6 +119,11 @@ it.each(["en", "ru"])(
     expect(html).toContain(
       "/workspace/library/collections/resources?collectionId=lcol_a&amp;release=attention",
     );
+    expect(html).toContain('href="/market/safe-core"');
+    expect(html).toContain(
+      'href="/workspace/library/prd_a/versions/compare?from=bld_pin&amp;to=bld_new"',
+    );
+    expect(html).toContain('data-follow-latest="prd_a"');
   },
 );
 it("shows filtered empty releases with a clear link that keeps the collection path", async () => {
