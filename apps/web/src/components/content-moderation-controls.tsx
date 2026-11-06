@@ -195,6 +195,7 @@ export function ContentModerationControls({
       )}
       {error ? (
         <ErrorState
+          id="content-moderation-controls-unavailable"
           title={error}
           description={moderationCopy(locale).decisionFailedDescription}
           action={
