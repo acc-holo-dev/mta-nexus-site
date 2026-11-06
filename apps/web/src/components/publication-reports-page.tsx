@@ -161,6 +161,7 @@ export async function PublicationReportsPage({
   } catch (error) {
     return (
       <ErrorState
+        id="publication-reports-unavailable"
         title={communityReportError(
           locale,
           error instanceof AppError ? error.code : "INTERNAL_ERROR",
