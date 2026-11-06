@@ -46,6 +46,7 @@ export default async function ResourceCompatibilityPage({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-resource-compatibility-unavailable"
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
