@@ -60,6 +60,7 @@ export function ContentDiscussion({
   count,
   initial,
   viewer = null,
+  followInitial,
   initialQuery = "",
   initialFocus,
   initialError = "",
@@ -71,6 +72,16 @@ export function ContentDiscussion({
   count: number;
   initial: DiscussionPage | null;
   viewer?: { id: string; canModerate: boolean } | null;
+  /** SSR/API-hydrated follow+mute so controls do not flash unmuted after Save. */
+  followInitial?: {
+    authenticated: boolean;
+    actorId?: string | null;
+    following: boolean;
+    notifyComments: boolean;
+    muted: boolean;
+    mutedUntil: string | null;
+    error?: boolean;
+  };
   initialQuery?: string;
   initialFocus?: string;
   initialError?: string;
@@ -383,7 +394,8 @@ export function ContentDiscussion({
           title={title ?? slug}
           locale={locale}
           initial={
-            viewer
+            followInitial ??
+            (viewer
               ? undefined
               : {
                   authenticated: false,
@@ -391,7 +403,7 @@ export function ContentDiscussion({
                   notifyComments: false,
                   muted: false,
                   mutedUntil: null,
-                }
+                })
           }
         />
         <div className="flex flex-wrap gap-4">
