@@ -70,6 +70,7 @@ export default async function PlanReviewPage({
       return (
         <section className={pageShellClass}>
           <ErrorState
+            id="subscription-review-detail-invalid"
             title={c.invalid}
             description={c.selectionRecoverHint}
             action={
