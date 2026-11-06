@@ -1,69 +1,32 @@
-import { createHash } from "node:crypto";
-import { beforeEach, expect, it, vi } from "vitest";
+import { expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][][],
-  config: null as unknown,
-  notice: vi.fn(),
-}));
-vi.mock("../packages/db/src/repositories/discussion-moderation-notice", () => ({
-  discussionModerationNotice: state.notice,
-}));
+vi.mock("../packages/db/src/repositories/discussion-moderation-notice", async () => {
+  const { moderatedDiscussionQueryState } = await import(
+    "./helpers/moderated-discussion-query-harness"
+  );
+  return { discussionModerationNotice: moderatedDiscussionQueryState.notice };
+});
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    return { rows: sql.startsWith("select") ? (state.rows.shift() ?? []) : [] };
-  });
-  return {
-    db: new Proxy(database, {
-      get(target, key) {
-        if (key === "transaction")
-          return (callback: (tx: typeof database) => unknown, config: unknown) => {
-            state.config = config;
-            return callback(database);
-          };
-        const value = Reflect.get(target, key);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    }),
-  };
+  const { createModeratedDiscussionQueryDbMock } = await import(
+    "./helpers/moderated-discussion-query-harness"
+  );
+  return createModeratedDiscussionQueryDbMock();
 });
 
 import { communityModerationWorkspaceRepository as repository } from "../packages/db/src/repositories/community-moderation-workspace";
+import { moderationDiscussionRevision } from "../packages/db/src/repositories/discussion-management";
 import {
-  discussionManagementRepository as management,
-  moderationDiscussionRevision,
-} from "../packages/db/src/repositories/discussion-management";
+  installModeratedDiscussionQueryHooks,
+  moderatedDiscussionQueryDigest as digest,
+  moderatedDiscussionQueryPublication as publication,
+  moderatedDiscussionQueryState as state,
+  moderatedDiscussionQueryTime as time,
+} from "./helpers/moderated-discussion-query-harness";
 
-const time = "2026-10-11T00:00:00.123456Z",
-  publication = ["post", "Private publication", "guide", "post", "archived"];
-const digest = createHash("sha256").update("Complete text 🧑‍💻").digest("hex"),
-  revision = moderationDiscussionRevision("post", "comment", digest);
-const command = {
-  contentId: "post",
-  commentId: "comment",
-  actorId: "staff",
-  moderationWorkspace: true,
-  expectedRevision: revision,
-  reason: "Recorded reason",
-  auditId: "audit",
-};
-const writes = () => state.queries.filter((query) => /^(insert|update|delete)/u.test(query.sql));
-const mutationRows = (role = "moderator", status = "archived", type = "post") => {
-  state.rows = [
-    [["post", status, "guide", type]],
-    [["comment", "Bounded text", "author", digest]],
-    [[role]],
-  ];
-};
-beforeEach(() => {
-  state.queries = [];
-  state.rows = [];
-  state.config = null;
-  state.notice.mockReset();
-});
+installModeratedDiscussionQueryHooks();
+
+const revision = moderationDiscussionRevision("post", "comment", digest);
+
 it("checks current staff before private reads, rejects revoked authority and unavailable scope", async () => {
   state.rows = [[["user"]]];
   await expect(repository.discussion("staff", "post", { query: "" })).rejects.toMatchObject({
@@ -148,49 +111,4 @@ it("allows a removed tombstone only when a retained scoped removal proves its pu
   await expect(repository.discussionDetail("staff", "post", "foreign")).rejects.toMatchObject({
     code: "NOT_FOUND",
   });
-});
-it("removes archived discussion with current staff locks and records a reason without deleting replies", async () => {
-  mutationRows();
-  await expect(management.mutate(command)).resolves.toEqual({
-    contentId: "post",
-    commentId: "comment",
-    removed: true,
-  });
-  expect(state.queries[0].sql).toContain("for update");
-  expect(state.queries[1].sql).toContain("for update");
-  expect(state.queries[2].sql).toContain("for share");
-  expect(writes().filter((query) => query.sql.startsWith("delete"))).toHaveLength(1);
-  expect(writes()[0].params).toEqual(["comment"]);
-  expect(writes().find((query) => query.sql.startsWith('update "content"'))?.sql).toContain(
-    "greatest(0,",
-  );
-  const audit = writes().find((query) => query.sql.startsWith("insert"));
-  expect(audit?.params).toContain(
-    JSON.stringify({ contentId: "post", moderator: true, reason: "Recorded reason" }),
-  );
-  expect(state.notice).toHaveBeenCalledWith(
-    expect.anything(),
-    expect.objectContaining({ available: false, authorId: "author" }),
-  );
-});
-it.each([
-  { actor: "user", extra: {}, code: "FORBIDDEN" },
-  { actor: "moderator", extra: { text: "Replacement" }, code: "FORBIDDEN" },
-  { actor: "admin", extra: { reason: " " }, code: "COMMENT_REASON_REQUIRED" },
-  { actor: "admin", extra: { expectedRevision: "f".repeat(64) }, code: "COMMENT_CHANGED" },
-])("rejects invalid moderation command $code before writes", async ({ actor, extra, code }) => {
-  mutationRows(actor);
-  await expect(management.mutate({ ...command, ...extra })).rejects.toMatchObject({ code });
-  expect(writes()).toEqual([]);
-  expect(state.notice).not.toHaveBeenCalled();
-});
-it("rejects commercial scope and mixed author/staff scopes before mutation", async () => {
-  mutationRows("admin", "published", "resource");
-  await expect(management.mutate(command)).rejects.toMatchObject({ code: "NOT_FOUND" });
-  expect(state.queries).toHaveLength(1);
-  state.queries = [];
-  await expect(management.mutate({ ...command, ownWorkspace: true })).rejects.toMatchObject({
-    code: "COMMENT_COMMAND_INVALID",
-  });
-  expect(state.queries).toEqual([]);
 });
