@@ -310,6 +310,7 @@ export function NotificationInbox({
       )}
       {error ? (
         <ErrorState
+          id="notification-inbox-unavailable"
           title={error}
           description={copy.formErrorHint}
           action={
