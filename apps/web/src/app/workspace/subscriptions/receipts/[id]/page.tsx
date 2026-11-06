@@ -105,6 +105,7 @@ export default async function SubscriptionReceiptPage({
       return (
         <section className={pageShellClass}>
           <ErrorState
+            id="subscription-receipt-code-unavailable"
             title={subscriptionError(locale, error.code)}
             description={c.selectionRecoverHint}
             action={
