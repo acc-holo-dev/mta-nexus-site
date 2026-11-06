@@ -121,6 +121,7 @@ export function ResourceMediaEditor({
       {readonly ? <ErrorState id="resource-media-readonly" title={copy.readonly} /> : null}
       {error ? (
         <ErrorState
+          id="resource-media-editor-unavailable"
           title={error}
           description={copy.errorDescription}
           action={
