@@ -213,6 +213,38 @@ export function formatNotification(
             : "В обсуждении, в котором вы участвуете, появился новый ответ."
           : notification.message,
     };
+  const resourceQa = notification.data;
+  if (resourceQa?.kind === "resource_qa") {
+    const titles =
+      locale === "ru"
+        ? {
+            asked: "Новый вопрос по ресурсу",
+            answered: "Ответ на вопрос по ресурсу",
+            resolved: "Вопрос по ресурсу решён",
+            removed: "Вопрос по ресурсу удалён",
+          }
+        : {
+            asked: "New resource question",
+            answered: "Resource question answered",
+            resolved: "Resource question resolved",
+            removed: "Resource question removed",
+          };
+    const messages =
+      locale === "ru"
+        ? {
+            asked: "По ресурсу задали новый публичный вопрос.",
+            answered: "В ветке вопроса появился новый ответ.",
+            resolved: "Ответ отмечен полезным для этого вопроса.",
+            removed: "Вопрос удалён издателем или сотрудниками.",
+          }
+        : {
+            asked: "Someone asked a public question about a resource.",
+            answered: "There is a new answer on a resource question thread.",
+            resolved: "A useful answer was marked for a resource question.",
+            removed: "A resource question was removed by staff or the publisher.",
+          };
+    return { title: titles[resourceQa.event], message: messages[resourceQa.event] };
+  }
   const follower =
     notification.title === "New Follower" &&
     /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);

@@ -20,6 +20,7 @@ export type HomePersonalCopy = {
   reasonReleaseWatch: string;
   reasonDiscussionFollow: string;
   reasonReplyToMe: string;
+  reasonResourceQa: string;
   openInbox: string;
 };
 
@@ -27,6 +28,7 @@ const reasonKey = {
   releaseWatch: "reasonReleaseWatch",
   discussionFollow: "reasonDiscussionFollow",
   replyToMe: "reasonReplyToMe",
+  resourceQa: "reasonResourceQa",
 } as const;
 
 const actionLinkClass =

@@ -1415,6 +1415,7 @@ export const notifications = pgTable(
       | LicenseTermNotificationData
       | ResourceReleaseNoticeData
       | import("@nexus/domain").DiscussionPushNotificationData
+      | import("@nexus/domain").ResourceQaNotificationData
     >(),
     id: text("id").primaryKey(),
     recipientId: text("recipient_id")

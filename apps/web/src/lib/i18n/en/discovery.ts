@@ -47,6 +47,7 @@ export const discovery = {
     personalReasonReleaseWatch: "New version on a watched resource",
     personalReasonDiscussionFollow: "Reply on a followed discussion",
     personalReasonReplyToMe: "Unread reply to you",
+    personalReasonResourceQa: "Update on a resource question you follow",
     personalOpenInbox: "Open unread notifications",
   },
   market: {

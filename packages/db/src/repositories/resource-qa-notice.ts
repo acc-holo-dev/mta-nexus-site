@@ -89,6 +89,13 @@ async function deliver(
       type: "content",
       category: "content",
       isRead: false,
+      data: {
+        kind: "resource_qa",
+        event: input.kind,
+        productId: input.product.id,
+        threadId: input.threadId,
+        answerId: input.answerId ?? null,
+      },
     })
     .onConflictDoNothing()
     .returning({ id: notifications.id });

@@ -69,6 +69,22 @@ it("notifies the publisher about a new question with a content-category inbox ro
       "content",
     ]),
   );
+  expect(
+    insert?.params.some((value) => {
+      if (typeof value === "string") {
+        try {
+          return (JSON.parse(value) as { kind?: string }).kind === "resource_qa";
+        } catch {
+          return false;
+        }
+      }
+      return (
+        typeof value === "object" &&
+        value !== null &&
+        (value as { kind?: string }).kind === "resource_qa"
+      );
+    }),
+  ).toBe(true);
   expect(state.push).toHaveBeenCalled();
 });
 

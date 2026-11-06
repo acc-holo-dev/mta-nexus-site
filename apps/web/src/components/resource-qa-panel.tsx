@@ -16,6 +16,7 @@ import { resourceQaCopy, resourceQaError } from "../lib/resource-qa-i18n";
 import { authEntryHref, currentBrowserReturnPath } from "./auth-return-path";
 import { confirmAction } from "./confirm-action";
 import { GuestAuthLinks } from "./guest-auth-links";
+import { ResourceQaReportForm } from "./resource-qa-report-form";
 
 type BuildOption = { id: string; version: string };
 
@@ -482,8 +483,23 @@ export function ResourceQaPanel({
                 ) : null}
               </div>
               <p className="text-[11px] text-faint">{copy.followingHelp}</p>
+              <ResourceQaReportForm
+                threadId={detail.thread.id}
+                locale={locale}
+                authenticated={authenticated}
+                loginHref={loginHref}
+                registerHref={registerHref}
+              />
             </div>
-          ) : null}
+          ) : (
+            <ResourceQaReportForm
+              threadId={detail.thread.id}
+              locale={locale}
+              authenticated={authenticated}
+              loginHref={loginHref}
+              registerHref={registerHref}
+            />
+          )}
 
           <div className="min-w-0 space-y-3 overflow-x-clip">
             {detail.thread.answers.length === 0 ? (

@@ -15,7 +15,7 @@
 ## Продуктовые и инженерные факты на tip
 
 - Core free-beta journeys (auth return, library acquire/download honesty, inbox filters, release watch, discussion intent, Home personal changes, resource Q&A) реализованы локально.
-- Resource Q&A: ask auto-follow, transactional content notices (ask/answer/resolve/remove), manager/staff remove thread+answer. Schema tip — `0089_resource_qa` (live upgrade rehearsal ещё нужен).
+- Resource Q&A: ask auto-follow; transactional content notices with structured data + RU/EN formatting and Home `resourceQa` reason; manager/staff remove; abuse report target `resource_qa_thread` + panel form. Schema tip — `0089_resource_qa` (live upgrade rehearsal ещё нужен).
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.

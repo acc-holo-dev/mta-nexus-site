@@ -2656,7 +2656,7 @@
         }
       ],
       "execution_updated_on": "2026-11-05",
-      "execution_notes": "Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Ask auto-follows asker; transactional content notices for ask/answer/resolve/remove; staff/publisher remove thread+answer routes/UI. Focused QA suites PASS. Migration still not applied live."
+      "execution_notes": "Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Ask auto-follows asker; transactional content notices with RU/EN formatting and Home resourceQa reason; staff/publisher remove; abuse report target resource_qa_thread + panel form. Focused QA suites PASS. Migration still not applied live."
     },
     {
       "id": "FLOW-13",

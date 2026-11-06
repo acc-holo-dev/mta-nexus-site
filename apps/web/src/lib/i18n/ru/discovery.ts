@@ -47,6 +47,7 @@ export const discovery = {
     personalReasonReleaseWatch: "Новая версия отслеживаемого ресурса",
     personalReasonDiscussionFollow: "Ответ в отслеживаемом обсуждении",
     personalReasonReplyToMe: "Непрочитанный ответ вам",
+    personalReasonResourceQa: "Обновление по вопросу о ресурсе, за которым вы следите",
     personalOpenInbox: "Открыть непрочитанные уведомления",
   },
   market: {

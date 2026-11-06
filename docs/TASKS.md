@@ -1957,7 +1957,7 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 
 **Фаза:** F4. **Приоритет:** P2. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.
 
-**Заметка исполнения.** Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Ask auto-follows asker; transactional content notices for ask/answer/resolve/remove; staff/publisher remove thread+answer routes/UI. Focused QA suites PASS. Migration still not applied live.
+**Заметка исполнения.** Separate resource Q&A (not reviews/support); migration 0089; API+panel on detail. Ask auto-follows asker; transactional content notices with RU/EN formatting and Home resourceQa reason; staff/publisher remove; abuse report target resource_qa_thread + panel form. Focused QA suites PASS. Migration still not applied live.
 
 **Исходные пункты:** INT16. **Решения обсуждения:** NX-005, NX-006, NX-008, NX-011.
 

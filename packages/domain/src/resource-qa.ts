@@ -87,3 +87,11 @@ export type ResourceQaRemoveAnswerCommand = {
   action: "remove";
   expectedRevision: number;
 };
+
+export type ResourceQaNotificationData = {
+  kind: "resource_qa";
+  event: "asked" | "answered" | "resolved" | "removed";
+  productId: string;
+  threadId: string;
+  answerId?: string | null;
+};
