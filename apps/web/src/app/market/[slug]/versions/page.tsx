@@ -68,6 +68,7 @@ export default async function PublicResourceVersionsPage({
           <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
         </header>
         <ErrorState
+          id="market-versions-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={releaseHistoryHref(slug, requestedPage)} className={actionLinkClass}>
