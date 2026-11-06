@@ -71,6 +71,7 @@ export default async function Page({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-resource-history-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
