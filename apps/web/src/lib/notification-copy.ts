@@ -163,23 +163,30 @@ export function formatNotification(
     ["user", "developer", "organization", "server"].includes(verification[1]) &&
     notification.title === `Verification ${verification[3]}`
   ) {
-    const labels: Record<string, string> = {
+    const labelsRu: Record<string, string> = {
       user: "Подтверждение личности",
       developer: "Подтверждение опыта разработчика",
       organization: "Подтверждение организации",
       server: "Подтверждение контроля сервера",
     };
+    const labelsEn: Record<string, string> = {
+      user: "Identity verification",
+      developer: "Developer experience verification",
+      organization: "Organization verification",
+      server: "Server ownership verification",
+    };
+    const approved = verification[3] === "approved";
     return {
       title:
         locale === "ru"
-          ? verification[3] === "approved"
+          ? approved
             ? "Верификация одобрена"
             : "Верификация отклонена"
           : notification.title,
       message:
         locale === "ru"
-          ? `${labels[verification[1]]} ${verification[3] === "approved" ? "одобрено" : "отклонено"}.`
-          : notification.message,
+          ? `${labelsRu[verification[1]]} ${approved ? "одобрено" : "отклонено"}. Откройте заявку в рабочей области.`
+          : `${labelsEn[verification[1]]} was ${verification[3]}. Open the application in your workspace.`,
     };
   }
   if (

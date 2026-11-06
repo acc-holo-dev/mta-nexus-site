@@ -79,7 +79,7 @@ it("allows experience verification after identity approval and atomically stores
   expect((await developerProfileRepository.own(id)).verifiedDeveloper).toBe(true);
   expect(
     await notificationRepository.findById(`ntf_verification_resolution_${request.id}`),
-  ).toMatchObject({ recipientId: id, link: "/workspace/verification?view=history" });
+  ).toMatchObject({ recipientId: id, link: `/workspace/verification/${request.id}` });
   expect(
     await db
       .select()

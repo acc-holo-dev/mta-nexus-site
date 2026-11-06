@@ -23,6 +23,7 @@
 - Publisher build honesty: review/quarantine/restore notices deep-link to `/workspace/resources/:productId/builds/:buildId` with RU/EN `build_lifecycle` copy (no malware invention).
 - Community discussion honesty: author removal notices → `/workspace/discussions/:commentId`; staff comment report targets expose `moderationHref` → `/admin/community/:contentId/discussion/:commentId`.
 - Article discussion follow/mute: public article SSR hydrates content follow + mute into ContentFollowControls (same honesty as discovery/product Save).
+- Verification requester resolution (non-server) → `/workspace/verification/:requestId` (history list remains unsafe-id fallback); server resolve stays on the managed server.
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.

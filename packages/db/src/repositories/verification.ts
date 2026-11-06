@@ -30,6 +30,14 @@ import {
 import { verificationTargetAuthority } from "./verification-authority";
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
+/** Requester deep link for a resolved application; history list is the unsafe-id fallback. */
+function verificationRequesterHref(requestId: string) {
+  if (!requestId || requestId.length > 128 || !/^[A-Za-z0-9_-]+$/u.test(requestId)) {
+    return "/workspace/verification/history";
+  }
+  return `/workspace/verification/${encodeURIComponent(requestId)}`;
+}
+
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
 
@@ -634,7 +642,7 @@ export class VerificationRepository {
             : `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
           link: serverResolution
             ? `/workspace/servers/${encodeURIComponent(request.targetId)}`
-            : `/workspace/verification?view=history`,
+            : verificationRequesterHref(request.id),
           type: "security",
           category: "security",
           isRead: false,
