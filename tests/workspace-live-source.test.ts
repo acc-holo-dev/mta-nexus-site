@@ -1,108 +1,59 @@
-import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
-const state = vi.hoisted(() => ({
-  user: {
-    id: "usr_workspace",
-    username: "workspace-user",
-    role: "user",
-  } as null | { id: string; username: string; role: string },
-}));
-
-const repos = vi.hoisted(() => ({
-  library: vi.fn(),
-  managedServers: vi.fn(),
-  directory: vi.fn(),
-}));
-
-vi.mock("next/headers", () => ({
-  cookies: vi.fn(async () => ({
-    get: (name: string) =>
-      name === "nexus_session" && state.user ? { value: "session-token" } : undefined,
-  })),
-}));
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/workspace",
-}));
-
+vi.mock("next/headers", async () => {
+  const { createWorkspaceLiveSourceHeadersMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceHeadersMock();
+});
+vi.mock("next/navigation", async () => {
+  const { createWorkspaceLiveSourceNavigationMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceNavigationMock();
+});
 vi.mock("next/link", async () => {
-  const React = await import("react");
-  return {
-    default: ({
-      href,
-      children,
-      className,
-    }: {
-      href: string;
-      children: ReactNode;
-      className?: string;
-    }) => React.createElement("a", { href, className }, children),
-  };
+  const { createWorkspaceLiveSourceLinkMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceLinkMock();
+});
+vi.mock("@nexus/db", async () => {
+  const { createWorkspaceLiveSourceDbMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceDbMock();
+});
+vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+  const { createWorkspaceLiveSourceAuthMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceAuthMock();
+});
+vi.mock("../apps/web/src/lib/i18n-server", async () => {
+  const { createWorkspaceLiveSourceI18nMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceI18nMock();
+});
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async () => {
+  const { createWorkspaceLiveSourceDirectoryMock } = await import(
+    "./helpers/workspace-live-source-harness"
+  );
+  return createWorkspaceLiveSourceDirectoryMock();
 });
 
-vi.mock("@nexus/db", () => ({
-  userLibraryRepository: { pageByUser: repos.library },
-  serverRepository: { pageManagedByUser: repos.managedServers },
-}));
-
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: {
-    getSession: vi.fn(async () => state.user),
-  },
-}));
-
-vi.mock("../apps/web/src/lib/i18n-server", () => ({
-  getRequestLocale: vi.fn(async () => "en"),
-}));
-
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
-  mtaMasterDirectoryService: {
-    getDirectory: repos.directory,
-  },
-  indexMtaObservations: vi.fn(
-    (observations: Array<Record<string, unknown>>) => (server: { id: string }) =>
-      observations.find((observation) => observation.serverId === server.id) ?? null,
-  ),
-  mtaLiveStatus: vi.fn((observation: null | { liveStatus?: string }, stale: boolean) =>
-    stale ? "unknown" : (observation?.liveStatus ?? "unknown"),
-  ),
-}));
-
-import WorkspaceLoading from "../apps/web/src/app/workspace/loading";
 import WorkspacePage from "../apps/web/src/app/workspace/page";
+import {
+  installWorkspaceLiveSourceHooks,
+  workspaceLiveSourceRepos as repos,
+} from "./helpers/workspace-live-source-harness";
 
 describe("workspace live telemetry behavior", () => {
   const dictionary = getDictionary("en");
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    state.user = {
-      id: "usr_workspace",
-      username: "workspace-user",
-      role: "user",
-    };
-    repos.library.mockResolvedValue({
-      items: [],
-      counts: { all: 0, ready: 0, unavailable: 0 },
-      page: 1,
-      pageSize: 4,
-      total: 0,
-      totalPages: 1,
-    });
-    repos.managedServers.mockResolvedValue({
-      servers: [],
-      total: 0,
-      page: 1,
-      pageSize: 4,
-      totalPages: 1,
-    });
-    repos.directory.mockResolvedValue({
-      servers: [],
-      isStale: false,
-    });
-  });
+  installWorkspaceLiveSourceHooks();
 
   it("does not contact the MTA directory when the user owns no servers", async () => {
     const html = renderToStaticMarkup(await WorkspacePage());
@@ -196,34 +147,6 @@ describe("workspace live telemetry behavior", () => {
     expect(html).not.toContain('href="/servers/unknown-server"');
   });
 
-  it("loads a bounded preview of already authorized library entries", async () => {
-    repos.library.mockResolvedValue({
-      items: [
-        {
-          resourceId: "prd_free",
-          addedAt: new Date("2026-01-01T00:00:00.000Z"),
-          downloadable: true,
-          title: "Free Resource",
-          slug: "free-resource",
-          version: "1.0.0",
-        },
-      ],
-      counts: { all: 36, ready: 35, unavailable: 1 },
-      page: 1,
-      pageSize: 4,
-      total: 36,
-      totalPages: 9,
-    });
-
-    const html = renderToStaticMarkup(await WorkspacePage());
-
-    expect(repos.library).toHaveBeenCalledWith("usr_workspace", 1, "all", 4);
-    expect(html).toContain("Free Resource");
-    expect(html).toContain("/market/free-resource");
-    expect(html).toContain("/workspace/library");
-    expect(html).toContain(">36<");
-  });
-
   it("starts directory lookup without waiting for the independent library read", async () => {
     let resolveLibrary!: (value: unknown) => void;
     repos.library.mockReturnValue(
@@ -290,52 +213,6 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain("On the displayed servers");
   });
 
-  it("never exposes unpublished resource details in a private library preview", async () => {
-    repos.library.mockResolvedValue({
-      items: [
-        {
-          resourceId: "prd_private",
-          addedAt: new Date("2026-01-01T00:00:00.000Z"),
-          downloadable: false,
-          title: null,
-          slug: null,
-          version: null,
-        },
-      ],
-      counts: { all: 1, ready: 0, unavailable: 1 },
-      page: 1,
-      pageSize: 4,
-      total: 1,
-      totalPages: 1,
-    });
-    const html = renderToStaticMarkup(await WorkspacePage());
-    expect(html).toContain("Resource temporarily unavailable");
-    expect(html).not.toContain("prd_private");
-    expect(html).not.toContain("/market/undefined");
-  });
-
-  it("routes guests through login with a workspace return path", async () => {
-    state.user = null;
-    const html = renderToStaticMarkup(await WorkspacePage());
-    expect(html).toContain('href="/auth/login?next=%2Fworkspace"');
-    expect(repos.library).not.toHaveBeenCalled();
-    expect(repos.managedServers).not.toHaveBeenCalled();
-  });
-
-  it("shows ErrorState retry when the library preview fails", async () => {
-    repos.library.mockRejectedValue(new Error("library-secret"));
-    const html = renderToStaticMarkup(await WorkspacePage());
-    expect(html).toContain('role="alert"');
-    expect(html).toContain(dictionary.workspace.libraryUnavailable);
-    expect(html).toContain(dictionary.errors.retry);
-    expect(html).toContain('href="/workspace"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
-    expect(html).toContain(dictionary.workspace.noServers);
-    expect(html).not.toContain("library-secret");
-    expect(html).not.toContain(dictionary.workspace.emptyLibrary);
-  });
-
   it("shows ErrorState retry when the managed servers preview fails", async () => {
     repos.managedServers.mockRejectedValue(new Error("servers-secret"));
     const html = renderToStaticMarkup(await WorkspacePage());
@@ -349,34 +226,5 @@ describe("workspace live telemetry behavior", () => {
     expect(html).not.toContain("servers-secret");
     expect(html).not.toContain(dictionary.workspace.noServers);
     expect(repos.directory).not.toHaveBeenCalled();
-  });
-
-  it.each(["en", "ru"] as const)(
-    "renders an honest workspace loading shell with clipped overflow in %s",
-    async (locale) => {
-      const { getRequestLocale } = await import("../apps/web/src/lib/i18n-server");
-      vi.mocked(getRequestLocale).mockResolvedValueOnce(locale);
-      const copy = getDictionary(locale).workspace;
-      const html = renderToStaticMarkup(await WorkspaceLoading());
-      expect(html).toContain('aria-busy="true"');
-      expect(html).toContain('id="workspace-loading-heading"');
-      expect(html).toContain(`>${copy.title}<`);
-      expect(html).toContain(copy.loading);
-      expect(html).toContain("overflow-x-clip");
-      expect(html).toContain("min-w-0");
-    },
-  );
-
-  it("keeps RU/EN workspace hub empty and unavailable copy distinct", () => {
-    const en = getDictionary("en").workspace;
-    const ru = getDictionary("ru").workspace;
-    expect(en.emptyLibrary).not.toBe(ru.emptyLibrary);
-    expect(en.emptyLibraryHint).not.toBe(ru.emptyLibraryHint);
-    expect(en.noServers).not.toBe(ru.noServers);
-    expect(en.noServersHint).not.toBe(ru.noServersHint);
-    expect(en.libraryUnavailable).not.toBe(ru.libraryUnavailable);
-    expect(en.serversUnavailable).not.toBe(ru.serversUnavailable);
-    expect(en.emptyLibraryHint.length).toBeGreaterThan(0);
-    expect(en.noServersHint.length).toBeGreaterThan(0);
   });
 });
