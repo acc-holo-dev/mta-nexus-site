@@ -163,7 +163,9 @@ export function MobileNav({ locale }: { locale: Locale }) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
-              active ? "bg-accent-soft text-accent" : "text-muted hover:bg-hover hover:text-primary"
+              active
+                ? "bg-accent-soft text-accent"
+                : "text-secondary hover:bg-hover hover:text-primary"
             }`}
           >
             <Icon className="h-4 w-4" aria-hidden="true" />
@@ -181,7 +183,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
         aria-haspopup="dialog"
         aria-controls={isMoreOpen ? "mobile-more-menu" : undefined}
         className={`h-auto min-h-12 min-w-0 flex-col gap-1 rounded-md px-1 py-2 text-[10px] font-semibold focus-visible:ring-offset-0 ${
-          moreActive ? "bg-accent-soft text-accent" : "text-muted hover:text-primary"
+          moreActive ? "bg-accent-soft text-accent" : "text-secondary hover:text-primary"
         }`}
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
