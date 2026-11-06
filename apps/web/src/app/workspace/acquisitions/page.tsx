@@ -64,6 +64,7 @@ export default async function AcquisitionHistoryPage({
           <h1 className="font-display text-primary">{copy.history}</h1>
         </header>
         <ErrorState
+          id="workspace-acquisitions-unavailable"
           title={copy.historyLoadUnavailable}
           action={
             <Link href={retryHref} className={navLinkClass}>
