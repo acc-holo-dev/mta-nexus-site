@@ -1,76 +1,24 @@
-import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({
-  sessionLive: true,
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][],
-  failAudit: false,
-}));
+import { expect, it, vi } from "vitest";
+
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const raw = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    if (sql.includes('from "sessions"'))
-      return { rows: state.sessionLive ? [["ses_a", "2099-01-01T00:00:00.000Z"]] : [] };
-    if (state.failAudit && sql.startsWith('insert into "audit_events"'))
-      throw new Error("audit failed");
-    return { rows: state.rows.shift() ?? [] };
-  });
-  const db: typeof raw = new Proxy(raw, {
-    get(target, key) {
-      if (key === "transaction")
-        return async (callback: (tx: typeof raw) => unknown) => callback(db);
-      const value = Reflect.get(target, key);
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-  return { db };
+  const { createResourceReleaseWatchResumeRepositoryDbMock } = await import(
+    "./helpers/resource-release-watch-resume-repository-harness"
+  );
+  return createResourceReleaseWatchResumeRepositoryDbMock();
 });
+
 import { resumeResourceReleaseWatches as resume } from "../packages/db/src/repositories/collection-release-watches";
-const stamp = "2026-10-12T00:00:00.000Z";
-const input = {
-  userId: "usr_a",
-  currentToken: "tok_a",
-  auditId: "aud_a",
-  command: {
-    items: [
-      { productId: "prd_b", expectedRevision: 3 },
-      { productId: "prd_a", expectedRevision: 1 },
-    ],
-  },
-};
-const ready = (
-  previous: unknown[][] = [
-    ["prd_a", false, 1, stamp],
-    ["prd_b", false, 3, stamp],
-  ],
-) => [
-  [],
-  [],
-  [],
-  [["usr_a"]],
-  [
-    ["prd_a", "published"],
-    ["prd_b", "published"],
-  ],
-  [["ent_a", null]],
-  [["bld_a"]],
-  [["ent_b", null]],
-  [["bld_b"]],
-  previous,
-];
-const output = [
-  { productId: "prd_b", enabled: true, revision: 4, updatedAt: stamp },
-  { productId: "prd_a", enabled: true, revision: 2, updatedAt: stamp },
-];
-const success = () => {
-  state.rows = [...ready(), [[4]], [{ observedAt: stamp }], output, []];
-};
-beforeEach(() => {
-  state.sessionLive = true;
-  state.queries = [];
-  state.rows = [];
-  state.failAudit = false;
-});
+import {
+  installResourceReleaseWatchResumeRepositoryHooks,
+  resourceReleaseWatchResumeRepositoryInput as input,
+  resourceReleaseWatchResumeRepositoryReady as ready,
+  resourceReleaseWatchResumeRepositoryStamp as stamp,
+  resourceReleaseWatchResumeRepositoryState as state,
+  resourceReleaseWatchResumeRepositorySuccess as success,
+} from "./helpers/resource-release-watch-resume-repository-harness";
+
+installResourceReleaseWatchResumeRepositoryHooks();
+
 it("resumes only the reviewed existing stopped watches through the shared baseline enrollment transaction", async () => {
   success();
   const result = await resume(input);
@@ -127,55 +75,4 @@ it.each([
 ])("rejects mixed retry states or stale revisions as one batch", async ({ previous }) => {
   state.rows = ready(previous);
   await expect(resume(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_BATCH_CONFLICT" });
-});
-it("rechecks finite access after all locks and enforces the account quota", async () => {
-  const rows = ready();
-  rows[5] = [["ent_a", stamp]];
-  state.rows = [...rows, [[4]], [{ observedAt: stamp }]];
-  await expect(resume(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
-  state.rows = [...ready(), [[99]]];
-  await expect(resume(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_LIMIT" });
-});
-it("rejects withdrawn or unsafe publication before resuming any selected watch", async () => {
-  state.rows = [
-    [],
-    [],
-    [],
-    [["usr_a"]],
-    [
-      ["prd_a", "draft"],
-      ["prd_b", "published"],
-    ],
-  ];
-  await expect(resume(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
-  state.rows = ready();
-  state.rows[6] = [];
-  await expect(resume(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
-});
-it("propagates required audit failure and refuses partial upsert results", async () => {
-  success();
-  state.failAudit = true;
-  await expect(resume(input)).rejects.toMatchObject({ cause: { message: "audit failed" } });
-  state.failAudit = false;
-  state.rows = [...ready(), [[4]], [{ observedAt: stamp }], [output[0]]];
-  await expect(resume(input)).rejects.toMatchObject({ code: "RELEASE_WATCH_BATCH_CONFLICT" });
-});
-it("rejects unreviewed new enrollment and injected collection authority before database work", async () => {
-  for (const command of [
-    { items: [{ productId: "prd_a", expectedRevision: 0 }] },
-    { ...input.command, expectedCollectionRevision: 1 },
-  ])
-    await expect(resume({ ...input, command })).rejects.toMatchObject({ statusCode: 400 });
-  expect(state.queries).toHaveLength(0);
-});
-
-it("revalidates the initiating session before returning an already resumed batch", async () => {
-  state.sessionLive = false;
-  state.rows = ready([
-    ["prd_a", true, 2, stamp],
-    ["prd_b", true, 4, stamp],
-  ]);
-  await expect(resume(input)).rejects.toMatchObject({ statusCode: 401 });
-  expect(state.queries.at(-2)?.sql).toContain("for no key update");
-  expect(state.queries.at(-1)?.sql).toContain('from "sessions"');
 });
