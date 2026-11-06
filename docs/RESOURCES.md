@@ -1,307 +1,148 @@
 # Ресурсы, библиотека и публикация
 
-**Статус:** living · предметный контракт (ресурсы / библиотека / публикация).
+**Статус:** living · предметный контракт (ресурсы / библиотека / публикация).  
+**База DOC-05:** `385e577e7443cf7d7b817419ce5c3b8afe87b690`.  
+**Не активирует** платежи, payout, production DRM. Commerce-цели — [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). UI/сценарии — [UX-CONTRACT](UX-CONTRACT.md), [FLOWS](FLOWS.md).
 
-Предметный контракт DOC-05 для каталога ресурсов, версий/сборок, выдачи файла, приватной библиотеки, коллекций и seller-публикации. Не активирует коммерцию и не заменяет [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md). Платежи, settlement, commission, DRM-модели, payout и dispute timing — [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md) (план) и исходные handbook-главы до DOC-04.
+| Метка | Значение |
+| ----- | -------- |
+| **Текущий runtime** | Код / free beta сейчас |
+| **Цель** | Утверждено владельцем; free beta не включает реальные платежи |
+| **Предложение** | Не строить без поручения |
+| **Live unknown** | Нужно свидетельство среды/CI |
 
-| Метка               | Значение                                                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| **Текущий runtime** | Что делает код / closed beta сейчас                                                       |
-| **Цель владельца**  | Утверждённая цель; строить можно при поручении, но free beta не включает реальные платежи |
-| **Предложение**     | Не утверждено к сборке без владельца                                                      |
-| **Live unknown**    | Нужно свидетельство кода/CI/среды                                                         |
+## Цель
 
----
+Контракт каталога ресурсов, версий/сборок, выдачи файла, приватной библиотеки, коллекций и seller-публикации. Первая коммерческая вертикаль — **MTA Scripts** (**цель**); архитектура не навечно только scripts. Коллекции/библиотека **не** versioned server packs ([SERVER-PACK-SPEC](SERVER-PACK-SPEC.md)).
 
-## 1. Границы предмета
+## Акторы и права
 
-- Первая коммерческая вертикаль — **MTA Scripts**; архитектура не навечно ограничена scripts, но первый paid depth — вокруг них (**цель**).
-- **Коллекции и библиотека — не versioned server packs.** Приватные подборки организуют доступные ресурсы; snapshot/pack целого сервера — отдельное будущее направление ([PRODUCT.md](PRODUCT.md)).
-- Free closed beta: **нет реальных платежей**, checkout/payout/DRM production не активируются. Цели license/access сохраняются как контракт, без включения commerce.
-- Любой зарегистрированный пользователь может стать seller фактом публикации коммерческого продукта и принятия Seller/Publishing Agreement; отдельная обязательная seller application отсутствует. Verification — независимый evidence layer (**цель**).
-- Workspace — единый адаптивный `/workspace`, не отдельные кабинеты ролей; после login **нет** авто-редиректа в dashboard (**цель**; навигация — [UX-CONTRACT.md](UX-CONTRACT.md)).
+| Актор | Права / ожидание |
+| ----- | ---------------- |
+| Гость / покупатель | Каталог, карточка, после входа — claim/library/download по правам |
+| Автор / seller | Публикация free path сейчас; paid listing — **цель** после commerce gates |
+| Org с `manage_products` | Metadata/builds/releases/support (**цель**); finance/payout — Owner/Finance + re-auth |
+| Staff | Модерация, quarantine, revoke с reason/audit/appeal |
+| Любой зарегистрированный | Может стать seller фактом публикации + Seller Agreement (**цель**); verification — отдельный evidence layer |
 
----
+Workspace — единый `/workspace`, без auto-redirect в dashboard после login (**цель**).
 
-## 2. Модель продукта и выдачи
+## Happy path (runtime free)
 
-### 2.1 Editions и delivery (**цель**)
+| Путь | Завершение |
+| ---- | ---------- |
+| Каталог → карточка | Автор, описание, доступность; ошибка ≠ пусто ≠ unknown online |
+| `/acquire?productId=` → claim → library | Сессия + entitlement; Save / release watch / discussion follow — разные действия |
+| Download latest / pinned | Published + clean scan; клиент сверяет `X-Resource-Build-Id` |
+| Коллекции | Private only; add ≠ watch; архив ≠ отзыв доступа |
+| Historical archive | Purchases/licenses/sales — read-only facts без provider secrets |
 
-Один продукт может иметь Free / Premium edition, closed-code / open-source delivery, несколько license scopes, bundle membership, source-code premium variant.
+Сценарии latest vs pinned, receipt, FLOW-01/07/17/18/20 — [FLOWS](FLOWS.md).
 
-| Режим       | DRM                          | Что видит покупатель                                                 |
-| ----------- | ---------------------------- | -------------------------------------------------------------------- |
-| Closed code | Seller opt-in enable/disable | Закрытая сборка; DRM Protected только если включено                  |
-| Open source | Нет DRM                      | Явно: source + license model; source access может быть отдельным SKU |
+## Инварианты публичной выдачи (не ослаблять)
 
-Seller задаёт цену сам; искусственный minimum price нет (кроме provider limits). **Цена не trust signal.** Fake markdown pricing запрещён.
+Публичная выдача файла требует:
 
-Скидки (**цель**, детали commerce → COMMERCIAL-FUTURE): seller discounts, coupons, promo codes, platform campaigns, bundles.
+1. допустимую **опубликованную** сборку, и  
+2. чистый результат сканирования с **идентификатором сканера** и **временем**.
 
-### 2.2 Что получает buyer до оплаты (**цель**)
+Иначе сборка не `ready` и не downloadable public build.
 
-Product page / каталог отвечают: что это, кто автор, что выдаётся, насколько можно доверять.
+### Download API (**текущий runtime**)
 
-Above-the-fold (когда применимо): title; price/Free; seller/org; rating evidence; current version; Open/Closed Source; DRM Protected если включено; key compatibility/dependency summary; Add to Cart; Trial/Demo CTA; trust/security state последнего downloadable build. Карточки каталога тоже показывают Open/Closed Source и DRM Protected.
+- `GET /api/products/:id/download` — latest safe published build.
+- `GET /api/products/:id/download?buildId=bld_…` — конкретная **сейчас** safe сборка того же product; никогда storage key / user path.
+- Unknown / retired / quarantined / unscanned / other-product → отказ. Bad `buildId` → 400.
+- 200 объявляет фактический `X-Resource-Build-Id`; несовпадение → клиент не пинит download.
+- `/market/[slug]/versions`: только published + trusted-clean; ≤12 rows; `noindex`; без storage keys / quarantine reasons.
+- Кнопки UI — convenience, не authoritative grant. Успех передачи ≠ установка.
 
-Media: screenshots, gallery, video, GIF, supported embeds, demo server/Join где уместно — по content/security правилам; arbitrary executable/embed code запрещён. Gallery уже есть в runtime; lightbox — **предложение** ([UX-CONTRACT.md](UX-CONTRACT.md)).
+**Live unknown:** гонка moderation между DB selection и object stream; независимая E2E SHA-256 без trusted digest.
 
-### 2.3 Compatibility и dependencies (**цель**)
+### Version compare (OPS-19 **A**)
 
-Compatibility metadata **необязательна** для каждого продукта. Optional: MTA version, server OS, Lua/runtime, required modules, dependencies, tested versions, known conflicts. Опубликованное — структурированно, не только в description.
+Новые релизы: SemVer-like `MAJOR.MINOR.PATCH[-pre]` (PATCH может опускаться → `0` при compare). Ведущий `v` снимается. Duplicate version identity не создаёт вторую сборку (`BUILD_VERSION_EXISTS`). Поля раздельно: build id, artifact hash/bytes, display version, `mtaVersionTarget`, package `schemaVersion`. Исторические published strings/bytes не переписываются. Helpers: `@nexus/domain` / `@nexus/validation`.
 
-NEXUS **не обязан** автоматически вычислять incompatibility по конфигу привязанного сервера.
+### Actor binding на write
 
-Dependency graph нужен независимо от полной compatibility: required / optional / bundled / external-manual + version constraint. Покупатель видит зависимости **до оплаты**. **Нельзя** автоматически класть платную dependency в cart без явного согласия.
+`POST /api/products`, builds, library releases/collections, license control требуют `X-Nexus-Actor-Id` исходного пользователя. Нет заголовка → 428; смена аккаунта → 409. Клиент хранит exact retry после неопределённого ответа.
 
----
+## Библиотека и коллекции (**текущий runtime**)
 
-## 3. Публикация и состояния каталога
+| Правило | Содержание |
+| ------- | ---------- |
+| `/workspace/library` | Счётчик `all/ready/unavailable`, страница ≤12; preview ≤4; порядок `MAX(grant.created_at) DESC, resource_id` |
+| Право `product.download` | User entitlements **или** активные неистёкшие licenses; дубли → одна строка |
+| Не карточка | Revoked/suspended/expired licenses; expired entitlements; `product.update` |
+| `ready` | Published product **и** ≥1 published build с clean-сканом (scanner id + time) |
+| Недоступный acquired | Остаётся без утечки title/slug/version/download |
+| Коллекции | ≤30 collections / ≤200 items / batch ≤20; private only; не server pack |
+| Archive routes | `/workspace/purchases|licenses|sales` — ownership + 20-row page; без payment tokens / secret keys / buyer PII на sales |
 
-### 3.1 Lifecycle (**цель**)
+`ready` label — подсказка, не авторизация. Paid checkout этим контуром **не** реализуется.
 
-Рекомендуемый поток:
+## Публикация (**цель** + runtime)
+
+**Runtime:** free publish/moderation path есть; restore archived / release suspended → **draft**, не published (FLOW-20). Paid publish/checkout выключены.
+
+**Цель lifecycle:**
 
 ```text
 DRAFT → READY_FOR_CHECKS → AUTOMATED_SAFETY_CHECKS → MANUAL_REVIEW → PUBLISHED
-DRAFT → READY_FOR_CHECKS → AUTOMATED_SAFETY_CHECKS → PUBLISHED   (subscription auto-publish)
+DRAFT → … → AUTOMATED_SAFETY_CHECKS → PUBLISHED   (subscription auto-publish)
 ```
 
-Auto-publish = bypass **только** manual queue; **никогда** не bypass malware / integrity / policy / storage safety / DRM-package validation where relevant / risk engine. Доступен лишь без active risk flags; staff может revoke с reason/audit/appeal.
+Auto-publish обходит **только** manual queue; никогда malware/integrity/policy/storage/DRM-package/risk. States: `DRAFT`, `PENDING_REVIEW`, `PUBLISHED`, `UNLISTED`, `QUARANTINED`, `SUSPENDED`, `ARCHIVED`, `TAKEDOWN`. `UNLISTED` — seller сам; archive/takedown сохраняют purchase/license/build/audit refs.
 
-Дополнительно: rejected; suspended; archived; retired; version deprecated.
+Publish Wizard (**цель**): full-page Basic → … → Preview → Submit; Open Source → no DRM. Checklist ≠ clean scanner.
 
-Каталожные states (**цель**): `DRAFT`, `PENDING_REVIEW`, `PUBLISHED`, `UNLISTED`, `QUARANTINED`, `SUSPENDED`, `ARCHIVED`, `TAKEDOWN`.
+KYC (**цель**): draft до KYC ок; KYC обязателен до первой payout; Seller Agreement до first paid publication.
 
-| State                            | Кто / правило                                                                                                                                                |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `UNLISTED`                       | Seller может включить сам                                                                                                                                    |
-| `ARCHIVED` / `TAKEDOWN`          | Сохраняют purchase, license/entitlement, build/version, moderation/audit, dispute/support refs                                                               |
-| Публичная archived/delisted page | Остаётся (если нет legal/security запрета): status, substantive reason, seller where allowed, latest safe metadata, **без purchase CTA**, guidance для buyer |
+## Editions, license, cart (**цель**; не runtime paid)
 
-### 3.2 Publish Wizard (**цель**)
+| Тема | Правило владельца |
+| ---- | ----------------- |
+| Editions | Free/Premium; closed/open delivery; несколько scopes/SKU |
+| DRM | Seller opt-in на closed; open source — без DRM; цена ≠ trust |
+| Dependencies | Graph до оплаты; нельзя авто-класть платную dep в cart |
+| License scope | **1 лицензия = 1 MTA server**; unbound paid: 30-day activation window |
+| Delist / seller-ban | Новые покупки stop; good-faith buyers — 30-day redownload window (malware/legal may cut sooner) |
+| Free retention | Safe free не обязан удаляться через 30 дней только из-за paid policy |
+| Reviews | Paid → confirmed purchase; free → claim; seller не обнуляет feedback релизом |
+| Cart | Multi-item; guest cart ≠ reservation; checkout = login + verified email; webhook без idempotent domain transition не создаёт доступ |
 
-Full-page flow (не modal): Basic → Delivery → Files/Source → Dependencies → Media → Price/SKU → DRM → Support → Preview → Publish/Submit. Draft сохраняется по шагам. Open Source → no DRM; Closed → seller решает DRM. Checklist/preview **не** заменяют clean scanner result (**цель** + [UX-CONTRACT.md](UX-CONTRACT.md)).
+Trial / wishlist / support term / update entitlement — **цель**; детали commerce → [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md).
 
-### 3.3 KYC / eligibility (**цель**; деньги → COMMERCIAL-FUTURE)
+## Trust на product page (**цель**)
 
-- Draft/listing до KYC/provider onboarding разрешены.
-- KYC/provider обязателен **до первой payout**; PSP/legal могут требовать раньше — implementation обязан уважать.
-- Seller/Publishing Agreement до first paid publication/transaction по legal gate.
-- Verified Seller не входной билет.
+Раздельно: seller verification; product moderation; build malware-scan; source model; DRM; verified reviews; update recency; delist/archive. **Не** один badge `Trusted`.
 
-### 3.4 Organization products (**цель**)
-
-`manage_products`: edit metadata, upload builds, releases, support, moderation responses. Payout/billing/tax/provider — только Owner/Finance + stronger re-auth/audit. Org — economic actor (resources + payouts, если provider/legal позволяет); детали → SERVERS-ORGS / COMMERCIAL-FUTURE.
-
-### 3.5 Текущий runtime lifecycle
-
-**Текущий runtime:** free publish/moderation path существует; restore archived и release suspended возвращают **draft**, не published ([FLOWS.md](FLOWS.md) FLOW-20). Paid publish/checkout **выключены**. Авторский readiness overview — **предложение**.
-
----
-
-## 4. Версии, сканирование и публичная выдача
-
-### 4.1 Инвариант публичного ресурса (не ослаблять)
-
-**Публичная выдача файла требует:** допустимую **опубликованную** сборку **и** чистый результат сканирования с **идентификатором сканера** и **временем** проверки. Без этого — не `ready` и не downloadable public build.
-
-Каждая версия (**цель**) хранит: immutable artifact identity; SHA-256/size; scan provenance; version number; changelog; compatibility/dependencies; publication/moderation history. Changelog/version history обязательны для коммерческого listing.
-
-### 4.1a Human resource version compare (OPS-19 **A**)
-
-Для **новых** релизов канон — SemVer-like `MAJOR.MINOR.PATCH[-pre]` (PATCH может быть опущен в принятом вводе; при сравнении отсутствует как `0`). Опциональный ведущий `v` снимается для compare и uniqueness; precedence как SemVer (prerelease ниже release). Duplicate version identity **не** создаёт вторую сборку продукта (`builds_product_version_idx` / `BUILD_VERSION_EXISTS`).
-
-Поля остаются **раздельными** и не подменяют друг друга: build id; artifact hash/bytes; display app/product `version`; `mtaVersionTarget`; package evidence `schemaVersion`. Опубликованные исторические version strings и bytes **не** переписываются задним числом. Helpers: `@nexus/domain` (`compareResourceVersions`, `normalizeResourceVersionForStorage`, …) и `@nexus/validation` `resourceVersionSchema`.
-
-### 4.2 Download API и historical releases (**текущий runtime**)
-
-- `GET /api/products/:id/download` — latest safe published build.
-- `GET /api/products/:id/download?buildId=bld_…` — конкретная **сейчас** safe сборка **того же** product; никогда storage key / user path.
-- Сохраняются: auth, ownership/entitlement, publication, scan provenance, rate limits, size/hash metadata, audit.
-- Unknown / retired / quarantined / unscanned / other-product → отказ. Duplicate/malformed buildId → 400.
-- 200 объявляет фактический `X-Resource-Build-Id`; клиент не сохраняет pinned download при несовпадении.
-- Публичный `/market/[slug]/versions`: только published + trusted-clean builds free published resource; 12-row SQL `created_at DESC, id DESC`; без storage keys / quarantine reasons; `noindex, nofollow`; RU/EN: recorded scan ≠ гарантия будущего доступа; signature flag ≠ verification.
-- Кнопки library/detail — convenience, **не** authoritative grant. Версия может исчезнуть между render и click; текущая серверная авторизация важнее stale UI.
-- UI download trust surface (**цель** / частично runtime): product/build/version, SHA-256, malware scan, scanner/provenance, signature/integrity if any, release timestamp, source/DRM model, quarantine warning.
-
-**Live unknown / hardening:** гонка moderation между DB selection и object stream (нужен delivery lease / immutable revocation gate); независимая E2E проверка binary SHA-256 без trusted provider digest — later pass. CI/PostgreSQL подтверждение интеграционных тестов — по факту runner.
-
-Сценарии latest vs pinned, progress/cancel/receipt — [FLOWS.md](FLOWS.md) §8; успех передачи ≠ установка.
-
-### 4.3 Claim / получение free (**текущий runtime** + цель FLOW-01)
-
-Бесплатный путь: `/acquire?productId=…` → сессия → claim → library/download. Auth return target и «Открыть библиотеку» → [FLOWS.md](FLOWS.md). Save / release watch / discussion follow — разные действия; watch требует current download access + published + safe build.
-
----
-
-## 5. Библиотека и коллекции
-
-### 5.1 Приватная библиотека прав (**текущий runtime**)
-
-**Выбор версии:** запись через `POST /api/library/releases/:id` требует `X-Nexus-Actor-Id` исходного пользователя; клиенты API должны передавать этот заголовок. При неизвестном результате интерфейс сохраняет исходную команду в текущем экране для точного повтора.
-
-Маршрут `/workspace/library` (замена полной загрузки всех entitlements/licenses в память):
-
-| Правило                    | Содержание                                                                                                                 |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Выборка                    | Счётчик `all / ready / unavailable`, затем страница; порядок `MAX(grant.created_at) DESC, resource_id ASC`                 |
-| Размер                     | ≤12 на странице; preview кабинета ≤4                                                                                       |
-| Право `product.download`   | Действующие user entitlements с permission **или** исторические активные licenses с неистёкшим сроком; дубли → одна строка |
-| Не создают карточку        | Отозванные / suspended / expired licenses; expired entitlements; права `product.update`                                    |
-| `ready`                    | Опубликованный продукт **и** ≥1 опубликованная сборка с `clean`-сканом, именем сканера и временем                          |
-| Недоступный ранее acquired | Остаётся в private library **без** утечки title/slug/version/download                                                      |
-| Historical paid            | Только при действующем праве; **не** открывает checkout                                                                    |
-| `ready` label              | Подсказка, **не** авторизация: download снова проверяет session, права, статус, trusted scan, audit                        |
-| Локализация / SEO          | RU/EN; robots noindex                                                                                                      |
-
-Коммерческие платежи, DRM и выдача **новых** платных лицензий этим контуром **не** реализуются.
-
-### 5.2 Целевые режимы Buyer Library (**цель**)
-
-`Purchased` / `Free` (claimed) / `Trials` / `Licenses` / `Updates` / `Support` / `Invoices`. Фильтры: type, seller, server binding, DRM, updates, access expiration. Каждый item показывает availability и reason при restriction.
-
-### 5.3 Коллекции (**текущий runtime**; сценарий → FLOWS FLOW-07)
-
-Приватные: лимиты 30 collections / 200 items / batch 20. Добавление ≠ watch; архив коллекции ≠ отзыв доступа. Public/shared collections не подразумеваются. **Не** versioned server pack.
-
-`POST /api/library/collections` требует `X-Nexus-Actor-Id` с ID исходного аккаунта; отсутствие заголовка даёт 428, смена аккаунта — 409. Create и duplicate сохраняют исходный `requestId` и команду в хранилище текущей вкладки для точного повтора после неопределённого ответа; без доступного хранилища отправка не начинается.
-
-### 5.4 Read-only historical archive (**текущий runtime**)
-
-Authenticated, `noindex`; без изобретения payment/payout/invoice/DRM provider:
-
-| Маршрут                | Что видно                                         | Чего нет                                                             |
-| ---------------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
-| `/workspace/purchases` | Historical order numbers, statuses, dates, totals | Payment tokens, emails, private provider data                        |
-| `/workspace/licenses`  | Titles, expiration, model, boolean server-binding | Secret keys, entitlement JSON, server IDs; `Active` ≠ download grant |
-| `/workspace/sales`     | Completed line items автора; gross line prices    | Buyer identity; withdrawable balance / fees / payout auth            |
-
-Ownership predicates + 20-row `created_at, id` DESC. Это **не** target cart/purchase workflow.
-
----
-
-## 6. Лицензии, доступ после продажи и retention
-
-> Commerce checkout/payment/settlement → [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md). Здесь — права доступа к ресурсу.
-
-**Текущий API управления:** изменения лицензии и чтение доступных серверов требуют `X-Nexus-Actor-Id` исходного пользователя. Одноразовый runtime token показывается только в текущем экране и очищается при потере фокуса или скрытии вкладки; потерянный ответ с токеном не восстанавливается. Это не включает платный checkout.
-
-### 6.1 License scope (**цель**, OWNER)
-
-**Одна лицензия = один MTA server.** Несколько серверов → отдельные license units. Unlimited/multi-server SKU не default без отдельного owner decision.
-
-Покупка **до** server binding. Unbound paid license: **30-дневное activation window** → иначе `activation_expired` (не авто-refund). Уведомления **7 / 3 / 1** день до конца окна. Срок окна ≠ договорный срок уже активированной лицензии.
-
-Trial (**цель**): seller-enabled, не обязателен; отдельный от Purchase; срок; server binding; download/activation limits; DRM lease если включён; conversion path; anti-abuse; visibly ≠ paid ownership; не становится permanent простым recreate.
-
-Wishlist (**цель**): notifications о discount / new version / availability / Free↔Premium / seller announcement (opt-in); не purchase intent; не влияет на trust/reviews.
-
-Support term (**цель**): отдельное право от ownership/update; product page до покупки показывает срок, состав, response expectations, канал unified support.
-
-Update entitlement (**цель**): будущие updates бесплатно по умолчанию в той же product/SKU/license family при active entitlement, пока seller не меняет scope через прозрачную migration.
-
-### 6.2 Delist / seller-ban / free retention (**цель**, OWNER)
-
-| Случай                  | Правило                                                                                                                                                                                                       |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Добровольный delist     | Новые purchases stop; buyers видят status/reason; **30 дней** download/access window; после — permanent redownload **не гарантируется**; правило видно buyer **до оплаты** и seller **до confirm**            |
-| Seller ban              | Good-faith buyers: 30-day transition; payout/dispute freeze по policy; malware/legal может закрыть download сразу; notification насколько позволяет safety/legal                                              |
-| Delist freeze releases  | В 30-day window seller **не** выпускает security hotfix обычным release flow; критичный дефект → platform security/moderation                                                                                 |
-| DRM после окна          | 30 дней = hosting/redownload, **не** авто-обрыв уже активированной DRM-license; perpetual не получает искусственный expiry от delist; time-limited/subscription до оплаченного конца; malware/legal supersede |
-| Existing copies         | NEXUS может прекратить hosting; не заявляет «удаление» уже скачанных binaries у пользователя                                                                                                                  |
-| Free resource retention | Safe free **не обязан** удаляться через 30 дней только из-за paid policy; дольше при отсутствии malware/legal, допустимой storage policy, валидных provenance/scan, ясном archived/unsupported UI             |
-
-### 6.3 Reviews (**цель**)
-
-Paid review → confirmed purchase. Free → confirmed claim/acquisition. Update review после новой версии с историей/last-updated; seller не «обнуляет» feedback релизом. Отказы/исключения автора — [FLOWS.md](FLOWS.md) FLOW-18.
-
-### 6.4 Cart / checkout (**цель**; не runtime paid)
-
-Multi-item cart; guest cart = convenience (цены не reservation); checkout требует login + verified email; server revalidates всё перед payment intent; invalid item объясняется явно (не silent price change/remove). Order → per-item Purchase/License. Webhook не создаёт доступ без idempotent domain transition. Offline/PWA: cached library metadata ok; payment/activation/transfer **blocked** с ясным Offline.
-
-**Текущий runtime:** paid checkout disabled.
-
----
-
-## 7. Workspace: buyer и seller экраны
-
-### 7.1 Workspace navigation (**цель**)
-
-Overview / Library·Purchases / Resources / Servers / Organizations / Deals·Services / Support / Billing·Subscriptions / Security shortcuts / Staff surfaces. Нет доступа → скрыть или честный onboarding CTA. Overview = actionable only, не копия Home.
-
-### 7.2 Buyer landing / purchase detail (**цель**)
-
-Landing: recent purchases; licenses waiting activation; updates; support/dispute; wishlist changes; invoices where supported.
-
-Purchase detail tabs: Overview / Downloads / License / Updates / Support / Invoice / Dispute — order identity, SKU, paid amount, entitlement, binding, DRM/lease, update history, support term, receipt, dispute, 30-day transition notice. Client success ≠ server purchase/license state.
-
-### 7.3 Seller dashboard / products / analytics (**цель**)
-
-KPI: Revenue / Pending / Sales / Conversion / Refunds. Product Health, action queue, support/disputes, moderation, releases, promotions, subscription, payout/KYC.
-
-Products table: Status / Version / Price / Sales / Rating / Support / DRM / Last update / Risk.
-
-Analytics: date range, product compare, funnel view→cart→purchase, revenue, refunds, downloads, version adoption; geography только privacy-safe; без лишнего buyer PII; operational facts ≠ estimated attribution.
-
-Promotions manager (**цель**): boosts/featured/schedule; sponsored явно labelled; не переписывает organic rank тайно (реклама → UX / COMMERCIAL-FUTURE).
-
-Seller support: unified inbox; subscription может дать **операционный** приоритет NEXUS-обработки; **никогда** не покупает dispute/moderation outcome, verification/trust, security bypass. Среднее response time **не обязательно** публичный reputation signal.
-
-Delist/archive UX: unlist доступен; history/buyer records survive; public page с reason без purchase CTA.
-
-### 7.4 Trust presentation на product page (**цель**)
-
-Различать отдельно: seller verification; product moderation; build malware-scan; source model; DRM; verified purchase reviews; update recency; delist/archive. **Не** сводить к одному badge `Trusted`.
-
----
-
-## 8. Отказы и non-goals (ресурсы)
-
-Не начинать first commerce с: custom crypto custody; самодельный wallet без legal need; сложный ad auction; dozens unrelated categories; DRM с per-customer recompilation (commerce non-goals → COMMERCIAL-FUTURE).
+## Ошибки и non-goals
 
 Не делать:
 
+- выдачу без published + clean scan (scanner id + time);
 - отдельные accounts Buyer/Seller/Server Owner;
 - dashboard redirect после каждого login;
-- finance/admin widgets без permission;
-- role-frontend, несовместимый с multi-role;
 - subscription ≡ trust/verification;
 - молчаливую подмену цены/SKU/build;
-- выдачу без published + clean scan (scanner id + time);
-- объявление коллекций versioned server packs;
-- активацию real payments в free closed beta.
+- коллекции как versioned server packs;
+- реальные платежи в free beta;
+- custom crypto custody / ad auction как first commerce.
 
----
+## Сводка runtime vs цель
 
-## 9. Сводка статусов
+| Тема | Runtime | Цель |
+| ---- | ------- | ---- |
+| Free claim, library, download gates | Да | UX FLOW-01/17 |
+| Historical + pinned download | Да | Сохранить gates |
+| Private collections | Да | FLOW-07 UX |
+| Paid cart/checkout/DRM/payout | Выкл. | Lifecycle + 1 license=1 server |
+| Publish wizard / KYC | Частичный free path | Полный wizard + states |
+| Trial / Wishlist / multi-SKU | Нет | С commerce phase |
 
-| Тема                                   | Текущий runtime                | Цель владельца                        | Предложение / Live unknown                 |
-| -------------------------------------- | ------------------------------ | ------------------------------------- | ------------------------------------------ |
-| Free claim, library, download gates    | Да                             | Усиление UX FLOW-01/17                | Auth return gaps — FLOWS                   |
-| Historical versions + pinned download  | Да                             | Сохранить gates                       | Read/stream race; E2E hash — live unknown  |
-| Private collections                    | Да (private only)              | FLOW-07 UX                            | Public/shared, server packs — нет / future |
-| Paid cart/checkout/DRM/payout          | Выключено                      | Полный lifecycle + 1 license=1 server | Не строить без owner + COMMERCIAL gates    |
-| Publish wizard / auto-publish / KYC UX | Частичный free path            | Полный wizard + states                | Readiness overview — предложение           |
-| Buyer/Seller professional dashboards   | Overview/library/sales archive | Полный KPI/analytics set              | Org-wide finance roles — future            |
-| Trial / Wishlist / multi-SKU           | Нет в beta commerce            | Owner-confirmed                       | Активация только с commerce phase          |
+## Связь с кодом и источниками
 
----
+Код: `product-service`, `build-*`, `library-*`, download routes, ClamAV. Архитектура storage/scanner — [ARCHITECTURE](ARCHITECTURE.md). Ops — [OPERATIONS](OPERATIONS.md).
 
-## 10. Источники и авторитет
-
-Перенесённый смысл (resource/library/publishing/access):
-
-1. [handbook/23-MARKETPLACE-PRODUCT-LIFECYCLE.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/23-MARKETPLACE-PRODUCT-LIFECYCLE.md) (история; актуальный контракт — этот файл)
-2. [handbook/28-CART-LICENSES-AND-ACCESS-RIGHTS.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/28-CART-LICENSES-AND-ACCESS-RIGHTS.md) (история; актуальный контракт — этот файл) — resource/access; commerce → COMMERCIAL-FUTURE
-3. [handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/33-WORKSPACE-DASHBOARDS-AND-LIBRARY.md) (история; актуальный контракт — этот файл)
-4. [handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md) (история; актуальный контракт — этот файл)
-5. [handbook/39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/39-SELLER-PUBLISHING-KYC-AND-CATALOG-STATES.md) (история; актуальный контракт — этот файл)
-6. [handbook/46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md) (история; актуальный контракт — этот файл)
-7. [handbook/47-SELLER-CREATOR-SCREENS.md](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/docs/handbook/47-SELLER-CREATOR-SCREENS.md) (история; актуальный контракт — этот файл)
-
-Смежные контракты без дублирования: [PRODUCT.md](PRODUCT.md), [FLOWS.md](FLOWS.md), [UX-CONTRACT.md](UX-CONTRACT.md), [DECISIONS.md](DECISIONS.md) + [handbook/13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md).
-
-**Пока DOC-04 не завершён, исходные главы handbook остаются авторитетными** при любом расхождении с этим черновиком. Этот файл — интегрированный DOC-05 draft subject contract, не разрешение удалять handbook и не активация commerce.
-
-Resource creation (`POST /api/products`) and build submission (`POST /api/products/:id/builds`) require `X-Nexus-Actor-Id` matching the authenticated session. Missing headers return 428; changed accounts return 409. Clients must keep the original actor and exact submission when a response is lost. The author form keeps an actor-scoped pending intent and requires the same filename and SHA-256 after a reload; an exact retry can recover the existing draft or pending build. A failed recovery attempt, including rate limiting, does not establish that an earlier request failed.
+Исторический смысл DOC-05 (главы 23/28/33/34/39/46/47) — в Git @ `385e577e…`. Актуальный контракт — этот файл после DOC-04.
