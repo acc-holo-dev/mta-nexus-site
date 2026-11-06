@@ -52,6 +52,7 @@ export async function CommunityReportHistoryPage({
     return (
       <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
         <ErrorState
+          id="community-report-history-unavailable"
           title={reportHistoryError(
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
