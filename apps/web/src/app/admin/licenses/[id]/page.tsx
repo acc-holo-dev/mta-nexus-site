@@ -43,6 +43,7 @@ export default async function ModerateLicensePage({ params }: { params: Promise<
           {copy.moderation}
         </Link>
         <ErrorState
+          id="admin-license-detail-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={retryHref} className={navLinkClass}>
