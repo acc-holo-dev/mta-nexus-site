@@ -31,6 +31,7 @@ export default async function RegisterServerPage() {
   } catch {
     return (
       <ErrorState
+        id="servers-new-session-unavailable"
         title={locale === "ru" ? "Не удалось проверить сессию" : "Could not check your session"}
         description={
           locale === "ru"
