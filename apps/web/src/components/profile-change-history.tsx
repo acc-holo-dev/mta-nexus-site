@@ -56,6 +56,7 @@ export function ProfileChangeHistoryView({
       />
       {!data ? (
         <ErrorState
+          id="profile-change-history-unavailable"
           title={error ?? copy.unavailable}
           action={
             <Link href={changeHistoryHref(path, filters, { fresh: true })} className={navLinkClass}>
