@@ -69,6 +69,7 @@ export default async function OrderDetailsPage({
           {copy.backToPurchases}
         </Link>
         <ErrorState
+          id="purchase-detail-load-unavailable"
           title={copy.orderLoadUnavailable}
           description={copy.orderLoadUnavailableHint}
           action={
