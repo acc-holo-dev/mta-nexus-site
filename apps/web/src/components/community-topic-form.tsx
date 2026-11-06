@@ -300,7 +300,11 @@ export function CommunityTopicForm({ actorId = null }: { actorId?: string | null
   return (
     <>
       {(!identityVerified || foreignActor) && error && (
-        <ErrorState title={error} description={copy.createErrorDescription} />
+        <ErrorState
+          id="community-topic-form-unavailable"
+          title={error}
+          description={copy.createErrorDescription}
+        />
       )}
       {(!actorId || !identityVerified || foreignActor) && (
         <div className="space-y-1">
