@@ -120,6 +120,7 @@ export default async function ApprovalHistoryPage({
       </a>
       {error && (
         <ErrorState
+          id="user-trust-history-unavailable"
           title={error}
           action={
             <a href={latest} className={actionLinkClass}>
