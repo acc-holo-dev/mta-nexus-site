@@ -38,6 +38,7 @@ function ResourceRequirementsLoadError({
         {copy.back}
       </Link>
       <ErrorState
+        id="resource-requirements-load-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
