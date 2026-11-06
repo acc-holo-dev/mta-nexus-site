@@ -165,6 +165,7 @@ export function ContextSwitcher() {
 
       {error ? (
         <ErrorState
+          id="context-switcher-unavailable"
           title={error}
           description={copy.errorHint}
           className="items-stretch py-4"
