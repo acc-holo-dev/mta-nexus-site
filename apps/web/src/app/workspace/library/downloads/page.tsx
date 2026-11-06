@@ -74,6 +74,7 @@ export default async function ResourceDownloadsPage({
           {copy.library}
         </Link>
         <ErrorState
+          id="workspace-library-downloads-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link href={resourceDeliveriesUrl(query)} className={navLinkClass}>
