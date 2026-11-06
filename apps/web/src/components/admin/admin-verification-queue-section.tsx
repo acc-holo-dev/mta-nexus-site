@@ -22,6 +22,10 @@ type VerificationRequest = {
   organizationSlug?: string | null;
   currentSpecialties?: string[] | null;
   currentGithubUrl?: string | null;
+  serverName?: string | null;
+  serverSlug?: string | null;
+  claimScope?: "personal" | "organization" | null;
+  proofMatchesServer?: boolean | null;
   proofUrl?: string | null;
   reviewNotes?: string | null;
   resolvedAt?: Date | string | null;
@@ -39,6 +43,7 @@ export function AdminVerificationQueueSection({
   verificationRequests,
   moreVerifications,
   verificationHref,
+  focusedVerificationId = null,
 }: {
   locale: Locale;
   copy: AdminCopy;
@@ -49,6 +54,7 @@ export function AdminVerificationQueueSection({
   verificationRequests: VerificationRequest[];
   moreVerifications: boolean;
   verificationHref: (view: "pending" | "history", page: number) => string;
+  focusedVerificationId?: string | null;
 }) {
   return (
     <section>
@@ -78,14 +84,25 @@ export function AdminVerificationQueueSection({
           verificationRequests.map((request) => (
             <div
               key={request.id}
-              className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
+              id={`verification-${request.id}`}
+              data-verification-focus={focusedVerificationId === request.id ? "true" : undefined}
+              className={`nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center${
+                focusedVerificationId === request.id
+                  ? " ring-2 ring-[color:var(--nexus-accent)] ring-offset-2 ring-offset-[var(--nexus-page)]"
+                  : ""
+              }`}
             >
               <div className="min-w-0 space-y-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
                     {request.targetType}
                   </span>
-                  <span className="truncate font-code text-xs font-heading text-primary">
+                  {request.serverName ? (
+                    <span className="min-w-0 break-words text-sm font-semibold text-primary">
+                      {request.serverName}
+                    </span>
+                  ) : null}
+                  <span className="truncate font-code text-xs font-heading text-muted">
                     {request.targetId}
                   </span>
                 </div>
@@ -99,6 +116,36 @@ export function AdminVerificationQueueSection({
                     {verificationApplicationsCopy(locale).updated}
                   </p>
                 )}
+                {request.claimScope === "personal" ? (
+                  <p className="text-xs text-secondary">{copy.verificationClaimPersonal}</p>
+                ) : null}
+                {request.claimScope === "organization" ? (
+                  <p className="text-xs text-secondary">{copy.verificationClaimOrganization}</p>
+                ) : null}
+                {request.proofMatchesServer === true ? (
+                  <p className="text-xs text-secondary">{copy.verificationProofCurrent}</p>
+                ) : null}
+                {request.proofMatchesServer === false ? (
+                  <p role="note" className="text-xs text-warning">
+                    {copy.verificationProofStale}
+                  </p>
+                ) : null}
+                {request.serverSlug ? (
+                  <Link
+                    href={`/servers/${encodeURIComponent(request.serverSlug)}`}
+                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.verificationOpenServer}
+                  </Link>
+                ) : null}
+                {request.targetType === "server" ? (
+                  <Link
+                    href={`/workspace/servers/${encodeURIComponent(request.targetId)}`}
+                    className="block text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  >
+                    {copy.verificationManagedServer}
+                  </Link>
+                ) : null}
                 {request.targetUsername && (
                   <Link
                     href={`/users/${encodeURIComponent(request.targetUsername)}`}

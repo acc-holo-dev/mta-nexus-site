@@ -18,7 +18,9 @@ export type VerificationNotificationDeliveryStats = Readonly<{
   oldestAgeSeconds: number;
 }>;
 
-const VERIFICATION_PENDING_LINK = "/admin?verificationView=pending&verificationPage=1";
+function verificationPendingLink(verificationRequestId: string) {
+  return `/admin?verificationView=pending&verificationId=${encodeURIComponent(verificationRequestId)}#verification-${encodeURIComponent(verificationRequestId)}`;
+}
 
 function noticeCopy(event: "application" | "server_claim") {
   if (event === "server_claim") {
@@ -102,7 +104,7 @@ export class VerificationNotificationDeliveryRepository {
                 recipientId: recipient.id,
                 title: copy.title,
                 message: copy.message,
-                link: VERIFICATION_PENDING_LINK,
+                link: verificationPendingLink(job.verificationRequestId),
                 type: "security",
                 category: "security",
               },

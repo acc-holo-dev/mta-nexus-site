@@ -21,6 +21,14 @@ export const admin = {
     verificationHistory: "История решений",
     verificationPages: "Страницы верификации",
     verificationProof: "Открыть доказательство",
+    verificationOpenServer: "Открыть публичную страницу сервера",
+    verificationManagedServer: "Открыть статус claim в управлении сервером",
+    verificationClaimPersonal: "Заявка на личное владение",
+    verificationClaimOrganization: "Заявка на владение организацией",
+    verificationProofCurrent:
+      "Доказательство контроля совпадает с текущим endpoint и областью владения сервера.",
+    verificationProofStale:
+      "Доказательство контроля больше не совпадает с текущим endpoint или областью владения.",
     noVerificationHistory: "Решений по верификации пока нет.",
     pendingRequests: "запросов ожидают решения",
     requester: "Автор запроса",

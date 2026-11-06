@@ -37,6 +37,13 @@ describe("verification queue query", () => {
       null,
       null,
       null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       `audit-${index}`,
       "verification.application_updated",
     ]);
@@ -46,6 +53,10 @@ describe("verification queue query", () => {
     expect(result.requests[0]).toMatchObject({
       applicationRevision: verificationApplicationRevision("ver-0", "pending", "audit-0"),
       evidenceUpdated: true,
+      serverName: null,
+      serverSlug: null,
+      claimScope: null,
+      proofMatchesServer: null,
     });
     expect(JSON.stringify(result)).not.toContain("evidenceEventId");
     expect(state.queries).toHaveLength(1);
@@ -54,6 +65,8 @@ describe("verification queue query", () => {
     expect(query.sql).toContain(
       '"audit_events"."actor_id" = "verification_requests"."requester_id"',
     );
+    expect(query.sql).toContain('"servers"');
+    expect(query.sql).toContain('"server_claim_challenges"');
     expect(query.sql).toContain('where "verification_requests"."status" =');
     expect(query.sql).toContain(
       'order by "verification_requests"."created_at" asc, "verification_requests"."id" asc',

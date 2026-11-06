@@ -17,6 +17,7 @@
 - Core free-beta journeys (auth return, library acquire/download honesty, inbox filters, release watch, discussion intent, Home personal changes, resource Q&A) реализованы локально.
 - Resource Q&A + platform abuse loop: member report UI на product/server/user; staff inbox deep link `reportId` + content moderationHref; reporter status notice → `/workspace/platform-reports`; discovery/follow mute hydration. Schema tip — `0089_resource_qa` (+ `0088`).
 - Collection release-posture loop: inventory / collection releases / library updates project watch state + follow-latest/open; collection watches page has per-item toggle (membership still does not auto-enroll watches).
+- Servers/orgs trust-staff: verification queue deep link `verificationId` + focused card; server claim/proof enrichment; ownership resolve notice → managed server; server report `moderationHref` → workspace claim status.
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.
