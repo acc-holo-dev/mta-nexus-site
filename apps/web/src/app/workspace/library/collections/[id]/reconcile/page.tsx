@@ -65,6 +65,7 @@ export default async function Page({
       return (
         <div className={pageShellClass}>
           <ErrorState
+            id="library-collection-reconcile-load-unavailable"
             title={m.reconcileLoadUnavailable}
             description={m.reconcileLoadUnavailableDescription}
             action={
