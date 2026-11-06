@@ -70,6 +70,7 @@ export default async function ResourceModerationDetail({
           {copy.moderation}
         </Link>
         <ErrorState
+          id="admin-resource-detail-unavailable"
           title={copy.loadUnavailable}
           action={
             <Link
