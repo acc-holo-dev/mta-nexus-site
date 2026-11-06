@@ -43,6 +43,7 @@ function ResourceReviewLoadError({
         {backLabel}
       </Link>
       <ErrorState
+        id="resource-review-report-load-unavailable"
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
