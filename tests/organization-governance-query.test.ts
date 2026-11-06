@@ -1,122 +1,42 @@
-import { getTableColumns } from "drizzle-orm";
-import { beforeEach, expect, it, vi } from "vitest";
+import { expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  queries: [] as { sql: string; params: unknown[] }[],
-  rows: [] as unknown[][][],
-  config: null as unknown,
-  failTable: "",
-  push: vi.fn(),
-}));
 vi.mock("../packages/db/src/client", async () => {
-  const { drizzle } = await import("drizzle-orm/pg-proxy");
-  const database = drizzle(async (sql, params) => {
-    state.queries.push({ sql, params });
-    if (state.failTable && sql.startsWith(`insert into "${state.failTable}"`))
-      throw new Error("write failed");
-    return {
-      rows:
-        sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
-    };
-  });
-  const proxy = new Proxy(database, {
-    get(target, key) {
-      if (key === "transaction")
-        return (callback: (tx: typeof database) => unknown, config: unknown) => {
-          if (config) state.config = config;
-          return callback(proxy);
-        };
-      const value = Reflect.get(target, key);
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-  return { db: proxy };
+  const { createOrganizationGovernanceQueryDbMock } = await import(
+    "./helpers/organization-governance-query-harness"
+  );
+  return createOrganizationGovernanceQueryDbMock();
 });
 vi.mock("../packages/db/src/repositories/initiating-session", async (original) => {
-  const actual =
-    await original<typeof import("../packages/db/src/repositories/initiating-session")>();
-  return {
-    lockInitiatingSession: (
-      tx: Parameters<typeof actual.lockInitiatingSession>[0],
-      actor: string,
-      token: string,
-    ) =>
-      token === "unit-token" ? Promise.resolve() : actual.lockInitiatingSession(tx, actor, token),
-  };
+  const { createOrganizationGovernanceQueryInitiatingSessionMock } = await import(
+    "./helpers/organization-governance-query-harness"
+  );
+  return createOrganizationGovernanceQueryInitiatingSessionMock(original);
 });
-vi.mock("../packages/db/src/repositories/web-push-admission-recovery", () => ({
-  enqueueWebPushWithRecoveryWithin: state.push,
-}));
+vi.mock("../packages/db/src/repositories/web-push-admission-recovery", async () => {
+  const { createOrganizationGovernanceQueryPushMock } = await import(
+    "./helpers/organization-governance-query-harness"
+  );
+  return createOrganizationGovernanceQueryPushMock();
+});
 
 import { db } from "../packages/db/src/client";
 import { storeOrganizationAccessNotice } from "../packages/db/src/repositories/organization-access-notice";
 import { organizationGovernanceRepository as repository } from "../packages/db/src/repositories/organization-governance";
 import { organizationWorkspaceRepository as workspace } from "../packages/db/src/repositories/organization-workspace";
 import { digestSessionToken } from "../packages/db/src/repositories/sessions";
-import { organizations } from "../packages/db/src/schema";
+import {
+  organizationGovernanceQueryInput as input,
+  installOrganizationGovernanceQueryHooks,
+  organizationGovernanceQueryLater as later,
+  organizationGovernanceQueryOrg as org,
+  organizationGovernanceQueryState as state,
+  organizationGovernanceQueryTime as time,
+  organizationGovernanceQueryTransferRows as transferRows,
+  organizationGovernanceQueryWrites as writes,
+} from "./helpers/organization-governance-query-harness";
 
-const time = "2026-10-11T00:00:00.000Z",
-  later = "2026-10-11T00:00:01.000Z";
-const org = (extra = {}) =>
-  Object.keys(getTableColumns(organizations)).map(
-    (key) =>
-      ({
-        id: "org",
-        name: "Team",
-        slug: "team",
-        ownerId: "owner",
-        description: null,
-        logoUrl: null,
-        websiteUrl: null,
-        isVerified: true,
-        createdAt: time,
-        updatedAt: time,
-        ...extra,
-      })[key as "id"],
-  );
-const input = {
-  id: "org",
-  actorId: "owner",
-  currentToken: "raw-owner-token",
-  targetId: "target",
-  targetUsername: "target",
-  confirmationSlug: "team",
-  expectedPasswordHash: "owner-password-hash",
-  formerOwnerRole: "member" as const,
-  expectedUpdatedAt: new Date(time),
-  memberId: "new-membership",
-  auditId: "audit",
-};
-const writes = (table: string) =>
-  state.queries.filter(
-    (query) =>
-      query.sql.startsWith(`insert into "${table}"`) || query.sql.startsWith(`update "${table}"`),
-  );
-function transferRows(
-  members = [
-    ["old-membership", "owner", "owner"],
-    ["target-membership", "target", "developer"],
-  ],
-) {
-  state.rows = [
-    [org()],
-    members,
-    [
-      ["owner", "owner", "Owner", null, "owner-password-hash"],
-      ["target", "target", "Target", null, "target-password-hash"],
-    ],
-    [["session", new Date(Date.now() + 3_600_000).toISOString()]],
-    [org({ ownerId: "target", updatedAt: later })],
-    [["session", new Date(Date.now() + 3_600_000).toISOString()]],
-  ];
-}
-beforeEach(() => {
-  state.queries = [];
-  state.rows = [];
-  state.config = null;
-  state.failTable = "";
-  state.push.mockReset().mockResolvedValue({ queued: 0, reason: "no_subscriptions" });
-});
+installOrganizationGovernanceQueryHooks();
+
 it("locks organization, stable memberships and actors, then the owned session before writes", async () => {
   transferRows();
   const result = await repository.transfer(input);
@@ -317,62 +237,3 @@ it.each(["removed", "left"] as const)(
     expect(writes("notifications")[0].params).toContain(id);
   },
 );
-it("reads manager-scoped history in a snapshot with explicit privacy-safe projections and stable keysets", async () => {
-  state.rows = [[org()], [["anchor", "2026-10-11T00:00:00.123456Z"]], []];
-  await repository.history("org", "owner", "anchor");
-  expect(state.config).toEqual({ isolationLevel: "repeatable read", accessMode: "read only" });
-  const anchor = state.queries[1];
-  expect(anchor.params).toEqual(expect.arrayContaining(["organization", "org", "anchor"]));
-  const page = state.queries[2];
-  expect(page.params).toEqual(
-    expect.arrayContaining(["2026-10-11T00:00:00.123456Z", "anchor", 21]),
-  );
-  expect(page.sql).toContain('order by "audit_events"."created_at" desc, "audit_events"."id" desc');
-  expect(page.sql.split(' from "audit_events"')[0]).not.toMatch(
-    /"details"[, ]|ip_address|user_agent|password|email|permissions/u,
-  );
-  expect(page.sql).toContain("jsonb_typeof");
-  expect(page.sql).toContain("limit 4");
-});
-it.each(["member", "developer", "owner"])(
-  "denies private history for nonmanager or stale owner membership %s",
-  async (role) => {
-    state.rows = [[org()], [[role]]];
-    await expect(repository.history("org", "other")).rejects.toMatchObject({ code: "FORBIDDEN" });
-    expect(state.queries).toHaveLength(2);
-  },
-);
-it("rejects foreign/missing anchors without falling back to another organization's history", async () => {
-  state.rows = [[org()], []];
-  await expect(repository.history("org", "owner", "foreign")).rejects.toMatchObject({
-    code: "ORGANIZATION_HISTORY_EXPIRED",
-  });
-  expect(state.queries).toHaveLength(2);
-  state.queries = [];
-  await expect(repository.history("org", "owner", "bad/id")).rejects.toMatchObject({
-    code: "VALIDATION_ERROR",
-  });
-  expect(state.queries).toHaveLength(0);
-});
-it("returns only twenty events and the actual final displayed ID as the next cursor", async () => {
-  state.rows = [
-    [org()],
-    Array.from({ length: 21 }, (_, index) => [
-      `audit_${index}`,
-      "organization.member_left",
-      time,
-      "actor",
-      "Actor",
-      null,
-      null,
-      "member",
-      null,
-      null,
-      [],
-    ]),
-  ];
-  const page = await repository.history("org", "owner");
-  expect(page.items).toHaveLength(20);
-  expect(page.hasMore).toBe(true);
-  expect(page.nextCursor).toBe("audit_19");
-});
