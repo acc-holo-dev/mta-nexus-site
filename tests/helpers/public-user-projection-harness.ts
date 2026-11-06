@@ -31,7 +31,7 @@ export async function createPublicUserProjectionDbMock() {
   };
 }
 
-export function resetPublicUserProjectionState() {
+function resetPublicUserProjectionState() {
   publicUserProjectionState.queries = [];
   publicUserProjectionState.results = [];
   publicUserProjectionState.failure = null;
