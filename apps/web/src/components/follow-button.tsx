@@ -20,9 +20,14 @@ type InitialFollowState = {
   following: boolean;
   self?: boolean;
   error?: boolean;
+  /** When present, SSR/API already hydrated mute; ObjectMuteControls skips its own fetch. */
   muted?: boolean;
   mutedUntil?: string | null;
 };
+
+function hasMuteHydration(initial?: InitialFollowState) {
+  return Boolean(initial && ("muted" in initial || "mutedUntil" in initial));
+}
 export function FollowButton(props: {
   targetType: FollowTargetType;
   targetId: string;
@@ -76,7 +81,14 @@ function FollowControl({
       : "checking",
   );
   const [actorId, setActorId] = useState(initial?.actorId ?? null);
-  const [mutedUntil, setMutedUntil] = useState<string | null>(initial?.mutedUntil ?? null);
+  const [mute, setMute] = useState<{ muted: boolean; mutedUntil: string | null } | null>(() =>
+    hasMuteHydration(initial)
+      ? {
+          muted: Boolean(initial?.muted ?? initial?.mutedUntil),
+          mutedUntil: initial?.mutedUntil ?? null,
+        }
+      : null,
+  );
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -92,6 +104,8 @@ function FollowControl({
     };
   }, []);
   useEffect(() => {
+    // Skip follow-state fetch when SSR already hydrated identity. Mute may still
+    // load via ObjectMuteControls when initial mute fields are absent.
     if (initial && attempt === 0 && (!initial.authenticated || initial.actorId)) return;
     let active = true;
     const controller = new AbortController();
@@ -114,7 +128,10 @@ function FollowControl({
           throw new Error("Invalid state");
         if (active) {
           setActorId(data.authenticated ? data.actorId : null);
-          setMutedUntil(typeof data.mutedUntil === "string" ? data.mutedUntil : null);
+          setMute({
+            muted: data.muted === true || typeof data.mutedUntil === "string",
+            mutedUntil: typeof data.mutedUntil === "string" ? data.mutedUntil : null,
+          });
           writeBlocked.current = !data.authenticated || data.self === true;
           setState(
             !data.authenticated
@@ -264,7 +281,7 @@ function FollowControl({
           targetId={targetId}
           actorId={actorId}
           locale={locale}
-          initial={{ muted: Boolean(mutedUntil), mutedUntil }}
+          initial={mute ?? undefined}
         />
       ) : null}
       {message && state !== "error" ? (

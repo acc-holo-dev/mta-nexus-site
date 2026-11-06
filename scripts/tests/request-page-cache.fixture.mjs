@@ -88,7 +88,12 @@ const mocks = {
     serverRepository: { pageActivePublicByOwner: emptyPage },
     contentRepository: { pagePublishedEditorialByOrganization: emptyPage },
   },
-  "auth-service": { authService: { getUserByUsername: (key) => read("user", key) } },
+  "auth-service": {
+    authService: {
+      getUserByUsername: (key) => read("user", key),
+      getSession: async () => null,
+    },
+  },
   "verification-workspace-service": {
     verificationWorkspaceService: {
       publicProfile: async () => ({

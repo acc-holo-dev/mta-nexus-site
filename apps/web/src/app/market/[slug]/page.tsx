@@ -11,8 +11,10 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { authEntryHref } from "../../../components/auth-return-path";
 import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
 import { FollowButton } from "../../../components/follow-button";
+import { ObjectReportForm } from "../../../components/object-report-form";
 import { ProductDependencyList } from "../../../components/product-dependency-list";
 import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
@@ -199,6 +201,7 @@ export default async function ProductDetailPage({
     releaseWatch,
     notificationPrefs,
     savedFollowIds,
+    productMute,
   ] = await Promise.all([
     managementAccess,
     user
@@ -228,12 +231,17 @@ export default async function ProductDetailPage({
     user
       ? followWorkspaceRepository.states(user.id, "product", [product.id]).catch(() => null)
       : Promise.resolve([] as string[]),
+    user
+      ? followWorkspaceRepository.muteState(user.id, "product", product.id).catch(() => null)
+      : Promise.resolve(null),
   ]);
   const hasAccess = isPublic && (canManageProduct || isLicensed || isAdmin);
   const saveInitial = {
     authenticated: Boolean(user),
+    actorId: user?.id ?? null,
     following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
     error: savedFollowIds === null,
+    ...(productMute ? { muted: productMute.muted, mutedUntil: productMute.mutedUntil } : {}),
   };
   // Download aside only shows provenance for the published current version; never invent clean.
   const downloadBuild = hasAccess
@@ -345,6 +353,14 @@ export default async function ProductDetailPage({
                       self: Boolean(user && user.id === product.authorId),
                     }}
                     locale={locale}
+                  />
+                  <ObjectReportForm
+                    targetType="product"
+                    targetId={product.id}
+                    locale={locale}
+                    authenticated={Boolean(user)}
+                    loginHref={authEntryHref("login", detailReturnPath)}
+                    registerHref={authEntryHref("register", detailReturnPath)}
                   />
                 </div>
               ) : null}

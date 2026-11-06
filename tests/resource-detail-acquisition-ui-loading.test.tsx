@@ -14,6 +14,7 @@ vi.mock("@nexus/db", () => ({
   },
   followWorkspaceRepository: {
     states: vi.fn(async () => [] as string[]),
+    muteState: vi.fn(async () => ({ muted: false, mutedUntil: null })),
   },
 }));
 

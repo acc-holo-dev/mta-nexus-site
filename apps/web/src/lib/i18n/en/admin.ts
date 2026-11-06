@@ -75,6 +75,7 @@ export const admin = {
     next: "Next",
     reporter: "Reported by",
     openReportedTarget: "Open reported target",
+    openStaffModeration: "Open staff moderation",
     removeReportedQaThread: "Remove question and resolve",
     removeReportedQaThreadNotes: "Staff removed the reported resource question.",
     targetTypes: {

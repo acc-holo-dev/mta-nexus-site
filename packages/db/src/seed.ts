@@ -6,6 +6,9 @@ import { type SeedOptions, seedBaseline } from "./seed-baseline";
 import { createSeedData } from "./seed-data";
 import { assertDevelopmentSeedAllowed } from "./seed-safety";
 
+// Baseline demo seed does not insert resource Q&A rows (migration 0089).
+// Use `pnpm db:seed:historical` when local UI needs Q&A threads/answers/follows.
+
 export async function runSeed(
   options: SeedOptions = {},
   environment: Record<string, string | undefined> = process.env,

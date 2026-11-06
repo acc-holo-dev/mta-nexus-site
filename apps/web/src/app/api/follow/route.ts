@@ -61,6 +61,13 @@ export async function GET(request: NextRequest) {
           parsed.data.targetId,
         );
         notifyComments = following;
+        const mute = await followWorkspaceRepository.muteState(
+          actor.id,
+          parsed.data.targetType,
+          parsed.data.targetId,
+        );
+        muted = mute.muted;
+        mutedUntil = mute.mutedUntil;
       }
     }
     return jsonWithRequestId(

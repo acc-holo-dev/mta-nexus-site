@@ -65,7 +65,7 @@ test("a move from a full-acceptance script to docs keeps full acceptance", (t) =
   });
 });
 
-test("a docs-only main push after a security push still requires full acceptance", (t) => {
+test("a docs-only main push stays docs-scoped while the prior security push stays full", (t) => {
   const root = mkdtempSync(join(tmpdir(), "nexus-ci-main-push-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const env = {
@@ -94,11 +94,13 @@ test("a docs-only main push after a security push still requires full acceptance
   const docs = git("rev-parse", "HEAD");
   const event = join(root, "event.json");
   const output = join(root, "output.txt");
-  // The second run can cancel the first even though its own diff is docs-only.
-  for (const [before, head] of [
-    [base, security],
-    [security, docs],
-  ]) {
+  // Docs-only tip pushes no longer force full_acceptance; security diffs still do.
+  // In-flight cancellation of an earlier full run is workflow policy, not this classifier.
+  const expectations = [
+    [base, security, { code: "true", unit_only: "false", full: "true" }],
+    [security, docs, { code: "false", unit_only: "false", full: "false" }],
+  ];
+  for (const [before, head, expected] of expectations) {
     git("checkout", "-q", "--detach", head);
     writeFileSync(event, JSON.stringify({ before }));
     writeFileSync(output, "");
@@ -121,11 +123,7 @@ test("a docs-only main push after a security push still requires full acceptance
           .split("\n")
           .map((line) => line.split("=")),
       ),
-      {
-        code: "true",
-        unit_only: "false",
-        full: "true",
-      },
+      expected,
     );
   }
 });

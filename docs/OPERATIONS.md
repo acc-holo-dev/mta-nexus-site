@@ -948,6 +948,11 @@ docker compose -p nexus-local -f compose.yaml exec \
   -e NEXUS_DEMO_SEED_ACK=development-only app pnpm db:seed:historical
 ```
 
+Resource Q&A demo threads/answers/follows are part of **`pnpm db:seed:historical`**,
+not the baseline `pnpm db:seed` catalog. After schema tip `0089_resource_qa`, run
+historical seed only when you need those fixtures for local UI rehearsal. The ordinary
+demo seed remains valid without Q&A rows.
+
 Every seed command fails before storage or database mutation when `NODE_ENV=production` or
 when the exact development-only acknowledgement is absent. Do not persist this acknowledgement
 in production configuration.

@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   detail: vi.fn(),
   session: vi.fn(),
   states: vi.fn(),
+  muteStates: vi.fn(),
   directory: vi.fn(),
   locale: "en" as "en" | "ru",
   ready: false,
@@ -28,7 +29,9 @@ vi.mock("next/navigation", () => ({
     throw new Error("TEST_NOT_FOUND");
   },
 }));
-vi.mock("@nexus/db", () => ({ followWorkspaceRepository: { states: mocks.states } }));
+vi.mock("@nexus/db", () => ({
+  followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
+}));
 vi.mock("@nexus/security", () => ({
   can: (actor: { role: string }) => ["moderator", "admin"].includes(actor.role),
 }));
@@ -86,6 +89,7 @@ beforeEach(() => {
   mocks.ready = false;
   mocks.session.mockResolvedValue({ id: "actor", role: "moderator" });
   mocks.states.mockResolvedValue([]);
+  mocks.muteStates.mockResolvedValue([]);
   mocks.directory.mockResolvedValue({ servers: [], isStale: false });
   mocks.stream.mockResolvedValue({
     type: "organizations",

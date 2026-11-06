@@ -4,7 +4,7 @@
 
 ## Текущий tip
 
-- **`origin/main` tip:** `3acacfdb` (docs tip honesty after #816/#819). Не объявлять verified-green без SUCCESS CI на exact SHA.
+- **`origin/main` tip:** обновлять после merge текущего pack. Не объявлять verified-green без SUCCESS CI на exact SHA.
 - **Последний verified-green tip:** `6cefa74e` / session-binding + order/storage/plan recovery — [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393).
 - Длинная серия tip-honesty / ErrorState residual PR после `6cefa74e` живёт в Git history; этот файл больше не дублирует каждый merge.
 
@@ -15,7 +15,7 @@
 ## Продуктовые и инженерные факты на tip
 
 - Core free-beta journeys (auth return, library acquire/download honesty, inbox filters, release watch, discussion intent, Home personal changes, resource Q&A) реализованы локально.
-- Resource Q&A: ask auto-follow; transactional content notices with structured data + RU/EN formatting and Home `resourceQa` reason; manager/staff remove; abuse report target `resource_qa_thread` + panel form. Schema tip — `0089_resource_qa` (live upgrade rehearsal ещё нужен).
+- Resource Q&A + platform abuse loop: member report UI на product/server/user; staff inbox deep link `reportId` + content moderationHref; reporter status notice → `/workspace/platform-reports`; discovery/follow mute hydration. Schema tip — `0089_resource_qa` (+ `0088`).
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.
@@ -25,7 +25,7 @@
 1. Только **`main`**: `git checkout main && git pull --ff-only` → чистый `git status`. Exact SHA → сначала GitHub CI для него. Читайте [AGENT.md](AGENT.md), этот файл, [PROBLEMS.md](PROBLEMS.md), `planning/tasks.json` (**64** `done` / **19** `not_started`). Markdown backlog — только через `python planning/tools/render_backlog.py`.
 2. Scratch (`scripts/_agent_*`, `.dsh-ops/`) в `.gitignore`. Не вести параллельные handoff-журналы.
 3. Defaults владельца — [DECISIONS.md](DECISIONS.md). Ads/commerce/GROW пилоты не активированы. **ErrorState residual / tip-honesty micro-PRs — не приоритет**, пока владелец не вернёт эту очередь.
-4. Schema tip: **`0089_resource_qa`** (+ `0088_follow_mute_and_notify_comments`). Forward-only; не `pnpm db:generate` на живой БД.
+4. Schema tip: **`0089_resource_qa`** (+ `0088_follow_mute_and_notify_comments`). Forward-only; не `pnpm db:generate` на живой БД. Q&A fixtures — `db:seed:historical`, не baseline seed.
 5. HTTP→service для новых write/составных путей.
 6. Push / GitHub settings / production deploy / платежи — только по прямому указанию владельца.
 7. Live drills **F03/F04** и **OPS-09/11** — только с допуском и evidence целевой среды.
@@ -35,7 +35,7 @@
 ## Свидетельства и ограничения
 
 - Green CI ≠ deploy. PASS только на exact SHA.
-- Upgrade/restore retained artifacts baseline = PASS для прежнего target; tip journal на 0089 требует нового disposable upgrade.
+- Upgrade contract target = `0089_resource_qa`. Local disposable migrate-to-tip PASS на compose Postgres; retained hosted CI upgrade artifact may still cite `0087_server_reviews` until the next hosted PASS.
 - GitHub: public; main protection на базе сверки отсутствовала. Settings не менять без поручения.
 - Tracker: 64 done / 19 open. `done` ≠ production enablement.
 

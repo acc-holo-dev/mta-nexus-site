@@ -1,6 +1,9 @@
 vi.mock("../../../components/follow-button", () => ({
   FollowButton: () => <button type="button">Follow</button>,
 }));
+vi.mock("../../../components/object-report-form", () => ({
+  ObjectReportForm: () => null,
+}));
 
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -30,7 +33,10 @@ vi.mock("@nexus/db", () => ({
   productRepository: { pagePublishedFreeByAuthor: state.products },
   serverRepository: { pageActivePublicByOwner: state.servers },
 }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/i18n-server", () => ({
+  getRequestLocale: async () => state.locale,
+  getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
+}));
 vi.mock("../../../lib/services/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));

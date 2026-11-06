@@ -7,11 +7,14 @@ const mocks = vi.hoisted(() => ({
   attributions: vi.fn(),
   viewer: vi.fn(),
   states: vi.fn(),
+  muteStates: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));
-vi.mock("@nexus/db", () => ({ followWorkspaceRepository: { states: mocks.states } }));
+vi.mock("@nexus/db", () => ({
+  followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
+}));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.viewer },
 }));
@@ -63,6 +66,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.viewer.mockResolvedValue(null);
   mocks.states.mockResolvedValue([]);
+  mocks.muteStates.mockResolvedValue([]);
   mocks.attributions.mockResolvedValue(new Map());
   mocks.page.mockResolvedValue({ type: "resources", items: [], page: 1, hasMore: false });
 });

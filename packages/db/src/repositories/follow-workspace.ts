@@ -88,6 +88,28 @@ class FollowWorkspaceRepository {
     return rows.map((row) => row.targetId);
   }
 
+  /** Active object mutes for a bounded discovery/detail grid (follow not required). */
+  async muteStates(actorId: string, targetType: TargetType, targetIds: readonly string[]) {
+    const ids = [...new Set(targetIds)].filter(validDiscussionId).slice(0, 50);
+    if (!ids.length) return [] as { targetId: string; mutedUntil: string }[];
+    const rows = await db
+      .select({
+        targetId: objectNotificationMutes.targetId,
+        mutedUntil: sql<string>`to_char(${objectNotificationMutes.mutedUntil} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+      })
+      .from(objectNotificationMutes)
+      .where(
+        and(
+          eq(objectNotificationMutes.userId, actorId),
+          eq(objectNotificationMutes.targetType, targetType),
+          inArray(objectNotificationMutes.targetId, ids),
+          gt(objectNotificationMutes.mutedUntil, sql`clock_timestamp()`),
+        ),
+      )
+      .limit(50);
+    return rows;
+  }
+
   async contentStates(actorId: string, targetIds: readonly string[]) {
     const ids = [...new Set(targetIds)].slice(0, 50);
     if (!ids.length) return [];

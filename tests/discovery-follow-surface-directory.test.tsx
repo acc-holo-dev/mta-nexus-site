@@ -13,7 +13,9 @@ vi.mock("@nexus/db", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(
     "./helpers/discovery-follow-surface-harness"
   );
-  return { followWorkspaceRepository: { states: mocks.states } };
+  return {
+    followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
+  };
 });
 vi.mock("../apps/web/src/lib/services/auth-service", async () => {
   const { discoveryFollowSurfaceMocks: mocks } = await import(

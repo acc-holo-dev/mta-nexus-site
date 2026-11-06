@@ -114,7 +114,12 @@ it("the real worker delivers moderator inbox without VAPID or a surviving HTTP c
             .digest("hex")}`,
         ),
       );
-    expect(inbox).toEqual([expect.objectContaining({ category: "security", link: "/admin" })]);
+    expect(inbox).toEqual([
+      expect.objectContaining({
+        category: "security",
+        link: `/admin?reportView=pending&reportId=${encodeURIComponent(reportId)}#report-${encodeURIComponent(reportId)}`,
+      }),
+    ]);
     const [job] = await db
       .select()
       .from(reportNotificationDeliveries)
