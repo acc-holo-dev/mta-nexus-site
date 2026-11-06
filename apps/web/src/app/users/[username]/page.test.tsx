@@ -20,10 +20,12 @@ const state = vi.hoisted(() => ({
   products: vi.fn(),
   servers: vi.fn(),
   directory: vi.fn(),
-  session: vi.fn(async (): Promise<{ id: string; role: string } | null> => ({
-    id: "viewer",
-    role: "user",
-  })),
+  session: vi.fn(
+    async (): Promise<{ id: string; role: string } | null> => ({
+      id: "viewer",
+      role: "user",
+    }),
+  ),
   followStates: vi.fn(async (): Promise<string[]> => []),
   muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));

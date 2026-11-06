@@ -68,13 +68,8 @@ vi.mock("@nexus/ui", async () => {
   return {
     TrustBadge: ({ label }: { label: string }) =>
       React.createElement("span", { "data-testid": "trust-badge" }, label),
-    Button: ({
-      children,
-      ...props
-    }: {
-      children?: ReactNode;
-      [key: string]: unknown;
-    }) => React.createElement("button", props, children),
+    Button: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) =>
+      React.createElement("button", props, children),
     ErrorState: ({ title }: { title: string }) =>
       React.createElement("div", { role: "alert" }, title),
   };

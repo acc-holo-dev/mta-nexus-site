@@ -121,7 +121,9 @@ export default async function ServerDetailPage({
         ? followWorkspaceRepository.states(reportViewer.id, "server", [server.id]).catch(() => null)
         : Promise.resolve([] as string[]),
       reportViewer
-        ? followWorkspaceRepository.muteState(reportViewer.id, "server", server.id).catch(() => null)
+        ? followWorkspaceRepository
+            .muteState(reportViewer.id, "server", server.id)
+            .catch(() => null)
         : Promise.resolve(null),
     ]);
   const followInitial = buildFollowInitialState({
