@@ -81,6 +81,7 @@ export async function LibraryMembershipHistoryScreen({
               {m.history}
             </Link>
             <ErrorState
+              id="library-membership-history-unavailable"
               title={m.loadUnavailable}
               action={
                 <Link
