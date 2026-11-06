@@ -60,6 +60,7 @@ export async function SupportMessagePage({
     return (
       <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
         <ErrorState
+          id="support-message-unavailable"
           title={supportMessageError(
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
