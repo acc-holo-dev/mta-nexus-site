@@ -59,7 +59,8 @@ def main() -> None:
     tracker = data.get("tracker") or {}
     head = f"""# Roadmap MTA NEXUS — рабочая редакция v1
 
-Сформирован из `planning/tasks.json`; вручную это представление не редактируется. База `{data['baseline_sha']}`, дата {data['as_of']}.
+**Статус:** derived · не править вручную (`python planning/tools/render_backlog.py`).  
+Сформирован из `planning/tasks.json`. База `{data['baseline_sha']}`, дата {data['as_of']}.
 
 **Рабочий tracker (DOC-03):** `{tracker.get('mode', 'unknown')}`. Живой статус исполнения — только в `planning/tasks.json`. Замороженный import baseline: `{tracker.get('import_baseline', 'planning/import-baseline/')}`. GitHub Issues: `{(tracker.get('issues_import') or {}).get('status', 'unknown')}` (нужен `github_settings`). Контракт: [TRACKER.md](../planning/TRACKER.md).
 
@@ -132,6 +133,7 @@ F6 намеренно не содержит детального execution backl
 
     cards = """# Карточки задач MTA NEXUS
 
+**Статус:** derived · не править вручную (`python planning/tools/render_backlog.py`).  
 Сгенерировано из `planning/tasks.json`. Команды проверок в карточках — план проверки, а не выполненный PASS, пока `execution_state` не `done` и нет свидетельств. Читайте только выбранную задачу и её зависимости. Источники закреплены на baseline SHA. Рабочий tracker: [TRACKER.md](../planning/TRACKER.md).
 
 """

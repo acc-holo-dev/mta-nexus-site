@@ -9,7 +9,7 @@
 
 | Поле | Значение |
 | ---- | -------- |
-| Tip `origin/main` (на дату среза) | `3acacfdb` — tip honesty за db581132 после #819 |
+| Tip `origin/main` (на дату среза) | `3acacfdb` |
 | Последний зафиксированный verified-green tip | `6cefa74e` — session-binding / recovery wave; [CI 41977081393](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/41977081393) SUCCESS |
 | Правило | PASS только на exact SHA. Зелёный CI ≠ production deploy. Не объявлять tip verified-green без SUCCESS на текущем SHA. |
 

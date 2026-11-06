@@ -1,5 +1,6 @@
 # Карточки задач MTA NEXUS
 
+**Статус:** derived · не править вручную (`python planning/tools/render_backlog.py`).  
 Сгенерировано из `planning/tasks.json`. Команды проверок в карточках — план проверки, а не выполненный PASS, пока `execution_state` не `done` и нет свидетельств. Читайте только выбранную задачу и её зависимости. Источники закреплены на baseline SHA. Рабочий tracker: [TRACKER.md](../planning/TRACKER.md).
 
 ## DOC-01 — Зафиксировать baseline решений и карту всех документов
