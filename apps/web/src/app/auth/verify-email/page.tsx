@@ -85,6 +85,7 @@ export default function VerifyEmailPage() {
 
         {state.kind === "invalid" && (
           <ErrorState
+            id="verify-email-invalid"
             title={copy.invalidVerification}
             action={
               <Link href="/settings" className={navLinkClass}>
