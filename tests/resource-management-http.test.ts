@@ -1,48 +1,39 @@
-import { Readable } from "node:stream";
 import { AppError, NotFoundError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import { expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  user: { id: "usr_a", role: "developer" } as null | {
-    id: string;
-    role: "developer" | "moderator";
-  },
-  allowed: true,
-  command: vi.fn(),
-  managed: vi.fn(),
-  candidates: vi.fn(),
-  compatibility: vi.fn(),
-  authorize: vi.fn(),
-  download: vi.fn(),
-  findBuild: vi.fn(),
-  findManagedProduct: vi.fn(),
-}));
-vi.mock("@nexus/db", () => ({
-  resourceVariantsRepository: {
-    command: state.command,
-    managed: state.managed,
-    candidates: state.candidates,
-  },
-  resourceCompatibilityRepository: { update: state.compatibility },
-  buildReviewDownloadRepository: { authorize: state.authorize },
-  buildRepository: { findById: state.findBuild },
-}));
-vi.mock("@nexus/security", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@nexus/security")>()),
-  consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
-}));
-vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: async () => state.user },
-}));
-vi.mock("../apps/web/src/lib/services/product-service", () => ({
-  productService: { getManagedProduct: state.findManagedProduct },
-}));
+vi.mock("@nexus/db", async () => {
+  const { createResourceManagementHttpDbMock } = await import(
+    "./helpers/resource-management-http-harness"
+  );
+  return createResourceManagementHttpDbMock();
+});
+vi.mock("@nexus/security", async (importOriginal) => {
+  const { createResourceManagementHttpSecurityMock } = await import(
+    "./helpers/resource-management-http-harness"
+  );
+  return createResourceManagementHttpSecurityMock(importOriginal);
+});
+vi.mock("@nexus/storage", async () => {
+  const { createResourceManagementHttpStorageMock } = await import(
+    "./helpers/resource-management-http-harness"
+  );
+  return createResourceManagementHttpStorageMock();
+});
+vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+  const { createResourceManagementHttpAuthMock } = await import(
+    "./helpers/resource-management-http-harness"
+  );
+  return createResourceManagementHttpAuthMock();
+});
+vi.mock("../apps/web/src/lib/services/product-service", async () => {
+  const { createResourceManagementHttpProductMock } = await import(
+    "./helpers/resource-management-http-harness"
+  );
+  return createResourceManagementHttpProductMock();
+});
 
 import { consumeRateLimit } from "@nexus/security";
-import { GET as reviewer } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
 import {
   POST as compatibility,
   GET as readCompatibility,
@@ -52,56 +43,18 @@ import {
   GET as managed,
   POST as variants,
 } from "../apps/web/src/app/api/products/[id]/variants/route";
+import { browserMutationHeaders } from "./browser-mutation-headers";
+import {
+  resourceManagementHttpCommand as command,
+  resourceManagementHttpContext as context,
+  installResourceManagementHttpHooks,
+  resourceManagementHttpRequest as request,
+  resourceManagementHttpRevision as revision,
+  resourceManagementHttpState as state,
+} from "./helpers/resource-management-http-harness";
 
-const context = { params: Promise.resolve({ id: "prd_a" }) },
-  revision = "2026-10-10T00:00:00.000Z";
-const command = {
-  action: "save",
-  expectedGroupId: null,
-  expectedRevision: 0,
-  title: "Resource variants",
-  variants: [{ productId: "prd_a", label: "Base" }],
-  reason: "Group the resources",
-};
-function request(path: string, body?: unknown, headers: Record<string, string> = {}) {
-  return new NextRequest(
-    `https://nexus.test${path}`,
-    body === undefined
-      ? {}
-      : {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers: {
-            ...browserMutationHeaders(),
-            "content-type": "application/json",
-            ...(path.includes("/compatibility") || path.endsWith("/variants")
-              ? { "x-nexus-actor-id": "usr_a" }
-              : {}),
-            ...headers,
-          },
-        },
-  );
-}
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
-beforeEach(() => {
-  stubBrowserMutationOrigin();
-  vi.clearAllMocks();
-  state.user = { id: "usr_a", role: "developer" };
-  state.allowed = true;
-  for (const mock of [
-    state.command,
-    state.managed,
-    state.candidates,
-    state.compatibility,
-    state.authorize,
-    state.download,
-    state.findBuild,
-    state.findManagedProduct,
-  ])
-    mock.mockReset();
-});
+installResourceManagementHttpHooks();
+
 it("requires an account for all private management APIs", async () => {
   state.user = null;
   for (const run of [
@@ -325,61 +278,4 @@ it("returns audited requirements without expanding the private product projectio
     expectedUpdatedAt: revision,
     compatibility: { dependencies: ["resource-b"] },
   });
-});
-function reviewFixture() {
-  state.user = { id: "usr_mod", role: "moderator" };
-  const build = {
-    id: "bld_a",
-    productId: "prd_a",
-    version: "1.0.0",
-    status: "pending_review",
-    scanStatus: "clean",
-    scanner: "scanner",
-    scannedAt: new Date(revision),
-    storageKey: "private/file.zip",
-    sha256Hash: "a".repeat(64),
-    fileSizeBytes: 4,
-    fileName: "file.zip",
-    mimeType: "application/zip",
-  };
-  const stream = Readable.from(Buffer.from("data"));
-  state.findBuild.mockResolvedValue(build);
-  state.download.mockResolvedValue({
-    stream,
-    meta: { sizeBytes: 4, sha256Hash: build.sha256Hash },
-  });
-  return { build, stream, context: { params: Promise.resolve({ buildId: "bld_a" }) } };
-}
-it("runs the final reviewer gate after opening storage and destroys bytes on a revoked grant", async () => {
-  const fixture = reviewFixture();
-  state.authorize.mockImplementation(async () => {
-    expect(state.download).toHaveBeenCalledOnce();
-    throw new AppError("Role revoked", 403, "FORBIDDEN");
-  });
-  const response = await reviewer(request("/api/admin/builds/bld_a/download"), fixture.context);
-  expect(response.status).toBe(403);
-  expect(fixture.stream.destroyed).toBe(true);
-  expect(state.authorize).toHaveBeenCalledWith({
-    actorId: "usr_mod",
-    auditId: expect.stringMatching(/^aud_/),
-    expected: fixture.build,
-  });
-  expect(response.headers.get("content-disposition")).toBeNull();
-});
-it("does not send bytes when the reviewer evidence changed during preparation", async () => {
-  const fixture = reviewFixture();
-  state.authorize.mockRejectedValue(new AppError("Artifact replaced", 409, "BUILD_STATE_CHANGED"));
-  const response = await reviewer(request("/api/admin/builds/bld_a/download"), fixture.context);
-  expect(response.status).toBe(409);
-  expect(fixture.stream.destroyed).toBe(true);
-  expect(await response.json()).toMatchObject({ code: "BUILD_STATE_CHANGED" });
-});
-it("delivers matching reviewer bytes only after final authorization succeeds", async () => {
-  const fixture = reviewFixture();
-  state.authorize.mockResolvedValue(undefined);
-  const response = await reviewer(request("/api/admin/builds/bld_a/download"), fixture.context);
-  expect(response.status).toBe(200);
-  expect(await response.text()).toBe("data");
-  expect(state.authorize).toHaveBeenCalledOnce();
-  expect(response.headers.get("cache-control")).toBe("private, no-store");
 });
