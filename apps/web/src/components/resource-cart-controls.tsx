@@ -287,7 +287,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
       ) : null}
       {uncertain && !busy ? (
         <div data-cart-state="pending">
-          <ErrorState title={receiptCopy.pending} />
+          <ErrorState id="resource-cart-pending" title={receiptCopy.pending} />
         </div>
       ) : null}
       {!cart.items.length ? (

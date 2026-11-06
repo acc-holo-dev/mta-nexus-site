@@ -11,7 +11,9 @@ const source = readFileSync(
 
 it("locks cart uncertain pending and unavailable notices to ErrorState", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={receiptCopy.pending} />");
+  expect(source).toContain('id="resource-cart-pending"');
+  expect(source).toContain('<ErrorState id="resource-cart-pending" title={receiptCopy.pending} />');
+  expect(source).not.toContain("<ErrorState title={receiptCopy.pending} />");
   expect(source).toContain('id="resource-cart-unavailable"');
   expect(source).toMatch(
     /unavailable \? \(\s*<ErrorState id="resource-cart-unavailable" title=\{copy\.unavailableNote\} \/>\s*\) : null/u,
