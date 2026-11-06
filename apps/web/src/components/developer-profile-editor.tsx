@@ -193,6 +193,7 @@ export function DeveloperProfileEditor({
       </form>
       {error ? (
         <ErrorState
+          id="developer-profile-editor-unavailable"
           title={error}
           action={
             <Button
