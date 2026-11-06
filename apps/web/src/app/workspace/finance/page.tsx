@@ -83,6 +83,7 @@ export default async function FinancialStatements({
           {copy.back}
         </Link>
         <ErrorState
+          id="workspace-finance-unavailable"
           title={copy.statementsLoadUnavailable}
           action={
             <Link href={returnHref} className={linkClass}>
