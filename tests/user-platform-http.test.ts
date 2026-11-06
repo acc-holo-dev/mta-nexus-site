@@ -1,57 +1,38 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { expect, it, vi } from "vitest";
+import { browserMutationHeaders } from "./browser-mutation-headers";
 
-const now = new Date("2026-10-10T12:00:00Z");
-const state = vi.hoisted(() => ({ user: null as Record<string, unknown> | null }));
-const mocks = vi.hoisted(() => ({
-  create: vi.fn(),
-  mutate: vi.fn(),
-  find: vi.fn(),
-  page: vi.fn(),
-  profile: vi.fn(),
-  rate: vi.fn(),
-}));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { getSession: async () => state.user },
-}));
-vi.mock("@nexus/db", () => ({
-  authorContentRepository: {
-    findAuthored: mocks.find,
-    mutate: mocks.mutate,
-    pageByAuthor: mocks.page,
-  },
-  contentRepository: { createWithAudit: mocks.create },
-  userRepository: { updatePublicProfile: mocks.profile },
-}));
-vi.mock("@nexus/security", () => ({
-  consumeRateLimit: mocks.rate,
-  generateId: (prefix: string) => `${prefix}_generated`,
-}));
+vi.mock("../apps/web/src/lib/services/auth-service", async () => {
+  const { createUserPlatformHttpAuthMock } = await import("./helpers/user-platform-http-harness");
+  return createUserPlatformHttpAuthMock();
+});
+vi.mock("@nexus/db", async () => {
+  const { createUserPlatformHttpDbMock } = await import("./helpers/user-platform-http-harness");
+  return createUserPlatformHttpDbMock();
+});
+vi.mock("@nexus/security", async () => {
+  const { createUserPlatformHttpSecurityMock } = await import(
+    "./helpers/user-platform-http-harness"
+  );
+  return createUserPlatformHttpSecurityMock();
+});
 
-import {
-  GET as profileGet,
-  PATCH as profilePatch,
-} from "../apps/web/src/app/api/account/profile/route";
 import {
   DELETE as archive,
   GET as get,
   PATCH as update,
 } from "../apps/web/src/app/api/workspace/content/[id]/route";
 import { POST as create, GET as list } from "../apps/web/src/app/api/workspace/content/route";
-import { userPlatformError } from "../apps/web/src/lib/user-platform-copy";
-import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+import {
+  installUserPlatformHttpHooks,
+  userPlatformHttpContext as context,
+  userPlatformHttpInput as input,
+  userPlatformHttpMocks as mocks,
+  userPlatformHttpNow as now,
+  userPlatformHttpState as state,
+} from "./helpers/user-platform-http-harness";
 
-const context = { params: Promise.resolve({ id: "cnt_author" }) };
-const input = {
-  title: "Author publication",
-  slug: "author-publication",
-  body: "A complete publication body.",
-  type: "article",
-  tags: [],
-  excerpt: "",
-  coverImageUrl: "",
-};
 function request(method: string, body?: unknown, locale = "en", headers = {}) {
   return new NextRequest("http://nexus.test/api/workspace/content?page=2&q=hello&status=draft", {
     method,
@@ -64,62 +45,9 @@ function request(method: string, body?: unknown, locale = "en", headers = {}) {
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 }
-beforeEach(() => {
-  vi.clearAllMocks();
-  stubBrowserMutationOrigin();
-  state.user = {
-    id: "usr_author",
-    username: "author",
-    displayName: "Writer",
-    updatedAt: now,
-    role: "user",
-    email: "private@example.test",
-    passwordHash: "secret",
-    isVerified: false,
-  };
-  mocks.rate.mockResolvedValue({ success: true });
-  mocks.create.mockImplementation(async (data) => ({ ...data, createdAt: now, updatedAt: now }));
-  mocks.find.mockResolvedValue({
-    ...input,
-    id: "cnt_author",
-    status: "draft",
-    authorId: "usr_author",
-    updatedAt: now,
-  });
-  mocks.mutate.mockImplementation(async (id, authorId, _date, _status, fields) => ({
-    ...input,
-    ...fields,
-    id,
-    authorId,
-    status: fields ? "draft" : "archived",
-    updatedAt: new Date(now.getTime() + 1),
-  }));
-  mocks.page.mockResolvedValue({ items: [], page: 2, hasMore: false });
-  mocks.profile.mockImplementation(async (_id, _date, fields) => ({
-    ...state.user,
-    ...fields,
-    updatedAt: new Date(now.getTime() + 1),
-  }));
-});
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
-it.each(["en", "ru"])("uses private cache and a safe account projection in %s", async (locale) => {
-  const response = await profileGet(request("GET", undefined, locale));
-  expect(response.status).toBe(200);
-  expect(response.headers.get("cache-control")).toBe("private, no-store");
-  expect(response.headers.get("vary")).toBe("Cookie");
-  expect(await response.json()).toEqual({
-    profile: {
-      id: "usr_author",
-      username: "author",
-      displayName: "Writer",
-      bio: "",
-      avatarUrl: "",
-      updatedAt: now.toISOString(),
-    },
-  });
-});
+
+installUserPlatformHttpHooks();
+
 it("localizes unauthenticated failures and performs no writes", async () => {
   state.user = null;
   const response = await create(request("POST", input, "ru"));
@@ -244,85 +172,6 @@ it.each(["CONFLICT", "CONTENT_ARCHIVED", "FORBIDDEN"])(
     expect(await response.json()).toMatchObject({ code });
   },
 );
-it("allows only the editable profile fields and the session account", async () => {
-  const fields = {
-    displayName: "New name",
-    bio: "New bio",
-    avatarUrl: "https://images.example.test/avatar.png",
-    expectedActorId: "usr_author",
-    expectedUpdatedAt: now.toISOString(),
-  };
-  const response = await profilePatch(request("PATCH", fields));
-  expect(response.status).toBe(200);
-  expect(mocks.profile).toHaveBeenCalledWith(
-    "usr_author",
-    now,
-    {
-      displayName: fields.displayName,
-      bio: fields.bio,
-      avatarUrl: fields.avatarUrl,
-    },
-    "aud_generated",
-    "test",
-  );
-  const data = await response.json();
-  expect(data.profile).toMatchObject({ displayName: "New name", bio: "New bio" });
-  expect(data.profile).not.toHaveProperty("email");
-  expect(data.profile).not.toHaveProperty("passwordHash");
-  expect((await profilePatch(request("PATCH", { ...fields, role: "admin" }))).status).toBe(422);
-});
-it("returns a conflict when profile version no longer matches", async () => {
-  mocks.profile.mockResolvedValue(null);
-  const response = await profilePatch(
-    request("PATCH", {
-      displayName: "Writer",
-      bio: "",
-      avatarUrl: "",
-      expectedActorId: "usr_author",
-      expectedUpdatedAt: now.toISOString(),
-    }),
-  );
-  expect(response.status).toBe(409);
-  expect(await response.json()).toMatchObject({ code: "CONFLICT" });
-});
-it.each(["en", "ru"])(
-  "rejects a switched account even when profile versions match in %s",
-  async (locale) => {
-    const original = await profileGet(request("GET", undefined, locale));
-    const { profile } = await original.json();
-    state.user = { ...state.user, id: "usr_other", username: "other", updatedAt: now };
-    const response = await profilePatch(
-      request(
-        "PATCH",
-        {
-          displayName: "Draft from first account",
-          bio: "",
-          avatarUrl: "",
-          expectedActorId: profile.id,
-          expectedUpdatedAt: profile.updatedAt,
-        },
-        locale,
-      ),
-    );
-    expect(response.status).toBe(409);
-    const body = await response.json();
-    expect(body.code).toBe("ACCOUNT_CHANGED");
-    expect(body.error).toBe(userPlatformError(locale as "en" | "ru", "ACCOUNT_CHANGED"));
-    expect(mocks.profile).not.toHaveBeenCalled();
-  },
-);
-it("fails closed for old clients without the account precondition", async () => {
-  const response = await profilePatch(
-    request("PATCH", {
-      displayName: "Draft",
-      bio: "",
-      avatarUrl: "",
-      expectedUpdatedAt: now.toISOString(),
-    }),
-  );
-  expect(response.status).toBe(422);
-  expect(mocks.profile).not.toHaveBeenCalled();
-});
 it("enforces rates before reading or writing publication data", async () => {
   mocks.rate.mockResolvedValue({ success: false });
   expect((await create(request("POST", input))).status).toBe(429);
