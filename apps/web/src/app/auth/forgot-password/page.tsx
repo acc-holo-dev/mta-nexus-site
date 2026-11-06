@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
         </form>
 
         {notice?.error ? (
-          <ErrorState title={notice.text} />
+          <ErrorState id="forgot-password-notice-unavailable" title={notice.text} />
         ) : notice ? (
           <p
             role="status"
