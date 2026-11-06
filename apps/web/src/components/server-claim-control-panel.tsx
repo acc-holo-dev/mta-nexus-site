@@ -440,7 +440,7 @@ export function ServerClaimControlPanel({
         </div>
       )}
 
-      {error ? <ErrorState title={error} /> : null}
+      {error ? <ErrorState id="server-claim-control-panel-unavailable" title={error} /> : null}
 
       <p className="text-[10px] leading-relaxed text-faint">{copy.exactEndpoint}</p>
     </section>
