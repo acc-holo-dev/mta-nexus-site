@@ -6,10 +6,13 @@ import { notFound } from "next/navigation";
 import { PlatformSignIn } from "../../../../../../components/platform-sign-in";
 import { ResourceReleaseWatchBatchControls } from "../../../../../../components/resource-release-watch-batch-controls";
 import { ResourceReleaseWatchControl } from "../../../../../../components/resource-release-watch-control";
+import { collectionReleasesCopy } from "../../../../../../lib/collection-releases-i18n";
 import { getDictionary } from "../../../../../../lib/i18n";
 import { getRequestLocale } from "../../../../../../lib/i18n-server";
-import { collectionReleasesCopy } from "../../../../../../lib/collection-releases-i18n";
-import { collectionHref, collectionPageParams } from "../../../../../../lib/library-collections-query";
+import {
+  collectionHref,
+  collectionPageParams,
+} from "../../../../../../lib/library-collections-query";
 import { getResourceReleaseControlCopy } from "../../../../../../lib/resource-release-control-i18n";
 import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
 import { resourceReleaseWatchesCopy } from "../../../../../../lib/resource-release-watches-i18n";
@@ -193,10 +196,7 @@ export default async function Page({
               />
               <div className="flex flex-wrap gap-4">
                 {item.slug ? (
-                  <Link
-                    href={`/market/${encodeURIComponent(item.slug)}`}
-                    className={navLinkClass}
-                  >
+                  <Link href={`/market/${encodeURIComponent(item.slug)}`} className={navLinkClass}>
                     {getResourceReleaseControlCopy(locale).open}
                   </Link>
                 ) : null}

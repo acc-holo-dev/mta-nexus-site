@@ -102,16 +102,10 @@ export default async function Page({
         <p className="text-sm text-secondary">{v.watchNote}</p>
         {report.collectionId ? (
           <nav className="flex flex-wrap gap-4" aria-label={v.collection}>
-            <Link
-              href={collectionHref(report.collectionId, "releases")}
-              className={navLinkClass}
-            >
+            <Link href={collectionHref(report.collectionId, "releases")} className={navLinkClass}>
               {v.collectionReleases}
             </Link>
-            <Link
-              href={collectionHref(report.collectionId, "watches")}
-              className={navLinkClass}
-            >
+            <Link href={collectionHref(report.collectionId, "watches")} className={navLinkClass}>
               {v.collectionWatches}
             </Link>
           </nav>

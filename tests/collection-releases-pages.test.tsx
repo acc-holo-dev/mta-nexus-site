@@ -37,11 +37,7 @@ vi.mock("../apps/web/src/components/library-release-follow-latest", () => ({
   ),
 }));
 vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
-  ResourceReleaseWatchControl: ({
-    watch,
-  }: {
-    watch: { productId: string; enabled: boolean };
-  }) => (
+  ResourceReleaseWatchControl: ({ watch }: { watch: { productId: string; enabled: boolean } }) => (
     <button type="button" data-watch={watch.productId} data-enabled={String(watch.enabled)}>
       Watch
     </button>

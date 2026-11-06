@@ -1,35 +1,36 @@
-import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
   RESOURCE_RELEASE_WATCH_LIMIT,
-  type ResourceReleaseWatchEnableCommand,
-  type ResourceReleaseWatchResumeCommand,
   type ResourceReleaseWatchBatchResult,
+  type ResourceReleaseWatchEnableCommand,
   type ResourceReleaseWatchFilter,
+  type ResourceReleaseWatchResumeCommand,
 } from "@nexus/domain";
 import {
   libraryCollectionIdSchema,
   resourceReleaseWatchEnableCommandSchema,
   resourceReleaseWatchResumeCommandSchema,
 } from "@nexus/validation";
+import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   builds,
   libraryCollections as collections,
+  resourceReleaseEvents as events,
   libraryCollectionItems as members,
   products,
-  resourceReleaseEvents as events,
-  resourceReleaseWatches as watches,
   users,
+  resourceReleaseWatches as watches,
 } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
-import { effectiveUserDownloadSources } from "./user-library";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
-import { containsPattern } from "./search-pattern";
 import { historyPageBounds } from "./history-pagination";
 import { lockInitiatingSession } from "./initiating-session";
+import { containsPattern } from "./search-pattern";
+import { effectiveUserDownloadSources } from "./user-library";
+
 const fail = (code = "RELEASE_WATCH_BATCH_CONFLICT") =>
   new AppError("Collection watches changed or are unavailable", 409, code);
 const collectionFields = {
@@ -131,7 +132,8 @@ export async function readCollectionReleaseWatches(
           updatedAt: row.updatedAt ? new Date(row.updatedAt) : null,
           available: row.available,
           title: row.available ? row.title : null,
-          slug: row.available && typeof row.slug === "string" && row.slug.length > 0 ? row.slug : null,
+          slug:
+            row.available && typeof row.slug === "string" && row.slug.length > 0 ? row.slug : null,
         })),
         counts,
         activeWatchCount: summary?.activeWatchCount ?? 0,
