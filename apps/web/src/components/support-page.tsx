@@ -57,6 +57,7 @@ export async function SupportPageSurface({
     return (
       <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
         <ErrorState
+          id="support-forbidden"
           title={copy.forbidden}
           action={
             <Link
