@@ -112,7 +112,13 @@ export function SubscriptionFeeEstimator({
       <Button type="submit" variant="outline" isLoading={busy} className="min-h-11">
         {busy ? c.busy : c.calculate}
       </Button>
-      {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
+      {error ? (
+        <ErrorState
+          id="subscription-fee-estimator-unavailable"
+          title={error}
+          description={c.formErrorHint}
+        />
+      ) : null}
       {result && (
         <output className="block space-y-2">
           <p>
