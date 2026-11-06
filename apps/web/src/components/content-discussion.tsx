@@ -723,6 +723,7 @@ export function ContentDiscussion({
       ) : null}
       {readError ? (
         <ErrorState
+          id="discussion-read-unavailable"
           title={readError}
           description={readError === copy.unavailable ? copy.unavailableDescription : undefined}
           action={
