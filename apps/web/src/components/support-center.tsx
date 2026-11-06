@@ -430,6 +430,7 @@ export function SupportCenter({
 
       {formError ? (
         <ErrorState
+          id="support-center-form-unavailable"
           title={formError}
           action={
             <Button
