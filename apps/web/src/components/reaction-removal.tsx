@@ -126,7 +126,9 @@ export function ReactionRemoval({
           {phase === "saving" ? copy.saving : copy.remove}
         </Button>
       )}
-      {message && phase === "blocked" ? <ErrorState title={message} /> : null}
+      {message && phase === "blocked" ? (
+        <ErrorState id="reaction-removal-unavailable" title={message} />
+      ) : null}
       {message && phase !== "blocked" ? (
         <p role="status" className="text-xs text-success">
           {message}
