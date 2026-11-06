@@ -1,3 +1,4 @@
+import { followWorkspaceRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Avatar } from "@nexus/ui";
@@ -79,7 +80,10 @@ export default async function ArticleDetailPage({
   }
   const filters = parseDiscussionQuery(discussionParams);
   let discussionFailure = filters ? "" : discussionError(locale, "INVALID_CURSOR");
-  const [author, discussion, viewer] = await Promise.all([
+  const viewer = await authService
+    .getSession((await cookies()).get("nexus_session")?.value)
+    .catch(() => null);
+  const [author, discussion, contentFollow, contentMute, reactions] = await Promise.all([
     authService.getUserById(article.authorId),
     filters
       ? (filters.query || filters.focusId
@@ -96,10 +100,35 @@ export default async function ArticleDetailPage({
           return null;
         })
       : null,
-    authService.getSession((await cookies()).get("nexus_session")?.value).catch(() => null),
+    viewer
+      ? followWorkspaceRepository.contentStates(viewer.id, [article.id]).catch(() => null)
+      : Promise.resolve(null),
+    viewer
+      ? followWorkspaceRepository.muteState(viewer.id, "content", article.id).catch(() => null)
+      : Promise.resolve(null),
+    contentReactionService.state(article.slug, viewer?.id).catch(() => null),
   ]);
+  const followRow = Array.isArray(contentFollow)
+    ? (contentFollow.find((row) => row.targetId === article.id) ?? null)
+    : null;
+  const followInitial = viewer
+    ? {
+        authenticated: true,
+        actorId: viewer.id,
+        following: Boolean(followRow),
+        notifyComments: followRow?.notifyComments === true,
+        muted: Boolean(followRow?.mutedUntil ?? contentMute?.mutedUntil),
+        mutedUntil: followRow?.mutedUntil ?? contentMute?.mutedUntil ?? null,
+        ...(contentFollow === null || (!followRow && contentMute === null) ? { error: true } : {}),
+      }
+    : {
+        authenticated: false,
+        following: false,
+        notifyComments: false,
+        muted: false,
+        mutedUntil: null,
+      };
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
-  const reactions = await contentReactionService.state(article.slug, viewer?.id).catch(() => null);
   const formattedDate = new Date(article.createdAt).toLocaleDateString(dateLocale, {
     month: "long",
     day: "numeric",
@@ -208,6 +237,7 @@ export default async function ArticleDetailPage({
         locale={locale}
         count={article.commentCount}
         initial={discussion}
+        followInitial={followInitial}
         initialQuery={filters?.query}
         initialFocus={filters?.focusId}
         initialError={discussionFailure}
