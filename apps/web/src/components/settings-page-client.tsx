@@ -527,6 +527,7 @@ export function SettingsPageClient() {
           <p className="mt-1 font-caption text-muted">{copy.description}</p>
         </header>
         <ErrorState
+          id="settings-page-client-unavailable"
           title={notice?.text ?? copy.loadFailed}
           action={
             <Button
