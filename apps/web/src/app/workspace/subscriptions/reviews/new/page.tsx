@@ -49,6 +49,7 @@ export default async function NewPlanReview({
       return (
         <section className={pageShellClass}>
           <ErrorState
+            id="subscription-review-new-plan-changed"
             title={c.planChanged}
             description={c.selectionRecoverHint}
             action={
