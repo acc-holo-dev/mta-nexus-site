@@ -58,11 +58,26 @@ describe("organization governance persistence: ownership transfer", () => {
           eq(notifications.title, "Organization access changed"),
         ),
       );
+    const orgName = f.org.name;
     expect(notices.map((notice) => notice.message)).toEqual(
       expect.arrayContaining([
-        `Organization ${f.org.id}: ownership_gained.`,
-        `Organization ${f.org.id}: ownership_transferred.`,
+        `Organization ownership was transferred to you. (${orgName})`,
+        `You transferred organization ownership. (${orgName})`,
       ]),
     );
+    expect(notices.every((notice) => !String(notice.message).includes(f.org.id))).toBe(true);
+    expect(
+      notices
+        .map((notice) => notice.data)
+        .every(
+          (data) =>
+            data &&
+            typeof data === "object" &&
+            "kind" in data &&
+            data.kind === "organization_access" &&
+            "organizationName" in data &&
+            data.organizationName === orgName,
+        ),
+    ).toBe(true);
   });
 });

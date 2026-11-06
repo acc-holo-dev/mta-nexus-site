@@ -35,7 +35,7 @@ describe("organization governance persistence: history access", () => {
       .where(
         and(
           eq(notifications.recipientId, f.target.id),
-          eq(notifications.message, `Organization ${f.org.id}: removed.`),
+          eq(notifications.message, `Your team access was revoked. (${f.org.name})`),
         ),
       );
     expect(notice.link).toBe(`/organizations/${f.org.slug}`);

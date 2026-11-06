@@ -102,12 +102,7 @@ export function formatNotification(
       message:
         locale === "ru" ? "Пользователь добавил сообщение в обращение." : notification.message,
     };
-  const organizationAccess =
-    notification.title === "Organization access changed" &&
-    /^Organization ([a-zA-Z0-9_-]{1,128}): (added|updated|removed|left|ownership_gained|ownership_transferred)\.$/u.exec(
-      notification.message,
-    );
-  if (organizationAccess) {
+  const organizationAccessMessages = (event: string): string | undefined => {
     const messages: Record<string, string> =
       locale === "ru"
         ? {
@@ -126,10 +121,36 @@ export function formatNotification(
             ownership_gained: "Organization ownership was transferred to you.",
             ownership_transferred: "You transferred organization ownership.",
           };
-    return {
-      title: locale === "ru" ? "Доступ к организации изменён" : notification.title,
-      message: messages[organizationAccess[2]],
-    };
+    return messages[event];
+  };
+  const organizationAccessData =
+    notification.data?.kind === "organization_access" ? notification.data : null;
+  if (organizationAccessData) {
+    const base = organizationAccessMessages(organizationAccessData.event);
+    if (base) {
+      const name =
+        typeof organizationAccessData.organizationName === "string"
+          ? organizationAccessData.organizationName.trim().slice(0, 200)
+          : "";
+      return {
+        title: locale === "ru" ? "Доступ к организации изменён" : "Organization access changed",
+        message: name ? `${base} (${name})` : base,
+      };
+    }
+  }
+  const organizationAccess =
+    notification.title === "Organization access changed" &&
+    /^Organization ([a-zA-Z0-9_-]{1,128}): (added|updated|removed|left|ownership_gained|ownership_transferred)\.$/u.exec(
+      notification.message,
+    );
+  if (organizationAccess) {
+    const message = organizationAccessMessages(organizationAccess[2]);
+    if (message) {
+      return {
+        title: locale === "ru" ? "Доступ к организации изменён" : notification.title,
+        message,
+      };
+    }
   }
   const serverOwnership = /^Server ownership verification was (approved|rejected)\.$/u.exec(
     notification.message,

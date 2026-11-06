@@ -471,11 +471,28 @@ export interface BuildLifecycleNotificationData {
   buildId: string;
 }
 
+export type OrganizationAccessChange =
+  | "added"
+  | "updated"
+  | "removed"
+  | "left"
+  | "ownership_gained"
+  | "ownership_transferred";
+
+export interface OrganizationAccessNotificationData {
+  kind: "organization_access";
+  event: OrganizationAccessChange;
+  organizationId: string;
+  organizationName: string;
+  organizationSlug: string;
+}
+
 export interface Notification {
   data?:
     | BuildReviewNotificationData
     | BuildIncidentNotificationData
     | BuildLifecycleNotificationData
+    | OrganizationAccessNotificationData
     | import("./license-maintenance").LicenseTermNotificationData
     | import("./resource-release-watches").ResourceReleaseNoticeData
     | DiscussionPushNotificationData
