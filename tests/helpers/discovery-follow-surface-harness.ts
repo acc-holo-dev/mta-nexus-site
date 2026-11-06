@@ -7,12 +7,14 @@ export const discoveryFollowSurfaceMocks = {
   directory: vi.fn(),
   viewer: vi.fn(),
   states: vi.fn(),
+  muteStates: vi.fn(),
 };
 
 function resetDiscoveryFollowSurfaceMocks() {
   vi.clearAllMocks();
   discoveryFollowSurfaceMocks.viewer.mockResolvedValue(null);
   discoveryFollowSurfaceMocks.states.mockResolvedValue([]);
+  discoveryFollowSurfaceMocks.muteStates.mockResolvedValue([]);
   discoveryFollowSurfaceMocks.page.mockResolvedValue({
     type: "creators",
     items: [],

@@ -104,13 +104,9 @@ function FollowControl({
     };
   }, []);
   useEffect(() => {
-    // Skip only when SSR already hydrated follow identity and mute together.
-    if (
-      initial &&
-      attempt === 0 &&
-      (!initial.authenticated || (initial.actorId && hasMuteHydration(initial)))
-    )
-      return;
+    // Skip follow-state fetch when SSR already hydrated identity. Mute may still
+    // load via ObjectMuteControls when initial mute fields are absent.
+    if (initial && attempt === 0 && (!initial.authenticated || initial.actorId)) return;
     let active = true;
     const controller = new AbortController();
     writeBlocked.current = true;

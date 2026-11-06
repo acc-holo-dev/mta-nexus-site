@@ -9,7 +9,12 @@ const sources = vi.hoisted(() => ({
   directory: vi.fn(),
   locale: "en" as "en" | "ru",
 }));
-vi.mock("@nexus/db", () => ({ followWorkspaceRepository: { states: vi.fn() } }));
+vi.mock("@nexus/db", () => ({
+  followWorkspaceRepository: {
+    states: vi.fn(async () => []),
+    muteStates: vi.fn(async () => []),
+  },
+}));
 vi.mock("next/link", async () => {
   const ReactModule = await import("react");
   return {

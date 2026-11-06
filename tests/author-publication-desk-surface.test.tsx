@@ -337,6 +337,7 @@ it("links available noncommercial follows to their own feeds while unavailable t
     image: null,
     verified: false,
     createdAt: revision,
+    mutedUntil: null,
     href:
       targetType === "product"
         ? "/market/product"

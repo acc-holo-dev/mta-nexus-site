@@ -85,14 +85,14 @@ export default async function ServerDetailPage({
 
   let reportViewer: { id: string } | null = null;
   let claimViewer: { id: string } | null | undefined;
+  const claimable = !server.organizationId && !server.ownerId && !server.isVerified;
   try {
     const store = await getRequestCookieStore();
     reportViewer = await authService.getSession(store.get("nexus_session")?.value);
+    if (claimable) claimViewer = reportViewer;
   } catch {
     reportViewer = null;
-  }
-  if (!server.organizationId && !server.ownerId && !server.isVerified) {
-    claimViewer = reportViewer;
+    if (claimable) claimViewer = undefined;
   }
   const serverReturnPath = `/servers/${encodeURIComponent(server.slug)}`;
 
