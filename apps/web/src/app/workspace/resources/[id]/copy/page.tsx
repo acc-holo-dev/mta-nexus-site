@@ -84,6 +84,7 @@ export default async function ResourceCopyPage({
           {c.back}
         </Link>
         <ErrorState
+          id="workspace-resource-copy-unavailable"
           title={c.loadUnavailable}
           action={
             <Link href={returnPath} className={navLinkClass}>
