@@ -57,6 +57,7 @@ export default async function ManagedServersPage({
     return (
       <div className={pageShellClass}>
         <ErrorState
+          id="workspace-servers-unavailable"
           title={workspace.unavailable}
           action={
             <Link href={managedServerHref(filters, page)} className={navLinkClass}>
