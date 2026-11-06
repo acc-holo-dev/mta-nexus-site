@@ -42,6 +42,7 @@ function LicenseHistoryLoadError({
         {backLabel}
       </Link>
       <ErrorState
+        id="license-history-unavailable"
         title={copy.loadUnavailable}
         action={
           <Link href={retryHref} className={navLinkClass}>
