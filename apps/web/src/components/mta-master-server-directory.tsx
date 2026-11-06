@@ -258,6 +258,10 @@ export function MtaMasterServerDirectory({
                 copy.updateUnknown
               )}
             </p>
+          ) : error ? (
+            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
+              {copy.unavailable}
+            </p>
           ) : (
             <ErrorState id="mta-master-directory-unavailable" title={copy.unavailable} />
           )}
