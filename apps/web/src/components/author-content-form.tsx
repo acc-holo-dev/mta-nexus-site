@@ -303,7 +303,7 @@ export function AuthorContentForm({
       )}
       {notice?.error ? (
         <div className="space-y-2">
-          <ErrorState title={notice.text} />
+          <ErrorState id="author-content-form-notice-unavailable" title={notice.text} />
           {saved && (
             <Button
               type="button"
