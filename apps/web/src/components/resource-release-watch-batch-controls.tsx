@@ -258,7 +258,13 @@ export function ResourceReleaseWatchBatchControls({
           </Button>
         </div>
       )}
-      {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
+      {error ? (
+        <ErrorState
+          id="resource-release-watch-batch-unavailable"
+          title={error}
+          description={copy.failedDescription}
+        />
+      ) : null}
       {saved && (
         <p role="status" className="text-sm text-success">
           {copy.saved}
