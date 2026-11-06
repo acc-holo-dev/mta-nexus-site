@@ -122,6 +122,7 @@ export default async function AdminPage({
     return (
       <div className="min-w-0 space-y-6 overflow-x-clip">
         <ErrorState
+          id="admin-hub-unavailable"
           title={copy.hubUnavailable}
           action={
             <Link
