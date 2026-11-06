@@ -70,6 +70,7 @@ export default async function Page({
             {c.title}
           </Link>
           <ErrorState
+            id="library-collection-resources-load-unavailable"
             title={v.loadUnavailable}
             action={
               <Link
