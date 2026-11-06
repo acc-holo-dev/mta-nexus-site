@@ -78,6 +78,7 @@ export default async function Page({
       return (
         <div className={pageShellClass}>
           <ErrorState
+            id="library-collections-history-load-unavailable"
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}
             action={
