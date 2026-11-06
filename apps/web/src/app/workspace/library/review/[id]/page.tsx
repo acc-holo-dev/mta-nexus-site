@@ -43,6 +43,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           {copy.back}
         </Link>
         <ErrorState
+          id="library-review-page-unavailable"
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
           action={
