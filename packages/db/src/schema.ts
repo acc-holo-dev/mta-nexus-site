@@ -14,6 +14,7 @@ import {
   type ContentReactionNotificationData,
   type OrganizationAccessNotificationData,
   type PublicationActivityNotificationData,
+  type SupportRequesterNotificationData,
   type CommercialPlanStatus,
   type CommercialPlanTerms,
   type LicenseTermNotificationData,
@@ -1420,6 +1421,7 @@ export const notifications = pgTable(
       | OrganizationAccessNotificationData
       | PublicationActivityNotificationData
       | ContentReactionNotificationData
+      | SupportRequesterNotificationData
       | LicenseTermNotificationData
       | ResourceReleaseNoticeData
       | import("@nexus/domain").DiscussionPushNotificationData

@@ -504,6 +504,15 @@ export interface ContentReactionNotificationData {
   contentSlug: string;
 }
 
+export type SupportRequesterActivityEvent = "reply" | "open" | "resolved" | "closed";
+
+export interface SupportRequesterNotificationData {
+  kind: "support_requester";
+  event: SupportRequesterActivityEvent;
+  caseId: string;
+  subject: string;
+}
+
 export interface Notification {
   data?:
     | BuildReviewNotificationData
@@ -512,6 +521,7 @@ export interface Notification {
     | OrganizationAccessNotificationData
     | PublicationActivityNotificationData
     | ContentReactionNotificationData
+    | SupportRequesterNotificationData
     | import("./license-maintenance").LicenseTermNotificationData
     | import("./resource-release-watches").ResourceReleaseNoticeData
     | DiscussionPushNotificationData

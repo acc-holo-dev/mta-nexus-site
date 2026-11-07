@@ -124,7 +124,18 @@ it("persists requester resolution/reopening, private status history and generic 
     .from(notifications)
     .where(eq(notifications.recipientId, f.owner.id));
   expect(inbox).toHaveLength(2);
-  expect(inbox.every((item) => !item.message.includes("Private support"))).toBe(true);
+  expect(inbox.every((item) => !item.message.includes(f.supportCase.id))).toBe(true);
+  expect(
+    inbox.every(
+      (item) =>
+        item.data &&
+        typeof item.data === "object" &&
+        "kind" in item.data &&
+        item.data.kind === "support_requester" &&
+        "subject" in item.data &&
+        item.data.subject === f.supportCase.subject,
+    ),
+  ).toBe(true);
 });
 it("respects staff closure and live role revocation for status, history and replies", async () => {
   const f = await fixture();
@@ -255,7 +266,7 @@ it("replays an authorized committed reply after closure without duplicating mess
     .where(
       and(
         eq(notifications.recipientId, f.owner.id),
-        eq(notifications.message, `Support case ${f.supportCase.id}: reply.`),
+        eq(notifications.message, `Support replied to your case. (${f.supportCase.subject})`),
       ),
     );
   expect(notices).toHaveLength(1);

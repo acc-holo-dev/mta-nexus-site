@@ -92,10 +92,7 @@ export function formatNotification(
       };
     }
   }
-  const supportActivity =
-    notification.title === "Support case activity" &&
-    /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(notification.message);
-  if (supportActivity) {
+  const supportActivityMessages = (event: string): string | undefined => {
     const messages: Record<string, string> =
       locale === "ru"
         ? {
@@ -110,10 +107,32 @@ export function formatNotification(
             resolved: "Your case was marked as resolved.",
             closed: "Support closed your case.",
           };
-    return {
-      title: locale === "ru" ? "Обновление обращения" : "Support case activity",
-      message: messages[supportActivity[2]],
-    };
+    return messages[event];
+  };
+  if (notification.data?.kind === "support_requester") {
+    const base = supportActivityMessages(notification.data.event);
+    if (base) {
+      const subject =
+        typeof notification.data.subject === "string"
+          ? notification.data.subject.trim().slice(0, 200)
+          : "";
+      return {
+        title: locale === "ru" ? "Обновление обращения" : "Support case activity",
+        message: subject ? `${base} (${subject})` : base,
+      };
+    }
+  }
+  const supportActivity =
+    notification.title === "Support case activity" &&
+    /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(notification.message);
+  if (supportActivity) {
+    const message = supportActivityMessages(supportActivity[2]);
+    if (message) {
+      return {
+        title: locale === "ru" ? "Обновление обращения" : "Support case activity",
+        message,
+      };
+    }
   }
   if (
     notification.title === "New support case" &&

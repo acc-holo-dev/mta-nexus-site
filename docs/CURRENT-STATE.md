@@ -27,6 +27,7 @@
 - Public entity follow/mute: server / user / developer / organization profiles SSR-hydrate FollowButton initial (same honesty as discovery/product Save).
 - Organization access notices: structured `data.kind = organization_access` with org name; stored/push copy no longer embeds raw org ids (legacy regex path retained).
 - Publication activity and reaction notices: structured `publication_activity` / `content_reaction` data with titles; stored/push copy no longer embeds raw content ids (legacy regex path retained).
+- Support requester notices: structured `data.kind = support_requester` with case subject; stored/push copy no longer embeds raw case ids (legacy regex path retained).
 - CI: main больше не отменяет in-flight full_acceptance; docs-only tip push не форсирует full scope.
 - Open free beta copy на public/legal/support/commerce; paid surfaces остаются disabled.
 - Auth chrome: full shell на `/auth`; logout → `/auth/login`.

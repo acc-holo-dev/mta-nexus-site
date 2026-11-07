@@ -516,6 +516,7 @@ class OrderCasesRepository {
         .returning({
           id: supportCases.id,
           requesterId: supportCases.requesterId,
+          subject: supportCases.subject,
           updatedAt: supportCases.updatedAt,
         });
       if (!updatedTicket) throw conflict("ORDER_CASE_REVISION_CONFLICT");
