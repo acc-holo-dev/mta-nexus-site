@@ -281,9 +281,19 @@ it("records access notices in the same transaction for team changes and uses saf
     "unit-token",
   );
   const notice = writes("notifications")[0];
-  expect(notice.params).toContain("Organization org: added.");
+  expect(notice.params).toContain("You were added to the team. (Team)");
+  expect(notice.params.join(" ")).not.toMatch(/Organization org:/u);
   expect(notice.params).toContain("/workspace/organizations/org");
   expect(notice.params.join(" ")).not.toContain("permissions");
+  expect(notice.params).toContain(
+    JSON.stringify({
+      kind: "organization_access",
+      event: "added",
+      organizationId: "org",
+      organizationName: "Team",
+      organizationSlug: "team",
+    }),
+  );
 });
 it.each(["removed", "left"] as const)(
   "uses a public organization link and a bounded deterministic notice ID for %s",
@@ -292,7 +302,7 @@ it.each(["removed", "left"] as const)(
     await db.transaction((tx) =>
       storeOrganizationAccessNotice(
         tx,
-        { id: "org", slug: "team" },
+        { id: "org", slug: "team", name: "Team" },
         target,
         change,
         "a".repeat(128),
@@ -308,7 +318,7 @@ it.each(["removed", "left"] as const)(
     await db.transaction((tx) =>
       storeOrganizationAccessNotice(
         tx,
-        { id: "org", slug: "team" },
+        { id: "org", slug: "team", name: "Team" },
         target,
         change,
         "a".repeat(128),

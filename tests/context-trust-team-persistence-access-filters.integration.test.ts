@@ -93,6 +93,17 @@ describe("context trust team persistence: access filters", () => {
       .select()
       .from(notifications)
       .where(eq(notifications.recipientId, reader.id));
-    expect(notice.some((row) => row.message === `Organization ${org.id}: updated.`)).toBe(true);
+    expect(
+      notice.some(
+        (row) =>
+          row.message === `Your role or delegated access changed. (${org.name})` ||
+          (row.data &&
+            typeof row.data === "object" &&
+            "kind" in row.data &&
+            row.data.kind === "organization_access" &&
+            "event" in row.data &&
+            row.data.event === "updated"),
+      ),
+    ).toBe(true);
   });
 });

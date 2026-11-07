@@ -11,6 +11,7 @@ import {
   type BuildLifecycleNotificationData,
   type BuildPackageEvidence,
   type BuildReviewNotificationData,
+  type OrganizationAccessNotificationData,
   type CommercialPlanStatus,
   type CommercialPlanTerms,
   type LicenseTermNotificationData,
@@ -1414,6 +1415,7 @@ export const notifications = pgTable(
       | BuildReviewNotificationData
       | BuildIncidentNotificationData
       | BuildLifecycleNotificationData
+      | OrganizationAccessNotificationData
       | LicenseTermNotificationData
       | ResourceReleaseNoticeData
       | import("@nexus/domain").DiscussionPushNotificationData

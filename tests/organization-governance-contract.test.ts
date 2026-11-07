@@ -75,8 +75,8 @@ it.each(["ru", "en"] as const)(
       "left",
       "ownership_gained",
       "ownership_transferred",
-    ]) {
-      const notice = formatNotification(
+    ] as const) {
+      const legacy = formatNotification(
         {
           title: "Organization access changed",
           message: `Organization org_1: ${action}.`,
@@ -85,8 +85,29 @@ it.each(["ru", "en"] as const)(
         { approved: "", rejected: "", notes: "", version: "" },
         locale,
       );
-      expect(notice.message).not.toContain("Organization org_1:");
-      expect(notice.message.length).toBeGreaterThan(5);
+      expect(legacy.message).not.toContain("Organization org_1:");
+      expect(legacy.message).not.toContain("org_1");
+      expect(legacy.message.length).toBeGreaterThan(5);
+      const structured = formatNotification(
+        {
+          title: "Organization access changed",
+          message: "stored",
+          data: {
+            kind: "organization_access",
+            event: action,
+            organizationId: "org_1",
+            organizationName: "Northwind",
+            organizationSlug: "northwind",
+          },
+        },
+        { approved: "", rejected: "", notes: "", version: "" },
+        locale,
+      );
+      expect(structured.message).toContain("Northwind");
+      expect(structured.message).not.toContain("org_1");
+      expect(structured.title.toLowerCase()).toContain(
+        locale === "ru" ? "организац" : "organization",
+      );
     }
   },
 );

@@ -32,7 +32,10 @@ describe("organization governance persistence: audit rollback", () => {
         .where(
           and(
             eq(notifications.recipientId, f.target.id),
-            eq(notifications.message, `Organization ${f.org.id}: ownership_gained.`),
+            eq(
+              notifications.message,
+              `Organization ownership was transferred to you. (${f.org.name})`,
+            ),
           ),
         ),
     ).toHaveLength(0);
