@@ -50,7 +50,7 @@ const command = {
 const writes = () => state.queries.filter((query) => /^(insert|delete|update)/u.test(query.sql));
 const fixture = (existing: unknown[][] = [], status = "published", author = "author") => {
   state.rows = [
-    [["content", "guide", status, "article", author]],
+    [["content", "guide", "Guide", status, "article", author]],
     [["actor"]],
     existing,
     [["👍", 1]],
